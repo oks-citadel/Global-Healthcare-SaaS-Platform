@@ -1,0 +1,139 @@
+# ============================================
+# UnifiedHealth Platform - CI/CD Docker Compose
+# Minimal configuration for CI/CD pipelines
+# ============================================
+
+version: '3.8'
+
+services:
+  # ==========================================
+  # API Service for Testing
+  # ==========================================
+  api:
+    build:
+      context: ./services/api
+      dockerfile: Dockerfile
+      target: builder
+      cache_from:
+        - unifiedhealth/api:latest
+    image: unifiedhealth/api:${GIT_SHA:-latest}
+    container_name: unifiedhealth-api-ci
+    environment:
+      - NODE_ENV=test
+      - PORT=8080
+      - DATABASE_URL=postgresql://unified_health:testpass@postgres:5432/unified_health_test
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - JWT_SECRET=test-jwt-secret
+      - LOG_LEVEL=error
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - ci-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    command: ["sh", "-c", "pnpm db:generate && pnpm db:migrate:prod && pnpm start"]
+
+  # ==========================================
+  # Web Service for Testing
+  # ==========================================
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+      target: builder
+      cache_from:
+        - unifiedhealth/web:latest
+    image: unifiedhealth/web:${GIT_SHA:-latest}
+    container_name: unifiedhealth-web-ci
+    environment:
+      - NODE_ENV=test
+      - NEXT_PUBLIC_API_URL=http://api:8080
+      - PORT=3000
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - ci-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  # ==========================================
+  # PostgreSQL for Testing
+  # ==========================================
+  postgres:
+    image: postgres:15-alpine
+    container_name: unifiedhealth-postgres-ci
+    environment:
+      POSTGRES_USER: unified_health
+      POSTGRES_PASSWORD: testpass
+      POSTGRES_DB: unified_health_test
+    networks:
+      - ci-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U unified_health -d unified_health_test"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    tmpfs:
+      - /var/lib/postgresql/data  # Use tmpfs for faster tests
+
+  # ==========================================
+  # Redis for Testing
+  # ==========================================
+  redis:
+    image: redis:7-alpine
+    container_name: unifiedhealth-redis-ci
+    networks:
+      - ci-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 3s
+    tmpfs:
+      - /data  # Use tmpfs for faster tests
+
+  # ==========================================
+  # Test Runner
+  # ==========================================
+  test:
+    build:
+      context: ./services/api
+      dockerfile: Dockerfile
+      target: builder
+    container_name: unifiedhealth-test-runner
+    environment:
+      - NODE_ENV=test
+      - DATABASE_URL=postgresql://unified_health:testpass@postgres:5432/unified_health_test
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - ci-network
+    command: ["pnpm", "test:coverage"]
+    volumes:
+      - ./coverage:/app/coverage
+
+networks:
+  ci-network:
+    driver: bridge
+
+# No volumes needed for CI - using ephemeral storage

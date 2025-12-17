@@ -1,0 +1,92 @@
+{
+  "title": "Tableau de bord",
+  "welcome": "Bon retour, {{name}}!",
+  "overview": "Aperçu",
+  "stats": {
+    "appointments": "Rendez-vous",
+    "patients": "Total des patients",
+    "doctors": "Professionnels de santé",
+    "revenue": "Revenus",
+    "upcomingAppointments": "Rendez-vous à venir",
+    "todayAppointments": "Rendez-vous d'aujourd'hui",
+    "pendingApprovals": "Approbations en attente",
+    "newPatients": "Nouveaux patients",
+    "occupancyRate": "Taux d'occupation",
+    "averageWaitTime": "Temps d'attente moyen",
+    "patientSatisfaction": "Satisfaction des patients",
+    "completedAppointments": "Rendez-vous terminés"
+  },
+  "quickActions": {
+    "title": "Actions rapides",
+    "scheduleAppointment": "Planifier un rendez-vous",
+    "addPatient": "Ajouter un patient",
+    "viewReports": "Voir les rapports",
+    "manageStaff": "Gérer le personnel",
+    "billing": "Facturation et factures",
+    "inventory": "Inventaire",
+    "prescriptions": "Ordonnances",
+    "labResults": "Résultats de laboratoire"
+  },
+  "recentActivity": {
+    "title": "Activité récente",
+    "viewAll": "Tout voir",
+    "noActivity": "Aucune activité récente",
+    "appointmentScheduled": "Rendez-vous planifié",
+    "appointmentCompleted": "Rendez-vous terminé",
+    "appointmentCancelled": "Rendez-vous annulé",
+    "patientRegistered": "Nouveau patient enregistré",
+    "prescriptionIssued": "Ordonnance délivrée",
+    "labResultAvailable": "Résultat de laboratoire disponible",
+    "invoicePaid": "Facture payée",
+    "reportGenerated": "Rapport généré"
+  },
+  "appointments": {
+    "title": "Rendez-vous à venir",
+    "today": "Aujourd'hui",
+    "thisWeek": "Cette semaine",
+    "noAppointments": "Aucun rendez-vous à venir",
+    "viewSchedule": "Voir l'agenda complet",
+    "patient": "Patient",
+    "doctor": "Médecin",
+    "time": "Heure",
+    "type": "Type",
+    "status": "Statut"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Tout marquer comme lu",
+    "noNotifications": "Aucune nouvelle notification",
+    "viewAll": "Tout voir",
+    "new": "Nouveau",
+    "appointmentReminder": "Rappel de rendez-vous",
+    "labResultReady": "Résultat de laboratoire prêt",
+    "prescriptionRefill": "Renouvellement d'ordonnance dû",
+    "systemAlert": "Alerte système"
+  },
+  "calendar": {
+    "title": "Calendrier",
+    "viewMonth": "Vue mensuelle",
+    "viewWeek": "Vue hebdomadaire",
+    "viewDay": "Vue quotidienne",
+    "today": "Aujourd'hui",
+    "events": "Événements"
+  },
+  "performance": {
+    "title": "Métriques de performance",
+    "monthly": "Mensuel",
+    "quarterly": "Trimestriel",
+    "yearly": "Annuel",
+    "comparison": "Comparaison",
+    "trend": "Tendance",
+    "growth": "Croissance",
+    "decline": "Déclin"
+  },
+  "alerts": {
+    "title": "Alertes système",
+    "critical": "Critique",
+    "warning": "Avertissement",
+    "info": "Information",
+    "dismiss": "Ignorer",
+    "viewDetails": "Voir les détails"
+  }
+}

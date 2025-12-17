@@ -1,0 +1,88 @@
+{
+  "app": {
+    "name": "Plateforme de Santé Unifiée",
+    "tagline": "Votre Solution de Santé Complète",
+    "welcome": "Bienvenue sur la Santé Unifiée",
+    "loading": "Chargement...",
+    "saving": "Enregistrement...",
+    "saved": "Enregistré avec succès",
+    "error": "Une erreur s'est produite"
+  },
+  "nav": {
+    "home": "Accueil",
+    "dashboard": "Tableau de bord",
+    "appointments": "Rendez-vous",
+    "patients": "Patients",
+    "doctors": "Médecins",
+    "billing": "Facturation",
+    "reports": "Rapports",
+    "settings": "Paramètres",
+    "profile": "Profil",
+    "logout": "Déconnexion"
+  },
+  "actions": {
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "create": "Créer",
+    "update": "Mettre à jour",
+    "submit": "Soumettre",
+    "close": "Fermer",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "confirm": "Confirmer",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "export": "Exporter",
+    "import": "Importer",
+    "download": "Télécharger",
+    "upload": "Téléverser",
+    "view": "Voir",
+    "refresh": "Actualiser",
+    "clear": "Effacer"
+  },
+  "status": {
+    "active": "Actif",
+    "inactive": "Inactif",
+    "pending": "En attente",
+    "completed": "Terminé",
+    "cancelled": "Annulé",
+    "draft": "Brouillon",
+    "published": "Publié"
+  },
+  "time": {
+    "today": "Aujourd'hui",
+    "yesterday": "Hier",
+    "tomorrow": "Demain",
+    "thisWeek": "Cette semaine",
+    "lastWeek": "Semaine dernière",
+    "nextWeek": "Semaine prochaine",
+    "thisMonth": "Ce mois-ci",
+    "lastMonth": "Mois dernier",
+    "nextMonth": "Mois prochain"
+  },
+  "pagination": {
+    "first": "Premier",
+    "last": "Dernier",
+    "showing": "Affichage de {{from}} à {{to}} sur {{total}} entrées",
+    "rowsPerPage": "Lignes par page"
+  },
+  "validation": {
+    "required": "Ce champ est obligatoire",
+    "invalidEmail": "Adresse e-mail invalide",
+    "invalidPhone": "Numéro de téléphone invalide",
+    "minLength": "Doit contenir au moins {{min}} caractères",
+    "maxLength": "Ne doit pas dépasser {{max}} caractères",
+    "passwordMismatch": "Les mots de passe ne correspondent pas",
+    "invalidDate": "Date invalide",
+    "futureDate": "La date doit être dans le futur",
+    "pastDate": "La date doit être dans le passé"
+  },
+  "confirmation": {
+    "delete": "Êtes-vous sûr de vouloir supprimer cet élément?",
+    "cancel": "Êtes-vous sûr de vouloir annuler?",
+    "unsavedChanges": "Vous avez des modifications non enregistrées. Êtes-vous sûr de vouloir quitter?"
+  }
+}

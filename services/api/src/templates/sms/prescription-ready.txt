@@ -1,0 +1,1 @@
+Hi {{patientName}}, your prescription for {{prescriptionName}} is ready for pickup at {{pharmacyName}}. - {{appName}}

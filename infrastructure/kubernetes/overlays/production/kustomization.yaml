@@ -1,0 +1,205 @@
+---
+# ============================================
+# UnifiedHealth API - Production Overlay
+# Production-specific configurations
+# ============================================
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Reference to base configuration
+resources:
+  - ../../base
+  - production-pdb.yaml
+
+# Namespace for production
+namespace: unified-health-production
+
+# Name prefix for all resources (optional for production)
+namePrefix: prod-
+
+# Common labels for production
+commonLabels:
+  environment: production
+  tier: production
+  compliance: hipaa-gdpr
+
+# Common annotations for production
+commonAnnotations:
+  environment: production
+  managed-by: kustomize
+  compliance: "HIPAA, GDPR, SOC2"
+
+# Production-specific replicas
+replicas:
+  - name: unified-health-api
+    count: 3
+
+# Production images with specific version tags
+images:
+  - name: unified-health-api
+    newName: ${ACR_LOGIN_SERVER}/unified-health-api
+    newTag: v1.0.0  # Use specific version tags in production
+
+# Patches for production
+patches:
+  # Patch deployment for production resources
+  - target:
+      kind: Deployment
+      name: unified-health-api
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 3
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/cpu
+        value: "500m"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/memory
+        value: "512Mi"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/cpu
+        value: "2000m"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/memory
+        value: "2Gi"
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: ENVIRONMENT
+          value: "production"
+      - op: add
+        path: /spec/template/metadata/annotations
+        value:
+          cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+
+  # Patch HPA for production
+  - target:
+      kind: HorizontalPodAutoscaler
+      name: unified-health-api-hpa
+    patch: |-
+      - op: replace
+        path: /spec/minReplicas
+        value: 3
+      - op: replace
+        path: /spec/maxReplicas
+        value: 20
+      - op: replace
+        path: /spec/metrics/0/resource/target/averageUtilization
+        value: 60
+      - op: replace
+        path: /spec/metrics/1/resource/target/averageUtilization
+        value: 70
+
+  # Patch PodDisruptionBudget for production
+  - target:
+      kind: PodDisruptionBudget
+      name: unified-health-api-pdb
+    patch: |-
+      - op: replace
+        path: /spec/minAvailable
+        value: 2
+
+  # Patch Ingress for production domain
+  - target:
+      kind: Ingress
+      name: unified-health-api-ingress
+    patch: |-
+      - op: replace
+        path: /spec/rules/0/host
+        value: "api.unifiedhealth.com"
+      - op: replace
+        path: /spec/tls/0/hosts/0
+        value: "api.unifiedhealth.com"
+      - op: add
+        path: /metadata/annotations/nginx.ingress.kubernetes.io~1rate-limit
+        value: "200"
+      - op: add
+        path: /metadata/annotations/nginx.ingress.kubernetes.io~1limit-rps
+        value: "200"
+
+  # Patch ConfigMap for production
+  - target:
+      kind: ConfigMap
+      name: unified-health-config
+    patch: |-
+      - op: replace
+        path: /data/NODE_ENV
+        value: "production"
+      - op: replace
+        path: /data/LOG_LEVEL
+        value: "info"
+      - op: replace
+        path: /data/cors-origins
+        value: "https://app.unifiedhealth.com,https://admin.unifiedhealth.com"
+      - op: replace
+        path: /data/api-rate-limit-per-minute
+        value: "200"
+      - op: replace
+        path: /data/api-rate-limit-per-hour
+        value: "10000"
+      - op: replace
+        path: /data/database-pool-size
+        value: "50"
+
+  # Patch Service Account for production Azure identity
+  - target:
+      kind: ServiceAccount
+      name: unified-health-api
+    patch: |-
+      - op: replace
+        path: /metadata/annotations/azure.workload.identity~1client-id
+        value: "${AZURE_PROD_CLIENT_ID}"
+      - op: replace
+        path: /metadata/annotations/azure.workload.identity~1tenant-id
+        value: "${AZURE_PROD_TENANT_ID}"
+
+# ConfigMap generator for production-specific config
+configMapGenerator:
+  - name: production-config
+    behavior: merge
+    literals:
+      - ENVIRONMENT=production
+      - DEBUG_MODE=false
+      - LOG_LEVEL=info
+      - ENABLE_PROFILING=false
+
+# Secret generator for production
+secretGenerator:
+  - name: production-secrets
+    type: Opaque
+    literals: []
+
+# Strategic merge patches (alternative to JSON patches)
+patchesStrategicMerge:
+  - |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: unified-health-api
+    spec:
+      template:
+        spec:
+          # Production-specific affinity rules
+          affinity:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchLabels:
+                      app: unified-health-api
+                  topologyKey: kubernetes.io/hostname
+            nodeAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - weight: 100
+                  preference:
+                    matchExpressions:
+                      - key: node.kubernetes.io/instance-type
+                        operator: In
+                        values:
+                          - Standard_D4s_v5
+                          - Standard_D8s_v5
+          # Production-specific tolerations
+          tolerations:
+            - key: "production"
+              operator: "Equal"
+              value: "true"
+              effect: "NoSchedule"

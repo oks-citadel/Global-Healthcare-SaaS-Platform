@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards
+  namespace: unified-health
+  labels:
+    app: grafana
+    component: monitoring
+data:
+  api-overview.json: |
+{{ .Files.Get "dashboards/api-overview.json" | indent 4 }}
+  database-metrics.json: |
+{{ .Files.Get "dashboards/database-metrics.json" | indent 4 }}
+  kubernetes-overview.json: |
+{{ .Files.Get "dashboards/kubernetes-overview.json" | indent 4 }}

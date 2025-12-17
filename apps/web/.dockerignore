@@ -1,0 +1,90 @@
+# ============================================
+# UnifiedHealth Web - Docker Ignore
+# ============================================
+
+# Dependencies
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store
+
+# Next.js
+.next
+out
+*.tsbuildinfo
+
+# Testing
+coverage
+.nyc_output
+tests
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+__tests__
+__mocks__
+.jest
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+README.md
+CHANGELOG.md
+docs
+*.md
+
+# CI/CD
+.github
+.gitlab-ci.yml
+.travis.yml
+Jenkinsfile
+azure-pipelines.yml
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Logs
+logs
+*.log
+
+# Temporary files
+tmp
+temp
+.tmp
+
+# Editor config
+.editorconfig
+.eslintrc*
+.prettierrc*
+tsconfig.json
+
+# Vercel
+.vercel
+
+# Other
+.husky
+.commitlint*
+
+# Public folder exceptions (we want to include public)
+# but exclude development assets
+public/*.md

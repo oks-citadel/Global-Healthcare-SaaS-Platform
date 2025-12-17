@@ -1,0 +1,503 @@
+/**
+ * Accessibility Styles
+ *
+ * Global styles for WCAG 2.1 AA compliance including:
+ * - Focus visible styles
+ * - High contrast mode support
+ * - Reduced motion support
+ * - Screen reader utilities
+ */
+
+/* ===================================================================
+   Focus Visible Styles (WCAG 2.4.7 Level AA)
+   =================================================================== */
+
+/**
+ * Default focus styles for keyboard navigation
+ * Provides a clear, high-contrast focus indicator
+ */
+*:focus {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+/* Focus visible - only show focus ring for keyboard navigation */
+*:focus-visible {
+  outline: 2px solid #3b82f6; /* blue-500 */
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);
+}
+
+/* Enhanced focus for interactive elements */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);
+  transition: box-shadow 0.15s ease-in-out;
+}
+
+/* Focus styles for specific UI elements */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+}
+
+.focus-ring-inset {
+  @apply focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500;
+}
+
+/* Dark mode focus styles */
+.dark *:focus-visible,
+.dark a:focus-visible,
+.dark button:focus-visible,
+.dark input:focus-visible,
+.dark textarea:focus-visible,
+.dark select:focus-visible {
+  outline-color: #60a5fa; /* blue-400 */
+  box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.3);
+}
+
+/* ===================================================================
+   High Contrast Mode Support (WCAG 1.4.3, 1.4.6, 1.4.11 Level AA)
+   =================================================================== */
+
+/**
+ * Windows High Contrast Mode
+ * Ensures UI elements remain visible in forced colors mode
+ */
+@media (forced-colors: active) {
+  /* Ensure borders are visible */
+  button,
+  input,
+  select,
+  textarea {
+    border: 1px solid ButtonText;
+  }
+
+  /* Ensure focus is visible */
+  *:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+
+  /* Ensure icons remain visible */
+  svg,
+  img {
+    forced-color-adjust: auto;
+  }
+
+  /* Ensure disabled state is clear */
+  :disabled {
+    opacity: 1;
+    color: GrayText;
+    border-color: GrayText;
+  }
+
+  /* Ensure links are distinguishable */
+  a {
+    color: LinkText;
+    text-decoration: underline;
+  }
+
+  a:visited {
+    color: VisitedText;
+  }
+}
+
+/**
+ * Prefers contrast: high
+ * Enhanced contrast for users who request it
+ */
+@media (prefers-contrast: high) {
+  /* Increase border contrast */
+  button,
+  input,
+  select,
+  textarea {
+    border-width: 2px;
+  }
+
+  /* Enhance focus indicators */
+  *:focus-visible {
+    outline-width: 3px;
+    outline-offset: 3px;
+  }
+
+  /* Increase text contrast */
+  body {
+    font-weight: 500;
+  }
+
+  /* Ensure sufficient contrast for disabled states */
+  :disabled {
+    opacity: 0.6;
+  }
+}
+
+/* ===================================================================
+   Reduced Motion Support (WCAG 2.3.3 Level AAA, 2.2.2 Level A)
+   =================================================================== */
+
+/**
+ * Respect user's motion preferences
+ * Removes animations for users who prefer reduced motion
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Allow essential focus transitions */
+  *:focus-visible {
+    transition: box-shadow 0.01ms !important;
+  }
+}
+
+/**
+ * Utility class for respecting reduced motion
+ */
+.motion-safe {
+  @media (prefers-reduced-motion: reduce) {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+.motion-reduce {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ===================================================================
+   Screen Reader Utilities
+   =================================================================== */
+
+/**
+ * Visually hidden but accessible to screen readers
+ * (WCAG 1.3.1, 2.4.4, 3.3.2 Level A/AA)
+ */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/**
+ * Visually hidden until focused
+ * Useful for skip links and keyboard-only navigation
+ */
+.sr-only-until-focused:not(:focus-within) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.sr-only-focusable:not(:focus):not(:focus-within) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* ===================================================================
+   Color Contrast (WCAG 1.4.3 Level AA)
+   =================================================================== */
+
+/**
+ * Ensure minimum contrast ratios of 4.5:1 for normal text
+ * and 3:1 for large text (18pt or 14pt bold)
+ */
+
+/* Text colors with sufficient contrast */
+.text-contrast-low {
+  color: #6b7280; /* gray-500 - Use only for non-essential text */
+}
+
+.text-contrast-normal {
+  color: #374151; /* gray-700 - Minimum for body text */
+}
+
+.text-contrast-high {
+  color: #1f2937; /* gray-800 - Recommended for important text */
+}
+
+.dark .text-contrast-low {
+  color: #9ca3af; /* gray-400 */
+}
+
+.dark .text-contrast-normal {
+  color: #d1d5db; /* gray-300 */
+}
+
+.dark .text-contrast-high {
+  color: #f3f4f6; /* gray-100 */
+}
+
+/* Background colors with sufficient contrast */
+.bg-contrast-surface {
+  background-color: #ffffff;
+  color: #1f2937;
+}
+
+.dark .bg-contrast-surface {
+  background-color: #1f2937;
+  color: #f3f4f6;
+}
+
+/* ===================================================================
+   Interactive Element States
+   =================================================================== */
+
+/**
+ * Clear visual states for interactive elements
+ * (WCAG 1.4.1, 2.4.7, 3.2.4 Level A/AA)
+ */
+
+/* Disabled state */
+.disabled,
+:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Required field indicator */
+.required::after {
+  content: ' *';
+  color: #dc2626; /* red-600 */
+  font-weight: 600;
+}
+
+.dark .required::after {
+  color: #f87171; /* red-400 */
+}
+
+/* Invalid/Error state */
+.error,
+.invalid,
+[aria-invalid='true'] {
+  border-color: #dc2626 !important; /* red-600 */
+}
+
+.error:focus,
+.invalid:focus,
+[aria-invalid='true']:focus {
+  outline-color: #dc2626;
+  box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.2);
+}
+
+/* ===================================================================
+   Skip Links (WCAG 2.4.1 Level A)
+   =================================================================== */
+
+.skip-link {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translateY(-100%);
+  z-index: 9999;
+  padding: 0.75rem 1rem;
+  background-color: #3b82f6;
+  color: white;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 0 0 0.5rem 0;
+  transition: transform 0.2s ease-in-out;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+  outline: 2px solid white;
+  outline-offset: 2px;
+}
+
+/* ===================================================================
+   Focus Trap (WCAG 2.1.2, 2.4.3 Level A)
+   =================================================================== */
+
+.focus-trap {
+  isolation: isolate;
+}
+
+/* ===================================================================
+   Touch Target Size (WCAG 2.5.5 Level AAA)
+   =================================================================== */
+
+/**
+ * Ensure minimum touch target size of 44x44 pixels
+ * Recommended for mobile accessibility
+ */
+.touch-target {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===================================================================
+   Link Styles (WCAG 1.4.1, 2.4.4 Level A)
+   =================================================================== */
+
+/**
+ * Ensure links are distinguishable from surrounding text
+ * without relying solely on color
+ */
+a:not([class]) {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+a:not([class]):hover {
+  text-decoration-thickness: 2px;
+}
+
+/* ===================================================================
+   Form Elements (WCAG 1.3.1, 3.3.1, 3.3.2 Level A)
+   =================================================================== */
+
+/**
+ * Clear visual labels and error states for form controls
+ */
+
+/* Label styling */
+label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.375rem;
+}
+
+/* Input states */
+input:not([type='checkbox']):not([type='radio']),
+textarea,
+select {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  border-color: #3b82f6;
+}
+
+/* Checkbox and radio sizing */
+input[type='checkbox'],
+input[type='radio'] {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+/* Error message styling */
+.error-message,
+[role='alert'] {
+  display: flex;
+  align-items: start;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  background-color: #fef2f2;
+  border-left: 4px solid #dc2626;
+  color: #991b1b;
+  font-size: 0.875rem;
+}
+
+.dark .error-message,
+.dark [role='alert'] {
+  background-color: #7f1d1d;
+  border-left-color: #f87171;
+  color: #fecaca;
+}
+
+/* ===================================================================
+   Table Accessibility (WCAG 1.3.1 Level A)
+   =================================================================== */
+
+/**
+ * Ensure tables are properly structured and accessible
+ */
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th {
+  text-align: left;
+  font-weight: 600;
+  padding: 0.75rem;
+  border-bottom: 2px solid #d1d5db;
+}
+
+td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* Zebra striping for better readability */
+tbody tr:nth-child(even) {
+  background-color: #f9fafb;
+}
+
+.dark tbody tr:nth-child(even) {
+  background-color: #374151;
+}
+
+/* ===================================================================
+   Print Styles
+   =================================================================== */
+
+@media print {
+  /* Ensure focus indicators don't print */
+  *:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Ensure links are distinguishable */
+  a {
+    text-decoration: underline;
+  }
+
+  /* Show link URLs in print */
+  a[href^='http']::after {
+    content: ' (' attr(href) ')';
+    font-size: 0.875em;
+    color: #6b7280;
+  }
+}

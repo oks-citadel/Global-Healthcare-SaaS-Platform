@@ -1,0 +1,113 @@
+[
+  {
+    "id": "basic-monthly",
+    "name": "Basic Plan",
+    "description": "Essential healthcare access for individuals",
+    "price": "29.99",
+    "currency": "USD",
+    "interval": "monthly",
+    "features": [
+      "Unlimited virtual consultations",
+      "24/7 chat support",
+      "Prescription management",
+      "Health records access",
+      "Basic lab results"
+    ],
+    "active": true
+  },
+  {
+    "id": "basic-annual",
+    "name": "Basic Plan (Annual)",
+    "description": "Essential healthcare access for individuals - Annual billing",
+    "price": "299.99",
+    "currency": "USD",
+    "interval": "annual",
+    "features": [
+      "Unlimited virtual consultations",
+      "24/7 chat support",
+      "Prescription management",
+      "Health records access",
+      "Basic lab results",
+      "2 months free"
+    ],
+    "active": true
+  },
+  {
+    "id": "professional-monthly",
+    "name": "Professional Plan",
+    "description": "Advanced healthcare with priority support",
+    "price": "79.99",
+    "currency": "USD",
+    "interval": "monthly",
+    "features": [
+      "Everything in Basic",
+      "Priority scheduling",
+      "Specialist consultations",
+      "Mental health support",
+      "Nutrition counseling",
+      "Advanced diagnostics",
+      "Family sharing (up to 4 members)"
+    ],
+    "active": true
+  },
+  {
+    "id": "professional-annual",
+    "name": "Professional Plan (Annual)",
+    "description": "Advanced healthcare with priority support - Annual billing",
+    "price": "799.99",
+    "currency": "USD",
+    "interval": "annual",
+    "features": [
+      "Everything in Basic",
+      "Priority scheduling",
+      "Specialist consultations",
+      "Mental health support",
+      "Nutrition counseling",
+      "Advanced diagnostics",
+      "Family sharing (up to 4 members)",
+      "2 months free"
+    ],
+    "active": true
+  },
+  {
+    "id": "enterprise-monthly",
+    "name": "Enterprise Plan",
+    "description": "Comprehensive healthcare solution for organizations",
+    "price": "199.99",
+    "currency": "USD",
+    "interval": "monthly",
+    "features": [
+      "Everything in Professional",
+      "Dedicated account manager",
+      "Custom integrations",
+      "Advanced analytics",
+      "Compliance reporting",
+      "On-site health screenings",
+      "Unlimited family members",
+      "Corporate wellness program",
+      "API access"
+    ],
+    "active": true
+  },
+  {
+    "id": "enterprise-annual",
+    "name": "Enterprise Plan (Annual)",
+    "description": "Comprehensive healthcare solution for organizations - Annual billing",
+    "price": "1999.99",
+    "currency": "USD",
+    "interval": "annual",
+    "features": [
+      "Everything in Professional",
+      "Dedicated account manager",
+      "Custom integrations",
+      "Advanced analytics",
+      "Compliance reporting",
+      "On-site health screenings",
+      "Unlimited family members",
+      "Corporate wellness program",
+      "API access",
+      "2 months free"
+    ],
+    "active": true
+  }
+]

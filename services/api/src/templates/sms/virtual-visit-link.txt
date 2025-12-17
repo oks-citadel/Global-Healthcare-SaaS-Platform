@@ -1,0 +1,1 @@
+Hi {{patientName}}, your virtual visit with Dr. {{providerName}} {{timeInfo}}. Join here: {{joinUrl}} - {{appName}}

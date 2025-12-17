@@ -1,0 +1,1 @@
+Hi {{patientName}}, we have received your payment of {{amount}} on {{paymentDate}}. Transaction ID: {{transactionId}}. Thank you! - {{appName}}

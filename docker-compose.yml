@@ -1,0 +1,164 @@
+# ============================================
+# UnifiedHealth Platform - Docker Compose
+# Local Development Environment
+# ============================================
+
+version: '3.8'
+
+services:
+  # ==========================================
+  # API Service
+  # ==========================================
+  api:
+    build:
+      context: ./services/api
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - NODE_ENV=development
+      - PORT=8080
+      - DATABASE_URL=postgresql://unified_health:password@postgres:5432/unified_health_dev
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - JWT_SECRET=dev-secret-key-change-in-production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./services/api/src:/app/src:ro
+    networks:
+      - unified-health-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ==========================================
+  # PostgreSQL Database
+  # ==========================================
+  postgres:
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: unified_health
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: unified_health_dev
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - unified-health-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U unified_health -d unified_health_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ==========================================
+  # Redis Cache
+  # ==========================================
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - unified-health-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ==========================================
+  # MongoDB (for FHIR documents)
+  # ==========================================
+  mongodb:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: unified_health
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - unified-health-network
+
+  # ==========================================
+  # Elasticsearch (for search)
+  # ==========================================
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.3
+    ports:
+      - "9200:9200"
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - unified-health-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:9200/_cluster/health | grep -q 'green\\|yellow'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # ==========================================
+  # MinIO (S3-compatible storage)
+  # ==========================================
+  minio:
+    image: minio/minio:latest
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    networks:
+      - unified-health-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  # ==========================================
+  # HAPI FHIR Server
+  # ==========================================
+  hapi-fhir:
+    image: hapiproject/hapi:latest
+    ports:
+      - "8082:8080"
+    environment:
+      - spring.datasource.url=jdbc:postgresql://postgres:5432/hapi_fhir
+      - spring.datasource.username=unified_health
+      - spring.datasource.password=password
+      - spring.datasource.driverClassName=org.postgresql.Driver
+      - spring.jpa.properties.hibernate.dialect=ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgres94Dialect
+      - hapi.fhir.allow_external_references=true
+    depends_on:
+      - postgres
+    networks:
+      - unified-health-network
+
+networks:
+  unified-health-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
+  mongodb_data:
+  elasticsearch_data:
+  minio_data:

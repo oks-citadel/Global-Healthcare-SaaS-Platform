@@ -1,0 +1,88 @@
+{
+  "app": {
+    "name": "Plataforma de Salud Unificada",
+    "tagline": "Su Solución de Salud Completa",
+    "welcome": "Bienvenido a Salud Unificada",
+    "loading": "Cargando...",
+    "saving": "Guardando...",
+    "saved": "Guardado exitosamente",
+    "error": "Ocurrió un error"
+  },
+  "nav": {
+    "home": "Inicio",
+    "dashboard": "Panel",
+    "appointments": "Citas",
+    "patients": "Pacientes",
+    "doctors": "Doctores",
+    "billing": "Facturación",
+    "reports": "Informes",
+    "settings": "Configuración",
+    "profile": "Perfil",
+    "logout": "Cerrar Sesión"
+  },
+  "actions": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "create": "Crear",
+    "update": "Actualizar",
+    "submit": "Enviar",
+    "close": "Cerrar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "confirm": "Confirmar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "export": "Exportar",
+    "import": "Importar",
+    "download": "Descargar",
+    "upload": "Subir",
+    "view": "Ver",
+    "refresh": "Actualizar",
+    "clear": "Limpiar"
+  },
+  "status": {
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "pending": "Pendiente",
+    "completed": "Completado",
+    "cancelled": "Cancelado",
+    "draft": "Borrador",
+    "published": "Publicado"
+  },
+  "time": {
+    "today": "Hoy",
+    "yesterday": "Ayer",
+    "tomorrow": "Mañana",
+    "thisWeek": "Esta Semana",
+    "lastWeek": "Semana Pasada",
+    "nextWeek": "Próxima Semana",
+    "thisMonth": "Este Mes",
+    "lastMonth": "Mes Pasado",
+    "nextMonth": "Próximo Mes"
+  },
+  "pagination": {
+    "first": "Primero",
+    "last": "Último",
+    "showing": "Mostrando {{from}} a {{to}} de {{total}} entradas",
+    "rowsPerPage": "Filas por página"
+  },
+  "validation": {
+    "required": "Este campo es obligatorio",
+    "invalidEmail": "Dirección de correo electrónico inválida",
+    "invalidPhone": "Número de teléfono inválido",
+    "minLength": "Debe tener al menos {{min}} caracteres",
+    "maxLength": "No debe tener más de {{max}} caracteres",
+    "passwordMismatch": "Las contraseñas no coinciden",
+    "invalidDate": "Fecha inválida",
+    "futureDate": "La fecha debe ser futura",
+    "pastDate": "La fecha debe ser pasada"
+  },
+  "confirmation": {
+    "delete": "¿Está seguro de que desea eliminar este elemento?",
+    "cancel": "¿Está seguro de que desea cancelar?",
+    "unsavedChanges": "Tiene cambios sin guardar. ¿Está seguro de que desea salir?"
+  }
+}

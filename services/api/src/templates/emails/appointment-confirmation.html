@@ -1,0 +1,76 @@
+<h1>Appointment Confirmed</h1>
+
+<p>Hi {{patientName}},</p>
+
+<p>Your appointment has been successfully scheduled. Here are the details:</p>
+
+<div class="info-box">
+  <h3>Appointment Details</h3>
+  <table class="details-table">
+    <tr>
+      <td>Appointment ID:</td>
+      <td><strong>{{appointmentId}}</strong></td>
+    </tr>
+    <tr>
+      <td>Provider:</td>
+      <td><strong>{{providerName}}</strong></td>
+    </tr>
+    <tr>
+      <td>Specialty:</td>
+      <td>{{specialty}}</td>
+    </tr>
+    <tr>
+      <td>Date & Time:</td>
+      <td><strong>{{appointmentDate}}</strong> at <strong>{{appointmentTime}}</strong></td>
+    </tr>
+    <tr>
+      <td>Duration:</td>
+      <td>{{duration}} minutes</td>
+    </tr>
+    <tr>
+      <td>Type:</td>
+      <td>{{appointmentType}}</td>
+    </tr>
+    {{#if location}}
+    <tr>
+      <td>Location:</td>
+      <td>{{location}}</td>
+    </tr>
+    {{/if}}
+  </table>
+</div>
+
+{{#if isVirtual}}
+<div class="info-box" style="background-color: #f0fff4; border-left-color: #48bb78;">
+  <h3 style="color: #2f855a;">Virtual Visit</h3>
+  <p>This is a virtual appointment. You'll receive a link to join the video consultation 15 minutes before your appointment time.</p>
+</div>
+{{/if}}
+
+{{#if notes}}
+<h2>Additional Notes</h2>
+<p>{{notes}}</p>
+{{/if}}
+
+<h2>Before Your Appointment</h2>
+
+<ul style="color: #4a5568;">
+  <li>Arrive 10 minutes early if visiting in person</li>
+  <li>Bring your ID and insurance card</li>
+  <li>Prepare a list of current medications</li>
+  <li>Note any symptoms or concerns you want to discuss</li>
+</ul>
+
+<div class="text-center">
+  <a href="{{appUrl}}/appointments/{{appointmentId}}" class="btn btn-primary">View Appointment</a>
+  <a href="{{appUrl}}/appointments/{{appointmentId}}/reschedule" class="btn btn-secondary">Reschedule</a>
+</div>
+
+<p class="text-muted text-center mt-20">
+  Need to cancel? <a href="{{appUrl}}/appointments/{{appointmentId}}/cancel">Cancel this appointment</a>
+</p>
+
+<p>
+  We look forward to seeing you!<br>
+  <strong>The UnifiedHealth Team</strong>
+</p>

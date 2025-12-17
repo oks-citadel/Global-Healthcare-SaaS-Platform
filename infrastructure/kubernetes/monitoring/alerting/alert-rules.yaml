@@ -1,0 +1,311 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-rules
+  namespace: unified-health
+  labels:
+    app: prometheus
+    component: monitoring
+data:
+  alert-rules.yml: |
+    groups:
+      # API Performance and Availability Alerts
+      - name: api-alerts
+        interval: 30s
+        rules:
+          # High Latency Alert
+          - alert: HighAPILatency
+            expr: |
+              histogram_quantile(0.95,
+                sum(rate(http_request_duration_seconds_bucket{job="unified-health-api"}[5m])) by (le, route)
+              ) > 1
+            for: 5m
+            labels:
+              severity: warning
+              component: api
+            annotations:
+              summary: "High API latency detected on {{ $labels.route }}"
+              description: "API route {{ $labels.route }} has 95th percentile latency above 1 second (current: {{ $value }}s)"
+              runbook_url: "https://docs.unified-health.io/runbooks/high-api-latency"
+
+          # Critical High Latency Alert
+          - alert: CriticalAPILatency
+            expr: |
+              histogram_quantile(0.95,
+                sum(rate(http_request_duration_seconds_bucket{job="unified-health-api"}[5m])) by (le, route)
+              ) > 3
+            for: 2m
+            labels:
+              severity: critical
+              component: api
+            annotations:
+              summary: "Critical API latency detected on {{ $labels.route }}"
+              description: "API route {{ $labels.route }} has 95th percentile latency above 3 seconds (current: {{ $value }}s)"
+              runbook_url: "https://docs.unified-health.io/runbooks/critical-api-latency"
+
+          # High Error Rate Alert
+          - alert: HighAPIErrorRate
+            expr: |
+              (sum(rate(http_requests_total{job="unified-health-api",status_code=~"5.."}[5m]))
+              /
+              sum(rate(http_requests_total{job="unified-health-api"}[5m]))) * 100 > 5
+            for: 5m
+            labels:
+              severity: high
+              component: api
+            annotations:
+              summary: "High API error rate detected"
+              description: "API is experiencing {{ $value }}% 5xx errors"
+              runbook_url: "https://docs.unified-health.io/runbooks/high-error-rate"
+
+          # Critical Error Rate Alert
+          - alert: CriticalAPIErrorRate
+            expr: |
+              (sum(rate(http_requests_total{job="unified-health-api",status_code=~"5.."}[5m]))
+              /
+              sum(rate(http_requests_total{job="unified-health-api"}[5m]))) * 100 > 10
+            for: 2m
+            labels:
+              severity: critical
+              component: api
+            annotations:
+              summary: "Critical API error rate detected"
+              description: "API is experiencing {{ $value }}% 5xx errors - immediate action required"
+              runbook_url: "https://docs.unified-health.io/runbooks/critical-error-rate"
+
+          # API Service Down
+          - alert: APIServiceDown
+            expr: up{job="unified-health-api"} == 0
+            for: 1m
+            labels:
+              severity: critical
+              component: api
+            annotations:
+              summary: "API service is down"
+              description: "API service {{ $labels.instance }} is not responding"
+              runbook_url: "https://docs.unified-health.io/runbooks/service-down"
+
+      # Database Alerts
+      - name: database-alerts
+        interval: 30s
+        rules:
+          # High Database Connection Usage
+          - alert: HighDatabaseConnections
+            expr: pg_stat_database_numbackends{datname="unified_health"} > 80
+            for: 5m
+            labels:
+              severity: warning
+              component: database
+            annotations:
+              summary: "High database connection count"
+              description: "Database has {{ $value }} active connections (threshold: 80)"
+              runbook_url: "https://docs.unified-health.io/runbooks/high-db-connections"
+
+          # Database Connection Pool Exhaustion
+          - alert: DatabaseConnectionPoolExhaustion
+            expr: db_connection_pool_waiting > 10
+            for: 2m
+            labels:
+              severity: high
+              component: database
+            annotations:
+              summary: "Database connection pool is exhausted"
+              description: "{{ $value }} requests are waiting for database connections"
+              runbook_url: "https://docs.unified-health.io/runbooks/connection-pool-exhaustion"
+
+          # Slow Database Queries
+          - alert: SlowDatabaseQueries
+            expr: |
+              histogram_quantile(0.95,
+                sum(rate(db_query_duration_seconds_bucket[5m])) by (le, operation)
+              ) > 1
+            for: 5m
+            labels:
+              severity: warning
+              component: database
+            annotations:
+              summary: "Slow database queries detected"
+              description: "Database operation {{ $labels.operation }} has 95th percentile latency above 1 second (current: {{ $value }}s)"
+              runbook_url: "https://docs.unified-health.io/runbooks/slow-queries"
+
+          # Low Database Cache Hit Ratio
+          - alert: LowDatabaseCacheHitRatio
+            expr: |
+              rate(pg_stat_database_blks_hit{datname="unified_health"}[5m])
+              /
+              (rate(pg_stat_database_blks_hit{datname="unified_health"}[5m]) + rate(pg_stat_database_blks_read{datname="unified_health"}[5m]))
+              < 0.9
+            for: 10m
+            labels:
+              severity: warning
+              component: database
+            annotations:
+              summary: "Low database cache hit ratio"
+              description: "Database cache hit ratio is {{ $value }} (threshold: 0.9)"
+              runbook_url: "https://docs.unified-health.io/runbooks/low-cache-hit-ratio"
+
+          # Database Disk Space
+          - alert: DatabaseDiskSpaceWarning
+            expr: |
+              (pg_database_size_bytes{datname="unified_health"} / 1024 / 1024 / 1024) > 40
+            for: 5m
+            labels:
+              severity: warning
+              component: database
+            annotations:
+              summary: "Database disk space is running low"
+              description: "Database size is {{ $value }}GB (threshold: 40GB)"
+              runbook_url: "https://docs.unified-health.io/runbooks/database-disk-space"
+
+      # Kubernetes Infrastructure Alerts
+      - name: kubernetes-alerts
+        interval: 30s
+        rules:
+          # Pod Restart Alert
+          - alert: PodRestartingFrequently
+            expr: rate(kube_pod_container_status_restarts_total{namespace="unified-health"}[1h]) > 0.1
+            for: 5m
+            labels:
+              severity: warning
+              component: infrastructure
+            annotations:
+              summary: "Pod {{ $labels.pod }} is restarting frequently"
+              description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} has restarted {{ $value }} times in the last hour"
+              runbook_url: "https://docs.unified-health.io/runbooks/pod-restarts"
+
+          # Pod CrashLoopBackOff
+          - alert: PodCrashLoopBackOff
+            expr: kube_pod_container_status_waiting_reason{reason="CrashLoopBackOff",namespace="unified-health"} > 0
+            for: 2m
+            labels:
+              severity: critical
+              component: infrastructure
+            annotations:
+              summary: "Pod {{ $labels.pod }} is in CrashLoopBackOff"
+              description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} is in CrashLoopBackOff state"
+              runbook_url: "https://docs.unified-health.io/runbooks/crashloopbackoff"
+
+          # High CPU Usage
+          - alert: HighCPUUsage
+            expr: |
+              sum(rate(container_cpu_usage_seconds_total{namespace="unified-health",container!=""}[5m])) by (pod) * 100 > 80
+            for: 10m
+            labels:
+              severity: warning
+              component: infrastructure
+            annotations:
+              summary: "High CPU usage on pod {{ $labels.pod }}"
+              description: "Pod {{ $labels.pod }} is using {{ $value }}% CPU"
+              runbook_url: "https://docs.unified-health.io/runbooks/high-cpu-usage"
+
+          # High Memory Usage
+          - alert: HighMemoryUsage
+            expr: |
+              (sum(container_memory_working_set_bytes{namespace="unified-health",container!=""}) by (pod)
+              /
+              sum(container_spec_memory_limit_bytes{namespace="unified-health",container!=""}) by (pod)) * 100 > 85
+            for: 10m
+            labels:
+              severity: warning
+              component: infrastructure
+            annotations:
+              summary: "High memory usage on pod {{ $labels.pod }}"
+              description: "Pod {{ $labels.pod }} is using {{ $value }}% of its memory limit"
+              runbook_url: "https://docs.unified-health.io/runbooks/high-memory-usage"
+
+          # Pod Not Ready
+          - alert: PodNotReady
+            expr: |
+              sum by (namespace, pod) (kube_pod_status_phase{namespace="unified-health",phase=~"Pending|Unknown|Failed"}) > 0
+            for: 5m
+            labels:
+              severity: high
+              component: infrastructure
+            annotations:
+              summary: "Pod {{ $labels.pod }} is not ready"
+              description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} has been in non-ready state for more than 5 minutes"
+              runbook_url: "https://docs.unified-health.io/runbooks/pod-not-ready"
+
+          # Node Not Ready
+          - alert: NodeNotReady
+            expr: kube_node_status_condition{condition="Ready",status="true"} == 0
+            for: 2m
+            labels:
+              severity: critical
+              component: infrastructure
+            annotations:
+              summary: "Node {{ $labels.node }} is not ready"
+              description: "Node {{ $labels.node }} has been in not-ready state for more than 2 minutes"
+              runbook_url: "https://docs.unified-health.io/runbooks/node-not-ready"
+
+      # Business Metrics Alerts
+      - name: business-alerts
+        interval: 60s
+        rules:
+          # Low Appointment Creation Rate
+          - alert: LowAppointmentCreationRate
+            expr: rate(appointments_created_total[15m]) < 0.5
+            for: 15m
+            labels:
+              severity: warning
+              component: business
+            annotations:
+              summary: "Low appointment creation rate"
+              description: "Appointment creation rate is {{ $value }} per second (expected: > 0.5/s)"
+              runbook_url: "https://docs.unified-health.io/runbooks/low-appointment-rate"
+
+          # High Appointment Cancellation Rate
+          - alert: HighAppointmentCancellationRate
+            expr: |
+              (rate(appointments_cancelled_total[30m]) / rate(appointments_created_total[30m])) * 100 > 20
+            for: 15m
+            labels:
+              severity: warning
+              component: business
+            annotations:
+              summary: "High appointment cancellation rate"
+              description: "Appointment cancellation rate is {{ $value }}%"
+              runbook_url: "https://docs.unified-health.io/runbooks/high-cancellation-rate"
+
+          # Payment Failure Rate
+          - alert: HighPaymentFailureRate
+            expr: |
+              (sum(rate(payments_processed_total{status="failed"}[10m]))
+              /
+              sum(rate(payments_processed_total[10m]))) * 100 > 5
+            for: 10m
+            labels:
+              severity: high
+              component: business
+            annotations:
+              summary: "High payment failure rate"
+              description: "Payment failure rate is {{ $value }}%"
+              runbook_url: "https://docs.unified-health.io/runbooks/payment-failures"
+
+      # Security Alerts
+      - name: security-alerts
+        interval: 30s
+        rules:
+          # High Rate Limit Violations
+          - alert: HighRateLimitViolations
+            expr: rate(rate_limit_exceeded_total[5m]) > 10
+            for: 5m
+            labels:
+              severity: warning
+              component: security
+            annotations:
+              summary: "High rate of rate limit violations"
+              description: "Rate limit is being exceeded {{ $value }} times per second on endpoint {{ $labels.endpoint }}"
+              runbook_url: "https://docs.unified-health.io/runbooks/rate-limit-violations"
+
+          # Failed Login Attempts
+          - alert: HighFailedLoginAttempts
+            expr: rate(user_login_attempts_total{status="failed"}[5m]) > 5
+            for: 5m
+            labels:
+              severity: high
+              component: security
+            annotations:
+              summary: "High rate of failed login attempts"
+              description: "Failed login attempts: {{ $value }} per second"
+              runbook_url: "https://docs.unified-health.io/runbooks/failed-logins"

@@ -1,0 +1,132 @@
+---
+# ============================================
+# UnifiedHealth API - Staging Overlay
+# Staging-specific configurations
+# ============================================
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Reference to base configuration
+resources:
+  - ../../base
+
+# Namespace for staging
+namespace: unified-health-staging
+
+# Name prefix for all resources
+namePrefix: staging-
+
+# Common labels for staging
+commonLabels:
+  environment: staging
+  tier: staging
+
+# Common annotations for staging
+commonAnnotations:
+  environment: staging
+  managed-by: kustomize
+
+# Staging-specific replicas
+replicas:
+  - name: unified-health-api
+    count: 2
+
+# Staging images
+images:
+  - name: unified-health-api
+    newName: ${ACR_LOGIN_SERVER}/unified-health-api
+    newTag: staging-latest
+
+# Patches for staging
+patches:
+  # Patch deployment for staging resources
+  - target:
+      kind: Deployment
+      name: unified-health-api
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 2
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/cpu
+        value: "200m"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/memory
+        value: "256Mi"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/cpu
+        value: "500m"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/memory
+        value: "512Mi"
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: ENVIRONMENT
+          value: "staging"
+
+  # Patch HPA for staging
+  - target:
+      kind: HorizontalPodAutoscaler
+      name: unified-health-api-hpa
+    patch: |-
+      - op: replace
+        path: /spec/minReplicas
+        value: 2
+      - op: replace
+        path: /spec/maxReplicas
+        value: 10
+
+  # Patch PodDisruptionBudget for staging
+  - target:
+      kind: PodDisruptionBudget
+      name: unified-health-api-pdb
+    patch: |-
+      - op: replace
+        path: /spec/minAvailable
+        value: 1
+
+  # Patch Ingress for staging domain
+  - target:
+      kind: Ingress
+      name: unified-health-api-ingress
+    patch: |-
+      - op: replace
+        path: /spec/rules/0/host
+        value: "api-staging.unifiedhealth.com"
+      - op: replace
+        path: /spec/tls/0/hosts/0
+        value: "api-staging.unifiedhealth.com"
+
+  # Patch ConfigMap for staging
+  - target:
+      kind: ConfigMap
+      name: unified-health-config
+    patch: |-
+      - op: replace
+        path: /data/NODE_ENV
+        value: "staging"
+      - op: replace
+        path: /data/LOG_LEVEL
+        value: "debug"
+      - op: replace
+        path: /data/cors-origins
+        value: "https://app-staging.unifiedhealth.com,https://admin-staging.unifiedhealth.com"
+
+# ConfigMap generator for staging-specific config
+configMapGenerator:
+  - name: staging-config
+    behavior: merge
+    literals:
+      - ENVIRONMENT=staging
+      - DEBUG_MODE=true
+      - LOG_LEVEL=debug
+
+# Secret generator for staging
+secretGenerator:
+  - name: staging-secrets
+    type: Opaque
+    literals: []
+
+# Transformers
+transformers: []

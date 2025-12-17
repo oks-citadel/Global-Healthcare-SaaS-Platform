@@ -1,0 +1,145 @@
+{
+  "title": "Citas",
+  "schedule": "Programar Cita",
+  "myAppointments": "Mis Citas",
+  "allAppointments": "Todas las Citas",
+  "details": "Detalles de la Cita",
+  "create": {
+    "title": "Programar Nueva Cita",
+    "selectPatient": "Seleccionar Paciente",
+    "selectDoctor": "Seleccionar Doctor",
+    "selectDate": "Seleccionar Fecha",
+    "selectTime": "Seleccionar Hora",
+    "appointmentType": "Tipo de Cita",
+    "reason": "Motivo de la Visita",
+    "notes": "Notas Adicionales",
+    "duration": "Duración",
+    "location": "Ubicación",
+    "department": "Departamento",
+    "submit": "Programar Cita",
+    "success": "Cita programada exitosamente"
+  },
+  "edit": {
+    "title": "Editar Cita",
+    "submit": "Actualizar Cita",
+    "success": "Cita actualizada exitosamente"
+  },
+  "cancel": {
+    "title": "Cancelar Cita",
+    "reason": "Motivo de Cancelación",
+    "confirm": "¿Está seguro de que desea cancelar esta cita?",
+    "submit": "Cancelar Cita",
+    "success": "Cita cancelada exitosamente"
+  },
+  "reschedule": {
+    "title": "Reprogramar Cita",
+    "selectNewDate": "Seleccionar Nueva Fecha",
+    "selectNewTime": "Seleccionar Nueva Hora",
+    "reason": "Motivo de Reprogramación",
+    "submit": "Reprogramar",
+    "success": "Cita reprogramada exitosamente"
+  },
+  "types": {
+    "consultation": "Consulta",
+    "followUp": "Seguimiento",
+    "checkup": "Chequeo",
+    "emergency": "Emergencia",
+    "vaccination": "Vacunación",
+    "laboratory": "Laboratorio",
+    "imaging": "Imágenes",
+    "surgery": "Cirugía",
+    "therapy": "Terapia",
+    "dental": "Dental",
+    "optometry": "Optometría",
+    "other": "Otro"
+  },
+  "status": {
+    "scheduled": "Programada",
+    "confirmed": "Confirmada",
+    "inProgress": "En Progreso",
+    "completed": "Completada",
+    "cancelled": "Cancelada",
+    "noShow": "No Asistió",
+    "rescheduled": "Reprogramada",
+    "pending": "Pendiente de Confirmación"
+  },
+  "filters": {
+    "all": "Todas las Citas",
+    "upcoming": "Próximas",
+    "past": "Pasadas",
+    "today": "Hoy",
+    "thisWeek": "Esta Semana",
+    "thisMonth": "Este Mes",
+    "byStatus": "Por Estado",
+    "byDoctor": "Por Doctor",
+    "byType": "Por Tipo",
+    "byPatient": "Por Paciente"
+  },
+  "list": {
+    "patient": "Paciente",
+    "doctor": "Doctor",
+    "date": "Fecha",
+    "time": "Hora",
+    "type": "Tipo",
+    "status": "Estado",
+    "actions": "Acciones",
+    "noAppointments": "No se encontraron citas",
+    "loadMore": "Cargar Más"
+  },
+  "details": {
+    "appointmentInfo": "Información de la Cita",
+    "patientInfo": "Información del Paciente",
+    "doctorInfo": "Información del Doctor",
+    "appointmentId": "ID de Cita",
+    "scheduledBy": "Programada Por",
+    "createdAt": "Creada el",
+    "updatedAt": "Última Actualización",
+    "location": "Ubicación",
+    "department": "Departamento",
+    "room": "Número de Habitación",
+    "notes": "Notas",
+    "vitals": "Signos Vitales",
+    "diagnosis": "Diagnóstico",
+    "prescription": "Receta",
+    "labOrders": "Órdenes de Laboratorio",
+    "nextAppointment": "Próxima Cita"
+  },
+  "reminder": {
+    "title": "Recordatorio de Cita",
+    "message": "Tiene una cita el {{date}} a las {{time}}",
+    "confirm": "Confirmar Asistencia",
+    "reschedule": "Reprogramar",
+    "cancel": "Cancelar"
+  },
+  "notifications": {
+    "scheduled": "Cita programada para {{date}} a las {{time}}",
+    "confirmed": "Su cita ha sido confirmada",
+    "cancelled": "Cita cancelada",
+    "rescheduled": "Cita reprogramada para {{date}} a las {{time}}",
+    "reminder": "Recordatorio: Cita en {{time}}",
+    "doctorRunningLate": "El doctor se retrasa {{minutes}} minutos",
+    "readyToSee": "El doctor está listo para atenderle ahora"
+  },
+  "calendar": {
+    "viewMode": "Modo de Vista",
+    "day": "Día",
+    "week": "Semana",
+    "month": "Mes",
+    "agenda": "Agenda",
+    "available": "Disponible",
+    "booked": "Reservado",
+    "blocked": "Bloqueado",
+    "selectSlot": "Seleccionar Horario"
+  },
+  "validation": {
+    "patientRequired": "El paciente es obligatorio",
+    "doctorRequired": "El doctor es obligatorio",
+    "dateRequired": "La fecha es obligatoria",
+    "timeRequired": "La hora es obligatoria",
+    "typeRequired": "El tipo de cita es obligatorio",
+    "reasonRequired": "El motivo de la visita es obligatorio",
+    "futureDate": "La fecha debe ser futura",
+    "slotNotAvailable": "El horario seleccionado no está disponible",
+    "conflictingAppointment": "Existe una cita en conflicto"
+  }
+}

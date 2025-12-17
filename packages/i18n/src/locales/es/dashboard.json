@@ -1,0 +1,92 @@
+{
+  "title": "Panel",
+  "welcome": "¡Bienvenido de nuevo, {{name}}!",
+  "overview": "Resumen",
+  "stats": {
+    "appointments": "Citas",
+    "patients": "Total de Pacientes",
+    "doctors": "Proveedores de Salud",
+    "revenue": "Ingresos",
+    "upcomingAppointments": "Citas Próximas",
+    "todayAppointments": "Citas de Hoy",
+    "pendingApprovals": "Aprobaciones Pendientes",
+    "newPatients": "Nuevos Pacientes",
+    "occupancyRate": "Tasa de Ocupación",
+    "averageWaitTime": "Tiempo de Espera Promedio",
+    "patientSatisfaction": "Satisfacción del Paciente",
+    "completedAppointments": "Citas Completadas"
+  },
+  "quickActions": {
+    "title": "Acciones Rápidas",
+    "scheduleAppointment": "Programar Cita",
+    "addPatient": "Agregar Paciente",
+    "viewReports": "Ver Informes",
+    "manageStaff": "Gestionar Personal",
+    "billing": "Facturación y Facturas",
+    "inventory": "Inventario",
+    "prescriptions": "Recetas",
+    "labResults": "Resultados de Laboratorio"
+  },
+  "recentActivity": {
+    "title": "Actividad Reciente",
+    "viewAll": "Ver Todo",
+    "noActivity": "No hay actividad reciente",
+    "appointmentScheduled": "Cita programada",
+    "appointmentCompleted": "Cita completada",
+    "appointmentCancelled": "Cita cancelada",
+    "patientRegistered": "Nuevo paciente registrado",
+    "prescriptionIssued": "Receta emitida",
+    "labResultAvailable": "Resultado de laboratorio disponible",
+    "invoicePaid": "Factura pagada",
+    "reportGenerated": "Informe generado"
+  },
+  "appointments": {
+    "title": "Citas Próximas",
+    "today": "Hoy",
+    "thisWeek": "Esta Semana",
+    "noAppointments": "No hay citas próximas",
+    "viewSchedule": "Ver Agenda Completa",
+    "patient": "Paciente",
+    "doctor": "Doctor",
+    "time": "Hora",
+    "type": "Tipo",
+    "status": "Estado"
+  },
+  "notifications": {
+    "title": "Notificaciones",
+    "markAllRead": "Marcar todas como leídas",
+    "noNotifications": "No hay notificaciones nuevas",
+    "viewAll": "Ver Todas",
+    "new": "Nueva",
+    "appointmentReminder": "Recordatorio de Cita",
+    "labResultReady": "Resultado de Laboratorio Listo",
+    "prescriptionRefill": "Recarga de Receta Pendiente",
+    "systemAlert": "Alerta del Sistema"
+  },
+  "calendar": {
+    "title": "Calendario",
+    "viewMonth": "Vista Mensual",
+    "viewWeek": "Vista Semanal",
+    "viewDay": "Vista Diaria",
+    "today": "Hoy",
+    "events": "Eventos"
+  },
+  "performance": {
+    "title": "Métricas de Rendimiento",
+    "monthly": "Mensual",
+    "quarterly": "Trimestral",
+    "yearly": "Anual",
+    "comparison": "Comparación",
+    "trend": "Tendencia",
+    "growth": "Crecimiento",
+    "decline": "Disminución"
+  },
+  "alerts": {
+    "title": "Alertas del Sistema",
+    "critical": "Crítico",
+    "warning": "Advertencia",
+    "info": "Información",
+    "dismiss": "Descartar",
+    "viewDetails": "Ver Detalles"
+  }
+}

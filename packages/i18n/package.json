@@ -1,0 +1,46 @@
+{
+  "name": "@unified-health/i18n",
+  "version": "1.0.0",
+  "description": "Internationalization package for Unified Healthcare Platform",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./locales/*": "./src/locales/*"
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts,.tsx"
+  },
+  "dependencies": {
+    "i18next": "^23.7.11",
+    "i18next-browser-languagedetector": "^7.2.0",
+    "i18next-fs-backend": "^2.3.1",
+    "i18next-http-backend": "^2.4.2",
+    "react-i18next": "^14.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.5",
+    "@types/react": "^18.2.45",
+    "eslint": "^8.56.0",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.3"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0"
+  },
+  "keywords": [
+    "i18n",
+    "internationalization",
+    "localization",
+    "translation",
+    "healthcare"
+  ]
+}

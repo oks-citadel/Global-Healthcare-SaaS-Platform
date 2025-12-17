@@ -1,0 +1,1 @@
+Hi {{patientName}}, you have been referred to {{specialistName}} ({{specialty}}). They will contact you shortly to schedule an appointment. - {{appName}}

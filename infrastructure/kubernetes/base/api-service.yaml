@@ -1,0 +1,71 @@
+---
+# ============================================
+# UnifiedHealth API - Service
+# ClusterIP service for internal communication
+# ============================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: unified-health-api
+  namespace: unified-health
+  labels:
+    app: unified-health-api
+    component: service
+  annotations:
+    # Service annotations for monitoring
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8080"
+    prometheus.io/path: "/metrics"
+    # Azure Load Balancer annotations (if needed)
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+spec:
+  type: ClusterIP
+  # Use session affinity for stateful sessions if needed
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800
+  ports:
+    # Main HTTP port
+    - port: 80
+      targetPort: http
+      protocol: TCP
+      name: http
+    # Health check port (same as main port in this case)
+    - port: 8080
+      targetPort: http
+      protocol: TCP
+      name: health
+    # Metrics port (for Prometheus)
+    - port: 9090
+      targetPort: metrics
+      protocol: TCP
+      name: metrics
+  selector:
+    app: unified-health-api
+
+---
+# ============================================
+# UnifiedHealth API - Headless Service
+# For StatefulSet or direct pod discovery
+# ============================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: unified-health-api-headless
+  namespace: unified-health
+  labels:
+    app: unified-health-api
+    component: service
+    service-type: headless
+spec:
+  type: ClusterIP
+  clusterIP: None
+  publishNotReadyAddresses: true
+  ports:
+    - port: 8080
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: unified-health-api

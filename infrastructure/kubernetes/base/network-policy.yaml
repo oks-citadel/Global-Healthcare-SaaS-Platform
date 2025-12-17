@@ -1,0 +1,329 @@
+---
+# ============================================
+# UnifiedHealth API - Network Policies
+# Restrict pod-to-pod communication for security
+# ============================================
+
+# Default Deny All Ingress Traffic
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all-ingress
+  namespace: unified-health
+  labels:
+    app: unified-health
+    component: network-policy
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+
+---
+# Default Deny All Egress Traffic
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all-egress
+  namespace: unified-health
+  labels:
+    app: unified-health
+    component: network-policy
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+
+---
+# Allow Ingress to API from Ingress Controller
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-ingress-to-api
+  namespace: unified-health
+  labels:
+    app: unified-health-api
+    component: network-policy
+spec:
+  podSelector:
+    matchLabels:
+      app: unified-health-api
+  policyTypes:
+    - Ingress
+  ingress:
+    # Allow from Ingress Controller
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 8080
+
+    # Allow from monitoring/prometheus
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring
+        - podSelector:
+            matchLabels:
+              app: prometheus
+      ports:
+        - protocol: TCP
+          port: 8080
+        - protocol: TCP
+          port: 9090
+
+    # Allow health checks from kube-system
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: kube-system
+      ports:
+        - protocol: TCP
+          port: 8080
+
+---
+# Allow Egress from API to Database
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-api-to-database
+  namespace: unified-health
+  labels:
+    app: unified-health-api
+    component: network-policy
+spec:
+  podSelector:
+    matchLabels:
+      app: unified-health-api
+  policyTypes:
+    - Egress
+  egress:
+    # Allow to PostgreSQL
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: database
+        - podSelector:
+            matchLabels:
+              app: postgresql
+      ports:
+        - protocol: TCP
+          port: 5432
+
+    # Allow to Azure PostgreSQL (external)
+    - to:
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 5432
+
+---
+# Allow Egress from API to Redis
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-api-to-redis
+  namespace: unified-health
+  labels:
+    app: unified-health-api
+    component: network-policy
+spec:
+  podSelector:
+    matchLabels:
+      app: unified-health-api
+  policyTypes:
+    - Egress
+  egress:
+    # Allow to Redis
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: unified-health
+        - podSelector:
+            matchLabels:
+              app: redis
+      ports:
+        - protocol: TCP
+          port: 6379
+
+---
+# Allow Egress from API to DNS
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-api-to-dns
+  namespace: unified-health
+  labels:
+    app: unified-health-api
+    component: network-policy
+spec:
+  podSelector:
+    matchLabels:
+      app: unified-health-api
+  policyTypes:
+    - Egress
+  egress:
+    # Allow DNS lookups (CoreDNS)
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: kube-system
+        - podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+
+---
+# Allow Egress from API to External Services
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-api-to-external
+  namespace: unified-health
+  labels:
+    app: unified-health-api
+    component: network-policy
+spec:
+  podSelector:
+    matchLabels:
+      app: unified-health-api
+  policyTypes:
+    - Egress
+  egress:
+    # Allow HTTPS to external services (Azure, SendGrid, Twilio, etc.)
+    - to:
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 443
+
+    # Allow HTTP (for redirects)
+    - to:
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 80
+
+---
+# Allow Egress from API to Kubernetes API Server
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-api-to-k8s-apiserver
+  namespace: unified-health
+  labels:
+    app: unified-health-api
+    component: network-policy
+spec:
+  podSelector:
+    matchLabels:
+      app: unified-health-api
+  policyTypes:
+    - Egress
+  egress:
+    # Allow to Kubernetes API Server
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: default
+      ports:
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 6443
+
+---
+# Allow Inter-Pod Communication within API
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-api-inter-pod
+  namespace: unified-health
+  labels:
+    app: unified-health-api
+    component: network-policy
+spec:
+  podSelector:
+    matchLabels:
+      app: unified-health-api
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow from same app pods
+    - from:
+        - podSelector:
+            matchLabels:
+              app: unified-health-api
+      ports:
+        - protocol: TCP
+          port: 8080
+  egress:
+    # Allow to same app pods
+    - to:
+        - podSelector:
+            matchLabels:
+              app: unified-health-api
+      ports:
+        - protocol: TCP
+          port: 8080
+
+---
+# Allow Egress to Email Service
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-api-to-email-service
+  namespace: unified-health
+  labels:
+    app: unified-health-api
+    component: network-policy
+spec:
+  podSelector:
+    matchLabels:
+      app: unified-health-api
+  policyTypes:
+    - Egress
+  egress:
+    # Allow SMTP/SMTPS for email
+    - to:
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 25
+        - protocol: TCP
+          port: 587
+        - protocol: TCP
+          port: 465
+
+---
+# Allow Egress to Azure Services
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-api-to-azure-services
+  namespace: unified-health
+  labels:
+    app: unified-health-api
+    component: network-policy
+spec:
+  podSelector:
+    matchLabels:
+      app: unified-health-api
+  policyTypes:
+    - Egress
+  egress:
+    # Allow to Azure Storage, Key Vault, etc.
+    - to:
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 443

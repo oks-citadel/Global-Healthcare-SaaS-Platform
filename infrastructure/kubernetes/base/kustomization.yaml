@@ -1,0 +1,82 @@
+---
+# ============================================
+# UnifiedHealth API - Base Kustomization
+# Base configuration for all environments
+# ============================================
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: unified-health
+
+# Common labels applied to all resources
+commonLabels:
+  app.kubernetes.io/name: unified-health-api
+  app.kubernetes.io/component: backend
+  app.kubernetes.io/part-of: unified-health-platform
+  app.kubernetes.io/managed-by: kustomize
+
+# Common annotations applied to all resources
+commonAnnotations:
+  documentation: "https://docs.unifiedhealth.com"
+  contact: "devops@unifiedhealth.com"
+
+# Resources to include
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - secrets.yaml
+  - service-account.yaml
+  - api-deployment.yaml
+  - api-service.yaml
+  - ingress.yaml
+  - network-policy.yaml
+  - poddisruptionbudget.yaml
+
+# ConfigMap generator (optional, for dynamic config generation)
+configMapGenerator:
+  - name: unified-health-runtime-config
+    literals:
+      - DEPLOYMENT_TIME=$(date +%Y-%m-%dT%H:%M:%S%z)
+      - KUSTOMIZE_VERSION=v1.0.0
+
+# Secret generator (optional, for dynamic secret generation)
+# Note: Actual secrets should come from Azure Key Vault
+secretGenerator:
+  - name: unified-health-runtime-secrets
+    type: Opaque
+    literals: []
+
+# Images to use
+images:
+  - name: unified-health-api
+    newName: ${ACR_LOGIN_SERVER}/unified-health-api
+    newTag: latest
+
+# Patches
+patches:
+  # Add resource quotas
+  - target:
+      kind: Deployment
+      name: unified-health-api
+    patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/resources/requests/cpu
+        value: "200m"
+      - op: add
+        path: /spec/template/spec/containers/0/resources/requests/memory
+        value: "256Mi"
+
+# Replicas
+replicas:
+  - name: unified-health-api
+    count: 2
+
+# Variable substitution
+vars:
+  - name: NAMESPACE
+    objref:
+      kind: Namespace
+      name: unified-health
+      apiVersion: v1
+    fieldref:
+      fieldpath: metadata.name

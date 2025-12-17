@@ -1,0 +1,158 @@
+import express from 'express';
+import { createServer } from 'http';
+import cors from 'cors';
+import helmet from 'helmet';
+import morgan from 'morgan';
+import rateLimit from 'express-rate-limit';
+import { config } from './config/index.js';
+import { logger } from './utils/logger.js';
+import { errorHandler } from './middleware/error.middleware.js';
+import { routes } from './routes/index.js';
+import { connectDatabase, disconnectDatabase, checkDatabaseHealth } from './lib/prisma.js';
+import { setupSwagger } from './docs/swagger.js';
+import { initializeSocket } from './lib/socket.js';
+import { setupRealtimeController } from './controllers/realtime.controller.js';
+
+const app = express();
+const httpServer = createServer(app);
+
+// Security middleware
+app.use(helmet());
+app.use(cors({
+  origin: config.cors.origins,
+  credentials: true,
+}));
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: config.rateLimit.max,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests, please try again later' },
+});
+app.use(limiter);
+
+// Body parsing
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true }));
+
+// Logging
+app.use(morgan('combined', {
+  stream: { write: (message) => logger.info(message.trim()) },
+}));
+
+// API Documentation (Swagger UI)
+setupSwagger(app);
+
+// API routes
+app.use('/api/v1', routes);
+
+// Health check (outside /api/v1 for K8s probes)
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    version: config.version,
+  });
+});
+
+app.get('/ready', async (req, res) => {
+  try {
+    const dbHealth = await checkDatabaseHealth();
+    if (!dbHealth.connected) {
+      return res.status(503).json({
+        status: 'not_ready',
+        checks: {
+          database: { connected: false, error: dbHealth.error },
+        },
+      });
+    }
+    res.json({
+      status: 'ready',
+      checks: {
+        database: { connected: true, latency: `${dbHealth.latency}ms` },
+      },
+    });
+  } catch (error) {
+    res.status(503).json({
+      status: 'not_ready',
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
+});
+
+// Error handling
+app.use(errorHandler);
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({
+    error: 'Not Found',
+    message: `Route ${req.method} ${req.path} not found`,
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// Start server
+const PORT = config.port;
+
+async function startServer() {
+  try {
+    // Connect to database
+    logger.info('Connecting to database...');
+    await connectDatabase();
+
+    // Initialize Socket.io
+    logger.info('Initializing Socket.io...');
+    const io = initializeSocket(httpServer);
+    setupRealtimeController(io);
+
+    const server = httpServer.listen(PORT, () => {
+      logger.info(`Server running on port ${PORT}`);
+      logger.info(`Environment: ${config.env}`);
+      logger.info(`Health check: http://localhost:${PORT}/health`);
+      logger.info(`Readiness check: http://localhost:${PORT}/ready`);
+      logger.info(`API base: http://localhost:${PORT}/api/v1`);
+      logger.info(`API docs: http://localhost:${PORT}/api/docs`);
+      logger.info(`OpenAPI spec: http://localhost:${PORT}/api/docs/openapi.json`);
+      logger.info(`WebSocket: ws://localhost:${PORT}`);
+    });
+
+    // Graceful shutdown handling
+    const gracefulShutdown = async (signal: string) => {
+      logger.info(`${signal} received, starting graceful shutdown`);
+
+      server.close(async () => {
+        logger.info('HTTP server closed');
+
+        try {
+          await disconnectDatabase();
+          logger.info('Database connection closed');
+          process.exit(0);
+        } catch (error) {
+          logger.error('Error during shutdown', { error });
+          process.exit(1);
+        }
+      });
+
+      // Force shutdown after 30 seconds
+      setTimeout(() => {
+        logger.error('Forced shutdown after timeout');
+        process.exit(1);
+      }, 30000);
+    };
+
+    process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+    process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+  } catch (error) {
+    logger.error('Failed to start server', { error });
+    process.exit(1);
+  }
+}
+
+// Start the server
+startServer();
+
+export { app };

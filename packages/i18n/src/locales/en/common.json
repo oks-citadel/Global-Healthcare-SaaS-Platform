@@ -1,0 +1,88 @@
+{
+  "app": {
+    "name": "Unified Healthcare Platform",
+    "tagline": "Your Complete Healthcare Solution",
+    "welcome": "Welcome to Unified Healthcare",
+    "loading": "Loading...",
+    "saving": "Saving...",
+    "saved": "Saved successfully",
+    "error": "An error occurred"
+  },
+  "nav": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "appointments": "Appointments",
+    "patients": "Patients",
+    "doctors": "Doctors",
+    "billing": "Billing",
+    "reports": "Reports",
+    "settings": "Settings",
+    "profile": "Profile",
+    "logout": "Logout"
+  },
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "create": "Create",
+    "update": "Update",
+    "submit": "Submit",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "confirm": "Confirm",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "import": "Import",
+    "download": "Download",
+    "upload": "Upload",
+    "view": "View",
+    "refresh": "Refresh",
+    "clear": "Clear"
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive",
+    "pending": "Pending",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "draft": "Draft",
+    "published": "Published"
+  },
+  "time": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "tomorrow": "Tomorrow",
+    "thisWeek": "This Week",
+    "lastWeek": "Last Week",
+    "nextWeek": "Next Week",
+    "thisMonth": "This Month",
+    "lastMonth": "Last Month",
+    "nextMonth": "Next Month"
+  },
+  "pagination": {
+    "first": "First",
+    "last": "Last",
+    "showing": "Showing {{from}} to {{to}} of {{total}} entries",
+    "rowsPerPage": "Rows per page"
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalidEmail": "Invalid email address",
+    "invalidPhone": "Invalid phone number",
+    "minLength": "Must be at least {{min}} characters",
+    "maxLength": "Must be no more than {{max}} characters",
+    "passwordMismatch": "Passwords do not match",
+    "invalidDate": "Invalid date",
+    "futureDate": "Date must be in the future",
+    "pastDate": "Date must be in the past"
+  },
+  "confirmation": {
+    "delete": "Are you sure you want to delete this item?",
+    "cancel": "Are you sure you want to cancel?",
+    "unsavedChanges": "You have unsaved changes. Are you sure you want to leave?"
+  }
+}

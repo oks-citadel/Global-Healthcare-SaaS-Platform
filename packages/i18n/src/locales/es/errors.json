@@ -1,0 +1,126 @@
+{
+  "general": {
+    "unknown": "Ocurrió un error desconocido",
+    "networkError": "Error de red. Verifique su conexión",
+    "serverError": "Error del servidor. Intente nuevamente más tarde",
+    "timeout": "Tiempo de espera agotado. Intente nuevamente",
+    "maintenance": "El sistema está en mantenimiento. Intente nuevamente más tarde",
+    "unauthorized": "No está autorizado para realizar esta acción",
+    "forbidden": "Acceso prohibido",
+    "notFound": "Recurso no encontrado",
+    "badRequest": "Solicitud inválida",
+    "conflict": "Ocurrió un conflicto de recursos",
+    "tooManyRequests": "Demasiadas solicitudes. Reduzca la velocidad"
+  },
+  "validation": {
+    "required": "{{field}} es obligatorio",
+    "invalid": "{{field}} inválido",
+    "tooShort": "{{field}} es muy corto",
+    "tooLong": "{{field}} es muy largo",
+    "invalidFormat": "Formato de {{field}} inválido",
+    "invalidEmail": "Dirección de correo electrónico inválida",
+    "invalidPhone": "Número de teléfono inválido",
+    "invalidDate": "Fecha inválida",
+    "invalidTime": "Hora inválida",
+    "passwordWeak": "La contraseña es muy débil",
+    "passwordMismatch": "Las contraseñas no coinciden",
+    "duplicateEntry": "{{field}} ya existe",
+    "outOfRange": "{{field}} está fuera de rango",
+    "fileTooBig": "El tamaño del archivo excede el límite",
+    "invalidFileType": "Tipo de archivo inválido",
+    "minValue": "El valor debe ser al menos {{min}}",
+    "maxValue": "El valor debe ser como máximo {{max}}"
+  },
+  "auth": {
+    "invalidCredentials": "Correo o contraseña inválidos",
+    "accountLocked": "La cuenta está bloqueada. Contacte soporte",
+    "accountDisabled": "La cuenta ha sido deshabilitada",
+    "accountNotVerified": "Por favor verifique su dirección de correo",
+    "emailExists": "El correo ya está registrado",
+    "sessionExpired": "Su sesión ha expirado. Inicie sesión nuevamente",
+    "tokenInvalid": "Token inválido o expirado",
+    "tokenExpired": "El token ha expirado",
+    "insufficientPermissions": "No tiene permiso para realizar esta acción",
+    "passwordExpired": "Su contraseña ha expirado. Restablézcala",
+    "twoFactorRequired": "Se requiere autenticación de dos factores",
+    "twoFactorInvalid": "Código de autenticación inválido",
+    "logoutFailed": "Error al cerrar sesión. Intente nuevamente"
+  },
+  "appointments": {
+    "notFound": "Cita no encontrada",
+    "slotNotAvailable": "El horario seleccionado no está disponible",
+    "conflict": "Existe una cita en conflicto",
+    "pastDate": "No se puede programar una cita en el pasado",
+    "cancelFailed": "Error al cancelar la cita",
+    "rescheduleFailed": "Error al reprogramar la cita",
+    "tooLate": "No se puede modificar la cita dentro de {{hours}} horas del horario programado",
+    "doctorUnavailable": "El doctor no está disponible en el horario seleccionado",
+    "patientUnavailable": "El paciente tiene una cita en conflicto",
+    "maxAppointmentsReached": "Se alcanzó el máximo de citas diarias",
+    "invalidDuration": "Duración de cita inválida"
+  },
+  "patients": {
+    "notFound": "Paciente no encontrado",
+    "createFailed": "Error al crear el registro del paciente",
+    "updateFailed": "Error al actualizar el registro del paciente",
+    "deleteFailed": "Error al eliminar el registro del paciente",
+    "duplicateRecord": "El registro del paciente ya existe",
+    "invalidMedicalRecord": "Número de registro médico inválido",
+    "recordLocked": "El registro del paciente está bloqueado"
+  },
+  "doctors": {
+    "notFound": "Doctor no encontrado",
+    "unavailable": "El doctor no está disponible",
+    "scheduleConflict": "Conflicto de horario detectado",
+    "maxCapacity": "El doctor alcanzó la capacidad máxima",
+    "invalidLicense": "Licencia médica inválida"
+  },
+  "billing": {
+    "paymentFailed": "Error al procesar el pago",
+    "invalidCard": "Tarjeta de crédito inválida",
+    "insufficientFunds": "Fondos insuficientes",
+    "invoiceNotFound": "Factura no encontrada",
+    "alreadyPaid": "La factura ya está pagada",
+    "refundFailed": "Error al procesar el reembolso",
+    "invalidAmount": "Monto de pago inválido"
+  },
+  "medical": {
+    "prescriptionExpired": "La receta ha expirado",
+    "prescriptionInvalid": "Receta inválida",
+    "allergicReaction": "Alergia a medicamento detectada",
+    "drugInteraction": "Advertencia de interacción de medicamentos",
+    "labResultNotReady": "Los resultados de laboratorio aún no están disponibles",
+    "invalidDosage": "Dosis de medicamento inválida"
+  },
+  "upload": {
+    "failed": "Error al subir el archivo",
+    "tooLarge": "El tamaño del archivo excede el límite máximo de {{max}}",
+    "invalidType": "Tipo de archivo no soportado. Tipos soportados: {{types}}",
+    "scanFailed": "Error en el escaneo de seguridad del archivo",
+    "virusDetected": "Amenaza de seguridad potencial detectada en el archivo",
+    "corruptFile": "El archivo parece estar corrupto"
+  },
+  "database": {
+    "connectionFailed": "Error de conexión a la base de datos",
+    "queryFailed": "Error en la consulta a la base de datos",
+    "transactionFailed": "Error en la transacción",
+    "recordNotFound": "Registro no encontrado",
+    "duplicateKey": "Existe un registro duplicado",
+    "foreignKeyViolation": "No se puede eliminar el registro debido a dependencias"
+  },
+  "integration": {
+    "apiUnavailable": "El servicio externo no está disponible",
+    "apiError": "Error del servicio externo",
+    "syncFailed": "Error en la sincronización de datos",
+    "webhookFailed": "Error en la entrega del webhook",
+    "connectionTimeout": "Tiempo de espera agotado en la conexión al servicio externo"
+  },
+  "actions": {
+    "tryAgain": "Intentar Nuevamente",
+    "goBack": "Volver",
+    "contactSupport": "Contactar Soporte",
+    "refresh": "Actualizar",
+    "cancel": "Cancelar",
+    "ok": "OK"
+  }
+}

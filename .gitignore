@@ -1,0 +1,84 @@
+# ============================================
+# UnifiedHealth Platform - Git Ignore
+# ============================================
+
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+.next/
+.nuxt/
+.turbo/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Testing
+coverage/
+.nyc_output/
+
+# Prisma
+prisma/migrations/*.sql
+
+# Terraform
+infrastructure/terraform/.terraform/
+infrastructure/terraform/*.tfstate
+infrastructure/terraform/*.tfstate.*
+infrastructure/terraform/.terraform.lock.hcl
+infrastructure/terraform/*.tfplan
+infrastructure/terraform/crash.log
+
+# Docker
+docker-compose.override.yml
+
+# Mobile
+apps/mobile/.expo/
+apps/mobile/ios/Pods/
+apps/mobile/android/.gradle/
+*.apk
+*.ipa
+*.aab
+
+# Secrets (NEVER commit these)
+*.pem
+*.key
+*.crt
+secrets/
+credentials.json
+service-account.json
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Cache
+.cache/
+.parcel-cache/
+
+# Misc
+*.bak
+*.backup

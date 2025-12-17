@@ -1,0 +1,145 @@
+{
+  "title": "Appointments",
+  "schedule": "Schedule Appointment",
+  "myAppointments": "My Appointments",
+  "allAppointments": "All Appointments",
+  "details": "Appointment Details",
+  "create": {
+    "title": "Schedule New Appointment",
+    "selectPatient": "Select Patient",
+    "selectDoctor": "Select Doctor",
+    "selectDate": "Select Date",
+    "selectTime": "Select Time",
+    "appointmentType": "Appointment Type",
+    "reason": "Reason for Visit",
+    "notes": "Additional Notes",
+    "duration": "Duration",
+    "location": "Location",
+    "department": "Department",
+    "submit": "Schedule Appointment",
+    "success": "Appointment scheduled successfully"
+  },
+  "edit": {
+    "title": "Edit Appointment",
+    "submit": "Update Appointment",
+    "success": "Appointment updated successfully"
+  },
+  "cancel": {
+    "title": "Cancel Appointment",
+    "reason": "Cancellation Reason",
+    "confirm": "Are you sure you want to cancel this appointment?",
+    "submit": "Cancel Appointment",
+    "success": "Appointment cancelled successfully"
+  },
+  "reschedule": {
+    "title": "Reschedule Appointment",
+    "selectNewDate": "Select New Date",
+    "selectNewTime": "Select New Time",
+    "reason": "Reason for Rescheduling",
+    "submit": "Reschedule",
+    "success": "Appointment rescheduled successfully"
+  },
+  "types": {
+    "consultation": "Consultation",
+    "followUp": "Follow-up",
+    "checkup": "Check-up",
+    "emergency": "Emergency",
+    "vaccination": "Vaccination",
+    "laboratory": "Laboratory",
+    "imaging": "Imaging",
+    "surgery": "Surgery",
+    "therapy": "Therapy",
+    "dental": "Dental",
+    "optometry": "Optometry",
+    "other": "Other"
+  },
+  "status": {
+    "scheduled": "Scheduled",
+    "confirmed": "Confirmed",
+    "inProgress": "In Progress",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "noShow": "No Show",
+    "rescheduled": "Rescheduled",
+    "pending": "Pending Confirmation"
+  },
+  "filters": {
+    "all": "All Appointments",
+    "upcoming": "Upcoming",
+    "past": "Past",
+    "today": "Today",
+    "thisWeek": "This Week",
+    "thisMonth": "This Month",
+    "byStatus": "By Status",
+    "byDoctor": "By Doctor",
+    "byType": "By Type",
+    "byPatient": "By Patient"
+  },
+  "list": {
+    "patient": "Patient",
+    "doctor": "Doctor",
+    "date": "Date",
+    "time": "Time",
+    "type": "Type",
+    "status": "Status",
+    "actions": "Actions",
+    "noAppointments": "No appointments found",
+    "loadMore": "Load More"
+  },
+  "details": {
+    "appointmentInfo": "Appointment Information",
+    "patientInfo": "Patient Information",
+    "doctorInfo": "Doctor Information",
+    "appointmentId": "Appointment ID",
+    "scheduledBy": "Scheduled By",
+    "createdAt": "Created At",
+    "updatedAt": "Last Updated",
+    "location": "Location",
+    "department": "Department",
+    "room": "Room Number",
+    "notes": "Notes",
+    "vitals": "Vitals",
+    "diagnosis": "Diagnosis",
+    "prescription": "Prescription",
+    "labOrders": "Lab Orders",
+    "nextAppointment": "Next Appointment"
+  },
+  "reminder": {
+    "title": "Appointment Reminder",
+    "message": "You have an appointment on {{date}} at {{time}}",
+    "confirm": "Confirm Attendance",
+    "reschedule": "Reschedule",
+    "cancel": "Cancel"
+  },
+  "notifications": {
+    "scheduled": "Appointment scheduled for {{date}} at {{time}}",
+    "confirmed": "Your appointment has been confirmed",
+    "cancelled": "Appointment cancelled",
+    "rescheduled": "Appointment rescheduled to {{date}} at {{time}}",
+    "reminder": "Reminder: Appointment in {{time}}",
+    "doctorRunningLate": "Doctor is running {{minutes}} minutes late",
+    "readyToSee": "Doctor is ready to see you now"
+  },
+  "calendar": {
+    "viewMode": "View Mode",
+    "day": "Day",
+    "week": "Week",
+    "month": "Month",
+    "agenda": "Agenda",
+    "available": "Available",
+    "booked": "Booked",
+    "blocked": "Blocked",
+    "selectSlot": "Select Time Slot"
+  },
+  "validation": {
+    "patientRequired": "Patient is required",
+    "doctorRequired": "Doctor is required",
+    "dateRequired": "Date is required",
+    "timeRequired": "Time is required",
+    "typeRequired": "Appointment type is required",
+    "reasonRequired": "Reason for visit is required",
+    "futureDate": "Date must be in the future",
+    "slotNotAvailable": "Selected time slot is not available",
+    "conflictingAppointment": "Conflicting appointment exists"
+  }
+}

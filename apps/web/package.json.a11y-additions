@@ -1,0 +1,15 @@
+{
+  "devDependencies": {
+    "@types/react": "^18.2.45",
+    "@types/react-dom": "^18.2.18",
+    "eslint-plugin-jsx-a11y": "^6.8.0",
+    "cypress": "^13.6.0",
+    "cypress-axe": "^1.5.0",
+    "axe-core": "^4.8.0"
+  },
+  "scripts": {
+    "test:a11y": "cypress run --spec 'cypress/e2e/a11y.spec.ts'",
+    "test:a11y:open": "cypress open",
+    "lint:a11y": "eslint . --ext .ts,.tsx --config .eslintrc.js"
+  }
+}

@@ -1,0 +1,302 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  ACR_NAME: unifiedhealthacr
+  AKS_CLUSTER: unified-health-aks-staging
+  RESOURCE_GROUP: unified-health-rg-staging
+  ENVIRONMENT: staging
+
+jobs:
+  build-and-deploy:
+    name: Build and Deploy to Staging
+    runs-on: ubuntu-latest
+    environment: staging
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run linter
+        run: pnpm lint
+
+      - name: Run type check
+        run: pnpm typecheck
+
+      - name: Run tests
+        run: pnpm test
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+      - name: Build services
+        run: pnpm build
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Login to Azure Container Registry
+        run: az acr login --name ${{ env.ACR_NAME }}
+
+      - name: Set image tags
+        id: tags
+        run: |
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+          IMAGE_TAG="${SHORT_SHA}-${TIMESTAMP}"
+          echo "IMAGE_TAG=${IMAGE_TAG}" >> $GITHUB_OUTPUT
+          echo "SHORT_SHA=${SHORT_SHA}" >> $GITHUB_OUTPUT
+
+      - name: Build Docker images
+        run: |
+          docker build \
+            -t ${{ env.ACR_NAME }}.azurecr.io/unified-health-api:${{ steps.tags.outputs.IMAGE_TAG }} \
+            -t ${{ env.ACR_NAME }}.azurecr.io/unified-health-api:latest-staging \
+            -f services/api/Dockerfile \
+            services/api
+
+          docker build \
+            -t ${{ env.ACR_NAME }}.azurecr.io/unified-health-web:${{ steps.tags.outputs.IMAGE_TAG }} \
+            -t ${{ env.ACR_NAME }}.azurecr.io/unified-health-web:latest-staging \
+            -f apps/web/Dockerfile \
+            apps/web
+
+      - name: Push Docker images
+        run: |
+          docker push ${{ env.ACR_NAME }}.azurecr.io/unified-health-api:${{ steps.tags.outputs.IMAGE_TAG }}
+          docker push ${{ env.ACR_NAME }}.azurecr.io/unified-health-api:latest-staging
+          docker push ${{ env.ACR_NAME }}.azurecr.io/unified-health-web:${{ steps.tags.outputs.IMAGE_TAG }}
+          docker push ${{ env.ACR_NAME }}.azurecr.io/unified-health-web:latest-staging
+
+      - name: Get AKS credentials
+        run: |
+          az aks get-credentials \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --name ${{ env.AKS_CLUSTER }} \
+            --overwrite-existing
+
+      - name: Run database migrations
+        run: |
+          cat <<EOF | kubectl apply -f -
+          apiVersion: batch/v1
+          kind: Job
+          metadata:
+            name: db-migration-${{ steps.tags.outputs.SHORT_SHA }}
+            namespace: unified-health-staging
+          spec:
+            ttlSecondsAfterFinished: 86400
+            backoffLimit: 3
+            template:
+              spec:
+                restartPolicy: Never
+                containers:
+                - name: migration
+                  image: ${{ env.ACR_NAME }}.azurecr.io/unified-health-api:${{ steps.tags.outputs.IMAGE_TAG }}
+                  command: ["pnpm", "db:migrate:deploy"]
+                  env:
+                  - name: DATABASE_URL
+                    valueFrom:
+                      secretKeyRef:
+                        name: unified-health-secrets
+                        key: database-url
+          EOF
+
+          kubectl wait --for=condition=complete \
+            --timeout=300s \
+            -n unified-health-staging \
+            job/db-migration-${{ steps.tags.outputs.SHORT_SHA }}
+
+      - name: Deploy to AKS
+        run: |
+          export ACR_LOGIN_SERVER="${{ env.ACR_NAME }}.azurecr.io"
+          export IMAGE_TAG="${{ steps.tags.outputs.IMAGE_TAG }}"
+
+          envsubst < infrastructure/kubernetes/base/api-deployment.yaml | kubectl apply -f -
+
+      - name: Wait for rollout
+        run: |
+          kubectl rollout status deployment/unified-health-api \
+            -n unified-health-staging \
+            --timeout=300s
+
+      - name: Verify deployment
+        run: |
+          kubectl get pods -n unified-health-staging -l app=unified-health-api
+
+          READY_PODS=$(kubectl get pods -n unified-health-staging -l app=unified-health-api -o json | jq -r '.items[] | select(.status.phase=="Running") | .metadata.name' | wc -l)
+
+          if [ "$READY_PODS" -eq 0 ]; then
+            echo "No pods are running!"
+            exit 1
+          fi
+
+          echo "Deployment successful: $READY_PODS pods running"
+
+      - name: Run smoke tests
+        run: |
+          kubectl port-forward -n unified-health-staging svc/unified-health-api 8080:80 &
+          PF_PID=$!
+
+          sleep 10
+
+          # Test health endpoint
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/health || echo "000")
+
+          if [ "$HTTP_CODE" == "200" ]; then
+            echo "Health check passed"
+          else
+            echo "Health check failed with code: $HTTP_CODE"
+            kill $PF_PID 2>/dev/null || true
+            exit 1
+          fi
+
+          # Test ready endpoint
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/ready || echo "000")
+
+          if [ "$HTTP_CODE" == "200" ]; then
+            echo "Ready check passed"
+          else
+            echo "Ready check failed with code: $HTTP_CODE"
+            kill $PF_PID 2>/dev/null || true
+            exit 1
+          fi
+
+          kill $PF_PID 2>/dev/null || true
+
+  run-e2e-tests:
+    name: Run E2E Tests
+    runs-on: ubuntu-latest
+    needs: build-and-deploy
+    environment: staging
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright
+        run: pnpm exec playwright install --with-deps
+
+      - name: Run E2E tests
+        run: pnpm test:e2e
+        env:
+          E2E_BASE_URL: ${{ secrets.STAGING_URL }}
+          E2E_API_URL: ${{ secrets.STAGING_API_URL }}
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: e2e-test-results
+          path: |
+            test-results/
+            playwright-report/
+
+  notify:
+    name: Send Notification
+    runs-on: ubuntu-latest
+    needs: [build-and-deploy, run-e2e-tests]
+    if: always()
+
+    steps:
+      - name: Send Slack notification
+        if: always()
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "Staging Deployment ${{ needs.build-and-deploy.result == 'success' && needs.run-e2e-tests.result == 'success' && 'Successful' || 'Failed' }}",
+              "attachments": [
+                {
+                  "color": "${{ needs.build-and-deploy.result == 'success' && needs.run-e2e-tests.result == 'success' && 'good' || 'danger' }}",
+                  "fields": [
+                    {
+                      "title": "Environment",
+                      "value": "staging",
+                      "short": true
+                    },
+                    {
+                      "title": "Branch",
+                      "value": "${{ github.ref_name }}",
+                      "short": true
+                    },
+                    {
+                      "title": "Commit",
+                      "value": "${{ github.sha }}",
+                      "short": true
+                    },
+                    {
+                      "title": "Author",
+                      "value": "${{ github.actor }}",
+                      "short": true
+                    },
+                    {
+                      "title": "Deployment Status",
+                      "value": "${{ needs.build-and-deploy.result }}",
+                      "short": true
+                    },
+                    {
+                      "title": "E2E Tests Status",
+                      "value": "${{ needs.run-e2e-tests.result }}",
+                      "short": true
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": "button",
+                      "text": "View Workflow",
+                      "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
