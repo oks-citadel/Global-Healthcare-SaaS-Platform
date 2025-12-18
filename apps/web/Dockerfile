@@ -1,7 +1,7 @@
 # ============================================
 # Stage 1: Dependencies
 # ============================================
-FROM node:20-alpine AS deps
+FROM node:25-alpine AS deps
 
 # Install security updates and dependencies
 RUN apk add --no-cache libc6-compat \
@@ -21,7 +21,7 @@ RUN pnpm install --frozen-lockfile
 # ============================================
 # Stage 2: Builder
 # ============================================
-FROM node:20-alpine AS builder
+FROM node:25-alpine AS builder
 
 WORKDIR /app
 
@@ -47,7 +47,7 @@ RUN pnpm build
 # ============================================
 # Stage 3: Production Runtime
 # ============================================
-FROM node:20-alpine AS production
+FROM node:25-alpine AS production
 
 # Add image metadata
 LABEL maintainer="UnifiedHealth Platform Team"
