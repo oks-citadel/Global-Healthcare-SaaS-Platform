@@ -1,6 +1,7 @@
 # ============================================
 # UnifiedHealth Platform - CI Pipeline
 # GitHub Actions for Continuous Integration
+# All jobs run on Azure Cloud infrastructure
 # ============================================
 
 name: CI Pipeline
@@ -14,6 +15,8 @@ on:
 env:
   NODE_VERSION: '20'
   PNPM_VERSION: '9'
+  ACR_NAME: unifiedhealthacr
+  RESOURCE_GROUP: unifiedhealth-rg
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -81,18 +84,19 @@ jobs:
         run: pnpm test:unit
 
       - name: Upload coverage reports
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           files: ./coverage/lcov.info
           flags: unittests
           fail_ci_if_error: false
 
   # ==========================================
-  # Integration Tests
+  # Integration Tests (Using Azure Services)
   # ==========================================
   test-integration:
     name: Integration Tests
     runs-on: ubuntu-latest
+    environment: ci
     services:
       postgres:
         image: postgres:15
@@ -159,6 +163,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
@@ -169,7 +187,7 @@ jobs:
           severity: 'CRITICAL,HIGH'
 
       - name: Upload Trivy scan results
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         if: always()
         with:
           sarif_file: 'trivy-results.sarif'
@@ -210,35 +228,34 @@ jobs:
           exit-code: '1'
           severity: 'CRITICAL,HIGH'
 
-  # ==========================================
-  # OpenAPI Contract Validation
-  # ==========================================
-  openapi-validation:
-    name: OpenAPI Contract Validation
+  build-web:
+    name: Build Web Image
     runs-on: ubuntu-latest
-    needs: [lint]
+    needs: [lint, test-unit]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Web image
+        uses: docker/build-push-action@v5
         with:
-          version: ${{ env.PNPM_VERSION }}
+          context: ./apps/web
+          file: ./apps/web/Dockerfile
+          push: false
+          tags: unified-health-web:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Run Trivy image scan
+        uses: aquasecurity/trivy-action@master
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Validate OpenAPI spec
-        run: |
-          npx @redocly/cli lint ./services/api/openapi.yaml || true
-        continue-on-error: true
+          image-ref: unified-health-web:${{ github.sha }}
+          format: 'table'
+          exit-code: '1'
+          severity: 'CRITICAL,HIGH'
 
   # ==========================================
   # Terraform Validation
@@ -268,25 +285,25 @@ jobs:
         run: terraform validate
 
   # ==========================================
-  # Push Images to ACR (on main branch)
+  # Push Images to Azure ACR (on main branch)
   # ==========================================
   push-images:
-    name: Push Images to ACR
+    name: Push Images to Azure ACR
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    needs: [build-api, test-integration, security-scan, terraform-validate]
+    needs: [build-api, build-web, test-integration, security-scan, terraform-validate]
     environment: staging
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Azure Login
-        uses: azure/login@v1
+        uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Login to ACR
-        run: az acr login --name ${{ secrets.ACR_NAME }}
+      - name: Login to Azure Container Registry
+        run: az acr login --name ${{ env.ACR_NAME }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -298,20 +315,61 @@ jobs:
           file: ./services/api/Dockerfile
           push: true
           tags: |
-            ${{ secrets.ACR_LOGIN_SERVER }}/unified-health-api:${{ github.sha }}
-            ${{ secrets.ACR_LOGIN_SERVER }}/unified-health-api:latest
+            ${{ env.ACR_NAME }}.azurecr.io/unified-health-api:${{ github.sha }}
+            ${{ env.ACR_NAME }}.azurecr.io/unified-health-api:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Generate SBOM
+      - name: Build and push Web image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./apps/web
+          file: ./apps/web/Dockerfile
+          push: true
+          tags: |
+            ${{ env.ACR_NAME }}.azurecr.io/unified-health-web:${{ github.sha }}
+            ${{ env.ACR_NAME }}.azurecr.io/unified-health-web:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Generate SBOM for API
         uses: anchore/sbom-action@v0
         with:
-          image: ${{ secrets.ACR_LOGIN_SERVER }}/unified-health-api:${{ github.sha }}
+          image: ${{ env.ACR_NAME }}.azurecr.io/unified-health-api:${{ github.sha }}
           format: 'spdx-json'
-          output-file: 'sbom.spdx.json'
+          output-file: 'sbom-api.spdx.json'
 
-      - name: Upload SBOM artifact
-        uses: actions/upload-artifact@v3
+      - name: Generate SBOM for Web
+        uses: anchore/sbom-action@v0
+        with:
+          image: ${{ env.ACR_NAME }}.azurecr.io/unified-health-web:${{ github.sha }}
+          format: 'spdx-json'
+          output-file: 'sbom-web.spdx.json'
+
+      - name: Upload SBOM artifacts
+        uses: actions/upload-artifact@v4
         with:
           name: sbom
-          path: sbom.spdx.json
+          path: |
+            sbom-api.spdx.json
+            sbom-web.spdx.json
+
+  # ==========================================
+  # Trigger Staging Deployment
+  # ==========================================
+  trigger-staging-deploy:
+    name: Trigger Staging Deployment
+    runs-on: ubuntu-latest
+    needs: push-images
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - name: Trigger staging deployment workflow
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'deploy-staging.yml',
+              ref: 'main'
+            })

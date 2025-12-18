@@ -15,16 +15,16 @@ datasource db {
 // ==========================================
 
 model User {
-  id            String    @id @default(uuid())
-  email         String    @unique
+  id            String     @id @default(uuid())
+  email         String     @unique
   password      String
   firstName     String
   lastName      String
   phone         String?
   dateOfBirth   DateTime?
-  role          Role      @default(patient)
+  role          Role       @default(patient)
   status        UserStatus @default(active)
-  emailVerified Boolean   @default(false)
+  emailVerified Boolean    @default(false)
 
   // Relations
   patient       Patient?
@@ -32,11 +32,14 @@ model User {
   refreshTokens RefreshToken[]
   auditEvents   AuditEvent[]
 
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([email])
   @@index([role])
+  @@index([status])
+  @@index([role, status])
+  @@index([createdAt])
 }
 
 enum Role {
@@ -62,6 +65,8 @@ model RefreshToken {
 
   @@index([userId])
   @@index([token])
+  @@index([expiresAt])
+  @@index([userId, expiresAt])
 }
 
 // ==========================================
@@ -69,26 +74,26 @@ model RefreshToken {
 // ==========================================
 
 model Patient {
-  id                  String    @id @default(uuid())
-  userId              String    @unique
-  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  medicalRecordNumber String    @unique
+  id                  String   @id @default(uuid())
+  userId              String   @unique
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  medicalRecordNumber String   @unique
   dateOfBirth         DateTime
   gender              Gender
   bloodType           String?
   allergies           String[]
 
   // Emergency contact (JSON)
-  emergencyContact    Json?
+  emergencyContact Json?
 
   // Relations
-  appointments        Appointment[]
-  encounters          Encounter[]
-  documents           Document[]
-  consents            Consent[]
+  appointments Appointment[]
+  encounters   Encounter[]
+  documents    Document[]
+  consents     Consent[]
 
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
   @@index([medicalRecordNumber])
@@ -106,23 +111,25 @@ enum Gender {
 // ==========================================
 
 model Provider {
-  id            String    @id @default(uuid())
-  userId        String    @unique
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  licenseNumber String
+  id            String   @id @default(uuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  licenseNumber String   @unique
   specialty     String[]
   bio           String?
-  available     Boolean   @default(true)
+  available     Boolean  @default(true)
 
   // Relations
-  appointments  Appointment[]
-  encounters    Encounter[]
+  appointments Appointment[]
+  encounters   Encounter[]
 
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
   @@index([specialty])
+  @@index([available])
+  @@index([licenseNumber])
 }
 
 // ==========================================
@@ -136,18 +143,18 @@ model Appointment {
   providerId     String
   provider       Provider          @relation(fields: [providerId], references: [id], onDelete: Cascade)
   scheduledAt    DateTime
-  duration       Int               // in minutes
+  duration       Int // in minutes
   type           AppointmentType
   status         AppointmentStatus @default(scheduled)
   reasonForVisit String?
   notes          String?
 
   // Relations
-  visit          Visit?
-  encounter      Encounter?
+  visit     Visit?
+  encounter Encounter?
 
-  createdAt      DateTime          @default(now())
-  updatedAt      DateTime          @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([patientId])
   @@index([providerId])
@@ -183,10 +190,10 @@ model Visit {
   endedAt       DateTime?
 
   // Relations
-  messages      ChatMessage[]
+  messages ChatMessage[]
 
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([appointmentId])
   @@index([sessionToken])
@@ -232,10 +239,10 @@ model Encounter {
   endedAt       DateTime?
 
   // Relations
-  notes         ClinicalNote[]
+  notes ClinicalNote[]
 
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([patientId])
   @@index([providerId])
@@ -283,8 +290,8 @@ model Document {
   description String?
   uploadedBy  String
 
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([patientId])
   @@index([type])
@@ -304,20 +311,24 @@ enum DocumentType {
 // ==========================================
 
 model Plan {
-  id          String         @id
+  id          String       @id
   name        String
   description String
-  price       Decimal        @db.Decimal(10, 2)
-  currency    String         @default("USD")
+  price       Decimal      @db.Decimal(10, 2)
+  currency    String       @default("USD")
   interval    PlanInterval
   features    String[]
-  active      Boolean        @default(true)
+  active      Boolean      @default(true)
 
   // Relations
   subscriptions Subscription[]
 
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([active])
+  @@index([interval])
+  @@index([active, interval])
 }
 
 enum PlanInterval {
@@ -326,23 +337,25 @@ enum PlanInterval {
 }
 
 model Subscription {
-  id                 String             @id @default(uuid())
-  userId             String
-  planId             String
-  plan               Plan               @relation(fields: [planId], references: [id], onDelete: Restrict)
-  status             SubscriptionStatus @default(active)
-  stripeSubscriptionId String?          @unique
-  currentPeriodStart DateTime
-  currentPeriodEnd   DateTime
-  cancelAtPeriodEnd  Boolean            @default(false)
+  id                   String             @id @default(uuid())
+  userId               String
+  planId               String
+  plan                 Plan               @relation(fields: [planId], references: [id], onDelete: Restrict)
+  status               SubscriptionStatus @default(active)
+  stripeSubscriptionId String?            @unique
+  currentPeriodStart   DateTime
+  currentPeriodEnd     DateTime
+  cancelAtPeriodEnd    Boolean            @default(false)
 
-  createdAt          DateTime           @default(now())
-  updatedAt          DateTime           @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
   @@index([status])
   @@index([userId, status])
   @@index([currentPeriodEnd])
+  @@index([planId])
+  @@index([status, currentPeriodEnd])
 }
 
 enum SubscriptionStatus {
@@ -353,22 +366,22 @@ enum SubscriptionStatus {
 }
 
 model PaymentMethod {
-  id                   String              @id @default(uuid())
-  userId               String
-  stripePaymentMethodId String             @unique
-  type                 PaymentMethodType
-  last4                String
-  brand                String?             // visa, mastercard, amex, etc.
-  expiryMonth          Int?
-  expiryYear           Int?
-  isDefault            Boolean             @default(false)
-  billingAddress       Json?
+  id                    String            @id @default(uuid())
+  userId                String
+  stripePaymentMethodId String            @unique
+  type                  PaymentMethodType
+  last4                 String
+  brand                 String? // visa, mastercard, amex, etc.
+  expiryMonth           Int?
+  expiryYear            Int?
+  isDefault             Boolean           @default(false)
+  billingAddress        Json?
 
   // Relations
-  payments             Payment[]
+  payments Payment[]
 
-  createdAt            DateTime            @default(now())
-  updatedAt            DateTime            @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
   @@index([userId, isDefault])
@@ -381,27 +394,27 @@ enum PaymentMethodType {
 }
 
 model Payment {
-  id                   String              @id @default(uuid())
-  userId               String
-  paymentMethodId      String?
-  paymentMethod        PaymentMethod?      @relation(fields: [paymentMethodId], references: [id], onDelete: SetNull)
-  stripePaymentIntentId String?            @unique
-  amount               Decimal             @db.Decimal(10, 2)
-  currency             String              @default("USD")
-  status               PaymentStatus       @default(pending)
-  description          String?
-  metadata             Json?
+  id                    String         @id @default(uuid())
+  userId                String
+  paymentMethodId       String?
+  paymentMethod         PaymentMethod? @relation(fields: [paymentMethodId], references: [id], onDelete: SetNull)
+  stripePaymentIntentId String?        @unique
+  amount                Decimal        @db.Decimal(10, 2)
+  currency              String         @default("USD")
+  status                PaymentStatus  @default(pending)
+  description           String?
+  metadata              Json?
 
   // Relations
-  invoice              Invoice?            @relation(fields: [invoiceId], references: [id])
-  invoiceId            String?
+  invoice   Invoice? @relation(fields: [invoiceId], references: [id])
+  invoiceId String?
 
-  failedReason         String?
-  refundedAmount       Decimal?            @db.Decimal(10, 2)
-  refundedAt           DateTime?
+  failedReason   String?
+  refundedAmount Decimal?  @db.Decimal(10, 2)
+  refundedAt     DateTime?
 
-  createdAt            DateTime            @default(now())
-  updatedAt            DateTime            @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
   @@index([status])
@@ -420,26 +433,26 @@ enum PaymentStatus {
 }
 
 model Invoice {
-  id                   String              @id @default(uuid())
-  userId               String
-  invoiceNumber        String              @unique
-  stripeInvoiceId      String?             @unique
-  status               InvoiceStatus       @default(draft)
-  subtotal             Decimal             @db.Decimal(10, 2)
-  tax                  Decimal             @db.Decimal(10, 2) @default(0)
-  discount             Decimal             @db.Decimal(10, 2) @default(0)
-  total                Decimal             @db.Decimal(10, 2)
-  currency             String              @default("USD")
-  dueDate              DateTime?
-  paidAt               DateTime?
-  notes                String?
+  id              String        @id @default(uuid())
+  userId          String
+  invoiceNumber   String        @unique
+  stripeInvoiceId String?       @unique
+  status          InvoiceStatus @default(draft)
+  subtotal        Decimal       @db.Decimal(10, 2)
+  tax             Decimal       @default(0) @db.Decimal(10, 2)
+  discount        Decimal       @default(0) @db.Decimal(10, 2)
+  total           Decimal       @db.Decimal(10, 2)
+  currency        String        @default("USD")
+  dueDate         DateTime?
+  paidAt          DateTime?
+  notes           String?
 
   // Relations
-  items                InvoiceItem[]
-  payments             Payment[]
+  items    InvoiceItem[]
+  payments Payment[]
 
-  createdAt            DateTime            @default(now())
-  updatedAt            DateTime            @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
   @@index([status])
@@ -459,16 +472,16 @@ enum InvoiceStatus {
 }
 
 model InvoiceItem {
-  id                   String              @id @default(uuid())
-  invoiceId            String
-  invoice              Invoice             @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
-  description          String
-  quantity             Int                 @default(1)
-  unitPrice            Decimal             @db.Decimal(10, 2)
-  amount               Decimal             @db.Decimal(10, 2)
-  metadata             Json?
+  id          String  @id @default(uuid())
+  invoiceId   String
+  invoice     Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  description String
+  quantity    Int     @default(1)
+  unitPrice   Decimal @db.Decimal(10, 2)
+  amount      Decimal @db.Decimal(10, 2)
+  metadata    Json?
 
-  createdAt            DateTime            @default(now())
+  createdAt DateTime @default(now())
 
   @@index([invoiceId])
 }
@@ -478,26 +491,26 @@ model InvoiceItem {
 // ==========================================
 
 model HealthPackage {
-  id                   String              @id @default(uuid())
-  name                 String
-  description          String
-  category             HealthPackageCategory
-  price                Decimal             @db.Decimal(10, 2)
-  currency             String              @default("USD")
-  duration             Int                 // Duration in minutes
-  active               Boolean             @default(true)
-  popular              Boolean             @default(false)
+  id          String                @id @default(uuid())
+  name        String
+  description String
+  category    HealthPackageCategory
+  price       Decimal               @db.Decimal(10, 2)
+  currency    String                @default("USD")
+  duration    Int // Duration in minutes
+  active      Boolean               @default(true)
+  popular     Boolean               @default(false)
 
   // What's included
-  tests                String[]            // List of test names
-  consultations        Int                 @default(1)
-  followUps            Int                 @default(0)
+  tests         String[] // List of test names
+  consultations Int      @default(1)
+  followUps     Int      @default(0)
 
   // Relations
-  bookings             HealthPackageBooking[]
+  bookings HealthPackageBooking[]
 
-  createdAt            DateTime            @default(now())
-  updatedAt            DateTime            @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([category])
   @@index([active])
@@ -517,21 +530,21 @@ enum HealthPackageCategory {
 }
 
 model HealthPackageBooking {
-  id                   String              @id @default(uuid())
-  patientId            String
-  packageId            String
-  package              HealthPackage       @relation(fields: [packageId], references: [id])
-  status               BookingStatus       @default(scheduled)
-  scheduledDate        DateTime
-  completedAt          DateTime?
-  notes                String?
+  id            String        @id @default(uuid())
+  patientId     String
+  packageId     String
+  package       HealthPackage @relation(fields: [packageId], references: [id])
+  status        BookingStatus @default(scheduled)
+  scheduledDate DateTime
+  completedAt   DateTime?
+  notes         String?
 
   // Results
-  reportUrl            String?
-  reportGeneratedAt    DateTime?
+  reportUrl         String?
+  reportGeneratedAt DateTime?
 
-  createdAt            DateTime            @default(now())
-  updatedAt            DateTime            @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([patientId])
   @@index([packageId])
@@ -548,23 +561,23 @@ enum BookingStatus {
 }
 
 model DiagnosticTest {
-  id                   String              @id @default(uuid())
-  name                 String
-  code                 String              @unique          // Lab test code
-  category             DiagnosticCategory
-  description          String?
-  preparation          String?             // Fasting requirements, etc.
-  sampleType           String?             // Blood, Urine, etc.
-  turnaroundTime       String?             // e.g., "24-48 hours"
-  price                Decimal             @db.Decimal(10, 2)
-  currency             String              @default("USD")
-  active               Boolean             @default(true)
+  id             String             @id @default(uuid())
+  name           String
+  code           String             @unique // Lab test code
+  category       DiagnosticCategory
+  description    String?
+  preparation    String? // Fasting requirements, etc.
+  sampleType     String? // Blood, Urine, etc.
+  turnaroundTime String? // e.g., "24-48 hours"
+  price          Decimal            @db.Decimal(10, 2)
+  currency       String             @default("USD")
+  active         Boolean            @default(true)
 
   // Reference ranges (JSON for flexibility)
-  referenceRanges      Json?
+  referenceRanges Json?
 
-  createdAt            DateTime            @default(now())
-  updatedAt            DateTime            @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([category])
   @@index([code])
@@ -584,24 +597,24 @@ enum DiagnosticCategory {
 }
 
 model LabResult {
-  id                   String              @id @default(uuid())
-  patientId            String
-  encounterId          String?
-  testCode             String
-  testName             String
-  value                String
-  unit                 String?
-  referenceRange       String?
-  status               LabResultStatus     @default(pending)
-  isAbnormal           Boolean             @default(false)
-  notes                String?
-  performedBy          String?
-  verifiedBy           String?
-  collectedAt          DateTime?
-  resultedAt           DateTime?
+  id             String          @id @default(uuid())
+  patientId      String
+  encounterId    String?
+  testCode       String
+  testName       String
+  value          String
+  unit           String?
+  referenceRange String?
+  status         LabResultStatus @default(pending)
+  isAbnormal     Boolean         @default(false)
+  notes          String?
+  performedBy    String?
+  verifiedBy     String?
+  collectedAt    DateTime?
+  resultedAt     DateTime?
 
-  createdAt            DateTime            @default(now())
-  updatedAt            DateTime            @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([patientId])
   @@index([encounterId])
@@ -622,21 +635,21 @@ enum LabResultStatus {
 // ==========================================
 
 model Prescription {
-  id                   String              @id @default(uuid())
-  patientId            String
-  providerId           String
-  encounterId          String?
-  status               PrescriptionStatus  @default(active)
+  id          String             @id @default(uuid())
+  patientId   String
+  providerId  String
+  encounterId String?
+  status      PrescriptionStatus @default(active)
 
   // Relations
-  items                PrescriptionItem[]
+  items PrescriptionItem[]
 
-  notes                String?
-  validFrom            DateTime            @default(now())
-  validUntil           DateTime?
+  notes      String?
+  validFrom  DateTime  @default(now())
+  validUntil DateTime?
 
-  createdAt            DateTime            @default(now())
-  updatedAt            DateTime            @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([patientId])
   @@index([providerId])
@@ -653,20 +666,20 @@ enum PrescriptionStatus {
 }
 
 model PrescriptionItem {
-  id                   String              @id @default(uuid())
-  prescriptionId       String
-  prescription         Prescription        @relation(fields: [prescriptionId], references: [id], onDelete: Cascade)
-  medicationName       String
-  dosage               String
-  frequency            String              // e.g., "twice daily"
-  duration             String?             // e.g., "7 days"
-  quantity             Int?
-  refillsAllowed       Int                 @default(0)
-  refillsUsed          Int                 @default(0)
-  instructions         String?
-  isGenericAllowed     Boolean             @default(true)
+  id               String       @id @default(uuid())
+  prescriptionId   String
+  prescription     Prescription @relation(fields: [prescriptionId], references: [id], onDelete: Cascade)
+  medicationName   String
+  dosage           String
+  frequency        String // e.g., "twice daily"
+  duration         String? // e.g., "7 days"
+  quantity         Int?
+  refillsAllowed   Int          @default(0)
+  refillsUsed      Int          @default(0)
+  instructions     String?
+  isGenericAllowed Boolean      @default(true)
 
-  createdAt            DateTime            @default(now())
+  createdAt DateTime @default(now())
 
   @@index([prescriptionId])
   @@index([medicationName])
@@ -685,8 +698,8 @@ model Consent {
   scope     String?
   expiresAt DateTime?
 
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([patientId])
   @@index([type])
@@ -727,19 +740,19 @@ model AuditEvent {
 // ==========================================
 
 model DeviceToken {
-  id           String       @id @default(uuid())
-  userId       String
-  token        String       @unique
-  platform     Platform
-  deviceName   String?
-  deviceModel  String?
-  osVersion    String?
-  appVersion   String?
-  active       Boolean      @default(true)
-  lastUsedAt   DateTime     @default(now())
+  id          String   @id @default(uuid())
+  userId      String
+  token       String   @unique
+  platform    Platform
+  deviceName  String?
+  deviceModel String?
+  osVersion   String?
+  appVersion  String?
+  active      Boolean  @default(true)
+  lastUsedAt  DateTime @default(now())
 
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
   @@index([token])
@@ -754,19 +767,19 @@ enum Platform {
 }
 
 model PushNotification {
-  id           String                 @id @default(uuid())
+  id           String             @id @default(uuid())
   userId       String
   title        String
   body         String
   data         Json?
   type         NotificationType
-  status       NotificationStatus     @default(pending)
+  status       NotificationStatus @default(pending)
   sentAt       DateTime?
   readAt       DateTime?
   failedReason String?
 
-  createdAt    DateTime               @default(now())
-  updatedAt    DateTime               @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
   @@index([status])
@@ -796,30 +809,30 @@ enum NotificationStatus {
 }
 
 model NotificationPreference {
-  id                    String   @id @default(uuid())
-  userId                String   @unique
+  id     String @id @default(uuid())
+  userId String @unique
 
   // Channel preferences
-  emailEnabled          Boolean  @default(true)
-  smsEnabled            Boolean  @default(true)
-  pushEnabled           Boolean  @default(true)
+  emailEnabled Boolean @default(true)
+  smsEnabled   Boolean @default(true)
+  pushEnabled  Boolean @default(true)
 
   // Notification type preferences
-  appointmentReminders  Boolean  @default(true)
-  messageAlerts         Boolean  @default(true)
-  prescriptionAlerts    Boolean  @default(true)
-  labResultAlerts       Boolean  @default(true)
-  paymentAlerts         Boolean  @default(true)
-  marketingEmails       Boolean  @default(false)
+  appointmentReminders Boolean @default(true)
+  messageAlerts        Boolean @default(true)
+  prescriptionAlerts   Boolean @default(true)
+  labResultAlerts      Boolean @default(true)
+  paymentAlerts        Boolean @default(true)
+  marketingEmails      Boolean @default(false)
 
   // Quiet hours
-  quietHoursEnabled     Boolean  @default(false)
-  quietHoursStart       String?  // HH:MM format
-  quietHoursEnd         String?  // HH:MM format
-  quietHoursTimezone    String?  @default("UTC")
+  quietHoursEnabled  Boolean @default(false)
+  quietHoursStart    String? // HH:MM format
+  quietHoursEnd      String? // HH:MM format
+  quietHoursTimezone String? @default("UTC")
 
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
 }

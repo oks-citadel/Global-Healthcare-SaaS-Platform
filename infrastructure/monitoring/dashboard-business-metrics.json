@@ -1,0 +1,596 @@
+{
+  "dashboardName": "Unified Health - Business Metrics Dashboard",
+  "version": "1.0",
+  "refreshInterval": 60,
+  "timeRange": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "tags": ["business", "metrics", "kpi"],
+  "panels": [
+    {
+      "id": 1,
+      "title": "Active Users (Last 24h)",
+      "type": "stat",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "query": "sum(active_users) by (role)",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "graphMode": "area",
+        "colorMode": "value",
+        "unit": "short",
+        "orientation": "auto",
+        "textMode": "value_and_name"
+      }
+    },
+    {
+      "id": 2,
+      "title": "New User Registrations",
+      "type": "stat",
+      "gridPos": {
+        "x": 6,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "query": "sum(increase(users_registered_total[24h]))",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "graphMode": "area",
+        "colorMode": "background",
+        "unit": "short",
+        "sparkline": {
+          "show": true
+        }
+      }
+    },
+    {
+      "id": 3,
+      "title": "Appointments Today",
+      "type": "stat",
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "query": "sum(increase(appointments_created_total[24h]))",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "graphMode": "area",
+        "colorMode": "value",
+        "unit": "short"
+      }
+    },
+    {
+      "id": 4,
+      "title": "Total Revenue (24h)",
+      "type": "stat",
+      "gridPos": {
+        "x": 18,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "query": "sum(payment_amount_sum{status='success'})",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "graphMode": "area",
+        "colorMode": "background",
+        "unit": "currencyUSD",
+        "decimals": 2,
+        "thresholds": [
+          {
+            "value": 0,
+            "color": "red"
+          },
+          {
+            "value": 10000,
+            "color": "yellow"
+          },
+          {
+            "value": 50000,
+            "color": "green"
+          }
+        ]
+      }
+    },
+    {
+      "id": 5,
+      "title": "User Registration Trend",
+      "type": "graph",
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 12,
+        "h": 6
+      },
+      "targets": [
+        {
+          "query": "sum(rate(users_registered_total[1h])) by (role) * 3600",
+          "refId": "A",
+          "legendFormat": "{{role}}"
+        }
+      ],
+      "options": {
+        "yAxis": {
+          "format": "short",
+          "label": "Registrations per hour"
+        },
+        "legend": {
+          "show": true,
+          "values": true,
+          "current": true,
+          "total": true
+        }
+      }
+    },
+    {
+      "id": 6,
+      "title": "User Distribution by Role",
+      "type": "piechart",
+      "gridPos": {
+        "x": 12,
+        "y": 4,
+        "w": 12,
+        "h": 6
+      },
+      "targets": [
+        {
+          "query": "sum(active_users) by (role)",
+          "refId": "A",
+          "legendFormat": "{{role}}"
+        }
+      ],
+      "options": {
+        "legend": {
+          "show": true,
+          "values": true,
+          "percentage": true
+        },
+        "pieType": "donut"
+      }
+    },
+    {
+      "id": 7,
+      "title": "Appointment Creation Rate",
+      "type": "graph",
+      "gridPos": {
+        "x": 0,
+        "y": 10,
+        "w": 12,
+        "h": 6
+      },
+      "targets": [
+        {
+          "query": "sum(rate(appointments_created_total[5m])) by (type) * 3600",
+          "refId": "A",
+          "legendFormat": "{{type}}"
+        }
+      ],
+      "options": {
+        "yAxis": {
+          "format": "short",
+          "label": "Appointments per hour"
+        },
+        "legend": {
+          "show": true
+        }
+      }
+    },
+    {
+      "id": 8,
+      "title": "Appointment Status Distribution",
+      "type": "bar-gauge",
+      "gridPos": {
+        "x": 12,
+        "y": 10,
+        "w": 12,
+        "h": 6
+      },
+      "targets": [
+        {
+          "query": "sum(increase(appointments_created_total[24h])) by (status)",
+          "refId": "A",
+          "legendFormat": "{{status}}"
+        },
+        {
+          "query": "sum(increase(appointments_completed_total[24h]))",
+          "refId": "B",
+          "legendFormat": "Completed"
+        },
+        {
+          "query": "sum(increase(appointments_cancelled_total[24h]))",
+          "refId": "C",
+          "legendFormat": "Cancelled"
+        }
+      ],
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "gradient",
+        "showUnfilled": true
+      }
+    },
+    {
+      "id": 9,
+      "title": "Consultation Duration Average",
+      "type": "graph",
+      "gridPos": {
+        "x": 0,
+        "y": 16,
+        "w": 12,
+        "h": 6
+      },
+      "targets": [
+        {
+          "query": "avg(consultation_duration_seconds) by (type)",
+          "refId": "A",
+          "legendFormat": "{{type}}"
+        }
+      ],
+      "options": {
+        "yAxis": {
+          "format": "s",
+          "label": "Average Duration"
+        }
+      }
+    },
+    {
+      "id": 10,
+      "title": "Consultations Started",
+      "type": "graph",
+      "gridPos": {
+        "x": 12,
+        "y": 16,
+        "w": 12,
+        "h": 6
+      },
+      "targets": [
+        {
+          "query": "sum(rate(consultations_started_total[5m])) by (specialty) * 3600",
+          "refId": "A",
+          "legendFormat": "{{specialty}}"
+        }
+      ],
+      "options": {
+        "yAxis": {
+          "format": "short",
+          "label": "Consultations per hour"
+        },
+        "legend": {
+          "show": true,
+          "values": true,
+          "current": true
+        }
+      }
+    },
+    {
+      "id": 11,
+      "title": "Payment Success Rate",
+      "type": "gauge",
+      "gridPos": {
+        "x": 0,
+        "y": 22,
+        "w": 8,
+        "h": 6
+      },
+      "targets": [
+        {
+          "query": "sum(rate(payments_processed_total{status='success'}[1h])) / sum(rate(payments_processed_total[1h])) * 100",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "unit": "percent",
+        "min": 0,
+        "max": 100,
+        "thresholds": [
+          {
+            "value": 0,
+            "color": "red"
+          },
+          {
+            "value": 95,
+            "color": "yellow"
+          },
+          {
+            "value": 99,
+            "color": "green"
+          }
+        ],
+        "showThresholdLabels": true,
+        "showThresholdMarkers": true
+      }
+    },
+    {
+      "id": 12,
+      "title": "Payment Volume by Method",
+      "type": "graph",
+      "gridPos": {
+        "x": 8,
+        "y": 22,
+        "w": 8,
+        "h": 6
+      },
+      "targets": [
+        {
+          "query": "sum(rate(payments_processed_total[1h])) by (method)",
+          "refId": "A",
+          "legendFormat": "{{method}}"
+        }
+      ],
+      "options": {
+        "yAxis": {
+          "format": "short",
+          "label": "Payments/hour"
+        }
+      }
+    },
+    {
+      "id": 13,
+      "title": "Revenue by Currency",
+      "type": "graph",
+      "gridPos": {
+        "x": 16,
+        "y": 22,
+        "w": 8,
+        "h": 6
+      },
+      "targets": [
+        {
+          "query": "sum(rate(payment_amount_sum{status='success'}[1h])) by (currency)",
+          "refId": "A",
+          "legendFormat": "{{currency}}"
+        }
+      ],
+      "options": {
+        "yAxis": {
+          "format": "currencyUSD",
+          "label": "Revenue/hour"
+        }
+      }
+    },
+    {
+      "id": 14,
+      "title": "Prescriptions Issued",
+      "type": "stat",
+      "gridPos": {
+        "x": 0,
+        "y": 28,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "query": "sum(increase(prescriptions_issued_total[24h]))",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "graphMode": "area",
+        "colorMode": "value",
+        "unit": "short"
+      }
+    },
+    {
+      "id": 15,
+      "title": "Medical Records Created",
+      "type": "stat",
+      "gridPos": {
+        "x": 6,
+        "y": 28,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "query": "sum(increase(medical_records_created_total[24h]))",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "graphMode": "area",
+        "colorMode": "value",
+        "unit": "short"
+      }
+    },
+    {
+      "id": 16,
+      "title": "Medical Record Access Pattern",
+      "type": "graph",
+      "gridPos": {
+        "x": 12,
+        "y": 28,
+        "w": 12,
+        "h": 4
+      },
+      "targets": [
+        {
+          "query": "sum(rate(medical_records_accessed_total[5m])) by (user_role)",
+          "refId": "A",
+          "legendFormat": "{{user_role}}"
+        }
+      ],
+      "options": {
+        "yAxis": {
+          "format": "ops",
+          "label": "Accesses per second"
+        }
+      }
+    },
+    {
+      "id": 17,
+      "title": "Login Success Rate",
+      "type": "gauge",
+      "gridPos": {
+        "x": 0,
+        "y": 32,
+        "w": 6,
+        "h": 6
+      },
+      "targets": [
+        {
+          "query": "sum(rate(user_login_attempts_total{status='success'}[1h])) / sum(rate(user_login_attempts_total[1h])) * 100",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "unit": "percent",
+        "thresholds": [
+          {
+            "value": 0,
+            "color": "red"
+          },
+          {
+            "value": 90,
+            "color": "yellow"
+          },
+          {
+            "value": 98,
+            "color": "green"
+          }
+        ]
+      }
+    },
+    {
+      "id": 18,
+      "title": "Top Features by Usage",
+      "type": "table",
+      "gridPos": {
+        "x": 6,
+        "y": 32,
+        "w": 18,
+        "h": 6
+      },
+      "targets": [
+        {
+          "query": "topk(10, sum(increase(http_requests_total[24h])) by (route))",
+          "refId": "A",
+          "format": "table"
+        }
+      ],
+      "options": {
+        "columns": [
+          {
+            "text": "Feature/Endpoint",
+            "value": "route"
+          },
+          {
+            "text": "Total Requests",
+            "value": "Value"
+          }
+        ],
+        "sortBy": {
+          "column": "Value",
+          "desc": true
+        }
+      }
+    },
+    {
+      "id": 19,
+      "title": "User Engagement Score",
+      "type": "graph",
+      "gridPos": {
+        "x": 0,
+        "y": 38,
+        "w": 12,
+        "h": 6
+      },
+      "targets": [
+        {
+          "query": "(sum(rate(http_requests_total{route!~'/health|/metrics'}[1h])) / sum(active_users)) * 3600",
+          "refId": "A",
+          "legendFormat": "Requests per active user per hour"
+        }
+      ],
+      "options": {
+        "yAxis": {
+          "format": "short",
+          "label": "Engagement Score"
+        }
+      }
+    },
+    {
+      "id": 20,
+      "title": "Appointment Cancellation Reasons",
+      "type": "piechart",
+      "gridPos": {
+        "x": 12,
+        "y": 38,
+        "w": 12,
+        "h": 6
+      },
+      "targets": [
+        {
+          "query": "sum(increase(appointments_cancelled_total[24h])) by (reason)",
+          "refId": "A",
+          "legendFormat": "{{reason}}"
+        }
+      ],
+      "options": {
+        "legend": {
+          "show": true,
+          "values": true
+        }
+      }
+    }
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "time_range",
+        "type": "interval",
+        "query": "1h,6h,12h,24h,7d,30d",
+        "current": {
+          "value": "24h",
+          "text": "24 hours"
+        }
+      },
+      {
+        "name": "organization",
+        "type": "query",
+        "query": "label_values(http_requests_total, organization)",
+        "refresh": 1,
+        "multi": true,
+        "includeAll": true
+      }
+    ]
+  },
+  "annotations": {
+    "list": [
+      {
+        "name": "Marketing Campaigns",
+        "datasource": "Azure Monitor",
+        "enable": true,
+        "iconColor": "rgba(0, 255, 0, 1)"
+      },
+      {
+        "name": "Feature Releases",
+        "datasource": "Azure Monitor",
+        "enable": true,
+        "iconColor": "rgba(0, 211, 255, 1)"
+      }
+    ]
+  }
+}

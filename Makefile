@@ -1,7 +1,8 @@
 # ============================================
 # UnifiedHealth Platform - Makefile
 # ============================================
-# Common commands for development and deployment
+# Commands for development and Azure Cloud deployment
+# All deployments run on Azure Cloud infrastructure
 
 .PHONY: help install build test lint format clean docker-build docker-push deploy-staging deploy-production rollback setup-azure setup-secrets backup restore logs
 
@@ -25,6 +26,7 @@ ACR_LOGIN_SERVER := $(ACR_NAME).azurecr.io
 
 help: ## Display this help message
 	@echo "$(BLUE)UnifiedHealth Platform - Available Commands$(NC)"
+	@echo "$(YELLOW)All deployments run on Azure Cloud$(NC)"
 	@echo ""
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make $(CYAN)<target>$(NC)\n"} /^[a-zA-Z_0-9-]+:.*?##/ { printf "  $(CYAN)%-20s$(NC) %s\n", $$1, $$2 } /^##@/ { printf "\n$(YELLOW)%s$(NC)\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
@@ -139,75 +141,39 @@ db-reset: ## Reset database (DANGER: drops all data)
 	@read -p "Are you sure? (yes/no): " confirm && [ "$$confirm" = "yes" ] || (echo "Cancelled" && exit 1)
 	cd services/api && pnpm db:reset
 
-##@ Docker
+##@ Azure Container Registry
 
-docker-build: ## Build all Docker images using build script
-	@echo "$(BLUE)Building Docker images...$(NC)"
-	./scripts/docker-build.sh
-	@echo "$(GREEN)Docker images built!$(NC)"
+acr-login: ## Login to Azure Container Registry
+	@echo "$(BLUE)Logging in to Azure Container Registry...$(NC)"
+	az acr login --name $(ACR_NAME)
 
-docker-build-api: ## Build API Docker image
+docker-build-api: ## Build API Docker image for Azure ACR
 	@echo "$(BLUE)Building API Docker image...$(NC)"
 	docker build -t $(ACR_LOGIN_SERVER)/unified-health-api:$(VERSION) -f services/api/Dockerfile services/api
 
-docker-build-web: ## Build Web Docker image
+docker-build-web: ## Build Web Docker image for Azure ACR
 	@echo "$(BLUE)Building Web Docker image...$(NC)"
 	docker build -t $(ACR_LOGIN_SERVER)/unified-health-web:$(VERSION) -f apps/web/Dockerfile apps/web
 
-docker-build-mobile: ## Build Mobile Docker image
-	@echo "$(BLUE)Building Mobile Docker image...$(NC)"
-	docker build -t $(ACR_LOGIN_SERVER)/unified-health-mobile:$(VERSION) -f apps/mobile/Dockerfile apps/mobile
+docker-build: acr-login docker-build-api docker-build-web ## Build all Docker images for Azure ACR
+	@echo "$(GREEN)Docker images built!$(NC)"
 
-docker-push: ## Push Docker images to ACR using build script
-	@echo "$(BLUE)Pushing Docker images to ACR...$(NC)"
-	PUSH=true ./scripts/docker-build.sh
-	@echo "$(GREEN)Docker images pushed!$(NC)"
+docker-push-api: ## Push API Docker image to Azure ACR
+	@echo "$(BLUE)Pushing API Docker image to Azure ACR...$(NC)"
+	docker push $(ACR_LOGIN_SERVER)/unified-health-api:$(VERSION)
 
-docker-up: ## Start development environment with Docker Compose
-	@echo "$(BLUE)Starting development environment...$(NC)"
-	docker-compose up -d
-	@echo "$(GREEN)Services started!$(NC)"
-	@echo "API: http://localhost:8080"
-	@echo "Web: http://localhost:3000"
+docker-push-web: ## Push Web Docker image to Azure ACR
+	@echo "$(BLUE)Pushing Web Docker image to Azure ACR...$(NC)"
+	docker push $(ACR_LOGIN_SERVER)/unified-health-web:$(VERSION)
 
-docker-down: ## Stop Docker Compose environment
-	@echo "$(BLUE)Stopping Docker Compose...$(NC)"
-	docker-compose down
-
-docker-logs: ## View Docker Compose logs
-	docker-compose logs -f
-
-docker-prod-up: ## Start production-like environment
-	@echo "$(BLUE)Starting production environment...$(NC)"
-	docker-compose -f docker-compose.prod.yml up -d
-	@echo "$(GREEN)Production services started!$(NC)"
-
-docker-prod-down: ## Stop production environment
-	docker-compose -f docker-compose.prod.yml down
-
-docker-health: ## Check health of all Docker services
-	@echo "$(BLUE)Checking service health...$(NC)"
-	./scripts/docker-health-check.sh
-
-docker-restart: ## Restart all Docker services
-	docker-compose restart
-
-docker-clean: ## Remove all containers, volumes, and images
-	@echo "$(YELLOW)WARNING: This will remove all Docker resources!$(NC)"
-	@read -p "Are you sure? (y/N): " confirm && [ "$$confirm" = "y" ]
-	docker-compose down -v
-	docker system prune -af
-
-docker-shell-api: ## Open shell in API container
-	docker-compose exec api sh
-
-docker-shell-web: ## Open shell in Web container
-	docker-compose exec web sh
-
-docker-stats: ## Show Docker resource usage statistics
-	docker stats --no-stream
+docker-push: acr-login docker-push-api docker-push-web ## Push all Docker images to Azure ACR
+	@echo "$(GREEN)Docker images pushed to Azure ACR!$(NC)"
 
 ##@ Azure Infrastructure
+
+azure-login: ## Login to Azure CLI
+	@echo "$(BLUE)Logging in to Azure...$(NC)"
+	az login
 
 setup-azure-staging: ## Setup Azure infrastructure for staging
 	@echo "$(BLUE)Setting up Azure infrastructure for staging...$(NC)"
@@ -225,104 +191,110 @@ setup-secrets-production: ## Setup Kubernetes secrets for production
 	@echo "$(BLUE)Setting up secrets for production...$(NC)"
 	./scripts/setup-secrets.sh production
 
-##@ Deployment
+##@ Azure Deployment
 
-deploy-staging: ## Deploy to staging
-	@echo "$(BLUE)Deploying to staging...$(NC)"
+deploy-staging: ## Deploy to staging on Azure AKS
+	@echo "$(BLUE)Deploying to Azure staging...$(NC)"
 	./scripts/deploy-staging.sh
 
-deploy-production: ## Deploy to production (requires confirmation)
-	@echo "$(RED)WARNING: Deploying to PRODUCTION$(NC)"
+deploy-production: ## Deploy to production on Azure AKS (requires confirmation)
+	@echo "$(RED)WARNING: Deploying to Azure PRODUCTION$(NC)"
 	./scripts/deploy-production.sh
 
-rollback-staging: ## Rollback staging deployment
-	@echo "$(YELLOW)Rolling back staging...$(NC)"
+rollback-staging: ## Rollback staging deployment on Azure
+	@echo "$(YELLOW)Rolling back Azure staging...$(NC)"
 	./scripts/rollback.sh staging
 
-rollback-production: ## Rollback production deployment
-	@echo "$(RED)Rolling back production...$(NC)"
+rollback-production: ## Rollback production deployment on Azure
+	@echo "$(RED)Rolling back Azure production...$(NC)"
 	./scripts/rollback.sh production
 
-##@ Database Operations
+##@ Azure Database Operations
 
-backup-staging: ## Backup staging database
-	@echo "$(BLUE)Backing up staging database...$(NC)"
+backup-staging: ## Backup staging database on Azure
+	@echo "$(BLUE)Backing up Azure staging database...$(NC)"
 	./scripts/db-backup.sh staging
 
-backup-production: ## Backup production database
-	@echo "$(BLUE)Backing up production database...$(NC)"
+backup-production: ## Backup production database on Azure
+	@echo "$(BLUE)Backing up Azure production database...$(NC)"
 	./scripts/db-backup.sh production
 
-restore-staging: ## Restore staging database (requires backup name)
-	@echo "$(YELLOW)Restoring staging database...$(NC)"
+restore-staging: ## Restore staging database on Azure (requires backup name)
+	@echo "$(YELLOW)Restoring Azure staging database...$(NC)"
 	@read -p "Enter backup name: " backup && ./scripts/db-restore.sh $$backup staging
 
-restore-production: ## Restore production database (requires backup name)
-	@echo "$(RED)WARNING: Restoring PRODUCTION database$(NC)"
+restore-production: ## Restore production database on Azure (requires backup name)
+	@echo "$(RED)WARNING: Restoring Azure PRODUCTION database$(NC)"
 	@read -p "Enter backup name: " backup && ./scripts/db-restore.sh $$backup production
 
-##@ Kubernetes
+##@ Azure Kubernetes Service (AKS)
 
-k8s-context-staging: ## Switch to staging Kubernetes context
-	@echo "$(BLUE)Switching to staging context...$(NC)"
+aks-context-staging: ## Switch to Azure AKS staging context
+	@echo "$(BLUE)Switching to Azure AKS staging context...$(NC)"
 	az aks get-credentials --resource-group unified-health-rg-staging --name unified-health-aks-staging
 
-k8s-context-production: ## Switch to production Kubernetes context
-	@echo "$(BLUE)Switching to production context...$(NC)"
+aks-context-production: ## Switch to Azure AKS production context
+	@echo "$(BLUE)Switching to Azure AKS production context...$(NC)"
 	az aks get-credentials --resource-group unified-health-rg-prod --name unified-health-aks-prod
 
-k8s-pods-staging: ## List staging pods
+aks-pods-staging: ## List staging pods on Azure AKS
 	kubectl get pods -n unified-health-staging
 
-k8s-pods-production: ## List production pods
+aks-pods-production: ## List production pods on Azure AKS
 	kubectl get pods -n unified-health-prod
 
-k8s-logs-staging: ## View staging API logs
+aks-logs-staging: ## View staging API logs on Azure AKS
 	kubectl logs -f -n unified-health-staging -l app=unified-health-api --tail=100
 
-k8s-logs-production: ## View production API logs
+aks-logs-production: ## View production API logs on Azure AKS
 	kubectl logs -f -n unified-health-prod -l app=unified-health-api --tail=100
 
-k8s-shell-staging: ## Open shell in staging pod
-	@echo "$(BLUE)Opening shell in staging pod...$(NC)"
+aks-shell-staging: ## Open shell in staging pod on Azure AKS
+	@echo "$(BLUE)Opening shell in Azure staging pod...$(NC)"
 	kubectl exec -it -n unified-health-staging $$(kubectl get pod -n unified-health-staging -l app=unified-health-api -o jsonpath='{.items[0].metadata.name}') -- /bin/sh
 
-k8s-shell-production: ## Open shell in production pod
-	@echo "$(BLUE)Opening shell in production pod...$(NC)"
+aks-shell-production: ## Open shell in production pod on Azure AKS
+	@echo "$(BLUE)Opening shell in Azure production pod...$(NC)"
 	kubectl exec -it -n unified-health-prod $$(kubectl get pod -n unified-health-prod -l app=unified-health-api -o jsonpath='{.items[0].metadata.name}') -- /bin/sh
 
-k8s-describe-staging: ## Describe staging deployment
+aks-describe-staging: ## Describe staging deployment on Azure AKS
 	kubectl describe deployment unified-health-api -n unified-health-staging
 
-k8s-describe-production: ## Describe production deployment
+aks-describe-production: ## Describe production deployment on Azure AKS
 	kubectl describe deployment unified-health-api -n unified-health-prod
 
-##@ Monitoring
+##@ Azure Container Apps
 
-logs-staging: ## View staging logs
-	@echo "$(BLUE)Viewing staging logs...$(NC)"
-	kubectl logs -f -n unified-health-staging -l app=unified-health-api --tail=100
+containerapp-logs-staging: ## View staging logs on Azure Container Apps
+	az containerapp logs show --name unifiedhealth-staging-api --resource-group unifiedhealth-rg-staging --follow
 
-logs-production: ## View production logs
-	@echo "$(BLUE)Viewing production logs...$(NC)"
-	kubectl logs -f -n unified-health-prod -l app=unified-health-api --tail=100
+containerapp-logs-production: ## View production logs on Azure Container Apps
+	az containerapp logs show --name unifiedhealth-prod-api --resource-group unifiedhealth-rg-prod --follow
 
-status-staging: ## Check staging status
-	@echo "$(BLUE)Staging Status:$(NC)"
-	@kubectl get pods -n unified-health-staging
-	@kubectl get svc -n unified-health-staging
-	@kubectl get ingress -n unified-health-staging
+containerapp-restart-staging: ## Restart staging Container App
+	az containerapp revision restart --name unifiedhealth-staging-api --resource-group unifiedhealth-rg-staging
 
-status-production: ## Check production status
-	@echo "$(BLUE)Production Status:$(NC)"
-	@kubectl get pods -n unified-health-prod
-	@kubectl get svc -n unified-health-prod
-	@kubectl get ingress -n unified-health-prod
+containerapp-restart-production: ## Restart production Container App
+	az containerapp revision restart --name unifiedhealth-prod-api --resource-group unifiedhealth-rg-prod
 
-metrics-staging: ## View staging metrics
+##@ Azure Monitoring
+
+status-staging: ## Check staging status on Azure
+	@echo "$(BLUE)Azure Staging Status:$(NC)"
+	@kubectl get pods -n unified-health-staging || az containerapp show --name unifiedhealth-staging-api --resource-group unifiedhealth-rg-staging --query "{Name:name, Status:properties.runningStatus}" -o table
+	@kubectl get svc -n unified-health-staging 2>/dev/null || true
+	@kubectl get ingress -n unified-health-staging 2>/dev/null || true
+
+status-production: ## Check production status on Azure
+	@echo "$(BLUE)Azure Production Status:$(NC)"
+	@kubectl get pods -n unified-health-prod || az containerapp show --name unifiedhealth-prod-api --resource-group unifiedhealth-rg-prod --query "{Name:name, Status:properties.runningStatus}" -o table
+	@kubectl get svc -n unified-health-prod 2>/dev/null || true
+	@kubectl get ingress -n unified-health-prod 2>/dev/null || true
+
+metrics-staging: ## View staging metrics on Azure AKS
 	kubectl top pods -n unified-health-staging
 
-metrics-production: ## View production metrics
+metrics-production: ## View production metrics on Azure AKS
 	kubectl top pods -n unified-health-prod
 
 ##@ Utilities
@@ -334,10 +306,6 @@ clean: ## Clean build artifacts and dependencies
 	find . -name ".next" -type d -prune -exec rm -rf '{}' +
 	find . -name ".turbo" -type d -prune -exec rm -rf '{}' +
 	@echo "$(GREEN)Clean complete!$(NC)"
-
-clean-docker: ## Clean Docker images and containers
-	@echo "$(BLUE)Cleaning Docker...$(NC)"
-	docker system prune -af --volumes
 
 version: ## Show current version
 	@echo "Version: $(VERSION)"
@@ -351,16 +319,17 @@ info: ## Show project information
 	@echo "Git branch: $$(git branch --show-current)"
 	@echo "Git commit: $$(git rev-parse HEAD)"
 
-check-env: ## Check environment setup
-	@echo "$(BLUE)Checking environment...$(NC)"
+check-env: ## Check environment setup for Azure
+	@echo "$(BLUE)Checking environment for Azure Cloud...$(NC)"
 	@command -v node >/dev/null 2>&1 || (echo "$(RED)Node.js not found$(NC)" && exit 1)
 	@command -v pnpm >/dev/null 2>&1 || (echo "$(RED)pnpm not found$(NC)" && exit 1)
 	@command -v docker >/dev/null 2>&1 || (echo "$(RED)Docker not found$(NC)" && exit 1)
 	@command -v kubectl >/dev/null 2>&1 || (echo "$(RED)kubectl not found$(NC)" && exit 1)
 	@command -v az >/dev/null 2>&1 || (echo "$(RED)Azure CLI not found$(NC)" && exit 1)
+	@az account show >/dev/null 2>&1 || (echo "$(YELLOW)Not logged in to Azure. Run 'make azure-login'$(NC)")
 	@echo "$(GREEN)All required tools are installed!$(NC)"
 
-##@ CI/CD
+##@ CI/CD (GitHub Actions)
 
 ci-install: ## CI: Install dependencies
 	pnpm install --frozen-lockfile
@@ -376,6 +345,6 @@ ci-lint: ## CI: Lint and type check
 	pnpm lint
 	pnpm typecheck
 
-ci-docker: ## CI: Build and push Docker images
+ci-docker: ## CI: Build and push Docker images to Azure ACR
 	$(MAKE) docker-build
 	$(MAKE) docker-push

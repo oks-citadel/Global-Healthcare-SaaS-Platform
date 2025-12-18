@@ -1,0 +1,370 @@
+# ============================================
+# UnifiedHealth Platform - Security Gate
+# Comprehensive security checks for CI/CD pipeline
+# This workflow must pass before deployment
+# ============================================
+
+name: Security Gate
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main, develop]
+  workflow_dispatch:
+
+# Prevent concurrent runs
+concurrency:
+  group: security-gate-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '9'
+
+jobs:
+  # ==========================================
+  # Gate 1: Dependency Vulnerabilities
+  # ==========================================
+  dependency-scan:
+    name: Gate 1 - Dependency Vulnerabilities
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run pnpm audit
+        id: pnpm-audit
+        run: |
+          echo "Running pnpm audit..."
+          pnpm audit --audit-level=high --json > audit-report.json || true
+
+          # Check for critical/high vulnerabilities
+          CRITICAL=$(jq '.metadata.vulnerabilities.critical // 0' audit-report.json)
+          HIGH=$(jq '.metadata.vulnerabilities.high // 0' audit-report.json)
+
+          echo "Critical vulnerabilities: $CRITICAL"
+          echo "High vulnerabilities: $HIGH"
+
+          if [ "$CRITICAL" -gt 0 ] || [ "$HIGH" -gt 0 ]; then
+            echo "❌ GATE FAILED: Critical or High vulnerabilities found"
+            pnpm audit --audit-level=high
+            exit 1
+          fi
+
+          echo "✅ GATE PASSED: No critical/high vulnerabilities"
+
+      - name: Run Snyk scan
+        if: always()
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        run: |
+          if [ -n "$SNYK_TOKEN" ]; then
+            npx snyk test --severity-threshold=high || true
+          else
+            echo "⚠️  SNYK_TOKEN not set, skipping Snyk scan"
+          fi
+
+      - name: Upload audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-audit-report
+          path: audit-report.json
+
+  # ==========================================
+  # Gate 2: Secret Detection
+  # ==========================================
+  secret-detection:
+    name: Gate 2 - Secret Detection
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run Trivy secret scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          scanners: 'secret'
+          exit-code: '1'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Check for .env files
+        run: |
+          if git ls-files | grep -E '^\.env$|^\.env\.[^e]'; then
+            echo "❌ GATE FAILED: .env files found in repository"
+            exit 1
+          fi
+          echo "✅ GATE PASSED: No .env files in repository"
+
+  # ==========================================
+  # Gate 3: SAST (Static Analysis)
+  # ==========================================
+  static-analysis:
+    name: Gate 3 - Static Analysis (SAST)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run ESLint with security rules
+        run: |
+          echo "Running ESLint with security rules..."
+          pnpm lint || {
+            echo "❌ GATE FAILED: ESLint security violations found"
+            exit 1
+          }
+          echo "✅ GATE PASSED: No ESLint violations"
+
+      - name: Run type check
+        run: |
+          echo "Running TypeScript type check..."
+          pnpm typecheck || {
+            echo "❌ GATE FAILED: Type errors found"
+            exit 1
+          }
+          echo "✅ GATE PASSED: No type errors"
+
+      - name: CodeQL Analysis
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript, typescript
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+
+  # ==========================================
+  # Gate 4: Container Security
+  # ==========================================
+  container-security:
+    name: Gate 4 - Container Security
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    strategy:
+      matrix:
+        service: [api, web]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./${{ matrix.service == 'api' && 'services/api' || 'apps/web' }}
+          file: ./${{ matrix.service == 'api' && 'services/api' || 'apps/web' }}/Dockerfile
+          push: false
+          tags: unified-health-${{ matrix.service }}:security-scan
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Run Trivy container scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: unified-health-${{ matrix.service }}:security-scan
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          exit-code: '1'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload Trivy results
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  # ==========================================
+  # Gate 5: License Compliance
+  # ==========================================
+  license-compliance:
+    name: Gate 5 - License Compliance
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check licenses
+        run: |
+          echo "Checking for forbidden licenses..."
+
+          # Install license checker
+          pnpm add -g license-checker
+
+          # Run license check
+          license-checker --json > licenses.json
+
+          # Check for GPL/AGPL licenses (forbidden in commercial healthcare software)
+          FORBIDDEN_LICENSES=$(jq -r 'to_entries[] | select(.value.licenses | test("GPL|AGPL"; "i")) | .key' licenses.json || echo "")
+
+          if [ -n "$FORBIDDEN_LICENSES" ]; then
+            echo "❌ GATE FAILED: Forbidden licenses found:"
+            echo "$FORBIDDEN_LICENSES"
+            exit 1
+          fi
+
+          echo "✅ GATE PASSED: No forbidden licenses"
+
+      - name: Upload license report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: license-report
+          path: licenses.json
+
+  # ==========================================
+  # Gate 6: Infrastructure Security
+  # ==========================================
+  infrastructure-security:
+    name: Gate 6 - Infrastructure Security
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Scan infrastructure code with Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'config'
+          scan-ref: './infrastructure'
+          format: 'sarif'
+          output: 'trivy-iac.sarif'
+          exit-code: '1'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload IaC scan results
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-iac.sarif'
+
+      - name: Validate Terraform
+        working-directory: ./infrastructure/terraform
+        run: |
+          # Install Terraform
+          wget -O terraform.zip https://releases.hashicorp.com/terraform/1.6.0/terraform_1.6.0_linux_amd64.zip
+          unzip terraform.zip
+          sudo mv terraform /usr/local/bin/
+
+          # Validate
+          terraform init -backend=false
+          terraform validate
+
+          echo "✅ GATE PASSED: Terraform validation successful"
+
+  # ==========================================
+  # Security Gate Summary
+  # ==========================================
+  security-gate-summary:
+    name: Security Gate Summary
+    runs-on: ubuntu-latest
+    needs:
+      - dependency-scan
+      - secret-detection
+      - static-analysis
+      - license-compliance
+      - infrastructure-security
+    if: always()
+    steps:
+      - name: Check gate status
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "Security Gate Summary"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+          echo "Gate 1 - Dependency Vulnerabilities: ${{ needs.dependency-scan.result }}"
+          echo "Gate 2 - Secret Detection: ${{ needs.secret-detection.result }}"
+          echo "Gate 3 - Static Analysis: ${{ needs.static-analysis.result }}"
+          echo "Gate 4 - Container Security: ${{ needs.container-security.result || 'skipped' }}"
+          echo "Gate 5 - License Compliance: ${{ needs.license-compliance.result }}"
+          echo "Gate 6 - Infrastructure Security: ${{ needs.infrastructure-security.result }}"
+          echo ""
+
+          # Check if any gate failed
+          if [ "${{ needs.dependency-scan.result }}" == "failure" ] || \
+             [ "${{ needs.secret-detection.result }}" == "failure" ] || \
+             [ "${{ needs.static-analysis.result }}" == "failure" ] || \
+             [ "${{ needs.container-security.result }}" == "failure" ] || \
+             [ "${{ needs.license-compliance.result }}" == "failure" ] || \
+             [ "${{ needs.infrastructure-security.result }}" == "failure" ]; then
+            echo "❌ SECURITY GATE FAILED"
+            echo ""
+            echo "Please review the failed checks above and fix the issues."
+            echo "Deployment is blocked until all security gates pass."
+            exit 1
+          fi
+
+          echo "✅ ALL SECURITY GATES PASSED"
+          echo ""
+          echo "The code is ready for deployment."
+
+      - name: Post PR comment
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const status = ${{ needs.dependency-scan.result == 'success' && needs.secret-detection.result == 'success' && needs.static-analysis.result == 'success' && needs.license-compliance.result == 'success' && needs.infrastructure-security.result == 'success' }};
+
+            const body = status
+              ? '✅ **Security Gate PASSED** - All security checks completed successfully!'
+              : '❌ **Security Gate FAILED** - Please review the security checks and fix the issues.';
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });

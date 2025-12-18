@@ -15,9 +15,14 @@ const TWILIO_PHONE_NUMBER = process.env.TWILIO_PHONE_NUMBER || '';
 // Initialize Twilio client
 let twilioClient: twilio.Twilio | null = null;
 
-if (TWILIO_ACCOUNT_SID && TWILIO_AUTH_TOKEN) {
-  twilioClient = twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
-  logger.info('Twilio client initialized');
+// Only initialize if valid credentials are provided (account SID must start with 'AC')
+if (TWILIO_ACCOUNT_SID && TWILIO_AUTH_TOKEN && TWILIO_ACCOUNT_SID.startsWith('AC')) {
+  try {
+    twilioClient = twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
+    logger.info('Twilio client initialized');
+  } catch (error) {
+    logger.warn('Failed to initialize Twilio client. SMS sending will be in stub mode.');
+  }
 } else {
   logger.warn('Twilio credentials not configured. SMS sending will be in stub mode.');
 }

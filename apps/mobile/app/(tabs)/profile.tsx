@@ -57,6 +57,24 @@ export default function ProfileScreen() {
       },
     },
     {
+      id: 'change-password',
+      title: 'Change Password',
+      description: 'Update your password',
+      icon: '🔑',
+      onPress: () => {
+        router.push('/settings/change-password');
+      },
+    },
+    {
+      id: 'language',
+      title: 'Language',
+      description: 'Select your preferred language',
+      icon: '🌐',
+      onPress: () => {
+        router.push('/settings/language');
+      },
+    },
+    {
       id: 'notifications',
       title: 'Notifications',
       description: 'Manage notification preferences',
@@ -71,7 +89,7 @@ export default function ProfileScreen() {
       description: 'Control your privacy settings',
       icon: '🔒',
       onPress: () => {
-        Alert.alert('Coming Soon', 'This feature will be available soon');
+        router.push('/settings/privacy');
       },
     },
     {
@@ -80,7 +98,7 @@ export default function ProfileScreen() {
       description: 'Get help and contact support',
       icon: '❓',
       onPress: () => {
-        Alert.alert('Coming Soon', 'This feature will be available soon');
+        router.push('/settings/help');
       },
     },
     {

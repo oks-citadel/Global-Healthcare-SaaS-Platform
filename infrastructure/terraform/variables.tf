@@ -2,6 +2,11 @@
 # UnifiedHealth Platform - Terraform Variables
 # ============================================
 
+variable "subscription_id" {
+  description = "Azure subscription ID"
+  type        = string
+}
+
 variable "project_name" {
   description = "Name of the project"
   type        = string
@@ -43,6 +48,12 @@ variable "database_subnet_prefix" {
   description = "Database subnet address prefix"
   type        = string
   default     = "10.1.16.0/24"
+}
+
+variable "appgw_subnet_prefix" {
+  description = "Application Gateway subnet address prefix"
+  type        = string
+  default     = "10.1.32.0/24"
 }
 
 # ============================================
@@ -165,4 +176,20 @@ variable "redis_sku" {
   description = "Redis cache SKU"
   type        = string
   default     = "Standard"
+}
+
+# ============================================
+# Monitoring & Alerts
+# ============================================
+
+variable "alert_email_address" {
+  description = "Email address for alert notifications"
+  type        = string
+  default     = "ops@unifiedhealth.example.com"
+}
+
+variable "alert_webhook_url" {
+  description = "Webhook URL for alert notifications (PagerDuty, Slack, etc.)"
+  type        = string
+  default     = ""
 }

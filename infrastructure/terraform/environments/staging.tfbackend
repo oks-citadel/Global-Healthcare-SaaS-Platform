@@ -1,0 +1,15 @@
+# ============================================
+# Staging Environment Backend Configuration
+# ============================================
+# Azure Storage backend for Terraform state management
+# Separate state from dev/prod for environment isolation
+
+# Storage Account Configuration
+# Replace these values with your actual Azure Storage account details
+resource_group_name  = "unified-health-tfstate-rg"
+storage_account_name = "unifiedhealthtfstatestg"
+container_name       = "tfstate-staging"
+key                  = "staging/terraform.tfstate"
+
+# State Locking
+# Uses Azure Storage blob leases for state locking to prevent concurrent modifications

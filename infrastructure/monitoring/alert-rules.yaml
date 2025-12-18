@@ -1,0 +1,384 @@
+---
+# ============================================
+# Azure Monitor Alert Rules Configuration
+# Unified Healthcare Platform
+# ============================================
+
+apiVersion: monitoring.azure.com/v1
+kind: AlertRules
+metadata:
+  name: unified-health-alerts
+  environment: production
+
+# ==========================================
+# High Error Rate Alerts
+# ==========================================
+errorRateAlerts:
+
+  - name: "High API Error Rate"
+    description: "Alert when API error rate exceeds 5% over 5 minutes"
+    severity: "2"
+    enabled: true
+    evaluationFrequency: "PT5M"
+    windowSize: "PT5M"
+    criteria:
+      allOf:
+        - metricName: "requests/failed"
+          metricNamespace: "Microsoft.Insights/components"
+          operator: "GreaterThan"
+          threshold: 5
+          timeAggregation: "Percentage"
+    actions:
+      - actionGroupId: "unified-health-alerts"
+        webhookProperties:
+          severity: "high"
+          component: "api"
+    autoMitigate: true
+    tags:
+      component: "api"
+      metric_type: "error_rate"
+
+  - name: "Critical Error Rate Spike"
+    description: "Alert when critical errors exceed 10 in 1 minute"
+    severity: "1"
+    enabled: true
+    evaluationFrequency: "PT1M"
+    windowSize: "PT1M"
+    criteria:
+      allOf:
+        - metricName: "critical_errors_total"
+          operator: "GreaterThan"
+          threshold: 10
+          timeAggregation: "Total"
+    actions:
+      - actionGroupId: "unified-health-alerts"
+        webhookProperties:
+          severity: "critical"
+          pagerduty: "true"
+    autoMitigate: false
+
+  - name: "Database Connection Errors"
+    description: "Alert when database connection errors exceed threshold"
+    severity: "2"
+    enabled: true
+    evaluationFrequency: "PT5M"
+    windowSize: "PT5M"
+    criteria:
+      allOf:
+        - metricName: "db_connection_errors_total"
+          operator: "GreaterThan"
+          threshold: 5
+          timeAggregation: "Total"
+    actions:
+      - actionGroupId: "unified-health-alerts"
+
+  - name: "Authentication Failures"
+    description: "Alert on excessive authentication failures (potential security issue)"
+    severity: "2"
+    enabled: true
+    evaluationFrequency: "PT5M"
+    windowSize: "PT5M"
+    criteria:
+      allOf:
+        - metricName: "user_login_attempts_total"
+          dimensions:
+            - name: "status"
+              operator: "Include"
+              values: ["failed"]
+          operator: "GreaterThan"
+          threshold: 50
+          timeAggregation: "Total"
+    actions:
+      - actionGroupId: "unified-health-alerts"
+        webhookProperties:
+          security_alert: "true"
+
+# ==========================================
+# Latency Threshold Alerts
+# ==========================================
+latencyAlerts:
+
+  - name: "High API Response Time"
+    description: "Alert when P95 API response time exceeds 1 second"
+    severity: "3"
+    enabled: true
+    evaluationFrequency: "PT5M"
+    windowSize: "PT15M"
+    criteria:
+      allOf:
+        - metricName: "http_request_duration_seconds"
+          operator: "GreaterThan"
+          threshold: 1.0
+          timeAggregation: "Percentile95"
+    actions:
+      - actionGroupId: "unified-health-alerts"
+    autoMitigate: true
+
+  - name: "Critical API Latency"
+    description: "Alert when P99 API response time exceeds 3 seconds"
+    severity: "2"
+    enabled: true
+    evaluationFrequency: "PT5M"
+    windowSize: "PT10M"
+    criteria:
+      allOf:
+        - metricName: "http_request_duration_seconds"
+          operator: "GreaterThan"
+          threshold: 3.0
+          timeAggregation: "Percentile99"
+    actions:
+      - actionGroupId: "unified-health-alerts"
+        webhookProperties:
+          severity: "high"
+
+  - name: "Slow Database Queries"
+    description: "Alert when P95 database query time exceeds 500ms"
+    severity: "3"
+    enabled: true
+    evaluationFrequency: "PT5M"
+    windowSize: "PT15M"
+    criteria:
+      allOf:
+        - metricName: "db_query_duration_seconds"
+          operator: "GreaterThan"
+          threshold: 0.5
+          timeAggregation: "Percentile95"
+    actions:
+      - actionGroupId: "unified-health-alerts"
+
+  - name: "External Service Timeout"
+    description: "Alert when external service calls timeout frequently"
+    severity: "2"
+    enabled: true
+    evaluationFrequency: "PT5M"
+    windowSize: "PT10M"
+    criteria:
+      allOf:
+        - metricName: "external_service_duration_seconds"
+          operator: "GreaterThan"
+          threshold: 10.0
+          timeAggregation: "Average"
+    actions:
+      - actionGroupId: "unified-health-alerts"
+
+# ==========================================
+# Resource Utilization Alerts
+# ==========================================
+resourceAlerts:
+
+  - name: "High CPU Utilization"
+    description: "Alert when CPU usage exceeds 80% for 10 minutes"
+    severity: "2"
+    enabled: true
+    evaluationFrequency: "PT5M"
+    windowSize: "PT10M"
+    criteria:
+      allOf:
+        - metricName: "node_cpu_seconds_total"
+          operator: "GreaterThan"
+          threshold: 80
+          timeAggregation: "Average"
+    actions:
+      - actionGroupId: "unified-health-alerts"
+    autoMitigate: true
+
+  - name: "High Memory Utilization"
+    description: "Alert when memory usage exceeds 85% for 10 minutes"
+    severity: "2"
+    enabled: true
+    evaluationFrequency: "PT5M"
+    windowSize: "PT10M"
+    criteria:
+      allOf:
+        - metricName: "node_memory_MemAvailable_bytes"
+          operator: "LessThan"
+          threshold: 15
+          timeAggregation: "Average"
+    actions:
+      - actionGroupId: "unified-health-alerts"
+
+  - name: "Disk Space Warning"
+    description: "Alert when disk usage exceeds 80%"
+    severity: "3"
+    enabled: true
+    evaluationFrequency: "PT15M"
+    windowSize: "PT15M"
+    criteria:
+      allOf:
+        - metricName: "node_filesystem_avail_bytes"
+          operator: "LessThan"
+          threshold: 20
+          timeAggregation: "Average"
+    actions:
+      - actionGroupId: "unified-health-alerts"
+
+  - name: "Database Connection Pool Exhausted"
+    description: "Alert when database connection pool is near capacity"
+    severity: "2"
+    enabled: true
+    evaluationFrequency: "PT5M"
+    windowSize: "PT5M"
+    criteria:
+      allOf:
+        - metricName: "db_connection_pool_waiting"
+          operator: "GreaterThan"
+          threshold: 5
+          timeAggregation: "Average"
+    actions:
+      - actionGroupId: "unified-health-alerts"
+
+  - name: "Pod Restart Loop"
+    description: "Alert when Kubernetes pod restarts exceed threshold"
+    severity: "2"
+    enabled: true
+    evaluationFrequency: "PT5M"
+    windowSize: "PT15M"
+    criteria:
+      allOf:
+        - metricName: "kube_pod_container_status_restarts_total"
+          operator: "GreaterThan"
+          threshold: 3
+          timeAggregation: "Total"
+    actions:
+      - actionGroupId: "unified-health-alerts"
+
+# ==========================================
+# Business Metrics Alerts
+# ==========================================
+businessAlerts:
+
+  - name: "Low Appointment Creation Rate"
+    description: "Alert when appointment creation drops below expected threshold"
+    severity: "3"
+    enabled: true
+    evaluationFrequency: "PT15M"
+    windowSize: "PT1H"
+    criteria:
+      allOf:
+        - metricName: "appointments_created_total"
+          operator: "LessThan"
+          threshold: 10
+          timeAggregation: "Total"
+    actions:
+      - actionGroupId: "unified-health-alerts"
+
+  - name: "High Appointment Cancellation Rate"
+    description: "Alert when cancellation rate exceeds 20%"
+    severity: "3"
+    enabled: true
+    evaluationFrequency: "PT15M"
+    windowSize: "PT1H"
+    criteria:
+      allOf:
+        - metricName: "appointments_cancelled_total"
+          operator: "GreaterThan"
+          threshold: 20
+          timeAggregation: "Percentage"
+    actions:
+      - actionGroupId: "unified-health-alerts"
+
+  - name: "Payment Processing Failures"
+    description: "Alert when payment failures exceed 5%"
+    severity: "2"
+    enabled: true
+    evaluationFrequency: "PT5M"
+    windowSize: "PT15M"
+    criteria:
+      allOf:
+        - metricName: "payments_processed_total"
+          dimensions:
+            - name: "status"
+              operator: "Include"
+              values: ["failed"]
+          operator: "GreaterThan"
+          threshold: 5
+          timeAggregation: "Percentage"
+    actions:
+      - actionGroupId: "unified-health-alerts"
+        webhookProperties:
+          severity: "high"
+          component: "payment"
+
+# ==========================================
+# Availability Alerts
+# ==========================================
+availabilityAlerts:
+
+  - name: "Service Availability Below SLA"
+    description: "Alert when service availability drops below 99.9%"
+    severity: "1"
+    enabled: true
+    evaluationFrequency: "PT5M"
+    windowSize: "PT15M"
+    criteria:
+      allOf:
+        - metricName: "availabilityResults/availabilityPercentage"
+          operator: "LessThan"
+          threshold: 99.9
+          timeAggregation: "Average"
+    actions:
+      - actionGroupId: "unified-health-alerts"
+        webhookProperties:
+          severity: "critical"
+          sla_breach: "true"
+
+  - name: "Health Check Failures"
+    description: "Alert when health check endpoint fails"
+    severity: "1"
+    enabled: true
+    evaluationFrequency: "PT1M"
+    windowSize: "PT5M"
+    criteria:
+      allOf:
+        - metricName: "requests/failed"
+          dimensions:
+            - name: "urlPath"
+              operator: "Include"
+              values: ["/health", "/api/health"]
+          operator: "GreaterThan"
+          threshold: 0
+          timeAggregation: "Total"
+    actions:
+      - actionGroupId: "unified-health-alerts"
+        webhookProperties:
+          severity: "critical"
+
+# ==========================================
+# Security Alerts
+# ==========================================
+securityAlerts:
+
+  - name: "Rate Limit Exceeded"
+    description: "Alert on excessive rate limiting (potential DDoS)"
+    severity: "2"
+    enabled: true
+    evaluationFrequency: "PT5M"
+    windowSize: "PT5M"
+    criteria:
+      allOf:
+        - metricName: "rate_limit_exceeded_total"
+          operator: "GreaterThan"
+          threshold: 100
+          timeAggregation: "Total"
+    actions:
+      - actionGroupId: "unified-health-alerts"
+        webhookProperties:
+          security_alert: "true"
+
+  - name: "Suspicious Medical Record Access"
+    description: "Alert on unusual pattern of medical record access"
+    severity: "2"
+    enabled: true
+    evaluationFrequency: "PT5M"
+    windowSize: "PT15M"
+    criteria:
+      allOf:
+        - metricName: "medical_records_accessed_total"
+          operator: "GreaterThan"
+          threshold: 100
+          timeAggregation: "Total"
+    actions:
+      - actionGroupId: "unified-health-alerts"
+        webhookProperties:
+          security_alert: "true"
+          compliance_alert: "true"

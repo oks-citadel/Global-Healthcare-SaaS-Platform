@@ -1,0 +1,297 @@
+# ============================================
+# UnifiedHealth Platform - Helm Values
+# Default values for unified-health chart
+# ============================================
+
+# Global settings
+global:
+  environment: production
+  region: us-east-1
+  imageRegistry: unifiedhealthacr.azurecr.io
+  imagePullSecrets:
+    - name: acr-secret
+
+# Replica counts
+replicaCount:
+  api: 3
+  web: 3
+  mobile: 2
+
+# Image configuration
+image:
+  api:
+    repository: unified-health-api
+    tag: latest
+    pullPolicy: IfNotPresent
+  web:
+    repository: unified-health-web
+    tag: latest
+    pullPolicy: IfNotPresent
+
+# Service configuration
+service:
+  type: LoadBalancer
+  annotations: {}
+  api:
+    port: 8080
+    targetPort: 8080
+    protocol: TCP
+  web:
+    port: 3000
+    targetPort: 3000
+    protocol: TCP
+
+# Ingress configuration
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+  hosts:
+    - host: api.unifiedhealth.com
+      paths:
+        - path: /
+          pathType: Prefix
+          service: api
+    - host: app.unifiedhealth.com
+      paths:
+        - path: /
+          pathType: Prefix
+          service: web
+  tls:
+    - secretName: unifiedhealth-tls
+      hosts:
+        - api.unifiedhealth.com
+        - app.unifiedhealth.com
+
+# Resource limits
+resources:
+  api:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+  web:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+
+# Autoscaling
+autoscaling:
+  enabled: true
+  api:
+    minReplicas: 3
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+  web:
+    minReplicas: 3
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+
+# Health checks
+healthChecks:
+  api:
+    livenessProbe:
+      httpGet:
+        path: /health
+        port: 8080
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 3
+    readinessProbe:
+      httpGet:
+        path: /ready
+        port: 8080
+      initialDelaySeconds: 10
+      periodSeconds: 5
+      timeoutSeconds: 3
+      failureThreshold: 3
+  web:
+    livenessProbe:
+      httpGet:
+        path: /api/health
+        port: 3000
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 3
+    readinessProbe:
+      httpGet:
+        path: /api/health
+        port: 3000
+      initialDelaySeconds: 10
+      periodSeconds: 5
+      timeoutSeconds: 3
+      failureThreshold: 3
+
+# Environment variables
+env:
+  api:
+    NODE_ENV: production
+    PORT: "8080"
+    LOG_LEVEL: info
+  web:
+    NODE_ENV: production
+    PORT: "3000"
+    NEXT_TELEMETRY_DISABLED: "1"
+
+# Secrets (mounted from Kubernetes secrets)
+secrets:
+  database:
+    secretName: unified-health-secrets
+    keys:
+      - DATABASE_URL
+  redis:
+    secretName: unified-health-secrets
+    keys:
+      - REDIS_URL
+  jwt:
+    secretName: unified-health-secrets
+    keys:
+      - JWT_SECRET
+  stripe:
+    secretName: unified-health-secrets
+    keys:
+      - STRIPE_SECRET_KEY
+      - STRIPE_WEBHOOK_SECRET
+
+# ConfigMaps
+configMaps:
+  app:
+    name: unified-health-config
+    data:
+      CORS_ORIGIN: "https://app.unifiedhealth.com"
+      API_BASE_URL: "https://api.unifiedhealth.com"
+
+# Persistence
+persistence:
+  enabled: true
+  storageClass: managed-premium
+  accessMode: ReadWriteOnce
+  size: 10Gi
+  mountPath: /app/data
+
+# Database configuration
+database:
+  enabled: false  # Using external Azure PostgreSQL
+  external:
+    host: unified-health-db-prod.postgres.database.azure.com
+    port: 5432
+    database: unified_health_prod
+    sslMode: require
+
+# Redis configuration
+redis:
+  enabled: false  # Using external Azure Redis
+  external:
+    host: unified-health-redis-prod.redis.cache.windows.net
+    port: 6380
+    ssl: true
+
+# Service Account
+serviceAccount:
+  create: true
+  annotations:
+    azure.workload.identity/client-id: "AZURE_CLIENT_ID"
+  name: unified-health-api
+
+# Pod Security
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+
+# Network Policy
+networkPolicy:
+  enabled: true
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: nginx-ingress
+      ports:
+        - protocol: TCP
+          port: 8080
+        - protocol: TCP
+          port: 3000
+  egress:
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 5432
+        - protocol: TCP
+          port: 6380
+
+# Pod Disruption Budget
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+# Monitoring
+monitoring:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    interval: 30s
+    scrapeTimeout: 10s
+  prometheusRule:
+    enabled: true
+
+# Blue-Green Deployment
+blueGreen:
+  enabled: true
+  activeColor: blue
+  colors:
+    blue:
+      enabled: true
+    green:
+      enabled: false
+
+# Node affinity
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - unified-health-api
+          topologyKey: kubernetes.io/hostname
+
+# Tolerations
+tolerations: []
+
+# Node selector
+nodeSelector: {}
+
+# Priority class
+priorityClassName: ""

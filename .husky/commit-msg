@@ -1,0 +1,47 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# ============================================
+# UnifiedHealth Platform - Commit Message Hook
+# Enforces commit message format and checks for sensitive data
+# ============================================
+
+COMMIT_MSG_FILE=$1
+COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
+
+# Check for secrets in commit message
+echo "🔍 Checking commit message for secrets..."
+
+# Check for AWS keys
+if echo "$COMMIT_MSG" | grep -qE "AKIA[0-9A-Z]{16}"; then
+    echo "❌ Error: AWS Access Key detected in commit message!"
+    exit 1
+fi
+
+# Check for private keys
+if echo "$COMMIT_MSG" | grep -q "BEGIN.*PRIVATE KEY"; then
+    echo "❌ Error: Private key detected in commit message!"
+    exit 1
+fi
+
+# Check for tokens
+if echo "$COMMIT_MSG" | grep -qE "ghp_[0-9a-zA-Z]{36}|gho_[0-9a-zA-Z]{36}"; then
+    echo "❌ Error: GitHub token detected in commit message!"
+    exit 1
+fi
+
+# Check for database credentials
+if echo "$COMMIT_MSG" | grep -qE "(mongodb|mysql|postgres)://[^:]+:[^@]+@" | grep -vE "example|sample|test"; then
+    echo "❌ Error: Database credentials detected in commit message!"
+    exit 1
+fi
+
+# Check for email addresses with passwords
+if echo "$COMMIT_MSG" | grep -qE "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}.*password"; then
+    echo "⚠️  Warning: Email with password reference in commit message"
+fi
+
+# Run commitlint
+pnpm commitlint --edit "$COMMIT_MSG_FILE"
+
+echo "✅ Commit message checks passed"

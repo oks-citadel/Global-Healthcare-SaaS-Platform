@@ -1,0 +1,87 @@
+# ============================================
+# Staging Environment Values
+# ============================================
+
+global:
+  environment: staging
+  region: us-east-1
+  imageRegistry: unifiedhealthacr.azurecr.io
+
+replicaCount:
+  api: 2
+  web: 2
+
+image:
+  api:
+    tag: latest-staging
+  web:
+    tag: latest-staging
+
+service:
+  type: ClusterIP
+
+ingress:
+  hosts:
+    - host: api-staging.unifiedhealth.com
+      paths:
+        - path: /
+          pathType: Prefix
+          service: api
+    - host: app-staging.unifiedhealth.com
+      paths:
+        - path: /
+          pathType: Prefix
+          service: web
+  tls:
+    - secretName: unifiedhealth-staging-tls
+      hosts:
+        - api-staging.unifiedhealth.com
+        - app-staging.unifiedhealth.com
+
+resources:
+  api:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+  web:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+autoscaling:
+  enabled: true
+  api:
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 80
+  web:
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 80
+
+env:
+  api:
+    NODE_ENV: staging
+    LOG_LEVEL: debug
+  web:
+    NODE_ENV: staging
+
+configMaps:
+  app:
+    data:
+      CORS_ORIGIN: "https://app-staging.unifiedhealth.com"
+      API_BASE_URL: "https://api-staging.unifiedhealth.com"
+
+database:
+  external:
+    host: unified-health-db-staging.postgres.database.azure.com
+
+redis:
+  external:
+    host: unified-health-redis-staging.redis.cache.windows.net

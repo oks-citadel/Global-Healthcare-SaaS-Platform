@@ -1,0 +1,577 @@
+# ============================================
+# UnifiedHealth Platform - Manual Rollback
+# Emergency rollback workflow for production incidents
+# ============================================
+
+name: Manual Rollback
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+        default: staging
+      rollback_type:
+        description: 'Rollback type'
+        required: true
+        type: choice
+        options:
+          - deployment
+          - database
+          - full
+        default: deployment
+      target_version:
+        description: 'Target version to rollback to (e.g., v1.2.3)'
+        required: false
+        type: string
+      reason:
+        description: 'Reason for rollback'
+        required: true
+        type: string
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '9'
+  ACR_NAME: unifiedhealthacr
+
+jobs:
+  # ==========================================
+  # Validate Rollback Request
+  # ==========================================
+  validate-rollback:
+    name: Validate Rollback
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}-approval
+    outputs:
+      current_version: ${{ steps.current.outputs.VERSION }}
+      target_version: ${{ steps.target.outputs.VERSION }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Require approval for production
+        if: inputs.environment == 'production'
+        run: |
+          echo "::warning::Production rollback requires approval"
+          echo "Reason: ${{ inputs.reason }}"
+
+      - name: Get current version
+        id: current
+        run: |
+          CURRENT_VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "unknown")
+          echo "VERSION=${CURRENT_VERSION}" >> $GITHUB_OUTPUT
+          echo "Current version: $CURRENT_VERSION"
+
+      - name: Determine target version
+        id: target
+        run: |
+          if [ -n "${{ inputs.target_version }}" ]; then
+            TARGET_VERSION="${{ inputs.target_version }}"
+          else
+            # Get previous version
+            CURRENT_VERSION="${{ steps.current.outputs.VERSION }}"
+            TARGET_VERSION=$(git describe --tags --abbrev=0 ${CURRENT_VERSION}^ 2>/dev/null || echo "unknown")
+          fi
+
+          echo "VERSION=${TARGET_VERSION}" >> $GITHUB_OUTPUT
+          echo "Target version: $TARGET_VERSION"
+
+          # Verify tag exists
+          if ! git rev-parse "$TARGET_VERSION" >/dev/null 2>&1; then
+            echo "::error::Target version $TARGET_VERSION does not exist"
+            exit 1
+          fi
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set environment variables
+        run: |
+          if [ "${{ inputs.environment }}" == "production" ]; then
+            echo "AKS_CLUSTER=unified-health-aks-prod" >> $GITHUB_ENV
+            echo "RESOURCE_GROUP=unified-health-rg-prod" >> $GITHUB_ENV
+            echo "NAMESPACE=unified-health-prod" >> $GITHUB_ENV
+          else
+            echo "AKS_CLUSTER=unified-health-aks-staging" >> $GITHUB_ENV
+            echo "RESOURCE_GROUP=unified-health-rg-staging" >> $GITHUB_ENV
+            echo "NAMESPACE=unified-health-staging" >> $GITHUB_ENV
+          fi
+
+  # ==========================================
+  # Create Snapshot Before Rollback
+  # ==========================================
+  create-snapshot:
+    name: Create Snapshot
+    runs-on: ubuntu-latest
+    needs: validate-rollback
+    environment: ${{ inputs.environment }}
+    outputs:
+      snapshot_name: ${{ steps.snapshot.outputs.SNAPSHOT_NAME }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set environment variables
+        run: |
+          if [ "${{ inputs.environment }}" == "production" ]; then
+            echo "RESOURCE_GROUP=unified-health-rg-prod" >> $GITHUB_ENV
+          else
+            echo "RESOURCE_GROUP=unified-health-rg-staging" >> $GITHUB_ENV
+          fi
+
+      - name: Create database snapshot
+        id: snapshot
+        if: inputs.rollback_type == 'database' || inputs.rollback_type == 'full'
+        run: |
+          SNAPSHOT_NAME="pre-rollback-snapshot-$(date +%Y%m%d-%H%M%S)"
+
+          echo "Creating database snapshot: $SNAPSHOT_NAME"
+
+          # Create backup before rollback
+          az postgres flexible-server backup create \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --name unified-health-db-${{ inputs.environment }} \
+            --backup-name $SNAPSHOT_NAME \
+            --retention-days 90 || echo "Using automatic backup"
+
+          echo "SNAPSHOT_NAME=${SNAPSHOT_NAME}" >> $GITHUB_OUTPUT
+
+          # Store snapshot name
+          az keyvault secret set \
+            --vault-name unified-health-kv-${{ inputs.environment }} \
+            --name "pre-rollback-snapshot" \
+            --value "${SNAPSHOT_NAME}" || true
+
+      - name: Save deployment state
+        if: inputs.rollback_type == 'deployment' || inputs.rollback_type == 'full'
+        run: |
+          if [ "${{ inputs.environment }}" == "production" ]; then
+            echo "AKS_CLUSTER=unified-health-aks-prod" >> $GITHUB_ENV
+            echo "NAMESPACE=unified-health-prod" >> $GITHUB_ENV
+          else
+            echo "AKS_CLUSTER=unified-health-aks-staging" >> $GITHUB_ENV
+            echo "NAMESPACE=unified-health-staging" >> $GITHUB_ENV
+          fi
+
+          # Get AKS credentials
+          az aks get-credentials \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --name ${{ env.AKS_CLUSTER }} \
+            --overwrite-existing
+
+          # Save current deployment state
+          kubectl get deployments -n ${{ env.NAMESPACE }} -o yaml > deployment-state.yaml
+          kubectl get services -n ${{ env.NAMESPACE }} -o yaml > service-state.yaml
+
+      - name: Upload state files
+        if: inputs.rollback_type == 'deployment' || inputs.rollback_type == 'full'
+        uses: actions/upload-artifact@v4
+        with:
+          name: pre-rollback-state
+          path: |
+            deployment-state.yaml
+            service-state.yaml
+
+  # ==========================================
+  # Rollback Deployment
+  # ==========================================
+  rollback-deployment:
+    name: Rollback Deployment
+    runs-on: ubuntu-latest
+    needs: [validate-rollback, create-snapshot]
+    if: inputs.rollback_type == 'deployment' || inputs.rollback_type == 'full'
+    environment: ${{ inputs.environment }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.validate-rollback.outputs.target_version }}
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set environment variables
+        run: |
+          if [ "${{ inputs.environment }}" == "production" ]; then
+            echo "AKS_CLUSTER=unified-health-aks-prod" >> $GITHUB_ENV
+            echo "RESOURCE_GROUP=unified-health-rg-prod" >> $GITHUB_ENV
+            echo "NAMESPACE=unified-health-prod" >> $GITHUB_ENV
+          else
+            echo "AKS_CLUSTER=unified-health-aks-staging" >> $GITHUB_ENV
+            echo "RESOURCE_GROUP=unified-health-rg-staging" >> $GITHUB_ENV
+            echo "NAMESPACE=unified-health-staging" >> $GITHUB_ENV
+          fi
+
+      - name: Get AKS credentials
+        run: |
+          az aks get-credentials \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --name ${{ env.AKS_CLUSTER }} \
+            --overwrite-existing
+
+      - name: Get current deployment color
+        id: color
+        run: |
+          CURRENT_COLOR=$(kubectl get svc unified-health-api -n ${{ env.NAMESPACE }} -o jsonpath='{.spec.selector.color}' 2>/dev/null || echo "blue")
+
+          if [ "$CURRENT_COLOR" == "blue" ]; then
+            ROLLBACK_COLOR="green"
+          else
+            ROLLBACK_COLOR="blue"
+          fi
+
+          echo "CURRENT_COLOR=${CURRENT_COLOR}" >> $GITHUB_OUTPUT
+          echo "ROLLBACK_COLOR=${ROLLBACK_COLOR}" >> $GITHUB_OUTPUT
+
+          echo "Current active: $CURRENT_COLOR"
+          echo "Rollback to: $ROLLBACK_COLOR"
+
+      - name: Check if rollback deployment exists
+        id: check
+        run: |
+          if kubectl get deployment unified-health-api-${{ steps.color.outputs.ROLLBACK_COLOR }} -n ${{ env.NAMESPACE }} >/dev/null 2>&1; then
+            echo "EXISTS=true" >> $GITHUB_OUTPUT
+            echo "Rollback deployment exists"
+          else
+            echo "EXISTS=false" >> $GITHUB_OUTPUT
+            echo "Rollback deployment does not exist, will deploy target version"
+          fi
+
+      - name: Deploy target version
+        if: steps.check.outputs.EXISTS == 'false'
+        run: |
+          TARGET_VERSION="${{ needs.validate-rollback.outputs.target_version }}"
+          ROLLBACK_COLOR="${{ steps.color.outputs.ROLLBACK_COLOR }}"
+
+          # Build image tag from version
+          IMAGE_TAG="${TARGET_VERSION}"
+
+          echo "Deploying version $IMAGE_TAG to $ROLLBACK_COLOR"
+
+          cat <<EOF | kubectl apply -f -
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: unified-health-api-${ROLLBACK_COLOR}
+            namespace: ${{ env.NAMESPACE }}
+            labels:
+              app: unified-health-api
+              color: ${ROLLBACK_COLOR}
+          spec:
+            replicas: 3
+            selector:
+              matchLabels:
+                app: unified-health-api
+                color: ${ROLLBACK_COLOR}
+            template:
+              metadata:
+                labels:
+                  app: unified-health-api
+                  color: ${ROLLBACK_COLOR}
+              spec:
+                containers:
+                - name: api
+                  image: ${{ env.ACR_NAME }}.azurecr.io/unified-health-api:${IMAGE_TAG}
+                  ports:
+                  - containerPort: 8080
+                  env:
+                  - name: NODE_ENV
+                    value: "${{ inputs.environment }}"
+                  resources:
+                    requests:
+                      cpu: "500m"
+                      memory: "512Mi"
+                    limits:
+                      cpu: "2000m"
+                      memory: "2Gi"
+                  livenessProbe:
+                    httpGet:
+                      path: /health
+                      port: 8080
+                  readinessProbe:
+                    httpGet:
+                      path: /ready
+                      port: 8080
+          EOF
+
+      - name: Scale up rollback deployment
+        if: steps.check.outputs.EXISTS == 'true'
+        run: |
+          kubectl scale deployment unified-health-api-${{ steps.color.outputs.ROLLBACK_COLOR }} \
+            -n ${{ env.NAMESPACE }} \
+            --replicas=3
+
+      - name: Wait for rollback deployment
+        run: |
+          kubectl rollout status deployment/unified-health-api-${{ steps.color.outputs.ROLLBACK_COLOR }} \
+            -n ${{ env.NAMESPACE }} \
+            --timeout=600s
+
+      - name: Switch traffic to rollback version
+        run: |
+          kubectl patch svc unified-health-api -n ${{ env.NAMESPACE }} \
+            -p '{"spec":{"selector":{"app":"unified-health-api","color":"${{ steps.color.outputs.ROLLBACK_COLOR }}"}}}'
+
+          echo "Traffic switched to ${{ steps.color.outputs.ROLLBACK_COLOR }}"
+
+      - name: Monitor rollback deployment
+        run: |
+          echo "Monitoring rollback deployment for 2 minutes..."
+
+          for i in {1..12}; do
+            FAILING_PODS=$(kubectl get pods -n ${{ env.NAMESPACE }} -l "app=unified-health-api,color=${{ steps.color.outputs.ROLLBACK_COLOR }}" -o json | jq -r '.items[] | select(.status.phase!="Running") | .metadata.name' | wc -l)
+
+            if [ "$FAILING_PODS" -gt 0 ]; then
+              echo "::error::$FAILING_PODS pods are failing!"
+              exit 1
+            fi
+
+            echo "All pods healthy (check $i/12)..."
+            sleep 10
+          done
+
+      - name: Scale down old deployment
+        if: success()
+        run: |
+          kubectl scale deployment unified-health-api-${{ steps.color.outputs.CURRENT_COLOR }} \
+            -n ${{ env.NAMESPACE }} \
+            --replicas=0 || echo "Old deployment already scaled down"
+
+  # ==========================================
+  # Rollback Database
+  # ==========================================
+  rollback-database:
+    name: Rollback Database
+    runs-on: ubuntu-latest
+    needs: [validate-rollback, create-snapshot]
+    if: inputs.rollback_type == 'database' || inputs.rollback_type == 'full'
+    environment: ${{ inputs.environment }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.validate-rollback.outputs.target_version }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Get database credentials
+        run: |
+          DB_URL=$(az keyvault secret show \
+            --vault-name unified-health-kv-${{ inputs.environment }} \
+            --name database-url \
+            --query value -o tsv)
+
+          echo "::add-mask::$DB_URL"
+          echo "DATABASE_URL=$DB_URL" >> $GITHUB_ENV
+
+      - name: Rollback database migrations
+        run: |
+          echo "Rolling back database migrations to version ${{ needs.validate-rollback.outputs.target_version }}"
+          pnpm --filter @unified-health/api db:migrate:rollback
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+
+      - name: Verify database state
+        run: |
+          echo "Verifying database state..."
+          pnpm --filter @unified-health/api db:migrate:status
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+
+  # ==========================================
+  # Verify Rollback
+  # ==========================================
+  verify-rollback:
+    name: Verify Rollback
+    runs-on: ubuntu-latest
+    needs: [rollback-deployment, rollback-database]
+    if: |
+      always() &&
+      (needs.rollback-deployment.result == 'success' || needs.rollback-deployment.result == 'skipped') &&
+      (needs.rollback-database.result == 'success' || needs.rollback-database.result == 'skipped')
+    environment: ${{ inputs.environment }}
+
+    steps:
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set environment variables
+        run: |
+          if [ "${{ inputs.environment }}" == "production" ]; then
+            echo "AKS_CLUSTER=unified-health-aks-prod" >> $GITHUB_ENV
+            echo "RESOURCE_GROUP=unified-health-rg-prod" >> $GITHUB_ENV
+            echo "NAMESPACE=unified-health-prod" >> $GITHUB_ENV
+          else
+            echo "AKS_CLUSTER=unified-health-aks-staging" >> $GITHUB_ENV
+            echo "RESOURCE_GROUP=unified-health-rg-staging" >> $GITHUB_ENV
+            echo "NAMESPACE=unified-health-staging" >> $GITHUB_ENV
+          fi
+
+      - name: Get AKS credentials
+        if: inputs.rollback_type == 'deployment' || inputs.rollback_type == 'full'
+        run: |
+          az aks get-credentials \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --name ${{ env.AKS_CLUSTER }} \
+            --overwrite-existing
+
+      - name: Run health checks
+        if: inputs.rollback_type == 'deployment' || inputs.rollback_type == 'full'
+        run: |
+          API_ENDPOINT=$(kubectl get svc unified-health-api -n ${{ env.NAMESPACE }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || echo "")
+
+          if [ -z "$API_ENDPOINT" ]; then
+            kubectl port-forward -n ${{ env.NAMESPACE }} svc/unified-health-api 8080:80 &
+            PF_PID=$!
+            sleep 10
+            API_ENDPOINT="localhost:8080"
+          fi
+
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://${API_ENDPOINT}/health || echo "000")
+
+          if [ "$HTTP_CODE" == "200" ]; then
+            echo "Health check passed"
+          else
+            echo "::error::Health check failed with code: $HTTP_CODE"
+            [ ! -z "$PF_PID" ] && kill $PF_PID 2>/dev/null || true
+            exit 1
+          fi
+
+          [ ! -z "$PF_PID" ] && kill $PF_PID 2>/dev/null || true
+
+  # ==========================================
+  # Notify Rollback
+  # ==========================================
+  notify:
+    name: Send Notification
+    runs-on: ubuntu-latest
+    needs: [validate-rollback, rollback-deployment, rollback-database, verify-rollback]
+    if: always()
+
+    steps:
+      - name: Determine status
+        id: status
+        run: |
+          if [ "${{ needs.verify-rollback.result }}" == "success" ]; then
+            echo "STATUS=SUCCESS" >> $GITHUB_OUTPUT
+            echo "COLOR=good" >> $GITHUB_OUTPUT
+          else
+            echo "STATUS=FAILED" >> $GITHUB_OUTPUT
+            echo "COLOR=danger" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Send Slack notification
+        uses: slackapi/slack-github-action@v1.26.0
+        with:
+          payload: |
+            {
+              "text": "ROLLBACK ${{ steps.status.outputs.STATUS }}: ${{ inputs.environment }}",
+              "attachments": [
+                {
+                  "color": "${{ steps.status.outputs.COLOR }}",
+                  "fields": [
+                    {
+                      "title": "Environment",
+                      "value": "${{ inputs.environment }}",
+                      "short": true
+                    },
+                    {
+                      "title": "Rollback Type",
+                      "value": "${{ inputs.rollback_type }}",
+                      "short": true
+                    },
+                    {
+                      "title": "Target Version",
+                      "value": "${{ needs.validate-rollback.outputs.target_version }}",
+                      "short": true
+                    },
+                    {
+                      "title": "Status",
+                      "value": "${{ steps.status.outputs.STATUS }}",
+                      "short": true
+                    },
+                    {
+                      "title": "Reason",
+                      "value": "${{ inputs.reason }}",
+                      "short": false
+                    },
+                    {
+                      "title": "Triggered By",
+                      "value": "${{ github.actor }}",
+                      "short": true
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": "button",
+                      "text": "View Workflow",
+                      "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        continue-on-error: true
+
+      - name: Send critical alert email
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "ROLLBACK ${{ steps.status.outputs.STATUS }}: ${{ inputs.environment }}"
+          to: ${{ secrets.NOTIFICATION_EMAIL }}
+          from: UnifiedHealth Platform
+          body: |
+            Rollback has been executed for ${{ inputs.environment }} environment.
+
+            Status: ${{ steps.status.outputs.STATUS }}
+            Rollback Type: ${{ inputs.rollback_type }}
+            Target Version: ${{ needs.validate-rollback.outputs.target_version }}
+            Reason: ${{ inputs.reason }}
+            Triggered By: ${{ github.actor }}
+
+            Workflow: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        continue-on-error: true

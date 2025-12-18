@@ -1,0 +1,35 @@
+# ============================================
+# UnifiedHealth Platform - Trivy Ignore File
+# Container Security Scanning Exceptions
+# ============================================
+
+# This file contains CVEs that are explicitly ignored during Trivy scans.
+# Each entry should have:
+# 1. CVE ID
+# 2. Reason for ignoring
+# 3. Expiration date (when to review again)
+# 4. Approved by
+
+# ============================================
+# Example Format:
+# ============================================
+# CVE-2024-XXXXX
+# # Reason: False positive - not applicable to our use case
+# # Expires: 2025-03-01
+# # Approved: Security Team
+
+# ============================================
+# Accepted Risks
+# ============================================
+
+# Note: Minimize entries in this file. Each ignored vulnerability
+# should have compensating controls and regular review.
+
+# ============================================
+# Development Dependencies Only
+# ============================================
+
+# CVE-YYYY-XXXXX
+# # Reason: Only affects development environment, not in production
+# # Expires: 2025-06-01
+# # Approved: DevSecOps Team

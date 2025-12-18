@@ -14,6 +14,7 @@ import { consentController } from '../controllers/consent.controller.js';
 import { notificationController } from '../controllers/notification.controller.js';
 import { paymentController } from '../controllers/payment.controller.js';
 import { pushController } from '../controllers/push.controller.js';
+import { dashboardController } from '../controllers/dashboard.controller.js';
 import { authenticate, authorize } from '../middleware/auth.middleware.js';
 
 const router = Router();
@@ -23,6 +24,12 @@ const router = Router();
 // ==========================================
 router.get('/version', healthController.getVersion);
 router.get('/config/public', healthController.getPublicConfig);
+
+// ==========================================
+// Dashboard Endpoints
+// ==========================================
+router.get('/dashboard/stats', authenticate, dashboardController.getStats);
+router.get('/dashboard/quick-actions', authenticate, dashboardController.getQuickActions);
 
 // ==========================================
 // Auth Endpoints

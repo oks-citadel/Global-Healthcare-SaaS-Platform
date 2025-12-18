@@ -24,15 +24,17 @@ export type LoginInput = z.infer<typeof LoginSchema>;
 export type RefreshTokenInput = z.infer<typeof RefreshTokenSchema>;
 
 export interface AuthResponse {
-  accessToken: string;
-  refreshToken: string;
-  expiresIn: number;
-  tokenType: string;
   user: {
     id: string;
     email: string;
     firstName: string;
     lastName: string;
     role: string;
+    createdAt: string;
+    updatedAt: string;
+  };
+  tokens: {
+    accessToken: string;
+    refreshToken: string;
   };
 }

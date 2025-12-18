@@ -1,0 +1,61 @@
+# Snyk (https://snyk.io) policy file
+
+# UnifiedHealth Platform - Snyk Configuration
+# This file defines security policies and exceptions for Snyk scanning
+
+# Specifies for which severities this policy should be used.
+version: v1.25.0
+
+# Language settings
+language-settings:
+  javascript:
+    # Ignore development dependencies in production scans
+    ignore-dev-dependencies: false
+
+# Patch and ignore policies
+# NOTE: Use exceptions sparingly and with proper justification
+
+# Ignore specific vulnerabilities (with expiration)
+ignore:
+  # Example: Temporary ignore for prototype pollution in development dependencies
+  # 'SNYK-JS-MINIMIST-559764':
+  #   - '*':
+  #       reason: 'Development dependency only, not exposed in production'
+  #       expires: '2025-03-01T00:00:00.000Z'
+
+# Patch specific vulnerabilities
+patch: {}
+
+# Exclude paths from scanning
+exclude:
+  # Test files and mocks
+  - '**/*.test.ts'
+  - '**/*.test.tsx'
+  - '**/*.test.js'
+  - '**/*.spec.ts'
+  - '**/*.spec.tsx'
+  - '**/*.spec.js'
+  - '**/tests/**'
+  - '**/test/**'
+  - '**/__tests__/**'
+  - '**/__mocks__/**'
+
+  # Build outputs
+  - '**/dist/**'
+  - '**/build/**'
+  - '**/.next/**'
+  - '**/out/**'
+
+  # Dependencies
+  - '**/node_modules/**'
+
+  # Documentation
+  - '**/docs/**'
+  - '**/*.md'
+
+# Security policies for different environments
+# Fail on high severity vulnerabilities in production
+failThreshold: high
+
+# Organization settings (configure in Snyk dashboard)
+organization: unifiedhealth-platform

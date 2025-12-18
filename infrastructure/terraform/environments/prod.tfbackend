@@ -1,0 +1,21 @@
+# ============================================
+# Production Environment Backend Configuration
+# ============================================
+# Azure Storage backend for Terraform state management
+# Production state is isolated and protected with additional controls
+
+# Storage Account Configuration
+# Replace these values with your actual Azure Storage account details
+# IMPORTANT: Ensure this storage account has:
+# - Soft delete enabled for blob recovery
+# - Versioning enabled for state history
+# - Access restricted via RBAC and network rules
+# - Backup/replication configured
+resource_group_name  = "unified-health-tfstate-rg"
+storage_account_name = "unifiedhealthtfstateprd"
+container_name       = "tfstate-prod"
+key                  = "prod/terraform.tfstate"
+
+# State Locking
+# Uses Azure Storage blob leases for state locking to prevent concurrent modifications
+# Production requires extra caution - consider implementing approval workflows

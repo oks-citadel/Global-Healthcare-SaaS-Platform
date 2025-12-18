@@ -1,0 +1,15 @@
+# ============================================
+# Development Environment Backend Configuration
+# ============================================
+# Azure Storage backend for Terraform state management
+# Enables state locking, versioning, and team collaboration
+
+# Storage Account Configuration
+# Replace these values with your actual Azure Storage account details
+resource_group_name  = "unified-health-tfstate-rg"
+storage_account_name = "unifiedhealthtfstatedev"
+container_name       = "tfstate-dev"
+key                  = "dev/terraform.tfstate"
+
+# State Locking
+# Uses Azure Storage blob leases for state locking to prevent concurrent modifications

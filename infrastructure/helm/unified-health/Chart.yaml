@@ -1,0 +1,26 @@
+apiVersion: v2
+name: unified-health
+description: UnifiedHealth Global Platform - Multi-Currency, Multi-Region Healthcare SaaS
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+
+keywords:
+  - healthcare
+  - saas
+  - telemedicine
+  - multi-tenant
+
+home: https://github.com/your-org/unified-health-platform
+sources:
+  - https://github.com/your-org/unified-health-platform
+
+maintainers:
+  - name: UnifiedHealth Team
+    email: devops@unifiedhealth.com
+
+dependencies: []
+
+annotations:
+  category: Healthcare
+  licenses: UNLICENSED

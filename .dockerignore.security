@@ -1,0 +1,151 @@
+# ============================================
+# UnifiedHealth Platform - Security-Enhanced .dockerignore
+# Prevents sensitive files from being included in Docker images
+# ============================================
+
+# Version Control
+.git
+.gitignore
+.gitattributes
+
+# Environment Files (CRITICAL - Never include in images)
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.env
+*.env.*
+
+# Secrets and Credentials
+secrets/
+*.pem
+*.key
+*.cert
+*.crt
+*.pfx
+*.p12
+*.jks
+*.keystore
+id_rsa*
+*.ssh
+
+# Configuration Files with Secrets
+config/secrets.yml
+config/credentials.yml
+*-secrets.yml
+*-credentials.yml
+*.secret.*
+
+# Database Files
+*.db
+*.sqlite
+*.sqlite3
+
+# Log Files (may contain sensitive data)
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Backup Files
+*.bak
+*.backup
+*.swp
+*.swo
+*~
+
+# Development Files
+node_modules/
+.npm
+.yarn
+.pnpm-store
+
+# Testing
+coverage/
+.nyc_output
+test-results/
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+__tests__/
+__mocks__/
+
+# Documentation
+*.md
+docs/
+!README.md
+
+# Build Artifacts
+dist/
+build/
+.next/
+out/
+.cache/
+
+# IDE Files
+.vscode/
+.idea/
+*.iml
+.project
+.classpath
+.settings/
+*.sublime-*
+
+# OS Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary Files
+tmp/
+temp/
+*.tmp
+
+# CI/CD Files
+.github/
+.gitlab-ci.yml
+.travis.yml
+Jenkinsfile
+azure-pipelines.yml
+
+# Docker Files (don't include in images)
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Package Manager Lock Files (can be large)
+# Uncomment if not needed for reproducible builds
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# Security Reports
+security-reports/
+*.sarif
+trivy-*.json
+
+# Kubernetes/Terraform (infrastructure as code)
+*.tf
+*.tfstate
+*.tfvars
+k8s/
+kubernetes/
+helm/
+
+# Monitoring/Observability
+grafana/
+prometheus/
+
+# Azure/Cloud Credentials
+.azure/
+.aws/
+.gcloud/
+
+# Healthcare-Specific
+# PHI test data (should never be in repos anyway)
+phi-test-data/
+patient-records/
+test-patients/

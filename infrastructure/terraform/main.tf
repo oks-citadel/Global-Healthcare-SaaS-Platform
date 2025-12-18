@@ -17,17 +17,10 @@ terraform {
       version = "~> 2.46.0"
     }
   }
-
-  backend "azurerm" {
-    # Configure in environments/<env>.tfbackend
-    # resource_group_name  = "terraform-state-rg"
-    # storage_account_name = "tfstateunifiedhealth"
-    # container_name       = "tfstate"
-    # key                  = "unified-health.tfstate"
-  }
 }
 
 provider "azurerm" {
+  subscription_id = var.subscription_id
   features {
     key_vault {
       purge_soft_delete_on_destroy = false
@@ -198,15 +191,15 @@ resource "azurerm_role_assignment" "aks_acr_pull" {
 data "azurerm_client_config" "current" {}
 
 resource "azurerm_key_vault" "main" {
-  name                        = "kv-${var.project_name}-${var.environment}"
-  location                    = azurerm_resource_group.main.location
-  resource_group_name         = azurerm_resource_group.main.name
-  tenant_id                   = data.azurerm_client_config.current.tenant_id
-  sku_name                    = "standard"
-  soft_delete_retention_days  = 90
-  purge_protection_enabled    = true
-  enable_rbac_authorization   = true
-  tags                        = local.common_tags
+  name                       = "kv-${var.project_name}-${var.environment}"
+  location                   = azurerm_resource_group.main.location
+  resource_group_name        = azurerm_resource_group.main.name
+  tenant_id                  = data.azurerm_client_config.current.tenant_id
+  sku_name                   = "standard"
+  soft_delete_retention_days = 90
+  purge_protection_enabled   = true
+  enable_rbac_authorization  = true
+  tags                       = local.common_tags
 }
 
 # Key Vault access for AKS
@@ -313,4 +306,431 @@ resource "azurerm_storage_container" "documents" {
   name                  = "documents"
   storage_account_name  = azurerm_storage_account.main.name
   container_access_type = "private"
+}
+
+# ============================================
+# Network Security Groups
+# ============================================
+
+resource "azurerm_network_security_group" "aks" {
+  name                = "nsg-aks-${var.environment}"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  tags                = local.common_tags
+
+  # Allow inbound from Application Gateway / Front Door
+  security_rule {
+    name                       = "AllowAppGatewayInbound"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_ranges    = ["443", "80"]
+    source_address_prefix      = var.appgw_subnet_prefix
+    destination_address_prefix = var.aks_subnet_prefix
+  }
+
+  # Allow Kubernetes API server
+  security_rule {
+    name                       = "AllowKubeAPIInbound"
+    priority                   = 110
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "443"
+    source_address_prefix      = "AzureCloud"
+    destination_address_prefix = var.aks_subnet_prefix
+  }
+
+  # Allow internal cluster communication
+  security_rule {
+    name                       = "AllowInternalInbound"
+    priority                   = 120
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = var.aks_subnet_prefix
+    destination_address_prefix = var.aks_subnet_prefix
+  }
+
+  # Allow Azure Load Balancer
+  security_rule {
+    name                       = "AllowAzureLoadBalancerInbound"
+    priority                   = 130
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "AzureLoadBalancer"
+    destination_address_prefix = "*"
+  }
+
+  # Deny all other inbound
+  security_rule {
+    name                       = "DenyAllInbound"
+    priority                   = 4096
+    direction                  = "Inbound"
+    access                     = "Deny"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  # Allow outbound to database subnet
+  security_rule {
+    name                       = "AllowDatabaseOutbound"
+    priority                   = 100
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "5432"
+    source_address_prefix      = var.aks_subnet_prefix
+    destination_address_prefix = var.database_subnet_prefix
+  }
+
+  # Allow outbound to VNet
+  security_rule {
+    name                       = "AllowVNetOutbound"
+    priority                   = 110
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "VirtualNetwork"
+    destination_address_prefix = "VirtualNetwork"
+  }
+
+  # Allow outbound to Azure services
+  security_rule {
+    name                       = "AllowAzureOutbound"
+    priority                   = 120
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "VirtualNetwork"
+    destination_address_prefix = "AzureCloud"
+  }
+
+  # Allow outbound to Internet (for pulling images, etc.)
+  security_rule {
+    name                       = "AllowInternetOutbound"
+    priority                   = 130
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "VirtualNetwork"
+    destination_address_prefix = "Internet"
+  }
+}
+
+resource "azurerm_subnet_network_security_group_association" "aks" {
+  subnet_id                 = azurerm_subnet.aks.id
+  network_security_group_id = azurerm_network_security_group.aks.id
+}
+
+resource "azurerm_network_security_group" "database" {
+  name                = "nsg-database-${var.environment}"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  tags                = local.common_tags
+
+  # Allow inbound from AKS subnet only
+  security_rule {
+    name                       = "AllowAKSPostgreSQLInbound"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "5432"
+    source_address_prefix      = var.aks_subnet_prefix
+    destination_address_prefix = var.database_subnet_prefix
+  }
+
+  # Deny all other inbound
+  security_rule {
+    name                       = "DenyAllInbound"
+    priority                   = 4096
+    direction                  = "Inbound"
+    access                     = "Deny"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  # Allow outbound to Azure services
+  security_rule {
+    name                       = "AllowAzureOutbound"
+    priority                   = 100
+    direction                  = "Outbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "VirtualNetwork"
+    destination_address_prefix = "AzureCloud"
+  }
+}
+
+resource "azurerm_subnet_network_security_group_association" "database" {
+  subnet_id                 = azurerm_subnet.database.id
+  network_security_group_id = azurerm_network_security_group.database.id
+}
+
+# ============================================
+# Monitoring & Alerting
+# ============================================
+
+# Application Insights for application monitoring
+resource "azurerm_application_insights" "main" {
+  name                = "appi-${var.project_name}-${var.environment}"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  workspace_id        = azurerm_log_analytics_workspace.main.id
+  application_type    = "web"
+  retention_in_days   = 90
+  tags                = local.common_tags
+}
+
+# Action Group for alerts
+resource "azurerm_monitor_action_group" "critical" {
+  name                = "ag-critical-${var.environment}"
+  resource_group_name = azurerm_resource_group.main.name
+  short_name          = "critical"
+  tags                = local.common_tags
+
+  email_receiver {
+    name          = "operations-team"
+    email_address = var.alert_email_address
+  }
+
+  # Add webhook for integration with PagerDuty, Slack, etc.
+  dynamic "webhook_receiver" {
+    for_each = var.alert_webhook_url != "" ? [1] : []
+    content {
+      name        = "webhook-notifications"
+      service_uri = var.alert_webhook_url
+    }
+  }
+}
+
+# AKS cluster health alerts
+resource "azurerm_monitor_metric_alert" "aks_node_cpu" {
+  name                = "aks-node-cpu-high-${var.environment}"
+  resource_group_name = azurerm_resource_group.main.name
+  scopes              = [azurerm_kubernetes_cluster.main.id]
+  description         = "Alert when AKS node CPU exceeds threshold"
+  severity            = 2
+  frequency           = "PT5M"
+  window_size         = "PT15M"
+  tags                = local.common_tags
+
+  criteria {
+    metric_namespace = "Microsoft.ContainerService/managedClusters"
+    metric_name      = "node_cpu_usage_percentage"
+    aggregation      = "Average"
+    operator         = "GreaterThan"
+    threshold        = 80
+  }
+
+  action {
+    action_group_id = azurerm_monitor_action_group.critical.id
+  }
+}
+
+resource "azurerm_monitor_metric_alert" "aks_node_memory" {
+  name                = "aks-node-memory-high-${var.environment}"
+  resource_group_name = azurerm_resource_group.main.name
+  scopes              = [azurerm_kubernetes_cluster.main.id]
+  description         = "Alert when AKS node memory exceeds threshold"
+  severity            = 2
+  frequency           = "PT5M"
+  window_size         = "PT15M"
+  tags                = local.common_tags
+
+  criteria {
+    metric_namespace = "Microsoft.ContainerService/managedClusters"
+    metric_name      = "node_memory_working_set_percentage"
+    aggregation      = "Average"
+    operator         = "GreaterThan"
+    threshold        = 80
+  }
+
+  action {
+    action_group_id = azurerm_monitor_action_group.critical.id
+  }
+}
+
+# PostgreSQL alerts
+resource "azurerm_monitor_metric_alert" "postgresql_cpu" {
+  name                = "postgresql-cpu-high-${var.environment}"
+  resource_group_name = azurerm_resource_group.main.name
+  scopes              = [azurerm_postgresql_flexible_server.main.id]
+  description         = "Alert when PostgreSQL CPU exceeds threshold"
+  severity            = 2
+  frequency           = "PT5M"
+  window_size         = "PT15M"
+  tags                = local.common_tags
+
+  criteria {
+    metric_namespace = "Microsoft.DBforPostgreSQL/flexibleServers"
+    metric_name      = "cpu_percent"
+    aggregation      = "Average"
+    operator         = "GreaterThan"
+    threshold        = 80
+  }
+
+  action {
+    action_group_id = azurerm_monitor_action_group.critical.id
+  }
+}
+
+resource "azurerm_monitor_metric_alert" "postgresql_storage" {
+  name                = "postgresql-storage-high-${var.environment}"
+  resource_group_name = azurerm_resource_group.main.name
+  scopes              = [azurerm_postgresql_flexible_server.main.id]
+  description         = "Alert when PostgreSQL storage exceeds threshold"
+  severity            = 1
+  frequency           = "PT5M"
+  window_size         = "PT15M"
+  tags                = local.common_tags
+
+  criteria {
+    metric_namespace = "Microsoft.DBforPostgreSQL/flexibleServers"
+    metric_name      = "storage_percent"
+    aggregation      = "Average"
+    operator         = "GreaterThan"
+    threshold        = 85
+  }
+
+  action {
+    action_group_id = azurerm_monitor_action_group.critical.id
+  }
+}
+
+# Redis Cache alerts
+resource "azurerm_monitor_metric_alert" "redis_cpu" {
+  name                = "redis-cpu-high-${var.environment}"
+  resource_group_name = azurerm_resource_group.main.name
+  scopes              = [azurerm_redis_cache.main.id]
+  description         = "Alert when Redis CPU exceeds threshold"
+  severity            = 2
+  frequency           = "PT5M"
+  window_size         = "PT15M"
+  tags                = local.common_tags
+
+  criteria {
+    metric_namespace = "Microsoft.Cache/Redis"
+    metric_name      = "percentProcessorTime"
+    aggregation      = "Average"
+    operator         = "GreaterThan"
+    threshold        = 80
+  }
+
+  action {
+    action_group_id = azurerm_monitor_action_group.critical.id
+  }
+}
+
+resource "azurerm_monitor_metric_alert" "redis_memory" {
+  name                = "redis-memory-high-${var.environment}"
+  resource_group_name = azurerm_resource_group.main.name
+  scopes              = [azurerm_redis_cache.main.id]
+  description         = "Alert when Redis memory usage exceeds threshold"
+  severity            = 2
+  frequency           = "PT5M"
+  window_size         = "PT15M"
+  tags                = local.common_tags
+
+  criteria {
+    metric_namespace = "Microsoft.Cache/Redis"
+    metric_name      = "usedmemorypercentage"
+    aggregation      = "Average"
+    operator         = "GreaterThan"
+    threshold        = 85
+  }
+
+  action {
+    action_group_id = azurerm_monitor_action_group.critical.id
+  }
+}
+
+# Diagnostic Settings for Key Vault
+resource "azurerm_monitor_diagnostic_setting" "keyvault" {
+  name                       = "keyvault-diagnostics"
+  target_resource_id         = azurerm_key_vault.main.id
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.main.id
+
+  enabled_log {
+    category = "AuditEvent"
+  }
+
+  metric {
+    category = "AllMetrics"
+    enabled  = true
+  }
+}
+
+# Diagnostic Settings for Storage Account
+resource "azurerm_monitor_diagnostic_setting" "storage" {
+  name                       = "storage-diagnostics"
+  target_resource_id         = azurerm_storage_account.main.id
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.main.id
+
+  metric {
+    category = "Transaction"
+    enabled  = true
+  }
+
+  metric {
+    category = "Capacity"
+    enabled  = true
+  }
+}
+
+# Diagnostic Settings for PostgreSQL
+resource "azurerm_monitor_diagnostic_setting" "postgresql" {
+  name                       = "postgresql-diagnostics"
+  target_resource_id         = azurerm_postgresql_flexible_server.main.id
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.main.id
+
+  enabled_log {
+    category = "PostgreSQLLogs"
+  }
+
+  metric {
+    category = "AllMetrics"
+    enabled  = true
+  }
+}
+
+# Diagnostic Settings for Redis Cache
+resource "azurerm_monitor_diagnostic_setting" "redis" {
+  name                       = "redis-diagnostics"
+  target_resource_id         = azurerm_redis_cache.main.id
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.main.id
+
+  enabled_log {
+    category = "ConnectedClientList"
+  }
+
+  metric {
+    category = "AllMetrics"
+    enabled  = true
+  }
 }

@@ -1,0 +1,546 @@
+{
+  "dashboardName": "Unified Health - API Performance Dashboard",
+  "version": "1.0",
+  "refreshInterval": 30,
+  "timeRange": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "tags": ["api", "performance", "backend"],
+  "panels": [
+    {
+      "id": 1,
+      "title": "Request Throughput",
+      "type": "graph",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 6
+      },
+      "targets": [
+        {
+          "query": "sum(rate(http_requests_total{service='unified-health-api'}[5m])) by (method)",
+          "refId": "A",
+          "legendFormat": "{{method}}"
+        }
+      ],
+      "options": {
+        "yAxis": {
+          "format": "reqps",
+          "label": "Requests per second"
+        },
+        "legend": {
+          "show": true,
+          "values": true,
+          "current": true,
+          "avg": true,
+          "max": true
+        },
+        "tooltip": {
+          "shared": true,
+          "sort": 2
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "Response Time Distribution (P50, P95, P99)",
+      "type": "graph",
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 12,
+        "h": 6
+      },
+      "targets": [
+        {
+          "query": "histogram_quantile(0.50, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, route))",
+          "refId": "A",
+          "legendFormat": "P50 - {{route}}"
+        },
+        {
+          "query": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, route))",
+          "refId": "B",
+          "legendFormat": "P95 - {{route}}"
+        },
+        {
+          "query": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, route))",
+          "refId": "C",
+          "legendFormat": "P99 - {{route}}"
+        }
+      ],
+      "options": {
+        "yAxis": {
+          "format": "s",
+          "label": "Response Time"
+        },
+        "thresholds": [
+          {
+            "value": 0.1,
+            "color": "green",
+            "line": true
+          },
+          {
+            "value": 1.0,
+            "color": "yellow",
+            "line": true
+          },
+          {
+            "value": 3.0,
+            "color": "red",
+            "line": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "title": "Status Code Distribution",
+      "type": "piechart",
+      "gridPos": {
+        "x": 0,
+        "y": 6,
+        "w": 8,
+        "h": 6
+      },
+      "targets": [
+        {
+          "query": "sum(increase(http_requests_total{service='unified-health-api'}[1h])) by (status_code)",
+          "refId": "A",
+          "legendFormat": "{{status_code}}"
+        }
+      ],
+      "options": {
+        "legend": {
+          "show": true,
+          "values": true,
+          "percentage": true
+        },
+        "colorScheme": {
+          "2xx": "green",
+          "3xx": "blue",
+          "4xx": "yellow",
+          "5xx": "red"
+        }
+      }
+    },
+    {
+      "id": 4,
+      "title": "Error Rate by Endpoint",
+      "type": "graph",
+      "gridPos": {
+        "x": 8,
+        "y": 6,
+        "w": 16,
+        "h": 6
+      },
+      "targets": [
+        {
+          "query": "sum(rate(http_requests_total{service='unified-health-api', status_code=~'5..'}[5m])) by (route) / sum(rate(http_requests_total{service='unified-health-api'}[5m])) by (route) * 100",
+          "refId": "A",
+          "legendFormat": "{{route}}"
+        }
+      ],
+      "options": {
+        "yAxis": {
+          "format": "percent",
+          "label": "Error Rate %"
+        },
+        "thresholds": [
+          {
+            "value": 1,
+            "color": "yellow"
+          },
+          {
+            "value": 5,
+            "color": "red"
+          }
+        ],
+        "alert": {
+          "threshold": 5
+        }
+      }
+    },
+    {
+      "id": 5,
+      "title": "Top 10 Slowest Endpoints (P95)",
+      "type": "bar-gauge",
+      "gridPos": {
+        "x": 0,
+        "y": 12,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "query": "topk(10, histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, route)))",
+          "refId": "A",
+          "legendFormat": "{{route}}"
+        }
+      ],
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "gradient",
+        "unit": "s",
+        "thresholds": [
+          {
+            "value": 0,
+            "color": "green"
+          },
+          {
+            "value": 0.5,
+            "color": "yellow"
+          },
+          {
+            "value": 1.0,
+            "color": "red"
+          }
+        ]
+      }
+    },
+    {
+      "id": 6,
+      "title": "Request Rate by Endpoint",
+      "type": "table",
+      "gridPos": {
+        "x": 12,
+        "y": 12,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "query": "sum(rate(http_requests_total{service='unified-health-api'}[5m])) by (route, method)",
+          "refId": "A",
+          "format": "table"
+        }
+      ],
+      "options": {
+        "columns": [
+          {
+            "text": "Endpoint",
+            "value": "route"
+          },
+          {
+            "text": "Method",
+            "value": "method"
+          },
+          {
+            "text": "Req/s",
+            "value": "Value",
+            "decimals": 2
+          }
+        ],
+        "sortBy": {
+          "column": "Value",
+          "desc": true
+        }
+      }
+    },
+    {
+      "id": 7,
+      "title": "Database Query Performance",
+      "type": "graph",
+      "gridPos": {
+        "x": 0,
+        "y": 20,
+        "w": 12,
+        "h": 6
+      },
+      "targets": [
+        {
+          "query": "histogram_quantile(0.95, sum(rate(db_query_duration_seconds_bucket[5m])) by (le, operation))",
+          "refId": "A",
+          "legendFormat": "P95 - {{operation}}"
+        },
+        {
+          "query": "histogram_quantile(0.99, sum(rate(db_query_duration_seconds_bucket[5m])) by (le, operation))",
+          "refId": "B",
+          "legendFormat": "P99 - {{operation}}"
+        }
+      ],
+      "options": {
+        "yAxis": {
+          "format": "s",
+          "label": "Query Duration"
+        },
+        "thresholds": [
+          {
+            "value": 0.05,
+            "color": "green"
+          },
+          {
+            "value": 0.5,
+            "color": "yellow"
+          },
+          {
+            "value": 1.0,
+            "color": "red"
+          }
+        ]
+      }
+    },
+    {
+      "id": 8,
+      "title": "Database Queries per Second",
+      "type": "graph",
+      "gridPos": {
+        "x": 12,
+        "y": 20,
+        "w": 12,
+        "h": 6
+      },
+      "targets": [
+        {
+          "query": "sum(rate(db_query_duration_seconds_count[5m])) by (operation, table)",
+          "refId": "A",
+          "legendFormat": "{{operation}} - {{table}}"
+        }
+      ],
+      "options": {
+        "yAxis": {
+          "format": "qps",
+          "label": "Queries per second"
+        }
+      }
+    },
+    {
+      "id": 9,
+      "title": "Cache Hit Rate",
+      "type": "stat",
+      "gridPos": {
+        "x": 0,
+        "y": 26,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "query": "sum(rate(cache_hits_total[5m])) / (sum(rate(cache_hits_total[5m])) + sum(rate(cache_misses_total[5m]))) * 100",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "graphMode": "area",
+        "colorMode": "background",
+        "unit": "percent",
+        "decimals": 2,
+        "thresholds": [
+          {
+            "value": 0,
+            "color": "red"
+          },
+          {
+            "value": 70,
+            "color": "yellow"
+          },
+          {
+            "value": 90,
+            "color": "green"
+          }
+        ]
+      }
+    },
+    {
+      "id": 10,
+      "title": "Cache Operations",
+      "type": "graph",
+      "gridPos": {
+        "x": 6,
+        "y": 26,
+        "w": 9,
+        "h": 4
+      },
+      "targets": [
+        {
+          "query": "sum(rate(cache_hits_total[5m])) by (cache_name)",
+          "refId": "A",
+          "legendFormat": "Hits - {{cache_name}}"
+        },
+        {
+          "query": "sum(rate(cache_misses_total[5m])) by (cache_name)",
+          "refId": "B",
+          "legendFormat": "Misses - {{cache_name}}"
+        }
+      ],
+      "options": {
+        "yAxis": {
+          "format": "ops",
+          "label": "Operations/sec"
+        }
+      }
+    },
+    {
+      "id": 11,
+      "title": "External Service Performance",
+      "type": "graph",
+      "gridPos": {
+        "x": 15,
+        "y": 26,
+        "w": 9,
+        "h": 4
+      },
+      "targets": [
+        {
+          "query": "histogram_quantile(0.95, sum(rate(external_service_duration_seconds_bucket[5m])) by (le, service))",
+          "refId": "A",
+          "legendFormat": "{{service}}"
+        }
+      ],
+      "options": {
+        "yAxis": {
+          "format": "s",
+          "label": "Response Time (P95)"
+        }
+      }
+    },
+    {
+      "id": 12,
+      "title": "WebSocket Connections",
+      "type": "stat",
+      "gridPos": {
+        "x": 0,
+        "y": 30,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "query": "websocket_connections",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "graphMode": "area",
+        "colorMode": "value",
+        "unit": "short"
+      }
+    },
+    {
+      "id": 13,
+      "title": "WebSocket Messages",
+      "type": "graph",
+      "gridPos": {
+        "x": 6,
+        "y": 30,
+        "w": 18,
+        "h": 4
+      },
+      "targets": [
+        {
+          "query": "sum(rate(websocket_messages_received_total[5m])) by (event)",
+          "refId": "A",
+          "legendFormat": "Received - {{event}}"
+        },
+        {
+          "query": "sum(rate(websocket_messages_sent_total[5m])) by (event)",
+          "refId": "B",
+          "legendFormat": "Sent - {{event}}"
+        }
+      ],
+      "options": {
+        "yAxis": {
+          "format": "mps",
+          "label": "Messages/sec"
+        }
+      }
+    },
+    {
+      "id": 14,
+      "title": "Rate Limiting Events",
+      "type": "graph",
+      "gridPos": {
+        "x": 0,
+        "y": 34,
+        "w": 12,
+        "h": 6
+      },
+      "targets": [
+        {
+          "query": "sum(rate(rate_limit_exceeded_total[5m])) by (endpoint)",
+          "refId": "A",
+          "legendFormat": "{{endpoint}}"
+        }
+      ],
+      "options": {
+        "yAxis": {
+          "format": "ops",
+          "label": "Rate Limits/sec"
+        }
+      }
+    },
+    {
+      "id": 15,
+      "title": "Request Duration Heatmap",
+      "type": "heatmap",
+      "gridPos": {
+        "x": 12,
+        "y": 34,
+        "w": 12,
+        "h": 6
+      },
+      "targets": [
+        {
+          "query": "sum(increase(http_request_duration_seconds_bucket[1m])) by (le)",
+          "refId": "A",
+          "format": "heatmap"
+        }
+      ],
+      "options": {
+        "yAxis": {
+          "format": "s",
+          "decimals": 3
+        },
+        "colorScheme": "interpolateSpectral"
+      }
+    }
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "environment",
+        "type": "custom",
+        "query": "production,staging,development",
+        "current": {
+          "value": "production",
+          "text": "Production"
+        }
+      },
+      {
+        "name": "endpoint",
+        "type": "query",
+        "query": "label_values(http_requests_total, route)",
+        "refresh": 1,
+        "multi": true,
+        "includeAll": true
+      },
+      {
+        "name": "method",
+        "type": "query",
+        "query": "label_values(http_requests_total, method)",
+        "refresh": 1,
+        "multi": true,
+        "includeAll": true
+      }
+    ]
+  },
+  "annotations": {
+    "list": [
+      {
+        "name": "Deployments",
+        "datasource": "Azure Monitor",
+        "enable": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "query": "AzureActivity | where OperationName contains 'deployment'"
+      },
+      {
+        "name": "Performance Degradation",
+        "datasource": "Prometheus",
+        "enable": true,
+        "iconColor": "rgba(255, 96, 96, 1)",
+        "query": "ALERTS{alertname='HighAPIResponseTime', alertstate='firing'}"
+      }
+    ]
+  }
+}

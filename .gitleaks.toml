@@ -1,0 +1,241 @@
+# ============================================
+# UnifiedHealth Platform - Gitleaks Configuration
+# Secret Detection for Git Repositories
+# ============================================
+
+title = "UnifiedHealth Platform - Secret Detection"
+
+# Extend default gitleaks config
+[extend]
+# useDefault = true
+
+# ============================================
+# Custom Rules
+# ============================================
+
+[[rules]]
+id = "aws-access-key"
+description = "AWS Access Key ID"
+regex = '''(A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}'''
+tags = ["key", "AWS"]
+[[rules.Entropies]]
+Min = "3.5"
+Max = "4.5"
+
+[[rules]]
+id = "aws-secret-key"
+description = "AWS Secret Access Key"
+regex = '''(?i)aws(.{0,20})?['\"][0-9a-zA-Z\/+]{40}['\"]'''
+tags = ["key", "AWS"]
+
+[[rules]]
+id = "azure-client-secret"
+description = "Azure Client Secret"
+regex = '''(?i)(azure|az)(.{0,20})?['\"][0-9a-zA-Z\-\.\_\~]{34,}['\"]'''
+tags = ["key", "Azure"]
+
+[[rules]]
+id = "github-token"
+description = "GitHub Personal Access Token"
+regex = '''ghp_[0-9a-zA-Z]{36}'''
+tags = ["key", "GitHub"]
+
+[[rules]]
+id = "github-oauth"
+description = "GitHub OAuth Access Token"
+regex = '''gho_[0-9a-zA-Z]{36}'''
+tags = ["key", "GitHub"]
+
+[[rules]]
+id = "github-app"
+description = "GitHub App Token"
+regex = '''(ghu|ghs)_[0-9a-zA-Z]{36}'''
+tags = ["key", "GitHub"]
+
+[[rules]]
+id = "private-key"
+description = "Private Key"
+regex = '''-----BEGIN (RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----'''
+tags = ["key", "private"]
+
+[[rules]]
+id = "jwt-token"
+description = "JWT Token"
+regex = '''ey[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*'''
+tags = ["token", "JWT"]
+[rules.allowlist]
+regexes = [
+    '''example''',
+    '''test''',
+    '''demo''',
+]
+
+[[rules]]
+id = "database-connection-string"
+description = "Database Connection String"
+regex = '''(?i)(mongodb|mysql|postgres|postgresql|mssql)://[^:]+:[^@]+@[^/]+'''
+tags = ["database", "connection"]
+
+[[rules]]
+id = "stripe-key"
+description = "Stripe API Key"
+regex = '''(sk|pk)_(test|live)_[0-9a-zA-Z]{24,99}'''
+tags = ["key", "payment", "stripe"]
+
+[[rules]]
+id = "sendgrid-api-key"
+description = "SendGrid API Key"
+regex = '''SG\.[A-Za-z0-9_-]{22}\.[A-Za-z0-9_-]{43}'''
+tags = ["key", "email", "sendgrid"]
+
+[[rules]]
+id = "mailgun-api-key"
+description = "Mailgun API Key"
+regex = '''key-[0-9a-zA-Z]{32}'''
+tags = ["key", "email", "mailgun"]
+
+[[rules]]
+id = "twilio-api-key"
+description = "Twilio API Key"
+regex = '''SK[0-9a-fA-F]{32}'''
+tags = ["key", "twilio", "sms"]
+
+[[rules]]
+id = "slack-token"
+description = "Slack Token"
+regex = '''xox[baprs]-([0-9a-zA-Z]{10,48})'''
+tags = ["token", "slack"]
+
+[[rules]]
+id = "slack-webhook"
+description = "Slack Webhook"
+regex = '''https://hooks\.slack\.com/services/T[a-zA-Z0-9_]{8}/B[a-zA-Z0-9_]{8}/[a-zA-Z0-9_]{24}'''
+tags = ["webhook", "slack"]
+
+[[rules]]
+id = "google-api-key"
+description = "Google API Key"
+regex = '''AIza[0-9A-Za-z\\-_]{35}'''
+tags = ["key", "google"]
+
+[[rules]]
+id = "google-oauth"
+description = "Google OAuth Token"
+regex = '''ya29\.[0-9A-Za-z\-_]+'''
+tags = ["token", "google"]
+
+[[rules]]
+id = "heroku-api-key"
+description = "Heroku API Key"
+regex = '''[h|H][e|E][r|R][o|O][k|K][u|U].*[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'''
+tags = ["key", "heroku"]
+
+[[rules]]
+id = "npm-token"
+description = "npm Access Token"
+regex = '''npm_[A-Za-z0-9]{36}'''
+tags = ["token", "npm"]
+
+[[rules]]
+id = "docker-registry-auth"
+description = "Docker Registry Auth"
+regex = '''(?i)docker(.{0,20})?['\"][0-9a-zA-Z\/+]{100,}['\"]'''
+tags = ["docker", "auth"]
+
+[[rules]]
+id = "generic-api-key"
+description = "Generic API Key"
+regex = '''(?i)(api[_-]?key|apikey|api[_-]?secret)(.{0,20})?['\"][0-9a-zA-Z_\-]{20,60}['\"]'''
+tags = ["key", "api"]
+[[rules.Entropies]]
+Min = "3.5"
+Max = "4.5"
+
+[[rules]]
+id = "generic-password"
+description = "Generic Password"
+regex = '''(?i)(password|passwd|pwd)(.{0,20})?['\"][^'\"]{8,}['\"]'''
+tags = ["password"]
+[rules.allowlist]
+regexes = [
+    '''example''',
+    '''test''',
+    '''demo''',
+    '''sample''',
+    '''placeholder''',
+    '''\$\{.*\}''',
+]
+
+[[rules]]
+id = "oauth-client-secret"
+description = "OAuth Client Secret"
+regex = '''(?i)(client[_-]?secret|oauth[_-]?secret)(.{0,20})?['\"][0-9a-zA-Z_\-]{32,}['\"]'''
+tags = ["oauth", "secret"]
+
+[[rules]]
+id = "session-secret"
+description = "Session Secret"
+regex = '''(?i)(session[_-]?secret|cookie[_-]?secret)(.{0,20})?['\"][0-9a-zA-Z_\-]{32,}['\"]'''
+tags = ["session", "secret"]
+
+# Healthcare-Specific
+[[rules]]
+id = "hipaa-encryption-key"
+description = "HIPAA Encryption Key"
+regex = '''(?i)(hipaa[_-]?key|phi[_-]?encryption[_-]?key)(.{0,20})?['\"][0-9a-zA-Z+/=]{32,}['\"]'''
+tags = ["healthcare", "hipaa", "encryption"]
+
+[[rules]]
+id = "fhir-api-key"
+description = "FHIR API Key"
+regex = '''(?i)(fhir[_-]?api[_-]?key|fhir[_-]?token)(.{0,20})?['\"][0-9a-zA-Z_\-]{20,}['\"]'''
+tags = ["healthcare", "fhir", "api"]
+
+# ============================================
+# Allowlist Configuration
+# ============================================
+
+[allowlist]
+description = "Global Allowlist"
+regexes = [
+    '''example''',
+    '''sample''',
+    '''test''',
+    '''demo''',
+    '''placeholder''',
+    '''your-key-here''',
+    '''your_key_here''',
+    '''xxx''',
+    '''yyy''',
+    '''zzz''',
+    '''<your-''',
+    '''\$\{.*\}''',
+    '''process\.env''',
+]
+
+paths = [
+    '''\.env\.example$''',
+    '''\.env\..*\.example$''',
+    '''\.sample$''',
+    '''\.template$''',
+    '''-example\.''',
+    '''-sample\.''',
+    '''-template\.''',
+    '''node_modules/''',
+    '''vendor/''',
+    '''\.git/''',
+    '''.*\.md$''',
+    '''.*\.test\.(ts|tsx|js|jsx)$''',
+    '''.*\.spec\.(ts|tsx|js|jsx)$''',
+    '''__tests__/''',
+    '''__mocks__/''',
+    '''coverage/''',
+    '''dist/''',
+    '''build/''',
+    '''\.next/''',
+]
+
+commits = []
+
+# Specific files to always ignore
+stopwords = []

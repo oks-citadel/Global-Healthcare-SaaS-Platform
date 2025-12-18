@@ -1,0 +1,504 @@
+{
+  "dashboardName": "Unified Health - System Health Dashboard",
+  "version": "1.0",
+  "refreshInterval": 30,
+  "timeRange": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "tags": ["system-health", "infrastructure", "sre"],
+  "panels": [
+    {
+      "id": 1,
+      "title": "Service Availability",
+      "type": "stat",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "query": "availabilityResults/availabilityPercentage",
+          "refId": "A",
+          "datasource": "Azure Monitor"
+        }
+      ],
+      "options": {
+        "graphMode": "area",
+        "colorMode": "background",
+        "thresholds": [
+          {
+            "value": 0,
+            "color": "red"
+          },
+          {
+            "value": 99,
+            "color": "yellow"
+          },
+          {
+            "value": 99.9,
+            "color": "green"
+          }
+        ],
+        "unit": "percent",
+        "decimals": 3
+      },
+      "alert": {
+        "enabled": true,
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [99.9],
+              "type": "lt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": ["A", "5m", "now"]
+            },
+            "reducer": {
+              "params": [],
+              "type": "avg"
+            },
+            "type": "query"
+          }
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "title": "Request Rate",
+      "type": "graph",
+      "gridPos": {
+        "x": 6,
+        "y": 0,
+        "w": 9,
+        "h": 4
+      },
+      "targets": [
+        {
+          "query": "rate(http_requests_total[5m])",
+          "refId": "A",
+          "legendFormat": "{{method}} {{route}}"
+        }
+      ],
+      "options": {
+        "legend": {
+          "show": true,
+          "values": true,
+          "current": true,
+          "avg": true,
+          "max": true
+        },
+        "tooltip": {
+          "shared": true,
+          "sort": 2
+        }
+      }
+    },
+    {
+      "id": 3,
+      "title": "Error Rate",
+      "type": "graph",
+      "gridPos": {
+        "x": 15,
+        "y": 0,
+        "w": 9,
+        "h": 4
+      },
+      "targets": [
+        {
+          "query": "sum(rate(errors_total[5m])) by (type, status_code)",
+          "refId": "A",
+          "legendFormat": "{{type}} - {{status_code}}"
+        }
+      ],
+      "options": {
+        "legend": {
+          "show": true
+        },
+        "yAxis": {
+          "format": "reqps"
+        },
+        "colors": ["#C4162A"],
+        "alert": {
+          "threshold": 0.05
+        }
+      }
+    },
+    {
+      "id": 4,
+      "title": "CPU Usage by Pod",
+      "type": "graph",
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 12,
+        "h": 6
+      },
+      "targets": [
+        {
+          "query": "sum(rate(container_cpu_usage_seconds_total{namespace='unified-health'}[5m])) by (pod) * 100",
+          "refId": "A",
+          "legendFormat": "{{pod}}"
+        }
+      ],
+      "options": {
+        "yAxis": {
+          "max": 100,
+          "format": "percent"
+        },
+        "thresholds": [
+          {
+            "value": 80,
+            "color": "yellow"
+          },
+          {
+            "value": 90,
+            "color": "red"
+          }
+        ]
+      }
+    },
+    {
+      "id": 5,
+      "title": "Memory Usage by Pod",
+      "type": "graph",
+      "gridPos": {
+        "x": 12,
+        "y": 4,
+        "w": 12,
+        "h": 6
+      },
+      "targets": [
+        {
+          "query": "sum(container_memory_working_set_bytes{namespace='unified-health'}) by (pod) / 1024 / 1024 / 1024",
+          "refId": "A",
+          "legendFormat": "{{pod}}"
+        }
+      ],
+      "options": {
+        "yAxis": {
+          "format": "GB"
+        },
+        "thresholds": [
+          {
+            "value": 4,
+            "color": "yellow"
+          },
+          {
+            "value": 6,
+            "color": "red"
+          }
+        ]
+      }
+    },
+    {
+      "id": 6,
+      "title": "Active Connections",
+      "type": "stat",
+      "gridPos": {
+        "x": 0,
+        "y": 10,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "query": "http_active_connections",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "graphMode": "area",
+        "colorMode": "value",
+        "unit": "short"
+      }
+    },
+    {
+      "id": 7,
+      "title": "Database Connection Pool",
+      "type": "gauge",
+      "gridPos": {
+        "x": 6,
+        "y": 10,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "query": "db_connection_pool_active",
+          "refId": "A",
+          "legendFormat": "Active"
+        },
+        {
+          "query": "db_connection_pool_idle",
+          "refId": "B",
+          "legendFormat": "Idle"
+        },
+        {
+          "query": "db_connection_pool_waiting",
+          "refId": "C",
+          "legendFormat": "Waiting"
+        }
+      ],
+      "options": {
+        "showThresholdLabels": true,
+        "showThresholdMarkers": true,
+        "thresholds": [
+          {
+            "value": 0,
+            "color": "green"
+          },
+          {
+            "value": 80,
+            "color": "yellow"
+          },
+          {
+            "value": 95,
+            "color": "red"
+          }
+        ]
+      }
+    },
+    {
+      "id": 8,
+      "title": "Disk I/O",
+      "type": "graph",
+      "gridPos": {
+        "x": 12,
+        "y": 10,
+        "w": 12,
+        "h": 4
+      },
+      "targets": [
+        {
+          "query": "rate(node_disk_read_bytes_total{namespace='unified-health'}[5m])",
+          "refId": "A",
+          "legendFormat": "Read - {{device}}"
+        },
+        {
+          "query": "rate(node_disk_written_bytes_total{namespace='unified-health'}[5m])",
+          "refId": "B",
+          "legendFormat": "Write - {{device}}"
+        }
+      ],
+      "options": {
+        "yAxis": {
+          "format": "Bps"
+        }
+      }
+    },
+    {
+      "id": 9,
+      "title": "Network Traffic",
+      "type": "graph",
+      "gridPos": {
+        "x": 0,
+        "y": 14,
+        "w": 12,
+        "h": 6
+      },
+      "targets": [
+        {
+          "query": "rate(node_network_receive_bytes_total{namespace='unified-health'}[5m])",
+          "refId": "A",
+          "legendFormat": "Received - {{device}}"
+        },
+        {
+          "query": "rate(node_network_transmit_bytes_total{namespace='unified-health'}[5m])",
+          "refId": "B",
+          "legendFormat": "Transmitted - {{device}}"
+        }
+      ],
+      "options": {
+        "yAxis": {
+          "format": "Bps"
+        }
+      }
+    },
+    {
+      "id": 10,
+      "title": "Pod Status",
+      "type": "table",
+      "gridPos": {
+        "x": 12,
+        "y": 14,
+        "w": 12,
+        "h": 6
+      },
+      "targets": [
+        {
+          "query": "kube_pod_status_phase{namespace='unified-health'}",
+          "refId": "A",
+          "format": "table"
+        }
+      ],
+      "options": {
+        "columns": [
+          {
+            "text": "Pod",
+            "value": "pod"
+          },
+          {
+            "text": "Phase",
+            "value": "phase"
+          },
+          {
+            "text": "Node",
+            "value": "node"
+          },
+          {
+            "text": "Restarts",
+            "value": "restarts"
+          }
+        ],
+        "colorMode": "row",
+        "thresholds": [
+          {
+            "value": "Running",
+            "color": "green"
+          },
+          {
+            "value": "Pending",
+            "color": "yellow"
+          },
+          {
+            "value": "Failed",
+            "color": "red"
+          }
+        ]
+      }
+    },
+    {
+      "id": 11,
+      "title": "Service Health Checks",
+      "type": "stat-panel",
+      "gridPos": {
+        "x": 0,
+        "y": 20,
+        "w": 24,
+        "h": 4
+      },
+      "targets": [
+        {
+          "query": "up{job='unified-health-api'}",
+          "refId": "A",
+          "legendFormat": "API"
+        },
+        {
+          "query": "up{job='postgresql'}",
+          "refId": "B",
+          "legendFormat": "PostgreSQL"
+        },
+        {
+          "query": "up{job='redis'}",
+          "refId": "C",
+          "legendFormat": "Redis"
+        },
+        {
+          "query": "up{job='elasticsearch'}",
+          "refId": "D",
+          "legendFormat": "Elasticsearch"
+        }
+      ],
+      "options": {
+        "displayMode": "basic",
+        "orientation": "horizontal",
+        "colorMode": "background",
+        "thresholds": [
+          {
+            "value": 0,
+            "color": "red"
+          },
+          {
+            "value": 1,
+            "color": "green"
+          }
+        ],
+        "valueMappings": [
+          {
+            "value": 0,
+            "text": "DOWN"
+          },
+          {
+            "value": 1,
+            "text": "UP"
+          }
+        ]
+      }
+    },
+    {
+      "id": 12,
+      "title": "Recent Critical Errors",
+      "type": "logs",
+      "gridPos": {
+        "x": 0,
+        "y": 24,
+        "w": 24,
+        "h": 8
+      },
+      "targets": [
+        {
+          "query": "ApplicationLogs_CL | where Level == 'ERROR' or Level == 'FATAL' | project TimeGenerated, Service, Message, CorrelationId | order by TimeGenerated desc | take 50",
+          "refId": "A",
+          "datasource": "Azure Log Analytics"
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "showLabels": true,
+        "wrapLogMessage": true
+      }
+    }
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "environment",
+        "type": "custom",
+        "query": "production,staging,development",
+        "current": {
+          "value": "production",
+          "text": "Production"
+        }
+      },
+      {
+        "name": "service",
+        "type": "query",
+        "query": "label_values(http_requests_total, service)",
+        "refresh": 1
+      },
+      {
+        "name": "namespace",
+        "type": "custom",
+        "query": "unified-health",
+        "current": {
+          "value": "unified-health",
+          "text": "unified-health"
+        }
+      }
+    ]
+  },
+  "annotations": {
+    "list": [
+      {
+        "name": "Deployments",
+        "datasource": "Azure Monitor",
+        "enable": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "query": "AzureActivity | where OperationName == 'Microsoft.ContainerService/managedClusters/write'"
+      },
+      {
+        "name": "Incidents",
+        "datasource": "Azure Monitor",
+        "enable": true,
+        "iconColor": "rgba(255, 96, 96, 1)",
+        "query": "alerts | where Severity in ('Sev0', 'Sev1', 'Sev2')"
+      }
+    ]
+  }
+}

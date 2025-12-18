@@ -6,13 +6,34 @@ import { UserResponse } from '../dtos/user.dto.js';
 import { ConflictError, UnauthorizedError, NotFoundError } from '../utils/errors.js';
 import { logger } from '../utils/logger.js';
 import { prisma } from '../lib/prisma.js';
+import { isDemoMode, demoStore } from '../lib/demo-store.js';
 
 export const authService = {
   /**
    * Register a new user
    */
   async register(input: RegisterInput): Promise<AuthResponse> {
-    // Check if email exists
+    // Demo mode - use in-memory store
+    if (isDemoMode) {
+      const existingUser = demoStore.users.findByEmail(input.email);
+      if (existingUser) {
+        throw new ConflictError('Email already registered');
+      }
+
+      const user = await demoStore.users.create({
+        email: input.email,
+        password: input.password,
+        firstName: input.firstName,
+        lastName: input.lastName,
+        phone: input.phone,
+        role: input.role,
+      });
+
+      logger.info({ userId: user.id, email: input.email }, 'User registered (demo mode)');
+      return this.generateTokens(user);
+    }
+
+    // Production mode - use database
     const existingUser = await prisma.user.findUnique({
       where: { email: input.email },
     });
@@ -49,7 +70,23 @@ export const authService = {
    * Authenticate user
    */
   async login(input: LoginInput): Promise<AuthResponse> {
-    // Find user by email
+    // Demo mode - use in-memory store
+    if (isDemoMode) {
+      const user = demoStore.users.findByEmail(input.email);
+      if (!user) {
+        throw new UnauthorizedError('Invalid credentials');
+      }
+
+      const validPassword = await bcrypt.compare(input.password, user.password);
+      if (!validPassword) {
+        throw new UnauthorizedError('Invalid credentials');
+      }
+
+      logger.info({ userId: user.id }, 'User logged in (demo mode)');
+      return this.generateTokens(user);
+    }
+
+    // Production mode - use database
     const user = await prisma.user.findUnique({
       where: { email: input.email },
     });
@@ -73,7 +110,34 @@ export const authService = {
    * Refresh access token
    */
   async refresh(refreshToken: string): Promise<AuthResponse> {
-    // Find refresh token in database
+    // Demo mode - use in-memory store
+    if (isDemoMode) {
+      const tokenRecord = demoStore.refreshTokens.findByToken(refreshToken);
+      if (!tokenRecord) {
+        throw new UnauthorizedError('Invalid refresh token');
+      }
+
+      if (new Date() > tokenRecord.expiresAt) {
+        demoStore.refreshTokens.delete(refreshToken);
+        throw new UnauthorizedError('Refresh token expired');
+      }
+
+      try {
+        jwt.verify(refreshToken, config.jwt.secret);
+        const user = tokenRecord.user;
+
+        if (!user) {
+          throw new UnauthorizedError('User not found');
+        }
+
+        demoStore.refreshTokens.delete(refreshToken);
+        return this.generateTokens(user);
+      } catch {
+        throw new UnauthorizedError('Invalid refresh token');
+      }
+    }
+
+    // Production mode - use database
     const tokenRecord = await prisma.refreshToken.findUnique({
       where: { token: refreshToken },
       include: { user: true },
@@ -114,7 +178,14 @@ export const authService = {
    * Logout user
    */
   async logout(userId: string): Promise<void> {
-    // Invalidate all refresh tokens for this user
+    // Demo mode - use in-memory store
+    if (isDemoMode) {
+      demoStore.refreshTokens.deleteByUserId(userId);
+      logger.info({ userId }, 'User logged out (demo mode)');
+      return;
+    }
+
+    // Production mode - use database
     await prisma.refreshToken.deleteMany({
       where: { userId },
     });
@@ -125,6 +196,28 @@ export const authService = {
    * Get current user
    */
   async getCurrentUser(userId: string): Promise<UserResponse> {
+    // Demo mode - use in-memory store
+    if (isDemoMode) {
+      const user = demoStore.users.findById(userId);
+      if (!user) {
+        throw new NotFoundError('User not found');
+      }
+
+      return {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        phone: user.phone,
+        role: user.role,
+        status: user.status,
+        emailVerified: user.emailVerified,
+        createdAt: user.createdAt.toISOString(),
+        updatedAt: user.updatedAt.toISOString(),
+      };
+    }
+
+    // Production mode - use database
     const user = await prisma.user.findUnique({
       where: { id: userId },
     });
@@ -180,26 +273,36 @@ export const authService = {
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 30);
 
-    // Store refresh token in database
-    await prisma.refreshToken.create({
-      data: {
+    // Store refresh token
+    if (isDemoMode) {
+      demoStore.refreshTokens.create({
         token: refreshToken,
         userId: user.id,
         expiresAt,
-      },
-    });
+      });
+    } else {
+      await prisma.refreshToken.create({
+        data: {
+          token: refreshToken,
+          userId: user.id,
+          expiresAt,
+        },
+      });
+    }
 
     return {
-      accessToken,
-      refreshToken,
-      expiresIn: 3600, // 1 hour
-      tokenType: 'Bearer',
       user: {
         id: user.id,
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
         role: user.role,
+        createdAt: user.createdAt?.toISOString?.() || new Date().toISOString(),
+        updatedAt: user.updatedAt?.toISOString?.() || new Date().toISOString(),
+      },
+      tokens: {
+        accessToken,
+        refreshToken,
       },
     };
   },

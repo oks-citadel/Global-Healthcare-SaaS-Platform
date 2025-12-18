@@ -1,0 +1,118 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "unified-health.fullname" . }}-api
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "unified-health.api.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount.api }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: unified-health-api
+      {{- include "unified-health.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+      labels:
+        app: unified-health-api
+        {{- include "unified-health.api.labels" . | nindent 8 }}
+    spec:
+      {{- include "unified-health.imagePullSecrets" . | nindent 6 }}
+      serviceAccountName: {{ include "unified-health.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: api
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: {{ include "unified-health.api.image" . }}
+          imagePullPolicy: {{ .Values.image.api.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.api.targetPort }}
+              protocol: TCP
+          env:
+            {{- range $key, $value := .Values.env.api }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+            {{- if .Values.secrets.database }}
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.database.secretName }}
+                  key: DATABASE_URL
+            {{- end }}
+            {{- if .Values.secrets.redis }}
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.redis.secretName }}
+                  key: REDIS_URL
+            {{- end }}
+            {{- if .Values.secrets.jwt }}
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.jwt.secretName }}
+                  key: JWT_SECRET
+            {{- end }}
+            {{- if .Values.secrets.stripe }}
+            - name: STRIPE_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.stripe.secretName }}
+                  key: STRIPE_SECRET_KEY
+            - name: STRIPE_WEBHOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.stripe.secretName }}
+                  key: STRIPE_WEBHOOK_SECRET
+            {{- end }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.configMaps.app.name }}
+          livenessProbe:
+            {{- toYaml .Values.healthChecks.api.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.healthChecks.api.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources.api | nindent 12 }}
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            - name: cache
+              mountPath: /app/.cache
+            {{- if .Values.persistence.enabled }}
+            - name: data
+              mountPath: {{ .Values.persistence.mountPath }}
+            {{- end }}
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        - name: cache
+          emptyDir: {}
+        {{- if .Values.persistence.enabled }}
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ include "unified-health.fullname" . }}-data
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

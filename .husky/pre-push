@@ -1,0 +1,57 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# ============================================
+# UnifiedHealth Platform - Pre-push Hook
+# Final security checks before pushing to remote
+# ============================================
+
+echo "🔒 Running pre-push security checks..."
+
+# Run full Gitleaks scan on commits being pushed
+if command -v gitleaks &> /dev/null; then
+    echo "🔍 Running full Gitleaks scan..."
+    if gitleaks detect --verbose --no-git; then
+        echo "✅ No secrets detected in repository"
+    else
+        echo "❌ Secrets detected in repository!"
+        echo "Please remove them before pushing."
+        exit 1
+    fi
+else
+    echo "⚠️  Gitleaks not installed. Skipping secret scan..."
+    echo "Install with: brew install gitleaks (macOS) or visit https://github.com/gitleaks/gitleaks"
+fi
+
+# Run tests
+echo "🧪 Running tests..."
+if pnpm test; then
+    echo "✅ Tests passed"
+else
+    echo "❌ Tests failed!"
+    echo "Fix failing tests before pushing"
+    exit 1
+fi
+
+# Run type checking
+echo "🔍 Running type checks..."
+if pnpm typecheck; then
+    echo "✅ Type checks passed"
+else
+    echo "❌ Type check failed!"
+    exit 1
+fi
+
+# Check for dependency vulnerabilities
+echo "🔍 Checking for vulnerabilities..."
+if pnpm audit --audit-level=critical; then
+    echo "✅ No critical vulnerabilities"
+else
+    echo "❌ Critical vulnerabilities found!"
+    echo "Run 'pnpm audit' to see details"
+    echo "Fix critical vulnerabilities before pushing"
+    exit 1
+fi
+
+echo "✅ Pre-push security checks passed"
+echo "🚀 Safe to push!"

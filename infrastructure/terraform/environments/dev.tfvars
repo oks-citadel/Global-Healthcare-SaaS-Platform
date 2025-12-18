@@ -2,6 +2,9 @@
 # Development Environment Variables
 # ============================================
 
+# Azure Subscription Configuration
+subscription_id = "d8afbfb0-0c60-4d11-a1c7-a614235f5eb6"
+
 environment = "dev"
 location    = "eastus"
 

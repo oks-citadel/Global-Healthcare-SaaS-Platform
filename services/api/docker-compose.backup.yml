@@ -1,0 +1,70 @@
+version: '3.8'
+
+# Database Backup Service Configuration
+# This docker-compose file adds a backup sidecar container
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.backup.yml up -d
+
+services:
+  # Database backup service
+  db-backup:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: healthcare-db-backup
+    restart: unless-stopped
+
+    environment:
+      # Database connection
+      DATABASE_URL: ${DATABASE_URL}
+      DB_HOST: ${DB_HOST:-db}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_NAME: ${DB_NAME:-healthcare_db}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD}
+
+      # Backup configuration
+      BACKUP_DIR: /backups
+      BACKUP_SCHEDULE: ${BACKUP_SCHEDULE:-0 2 * * *}  # 2 AM daily
+      BACKUP_TYPE: ${BACKUP_TYPE:-full}
+      BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS:-30}
+
+    volumes:
+      # Backup storage
+      - backup-data:/backups
+
+      # Script access
+      - ./scripts:/app/scripts:ro
+
+      # Logs
+      - backup-logs:/var/log
+
+    entrypoint: ["/app/scripts/docker-backup-entrypoint.sh"]
+
+    depends_on:
+      - db
+
+    networks:
+      - healthcare-network
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "test", "-d", "/backups"]
+      interval: 1h
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  backup-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${BACKUP_HOST_PATH:-./backups}
+      o: bind
+
+  backup-logs:
+    driver: local
+
+networks:
+  healthcare-network:
+    external: true

@@ -12,6 +12,19 @@ const apiClient: AxiosInstance = axios.create({
   timeout: 30000,
 });
 
+// Cookie utilities
+const setCookie = (name: string, value: string, days: number = 7): void => {
+  if (typeof window === 'undefined') return;
+  const expires = new Date();
+  expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+  document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
+};
+
+const deleteCookie = (name: string): void => {
+  if (typeof window === 'undefined') return;
+  document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+};
+
 // Token storage utilities
 export const tokenStorage = {
   getAccessToken: (): string | null => {
@@ -26,14 +39,21 @@ export const tokenStorage = {
 
   setTokens: (tokens: AuthTokens): void => {
     if (typeof window === 'undefined') return;
+    // Store in localStorage for API requests
     localStorage.setItem('accessToken', tokens.accessToken);
     localStorage.setItem('refreshToken', tokens.refreshToken);
+    // Also set cookies for middleware authentication
+    setCookie('accessToken', tokens.accessToken, 7);
+    setCookie('refreshToken', tokens.refreshToken, 30);
   },
 
   clearTokens: (): void => {
     if (typeof window === 'undefined') return;
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
+    // Also clear cookies
+    deleteCookie('accessToken');
+    deleteCookie('refreshToken');
   },
 };
 

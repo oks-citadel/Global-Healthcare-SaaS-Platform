@@ -12,6 +12,7 @@ import { connectDatabase, disconnectDatabase, checkDatabaseHealth } from './lib/
 import { setupSwagger } from './docs/swagger.js';
 import { initializeSocket } from './lib/socket.js';
 import { setupRealtimeController } from './controllers/realtime.controller.js';
+import { isDemoMode, demoCredentials } from './lib/demo-store.js';
 
 const app = express();
 const httpServer = createServer(app);
@@ -59,6 +60,17 @@ app.get('/health', (req, res) => {
 
 app.get('/ready', async (req, res) => {
   try {
+    // Demo mode - always ready
+    if (isDemoMode) {
+      return res.json({
+        status: 'ready',
+        mode: 'demo',
+        checks: {
+          database: { connected: true, mode: 'in-memory' },
+        },
+      });
+    }
+
     const dbHealth = await checkDatabaseHealth();
     if (!dbHealth.connected) {
       return res.status(503).json({
@@ -99,9 +111,21 @@ const PORT = config.port;
 
 async function startServer() {
   try {
-    // Connect to database
-    logger.info('Connecting to database...');
-    await connectDatabase();
+    // Demo mode - skip database connection
+    if (isDemoMode) {
+      logger.info('===========================================');
+      logger.info('    DEMO MODE ENABLED - No Database Required');
+      logger.info('===========================================');
+      logger.info('Demo credentials:');
+      logger.info(`  Patient:  ${demoCredentials.patient.email} / ${demoCredentials.patient.password}`);
+      logger.info(`  Doctor:   ${demoCredentials.doctor.email} / ${demoCredentials.doctor.password}`);
+      logger.info(`  Admin:    ${demoCredentials.admin.email} / ${demoCredentials.admin.password}`);
+      logger.info('===========================================');
+    } else {
+      // Connect to database
+      logger.info('Connecting to database...');
+      await connectDatabase();
+    }
 
     // Initialize Socket.io
     logger.info('Initializing Socket.io...');
@@ -111,6 +135,9 @@ async function startServer() {
     const server = httpServer.listen(PORT, () => {
       logger.info(`Server running on port ${PORT}`);
       logger.info(`Environment: ${config.env}`);
+      if (isDemoMode) {
+        logger.info(`Mode: DEMO (in-memory data)`);
+      }
       logger.info(`Health check: http://localhost:${PORT}/health`);
       logger.info(`Readiness check: http://localhost:${PORT}/ready`);
       logger.info(`API base: http://localhost:${PORT}/api/v1`);
