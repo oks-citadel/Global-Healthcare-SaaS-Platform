@@ -264,8 +264,8 @@ importers:
         specifier: ^23.7.11
         version: 23.16.8
       i18next-browser-languagedetector:
-        specifier: ^7.2.0
-        version: 7.2.2
+        specifier: ^8.2.0
+        version: 8.2.0
       i18next-fs-backend:
         specifier: ^2.3.1
         version: 2.6.1
@@ -2153,7 +2153,7 @@ packages:
 
   '@expo/bunyan@4.0.1':
     resolution: {integrity: sha512-+Lla7nYSiHZirgK+U/uYzsLv/X+HaJienbD5AKX1UQZHYfWaP+9uuQluRB4GrEVWF0GZ7vEVp/jzaOT9k/SQlg==}
-    engines: {'0': node >=0.10.0}
+    engines: {node: '>=0.10.0'}
 
   '@expo/cli@0.17.13':
     resolution: {integrity: sha512-n13yxOmI3I0JidzMdFCH68tYKGDtK4XlDFk1vysZX7AIRKeDVRsSbHhma5jCla2bDt25RKmJBHA9KtzielwzAA==}
@@ -2174,8 +2174,8 @@ packages:
   '@expo/config-types@54.0.10':
     resolution: {integrity: sha512-/J16SC2an1LdtCZ67xhSkGXpALYUVUNyZws7v+PVsFZxClYehDSoKLqyRaGkpHlYrCc08bS0RF5E0JV6g50psA==}
 
-  '@expo/config@12.0.12':
-    resolution: {integrity: sha512-X2MW86+ulLpMGvdgfvpl2EOBAKUlwvnvoPwdaZeeyWufGopn1nTUeh4C9gMsplDaP1kXv9sLXVhOoUoX6g9PvQ==}
+  '@expo/config@12.0.13':
+    resolution: {integrity: sha512-Cu52arBa4vSaupIWsF0h7F/Cg//N374nYb7HAxV0I4KceKA7x2UXpYaHOL7EEYYvp7tZdThBjvGpVmr8ScIvaQ==}
 
   '@expo/config@8.5.6':
     resolution: {integrity: sha512-wF5awSg6MNn1cb1lIgjnhOn5ov2TEUTnkAVCsOl0QqDwcP+YIerteSFwjn9V52UZvg58L+LKxpCuGbw5IHavbg==}
@@ -5945,8 +5945,8 @@ packages:
     engines: {node: '>=14'}
     hasBin: true
 
-  i18next-browser-languagedetector@7.2.2:
-    resolution: {integrity: sha512-6b7r75uIJDWCcCflmbof+sJ94k9UQO4X0YR62oUfqGI/GjCLVzlCwu8TFdRZIqVLzWbzNcmkmhfqKEr4TLz4HQ==}
+  i18next-browser-languagedetector@8.2.0:
+    resolution: {integrity: sha512-P+3zEKLnOF0qmiesW383vsLdtQVyKtCNA9cjSoKCppTKPQVfKd2W8hbVo5ZhNJKDqeM7BOcvNoKJOjpHh4Js9g==}
 
   i18next-fs-backend@2.6.1:
     resolution: {integrity: sha512-eYWTX7QT7kJ0sZyCPK6x1q+R63zvNKv2D6UdbMf15A8vNb2ZLyw4NNNZxPFwXlIv/U+oUtg8SakW6ZgJZcoqHQ==}
@@ -11243,7 +11243,7 @@ snapshots:
 
   '@expo/config-types@54.0.10': {}
 
-  '@expo/config@12.0.12':
+  '@expo/config@12.0.13':
     dependencies:
       '@babel/code-frame': 7.10.4
       '@expo/config-plugins': 54.0.4
@@ -15315,7 +15315,7 @@ snapshots:
 
   expo-constants@18.0.12(expo@50.0.21(@babel/core@7.28.5)(@react-native/babel-preset@0.73.21(@babel/core@7.28.5)(@babel/preset-env@7.28.5(@babel/core@7.28.5)))(react-native@0.73.0(@babel/core@7.28.5)(@babel/preset-env@7.28.5(@babel/core@7.28.5))(react@18.2.0))(react@18.2.0))(react-native@0.73.0(@babel/core@7.28.5)(@babel/preset-env@7.28.5(@babel/core@7.28.5))(react@18.2.0)):
     dependencies:
-      '@expo/config': 12.0.12
+      '@expo/config': 12.0.13
       '@expo/env': 2.0.8
       expo: 50.0.21(@babel/core@7.28.5)(@react-native/babel-preset@0.73.21(@babel/core@7.28.5)(@babel/preset-env@7.28.5(@babel/core@7.28.5)))(react-native@0.73.0(@babel/core@7.28.5)(@babel/preset-env@7.28.5(@babel/core@7.28.5))(react@18.2.0))(react@18.2.0)
       react-native: 0.73.0(@babel/core@7.28.5)(@babel/preset-env@7.28.5(@babel/core@7.28.5))(react@18.2.0)
@@ -16044,7 +16044,7 @@ snapshots:
 
   husky@8.0.3: {}
 
-  i18next-browser-languagedetector@7.2.2:
+  i18next-browser-languagedetector@8.2.0:
     dependencies:
       '@babel/runtime': 7.28.4
 
