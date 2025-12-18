@@ -10,9 +10,9 @@ import { errorHandler } from './middleware/error.middleware.js';
 import { routes } from './routes/index.js';
 import { connectDatabase, disconnectDatabase, checkDatabaseHealth } from './lib/prisma.js';
 import { setupSwagger } from './docs/swagger.js';
-import { initializeSocket } from './lib/socket.js';
-import { setupRealtimeController } from './controllers/realtime.controller.js';
+import { initializeWebSocket, shutdownWebSocket } from './lib/websocket.js';
 import { isDemoMode, demoCredentials } from './lib/demo-store.js';
+import { config } from './config/index.js';
 
 const app = express();
 const httpServer = createServer(app);
@@ -127,10 +127,10 @@ async function startServer() {
       await connectDatabase();
     }
 
-    // Initialize Socket.io
-    logger.info('Initializing Socket.io...');
-    const io = initializeSocket(httpServer);
-    setupRealtimeController(io);
+    // Initialize WebSocket server with Redis adapter for horizontal scaling
+    logger.info('Initializing WebSocket server...');
+    const useRedisAdapter = !isDemoMode && !!config.redis.host;
+    await initializeWebSocket(httpServer, useRedisAdapter);
 
     const server = httpServer.listen(PORT, () => {
       logger.info(`Server running on port ${PORT}`);
@@ -154,6 +154,11 @@ async function startServer() {
         logger.info('HTTP server closed');
 
         try {
+          // Shutdown WebSocket server first
+          await shutdownWebSocket();
+          logger.info('WebSocket server closed');
+
+          // Then disconnect database
           await disconnectDatabase();
           logger.info('Database connection closed');
           process.exit(0);

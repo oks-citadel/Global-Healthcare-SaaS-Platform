@@ -1,0 +1,206 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// Chronic Care Domain
+// ==========================================
+
+model CarePlan {
+  id              String       @id @default(uuid())
+  patientId       String
+  providerId      String
+  condition       String       // Diabetes, Hypertension, COPD, etc.
+  status          PlanStatus   @default(active)
+  startDate       DateTime     @default(now())
+  endDate         DateTime?
+  goals           Json         // Treatment goals
+  interventions   Json         // Planned interventions
+  reviewSchedule  String?      // e.g., "monthly", "quarterly"
+  nextReviewDate  DateTime?
+
+  // Relations
+  tasks           CareTask[]
+  vitals          VitalReading[]
+  alerts          Alert[]
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([patientId])
+  @@index([providerId])
+  @@index([status])
+  @@index([nextReviewDate])
+}
+
+enum PlanStatus {
+  active
+  completed
+  suspended
+  cancelled
+}
+
+model CareTask {
+  id              String       @id @default(uuid())
+  carePlanId      String
+  carePlan        CarePlan     @relation(fields: [carePlanId], references: [id], onDelete: Cascade)
+  title           String
+  description     String?
+  taskType        TaskType
+  frequency       String       // daily, weekly, as_needed, etc.
+  dueDate         DateTime?
+  completedAt     DateTime?
+  status          TaskStatus   @default(pending)
+  notes           String?
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([carePlanId])
+  @@index([status])
+  @@index([dueDate])
+}
+
+enum TaskType {
+  medication
+  measurement
+  exercise
+  diet
+  appointment
+  other
+}
+
+enum TaskStatus {
+  pending
+  completed
+  missed
+  cancelled
+}
+
+model MonitoringDevice {
+  id              String       @id @default(uuid())
+  patientId       String
+  deviceType      DeviceType
+  manufacturer    String?
+  model           String?
+  serialNumber    String       @unique
+  status          DeviceStatus @default(active)
+  lastSyncAt      DateTime?
+  batteryLevel    Int?         // 0-100
+
+  // Relations
+  readings        VitalReading[]
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([patientId])
+  @@index([deviceType])
+  @@index([status])
+  @@index([serialNumber])
+}
+
+enum DeviceType {
+  blood_pressure_monitor
+  glucose_meter
+  pulse_oximeter
+  weight_scale
+  thermometer
+  heart_rate_monitor
+  peak_flow_meter
+  ecg_monitor
+}
+
+enum DeviceStatus {
+  active
+  inactive
+  maintenance
+  decommissioned
+}
+
+model VitalReading {
+  id              String           @id @default(uuid())
+  patientId       String
+  carePlanId      String?
+  carePlan        CarePlan?        @relation(fields: [carePlanId], references: [id], onDelete: SetNull)
+  deviceId        String?
+  device          MonitoringDevice? @relation(fields: [deviceId], references: [id], onDelete: SetNull)
+  vitalType       VitalType
+  value           Float
+  unit            String
+  isAbnormal      Boolean          @default(false)
+  notes           String?
+  recordedAt      DateTime         @default(now())
+
+  createdAt       DateTime         @default(now())
+
+  @@index([patientId])
+  @@index([carePlanId])
+  @@index([deviceId])
+  @@index([vitalType])
+  @@index([recordedAt])
+  @@index([patientId, recordedAt])
+}
+
+enum VitalType {
+  blood_pressure_systolic
+  blood_pressure_diastolic
+  heart_rate
+  blood_glucose
+  oxygen_saturation
+  temperature
+  weight
+  respiratory_rate
+  peak_flow
+}
+
+model Alert {
+  id              String       @id @default(uuid())
+  patientId       String
+  carePlanId      String?
+  carePlan        CarePlan?    @relation(fields: [carePlanId], references: [id], onDelete: SetNull)
+  alertType       AlertType
+  severity        AlertSeverity
+  title           String
+  description     String
+  status          AlertStatus  @default(new)
+  acknowledgedBy  String?
+  acknowledgedAt  DateTime?
+  resolvedAt      DateTime?
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([patientId])
+  @@index([carePlanId])
+  @@index([status])
+  @@index([severity])
+  @@index([createdAt])
+}
+
+enum AlertType {
+  vital_out_of_range
+  missed_medication
+  missed_measurement
+  device_offline
+  no_activity
+  threshold_exceeded
+}
+
+enum AlertSeverity {
+  info
+  warning
+  critical
+}
+
+enum AlertStatus {
+  new
+  acknowledged
+  resolved
+  dismissed
+}

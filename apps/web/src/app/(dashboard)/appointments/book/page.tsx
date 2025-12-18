@@ -3,26 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
-
-// Demo providers
-const providers = [
-  { id: '1', name: 'Dr. Sarah Johnson', specialty: 'Primary Care', avatar: '👩‍⚕️' },
-  { id: '2', name: 'Dr. Michael Chen', specialty: 'Cardiology', avatar: '👨‍⚕️' },
-  { id: '3', name: 'Dr. Emily Davis', specialty: 'Dermatology', avatar: '👩‍⚕️' },
-  { id: '4', name: 'Dr. James Wilson', specialty: 'Orthopedics', avatar: '👨‍⚕️' },
-];
-
-// Demo time slots
-const generateTimeSlots = () => {
-  const slots = [];
-  for (let hour = 9; hour <= 17; hour++) {
-    if (hour !== 12) { // Skip lunch hour
-      slots.push(`${hour.toString().padStart(2, '0')}:00`);
-      slots.push(`${hour.toString().padStart(2, '0')}:30`);
-    }
-  }
-  return slots;
-};
+import { useProviders, useProviderAvailability, useBookAppointment } from '@/hooks/usePatient';
+import toast from '@/lib/toast';
 
 const appointmentTypes = [
   { id: 'in-person', label: 'In-Person Visit', icon: '🏥', description: 'Visit the clinic in person' },
@@ -40,7 +22,19 @@ export default function BookAppointmentPage() {
   const [appointmentType, setAppointmentType] = useState<string>('video');
   const [reason, setReason] = useState('');
 
-  const timeSlots = generateTimeSlots();
+  // Fetch providers
+  const { data: providersData, isLoading: loadingProviders } = useProviders();
+  const providers = providersData || [];
+
+  // Fetch provider availability when date is selected
+  const { data: availabilityData, isLoading: loadingAvailability } = useProviderAvailability(
+    selectedProvider || '',
+    selectedDate
+  );
+  const timeSlots = availabilityData?.availableSlots || [];
+
+  // Book appointment mutation
+  const bookAppointment = useBookAppointment();
 
   // Generate next 14 days for date selection
   const getAvailableDates = () => {
@@ -49,29 +43,39 @@ export default function BookAppointmentPage() {
     for (let i = 1; i <= 14; i++) {
       const date = new Date(today);
       date.setDate(today.getDate() + i);
-      if (date.getDay() !== 0 && date.getDay() !== 6) { // Exclude weekends
+      if (date.getDay() !== 0 && date.getDay() !== 6) {
         dates.push(date.toISOString().split('T')[0]);
       }
     }
     return dates;
   };
 
-  const handleSubmit = () => {
-    // In a real app, this would call the API to create the appointment
-    console.log({
-      provider: selectedProvider,
-      date: selectedDate,
-      time: selectedTime,
-      type: appointmentType,
-      reason,
-    });
+  const handleSubmit = async () => {
+    if (!selectedProvider || !selectedDate || !selectedTime) {
+      toast.error('Please complete all required fields');
+      return;
+    }
 
-    // Show success and redirect
-    alert('Appointment booked successfully!');
-    router.push('/appointments');
+    try {
+      // Combine date and time
+      const dateTime = `${selectedDate}T${selectedTime}:00`;
+
+      await bookAppointment.mutateAsync({
+        providerId: selectedProvider,
+        dateTime,
+        type: appointmentType as any,
+        reason: reason || undefined,
+      });
+
+      toast.success('Appointment booked successfully!');
+      router.push('/appointments');
+    } catch (error) {
+      console.error('Failed to book appointment:', error);
+      toast.error('Failed to book appointment. Please try again.');
+    }
   };
 
-  const selectedProviderData = providers.find((p) => p.id === selectedProvider);
+  const selectedProviderData = providers.find((p: any) => p.id === selectedProvider);
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -121,38 +125,52 @@ export default function BookAppointmentPage() {
           <h2 className="text-lg font-semibold text-gray-900 mb-4">
             Select a Healthcare Provider
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {providers.map((provider) => (
-              <button
-                key={provider.id}
-                onClick={() => setSelectedProvider(provider.id)}
-                className={`p-4 border rounded-lg text-left transition-colors ${
-                  selectedProvider === provider.id
-                    ? 'border-blue-500 bg-blue-50'
-                    : 'border-gray-200 hover:border-blue-300'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-2xl">
-                    {provider.avatar}
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-gray-900">{provider.name}</h3>
-                    <p className="text-sm text-gray-500">{provider.specialty}</p>
-                  </div>
-                </div>
-              </button>
-            ))}
-          </div>
-          <div className="mt-6 flex justify-end">
-            <button
-              onClick={() => setStep(2)}
-              disabled={!selectedProvider}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-            >
-              Continue
-            </button>
-          </div>
+          {loadingProviders ? (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            </div>
+          ) : providers.length > 0 ? (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {providers.map((provider: any) => (
+                  <button
+                    key={provider.id}
+                    onClick={() => setSelectedProvider(provider.id)}
+                    className={`p-4 border rounded-lg text-left transition-colors ${
+                      selectedProvider === provider.id
+                        ? 'border-blue-500 bg-blue-50'
+                        : 'border-gray-200 hover:border-blue-300'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-2xl">
+                        {provider.avatar || '👨‍⚕️'}
+                      </div>
+                      <div>
+                        <h3 className="font-medium text-gray-900">
+                          {provider.firstName} {provider.lastName}
+                        </h3>
+                        <p className="text-sm text-gray-500">{provider.specialty || 'General Practice'}</p>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+              <div className="mt-6 flex justify-end">
+                <button
+                  onClick={() => setStep(2)}
+                  disabled={!selectedProvider}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                >
+                  Continue
+                </button>
+              </div>
+            </>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-gray-500">No providers available at this time.</p>
+            </div>
+          )}
         </div>
       )}
 
@@ -191,21 +209,31 @@ export default function BookAppointmentPage() {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Available Time Slots
               </label>
-              <div className="grid grid-cols-4 gap-2">
-                {timeSlots.map((time) => (
-                  <button
-                    key={time}
-                    onClick={() => setSelectedTime(time)}
-                    className={`py-2 px-3 border rounded-lg text-sm transition-colors ${
-                      selectedTime === time
-                        ? 'border-blue-500 bg-blue-50 text-blue-700'
-                        : 'border-gray-200 hover:border-blue-300'
-                    }`}
-                  >
-                    {time}
-                  </button>
-                ))}
-              </div>
+              {loadingAvailability ? (
+                <div className="flex justify-center items-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                </div>
+              ) : timeSlots.length > 0 ? (
+                <div className="grid grid-cols-4 gap-2">
+                  {timeSlots.map((time: string) => (
+                    <button
+                      key={time}
+                      onClick={() => setSelectedTime(time)}
+                      className={`py-2 px-3 border rounded-lg text-sm transition-colors ${
+                        selectedTime === time
+                          ? 'border-blue-500 bg-blue-50 text-blue-700'
+                          : 'border-gray-200 hover:border-blue-300'
+                      }`}
+                    >
+                      {time}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-gray-500">No available time slots for this date.</p>
+                </div>
+              )}
             </div>
           )}
 
@@ -341,14 +369,26 @@ export default function BookAppointmentPage() {
             <button
               onClick={() => setStep(3)}
               className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              disabled={bookAppointment.isPending}
             >
               Back
             </button>
             <button
               onClick={handleSubmit}
-              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              disabled={bookAppointment.isPending}
+              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Confirm Booking
+              {bookAppointment.isPending ? (
+                <span className="flex items-center">
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Booking...
+                </span>
+              ) : (
+                'Confirm Booking'
+              )}
             </button>
           </div>
         </div>

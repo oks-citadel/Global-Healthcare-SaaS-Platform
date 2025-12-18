@@ -1,0 +1,214 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// Mental Health Domain
+// ==========================================
+
+model TherapySession {
+  id              String        @id @default(uuid())
+  patientId       String
+  therapistId     String
+  sessionType     SessionType
+  status          SessionStatus @default(scheduled)
+  scheduledAt     DateTime
+  duration        Int           // in minutes
+  actualStartTime DateTime?
+  actualEndTime   DateTime?
+  modality        String?       // CBT, DBT, EMDR, etc.
+  notes           String?
+  homework        String?
+  nextSessionDate DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([patientId])
+  @@index([therapistId])
+  @@index([scheduledAt])
+  @@index([status])
+  @@index([patientId, scheduledAt])
+  @@index([therapistId, scheduledAt])
+}
+
+enum SessionType {
+  individual
+  group
+  couples
+  family
+}
+
+enum SessionStatus {
+  scheduled
+  in_progress
+  completed
+  cancelled
+  no_show
+}
+
+model MentalHealthAssessment {
+  id          String           @id @default(uuid())
+  patientId   String
+  assessedBy  String
+  assessmentType AssessmentType
+  score       Int?
+  severity    String?          // mild, moderate, severe
+  results     Json             // Detailed results
+  notes       String?
+  followUpRequired Boolean      @default(false)
+  followUpDate DateTime?
+
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([patientId])
+  @@index([assessedBy])
+  @@index([assessmentType])
+  @@index([patientId, createdAt])
+}
+
+enum AssessmentType {
+  PHQ9           // Depression
+  GAD7           // Anxiety
+  PCL5           // PTSD
+  AUDIT          // Alcohol Use
+  DAST           // Drug Use
+  MDQ            // Bipolar
+  YBOCS          // OCD
+  PSS            // Perceived Stress
+  general_intake
+}
+
+model CrisisIntervention {
+  id              String         @id @default(uuid())
+  patientId       String
+  responderId     String?
+  crisisType      CrisisType
+  severity        CrisisSeverity
+  status          CrisisStatus   @default(active)
+  description     String
+  interventions   String[]       // Actions taken
+  outcome         String?
+  referredTo      String?        // Emergency services, hospital, etc.
+  contactedAt     DateTime       @default(now())
+  resolvedAt      DateTime?
+  followUpNeeded  Boolean        @default(true)
+  followUpDate    DateTime?
+
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([patientId])
+  @@index([responderId])
+  @@index([status])
+  @@index([severity])
+  @@index([contactedAt])
+  @@index([patientId, contactedAt])
+}
+
+enum CrisisType {
+  suicidal_ideation
+  self_harm
+  panic_attack
+  psychotic_episode
+  substance_overdose
+  domestic_violence
+  trauma
+  other
+}
+
+enum CrisisSeverity {
+  low
+  medium
+  high
+  critical
+}
+
+enum CrisisStatus {
+  active
+  monitoring
+  resolved
+  escalated
+}
+
+model TreatmentPlan {
+  id              String   @id @default(uuid())
+  patientId       String
+  providerId      String
+  diagnosis       String[]
+  goals           Json     // Array of treatment goals
+  interventions   Json     // Planned interventions
+  medications     Json?    // Current medications
+  frequency       String?  // e.g., "weekly", "bi-weekly"
+  startDate       DateTime
+  reviewDate      DateTime
+  status          String   @default("active") // active, completed, discontinued
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([patientId])
+  @@index([providerId])
+  @@index([status])
+  @@index([reviewDate])
+}
+
+model MoodLog {
+  id          String   @id @default(uuid())
+  patientId   String
+  moodRating  Int      // 1-10 scale
+  energy      Int?     // 1-10 scale
+  anxiety     Int?     // 1-10 scale
+  sleep       Int?     // hours
+  notes       String?
+  triggers    String[] // What affected mood
+  activities  String[] // What the patient did
+  logDate     DateTime @default(now())
+
+  createdAt   DateTime @default(now())
+
+  @@index([patientId])
+  @@index([logDate])
+  @@index([patientId, logDate])
+}
+
+model SupportGroup {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  type        String   // Anxiety, Depression, PTSD, Addiction Recovery, etc.
+  facilitatorId String
+  schedule    Json     // Meeting schedule
+  maxMembers  Int      @default(12)
+  isActive    Boolean  @default(true)
+
+  // Relations
+  members     SupportGroupMember[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([type])
+  @@index([facilitatorId])
+  @@index([isActive])
+}
+
+model SupportGroupMember {
+  id          String       @id @default(uuid())
+  groupId     String
+  group       SupportGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  patientId   String
+  joinedAt    DateTime     @default(now())
+  status      String       @default("active") // active, inactive, left
+
+  @@unique([groupId, patientId])
+  @@index([groupId])
+  @@index([patientId])
+  @@index([status])
+}

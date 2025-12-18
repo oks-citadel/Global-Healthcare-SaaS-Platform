@@ -3,14 +3,23 @@
 # GitHub Actions for Staging Deployment on Azure
 # All jobs run on GitHub-hosted runners with Azure Cloud
 # ============================================
+# WORKFLOW LOCKED - v1.0.0 deployed to production
+# Automatic triggers disabled to prevent accidental deployments
+# ============================================
 
 name: Deploy to Staging
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "DEPLOY" to confirm manual trigger'
+        required: true
+        type: string
+# DISABLED AUTOMATIC TRIGGERS - Uncomment to re-enable:
+#  push:
+#    branches:
+#      - main
 
 env:
   ACR_NAME: unifiedhealthacr

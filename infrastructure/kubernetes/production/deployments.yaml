@@ -1,0 +1,390 @@
+# API Gateway Deployment - v1.0.0 (FIXED VERSION - NO AUTO-UPDATE)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway
+  namespace: unified-health-prod
+  labels:
+    app: api-gateway
+    version: "1.0.0"
+  annotations:
+    kubernetes.io/change-cause: "Initial deployment v1.0.0"
+    image.policy: "Never"
+spec:
+  replicas: 1  # Cost optimized - single replica
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: api-gateway
+  template:
+    metadata:
+      labels:
+        app: api-gateway
+        version: "1.0.0"
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "3000"
+    spec:
+      containers:
+      - name: api-gateway
+        image: node:20-alpine  # FIXED VERSION
+        imagePullPolicy: IfNotPresent  # No auto-pull
+        command: ["node", "/app/server.js"]
+        ports:
+        - containerPort: 3000
+          name: http
+        env:
+        - name: PORT
+          value: "3000"
+        - name: NODE_ENV
+          value: "production"
+        - name: TELEHEALTH_SERVICE
+          value: "http://telehealth-service"
+        - name: MENTAL_HEALTH_SERVICE
+          value: "http://mental-health-service"
+        - name: CHRONIC_CARE_SERVICE
+          value: "http://chronic-care-service"
+        - name: PHARMACY_SERVICE
+          value: "http://pharmacy-service"
+        - name: LABORATORY_SERVICE
+          value: "http://laboratory-service"
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 128Mi
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 3000
+          initialDelaySeconds: 3
+          periodSeconds: 5
+        volumeMounts:
+        - name: code
+          mountPath: /app
+      volumes:
+      - name: code
+        configMap:
+          name: api-gateway-code
+---
+# Telehealth Service Deployment - v1.0.0
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: telehealth-service
+  namespace: unified-health-prod
+  labels:
+    app: telehealth-service
+    version: "1.0.0"
+  annotations:
+    kubernetes.io/change-cause: "Initial deployment v1.0.0"
+    image.policy: "Never"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: telehealth-service
+  template:
+    metadata:
+      labels:
+        app: telehealth-service
+        version: "1.0.0"
+    spec:
+      containers:
+      - name: telehealth-service
+        image: node:20-alpine
+        imagePullPolicy: IfNotPresent
+        command: ["node", "/app/server.js"]
+        ports:
+        - containerPort: 3001
+        env:
+        - name: PORT
+          value: "3001"
+        - name: NODE_ENV
+          value: "production"
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 128Mi
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3001
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 3001
+          initialDelaySeconds: 3
+          periodSeconds: 5
+        volumeMounts:
+        - name: code
+          mountPath: /app
+      volumes:
+      - name: code
+        configMap:
+          name: telehealth-service-code
+---
+# Mental Health Service Deployment - v1.0.0
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mental-health-service
+  namespace: unified-health-prod
+  labels:
+    app: mental-health-service
+    version: "1.0.0"
+  annotations:
+    kubernetes.io/change-cause: "Initial deployment v1.0.0"
+    image.policy: "Never"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mental-health-service
+  template:
+    metadata:
+      labels:
+        app: mental-health-service
+        version: "1.0.0"
+    spec:
+      containers:
+      - name: mental-health-service
+        image: node:20-alpine
+        imagePullPolicy: IfNotPresent
+        command: ["node", "/app/server.js"]
+        ports:
+        - containerPort: 3002
+        env:
+        - name: PORT
+          value: "3002"
+        - name: NODE_ENV
+          value: "production"
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 128Mi
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3002
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 3002
+          initialDelaySeconds: 3
+          periodSeconds: 5
+        volumeMounts:
+        - name: code
+          mountPath: /app
+      volumes:
+      - name: code
+        configMap:
+          name: mental-health-service-code
+---
+# Chronic Care Service Deployment - v1.0.0
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chronic-care-service
+  namespace: unified-health-prod
+  labels:
+    app: chronic-care-service
+    version: "1.0.0"
+  annotations:
+    kubernetes.io/change-cause: "Initial deployment v1.0.0"
+    image.policy: "Never"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chronic-care-service
+  template:
+    metadata:
+      labels:
+        app: chronic-care-service
+        version: "1.0.0"
+    spec:
+      containers:
+      - name: chronic-care-service
+        image: node:20-alpine
+        imagePullPolicy: IfNotPresent
+        command: ["node", "/app/server.js"]
+        ports:
+        - containerPort: 3003
+        env:
+        - name: PORT
+          value: "3003"
+        - name: NODE_ENV
+          value: "production"
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 128Mi
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3003
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 3003
+          initialDelaySeconds: 3
+          periodSeconds: 5
+        volumeMounts:
+        - name: code
+          mountPath: /app
+      volumes:
+      - name: code
+        configMap:
+          name: chronic-care-service-code
+---
+# Pharmacy Service Deployment - v1.0.0
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pharmacy-service
+  namespace: unified-health-prod
+  labels:
+    app: pharmacy-service
+    version: "1.0.0"
+  annotations:
+    kubernetes.io/change-cause: "Initial deployment v1.0.0"
+    image.policy: "Never"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pharmacy-service
+  template:
+    metadata:
+      labels:
+        app: pharmacy-service
+        version: "1.0.0"
+    spec:
+      containers:
+      - name: pharmacy-service
+        image: node:20-alpine
+        imagePullPolicy: IfNotPresent
+        command: ["node", "/app/server.js"]
+        ports:
+        - containerPort: 3004
+        env:
+        - name: PORT
+          value: "3004"
+        - name: NODE_ENV
+          value: "production"
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 128Mi
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3004
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 3004
+          initialDelaySeconds: 3
+          periodSeconds: 5
+        volumeMounts:
+        - name: code
+          mountPath: /app
+      volumes:
+      - name: code
+        configMap:
+          name: pharmacy-service-code
+---
+# Laboratory Service Deployment - v1.0.0
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: laboratory-service
+  namespace: unified-health-prod
+  labels:
+    app: laboratory-service
+    version: "1.0.0"
+  annotations:
+    kubernetes.io/change-cause: "Initial deployment v1.0.0"
+    image.policy: "Never"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: laboratory-service
+  template:
+    metadata:
+      labels:
+        app: laboratory-service
+        version: "1.0.0"
+    spec:
+      containers:
+      - name: laboratory-service
+        image: node:20-alpine
+        imagePullPolicy: IfNotPresent
+        command: ["node", "/app/server.js"]
+        ports:
+        - containerPort: 3005
+        env:
+        - name: PORT
+          value: "3005"
+        - name: NODE_ENV
+          value: "production"
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 128Mi
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3005
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 3005
+          initialDelaySeconds: 3
+          periodSeconds: 5
+        volumeMounts:
+        - name: code
+          mountPath: /app
+      volumes:
+      - name: code
+        configMap:
+          name: laboratory-service-code

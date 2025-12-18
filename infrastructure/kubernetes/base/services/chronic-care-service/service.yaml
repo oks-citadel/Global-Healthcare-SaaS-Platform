@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: chronic-care-service
+  labels:
+    app: chronic-care-service
+    component: specialized
+    tier: backend
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9091"
+spec:
+  type: ClusterIP
+  selector:
+    app: chronic-care-service
+  ports:
+  - name: http
+    port: 80
+    targetPort: http
+    protocol: TCP
+  - name: grpc
+    port: 9090
+    targetPort: grpc
+    protocol: TCP
+  - name: metrics
+    port: 9091
+    targetPort: metrics
+    protocol: TCP
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: chronic-care-service
+  labels:
+    app: chronic-care-service
+    component: specialized
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::ACCOUNT_ID:role/chronic-care-service-role

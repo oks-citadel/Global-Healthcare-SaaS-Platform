@@ -1,0 +1,75 @@
+{
+  "name": "@unifiedhealth/compliance",
+  "version": "1.0.0",
+  "description": "Compliance utilities for HIPAA, GDPR, and POPIA",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "lint": "eslint src --ext .ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "compliance",
+    "hipaa",
+    "gdpr",
+    "popia",
+    "healthcare",
+    "data-protection",
+    "privacy"
+  ],
+  "author": "UnifiedHealth Platform",
+  "license": "PROPRIETARY",
+  "dependencies": {
+    "crypto": "^1.0.1",
+    "uuid": "^9.0.1",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/uuid": "^9.0.7",
+    "eslint": "^8.55.0",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.3",
+    "vitest": "^1.0.4"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./audit": {
+      "types": "./dist/audit/index.d.ts",
+      "import": "./dist/audit/index.mjs",
+      "require": "./dist/audit/index.js"
+    },
+    "./consent": {
+      "types": "./dist/consent/index.d.ts",
+      "import": "./dist/consent/index.mjs",
+      "require": "./dist/consent/index.js"
+    },
+    "./encryption": {
+      "types": "./dist/encryption/index.d.ts",
+      "import": "./dist/encryption/index.mjs",
+      "require": "./dist/encryption/index.js"
+    },
+    "./retention": {
+      "types": "./dist/retention/index.d.ts",
+      "import": "./dist/retention/index.mjs",
+      "require": "./dist/retention/index.js"
+    },
+    "./deletion": {
+      "types": "./dist/deletion/index.d.ts",
+      "import": "./dist/deletion/index.mjs",
+      "require": "./dist/deletion/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ]
+}

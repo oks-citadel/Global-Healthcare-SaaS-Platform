@@ -10,17 +10,18 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 3.85.0"
+      version = "~> 4.14.0"
     }
     azuread = {
       source  = "hashicorp/azuread"
-      version = "~> 2.46.0"
+      version = "~> 3.0.0"
     }
   }
 }
 
 provider "azurerm" {
-  subscription_id = var.subscription_id
+  subscription_id                 = var.subscription_id
+  resource_provider_registrations = "none"
   features {
     key_vault {
       purge_soft_delete_on_destroy = false
@@ -127,7 +128,7 @@ resource "azurerm_kubernetes_cluster" "main" {
     vnet_subnet_id      = azurerm_subnet.aks.id
     os_disk_size_gb     = 100
     type                = "VirtualMachineScaleSets"
-    enable_auto_scaling = true
+    auto_scaling_enabled = true
     min_count           = var.aks_system_node_min
     max_count           = var.aks_system_node_max
 
@@ -164,7 +165,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "user" {
   vm_size               = var.aks_user_node_size
   node_count            = var.aks_user_node_count
   vnet_subnet_id        = azurerm_subnet.aks.id
-  enable_auto_scaling   = true
+  auto_scaling_enabled  = true
   min_count             = var.aks_user_node_min
   max_count             = var.aks_user_node_max
   os_disk_size_gb       = 100
@@ -227,19 +228,20 @@ resource "azurerm_private_dns_zone_virtual_network_link" "postgresql" {
 }
 
 resource "azurerm_postgresql_flexible_server" "main" {
-  name                   = "psql-${var.project_name}-${var.environment}"
-  resource_group_name    = azurerm_resource_group.main.name
-  location               = azurerm_resource_group.main.location
-  version                = "15"
-  delegated_subnet_id    = azurerm_subnet.database.id
-  private_dns_zone_id    = azurerm_private_dns_zone.postgresql.id
-  administrator_login    = var.postgresql_admin_username
-  administrator_password = var.postgresql_admin_password
-  zone                   = "1"
-  storage_mb             = var.postgresql_storage_mb
-  sku_name               = var.postgresql_sku
-  backup_retention_days  = 35
-  tags                   = local.common_tags
+  name                          = "psql-${var.project_name}-${var.environment}"
+  resource_group_name           = azurerm_resource_group.main.name
+  location                      = azurerm_resource_group.main.location
+  version                       = "15"
+  delegated_subnet_id           = azurerm_subnet.database.id
+  private_dns_zone_id           = azurerm_private_dns_zone.postgresql.id
+  public_network_access_enabled = false
+  administrator_login           = var.postgresql_admin_username
+  administrator_password        = var.postgresql_admin_password
+  zone                          = "1"
+  storage_mb                    = var.postgresql_storage_mb
+  sku_name                      = var.postgresql_sku
+  backup_retention_days         = 35
+  tags                          = local.common_tags
 
   depends_on = [azurerm_private_dns_zone_virtual_network_link.postgresql]
 }
@@ -262,7 +264,7 @@ resource "azurerm_redis_cache" "main" {
   capacity            = var.redis_capacity
   family              = var.redis_family
   sku_name            = var.redis_sku
-  enable_non_ssl_port = false
+  non_ssl_port_enabled = false
   minimum_tls_version = "1.2"
   tags                = local.common_tags
 

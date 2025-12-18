@@ -1,0 +1,26 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- api-gateway/deployment.yaml
+- api-gateway/service.yaml
+- api-gateway/hpa.yaml
+- telehealth-service/deployment.yaml
+- telehealth-service/service.yaml
+- telehealth-service/hpa.yaml
+- mental-health-service/deployment.yaml
+- mental-health-service/service.yaml
+- mental-health-service/hpa.yaml
+- chronic-care-service/deployment.yaml
+- chronic-care-service/service.yaml
+- chronic-care-service/hpa.yaml
+- pharmacy-service/deployment.yaml
+- pharmacy-service/service.yaml
+- pharmacy-service/hpa.yaml
+- laboratory-service/deployment.yaml
+- laboratory-service/service.yaml
+- laboratory-service/hpa.yaml
+
+commonLabels:
+  app.kubernetes.io/part-of: healthcare-platform
+  app.kubernetes.io/managed-by: kustomize

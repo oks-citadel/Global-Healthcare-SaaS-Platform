@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: healthcare-americas
+  labels:
+    name: healthcare-americas
+    region: americas
+    environment: production
+    istio-injection: enabled
+  annotations:
+    description: "Healthcare Platform - Americas Region"

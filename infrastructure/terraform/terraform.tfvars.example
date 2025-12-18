@@ -1,0 +1,140 @@
+# ============================================
+# UnifiedHealth Platform - Multi-Region Configuration Example
+# ============================================
+# Copy this file to terraform.tfvars and customize for your deployment
+
+# ============================================
+# Azure Subscription
+# ============================================
+
+# Your Azure subscription ID
+# Find it: az account show --query id -o tsv
+subscription_id = "00000000-0000-0000-0000-000000000000"
+
+# ============================================
+# Project Configuration
+# ============================================
+
+# Project name (used in resource naming)
+project_name = "unified-health"
+
+# Environment (prod or staging)
+environment = "prod"
+
+# Primary location for global resources
+primary_location = "eastus"
+
+# ============================================
+# Region Deployment Flags
+# ============================================
+
+# Deploy to Americas (East US)
+deploy_americas = true
+
+# Deploy to Europe (West Europe)
+deploy_europe = true
+
+# Deploy to Africa (South Africa North)
+deploy_africa = true
+
+# ============================================
+# Cross-Region Configuration
+# ============================================
+
+# Enable VNet peering between regions
+# Set to true only if you need cross-region communication
+# Note: This may affect data residency compliance
+enable_cross_region_peering = false
+
+# ============================================
+# Kubernetes Configuration
+# ============================================
+
+# Kubernetes version (check availability: az aks get-versions --location eastus -o table)
+kubernetes_version = "1.28.3"
+
+# ============================================
+# Database Configuration
+# ============================================
+
+# PostgreSQL administrator username (used for all regional databases)
+postgresql_admin_username = "unifiedhealth_admin"
+
+# PostgreSQL administrator password
+# IMPORTANT: Use a strong password and store it securely
+# Minimum 8 characters, must contain uppercase, lowercase, numbers
+postgresql_admin_password = "ChangeThisPassword123!"
+
+# ============================================
+# DNS Configuration
+# ============================================
+
+# Manage DNS zone in Azure (set to true if you want Azure DNS)
+manage_dns = false
+
+# DNS zone name (your domain)
+dns_zone_name = "unifiedhealth.example.com"
+
+# ============================================
+# Monitoring & Alerts
+# ============================================
+
+# Global operations team email
+global_alert_email_address = "ops@unifiedhealth.example.com"
+
+# Regional operations team emails
+americas_alert_email_address = "ops-americas@unifiedhealth.example.com"
+europe_alert_email_address   = "ops-europe@unifiedhealth.example.com"
+africa_alert_email_address   = "ops-africa@unifiedhealth.example.com"
+
+# Global webhook URL for alert notifications (optional)
+# Examples: PagerDuty, Slack, Microsoft Teams
+global_alert_webhook_url = ""
+
+# Regional webhook URL for alert notifications (optional)
+alert_webhook_url = ""
+
+# ============================================
+# Cost Management
+# ============================================
+
+# Enable cost alerts
+enable_cost_alerts = true
+
+# Monthly budget in USD
+monthly_budget_usd = 50000
+
+# ============================================
+# Additional Notes
+# ============================================
+
+# Regional configurations are stored in:
+# - environments/prod-americas.tfvars
+# - environments/prod-europe.tfvars
+# - environments/prod-africa.tfvars
+#
+# You can customize node counts, VM sizes, storage sizes, etc.
+# in those files without modifying this main configuration.
+
+# ============================================
+# Deployment Commands
+# ============================================
+
+# After copying this file to terraform.tfvars:
+#
+# 1. Initialize Terraform:
+#    terraform init
+#
+# 2. Validate configuration:
+#    terraform validate
+#
+# 3. Plan deployment:
+#    terraform plan -out=multiregion.tfplan
+#
+# 4. Apply deployment:
+#    terraform apply multiregion.tfplan
+#
+# Or use the Makefile:
+#    make -f Makefile.multiregion init
+#    make -f Makefile.multiregion plan
+#    make -f Makefile.multiregion apply

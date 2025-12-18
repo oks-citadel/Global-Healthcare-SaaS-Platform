@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway
+spec:
+  template:
+    spec:
+      containers:
+      - name: api-gateway
+        resources:
+          requests:
+            cpu: 500m
+            memory: 512Mi
+          limits:
+            cpu: 2000m
+            memory: 2Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: telehealth-service
+spec:
+  template:
+    spec:
+      containers:
+      - name: telehealth-service
+        resources:
+          requests:
+            cpu: 600m
+            memory: 1Gi
+          limits:
+            cpu: 2500m
+            memory: 4Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mental-health-service
+spec:
+  template:
+    spec:
+      containers:
+      - name: mental-health-service
+        resources:
+          requests:
+            cpu: 400m
+            memory: 768Mi
+          limits:
+            cpu: 1500m
+            memory: 2Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chronic-care-service
+spec:
+  template:
+    spec:
+      containers:
+      - name: chronic-care-service
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1Gi
+          limits:
+            cpu: 2000m
+            memory: 3Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pharmacy-service
+spec:
+  template:
+    spec:
+      containers:
+      - name: pharmacy-service
+        resources:
+          requests:
+            cpu: 300m
+            memory: 512Mi
+          limits:
+            cpu: 1200m
+            memory: 1.5Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: laboratory-service
+spec:
+  template:
+    spec:
+      containers:
+      - name: laboratory-service
+        resources:
+          requests:
+            cpu: 400m
+            memory: 768Mi
+          limits:
+            cpu: 1500m
+            memory: 2Gi

@@ -16,6 +16,7 @@ import { paymentController } from '../controllers/payment.controller.js';
 import { pushController } from '../controllers/push.controller.js';
 import { dashboardController } from '../controllers/dashboard.controller.js';
 import { authenticate, authorize } from '../middleware/auth.middleware.js';
+import stripeWebhookRouter from './webhooks/stripe.js';
 
 const router = Router();
 
@@ -108,9 +109,17 @@ router.post('/subscriptions', authenticate, subscriptionController.createSubscri
 router.delete('/subscriptions/:id', authenticate, subscriptionController.cancelSubscription);
 
 // ==========================================
-// Billing Webhook (Stripe)
+// Billing Webhook (Stripe) - Legacy
 // ==========================================
 router.post('/billing/webhook', subscriptionController.handleWebhook);
+
+// ==========================================
+// Stripe Webhooks (Dedicated Route)
+// ==========================================
+// IMPORTANT: This route requires raw body parsing
+// Configure in your main app.ts before JSON parsing:
+// app.use('/webhooks/stripe', express.raw({ type: 'application/json' }));
+router.use('/webhooks/stripe', stripeWebhookRouter);
 
 // ==========================================
 // Payment Endpoints (Stripe)

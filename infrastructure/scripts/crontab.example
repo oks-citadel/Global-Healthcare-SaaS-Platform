@@ -1,0 +1,139 @@
+# Database Backup and Monitoring Cron Jobs
+#
+# This file contains example cron job configurations for automated
+# database backup and monitoring tasks.
+#
+# Installation:
+# 1. Copy this file: cp crontab.example crontab.local
+# 2. Edit paths to match your environment
+# 3. Install: crontab crontab.local
+#
+# Cron Format:
+# * * * * * command
+# │ │ │ │ │
+# │ │ │ │ └─── Day of week (0-7, 0 and 7 are Sunday)
+# │ │ │ └───── Month (1-12)
+# │ │ └─────── Day of month (1-31)
+# │ └───────── Hour (0-23)
+# └─────────── Minute (0-59)
+
+# ============================================================================
+# Environment Variables
+# ============================================================================
+
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+MAILTO=ops@example.com
+
+# Project directory - UPDATE THIS
+PROJECT_DIR=/path/to/Unified-Healthcare-Platform/Global-Healthcare-SaaS-Platform
+
+# ============================================================================
+# Database Backups
+# ============================================================================
+
+# Full backup daily at 2:00 AM
+0 2 * * * cd $PROJECT_DIR && ./infrastructure/scripts/db-backup.sh >> /var/log/db-backup.log 2>&1
+
+# Full backup every 6 hours (production high-frequency backup)
+# 0 */6 * * * cd $PROJECT_DIR && ./infrastructure/scripts/db-backup.sh >> /var/log/db-backup.log 2>&1
+
+# Full backup hourly (production critical systems)
+# 0 * * * * cd $PROJECT_DIR && ./infrastructure/scripts/db-backup.sh >> /var/log/db-backup.log 2>&1
+
+# Weekly full backup on Sunday at 1:00 AM (for longer retention)
+# 0 1 * * 0 cd $PROJECT_DIR && BACKUP_RETENTION_DAYS=90 ./infrastructure/scripts/db-backup.sh >> /var/log/db-backup-weekly.log 2>&1
+
+# ============================================================================
+# Performance Monitoring
+# ============================================================================
+
+# Daily performance monitoring at 9:00 AM
+0 9 * * * cd $PROJECT_DIR && ./infrastructure/scripts/db-monitor.sh >> /var/log/db-monitor.log 2>&1
+
+# Weekly detailed monitoring on Monday at 8:00 AM
+# 0 8 * * 1 cd $PROJECT_DIR && ./infrastructure/scripts/db-monitor.sh >> /var/log/db-monitor-weekly.log 2>&1
+
+# Hourly quick health check (production)
+# 0 * * * * cd $PROJECT_DIR && ./infrastructure/scripts/db-monitor.sh >> /var/log/db-monitor-hourly.log 2>&1
+
+# ============================================================================
+# Database Maintenance
+# ============================================================================
+
+# Analyze database daily at 3:00 AM
+0 3 * * * psql -U unified_health -d unified_health_prod -c "ANALYZE;" >> /var/log/db-analyze.log 2>&1
+
+# Vacuum database daily at 4:00 AM
+0 4 * * * psql -U unified_health -d unified_health_prod -c "VACUUM ANALYZE;" >> /var/log/db-vacuum.log 2>&1
+
+# Reindex database weekly on Sunday at 5:00 AM
+0 5 * * 0 psql -U unified_health -d unified_health_prod -c "REINDEX DATABASE unified_health_prod;" >> /var/log/db-reindex.log 2>&1
+
+# ============================================================================
+# Cleanup Tasks
+# ============================================================================
+
+# Remove old log files (keep last 30 days)
+0 5 * * * find /var/log -name "db-*.log" -mtime +30 -delete
+
+# Cleanup old metrics files (keep last 7 days)
+0 6 * * * find $PROJECT_DIR/infrastructure/monitoring/database/metrics -name "metrics_*.prom" -mtime +7 -delete
+
+# Cleanup old performance reports (keep last 30 days)
+0 6 * * * find $PROJECT_DIR/infrastructure/monitoring/database/reports -name "performance_report_*.txt" -mtime +30 -delete
+
+# ============================================================================
+# Health Checks and Alerts
+# ============================================================================
+
+# Check database connectivity every 5 minutes
+# */5 * * * * psql -U unified_health -d unified_health_prod -c "SELECT 1;" > /dev/null 2>&1 || echo "Database connection failed" | mail -s "Database Alert" ops@example.com
+
+# Check disk space hourly
+# 0 * * * * df -h | grep -E '(9[0-9]|100)%' && echo "Disk space alert" | mail -s "Disk Space Alert" ops@example.com
+
+# Check backup completion daily
+# 30 2 * * * [ -f "$PROJECT_DIR/infrastructure/backups/database/full/backup_$(date +\%Y\%m\%d)_*.sql.gz" ] || echo "Backup failed or not found" | mail -s "Backup Alert" ops@example.com
+
+# ============================================================================
+# Test Restore (Weekly - Staging Environment Only)
+# ============================================================================
+
+# Automated test restore on staging every Sunday at 6:00 AM
+# Only run this on staging/test environments, NEVER on production
+# 0 6 * * 0 cd $PROJECT_DIR && DB_NAME=unified_health_test ./infrastructure/scripts/db-restore.sh --no-confirm --file $(ls -t $PROJECT_DIR/infrastructure/backups/database/full/*.sql.gz | head -1) >> /var/log/db-test-restore.log 2>&1
+
+# ============================================================================
+# Notes
+# ============================================================================
+
+# Production Recommendations:
+# - Run full backups at least daily
+# - For critical systems, consider hourly or continuous backups (WAL archiving)
+# - Enable CLOUD_STORAGE_ENABLED for off-site backup storage
+# - Set up monitoring alerts via NOTIFICATION_WEBHOOK
+# - Test restore procedures regularly
+# - Keep multiple backup retention tiers (daily, weekly, monthly)
+# - Monitor backup sizes and adjust retention accordingly
+# - Ensure sufficient disk space for backups
+# - Use separate backup server/storage when possible
+
+# Staging/Development:
+# - Daily backups are usually sufficient
+# - Weekly test restores to verify backup integrity
+# - Lower retention periods acceptable
+
+# Security:
+# - Ensure cron runs as appropriate user with necessary permissions
+# - Protect crontab file permissions (chmod 600)
+# - Use encrypted backups for production (set BACKUP_ENCRYPTION_KEY)
+# - Secure backup storage locations
+# - Rotate encryption keys periodically
+
+# Monitoring:
+# - Check cron execution logs regularly
+# - Set up alerts for failed jobs
+# - Monitor disk space on backup storage
+# - Track backup completion times
+# - Review monitoring reports weekly

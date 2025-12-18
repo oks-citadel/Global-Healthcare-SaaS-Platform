@@ -1,0 +1,97 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// Pharmacy Domain
+// ==========================================
+
+model Prescription {
+  id          String             @id @default(uuid())
+  patientId   String
+  providerId  String
+  encounterId String?
+  status      PrescriptionStatus @default(active)
+  items       PrescriptionItem[]
+  notes       String?
+  validFrom   DateTime           @default(now())
+  validUntil  DateTime?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  @@index([patientId])
+  @@index([providerId])
+  @@index([status])
+  @@index([validUntil])
+}
+
+enum PrescriptionStatus {
+  active
+  completed
+  cancelled
+  expired
+}
+
+model PrescriptionItem {
+  id               String       @id @default(uuid())
+  prescriptionId   String
+  prescription     Prescription @relation(fields: [prescriptionId], references: [id], onDelete: Cascade)
+  medicationName   String
+  dosage           String
+  frequency        String
+  duration         String?
+  quantity         Int?
+  refillsAllowed   Int          @default(0)
+  refillsUsed      Int          @default(0)
+  instructions     String?
+  isGenericAllowed Boolean      @default(true)
+  createdAt        DateTime     @default(now())
+
+  @@index([prescriptionId])
+  @@index([medicationName])
+}
+
+model Pharmacy {
+  id              String   @id @default(uuid())
+  name            String
+  licenseNumber   String   @unique
+  phone           String
+  email           String?
+  address         Json
+  operatingHours  Json?
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([licenseNumber])
+  @@index([isActive])
+}
+
+model Medication {
+  id              String   @id @default(uuid())
+  name            String
+  genericName     String?
+  brandNames      String[]
+  strength        String
+  dosageForm      String   // tablet, capsule, liquid, etc.
+  manufacturer    String?
+  ndcCode         String?  @unique // National Drug Code
+  description     String?
+  sideEffects     String[]
+  interactions    String[]
+  isControlled    Boolean  @default(false)
+  schedule        String?  // DEA Schedule (I-V)
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([name])
+  @@index([genericName])
+  @@index([ndcCode])
+  @@index([isActive])
+}

@@ -3,11 +3,26 @@
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["metrics", "tracing"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+
+  // Connection pooling configuration
+  // Use connection_limit and pool_timeout for PgBouncer or built-in pooling
+  // Example: postgresql://user:password@host:port/db?connection_limit=20&pool_timeout=10
+
+  // For direct connection (without PgBouncer):
+  // - connection_limit: Max connections per Prisma Client instance (default: num_cpus * 2 + 1)
+  // - pool_timeout: Time in seconds to wait for a connection (default: 10)
+  // - connect_timeout: Database connection timeout in seconds (default: 5)
+  // - socket_timeout: Query timeout in seconds (default: 0 - no timeout)
+
+  // For Prisma Data Proxy / Accelerate (production):
+  // directUrl is used for migrations, url is used for queries
+  directUrl = env("DIRECT_DATABASE_URL")
 }
 
 // ==========================================
@@ -285,10 +300,12 @@ model Document {
   type        DocumentType
   fileName    String
   fileUrl     String
+  blobName    String?      // Azure Blob Storage blob name
   mimeType    String
   size        Int
   description String?
   uploadedBy  String
+  version     Int          @default(1) // Document version number
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -297,6 +314,8 @@ model Document {
   @@index([type])
   @@index([patientId, createdAt])
   @@index([uploadedBy])
+  @@index([blobName])
+  @@index([patientId, type])
 }
 
 enum DocumentType {
@@ -835,4 +854,35 @@ model NotificationPreference {
   updatedAt DateTime @updatedAt
 
   @@index([userId])
+}
+
+// ==========================================
+// Webhook Event Logging
+// ==========================================
+
+model WebhookEventLog {
+  id                String             @id @default(uuid())
+  eventType         String
+  eventId           String             @unique
+  status            WebhookEventStatus @default(pending)
+  payload           Json
+  error             String?
+  retryCount        Int                @default(0)
+  processingTimeMs  Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([eventId])
+  @@index([eventType])
+  @@index([status])
+  @@index([createdAt])
+  @@index([eventType, status])
+}
+
+enum WebhookEventStatus {
+  pending
+  processing
+  succeeded
+  failed
 }

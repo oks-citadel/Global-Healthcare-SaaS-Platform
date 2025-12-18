@@ -78,6 +78,10 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({
         throw new Error('Failed to create payment method');
       }
 
+      // Save payment method to backend
+      // This should be done through your payment hooks
+      // Example: await savePaymentMethod(paymentMethod.id)
+
       // Call success callback with payment method ID
       if (onSuccess) {
         onSuccess(paymentMethod.id);

@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: shared-config
+data:
+  # Override region-specific settings
+  region: "us-east-1"
+  deployment_zone: "americas"
+
+  # Americas-specific endpoints
+  kafka_brokers: "kafka-americas-1.healthcare.internal:9092,kafka-americas-2.healthcare.internal:9092,kafka-americas-3.healthcare.internal:9092"
+
+  # Compliance settings for Americas
+  hipaa_mode: "true"
+  hitech_compliance: "true"
+  state_reporting_enabled: "true"
+
+  # Americas-specific features
+  feature_state_medicaid: "true"
+  feature_medicare_integration: "true"
+  feature_prescription_monitoring: "true"
+
+  # Storage endpoints for Americas
+  s3_endpoint: "https://s3.us-east-1.amazonaws.com"
+  lab_results_bucket: "healthcare-lab-results-americas"
+  medical_images_bucket: "healthcare-medical-images-americas"
+
+  # Americas data residency
+  data_residency: "us"
+  data_sovereignty: "enabled"
+
+  # FHIR endpoints for Americas
+  fhir_server_url: "https://fhir-americas.healthcare-platform.com"
+
+  # Timezone and localization
+  default_timezone: "America/New_York"
+  supported_timezones: "America/New_York,America/Chicago,America/Denver,America/Los_Angeles,America/Toronto,America/Sao_Paulo"
+
+  # Currency and payment
+  default_currency: "USD"
+  supported_currencies: "USD,CAD,BRL"
+  payment_processor: "stripe"
+
+  # Language support
+  default_language: "en-US"
+  supported_languages: "en-US,es-US,pt-BR,fr-CA"
+
+  # Rate limiting for Americas peak hours
+  rate_limit_per_minute: "1500"
+  peak_hours_start: "08:00"
+  peak_hours_end: "20:00"
+
+  # Americas-specific integrations
+  epic_integration: "enabled"
+  cerner_integration: "enabled"
+  allscripts_integration: "enabled"
+
+  # Emergency services
+  emergency_services_enabled: "true"
+  emergency_hotline: "+1-911"

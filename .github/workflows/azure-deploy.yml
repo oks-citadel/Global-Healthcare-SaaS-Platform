@@ -3,17 +3,13 @@
 # GitHub Actions Workflow for Azure Cloud Deployment
 # Consolidated CI/CD pipeline for all environments
 # ============================================
+# WORKFLOW LOCKED - v1.0.0 deployed to production
+# Automatic triggers disabled to prevent accidental deployments
+# ============================================
 
 name: Azure Unified Deployment
 
 on:
-  push:
-    branches: [main, develop]
-    paths-ignore:
-      - "**.md"
-      - "docs/**"
-  pull_request:
-    branches: [main]
   workflow_dispatch:
     inputs:
       environment:

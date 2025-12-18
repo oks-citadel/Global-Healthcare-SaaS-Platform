@@ -1,0 +1,151 @@
+version: '3.8'
+
+services:
+  # API Gateway
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - JWT_SECRET=${JWT_SECRET}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - TELEHEALTH_SERVICE_URL=http://telehealth-service:3001
+      - MENTAL_HEALTH_SERVICE_URL=http://mental-health-service:3002
+      - CHRONIC_CARE_SERVICE_URL=http://chronic-care-service:3003
+      - PHARMACY_SERVICE_URL=http://pharmacy-service:3004
+      - LABORATORY_SERVICE_URL=http://laboratory-service:3005
+      - CORS_ORIGIN=*
+    depends_on:
+      - redis
+      - telehealth-service
+      - mental-health-service
+      - chronic-care-service
+      - pharmacy-service
+      - laboratory-service
+    networks:
+      - microservices-network
+    restart: unless-stopped
+
+  # Telehealth Service
+  telehealth-service:
+    build:
+      context: ./telehealth-service
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/telehealth_db?schema=public
+      - CORS_ORIGIN=*
+    depends_on:
+      - postgres
+    networks:
+      - microservices-network
+    restart: unless-stopped
+
+  # Mental Health Service
+  mental-health-service:
+    build:
+      context: ./mental-health-service
+      dockerfile: Dockerfile
+    ports:
+      - "3002:3002"
+    environment:
+      - PORT=3002
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/mental_health_db?schema=public
+      - CORS_ORIGIN=*
+    depends_on:
+      - postgres
+    networks:
+      - microservices-network
+    restart: unless-stopped
+
+  # Chronic Care Service
+  chronic-care-service:
+    build:
+      context: ./chronic-care-service
+      dockerfile: Dockerfile
+    ports:
+      - "3003:3003"
+    environment:
+      - PORT=3003
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/chronic_care_db?schema=public
+      - CORS_ORIGIN=*
+    depends_on:
+      - postgres
+    networks:
+      - microservices-network
+    restart: unless-stopped
+
+  # Pharmacy Service
+  pharmacy-service:
+    build:
+      context: ./pharmacy-service
+      dockerfile: Dockerfile
+    ports:
+      - "3004:3004"
+    environment:
+      - PORT=3004
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/pharmacy_db?schema=public
+      - CORS_ORIGIN=*
+    depends_on:
+      - postgres
+    networks:
+      - microservices-network
+    restart: unless-stopped
+
+  # Laboratory Service
+  laboratory-service:
+    build:
+      context: ./laboratory-service
+      dockerfile: Dockerfile
+    ports:
+      - "3005:3005"
+    environment:
+      - PORT=3005
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/laboratory_db?schema=public
+      - CORS_ORIGIN=*
+    depends_on:
+      - postgres
+    networks:
+      - microservices-network
+    restart: unless-stopped
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_MULTIPLE_DATABASES=telehealth_db,mental_health_db,chronic_care_db,pharmacy_db,laboratory_db
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./scripts/create-multiple-postgresql-databases.sh:/docker-entrypoint-initdb.d/create-multiple-postgresql-databases.sh
+    networks:
+      - microservices-network
+    restart: unless-stopped
+
+  # Redis (for rate limiting and caching)
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - microservices-network
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
+  redis-data:
+
+networks:
+  microservices-network:
+    driver: bridge

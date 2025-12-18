@@ -233,7 +233,7 @@ export const documentService = {
    * Generate pre-signed download URL (stub for actual cloud storage integration)
    */
   async generateDownloadUrl(id: string): Promise<{ downloadUrl: string; expiresAt: string }> {
-    const document = documents.get(id);
+    const document = await prisma.document.findUnique({ where: { id } });
     if (!document) {
       throw new NotFoundError('Document not found');
     }
@@ -244,6 +244,71 @@ export const documentService = {
     return {
       downloadUrl: `${document.fileUrl}?token=mock-token`,
       expiresAt,
+    };
+  },
+
+  /**
+   * Update document URL and blob name after upload
+   */
+  async updateDocumentUrl(
+    id: string,
+    fileUrl: string,
+    blobName: string
+  ): Promise<DocumentResponseType> {
+    const document = await prisma.document.update({
+      where: { id },
+      data: {
+        fileUrl,
+        blobName,
+      },
+    });
+
+    return {
+      id: document.id,
+      patientId: document.patientId,
+      type: document.type,
+      fileName: document.fileName,
+      fileUrl: document.fileUrl,
+      mimeType: document.mimeType,
+      size: document.size,
+      description: document.description,
+      uploadedBy: document.uploadedBy,
+      createdAt: document.createdAt.toISOString(),
+      updatedAt: document.updatedAt.toISOString(),
+    };
+  },
+
+  /**
+   * Update document metadata
+   */
+  async updateDocument(
+    id: string,
+    updates: {
+      description?: string;
+      type?: DocumentType;
+      version?: number;
+      fileUrl?: string;
+      blobName?: string;
+      size?: number;
+    }
+  ): Promise<DocumentResponseType> {
+    const document = await prisma.document.update({
+      where: { id },
+      data: updates,
+    });
+
+    return {
+      id: document.id,
+      patientId: document.patientId,
+      type: document.type,
+      fileName: document.fileName,
+      fileUrl: document.fileUrl,
+      mimeType: document.mimeType,
+      size: document.size,
+      description: document.description,
+      uploadedBy: document.uploadedBy,
+      createdAt: document.createdAt.toISOString(),
+      updatedAt: document.updatedAt.toISOString(),
     };
   },
 };

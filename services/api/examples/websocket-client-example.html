@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Client Test - Unified Healthcare Platform</title>
+    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 { color: #2c3e50; }
+        h2 {
+            color: #34495e;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px 5px 5px 0;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+        button:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .status.connected {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.disconnected {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        #logs {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 4px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 3px solid #3498db;
+            padding-left: 10px;
+        }
+        .log-error { border-left-color: #e74c3c; }
+        .log-success { border-left-color: #2ecc71; }
+        .log-info { border-left-color: #3498db; }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <h1>🏥 WebSocket Client Test</h1>
+    <p>Test the Unified Healthcare Platform WebSocket implementation</p>
+
+    <!-- Connection Status -->
+    <div class="container">
+        <h2>Connection Status</h2>
+        <div id="status" class="status disconnected">
+            Disconnected
+        </div>
+        <div>
+            <label>Server URL:</label>
+            <input type="text" id="serverUrl" value="http://localhost:8080" />
+        </div>
+        <div>
+            <label>JWT Token:</label>
+            <textarea id="jwtToken" rows="3" placeholder="Paste your JWT token here..."></textarea>
+            <small>Get a token by logging in via /api/v1/auth/login</small>
+        </div>
+        <button onclick="connect()" id="connectBtn">Connect</button>
+        <button onclick="disconnect()" id="disconnectBtn" disabled>Disconnect</button>
+    </div>
+
+    <div class="grid">
+        <!-- Messaging -->
+        <div class="container">
+            <h2>💬 Messaging</h2>
+            <div>
+                <label>Visit ID:</label>
+                <input type="text" id="msgVisitId" placeholder="visit-123" />
+            </div>
+            <div>
+                <label>Message:</label>
+                <textarea id="message" rows="3" placeholder="Type your message..."></textarea>
+            </div>
+            <button onclick="sendMessage()" disabled id="sendMsgBtn">Send Message</button>
+            <button onclick="startTyping()" disabled id="startTypingBtn">Start Typing</button>
+            <button onclick="stopTyping()" disabled id="stopTypingBtn">Stop Typing</button>
+            <button onclick="getMessageHistory()" disabled id="getMsgHistoryBtn">Get History</button>
+        </div>
+
+        <!-- Room Management -->
+        <div class="container">
+            <h2>🚪 Room Management</h2>
+            <div>
+                <label>Room ID:</label>
+                <input type="text" id="roomId" placeholder="chat:user1:user2" />
+            </div>
+            <div>
+                <label>Room Type:</label>
+                <select id="roomType">
+                    <option value="chat">Chat</option>
+                    <option value="video_call">Video Call</option>
+                    <option value="notification">Notification</option>
+                </select>
+            </div>
+            <button onclick="joinRoom()" disabled id="joinRoomBtn">Join Room</button>
+            <button onclick="leaveRoom()" disabled id="leaveRoomBtn">Leave Room</button>
+            <button onclick="getRoomParticipants()" disabled id="getRoomParticipantsBtn">Get Participants</button>
+        </div>
+
+        <!-- Video/Audio Calls -->
+        <div class="container">
+            <h2>📞 Video/Audio Calls</h2>
+            <div>
+                <label>Recipient User ID:</label>
+                <input type="text" id="callRecipientId" placeholder="user-456" />
+            </div>
+            <div>
+                <label>Call Type:</label>
+                <select id="callType">
+                    <option value="video">Video</option>
+                    <option value="audio">Audio</option>
+                </select>
+            </div>
+            <div>
+                <label>Call ID (for accept/reject/end):</label>
+                <input type="text" id="callId" placeholder="call-123" />
+            </div>
+            <button onclick="initiateCall()" disabled id="initiateCallBtn">Initiate Call</button>
+            <button onclick="acceptCall()" disabled id="acceptCallBtn">Accept Call</button>
+            <button onclick="rejectCall()" disabled id="rejectCallBtn">Reject Call</button>
+            <button onclick="endCall()" disabled id="endCallBtn">End Call</button>
+        </div>
+
+        <!-- Presence -->
+        <div class="container">
+            <h2>👤 Presence</h2>
+            <div>
+                <label>User IDs (comma-separated):</label>
+                <input type="text" id="presenceUserIds" placeholder="user-1,user-2,user-3" />
+            </div>
+            <div>
+                <label>Set Status:</label>
+                <select id="presenceStatus">
+                    <option value="online">Online</option>
+                    <option value="away">Away</option>
+                    <option value="busy">Busy</option>
+                    <option value="in_call">In Call</option>
+                </select>
+            </div>
+            <button onclick="getPresence()" disabled id="getPresenceBtn">Get Presence</button>
+            <button onclick="setStatus()" disabled id="setStatusBtn">Set Status</button>
+            <button onclick="subscribePresence()" disabled id="subscribePresenceBtn">Subscribe to Updates</button>
+        </div>
+
+        <!-- Notifications -->
+        <div class="container">
+            <h2>🔔 Notifications</h2>
+            <div>
+                <label>Notification ID:</label>
+                <input type="text" id="notificationId" placeholder="notif-123" />
+            </div>
+            <button onclick="getUnreadCount()" disabled id="getUnreadCountBtn">Get Unread Count</button>
+            <button onclick="markAsRead()" disabled id="markAsReadBtn">Mark As Read</button>
+            <button onclick="markAllAsRead()" disabled id="markAllAsReadBtn">Mark All As Read</button>
+        </div>
+    </div>
+
+    <!-- Event Logs -->
+    <div class="container">
+        <h2>📋 Event Logs</h2>
+        <button onclick="clearLogs()">Clear Logs</button>
+        <div id="logs"></div>
+    </div>
+
+    <script>
+        let socket = null;
+
+        function log(message, type = 'info') {
+            const logs = document.getElementById('logs');
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            const timestamp = new Date().toLocaleTimeString();
+            entry.textContent = `[${timestamp}] ${message}`;
+            logs.insertBefore(entry, logs.firstChild);
+        }
+
+        function updateStatus(connected) {
+            const statusEl = document.getElementById('status');
+            statusEl.className = `status ${connected ? 'connected' : 'disconnected'}`;
+            statusEl.textContent = connected ?
+                `Connected (Socket ID: ${socket?.id})` :
+                'Disconnected';
+
+            // Enable/disable buttons
+            const buttons = document.querySelectorAll('button[id$="Btn"]:not(#connectBtn):not(#disconnectBtn)');
+            buttons.forEach(btn => btn.disabled = !connected);
+            document.getElementById('connectBtn').disabled = connected;
+            document.getElementById('disconnectBtn').disabled = !connected;
+        }
+
+        function connect() {
+            const serverUrl = document.getElementById('serverUrl').value;
+            const token = document.getElementById('jwtToken').value.trim();
+
+            if (!token) {
+                alert('Please enter a JWT token');
+                return;
+            }
+
+            log('Connecting to ' + serverUrl, 'info');
+
+            socket = io(serverUrl, {
+                auth: { token },
+                transports: ['websocket', 'polling']
+            });
+
+            socket.on('connected', (data) => {
+                log('Connected successfully: ' + JSON.stringify(data), 'success');
+                updateStatus(true);
+            });
+
+            socket.on('connect_error', (error) => {
+                log('Connection error: ' + error.message, 'error');
+                updateStatus(false);
+            });
+
+            socket.on('disconnect', (reason) => {
+                log('Disconnected: ' + reason, 'error');
+                updateStatus(false);
+            });
+
+            // Message events
+            socket.on('message:new', (data) => {
+                log('New message: ' + JSON.stringify(data), 'success');
+            });
+
+            socket.on('message:sent', (data) => {
+                log('Message sent: ' + JSON.stringify(data), 'success');
+            });
+
+            socket.on('typing:start', (data) => {
+                log('User typing: ' + data.userId, 'info');
+            });
+
+            socket.on('typing:stop', (data) => {
+                log('User stopped typing: ' + data.userId, 'info');
+            });
+
+            // Room events
+            socket.on('room:userJoined', (data) => {
+                log('User joined room: ' + JSON.stringify(data), 'info');
+            });
+
+            socket.on('room:userLeft', (data) => {
+                log('User left room: ' + JSON.stringify(data), 'info');
+            });
+
+            // Call events
+            socket.on('call:incoming', (data) => {
+                log('Incoming call: ' + JSON.stringify(data), 'success');
+                document.getElementById('callId').value = data.callId;
+            });
+
+            socket.on('call:accepted', (data) => {
+                log('Call accepted: ' + JSON.stringify(data), 'success');
+            });
+
+            socket.on('call:rejected', (data) => {
+                log('Call rejected: ' + JSON.stringify(data), 'info');
+            });
+
+            socket.on('call:ended', (data) => {
+                log('Call ended: ' + JSON.stringify(data), 'info');
+            });
+
+            socket.on('call:missed', (data) => {
+                log('Call missed: ' + JSON.stringify(data), 'info');
+            });
+
+            // Presence events
+            socket.on('presence:changed', (data) => {
+                log('Presence changed: ' + JSON.stringify(data), 'info');
+            });
+
+            // Notification events
+            socket.on('notification:new', (data) => {
+                log('New notification: ' + JSON.stringify(data), 'success');
+            });
+        }
+
+        function disconnect() {
+            if (socket) {
+                socket.close();
+                socket = null;
+                updateStatus(false);
+                log('Disconnected by user', 'info');
+            }
+        }
+
+        function sendMessage() {
+            const visitId = document.getElementById('msgVisitId').value;
+            const message = document.getElementById('message').value;
+
+            socket.emit('message:send', {
+                visitId,
+                message,
+                attachments: []
+            }, (response) => {
+                log('Send message response: ' + JSON.stringify(response),
+                    response.success ? 'success' : 'error');
+            });
+        }
+
+        function startTyping() {
+            const roomId = document.getElementById('roomId').value;
+            socket.emit('typing:start', { roomId });
+            log('Sent typing indicator (start)', 'info');
+        }
+
+        function stopTyping() {
+            const roomId = document.getElementById('roomId').value;
+            socket.emit('typing:stop', { roomId });
+            log('Sent typing indicator (stop)', 'info');
+        }
+
+        function getMessageHistory() {
+            const visitId = document.getElementById('msgVisitId').value;
+            socket.emit('message:history', { visitId, limit: 50 }, (response) => {
+                log('Message history: ' + JSON.stringify(response), 'success');
+            });
+        }
+
+        function joinRoom() {
+            const roomId = document.getElementById('roomId').value;
+            const roomType = document.getElementById('roomType').value;
+
+            socket.emit('room:join', {
+                roomId,
+                roomType,
+                metadata: {}
+            }, (response) => {
+                log('Join room response: ' + JSON.stringify(response),
+                    response.success ? 'success' : 'error');
+            });
+        }
+
+        function leaveRoom() {
+            const roomId = document.getElementById('roomId').value;
+            socket.emit('room:leave', { roomId }, (response) => {
+                log('Leave room response: ' + JSON.stringify(response),
+                    response.success ? 'success' : 'error');
+            });
+        }
+
+        function getRoomParticipants() {
+            const roomId = document.getElementById('roomId').value;
+            socket.emit('room:participants', { roomId }, (response) => {
+                log('Room participants: ' + JSON.stringify(response), 'success');
+            });
+        }
+
+        function initiateCall() {
+            const recipientId = document.getElementById('callRecipientId').value;
+            const callType = document.getElementById('callType').value;
+
+            socket.emit('call:initiate', {
+                recipientId,
+                callType,
+                metadata: {}
+            }, (response) => {
+                log('Initiate call response: ' + JSON.stringify(response),
+                    response.success ? 'success' : 'error');
+                if (response.success) {
+                    document.getElementById('callId').value = response.callId;
+                }
+            });
+        }
+
+        function acceptCall() {
+            const callId = document.getElementById('callId').value;
+            socket.emit('call:accept', { callId }, (response) => {
+                log('Accept call response: ' + JSON.stringify(response),
+                    response.success ? 'success' : 'error');
+            });
+        }
+
+        function rejectCall() {
+            const callId = document.getElementById('callId').value;
+            socket.emit('call:reject', { callId, reason: 'User declined' }, (response) => {
+                log('Reject call response: ' + JSON.stringify(response),
+                    response.success ? 'success' : 'error');
+            });
+        }
+
+        function endCall() {
+            const callId = document.getElementById('callId').value;
+            socket.emit('call:end', { callId }, (response) => {
+                log('End call response: ' + JSON.stringify(response),
+                    response.success ? 'success' : 'error');
+            });
+        }
+
+        function getPresence() {
+            const userIds = document.getElementById('presenceUserIds').value.split(',').map(s => s.trim());
+            socket.emit('presence:get', { userIds }, (response) => {
+                log('Get presence response: ' + JSON.stringify(response), 'success');
+            });
+        }
+
+        function setStatus() {
+            const status = document.getElementById('presenceStatus').value;
+            socket.emit('presence:setStatus', { status, customStatus: '' });
+            log('Set status to: ' + status, 'info');
+        }
+
+        function subscribePresence() {
+            const userIds = document.getElementById('presenceUserIds').value.split(',').map(s => s.trim());
+            socket.emit('presence:subscribe', { userIds });
+            log('Subscribed to presence updates for: ' + userIds.join(', '), 'info');
+        }
+
+        function getUnreadCount() {
+            socket.emit('notification:getUnreadCount', (response) => {
+                log('Unread count: ' + JSON.stringify(response), 'success');
+            });
+        }
+
+        function markAsRead() {
+            const notificationId = document.getElementById('notificationId').value;
+            socket.emit('notification:read', { notificationId }, (response) => {
+                log('Mark as read response: ' + JSON.stringify(response),
+                    response.success ? 'success' : 'error');
+            });
+        }
+
+        function markAllAsRead() {
+            socket.emit('notification:readAll', (response) => {
+                log('Mark all as read response: ' + JSON.stringify(response), 'success');
+            });
+        }
+
+        function clearLogs() {
+            document.getElementById('logs').innerHTML = '';
+        }
+
+        // Initialize
+        updateStatus(false);
+        log('WebSocket client ready. Enter your JWT token and click Connect.', 'info');
+    </script>
+</body>
+</html>

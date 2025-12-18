@@ -1,0 +1,67 @@
+kubernetes/
+├── base/
+│   ├── services/
+│   │   ├── api-gateway/
+│   │   │   ├── deployment.yaml
+│   │   │   ├── service.yaml
+│   │   │   └── hpa.yaml
+│   │   ├── telehealth-service/
+│   │   │   ├── deployment.yaml
+│   │   │   ├── service.yaml
+│   │   │   └── hpa.yaml
+│   │   ├── mental-health-service/
+│   │   │   ├── deployment.yaml
+│   │   │   ├── service.yaml
+│   │   │   └── hpa.yaml
+│   │   ├── chronic-care-service/
+│   │   │   ├── deployment.yaml
+│   │   │   ├── service.yaml
+│   │   │   └── hpa.yaml
+│   │   ├── pharmacy-service/
+│   │   │   ├── deployment.yaml
+│   │   │   ├── service.yaml
+│   │   │   └── hpa.yaml
+│   │   ├── laboratory-service/
+│   │   │   ├── deployment.yaml
+│   │   │   ├── service.yaml
+│   │   │   └── hpa.yaml
+│   │   └── kustomization.yaml
+│   ├── shared/
+│   │   ├── configmap.yaml
+│   │   ├── secrets.yaml
+│   │   ├── networkpolicy.yaml
+│   │   └── poddisruptionbudget.yaml
+│   └── ingress/
+│       ├── ingress.yaml
+│       └── certificate.yaml
+├── overlays/
+│   ├── americas/
+│   │   ├── kustomization.yaml
+│   │   ├── namespace.yaml
+│   │   ├── configmap-patch.yaml
+│   │   └── patches/
+│   │       ├── replicas.yaml
+│   │       └── resources.yaml
+│   ├── europe/
+│   │   ├── kustomization.yaml
+│   │   ├── namespace.yaml
+│   │   ├── configmap-patch.yaml
+│   │   └── patches/
+│   │       ├── replicas.yaml
+│   │       └── resources.yaml
+│   └── africa/
+│       ├── kustomization.yaml
+│       ├── namespace.yaml
+│       ├── configmap-patch.yaml
+│       └── patches/
+│           ├── replicas.yaml
+│           └── resources.yaml
+├── deploy-regions.sh
+├── validate-manifests.sh
+├── KUSTOMIZE-README.md
+├── DEPLOYMENT-SUMMARY.md
+├── QUICK-REFERENCE.md
+├── MANIFEST-INDEX.md
+└── STRUCTURE.txt
+
+Total: 54 YAML files + 3 scripts + 5 docs = 62 files

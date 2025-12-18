@@ -37,11 +37,18 @@ export const config = {
 
   azure: {
     keyVaultUrl: process.env.AZURE_KEY_VAULT_URL,
+    storage: {
+      connectionString: process.env.AZURE_STORAGE_CONNECTION_STRING,
+      accountName: process.env.AZURE_STORAGE_ACCOUNT_NAME,
+      accountKey: process.env.AZURE_STORAGE_ACCOUNT_KEY,
+      containerName: process.env.AZURE_STORAGE_CONTAINER_NAME || 'healthcare-documents',
+    },
   },
 
   storage: {
     url: process.env.STORAGE_URL || 'https://storage.example.com',
     container: process.env.STORAGE_CONTAINER || 'documents',
+    maxFileSize: parseInt(process.env.MAX_FILE_SIZE || '104857600', 10), // 100MB
   },
 
   storageUrl: process.env.STORAGE_URL || 'https://storage.example.com',

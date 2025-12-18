@@ -1,0 +1,71 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: api-gateway-pdb
+  labels:
+    app: api-gateway
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: api-gateway
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: telehealth-service-pdb
+  labels:
+    app: telehealth-service
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: telehealth-service
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: mental-health-service-pdb
+  labels:
+    app: mental-health-service
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: mental-health-service
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: chronic-care-service-pdb
+  labels:
+    app: chronic-care-service
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: chronic-care-service
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: pharmacy-service-pdb
+  labels:
+    app: pharmacy-service
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: pharmacy-service
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: laboratory-service-pdb
+  labels:
+    app: laboratory-service
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: laboratory-service

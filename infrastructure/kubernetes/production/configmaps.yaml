@@ -1,0 +1,354 @@
+# API Gateway Code - v1.0.0
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-gateway-code
+  namespace: unified-health-prod
+  labels:
+    app: api-gateway
+    version: "1.0.0"
+data:
+  server.js: |
+    const http = require('http');
+    const PORT = process.env.PORT || 3000;
+
+    const services = {
+      telehealth: process.env.TELEHEALTH_SERVICE || 'http://telehealth-service',
+      mentalHealth: process.env.MENTAL_HEALTH_SERVICE || 'http://mental-health-service',
+      chronicCare: process.env.CHRONIC_CARE_SERVICE || 'http://chronic-care-service',
+      pharmacy: process.env.PHARMACY_SERVICE || 'http://pharmacy-service',
+      laboratory: process.env.LABORATORY_SERVICE || 'http://laboratory-service'
+    };
+
+    const routes = {
+      '/': { message: 'UnifiedHealth API Gateway', version: '1.0.0', status: 'running' },
+      '/health': { status: 'healthy', timestamp: new Date().toISOString(), gateway: 'active' },
+      '/ready': { ready: true },
+      '/api/v1/services': { services: Object.keys(services), count: 5 },
+      '/api/v1/gateway/status': {
+        gateway: 'operational',
+        version: '1.0.0',
+        uptime: process.uptime(),
+        services: services
+      }
+    };
+
+    const server = http.createServer((req, res) => {
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('X-Gateway-Version', '1.0.0');
+      res.setHeader('X-Request-Id', Date.now().toString(36));
+
+      const route = routes[req.url];
+      if (route) {
+        if (req.url === '/health') route.timestamp = new Date().toISOString();
+        res.writeHead(200);
+        res.end(JSON.stringify(route, null, 2));
+      } else if (req.url.startsWith('/api/')) {
+        res.writeHead(200);
+        res.end(JSON.stringify({
+          message: 'Route forwarded',
+          path: req.url,
+          gateway: 'api-gateway-v1.0.0'
+        }));
+      } else {
+        res.writeHead(404);
+        res.end(JSON.stringify({ error: 'Not found', path: req.url }));
+      }
+    });
+
+    server.listen(PORT, () => console.log(`API Gateway v1.0.0 running on port ${PORT}`));
+---
+# Telehealth Service Code - v1.0.0
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: telehealth-service-code
+  namespace: unified-health-prod
+  labels:
+    app: telehealth-service
+    version: "1.0.0"
+data:
+  server.js: |
+    const http = require('http');
+    const PORT = process.env.PORT || 3001;
+
+    const appointments = [
+      { id: 'APT001', patientId: 'P001', providerId: 'DR001', type: 'video', status: 'scheduled', datetime: '2025-12-20T10:00:00Z' },
+      { id: 'APT002', patientId: 'P002', providerId: 'DR002', type: 'audio', status: 'completed', datetime: '2025-12-18T14:00:00Z' },
+      { id: 'APT003', patientId: 'P003', providerId: 'DR001', type: 'chat', status: 'in_progress', datetime: '2025-12-18T16:00:00Z' }
+    ];
+
+    const visits = [
+      { id: 'V001', appointmentId: 'APT002', duration: 30, notes: 'Follow-up consultation', recording: false },
+      { id: 'V002', appointmentId: 'APT003', duration: 15, notes: 'Initial assessment', recording: true }
+    ];
+
+    const routes = {
+      '/': { service: 'Telehealth Service', version: '1.0.0', status: 'running' },
+      '/health': { status: 'healthy', service: 'telehealth', timestamp: new Date().toISOString() },
+      '/ready': { ready: true },
+      '/api/v1/telehealth/appointments': { appointments, total: appointments.length },
+      '/api/v1/telehealth/visits': { visits, total: visits.length },
+      '/api/v1/telehealth/stats': {
+        totalAppointments: appointments.length,
+        byType: { video: 1, audio: 1, chat: 1 },
+        byStatus: { scheduled: 1, completed: 1, in_progress: 1 }
+      }
+    };
+
+    const server = http.createServer((req, res) => {
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('X-Service', 'telehealth-v1.0.0');
+      const route = routes[req.url];
+      if (route) {
+        if (req.url === '/health') route.timestamp = new Date().toISOString();
+        res.writeHead(200);
+        res.end(JSON.stringify(route, null, 2));
+      } else {
+        res.writeHead(404);
+        res.end(JSON.stringify({ error: 'Not found' }));
+      }
+    });
+
+    server.listen(PORT, () => console.log(`Telehealth Service v1.0.0 running on port ${PORT}`));
+---
+# Mental Health Service Code - v1.0.0
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mental-health-service-code
+  namespace: unified-health-prod
+  labels:
+    app: mental-health-service
+    version: "1.0.0"
+data:
+  server.js: |
+    const http = require('http');
+    const PORT = process.env.PORT || 3002;
+
+    const therapySessions = [
+      { id: 'TS001', patientId: 'P001', therapistId: 'TH001', type: 'individual', duration: 50, status: 'completed' },
+      { id: 'TS002', patientId: 'P002', therapistId: 'TH002', type: 'group', duration: 90, status: 'scheduled' },
+      { id: 'TS003', patientId: 'P003', therapistId: 'TH001', type: 'couples', duration: 60, status: 'in_progress' }
+    ];
+
+    const assessments = [
+      { id: 'AS001', patientId: 'P001', type: 'PHQ-9', score: 8, severity: 'mild', date: '2025-12-15' },
+      { id: 'AS002', patientId: 'P002', type: 'GAD-7', score: 12, severity: 'moderate', date: '2025-12-16' },
+      { id: 'AS003', patientId: 'P003', type: 'PHQ-9', score: 5, severity: 'minimal', date: '2025-12-17' }
+    ];
+
+    const crisisSupport = {
+      hotline: '1-800-273-8255',
+      available: '24/7',
+      resources: ['Crisis Text Line: Text HOME to 741741', 'SAMHSA: 1-800-662-4357']
+    };
+
+    const routes = {
+      '/': { service: 'Mental Health Service', version: '1.0.0', status: 'running' },
+      '/health': { status: 'healthy', service: 'mental-health', timestamp: new Date().toISOString() },
+      '/ready': { ready: true },
+      '/api/v1/mental-health/sessions': { sessions: therapySessions, total: therapySessions.length },
+      '/api/v1/mental-health/assessments': { assessments, total: assessments.length },
+      '/api/v1/mental-health/crisis': crisisSupport,
+      '/api/v1/mental-health/stats': {
+        totalSessions: therapySessions.length,
+        byType: { individual: 1, group: 1, couples: 1 },
+        assessmentsTaken: assessments.length
+      }
+    };
+
+    const server = http.createServer((req, res) => {
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('X-Service', 'mental-health-v1.0.0');
+      const route = routes[req.url];
+      if (route) {
+        if (req.url === '/health') route.timestamp = new Date().toISOString();
+        res.writeHead(200);
+        res.end(JSON.stringify(route, null, 2));
+      } else {
+        res.writeHead(404);
+        res.end(JSON.stringify({ error: 'Not found' }));
+      }
+    });
+
+    server.listen(PORT, () => console.log(`Mental Health Service v1.0.0 running on port ${PORT}`));
+---
+# Chronic Care Service Code - v1.0.0
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: chronic-care-service-code
+  namespace: unified-health-prod
+  labels:
+    app: chronic-care-service
+    version: "1.0.0"
+data:
+  server.js: |
+    const http = require('http');
+    const PORT = process.env.PORT || 3003;
+
+    const carePlans = [
+      { id: 'CP001', patientId: 'P001', condition: 'Type 2 Diabetes', goals: ['HbA1c < 7%', 'Daily glucose monitoring'], status: 'active' },
+      { id: 'CP002', patientId: 'P002', condition: 'Hypertension', goals: ['BP < 130/80', 'Daily medication adherence'], status: 'active' },
+      { id: 'CP003', patientId: 'P003', condition: 'COPD', goals: ['Peak flow > 80%', 'Smoking cessation'], status: 'review' }
+    ];
+
+    const deviceReadings = [
+      { id: 'DR001', patientId: 'P001', device: 'Glucose Monitor', value: 120, unit: 'mg/dL', timestamp: '2025-12-18T08:00:00Z' },
+      { id: 'DR002', patientId: 'P002', device: 'BP Monitor', value: '128/82', unit: 'mmHg', timestamp: '2025-12-18T09:00:00Z' },
+      { id: 'DR003', patientId: 'P003', device: 'Pulse Oximeter', value: 96, unit: '%', timestamp: '2025-12-18T10:00:00Z' }
+    ];
+
+    const alerts = [
+      { id: 'AL001', patientId: 'P001', type: 'high_glucose', severity: 'warning', message: 'Glucose reading above target', resolved: false }
+    ];
+
+    const routes = {
+      '/': { service: 'Chronic Care Service', version: '1.0.0', status: 'running' },
+      '/health': { status: 'healthy', service: 'chronic-care', timestamp: new Date().toISOString() },
+      '/ready': { ready: true },
+      '/api/v1/chronic-care/plans': { plans: carePlans, total: carePlans.length },
+      '/api/v1/chronic-care/readings': { readings: deviceReadings, total: deviceReadings.length },
+      '/api/v1/chronic-care/alerts': { alerts, activeAlerts: alerts.filter(a => !a.resolved).length },
+      '/api/v1/chronic-care/stats': {
+        activePatients: 3,
+        activePlans: carePlans.filter(p => p.status === 'active').length,
+        devicesConnected: 3,
+        unresovledAlerts: 1
+      }
+    };
+
+    const server = http.createServer((req, res) => {
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('X-Service', 'chronic-care-v1.0.0');
+      const route = routes[req.url];
+      if (route) {
+        if (req.url === '/health') route.timestamp = new Date().toISOString();
+        res.writeHead(200);
+        res.end(JSON.stringify(route, null, 2));
+      } else {
+        res.writeHead(404);
+        res.end(JSON.stringify({ error: 'Not found' }));
+      }
+    });
+
+    server.listen(PORT, () => console.log(`Chronic Care Service v1.0.0 running on port ${PORT}`));
+---
+# Pharmacy Service Code - v1.0.0
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pharmacy-service-code
+  namespace: unified-health-prod
+  labels:
+    app: pharmacy-service
+    version: "1.0.0"
+data:
+  server.js: |
+    const http = require('http');
+    const PORT = process.env.PORT || 3004;
+
+    const prescriptions = [
+      { id: 'RX001', patientId: 'P001', medication: 'Metformin 500mg', quantity: 60, refills: 3, status: 'filled', pharmacy: 'CVS' },
+      { id: 'RX002', patientId: 'P002', medication: 'Lisinopril 10mg', quantity: 30, refills: 5, status: 'pending', pharmacy: 'Walgreens' },
+      { id: 'RX003', patientId: 'P003', medication: 'Albuterol Inhaler', quantity: 1, refills: 2, status: 'dispensed', pharmacy: 'CVS' }
+    ];
+
+    const pharmacies = [
+      { id: 'PH001', name: 'CVS Pharmacy', address: '123 Main St', phone: '555-0101', hours: '8am-10pm' },
+      { id: 'PH002', name: 'Walgreens', address: '456 Oak Ave', phone: '555-0102', hours: '24/7' },
+      { id: 'PH003', name: 'Rite Aid', address: '789 Elm Rd', phone: '555-0103', hours: '9am-9pm' }
+    ];
+
+    const routes = {
+      '/': { service: 'Pharmacy Service', version: '1.0.0', status: 'running' },
+      '/health': { status: 'healthy', service: 'pharmacy', timestamp: new Date().toISOString() },
+      '/ready': { ready: true },
+      '/api/v1/pharmacy/prescriptions': { prescriptions, total: prescriptions.length },
+      '/api/v1/pharmacy/pharmacies': { pharmacies, total: pharmacies.length },
+      '/api/v1/pharmacy/stats': {
+        totalPrescriptions: prescriptions.length,
+        byStatus: { filled: 1, pending: 1, dispensed: 1 },
+        partnerPharmacies: pharmacies.length
+      }
+    };
+
+    const server = http.createServer((req, res) => {
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('X-Service', 'pharmacy-v1.0.0');
+      const route = routes[req.url];
+      if (route) {
+        if (req.url === '/health') route.timestamp = new Date().toISOString();
+        res.writeHead(200);
+        res.end(JSON.stringify(route, null, 2));
+      } else {
+        res.writeHead(404);
+        res.end(JSON.stringify({ error: 'Not found' }));
+      }
+    });
+
+    server.listen(PORT, () => console.log(`Pharmacy Service v1.0.0 running on port ${PORT}`));
+---
+# Laboratory Service Code - v1.0.0
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: laboratory-service-code
+  namespace: unified-health-prod
+  labels:
+    app: laboratory-service
+    version: "1.0.0"
+data:
+  server.js: |
+    const http = require('http');
+    const PORT = process.env.PORT || 3005;
+
+    const labOrders = [
+      { id: 'LO001', patientId: 'P001', tests: ['CBC', 'HbA1c', 'Lipid Panel'], status: 'completed', orderedDate: '2025-12-15' },
+      { id: 'LO002', patientId: 'P002', tests: ['BMP', 'TSH'], status: 'processing', orderedDate: '2025-12-17' },
+      { id: 'LO003', patientId: 'P003', tests: ['Chest X-Ray', 'Spirometry'], status: 'pending', orderedDate: '2025-12-18' }
+    ];
+
+    const labResults = [
+      { id: 'LR001', orderId: 'LO001', test: 'HbA1c', value: '6.8', unit: '%', referenceRange: '4.0-5.6', isAbnormal: true },
+      { id: 'LR002', orderId: 'LO001', test: 'CBC - WBC', value: '7.5', unit: 'K/uL', referenceRange: '4.5-11.0', isAbnormal: false },
+      { id: 'LR003', orderId: 'LO001', test: 'Total Cholesterol', value: '195', unit: 'mg/dL', referenceRange: '<200', isAbnormal: false }
+    ];
+
+    const testCatalog = [
+      { code: 'CBC', name: 'Complete Blood Count', category: 'Hematology', price: 25 },
+      { code: 'BMP', name: 'Basic Metabolic Panel', category: 'Chemistry', price: 35 },
+      { code: 'HbA1c', name: 'Hemoglobin A1c', category: 'Diabetes', price: 45 },
+      { code: 'TSH', name: 'Thyroid Stimulating Hormone', category: 'Endocrine', price: 40 }
+    ];
+
+    const routes = {
+      '/': { service: 'Laboratory Service', version: '1.0.0', status: 'running' },
+      '/health': { status: 'healthy', service: 'laboratory', timestamp: new Date().toISOString() },
+      '/ready': { ready: true },
+      '/api/v1/laboratory/orders': { orders: labOrders, total: labOrders.length },
+      '/api/v1/laboratory/results': { results: labResults, total: labResults.length },
+      '/api/v1/laboratory/catalog': { tests: testCatalog, total: testCatalog.length },
+      '/api/v1/laboratory/stats': {
+        totalOrders: labOrders.length,
+        byStatus: { completed: 1, processing: 1, pending: 1 },
+        abnormalResults: labResults.filter(r => r.isAbnormal).length
+      }
+    };
+
+    const server = http.createServer((req, res) => {
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('X-Service', 'laboratory-v1.0.0');
+      const route = routes[req.url];
+      if (route) {
+        if (req.url === '/health') route.timestamp = new Date().toISOString();
+        res.writeHead(200);
+        res.end(JSON.stringify(route, null, 2));
+      } else {
+        res.writeHead(404);
+        res.end(JSON.stringify({ error: 'Not found' }));
+      }
+    });
+
+    server.listen(PORT, () => console.log(`Laboratory Service v1.0.0 running on port ${PORT}`));

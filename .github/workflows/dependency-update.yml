@@ -2,14 +2,22 @@
 # UnifiedHealth Platform - Dependency Updates
 # Automated dependency updates and security patches
 # ============================================
+# WORKFLOW LOCKED - v1.0.0 deployed to production
+# Schedule disabled to prevent automatic dependency updates
+# ============================================
 
 name: Dependency Updates
 
 on:
-  schedule:
-    # Run weekly on Monday at 9 AM UTC
-    - cron: '0 9 * * 1'
   workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "UPDATE" to confirm manual trigger'
+        required: true
+        type: string
+# DISABLED SCHEDULE - Uncomment to re-enable:
+#  schedule:
+#    - cron: '0 9 * * 1'
 
 env:
   NODE_VERSION: '20'
