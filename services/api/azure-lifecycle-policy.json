@@ -1,0 +1,84 @@
+{
+  "rules": [
+    {
+      "enabled": true,
+      "name": "moveToArchiveAfter90Days",
+      "type": "Lifecycle",
+      "definition": {
+        "filters": {
+          "blobTypes": ["blockBlob"],
+          "prefixMatch": ["healthcare-documents/"]
+        },
+        "actions": {
+          "baseBlob": {
+            "tierToCool": {
+              "daysAfterModificationGreaterThan": 90
+            },
+            "tierToArchive": {
+              "daysAfterModificationGreaterThan": 180
+            }
+          }
+        }
+      }
+    },
+    {
+      "enabled": true,
+      "name": "hipaaRetentionPolicy",
+      "type": "Lifecycle",
+      "definition": {
+        "filters": {
+          "blobTypes": ["blockBlob"],
+          "prefixMatch": ["healthcare-documents/"]
+        },
+        "actions": {
+          "baseBlob": {
+            "delete": {
+              "daysAfterModificationGreaterThan": 2555
+            }
+          },
+          "snapshot": {
+            "delete": {
+              "daysAfterCreationGreaterThan": 90
+            }
+          }
+        }
+      }
+    },
+    {
+      "enabled": true,
+      "name": "cleanupQuarantineAfter90Days",
+      "type": "Lifecycle",
+      "definition": {
+        "filters": {
+          "blobTypes": ["blockBlob"],
+          "prefixMatch": ["healthcare-documents-quarantine/"]
+        },
+        "actions": {
+          "baseBlob": {
+            "delete": {
+              "daysAfterModificationGreaterThan": 90
+            }
+          }
+        }
+      }
+    },
+    {
+      "enabled": true,
+      "name": "deleteThumbnailsWithOriginal",
+      "type": "Lifecycle",
+      "definition": {
+        "filters": {
+          "blobTypes": ["blockBlob"],
+          "prefixMatch": ["healthcare-documents/"]
+        },
+        "actions": {
+          "baseBlob": {
+            "delete": {
+              "daysAfterModificationGreaterThan": 2555
+            }
+          }
+        }
+      }
+    }
+  ]
+}

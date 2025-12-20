@@ -1,0 +1,257 @@
+// Imaging Service Database Schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ImagingOrder {
+  id                String    @id @default(uuid())
+  patientId         String
+  providerId        String
+  facilityId        String
+  orderNumber       String    @unique
+  priority          Priority  @default(ROUTINE)
+  modality          Modality
+  bodyPart          String
+  clinicalIndication String
+  instructions      String?
+  urgency           String?
+  transportRequired Boolean   @default(false)
+  contrastAllergy   Boolean   @default(false)
+  contrastNotes     String?
+  status            OrderStatus @default(PENDING)
+  scheduledAt       DateTime?
+  requestedBy       String
+  requestedAt       DateTime  @default(now())
+
+  studies           Study[]
+
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([patientId])
+  @@index([providerId])
+  @@index([facilityId])
+  @@index([status])
+  @@index([scheduledAt])
+}
+
+model Study {
+  id                String       @id @default(uuid())
+  orderId           String
+  order             ImagingOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  accessionNumber   String       @unique
+  studyInstanceUID  String       @unique
+  studyDate         DateTime
+  studyTime         String?
+  studyDescription  String
+  modality          Modality
+  bodyPart          String
+  numberOfSeries    Int          @default(0)
+  numberOfInstances Int          @default(0)
+
+  patientId         String
+  patientName       String
+  patientDOB        DateTime?
+  patientSex        String?
+
+  performingPhysician String?
+  operatorName      String?
+  institutionName   String?
+  stationName       String?
+
+  status            StudyStatus  @default(SCHEDULED)
+  priority          Priority     @default(ROUTINE)
+
+  images            Image[]
+  reports           RadiologyReport[]
+  criticalFindings  CriticalFinding[]
+
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  @@index([orderId])
+  @@index([patientId])
+  @@index([studyDate])
+  @@index([modality])
+  @@index([status])
+}
+
+model Image {
+  id                  String   @id @default(uuid())
+  studyId             String
+  study               Study    @relation(fields: [studyId], references: [id], onDelete: Cascade)
+
+  seriesInstanceUID   String
+  sopInstanceUID      String   @unique
+  instanceNumber      Int
+  seriesNumber        Int
+  seriesDescription   String?
+
+  imageType           String?
+  photometricInterpretation String?
+  rows                Int?
+  columns             Int?
+  bitsAllocated       Int?
+  bitsStored          Int?
+  pixelSpacing        String?
+  sliceThickness      Float?
+  sliceLocation       Float?
+  imagePosition       String?
+  imageOrientation    String?
+
+  acquisitionDate     DateTime?
+  acquisitionTime     String?
+  contentDate         DateTime?
+  contentTime         String?
+
+  windowCenter        String?
+  windowWidth         String?
+
+  storageUrl          String
+  thumbnailUrl        String?
+  fileSize            BigInt
+  transferSyntaxUID   String?
+
+  metadata            Json?
+
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@index([studyId])
+  @@index([seriesInstanceUID])
+}
+
+model RadiologyReport {
+  id                String       @id @default(uuid())
+  studyId           String
+  study             Study        @relation(fields: [studyId], references: [id], onDelete: Cascade)
+
+  reportNumber      String       @unique
+  radiologistId     String
+  radiologistName   String
+
+  status            ReportStatus @default(PRELIMINARY)
+
+  clinicalHistory   String?
+  technique         String?
+  comparison        String?
+  findings          String
+  impression        String
+  recommendations   String?
+
+  preliminaryDate   DateTime?
+  finalizedDate     DateTime?
+  amendedDate       DateTime?
+  amendmentReason   String?
+
+  signedBy          String?
+  signedAt          DateTime?
+
+  transcribedBy     String?
+  transcribedAt     DateTime?
+
+  template          String?
+  macros            Json?
+
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  @@index([studyId])
+  @@index([radiologistId])
+  @@index([status])
+}
+
+model CriticalFinding {
+  id                String         @id @default(uuid())
+  studyId           String
+  study             Study          @relation(fields: [studyId], references: [id], onDelete: Cascade)
+
+  reportId          String?
+
+  finding           String
+  severity          Severity
+  category          String
+  bodyPart          String?
+
+  reportedBy        String
+  reportedAt        DateTime       @default(now())
+
+  notifiedTo        String[]
+  notificationSent  Boolean        @default(false)
+  acknowledgedBy    String?
+  acknowledgedAt    DateTime?
+
+  followUpRequired  Boolean        @default(true)
+  followUpAction    String?
+  followUpStatus    String?
+
+  notes             String?
+
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  @@index([studyId])
+  @@index([severity])
+  @@index([notificationSent])
+}
+
+enum Priority {
+  STAT
+  URGENT
+  ROUTINE
+}
+
+enum Modality {
+  CR          // Computed Radiography
+  CT          // Computed Tomography
+  MR          // Magnetic Resonance
+  US          // Ultrasound
+  XA          // X-Ray Angiography
+  DX          // Digital Radiography
+  MG          // Mammography
+  NM          // Nuclear Medicine
+  PT          // Positron Emission Tomography
+  PET_CT      // PET-CT
+  RF          // Radiofluoroscopy
+  OT          // Other
+}
+
+enum OrderStatus {
+  PENDING
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  ON_HOLD
+}
+
+enum StudyStatus {
+  SCHEDULED
+  ARRIVED
+  IN_PROGRESS
+  COMPLETED
+  PRELIMINARY
+  FINAL
+  CANCELLED
+}
+
+enum ReportStatus {
+  PRELIMINARY
+  FINAL
+  AMENDED
+  CORRECTED
+}
+
+enum Severity {
+  CRITICAL
+  HIGH
+  MODERATE
+  LOW
+}
