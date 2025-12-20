@@ -21,7 +21,7 @@
   "author": "Global Healthcare Platform",
   "license": "MIT",
   "dependencies": {
-    "@global-health/country-config": "^1.0.0"
+    "@global-health/country-config": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
