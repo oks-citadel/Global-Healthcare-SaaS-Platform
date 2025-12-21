@@ -17,7 +17,7 @@ COPY package.json package-lock.json* ./
 COPY prisma ./prisma/
 
 # Install all dependencies (needed for build)
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 
 # ============================================
 # Stage 2: Builder
