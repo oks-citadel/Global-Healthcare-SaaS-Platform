@@ -12,7 +12,6 @@ import { connectDatabase, disconnectDatabase, checkDatabaseHealth } from './lib/
 import { setupSwagger } from './docs/swagger.js';
 import { initializeWebSocket, shutdownWebSocket } from './lib/websocket.js';
 import { isDemoMode, demoCredentials } from './lib/demo-store.js';
-import { config } from './config/index.js';
 
 const app = express();
 const httpServer = createServer(app);
