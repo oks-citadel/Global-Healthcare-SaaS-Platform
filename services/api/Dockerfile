@@ -45,7 +45,7 @@ RUN npm run db:generate
 RUN npm run build
 
 # Remove dev dependencies
-RUN npm prune --production
+RUN npm prune --production --legacy-peer-deps
 
 # ============================================
 # Stage 3: Production Runtime
