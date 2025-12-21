@@ -73,7 +73,6 @@ temp
 .editorconfig
 .eslintrc*
 .prettierrc*
-tsconfig.json
 
 # Other
 .husky
