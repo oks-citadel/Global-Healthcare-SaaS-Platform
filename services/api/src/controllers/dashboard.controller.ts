@@ -14,7 +14,7 @@ export const dashboardController = {
     try {
       const userId = req.user?.userId;
 
-      logger.info({ userId }, 'Fetching dashboard stats');
+      logger.info('Fetching dashboard stats', { userId });
 
       // Return demo stats
       const stats = {

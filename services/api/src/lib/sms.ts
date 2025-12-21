@@ -115,10 +115,10 @@ export async function sendSms(options: SmsOptions): Promise<SmsResponse> {
 
     // If Twilio is not configured, log and return stub response
     if (!twilioClient || !TWILIO_PHONE_NUMBER) {
-      logger.info({
+      logger.info('SMS stub - Twilio not configured', {
         to: phoneNumber,
         messageLength: options.message.length,
-      }, 'SMS stub - Twilio not configured');
+      });
 
       return {
         success: true,
@@ -134,11 +134,11 @@ export async function sendSms(options: SmsOptions): Promise<SmsResponse> {
       to: phoneNumber,
     });
 
-    logger.info({
+    logger.info('SMS sent successfully', {
       to: phoneNumber,
       messageId: message.sid,
       status: message.status,
-    }, 'SMS sent successfully');
+    });
 
     return {
       success: true,
@@ -146,10 +146,10 @@ export async function sendSms(options: SmsOptions): Promise<SmsResponse> {
       status: message.status,
     };
   } catch (error) {
-    logger.error({
+    logger.error('Failed to send SMS', {
       error: error instanceof Error ? error.message : 'Unknown error',
       to: options.to,
-    }, 'Failed to send SMS');
+    });
 
     return {
       success: false,
@@ -169,10 +169,10 @@ export async function sendBatchSms(
   recipients: string[],
   message: string
 ): Promise<SmsResponse[]> {
-  logger.info({
+  logger.info('Sending batch SMS messages', {
     recipientCount: recipients.length,
     messageLength: message.length,
-  }, 'Sending batch SMS messages');
+  });
 
   const promises = recipients.map(to =>
     sendSms({ to, message })
@@ -224,10 +224,10 @@ export async function getSmsStatus(messageId: string): Promise<{
       errorMessage: message.errorMessage || undefined,
     };
   } catch (error) {
-    logger.error({
+    logger.error('Failed to get SMS status', {
       error: error instanceof Error ? error.message : 'Unknown error',
       messageId,
-    }, 'Failed to get SMS status');
+    });
 
     return {
       status: 'unknown',

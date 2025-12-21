@@ -118,7 +118,7 @@ class IntegrationTestRunner {
 
       return {
         customerId: customer.id,
-        email: customer.email,
+        email: (customer as any).email,
       };
     });
 

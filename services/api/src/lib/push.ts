@@ -223,7 +223,7 @@ class PushNotificationService {
         };
       }
 
-      logger.info({ token: token.substring(0, 20) + '...', platform, title: payload.title }, 'Sending push notification');
+      logger.info('Sending push notification', { token: token.substring(0, 20) + '...', platform, title: payload.title });
 
       switch (platform) {
         case 'android':
@@ -257,7 +257,7 @@ class PushNotificationService {
     payload: PushPayload
   ): Promise<BatchPushResult> {
     try {
-      logger.info({ count: tokens.length, title: payload.title }, 'Sending batch push notifications');
+      logger.info('Sending batch push notifications', { count: tokens.length, title: payload.title });
 
       // Group tokens by platform for optimized batch sending
       const tokensByPlatform = tokens.reduce((acc, { token, platform }) => {
@@ -306,7 +306,7 @@ class PushNotificationService {
       const successCount = allResults.filter(r => r.success).length;
       const failureCount = allResults.filter(r => !r.success).length;
 
-      logger.info({ successCount, failureCount, total: tokens.length }, 'Batch push notifications completed');
+      logger.info('Batch push notifications completed', { successCount, failureCount, total: tokens.length });
 
       return {
         successCount,

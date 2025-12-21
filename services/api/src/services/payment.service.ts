@@ -154,8 +154,8 @@ export class PaymentService {
             subscription.status === 'active' || subscription.status === 'trialing'
               ? 'active'
               : 'past_due',
-          currentPeriodStart: new Date(subscription.current_period_start * 1000),
-          currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+          currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
+          currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
           cancelAtPeriodEnd: subscription.cancel_at_period_end,
         },
       });
@@ -545,8 +545,8 @@ export class PaymentService {
         },
         update: {
           status,
-          currentPeriodStart: new Date(subscription.current_period_start * 1000),
-          currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+          currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
+          currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
           cancelAtPeriodEnd: subscription.cancel_at_period_end,
           updatedAt: new Date(),
         },
@@ -555,8 +555,8 @@ export class PaymentService {
           planId: subscription.items.data[0].price.id,
           stripeSubscriptionId: subscription.id,
           status,
-          currentPeriodStart: new Date(subscription.current_period_start * 1000),
-          currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+          currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
+          currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
           cancelAtPeriodEnd: subscription.cancel_at_period_end,
         },
       });
@@ -617,10 +617,10 @@ export class PaymentService {
       logger.warn(`Invoice ${invoice.id} payment failed`);
       // You can add custom logic here, such as sending payment failure notifications
 
-      if (invoice.subscription) {
-        const subscriptionId = typeof invoice.subscription === 'string'
-          ? invoice.subscription
-          : invoice.subscription.id;
+      if ((invoice as any).subscription) {
+        const subscriptionId = typeof (invoice as any).subscription === 'string'
+          ? (invoice as any).subscription
+          : (invoice as any).subscription.id;
 
         await prisma.subscription.updateMany({
           where: {

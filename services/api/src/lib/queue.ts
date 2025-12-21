@@ -111,11 +111,11 @@ export class NotificationQueues {
   private setupProcessors() {
     // Email processor
     this.emailQueue.process(async (job: Job<EmailJobData>) => {
-      logger.info({
+      logger.info('Processing email job', {
         jobId: job.id,
         to: job.data.to,
         subject: job.data.subject,
-      }, 'Processing email job');
+      });
 
       const result = await sendEmail(job.data);
 
@@ -128,10 +128,10 @@ export class NotificationQueues {
 
     // SMS processor
     this.smsQueue.process(async (job: Job<SmsJobData>) => {
-      logger.info({
+      logger.info('Processing SMS job', {
         jobId: job.id,
         to: job.data.to,
-      }, 'Processing SMS job');
+      });
 
       const result = await sendSms(job.data);
 
@@ -144,10 +144,10 @@ export class NotificationQueues {
 
     // Scheduled notifications processor
     this.scheduledQueue.process(async (job: Job) => {
-      logger.info({
+      logger.info('Processing scheduled notification job', {
         jobId: job.id,
         type: job.data.type,
-      }, 'Processing scheduled notification job');
+      });
 
       // Process based on notification type
       if (job.data.type === 'email') {
@@ -166,53 +166,53 @@ export class NotificationQueues {
   private setupEventListeners() {
     // Email queue events
     this.emailQueue.on('completed', (job, result) => {
-      logger.info({
+      logger.info('Email job completed', {
         jobId: job.id,
         to: job.data.to,
         messageId: result.messageId,
-      }, 'Email job completed');
+      });
     });
 
     this.emailQueue.on('failed', (job, err) => {
-      logger.error({
+      logger.error('Email job failed', {
         jobId: job?.id,
         to: job?.data.to,
         error: err.message,
         attempts: job?.attemptsMade,
-      }, 'Email job failed');
+      });
     });
 
     // SMS queue events
     this.smsQueue.on('completed', (job, result) => {
-      logger.info({
+      logger.info('SMS job completed', {
         jobId: job.id,
         to: job.data.to,
         messageId: result.messageId,
-      }, 'SMS job completed');
+      });
     });
 
     this.smsQueue.on('failed', (job, err) => {
-      logger.error({
+      logger.error('SMS job failed', {
         jobId: job?.id,
         to: job?.data.to,
         error: err.message,
         attempts: job?.attemptsMade,
-      }, 'SMS job failed');
+      });
     });
 
     // Scheduled queue events
     this.scheduledQueue.on('completed', (job) => {
-      logger.info({
+      logger.info('Scheduled notification job completed', {
         jobId: job.id,
         type: job.data.type,
-      }, 'Scheduled notification job completed');
+      });
     });
 
     this.scheduledQueue.on('failed', (job, err) => {
-      logger.error({
+      logger.error('Scheduled notification job failed', {
         jobId: job?.id,
         error: err.message,
-      }, 'Scheduled notification job failed');
+      });
     });
   }
 
@@ -227,10 +227,10 @@ export class NotificationQueues {
     data: EmailJobData,
     options?: JobOptions
   ): Promise<Job<EmailJobData>> {
-    logger.info({
+    logger.info('Adding email job to queue', {
       to: data.to,
       subject: data.subject,
-    }, 'Adding email job to queue');
+    });
 
     return this.emailQueue.add(data, options);
   }
@@ -246,9 +246,9 @@ export class NotificationQueues {
     data: SmsJobData,
     options?: JobOptions
   ): Promise<Job<SmsJobData>> {
-    logger.info({
+    logger.info('Adding SMS job to queue', {
       to: data.to,
-    }, 'Adding SMS job to queue');
+    });
 
     return this.smsQueue.add(data, options);
   }
@@ -264,11 +264,11 @@ export class NotificationQueues {
     data: EmailJobData,
     delay: number
   ): Promise<Job<any>> {
-    logger.info({
+    logger.info('Scheduling email notification', {
       to: data.to,
       subject: data.subject,
       delay,
-    }, 'Scheduling email notification');
+    });
 
     return this.scheduledQueue.add(
       {
@@ -290,10 +290,10 @@ export class NotificationQueues {
     data: SmsJobData,
     delay: number
   ): Promise<Job<any>> {
-    logger.info({
+    logger.info('Scheduling SMS notification', {
       to: data.to,
       delay,
-    }, 'Scheduling SMS notification');
+    });
 
     return this.scheduledQueue.add(
       {

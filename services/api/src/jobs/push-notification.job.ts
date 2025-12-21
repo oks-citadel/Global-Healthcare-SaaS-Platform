@@ -146,11 +146,11 @@ export async function sendAppointmentReminders() {
       }
     }
 
-    logger.info({
+    logger.info('Appointment reminder job completed', {
       sent24Hr,
       sent1Hr,
       total: sent24Hr + sent1Hr,
-    }, 'Appointment reminder job completed');
+    });
 
     return { sent24Hr, sent1Hr, total: sent24Hr + sent1Hr };
   } catch (error) {
@@ -171,7 +171,7 @@ export async function cleanupOldNotifications() {
     // Delete read notifications older than 90 days
     const deletedCount = await pushService.deleteOldNotifications(90);
 
-    logger.info({ deletedCount }, 'Notification cleanup job completed');
+    logger.info('Notification cleanup job completed', { deletedCount });
 
     return { deletedCount };
   } catch (error) {
@@ -205,7 +205,7 @@ export async function deactivateStaleTokens() {
       },
     });
 
-    logger.info({ deactivatedCount: result.count }, 'Stale token deactivation completed');
+    logger.info('Stale token deactivation completed', { deactivatedCount: result.count });
 
     return { deactivatedCount: result.count };
   } catch (error) {
@@ -263,11 +263,11 @@ export async function retryFailedNotifications() {
       }
     }
 
-    logger.info({
+    logger.info('Failed notification retry job completed', {
       retriedCount,
       successCount,
       failedCount: retriedCount - successCount,
-    }, 'Failed notification retry job completed');
+    });
 
     return { retriedCount, successCount, failedCount: retriedCount - successCount };
   } catch (error) {
@@ -332,11 +332,11 @@ export async function sendScheduledNotifications() {
       }
     }
 
-    logger.info({
+    logger.info('Scheduled notification job completed', {
       sentCount,
       skippedCount,
       total: pendingNotifications.length,
-    }, 'Scheduled notification job completed');
+    });
 
     return { sentCount, skippedCount, total: pendingNotifications.length };
   } catch (error) {

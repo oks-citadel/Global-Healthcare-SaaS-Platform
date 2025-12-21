@@ -36,7 +36,7 @@ export const subscriptionService = {
       },
     });
 
-    logger.info({ subscriptionId: subscription.id, userId, planId: input.planId }, 'Subscription created');
+    logger.info('Subscription created', { subscriptionId: subscription.id, userId, planId: input.planId });
 
     return {
       id: subscription.id,
@@ -72,7 +72,7 @@ export const subscriptionService = {
       data: { cancelAtPeriodEnd: true },
     });
 
-    logger.info({ subscriptionId: id, userId }, 'Subscription cancelled');
+    logger.info('Subscription cancelled', { subscriptionId: id, userId });
   },
 
   /**
@@ -80,7 +80,7 @@ export const subscriptionService = {
    */
   async handleWebhook(payload: any, signature: string): Promise<void> {
     // In production, verify Stripe signature and process events
-    logger.info({ eventType: payload.type }, 'Received billing webhook');
+    logger.info('Received billing webhook', { eventType: payload.type });
 
     // Handle different event types
     switch (payload.type) {
@@ -94,7 +94,7 @@ export const subscriptionService = {
         // Handle subscription cancellation
         break;
       default:
-        logger.debug({ eventType: payload.type }, 'Unhandled webhook event');
+        logger.debug('Unhandled webhook event', { eventType: payload.type });
     }
   },
 };

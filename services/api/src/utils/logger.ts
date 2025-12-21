@@ -48,7 +48,7 @@ const developmentFormat = winston.format.combine(
     }
 
     if (traceId) {
-      log += ` [trace:${traceId.substring(0, 8)}]`;
+      log += ` [trace:${String(traceId).substring(0, 8)}]`;
     }
 
     log += `: ${message}`;

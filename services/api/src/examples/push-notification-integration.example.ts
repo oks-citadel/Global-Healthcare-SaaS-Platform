@@ -47,7 +47,7 @@ export async function sendAppointmentConfirmation(
       },
     });
 
-    logger.info({ userId, appointmentId: appointmentData.id }, 'Appointment confirmation sent');
+    logger.info('Appointment confirmation sent', { userId, appointmentId: appointmentData.id });
   } catch (error) {
     logger.error('Failed to send appointment confirmation', { error, userId });
     // Don't throw - notification failure shouldn't break appointment creation
@@ -106,7 +106,7 @@ export async function sendAppointmentReminders() {
       });
     }
 
-    logger.info({ count: upcomingAppointments.length }, 'Appointment reminders sent');
+    logger.info('Appointment reminders sent', { count: upcomingAppointments.length });
   } catch (error) {
     logger.error('Failed to send appointment reminders', { error });
   }
@@ -345,7 +345,7 @@ export async function notifySystemMaintenance(
       },
     });
 
-    logger.info({ userCount: userIds.length }, 'System maintenance notifications sent');
+    logger.info('System maintenance notifications sent', { userCount: userIds.length });
   } catch (error) {
     logger.error('Failed to send maintenance notifications', { error });
   }
@@ -371,14 +371,14 @@ export async function sendConditionalNotification(
 
     // Check if push is enabled
     if (!preferences.pushEnabled) {
-      logger.info({ userId }, 'Push notifications disabled for user');
+      logger.info('Push notifications disabled for user', { userId });
       return;
     }
 
     // Check type-specific preferences
     const typeEnabled = checkNotificationTypeEnabled(preferences, notification.type);
     if (!typeEnabled) {
-      logger.info({ userId, type: notification.type }, 'Notification type disabled for user');
+      logger.info('Notification type disabled for user', { userId, type: notification.type });
       return;
     }
 

@@ -288,17 +288,17 @@ export class StripeWebhookService {
     }
 
     // Update subscription if this payment is for a subscription
-    if (paymentIntent.invoice) {
-      const invoiceId = typeof paymentIntent.invoice === 'string'
-        ? paymentIntent.invoice
-        : paymentIntent.invoice.id;
+    if ((paymentIntent as any).invoice) {
+      const invoiceId = typeof (paymentIntent as any).invoice === 'string'
+        ? (paymentIntent as any).invoice
+        : (paymentIntent as any).invoice.id;
 
       try {
         const invoice = await stripe.invoices.retrieve(invoiceId);
-        if (invoice.subscription) {
-          const subscriptionId = typeof invoice.subscription === 'string'
-            ? invoice.subscription
-            : invoice.subscription.id;
+        if ((invoice as any).subscription) {
+          const subscriptionId = typeof (invoice as any).subscription === 'string'
+            ? (invoice as any).subscription
+            : (invoice as any).subscription.id;
 
           await this.retryDatabaseOperation(async () => {
             await prisma.subscription.updateMany({
@@ -417,8 +417,8 @@ export class StripeWebhookService {
         where: { stripeSubscriptionId: subscription.id },
         update: {
           status,
-          currentPeriodStart: new Date(subscription.current_period_start * 1000),
-          currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+          currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
+          currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
           cancelAtPeriodEnd: subscription.cancel_at_period_end,
           updatedAt: new Date(),
         },
@@ -427,8 +427,8 @@ export class StripeWebhookService {
           planId: subscription.items.data[0].price.id,
           stripeSubscriptionId: subscription.id,
           status,
-          currentPeriodStart: new Date(subscription.current_period_start * 1000),
-          currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+          currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
+          currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
           cancelAtPeriodEnd: subscription.cancel_at_period_end,
         },
       });
@@ -462,8 +462,8 @@ export class StripeWebhookService {
         where: { stripeSubscriptionId: subscription.id },
         update: {
           status,
-          currentPeriodStart: new Date(subscription.current_period_start * 1000),
-          currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+          currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
+          currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
           cancelAtPeriodEnd: subscription.cancel_at_period_end,
           updatedAt: new Date(),
         },
@@ -472,8 +472,8 @@ export class StripeWebhookService {
           planId: subscription.items.data[0].price.id,
           stripeSubscriptionId: subscription.id,
           status,
-          currentPeriodStart: new Date(subscription.current_period_start * 1000),
-          currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+          currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
+          currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
           cancelAtPeriodEnd: subscription.cancel_at_period_end,
         },
       });
@@ -565,10 +565,10 @@ export class StripeWebhookService {
     });
 
     // Record successful invoice payment
-    if (invoice.subscription) {
-      const subscriptionId = typeof invoice.subscription === 'string'
-        ? invoice.subscription
-        : invoice.subscription.id;
+    if ((invoice as any).subscription) {
+      const subscriptionId = typeof (invoice as any).subscription === 'string'
+        ? (invoice as any).subscription
+        : (invoice as any).subscription.id;
 
       await this.retryDatabaseOperation(async () => {
         await prisma.subscription.updateMany({
@@ -606,10 +606,10 @@ export class StripeWebhookService {
     });
 
     // Update subscription status to past_due
-    if (invoice.subscription) {
-      const subscriptionId = typeof invoice.subscription === 'string'
-        ? invoice.subscription
-        : invoice.subscription.id;
+    if ((invoice as any).subscription) {
+      const subscriptionId = typeof (invoice as any).subscription === 'string'
+        ? (invoice as any).subscription
+        : (invoice as any).subscription.id;
 
       await this.retryDatabaseOperation(async () => {
         await prisma.subscription.updateMany({
@@ -783,9 +783,9 @@ export class StripeWebhookService {
     if (paymentMethod.customer && typeof paymentMethod.customer === 'string') {
       try {
         const customer = await stripe.customers.retrieve(paymentMethod.customer);
-        if (customer && !customer.deleted && customer.email) {
+        if (customer && !customer.deleted && (customer as any).email) {
           await sendEmail({
-            to: customer.email,
+            to: (customer as any).email,
             subject: 'Payment Method Automatically Updated',
             html: `
               <p>Your payment method has been automatically updated by your bank.</p>
@@ -1070,7 +1070,7 @@ export class StripeWebhookService {
           subscriptionId: subscription.id,
           status: subscription.status,
           currentPeriodEnd: new Date(
-            subscription.current_period_end * 1000
+            (subscription as any).current_period_end * 1000
           ).toLocaleDateString(),
         },
       });
@@ -1091,7 +1091,7 @@ export class StripeWebhookService {
         templateData: {
           name: `${user.firstName} ${user.lastName}`,
           subscriptionId: subscription.id,
-          endDate: new Date(subscription.current_period_end * 1000).toLocaleDateString(),
+          endDate: new Date((subscription as any).current_period_end * 1000).toLocaleDateString(),
         },
       });
     } catch (error) {

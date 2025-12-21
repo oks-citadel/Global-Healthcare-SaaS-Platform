@@ -33,7 +33,7 @@ function getCommonData() {
  */
 export async function sendWelcomeEmail(email: string, userName: string) {
   try {
-    logger.info({ email, userName }, 'Sending welcome email');
+    logger.info('Sending welcome email', { email, userName });
 
     const result = await sendEmail({
       to: email,
@@ -47,15 +47,15 @@ export async function sendWelcomeEmail(email: string, userName: string) {
     });
 
     if (!result.success) {
-      logger.error({ email, error: result.error }, 'Failed to send welcome email');
+      logger.error('Failed to send welcome email', { email, error: result.error });
     }
 
     return result;
   } catch (error) {
-    logger.error({
+    logger.error('Error sending welcome email', {
       error: error instanceof Error ? error.message : 'Unknown error',
       email,
-    }, 'Error sending welcome email');
+    });
     throw error;
   }
 }
@@ -73,7 +73,7 @@ export async function sendPasswordResetEmail(
   resetToken: string
 ) {
   try {
-    logger.info({ email, userName }, 'Sending password reset email');
+    logger.info('Sending password reset email', { email, userName });
 
     const resetUrl = `${APP_URL}/reset-password?token=${resetToken}`;
     const requestedAt = new Date().toLocaleString('en-US', {
@@ -96,15 +96,15 @@ export async function sendPasswordResetEmail(
     });
 
     if (!result.success) {
-      logger.error({ email, error: result.error }, 'Failed to send password reset email');
+      logger.error('Failed to send password reset email', { email, error: result.error });
     }
 
     return result;
   } catch (error) {
-    logger.error({
+    logger.error('Error sending password reset email', {
       error: error instanceof Error ? error.message : 'Unknown error',
       email,
-    }, 'Error sending password reset email');
+    });
     throw error;
   }
 }
@@ -129,10 +129,10 @@ export async function sendAppointmentConfirmation(data: {
   notes?: string;
 }) {
   try {
-    logger.info({
+    logger.info('Sending appointment confirmation email', {
       email: data.email,
       appointmentId: data.appointmentId,
-    }, 'Sending appointment confirmation email');
+    });
 
     const result = await sendEmail({
       to: data.email,
@@ -146,18 +146,18 @@ export async function sendAppointmentConfirmation(data: {
     });
 
     if (!result.success) {
-      logger.error({
+      logger.error('Failed to send appointment confirmation email', {
         email: data.email,
         error: result.error,
-      }, 'Failed to send appointment confirmation email');
+      });
     }
 
     return result;
   } catch (error) {
-    logger.error({
+    logger.error('Error sending appointment confirmation email', {
       error: error instanceof Error ? error.message : 'Unknown error',
       email: data.email,
-    }, 'Error sending appointment confirmation email');
+    });
     throw error;
   }
 }
@@ -183,10 +183,10 @@ export async function sendAppointmentReminder(data: {
   mapsUrl?: string;
 }) {
   try {
-    logger.info({
+    logger.info('Sending appointment reminder email', {
       email: data.email,
       appointmentId: data.appointmentId,
-    }, 'Sending appointment reminder email');
+    });
 
     const result = await sendEmail({
       to: data.email,
@@ -200,18 +200,18 @@ export async function sendAppointmentReminder(data: {
     });
 
     if (!result.success) {
-      logger.error({
+      logger.error('Failed to send appointment reminder email', {
         email: data.email,
         error: result.error,
-      }, 'Failed to send appointment reminder email');
+      });
     }
 
     return result;
   } catch (error) {
-    logger.error({
+    logger.error('Error sending appointment reminder email', {
       error: error instanceof Error ? error.message : 'Unknown error',
       email: data.email,
-    }, 'Error sending appointment reminder email');
+    });
     throw error;
   }
 }
@@ -242,10 +242,10 @@ export async function sendVisitSummary(data: {
   notes?: string;
 }) {
   try {
-    logger.info({
+    logger.info('Sending visit summary email', {
       email: data.email,
       visitId: data.visitId,
-    }, 'Sending visit summary email');
+    });
 
     const result = await sendEmail({
       to: data.email,
@@ -259,18 +259,18 @@ export async function sendVisitSummary(data: {
     });
 
     if (!result.success) {
-      logger.error({
+      logger.error('Failed to send visit summary email', {
         email: data.email,
         error: result.error,
-      }, 'Failed to send visit summary email');
+      });
     }
 
     return result;
   } catch (error) {
-    logger.error({
+    logger.error('Error sending visit summary email', {
       error: error instanceof Error ? error.message : 'Unknown error',
       email: data.email,
-    }, 'Error sending visit summary email');
+    });
     throw error;
   }
 }
@@ -313,10 +313,10 @@ export async function sendInvoice(data: {
   paymentUrl?: string;
 }) {
   try {
-    logger.info({
+    logger.info('Sending invoice email', {
       email: data.email,
       invoiceId: data.invoiceId,
-    }, 'Sending invoice email');
+    });
 
     // Determine status color
     const statusColor =
@@ -340,18 +340,18 @@ export async function sendInvoice(data: {
     });
 
     if (!result.success) {
-      logger.error({
+      logger.error('Failed to send invoice email', {
         email: data.email,
         error: result.error,
-      }, 'Failed to send invoice email');
+      });
     }
 
     return result;
   } catch (error) {
-    logger.error({
+    logger.error('Error sending invoice email', {
       error: error instanceof Error ? error.message : 'Unknown error',
       email: data.email,
-    }, 'Error sending invoice email');
+    });
     throw error;
   }
 }

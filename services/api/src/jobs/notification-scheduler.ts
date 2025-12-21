@@ -58,10 +58,7 @@ export function schedule24HourReminders() {
         },
       });
 
-      logger.info(
-        { count: appointments.length },
-        'Found appointments for 24-hour reminders'
-      );
+      logger.info('Found appointments for 24-hour reminders', { count: appointments.length });
 
       // Send reminders
       for (const appointment of appointments) {
@@ -131,23 +128,20 @@ export function schedule24HourReminders() {
             data: { reminderSent: true },
           });
 
-          logger.info(
-            { appointmentId: appointment.id },
-            'Sent 24-hour appointment reminder'
-          );
+          logger.info('Sent 24-hour appointment reminder', { appointmentId: appointment.id });
         } catch (error) {
-          logger.error({
+          logger.error('Failed to send 24-hour appointment reminder', {
             error: error instanceof Error ? error.message : 'Unknown error',
             appointmentId: appointment.id,
-          }, 'Failed to send 24-hour appointment reminder');
+          });
         }
       }
 
       logger.info('Completed 24-hour appointment reminder job');
     } catch (error) {
-      logger.error({
+      logger.error('Error in 24-hour appointment reminder job', {
         error: error instanceof Error ? error.message : 'Unknown error',
-      }, 'Error in 24-hour appointment reminder job');
+      });
     }
   });
 
@@ -196,10 +190,7 @@ export function schedule1HourVirtualVisitReminders() {
         },
       });
 
-      logger.info(
-        { count: appointments.length },
-        'Found virtual appointments for 1-hour reminders'
-      );
+      logger.info('Found virtual appointments for 1-hour reminders', { count: appointments.length });
 
       // Send reminders
       for (const appointment of appointments) {
@@ -244,23 +235,20 @@ export function schedule1HourVirtualVisitReminders() {
             data: { immediateReminderSent: true },
           });
 
-          logger.info(
-            { appointmentId: appointment.id },
-            'Sent 1-hour virtual visit reminder'
-          );
+          logger.info('Sent 1-hour virtual visit reminder', { appointmentId: appointment.id });
         } catch (error) {
-          logger.error({
+          logger.error('Failed to send 1-hour virtual visit reminder', {
             error: error instanceof Error ? error.message : 'Unknown error',
             appointmentId: appointment.id,
-          }, 'Failed to send 1-hour virtual visit reminder');
+          });
         }
       }
 
       logger.info('Completed 1-hour virtual visit reminder job');
     } catch (error) {
-      logger.error({
+      logger.error('Error in 1-hour virtual visit reminder job', {
         error: error instanceof Error ? error.message : 'Unknown error',
-      }, 'Error in 1-hour virtual visit reminder job');
+      });
     }
   });
 
@@ -302,10 +290,7 @@ export function schedulePrescriptionRefillReminders() {
         },
       });
 
-      logger.info(
-        { count: prescriptions.length },
-        'Found prescriptions for refill reminders'
-      );
+      logger.info('Found prescriptions for refill reminders', { count: prescriptions.length });
 
       // Send reminders
       for (const prescription of prescriptions) {
@@ -333,23 +318,20 @@ export function schedulePrescriptionRefillReminders() {
             data: { refillReminderSent: true },
           });
 
-          logger.info(
-            { prescriptionId: prescription.id },
-            'Sent prescription refill reminder'
-          );
+          logger.info('Sent prescription refill reminder', { prescriptionId: prescription.id });
         } catch (error) {
-          logger.error({
+          logger.error('Failed to send prescription refill reminder', {
             error: error instanceof Error ? error.message : 'Unknown error',
             prescriptionId: prescription.id,
-          }, 'Failed to send prescription refill reminder');
+          });
         }
       }
 
       logger.info('Completed prescription refill reminder job');
     } catch (error) {
-      logger.error({
+      logger.error('Error in prescription refill reminder job', {
         error: error instanceof Error ? error.message : 'Unknown error',
-      }, 'Error in prescription refill reminder job');
+      });
     }
   });
 
@@ -390,10 +372,7 @@ export function schedulePaymentReminders() {
         },
       });
 
-      logger.info(
-        { count: invoices.length },
-        'Found overdue invoices for payment reminders'
-      );
+      logger.info('Found overdue invoices for payment reminders', { count: invoices.length });
 
       // Send reminders
       for (const invoice of invoices) {
@@ -440,23 +419,20 @@ export function schedulePaymentReminders() {
             data: { reminderSent: true },
           });
 
-          logger.info(
-            { invoiceId: invoice.id },
-            'Sent payment reminder'
-          );
+          logger.info('Sent payment reminder', { invoiceId: invoice.id });
         } catch (error) {
-          logger.error({
+          logger.error('Failed to send payment reminder', {
             error: error instanceof Error ? error.message : 'Unknown error',
             invoiceId: invoice.id,
-          }, 'Failed to send payment reminder');
+          });
         }
       }
 
       logger.info('Completed payment reminder job');
     } catch (error) {
-      logger.error({
+      logger.error('Error in payment reminder job', {
         error: error instanceof Error ? error.message : 'Unknown error',
-      }, 'Error in payment reminder job');
+      });
     }
   });
 
@@ -490,7 +466,7 @@ export function stopAllScheduledJobs(tasks: Record<string, cron.ScheduledTask>) 
 
   Object.entries(tasks).forEach(([name, task]) => {
     task.stop();
-    logger.info({ jobName: name }, 'Stopped scheduled job');
+    logger.info('Stopped scheduled job', { jobName: name });
   });
 
   logger.info('All scheduled notification jobs stopped');

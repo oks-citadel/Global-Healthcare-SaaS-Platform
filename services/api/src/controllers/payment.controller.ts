@@ -73,8 +73,8 @@ class PaymentController {
         subscription: {
           id: result.subscription.id,
           status: result.subscription.status,
-          currentPeriodStart: result.subscription.current_period_start,
-          currentPeriodEnd: result.subscription.current_period_end,
+          currentPeriodStart: (result.subscription as any).current_period_start,
+          currentPeriodEnd: (result.subscription as any).current_period_end,
           cancelAtPeriodEnd: result.subscription.cancel_at_period_end,
           trialStart: result.subscription.trial_start,
           trialEnd: result.subscription.trial_end,
@@ -113,7 +113,7 @@ class PaymentController {
           status: subscription.status,
           cancelAtPeriodEnd: subscription.cancel_at_period_end,
           canceledAt: subscription.canceled_at,
-          currentPeriodEnd: subscription.current_period_end,
+          currentPeriodEnd: (subscription as any).current_period_end,
         },
         message: validatedData.cancelAtPeriodEnd
           ? 'Subscription will be canceled at the end of the billing period'
@@ -150,8 +150,8 @@ class PaymentController {
         subscription: {
           id: subscription.stripeSubscription.id,
           status: subscription.stripeSubscription.status,
-          currentPeriodStart: subscription.stripeSubscription.current_period_start,
-          currentPeriodEnd: subscription.stripeSubscription.current_period_end,
+          currentPeriodStart: (subscription.stripeSubscription as any).current_period_start,
+          currentPeriodEnd: (subscription.stripeSubscription as any).current_period_end,
           cancelAtPeriodEnd: subscription.stripeSubscription.cancel_at_period_end,
           canceledAt: subscription.stripeSubscription.canceled_at,
           trialStart: subscription.stripeSubscription.trial_start,

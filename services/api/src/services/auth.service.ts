@@ -29,7 +29,7 @@ export const authService = {
         role: input.role,
       });
 
-      logger.info({ userId: user.id, email: input.email }, 'User registered (demo mode)');
+      logger.info('User registered (demo mode)', { userId: user.id, email: input.email });
       return this.generateTokens(user);
     }
 
@@ -60,7 +60,7 @@ export const authService = {
       },
     });
 
-    logger.info({ userId: user.id, email: input.email }, 'User registered');
+    logger.info('User registered', { userId: user.id, email: input.email });
 
     // Generate tokens
     return this.generateTokens(user);
@@ -82,7 +82,7 @@ export const authService = {
         throw new UnauthorizedError('Invalid credentials');
       }
 
-      logger.info({ userId: user.id }, 'User logged in (demo mode)');
+      logger.info('User logged in (demo mode)', { userId: user.id });
       return this.generateTokens(user);
     }
 
@@ -101,7 +101,7 @@ export const authService = {
       throw new UnauthorizedError('Invalid credentials');
     }
 
-    logger.info({ userId: user.id }, 'User logged in');
+    logger.info('User logged in', { userId: user.id });
 
     return this.generateTokens(user);
   },
@@ -181,7 +181,7 @@ export const authService = {
     // Demo mode - use in-memory store
     if (isDemoMode) {
       demoStore.refreshTokens.deleteByUserId(userId);
-      logger.info({ userId }, 'User logged out (demo mode)');
+      logger.info('User logged out (demo mode)', { userId });
       return;
     }
 
@@ -189,7 +189,7 @@ export const authService = {
     await prisma.refreshToken.deleteMany({
       where: { userId },
     });
-    logger.info({ userId }, 'User logged out');
+    logger.info('User logged out', { userId });
   },
 
   /**

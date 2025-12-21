@@ -92,10 +92,10 @@ export async function renderTemplate(
 
     return html;
   } catch (error) {
-    logger.error({
+    logger.error('Failed to render email template', {
       error: error instanceof Error ? error.message : 'Unknown error',
       templatePath,
-    }, 'Failed to render email template');
+    });
     throw error;
   }
 }
@@ -125,11 +125,11 @@ export async function sendEmail(options: EmailOptions): Promise<EmailResponse> {
 
     // If SendGrid is not configured, log and return stub response
     if (!SENDGRID_API_KEY) {
-      logger.info({
+      logger.info('Email stub - SendGrid not configured', {
         to: options.to,
         subject: options.subject,
         templatePath: options.templatePath,
-      }, 'Email stub - SendGrid not configured');
+      });
 
       return {
         success: true,
@@ -166,22 +166,22 @@ export async function sendEmail(options: EmailOptions): Promise<EmailResponse> {
     // Send email
     const response = await sgMail.send(message);
 
-    logger.info({
+    logger.info('Email sent successfully', {
       to: options.to,
       subject: options.subject,
       statusCode: response[0].statusCode,
-    }, 'Email sent successfully');
+    });
 
     return {
       success: true,
       messageId: response[0].headers['x-message-id'] as string,
     };
   } catch (error) {
-    logger.error({
+    logger.error('Failed to send email', {
       error: error instanceof Error ? error.message : 'Unknown error',
       to: options.to,
       subject: options.subject,
-    }, 'Failed to send email');
+    });
 
     return {
       success: false,
@@ -208,10 +208,10 @@ export async function sendBatchEmail(
     templateData?: Record<string, any>;
   }
 ): Promise<EmailResponse[]> {
-  logger.info({
+  logger.info('Sending batch emails', {
     recipientCount: recipients.length,
     subject,
-  }, 'Sending batch emails');
+  });
 
   const promises = recipients.map(to =>
     sendEmail({

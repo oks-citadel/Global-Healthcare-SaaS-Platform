@@ -29,10 +29,10 @@ export async function sendAppointmentReminder(
   }
 ) {
   try {
-    logger.info({
+    logger.info('Sending appointment reminder SMS', {
       phoneNumber,
       appointmentId: data.appointmentId,
-    }, 'Sending appointment reminder SMS');
+    });
 
     let message = `Hi ${data.patientName}, this is a reminder about your appointment with Dr. ${data.providerName} on ${data.appointmentDate} at ${data.appointmentTime}.`;
 
@@ -50,18 +50,18 @@ export async function sendAppointmentReminder(
     });
 
     if (!result.success) {
-      logger.error({
+      logger.error('Failed to send appointment reminder SMS', {
         phoneNumber,
         error: result.error,
-      }, 'Failed to send appointment reminder SMS');
+      });
     }
 
     return result;
   } catch (error) {
-    logger.error({
+    logger.error('Error sending appointment reminder SMS', {
       error: error instanceof Error ? error.message : 'Unknown error',
       phoneNumber,
-    }, 'Error sending appointment reminder SMS');
+    });
     throw error;
   }
 }
@@ -82,10 +82,10 @@ export async function sendVisitLink(
   }
 ) {
   try {
-    logger.info({
+    logger.info('Sending visit link SMS', {
       phoneNumber,
       appointmentId: data.appointmentId,
-    }, 'Sending visit link SMS');
+    });
 
     const joinUrl = `${APP_URL}/appointments/${data.appointmentId}/join`;
     let message = `Hi ${data.patientName}, your virtual visit with Dr. ${data.providerName}`;
@@ -104,18 +104,18 @@ export async function sendVisitLink(
     });
 
     if (!result.success) {
-      logger.error({
+      logger.error('Failed to send visit link SMS', {
         phoneNumber,
         error: result.error,
-      }, 'Failed to send visit link SMS');
+      });
     }
 
     return result;
   } catch (error) {
-    logger.error({
+    logger.error('Error sending visit link SMS', {
       error: error instanceof Error ? error.message : 'Unknown error',
       phoneNumber,
-    }, 'Error sending visit link SMS');
+    });
     throw error;
   }
 }
@@ -131,7 +131,7 @@ export async function sendVerificationCode(
   verificationCode: string
 ) {
   try {
-    logger.info({ phoneNumber }, 'Sending verification code SMS');
+    logger.info('Sending verification code SMS', { phoneNumber });
 
     const message = `Your ${APP_NAME} verification code is: ${verificationCode}. This code will expire in 10 minutes. Do not share this code with anyone.`;
 
@@ -141,18 +141,18 @@ export async function sendVerificationCode(
     });
 
     if (!result.success) {
-      logger.error({
+      logger.error('Failed to send verification code SMS', {
         phoneNumber,
         error: result.error,
-      }, 'Failed to send verification code SMS');
+      });
     }
 
     return result;
   } catch (error) {
-    logger.error({
+    logger.error('Error sending verification code SMS', {
       error: error instanceof Error ? error.message : 'Unknown error',
       phoneNumber,
-    }, 'Error sending verification code SMS');
+    });
     throw error;
   }
 }
@@ -174,10 +174,10 @@ export async function sendAppointmentConfirmation(
   }
 ) {
   try {
-    logger.info({
+    logger.info('Sending appointment confirmation SMS', {
       phoneNumber,
       appointmentId: data.appointmentId,
-    }, 'Sending appointment confirmation SMS');
+    });
 
     const message = `Hi ${data.patientName}, your appointment with Dr. ${data.providerName} is confirmed for ${data.appointmentDate} at ${data.appointmentTime}. View details: ${APP_URL}/appointments/${data.appointmentId} - ${APP_NAME}`;
 
@@ -187,18 +187,18 @@ export async function sendAppointmentConfirmation(
     });
 
     if (!result.success) {
-      logger.error({
+      logger.error('Failed to send appointment confirmation SMS', {
         phoneNumber,
         error: result.error,
-      }, 'Failed to send appointment confirmation SMS');
+      });
     }
 
     return result;
   } catch (error) {
-    logger.error({
+    logger.error('Error sending appointment confirmation SMS', {
       error: error instanceof Error ? error.message : 'Unknown error',
       phoneNumber,
-    }, 'Error sending appointment confirmation SMS');
+    });
     throw error;
   }
 }
@@ -218,7 +218,7 @@ export async function sendPrescriptionReady(
   }
 ) {
   try {
-    logger.info({ phoneNumber }, 'Sending prescription ready SMS');
+    logger.info('Sending prescription ready SMS', { phoneNumber });
 
     const message = `Hi ${data.patientName}, your prescription for ${data.prescriptionName} is ready for pickup at ${data.pharmacyName}. - ${APP_NAME}`;
 
@@ -228,18 +228,18 @@ export async function sendPrescriptionReady(
     });
 
     if (!result.success) {
-      logger.error({
+      logger.error('Failed to send prescription ready SMS', {
         phoneNumber,
         error: result.error,
-      }, 'Failed to send prescription ready SMS');
+      });
     }
 
     return result;
   } catch (error) {
-    logger.error({
+    logger.error('Error sending prescription ready SMS', {
       error: error instanceof Error ? error.message : 'Unknown error',
       phoneNumber,
-    }, 'Error sending prescription ready SMS');
+    });
     throw error;
   }
 }
@@ -255,7 +255,7 @@ export async function sendTestResultsAvailable(
   patientName: string
 ) {
   try {
-    logger.info({ phoneNumber }, 'Sending test results available SMS');
+    logger.info('Sending test results available SMS', { phoneNumber });
 
     const message = `Hi ${patientName}, your test results are now available. Log in to ${APP_URL} to view them securely. - ${APP_NAME}`;
 
@@ -265,18 +265,18 @@ export async function sendTestResultsAvailable(
     });
 
     if (!result.success) {
-      logger.error({
+      logger.error('Failed to send test results SMS', {
         phoneNumber,
         error: result.error,
-      }, 'Failed to send test results SMS');
+      });
     }
 
     return result;
   } catch (error) {
-    logger.error({
+    logger.error('Error sending test results SMS', {
       error: error instanceof Error ? error.message : 'Unknown error',
       phoneNumber,
-    }, 'Error sending test results SMS');
+    });
     throw error;
   }
 }
@@ -297,10 +297,10 @@ export async function sendPaymentReminder(
   }
 ) {
   try {
-    logger.info({
+    logger.info('Sending payment reminder SMS', {
       phoneNumber,
       invoiceId: data.invoiceId,
-    }, 'Sending payment reminder SMS');
+    });
 
     const message = `Hi ${data.patientName}, you have an outstanding balance of ${data.amount} due by ${data.dueDate}. Pay now: ${APP_URL}/invoices/${data.invoiceId}/pay - ${APP_NAME}`;
 
@@ -310,18 +310,18 @@ export async function sendPaymentReminder(
     });
 
     if (!result.success) {
-      logger.error({
+      logger.error('Failed to send payment reminder SMS', {
         phoneNumber,
         error: result.error,
-      }, 'Failed to send payment reminder SMS');
+      });
     }
 
     return result;
   } catch (error) {
-    logger.error({
+    logger.error('Error sending payment reminder SMS', {
       error: error instanceof Error ? error.message : 'Unknown error',
       phoneNumber,
-    }, 'Error sending payment reminder SMS');
+    });
     throw error;
   }
 }
@@ -343,7 +343,7 @@ export async function sendAppointmentCancellation(
   }
 ) {
   try {
-    logger.info({ phoneNumber }, 'Sending appointment cancellation SMS');
+    logger.info('Sending appointment cancellation SMS', { phoneNumber });
 
     let message = `Hi ${data.patientName}, your appointment with Dr. ${data.providerName} on ${data.appointmentDate} at ${data.appointmentTime} has been cancelled.`;
 
@@ -359,18 +359,18 @@ export async function sendAppointmentCancellation(
     });
 
     if (!result.success) {
-      logger.error({
+      logger.error('Failed to send appointment cancellation SMS', {
         phoneNumber,
         error: result.error,
-      }, 'Failed to send appointment cancellation SMS');
+      });
     }
 
     return result;
   } catch (error) {
-    logger.error({
+    logger.error('Error sending appointment cancellation SMS', {
       error: error instanceof Error ? error.message : 'Unknown error',
       phoneNumber,
-    }, 'Error sending appointment cancellation SMS');
+    });
     throw error;
   }
 }
@@ -394,10 +394,10 @@ export async function sendAppointmentRescheduled(
   }
 ) {
   try {
-    logger.info({
+    logger.info('Sending appointment rescheduled SMS', {
       phoneNumber,
       appointmentId: data.appointmentId,
-    }, 'Sending appointment rescheduled SMS');
+    });
 
     const message = `Hi ${data.patientName}, your appointment with Dr. ${data.providerName} has been rescheduled from ${data.oldDate} at ${data.oldTime} to ${data.newDate} at ${data.newTime}. View details: ${APP_URL}/appointments/${data.appointmentId} - ${APP_NAME}`;
 
@@ -407,18 +407,18 @@ export async function sendAppointmentRescheduled(
     });
 
     if (!result.success) {
-      logger.error({
+      logger.error('Failed to send appointment rescheduled SMS', {
         phoneNumber,
         error: result.error,
-      }, 'Failed to send appointment rescheduled SMS');
+      });
     }
 
     return result;
   } catch (error) {
-    logger.error({
+    logger.error('Error sending appointment rescheduled SMS', {
       error: error instanceof Error ? error.message : 'Unknown error',
       phoneNumber,
-    }, 'Error sending appointment rescheduled SMS');
+    });
     throw error;
   }
 }
@@ -439,10 +439,10 @@ export async function sendPaymentConfirmation(
   }
 ) {
   try {
-    logger.info({
+    logger.info('Sending payment confirmation SMS', {
       phoneNumber,
       transactionId: data.transactionId,
-    }, 'Sending payment confirmation SMS');
+    });
 
     const message = `Hi ${data.patientName}, we have received your payment of ${data.amount} on ${data.paymentDate}. Transaction ID: ${data.transactionId}. Thank you! - ${APP_NAME}`;
 
@@ -452,18 +452,18 @@ export async function sendPaymentConfirmation(
     });
 
     if (!result.success) {
-      logger.error({
+      logger.error('Failed to send payment confirmation SMS', {
         phoneNumber,
         error: result.error,
-      }, 'Failed to send payment confirmation SMS');
+      });
     }
 
     return result;
   } catch (error) {
-    logger.error({
+    logger.error('Error sending payment confirmation SMS', {
       error: error instanceof Error ? error.message : 'Unknown error',
       phoneNumber,
-    }, 'Error sending payment confirmation SMS');
+    });
     throw error;
   }
 }
@@ -482,7 +482,7 @@ export async function sendLabResultsAvailable(
   }
 ) {
   try {
-    logger.info({ phoneNumber }, 'Sending lab results available SMS');
+    logger.info('Sending lab results available SMS', { phoneNumber });
 
     let message = `Hi ${data.patientName}, `;
 
@@ -500,18 +500,18 @@ export async function sendLabResultsAvailable(
     });
 
     if (!result.success) {
-      logger.error({
+      logger.error('Failed to send lab results SMS', {
         phoneNumber,
         error: result.error,
-      }, 'Failed to send lab results SMS');
+      });
     }
 
     return result;
   } catch (error) {
-    logger.error({
+    logger.error('Error sending lab results SMS', {
       error: error instanceof Error ? error.message : 'Unknown error',
       phoneNumber,
-    }, 'Error sending lab results SMS');
+    });
     throw error;
   }
 }
@@ -531,7 +531,7 @@ export async function sendReferralNotification(
   }
 ) {
   try {
-    logger.info({ phoneNumber }, 'Sending referral notification SMS');
+    logger.info('Sending referral notification SMS', { phoneNumber });
 
     const message = `Hi ${data.patientName}, you have been referred to ${data.specialistName} (${data.specialty}). They will contact you shortly to schedule an appointment. - ${APP_NAME}`;
 
@@ -541,18 +541,18 @@ export async function sendReferralNotification(
     });
 
     if (!result.success) {
-      logger.error({
+      logger.error('Failed to send referral notification SMS', {
         phoneNumber,
         error: result.error,
-      }, 'Failed to send referral notification SMS');
+      });
     }
 
     return result;
   } catch (error) {
-    logger.error({
+    logger.error('Error sending referral notification SMS', {
       error: error instanceof Error ? error.message : 'Unknown error',
       phoneNumber,
-    }, 'Error sending referral notification SMS');
+    });
     throw error;
   }
 }
@@ -573,7 +573,7 @@ export async function sendMedicationReminder(
   }
 ) {
   try {
-    logger.info({ phoneNumber }, 'Sending medication reminder SMS');
+    logger.info('Sending medication reminder SMS', { phoneNumber });
 
     const message = `Hi ${data.patientName}, reminder to take your ${data.medicationName} (${data.dosage}) at ${data.time}. - ${APP_NAME}`;
 
@@ -583,18 +583,18 @@ export async function sendMedicationReminder(
     });
 
     if (!result.success) {
-      logger.error({
+      logger.error('Failed to send medication reminder SMS', {
         phoneNumber,
         error: result.error,
-      }, 'Failed to send medication reminder SMS');
+      });
     }
 
     return result;
   } catch (error) {
-    logger.error({
+    logger.error('Error sending medication reminder SMS', {
       error: error instanceof Error ? error.message : 'Unknown error',
       phoneNumber,
-    }, 'Error sending medication reminder SMS');
+    });
     throw error;
   }
 }
@@ -616,7 +616,7 @@ export async function sendEmergencyAlert(
   }
 ) {
   try {
-    logger.info({ phoneNumber }, 'Sending emergency alert SMS');
+    logger.info('Sending emergency alert SMS', { phoneNumber });
 
     let message = `URGENT: ${data.recipientName}, ${data.patientName} - ${data.alertType}: ${data.message}`;
 
@@ -632,18 +632,18 @@ export async function sendEmergencyAlert(
     });
 
     if (!result.success) {
-      logger.error({
+      logger.error('Failed to send emergency alert SMS', {
         phoneNumber,
         error: result.error,
-      }, 'Failed to send emergency alert SMS');
+      });
     }
 
     return result;
   } catch (error) {
-    logger.error({
+    logger.error('Error sending emergency alert SMS', {
       error: error instanceof Error ? error.message : 'Unknown error',
       phoneNumber,
-    }, 'Error sending emergency alert SMS');
+    });
     throw error;
   }
 }

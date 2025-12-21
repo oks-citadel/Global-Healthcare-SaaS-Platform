@@ -43,7 +43,7 @@ export const notificationService = {
         throw new BadRequestError('Missing required email fields');
       }
 
-      logger.info({
+      logger.info('Sending email notification', {
         notificationId,
         type: 'email',
         to: input.to,
@@ -51,7 +51,7 @@ export const notificationService = {
         bodyLength: input.body.length,
         templateId: input.templateId,
         timestamp,
-      }, 'Sending email notification');
+      });
 
       // Send email via library
       const result = await sendEmailLib({
@@ -73,11 +73,11 @@ export const notificationService = {
         sentAt: timestamp,
       };
     } catch (error) {
-      logger.error({
+      logger.error('Failed to send email notification', {
         notificationId,
         error: error instanceof Error ? error.message : 'Unknown error',
         to: input.to,
-      }, 'Failed to send email notification');
+      });
 
       return {
         id: notificationId,
@@ -116,13 +116,13 @@ export const notificationService = {
         throw new BadRequestError('Message too long. Maximum 1600 characters.');
       }
 
-      logger.info({
+      logger.info('Sending SMS notification', {
         notificationId,
         type: 'sms',
         to: input.to,
         messageLength: input.message.length,
         timestamp,
-      }, 'Sending SMS notification');
+      });
 
       // Send SMS via library
       const result = await sendSmsLib({
@@ -142,11 +142,11 @@ export const notificationService = {
         sentAt: timestamp,
       };
     } catch (error) {
-      logger.error({
+      logger.error('Failed to send SMS notification', {
         notificationId,
         error: error instanceof Error ? error.message : 'Unknown error',
         to: input.to,
-      }, 'Failed to send SMS notification');
+      });
 
       return {
         id: notificationId,
@@ -174,12 +174,12 @@ export const notificationService = {
         throw new BadRequestError('Missing required email fields');
       }
 
-      logger.info({
+      logger.info('Queueing email notification', {
         notificationId,
         type: 'email',
         to: input.to,
         subject: input.subject,
-      }, 'Queueing email notification');
+      });
 
       // Add to queue
       const job = await queues.addEmailJob({
@@ -198,11 +198,11 @@ export const notificationService = {
         jobId: job.id?.toString(),
       };
     } catch (error) {
-      logger.error({
+      logger.error('Failed to queue email notification', {
         notificationId,
         error: error instanceof Error ? error.message : 'Unknown error',
         to: input.to,
-      }, 'Failed to queue email notification');
+      });
 
       return {
         id: notificationId,
@@ -230,11 +230,11 @@ export const notificationService = {
         throw new BadRequestError('Missing required SMS fields');
       }
 
-      logger.info({
+      logger.info('Queueing SMS notification', {
         notificationId,
         type: 'sms',
         to: input.to,
-      }, 'Queueing SMS notification');
+      });
 
       // Add to queue
       const job = await queues.addSmsJob({
@@ -251,11 +251,11 @@ export const notificationService = {
         jobId: job.id?.toString(),
       };
     } catch (error) {
-      logger.error({
+      logger.error('Failed to queue SMS notification', {
         notificationId,
         error: error instanceof Error ? error.message : 'Unknown error',
         to: input.to,
-      }, 'Failed to queue SMS notification');
+      });
 
       return {
         id: notificationId,
@@ -282,10 +282,10 @@ export const notificationService = {
     body: string,
     templateId?: string
   ): Promise<NotificationResponse[]> {
-    logger.info({
+    logger.info('Sending batch email notifications', {
       recipientCount: recipients.length,
       subject,
-    }, 'Sending batch email notifications');
+    });
 
     const promises = recipients.map(to =>
       this.sendEmail({ to, subject, body, templateId })
@@ -305,10 +305,10 @@ export const notificationService = {
     recipients: string[],
     message: string
   ): Promise<NotificationResponse[]> {
-    logger.info({
+    logger.info('Sending batch SMS notifications', {
       recipientCount: recipients.length,
       messageLength: message.length,
-    }, 'Sending batch SMS notifications');
+    });
 
     const promises = recipients.map(to =>
       this.sendSms({ to, message })
@@ -332,10 +332,10 @@ export const notificationService = {
     body: string,
     templateId?: string
   ): Promise<NotificationResponse[]> {
-    logger.info({
+    logger.info('Queueing batch email notifications', {
       recipientCount: recipients.length,
       subject,
-    }, 'Queueing batch email notifications');
+    });
 
     const promises = recipients.map(to =>
       this.queueEmail({ to, subject, body, templateId })
@@ -355,10 +355,10 @@ export const notificationService = {
     recipients: string[],
     message: string
   ): Promise<NotificationResponse[]> {
-    logger.info({
+    logger.info('Queueing batch SMS notifications', {
       recipientCount: recipients.length,
       messageLength: message.length,
-    }, 'Queueing batch SMS notifications');
+    });
 
     const promises = recipients.map(to =>
       this.queueSms({ to, message })
@@ -398,7 +398,7 @@ export const notificationService = {
         throw new BadRequestError('Message ID is required');
       }
 
-      logger.info({ messageId }, 'Fetching SMS status');
+      logger.info('Fetching SMS status', { messageId });
 
       const status = await getSmsStatus(messageId);
 
@@ -409,10 +409,10 @@ export const notificationService = {
         errorMessage: status.errorMessage,
       };
     } catch (error) {
-      logger.error({
+      logger.error('Failed to fetch SMS status', {
         error: error instanceof Error ? error.message : 'Unknown error',
         messageId,
-      }, 'Failed to fetch SMS status');
+      });
 
       throw error;
     }

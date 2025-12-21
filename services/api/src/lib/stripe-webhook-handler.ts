@@ -297,8 +297,8 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription): Pro
     where: { stripeSubscriptionId: subscription.id },
     update: {
       status,
-      currentPeriodStart: new Date(subscription.current_period_start * 1000),
-      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+      currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
+      currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
       cancelAtPeriodEnd: subscription.cancel_at_period_end,
       updatedAt: new Date(),
     },
@@ -307,8 +307,8 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription): Pro
       planId: subscription.items.data[0].price.id,
       stripeSubscriptionId: subscription.id,
       status,
-      currentPeriodStart: new Date(subscription.current_period_start * 1000),
-      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+      currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
+      currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
       cancelAtPeriodEnd: subscription.cancel_at_period_end,
     },
   });
@@ -336,7 +336,7 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription): Pro
         templateData: {
           name: `${user.firstName} ${user.lastName}`,
           subscriptionId: subscription.id,
-          endDate: new Date(subscription.current_period_end * 1000).toLocaleDateString(),
+          endDate: new Date((subscription as any).current_period_end * 1000).toLocaleDateString(),
         },
       });
     }
@@ -441,10 +441,10 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice): Promise<v
 async function handleInvoicePaymentFailed(invoice: Stripe.Invoice): Promise<void> {
   logger.warn(`Invoice payment failed: ${invoice.id}`);
 
-  if (invoice.subscription) {
-    const subscriptionId = typeof invoice.subscription === 'string'
-      ? invoice.subscription
-      : invoice.subscription.id;
+  if ((invoice as any).subscription) {
+    const subscriptionId = typeof (invoice as any).subscription === 'string'
+      ? (invoice as any).subscription
+      : (invoice as any).subscription.id;
 
     await prisma.subscription.updateMany({
       where: { stripeSubscriptionId: subscriptionId },

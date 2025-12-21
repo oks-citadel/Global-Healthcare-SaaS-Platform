@@ -29,7 +29,7 @@ import {
  */
 export async function registerDevice(userId: string, input: RegisterDeviceInput) {
   try {
-    logger.info({ userId, platform: input.platform }, 'Registering device token');
+    logger.info('Registering device token', { userId, platform: input.platform });
 
     // Validate token
     if (!pushNotificationService.validateToken(input.token, input.platform)) {
@@ -57,7 +57,7 @@ export async function registerDevice(userId: string, input: RegisterDeviceInput)
         },
       });
 
-      logger.info({ tokenId: updatedToken.id }, 'Device token updated');
+      logger.info('Device token updated', { tokenId: updatedToken.id });
       return updatedToken;
     }
 
@@ -76,7 +76,7 @@ export async function registerDevice(userId: string, input: RegisterDeviceInput)
       },
     });
 
-    logger.info({ tokenId: deviceToken.id }, 'Device token registered');
+    logger.info('Device token registered', { tokenId: deviceToken.id });
     return deviceToken;
   } catch (error) {
     logger.error('Failed to register device token', { error, userId });
@@ -92,7 +92,7 @@ export async function registerDevice(userId: string, input: RegisterDeviceInput)
  */
 export async function unregisterDevice(userId: string, token: string) {
   try {
-    logger.info({ userId, token }, 'Unregistering device token');
+    logger.info('Unregistering device token', { userId, token });
 
     const deviceToken = await prisma.deviceToken.findUnique({
       where: { token },
@@ -255,19 +255,19 @@ export async function sendPushNotification(
   }
 ) {
   try {
-    logger.info({ userId, type: notification.type, title: notification.title }, 'Sending push notification');
+    logger.info('Sending push notification', { userId, type: notification.type, title: notification.title });
 
     // Check if user can receive this notification type
     const canReceive = await canReceiveNotification(userId, notification.type);
     if (!canReceive) {
-      logger.info({ userId, type: notification.type }, 'User preferences prevent notification');
+      logger.info('User preferences prevent notification', { userId, type: notification.type });
       return null;
     }
 
     // Check quiet hours
     const inQuietHours = await isInQuietHours(userId);
     if (inQuietHours) {
-      logger.info({ userId }, 'User is in quiet hours, notification will be delayed');
+      logger.info('User is in quiet hours, notification will be delayed', { userId });
       // Create notification but don't send immediately
       const savedNotification = await prisma.pushNotification.create({
         data: {
@@ -286,7 +286,7 @@ export async function sendPushNotification(
     const deviceTokens = await getUserDeviceTokens(userId);
 
     if (deviceTokens.length === 0) {
-      logger.info({ userId }, 'No active device tokens found');
+      logger.info('No active device tokens found', { userId });
       // Save notification even if no devices
       const savedNotification = await prisma.pushNotification.create({
         data: {
@@ -351,14 +351,14 @@ export async function sendPushNotification(
           active: false,
         },
       });
-      logger.info({ count: failedTokens.length }, 'Deactivated failed device tokens');
+      logger.info('Deactivated failed device tokens', { count: failedTokens.length });
     }
 
-    logger.info({
+    logger.info('Push notification sent', {
       notificationId: savedNotification.id,
       successCount: results.successCount,
       failureCount: results.failureCount,
-    }, 'Push notification sent');
+    });
 
     return savedNotification;
   } catch (error) {
@@ -384,14 +384,14 @@ export async function sendBatchPushNotifications(
   }
 ) {
   try {
-    logger.info({ userCount: userIds.length, type: notification.type }, 'Sending batch push notifications');
+    logger.info('Sending batch push notifications', { userCount: userIds.length, type: notification.type });
 
     const results = await Promise.all(
       userIds.map(userId => sendPushNotification(userId, notification))
     );
 
     const successCount = results.filter(r => r !== null).length;
-    logger.info({ successCount, totalCount: userIds.length }, 'Batch push notifications completed');
+    logger.info('Batch push notifications completed', { successCount, totalCount: userIds.length });
 
     return results.filter(r => r !== null);
   } catch (error) {
@@ -417,7 +417,7 @@ export async function getNotificationPreferences(userId: string) {
       preferences = await prisma.notificationPreference.create({
         data: { userId },
       });
-      logger.info({ userId }, 'Created default notification preferences');
+      logger.info('Created default notification preferences', { userId });
     }
 
     return preferences;
@@ -439,7 +439,7 @@ export async function updateNotificationPreferences(
   input: NotificationPreferencesInput
 ) {
   try {
-    logger.info({ userId }, 'Updating notification preferences');
+    logger.info('Updating notification preferences', { userId });
 
     // Validate quiet hours
     if (input.quietHoursEnabled) {
@@ -457,7 +457,7 @@ export async function updateNotificationPreferences(
       data: input as Prisma.NotificationPreferenceUpdateInput,
     });
 
-    logger.info({ userId }, 'Notification preferences updated');
+    logger.info('Notification preferences updated', { userId });
     return preferences;
   } catch (error) {
     logger.error('Failed to update notification preferences', { error, userId });
@@ -474,7 +474,7 @@ export async function updateNotificationPreferences(
  */
 export async function markNotificationAsRead(userId: string, notificationId: string) {
   try {
-    logger.info({ userId, notificationId }, 'Marking notification as read');
+    logger.info('Marking notification as read', { userId, notificationId });
 
     const notification = await prisma.pushNotification.findUnique({
       where: { id: notificationId },
@@ -489,7 +489,7 @@ export async function markNotificationAsRead(userId: string, notificationId: str
     }
 
     if (notification.readAt) {
-      logger.info({ notificationId }, 'Notification already marked as read');
+      logger.info('Notification already marked as read', { notificationId });
       return notification;
     }
 
@@ -501,7 +501,7 @@ export async function markNotificationAsRead(userId: string, notificationId: str
       },
     });
 
-    logger.info({ notificationId }, 'Notification marked as read');
+    logger.info('Notification marked as read', { notificationId });
     return updatedNotification;
   } catch (error) {
     logger.error('Failed to mark notification as read', { error, userId, notificationId });
@@ -518,7 +518,7 @@ export async function markNotificationAsRead(userId: string, notificationId: str
  */
 export async function getUserNotifications(userId: string, filters: NotificationFilters) {
   try {
-    logger.info({ userId, filters }, 'Getting user notifications');
+    logger.info('Getting user notifications', { userId, filters });
 
     // Build where clause
     const where: Prisma.PushNotificationWhereInput = {
@@ -564,7 +564,7 @@ export async function getUserNotifications(userId: string, filters: Notification
 
     const hasMore = (filters.offset || 0) + notifications.length < total;
 
-    logger.info({ userId, count: notifications.length, total }, 'Retrieved user notifications');
+    logger.info('Retrieved user notifications', { userId, count: notifications.length, total });
 
     return {
       notifications,
@@ -587,7 +587,7 @@ export async function getUserNotifications(userId: string, filters: Notification
  */
 export async function deleteOldNotifications(daysOld: number = 90) {
   try {
-    logger.info({ daysOld }, 'Deleting old notifications');
+    logger.info('Deleting old notifications', { daysOld });
 
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - daysOld);
@@ -599,7 +599,7 @@ export async function deleteOldNotifications(daysOld: number = 90) {
       },
     });
 
-    logger.info({ count: result.count }, 'Old notifications deleted');
+    logger.info('Old notifications deleted', { count: result.count });
     return result.count;
   } catch (error) {
     logger.error('Failed to delete old notifications', { error });
