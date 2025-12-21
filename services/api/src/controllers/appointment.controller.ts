@@ -109,7 +109,7 @@ export const appointmentController = {
   /**
    * Helper: Check if user has access to appointment
    */
-  checkAppointmentAccess: async (req: Request, appointment: any) => {
+  checkAppointmentAccess: async (req: Request, appointment: { patientId: string; providerId: string }) => {
     if (req.user?.role === 'admin') return;
 
     if (req.user?.role === 'patient') {

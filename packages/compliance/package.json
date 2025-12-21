@@ -25,7 +25,6 @@
   "author": "UnifiedHealth Platform",
   "license": "PROPRIETARY",
   "dependencies": {
-    "crypto": "^1.0.1",
     "uuid": "^9.0.1",
     "zod": "^3.22.4"
   },

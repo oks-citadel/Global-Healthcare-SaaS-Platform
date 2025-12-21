@@ -12,7 +12,7 @@ export const dashboardController = {
    */
   async getStats(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const userId = (req as any).user?.userId;
+      const userId = req.user?.userId;
 
       logger.info({ userId }, 'Fetching dashboard stats');
 

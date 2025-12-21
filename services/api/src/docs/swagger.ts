@@ -530,7 +530,7 @@ export function setupSwagger(app: Express): void {
 }
 
 // Simple JSON to YAML converter
-function convertToYAML(obj: any, indent = 0): string {
+function convertToYAML(obj: Record<string, unknown>, indent = 0): string {
   const spaces = '  '.repeat(indent);
   let yaml = '';
 

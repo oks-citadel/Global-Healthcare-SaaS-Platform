@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { encrypt, decrypt, encryptFields, decryptFields, phiEncryption } from '../lib/encryption.js';
+import { logger } from '../utils/logger.js';
 
 /**
  * HIPAA Encryption Middleware
@@ -75,7 +76,7 @@ function getEncryptableFields(resourceType: string): string[] {
 /**
  * Encrypt nested objects recursively
  */
-function encryptNestedFields(obj: any, fields: string[]): any {
+function encryptNestedFields(obj: unknown, fields: string[]): unknown {
   if (typeof obj !== 'object' || obj === null) {
     return obj;
   }
@@ -84,7 +85,7 @@ function encryptNestedFields(obj: any, fields: string[]): any {
     return obj.map(item => encryptNestedFields(item, fields));
   }
 
-  const result: any = { ...obj };
+  const result: Record<string, unknown> = { ...(obj as Record<string, unknown>) };
 
   for (const key in result) {
     if (fields.includes(key) && result[key] !== null && result[key] !== undefined) {
@@ -92,7 +93,7 @@ function encryptNestedFields(obj: any, fields: string[]): any {
       try {
         result[key] = encrypt(String(result[key]));
       } catch (error) {
-        console.error(`Failed to encrypt field: ${key}`, error);
+        logger.error(`Failed to encrypt field: ${key}`, { error });
       }
     } else if (typeof result[key] === 'object') {
       // Recursively process nested objects
@@ -106,7 +107,7 @@ function encryptNestedFields(obj: any, fields: string[]): any {
 /**
  * Decrypt nested objects recursively
  */
-function decryptNestedFields(obj: any, fields: string[]): any {
+function decryptNestedFields(obj: unknown, fields: string[]): unknown {
   if (typeof obj !== 'object' || obj === null) {
     return obj;
   }
@@ -115,7 +116,7 @@ function decryptNestedFields(obj: any, fields: string[]): any {
     return obj.map(item => decryptNestedFields(item, fields));
   }
 
-  const result: any = { ...obj };
+  const result: Record<string, unknown> = { ...(obj as Record<string, unknown>) };
 
   for (const key in result) {
     if (fields.includes(key) && result[key] !== null && result[key] !== undefined) {
@@ -123,7 +124,7 @@ function decryptNestedFields(obj: any, fields: string[]): any {
       try {
         result[key] = decrypt(String(result[key]));
       } catch (error) {
-        console.error(`Failed to decrypt field: ${key}`, error);
+        logger.error(`Failed to decrypt field: ${key}`, { error });
         // Keep encrypted value if decryption fails
       }
     } else if (typeof result[key] === 'object') {
@@ -166,7 +167,7 @@ export const encryptRequest = (
 
     next();
   } catch (error) {
-    console.error('Encryption middleware error:', error);
+    logger.error('Encryption middleware error:', { error });
     next(error);
   }
 };
@@ -206,7 +207,7 @@ export const decryptResponse = (
 
     next();
   } catch (error) {
-    console.error('Decryption middleware error:', error);
+    logger.error('Decryption middleware error:', { error });
     next(error);
   }
 };
@@ -253,7 +254,7 @@ export const customFieldEncryption = (fields: string[]) => {
 
       next();
     } catch (error) {
-      console.error('Custom encryption middleware error:', error);
+      logger.error('Custom encryption middleware error:', { error });
       next(error);
     }
   };
@@ -286,7 +287,7 @@ export const autoDetectPHI = (
 
     next();
   } catch (error) {
-    console.error('Auto PHI detection error:', error);
+    logger.error('Auto PHI detection error:', { error });
     next(error);
   }
 };
@@ -363,7 +364,7 @@ export const createEncryptionMiddleware = (resourceType: string, customFields?: 
 
       next();
     } catch (error) {
-      console.error(`Encryption error for ${resourceType}:`, error);
+      logger.error(`Encryption error for ${resourceType}:`, { error });
       next(error);
     }
   };

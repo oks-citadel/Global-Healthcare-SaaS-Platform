@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { auditService } from '../services/audit.service.js';
 import { filterPHI } from '../lib/phi-filter.js';
+import { logger } from '../utils/logger.js';
 
 /**
  * HIPAA Audit Middleware
@@ -172,7 +173,7 @@ export const auditPHIAccess = async (
       }
     } catch (error) {
       // Log error but don't block response
-      console.error('Audit logging failed:', error);
+      logger.error('Audit logging failed:', { error });
     }
   };
 
@@ -222,7 +223,7 @@ export const auditSensitiveOperation = (operationType: string) => {
         userAgent,
       });
     } catch (error) {
-      console.error('Audit logging failed:', error);
+      logger.error('Audit logging failed:', { error });
     }
 
     next();
@@ -255,7 +256,7 @@ export const auditAuthEvent = (eventType: 'login' | 'logout' | 'password_change'
           ipAddress,
           userAgent,
         }).catch(error => {
-          console.error('Auth audit logging failed:', error);
+          logger.error('Auth audit logging failed:', { error });
         });
       } else if (eventType === 'failed_login') {
         // Always log failed logins
@@ -271,7 +272,7 @@ export const auditAuthEvent = (eventType: 'login' | 'logout' | 'password_change'
           ipAddress,
           userAgent,
         }).catch(error => {
-          console.error('Failed login audit logging failed:', error);
+          logger.error('Failed login audit logging failed:', { error });
         });
       }
 
@@ -315,7 +316,7 @@ export const auditDataExport = async (
       userAgent,
     });
   } catch (error) {
-    console.error('Export audit logging failed:', error);
+    logger.error('Export audit logging failed:', { error });
   }
 
   next();

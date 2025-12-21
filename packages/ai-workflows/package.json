@@ -26,9 +26,7 @@
   ],
   "author": "Global Healthcare",
   "license": "MIT",
-  "dependencies": {
-    "crypto": "^1.0.1"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/node": "^20.0.0",
     "typescript": "^5.3.0",

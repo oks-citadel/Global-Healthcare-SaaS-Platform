@@ -87,8 +87,8 @@ export default function MessagesPage() {
 
   const handleSendMessage = () => {
     if (newMessage.trim()) {
-      // In a real app, this would send the message to the API
-      console.log('Sending message:', newMessage);
+      // TODO: Send message to API
+      // await api.sendMessage({ conversationId: selectedConversation, content: newMessage });
       setNewMessage('');
     }
   };

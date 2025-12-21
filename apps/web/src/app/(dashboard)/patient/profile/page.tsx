@@ -10,8 +10,8 @@ export default function ProfilePage() {
   const [formData, setFormData] = useState<Partial<PatientProfile>>(profile || {});
 
   const handleSave = async () => {
-    // Save logic would be implemented here
-    console.log('Saving profile:', formData);
+    // TODO: Implement profile update API call
+    // await api.updateProfile(formData);
     setIsEditing(false);
   };
 
