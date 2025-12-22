@@ -66,8 +66,7 @@ const nextConfig = {
     ],
   },
 
-  // CSS optimization (stable in Next.js 16)
-  cssChunking: 'strict',
+  // CSS optimization - cssChunking removed in Next.js 16
 
   // Security headers
   async headers() {
