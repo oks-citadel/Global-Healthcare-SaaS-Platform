@@ -107,7 +107,7 @@ jobs:
       # Build SDK Package First
       # ----------------------------------------
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --no-frozen-lockfile
 
       - name: Build SDK package
         run: pnpm --filter @unified-health/sdk build
