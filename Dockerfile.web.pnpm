@@ -93,8 +93,7 @@ ENV GIT_SHA=${GIT_SHA}
 ENV GIT_BRANCH=${GIT_BRANCH}
 
 # Build Next.js app with webpack (Turbopack has workspace root detection issues in Docker)
-# Using --no-lint to skip linting since it was already done in CI
-RUN NEXT_TELEMETRY_DISABLED=1 npx next build --no-lint --webpack
+RUN NEXT_TELEMETRY_DISABLED=1 npx next build --webpack
 
 # Verify standalone output exists
 RUN ls -la .next/standalone/ && ls -la .next/static/
