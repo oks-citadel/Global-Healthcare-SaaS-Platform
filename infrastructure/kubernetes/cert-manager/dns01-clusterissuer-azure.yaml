@@ -1,0 +1,90 @@
+# ============================================
+# DNS-01 ClusterIssuer for Azure DNS
+# ============================================
+# This configuration uses Azure DNS with Workload Identity
+# for DNS-01 ACME challenges (recommended approach)
+#
+# Prerequisites:
+# 1. Azure DNS Zone exists in your subscription
+# 2. AKS cluster has workload identity enabled
+# 3. Managed Identity with DNS Zone Contributor role
+# 4. Federated credentials configured for cert-manager
+# ============================================
+
+---
+# Production ClusterIssuer with Azure DNS (Workload Identity)
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod-dns01
+  labels:
+    app.kubernetes.io/name: cert-manager
+    app.kubernetes.io/component: cluster-issuer
+    app.kubernetes.io/part-of: unified-health
+spec:
+  acme:
+    # Production Let's Encrypt server
+    server: https://acme-v02.api.letsencrypt.org/directory
+
+    # Email for certificate expiration notifications
+    # IMPORTANT: Replace with your actual email
+    email: platform-admin@unifiedhealth.com
+
+    # Secret to store the ACME account private key
+    privateKeySecretRef:
+      name: letsencrypt-prod-dns01-account-key
+
+    solvers:
+    # DNS-01 solver using Azure DNS with Workload Identity
+    - dns01:
+        azureDNS:
+          # Azure subscription containing the DNS zone
+          # IMPORTANT: Replace with your actual subscription ID
+          subscriptionID: "YOUR_AZURE_SUBSCRIPTION_ID"
+
+          # Resource group containing the DNS zone
+          # IMPORTANT: Replace with your actual resource group
+          resourceGroupName: "rg-unified-health-dns"
+
+          # The Azure DNS zone name
+          # IMPORTANT: Replace with your actual DNS zone name
+          hostedZoneName: "unifiedhealth.com"
+
+          # Azure cloud environment
+          environment: AzurePublicCloud
+
+          # Using Workload Identity (recommended)
+          # The managed identity client ID
+          managedIdentity:
+            # IMPORTANT: Replace with your managed identity client ID
+            clientID: "YOUR_MANAGED_IDENTITY_CLIENT_ID"
+
+---
+# Staging ClusterIssuer for testing (uses Let's Encrypt staging)
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging-dns01
+  labels:
+    app.kubernetes.io/name: cert-manager
+    app.kubernetes.io/component: cluster-issuer
+    app.kubernetes.io/part-of: unified-health
+spec:
+  acme:
+    # Staging Let's Encrypt server (for testing)
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+
+    email: platform-admin@unifiedhealth.com
+
+    privateKeySecretRef:
+      name: letsencrypt-staging-dns01-account-key
+
+    solvers:
+    - dns01:
+        azureDNS:
+          subscriptionID: "YOUR_AZURE_SUBSCRIPTION_ID"
+          resourceGroupName: "rg-unified-health-dns"
+          hostedZoneName: "unifiedhealth.com"
+          environment: AzurePublicCloud
+          managedIdentity:
+            clientID: "YOUR_MANAGED_IDENTITY_CLIENT_ID"

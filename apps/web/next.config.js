@@ -32,105 +32,42 @@ const nextConfig = {
     } : false,
   },
 
-  // SWC Minification
-  swcMinify: true,
-
   // Production source maps (disabled for performance)
   productionBrowserSourceMaps: false,
 
+  // Turbopack configuration (Next.js 16+)
+  // Note: Turbopack is now the default bundler in Next.js 16
+  // Use `next build --webpack` to fall back to webpack if needed
+  turbopack: {
+    // Resolve aliases for Turbopack (mirrors webpack config)
+    resolveAlias: {
+      '@': './src',
+      '@components': './src/components',
+      '@hooks': './src/hooks',
+      '@lib': './src/lib',
+      '@api': './src/api',
+    },
+  },
+
+  // Transpile workspace packages for Turbopack compatibility
+  transpilePackages: ['@unified-health/sdk'],
+
   // Experimental features for performance
   experimental: {
-    optimizeCss: true,
+    // optimizeCss is now stable in Next.js 16, moved out of experimental
     optimizePackageImports: [
       '@tanstack/react-query',
       'zustand',
       'axios',
       'zod',
+      'lucide-react',
+      'date-fns',
+      'recharts',
     ],
   },
 
-  // Webpack configuration
-  webpack: (config, { dev, isServer, webpack }) => {
-    // Bundle analyzer (only in production build with ANALYZE=true)
-    if (process.env.ANALYZE === 'true') {
-      const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
-      config.plugins.push(
-        new BundleAnalyzerPlugin({
-          analyzerMode: 'static',
-          reportFilename: isServer
-            ? '../analyze/server.html'
-            : './analyze/client.html',
-          openAnalyzer: true,
-        })
-      );
-    }
-
-    // Optimize module resolution
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      '@': require('path').resolve(__dirname, 'src'),
-    };
-
-    // Code splitting optimization
-    if (!dev && !isServer) {
-      config.optimization = {
-        ...config.optimization,
-        moduleIds: 'deterministic',
-        runtimeChunk: 'single',
-        splitChunks: {
-          chunks: 'all',
-          cacheGroups: {
-            default: false,
-            vendors: false,
-            // Framework bundle (React, Next.js)
-            framework: {
-              name: 'framework',
-              chunks: 'all',
-              test: /[\\/]node_modules[\\/](react|react-dom|scheduler|prop-types|use-subscription)[\\/]/,
-              priority: 40,
-              enforce: true,
-            },
-            // Common libraries
-            lib: {
-              test: /[\\/]node_modules[\\/]/,
-              name(module) {
-                const packageName = module.context.match(
-                  /[\\/]node_modules[\\/](.*?)([\\/]|$)/
-                )?.[1];
-                return `lib.${packageName?.replace('@', '')}`;
-              },
-              priority: 30,
-              minChunks: 1,
-              reuseExistingChunk: true,
-            },
-            // Common components
-            commons: {
-              name: 'commons',
-              minChunks: 2,
-              priority: 20,
-            },
-            // Shared code between pages
-            shared: {
-              name: 'shared',
-              minChunks: 2,
-              priority: 10,
-              reuseExistingChunk: true,
-              enforce: true,
-            },
-          },
-        },
-      };
-    }
-
-    // Performance hints
-    config.performance = {
-      hints: dev ? false : 'warning',
-      maxEntrypointSize: 512000,
-      maxAssetSize: 512000,
-    };
-
-    return config;
-  },
+  // CSS optimization (stable in Next.js 16)
+  cssChunking: 'strict',
 
   // Security headers
   async headers() {

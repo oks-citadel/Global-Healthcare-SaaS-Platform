@@ -1,10 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
+  // Note: swcMinify is deprecated in Next.js 16 - SWC minification is now always enabled
   experimental: {
     optimizePackageImports: ['lucide-react'],
   },
+  // Turbopack configuration (Next.js 16+)
+  turbopack: {},
+  // Transpile workspace packages for Turbopack compatibility
+  transpilePackages: ['@unified-health/sdk'],
   // Optimize for kiosk deployment
   output: 'standalone',
   poweredByHeader: false,

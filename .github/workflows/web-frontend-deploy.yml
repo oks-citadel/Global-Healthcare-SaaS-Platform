@@ -1,0 +1,470 @@
+# ============================================
+# UnifiedHealth Platform - Web Frontend Build & Deploy
+# GitHub Actions Workflow for Azure ACR + AKS Deployment
+# ============================================
+# This workflow handles the web frontend (apps/web) which depends on
+# packages/sdk workspace package. It builds from the monorepo root
+# using Dockerfile.web to properly resolve workspace dependencies.
+# ============================================
+
+name: Web Frontend - Build & Deploy
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/web/**'
+      - 'packages/sdk/**'
+      - 'Dockerfile.web'
+      - 'Dockerfile.web.pnpm'
+      - '.github/workflows/web-frontend-deploy.yml'
+
+  workflow_dispatch:
+    inputs:
+      deploy_to_aks:
+        description: 'Deploy to AKS after build'
+        required: false
+        default: false
+        type: boolean
+      image_tag:
+        description: 'Custom image tag (leave empty for auto-generated)'
+        required: false
+        type: string
+      environment:
+        description: 'Deployment environment'
+        required: false
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - staging
+          - production
+
+env:
+  # Azure Configuration
+  AZURE_SUBSCRIPTION_ID: d8afbfb0-0c60-4d11-a1c7-a614235f5eb6
+  RESOURCE_GROUP: rg-unified-health-dev2
+  ACR_NAME: acrunifiedhealthdev2
+  ACR_REGISTRY: acrunifiedhealthdev2.azurecr.io
+  AKS_CLUSTER: aks-unified-health-dev2
+
+  # Image Configuration
+  IMAGE_NAME: unifiedhealth/web
+
+  # Build Configuration
+  NODE_VERSION: '20'
+  PNPM_VERSION: '9'
+
+jobs:
+  # ==========================================
+  # Build SDK and Web App
+  # ==========================================
+  build:
+    name: Build Web Frontend
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write  # Required for OIDC
+
+    outputs:
+      image_tag: ${{ steps.meta.outputs.image_tag }}
+      image_digest: ${{ steps.build.outputs.digest }}
+      full_image_ref: ${{ steps.meta.outputs.full_image_ref }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # ----------------------------------------
+      # Setup Build Tools
+      # ----------------------------------------
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      # ----------------------------------------
+      # Build SDK Package First
+      # ----------------------------------------
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build SDK package
+        run: pnpm --filter @unified-health/sdk build
+
+      - name: Verify SDK build output
+        run: |
+          echo "Checking SDK build output..."
+          ls -la packages/sdk/dist/ || echo "SDK dist not found"
+
+      - name: Type check web app
+        run: pnpm --filter @unified-health/web typecheck
+        continue-on-error: true
+
+      # ----------------------------------------
+      # Docker Build & Push to ACR
+      # ----------------------------------------
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: |
+            network=host
+
+      - name: Generate image metadata
+        id: meta
+        run: |
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          TIMESTAMP=$(date +%Y%m%d%H%M%S)
+          BRANCH=${GITHUB_REF##*/}
+
+          # Use custom tag if provided, otherwise generate one
+          if [ -n "${{ inputs.image_tag }}" ]; then
+            IMAGE_TAG="${{ inputs.image_tag }}"
+          else
+            IMAGE_TAG="${BRANCH}-${SHORT_SHA}-${TIMESTAMP}"
+          fi
+
+          FULL_IMAGE_REF="${{ env.ACR_REGISTRY }}/${{ env.IMAGE_NAME }}:${IMAGE_TAG}"
+
+          echo "image_tag=${IMAGE_TAG}" >> $GITHUB_OUTPUT
+          echo "short_sha=${SHORT_SHA}" >> $GITHUB_OUTPUT
+          echo "full_image_ref=${FULL_IMAGE_REF}" >> $GITHUB_OUTPUT
+          echo "branch=${BRANCH}" >> $GITHUB_OUTPUT
+
+          echo "Image will be tagged as: ${IMAGE_TAG}"
+          echo "Full image reference: ${FULL_IMAGE_REF}"
+
+      # Azure Login using OIDC (preferred) or Service Principal
+      - name: Azure Login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
+        continue-on-error: true
+        id: azure-oidc
+
+      - name: Azure Login (Service Principal Fallback)
+        if: steps.azure-oidc.outcome == 'failure'
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Login to Azure Container Registry
+        run: |
+          az acr login --name ${{ env.ACR_NAME }}
+          echo "Successfully logged into ACR: ${{ env.ACR_REGISTRY }}"
+
+      - name: Build and push Docker image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.web.pnpm
+          push: true
+          tags: |
+            ${{ env.ACR_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.image_tag }}
+            ${{ env.ACR_REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            ${{ env.ACR_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.short_sha }}
+          labels: |
+            org.opencontainers.image.title=UnifiedHealth Web Frontend
+            org.opencontainers.image.description=UnifiedHealth Patient Portal - Next.js Application
+            org.opencontainers.image.vendor=UnifiedHealth
+            org.opencontainers.image.version=${{ steps.meta.outputs.image_tag }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+          build-args: |
+            BUILD_DATE=${{ github.event.head_commit.timestamp || github.event.repository.updated_at }}
+            VERSION=${{ steps.meta.outputs.image_tag }}
+            GIT_SHA=${{ github.sha }}
+            GIT_BRANCH=${{ steps.meta.outputs.branch }}
+          cache-from: type=gha,scope=web-frontend
+          cache-to: type=gha,scope=web-frontend,mode=max
+          platforms: linux/amd64
+
+      - name: Output image information
+        run: |
+          echo "============================================"
+          echo "BUILD COMPLETE"
+          echo "============================================"
+          echo "Image Tag: ${{ steps.meta.outputs.image_tag }}"
+          echo "Image Digest: ${{ steps.build.outputs.digest }}"
+          echo "Full Reference: ${{ steps.meta.outputs.full_image_ref }}"
+          echo ""
+          echo "To pull this image:"
+          echo "  az acr login --name ${{ env.ACR_NAME }}"
+          echo "  docker pull ${{ steps.meta.outputs.full_image_ref }}"
+          echo "============================================"
+
+  # ==========================================
+  # Security Scan
+  # ==========================================
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      security-events: write
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Azure Login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
+        continue-on-error: true
+        id: azure-oidc
+
+      - name: Azure Login (Service Principal Fallback)
+        if: steps.azure-oidc.outcome == 'failure'
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Login to Azure Container Registry
+        run: az acr login --name ${{ env.ACR_NAME }}
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ needs.build.outputs.full_image_ref }}
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '0'  # Don't fail the build, just report
+
+      - name: Upload Trivy scan results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+          category: 'trivy-web-frontend'
+
+      - name: Trivy scan summary
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ needs.build.outputs.full_image_ref }}
+          format: 'table'
+          severity: 'CRITICAL,HIGH,MEDIUM'
+          exit-code: '0'
+
+  # ==========================================
+  # Deploy to AKS (Optional)
+  # ==========================================
+  deploy-aks:
+    name: Deploy to AKS
+    runs-on: ubuntu-latest
+    needs: [build, security-scan]
+    if: |
+      (github.event_name == 'workflow_dispatch' && inputs.deploy_to_aks == true) ||
+      (github.event_name == 'push' && github.ref == 'refs/heads/main')
+
+    permissions:
+      contents: read
+      id-token: write
+
+    environment:
+      name: ${{ inputs.environment || 'dev' }}
+      url: https://web.${{ inputs.environment || 'dev' }}.unifiedhealth.io
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Azure Login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
+        continue-on-error: true
+        id: azure-oidc
+
+      - name: Azure Login (Service Principal Fallback)
+        if: steps.azure-oidc.outcome == 'failure'
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set AKS context
+        uses: azure/aks-set-context@v4
+        with:
+          resource-group: ${{ env.RESOURCE_GROUP }}
+          cluster-name: ${{ env.AKS_CLUSTER }}
+          admin: false
+
+      - name: Deploy to AKS
+        run: |
+          ENV="${{ inputs.environment || 'dev' }}"
+          IMAGE="${{ needs.build.outputs.full_image_ref }}"
+          NAMESPACE="unifiedhealth-${ENV}"
+
+          echo "Deploying to namespace: ${NAMESPACE}"
+          echo "Image: ${IMAGE}"
+
+          # Create namespace if it doesn't exist
+          kubectl create namespace ${NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -
+
+          # Check if deployment exists
+          if kubectl get deployment web -n ${NAMESPACE} > /dev/null 2>&1; then
+            echo "Updating existing deployment..."
+            kubectl set image deployment/web \
+              web=${IMAGE} \
+              -n ${NAMESPACE}
+
+            # Wait for rollout
+            kubectl rollout status deployment/web -n ${NAMESPACE} --timeout=300s
+          else
+            echo "Deployment 'web' not found in namespace ${NAMESPACE}"
+            echo "Please ensure Kubernetes manifests are applied first."
+            echo ""
+            echo "You can apply a deployment with:"
+            echo "  kubectl create deployment web --image=${IMAGE} -n ${NAMESPACE}"
+            echo "  kubectl expose deployment web --port=3000 -n ${NAMESPACE}"
+            exit 1
+          fi
+
+      - name: Verify deployment
+        run: |
+          ENV="${{ inputs.environment || 'dev' }}"
+          NAMESPACE="unifiedhealth-${ENV}"
+
+          echo "Checking deployment status..."
+          kubectl get pods -n ${NAMESPACE} -l app=web
+
+          echo ""
+          echo "Deployment details:"
+          kubectl describe deployment web -n ${NAMESPACE} | head -50
+
+      - name: Deployment summary
+        run: |
+          echo "============================================"
+          echo "DEPLOYMENT COMPLETE"
+          echo "============================================"
+          echo "Environment: ${{ inputs.environment || 'dev' }}"
+          echo "Image: ${{ needs.build.outputs.full_image_ref }}"
+          echo "AKS Cluster: ${{ env.AKS_CLUSTER }}"
+          echo "Resource Group: ${{ env.RESOURCE_GROUP }}"
+          echo "============================================"
+
+  # ==========================================
+  # Notify Build Status
+  # ==========================================
+  notify:
+    name: Notify Status
+    runs-on: ubuntu-latest
+    needs: [build, security-scan, deploy-aks]
+    if: always()
+
+    steps:
+      - name: Determine overall status
+        id: status
+        run: |
+          BUILD_RESULT="${{ needs.build.result }}"
+          SCAN_RESULT="${{ needs.security-scan.result }}"
+          DEPLOY_RESULT="${{ needs.deploy-aks.result }}"
+
+          if [ "$BUILD_RESULT" == "success" ]; then
+            if [ "$DEPLOY_RESULT" == "success" ]; then
+              echo "STATUS=deployed" >> $GITHUB_OUTPUT
+              echo "COLOR=good" >> $GITHUB_OUTPUT
+              echo "EMOJI=rocket" >> $GITHUB_OUTPUT
+            elif [ "$DEPLOY_RESULT" == "skipped" ]; then
+              echo "STATUS=built" >> $GITHUB_OUTPUT
+              echo "COLOR=good" >> $GITHUB_OUTPUT
+              echo "EMOJI=white_check_mark" >> $GITHUB_OUTPUT
+            else
+              echo "STATUS=deploy-failed" >> $GITHUB_OUTPUT
+              echo "COLOR=danger" >> $GITHUB_OUTPUT
+              echo "EMOJI=x" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "STATUS=build-failed" >> $GITHUB_OUTPUT
+            echo "COLOR=danger" >> $GITHUB_OUTPUT
+            echo "EMOJI=x" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Post summary to GitHub
+        run: |
+          echo "## Web Frontend Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Item | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Status | ${{ steps.status.outputs.STATUS }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Image Tag | ${{ needs.build.outputs.image_tag }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Image Digest | ${{ needs.build.outputs.image_digest }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Full Reference | ${{ needs.build.outputs.full_image_ref }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build Result | ${{ needs.build.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Security Scan | ${{ needs.security-scan.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Deploy Result | ${{ needs.deploy-aks.result }} |" >> $GITHUB_STEP_SUMMARY
+
+      - name: Send Slack notification
+        if: always() && vars.SLACK_NOTIFICATIONS_ENABLED == 'true'
+        uses: slackapi/slack-github-action@v1.26.0
+        with:
+          payload: |
+            {
+              "text": "Web Frontend Build: ${{ steps.status.outputs.STATUS }}",
+              "attachments": [
+                {
+                  "color": "${{ steps.status.outputs.COLOR }}",
+                  "fields": [
+                    {
+                      "title": "Repository",
+                      "value": "${{ github.repository }}",
+                      "short": true
+                    },
+                    {
+                      "title": "Branch",
+                      "value": "${{ github.ref_name }}",
+                      "short": true
+                    },
+                    {
+                      "title": "Image Tag",
+                      "value": "${{ needs.build.outputs.image_tag }}",
+                      "short": true
+                    },
+                    {
+                      "title": "Author",
+                      "value": "${{ github.actor }}",
+                      "short": true
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": "button",
+                      "text": "View Workflow",
+                      "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        continue-on-error: true

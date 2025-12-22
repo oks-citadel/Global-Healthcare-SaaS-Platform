@@ -1,0 +1,132 @@
+# ============================================
+# Certificate Resources for DNS-01 Challenge
+# ============================================
+# These Certificate resources use the DNS-01 ClusterIssuer
+# to obtain TLS certificates from Let's Encrypt
+# ============================================
+
+---
+# Main platform TLS certificate (supports wildcard)
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: unified-health-tls-dns01
+  namespace: unified-health
+  labels:
+    app.kubernetes.io/name: unified-health
+    app.kubernetes.io/component: tls-certificate
+spec:
+  # Name of the secret to store the certificate
+  secretName: unified-health-tls-dns01
+
+  # Reference to the DNS-01 ClusterIssuer
+  issuerRef:
+    name: letsencrypt-prod-dns01
+    kind: ClusterIssuer
+    group: cert-manager.io
+
+  # DNS names to include in the certificate
+  # DNS-01 supports wildcard certificates
+  dnsNames:
+  - "unifiedhealth.com"
+  - "*.unifiedhealth.com"
+  - "api.unifiedhealth.com"
+  - "app.unifiedhealth.com"
+  - "admin.unifiedhealth.com"
+
+  # Certificate validity duration (90 days is Let's Encrypt max)
+  duration: 2160h  # 90 days
+
+  # Renew 30 days before expiry
+  renewBefore: 720h  # 30 days
+
+  # Private key settings
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS1
+    size: 4096
+    rotationPolicy: Always
+
+  # Certificate usages
+  usages:
+  - digital signature
+  - key encipherment
+  - server auth
+
+---
+# Development/staging certificate for nip.io domain workaround
+# NOTE: This uses a custom domain registered in Azure DNS
+# since nip.io doesn't support DNS-01 challenges
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: unified-health-dev-tls
+  namespace: unified-health
+  labels:
+    app.kubernetes.io/name: unified-health
+    app.kubernetes.io/component: tls-certificate
+    environment: development
+spec:
+  secretName: unified-health-dev-tls
+
+  issuerRef:
+    # Use staging issuer for development to avoid rate limits
+    name: letsencrypt-staging-dns01
+    kind: ClusterIssuer
+    group: cert-manager.io
+
+  # Development subdomain (registered in Azure DNS)
+  dnsNames:
+  - "dev.unifiedhealth.com"
+  - "*.dev.unifiedhealth.com"
+
+  duration: 2160h
+  renewBefore: 720h
+
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS1
+    size: 4096
+    rotationPolicy: Always
+
+  usages:
+  - digital signature
+  - key encipherment
+  - server auth
+
+---
+# WebSocket-specific certificate
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: unified-health-ws-tls
+  namespace: unified-health
+  labels:
+    app.kubernetes.io/name: unified-health
+    app.kubernetes.io/component: tls-certificate
+    type: websocket
+spec:
+  secretName: unified-health-ws-tls
+
+  issuerRef:
+    name: letsencrypt-prod-dns01
+    kind: ClusterIssuer
+    group: cert-manager.io
+
+  dnsNames:
+  - "ws.unifiedhealth.com"
+  - "realtime.unifiedhealth.com"
+
+  duration: 2160h
+  renewBefore: 720h
+
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS1
+    size: 4096
+    rotationPolicy: Always
+
+  usages:
+  - digital signature
+  - key encipherment
+  - server auth

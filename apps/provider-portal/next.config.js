@@ -1,10 +1,24 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
+  // Note: swcMinify is deprecated in Next.js 16 - SWC minification is now always enabled
   images: {
-    domains: ['localhost', 'api.unified-health.com'],
+    // Use remotePatterns instead of deprecated domains option
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+      },
+      {
+        protocol: 'https',
+        hostname: 'api.unified-health.com',
+      },
+    ],
   },
+  // Turbopack configuration (Next.js 16+)
+  turbopack: {},
+  // Transpile workspace packages for Turbopack compatibility
+  transpilePackages: ['@unified-health/sdk'],
   async rewrites() {
     return [
       {

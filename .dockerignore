@@ -95,3 +95,10 @@ tsconfig*.json
 .bundle
 ios
 android
+
+# Mobile app (not needed for web/api builds)
+apps/mobile
+
+# Turbo cache
+.turbo
+**/.turbo

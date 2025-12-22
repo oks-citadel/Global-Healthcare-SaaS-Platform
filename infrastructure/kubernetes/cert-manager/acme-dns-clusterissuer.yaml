@@ -1,0 +1,93 @@
+# ============================================
+# ACME-DNS ClusterIssuer Configuration
+# ============================================
+# This configuration uses acme-dns for DNS-01 challenges
+# as an alternative when you don't control the DNS zone
+# (e.g., when using nip.io or similar services)
+#
+# acme-dns is a limited DNS server specifically designed
+# for ACME DNS-01 challenges. You deploy it and then
+# create CNAME records pointing to it.
+#
+# Prerequisites:
+# 1. Deploy acme-dns server (self-hosted or use a public instance)
+# 2. Register your domains with acme-dns
+# 3. Create CNAME records in your DNS pointing to acme-dns
+# ============================================
+
+---
+# Secret for acme-dns credentials
+# Each domain registration with acme-dns produces credentials
+apiVersion: v1
+kind: Secret
+metadata:
+  name: acme-dns-credentials
+  namespace: cert-manager
+  labels:
+    app.kubernetes.io/name: cert-manager
+    app.kubernetes.io/component: acme-dns-credentials
+type: Opaque
+stringData:
+  # acme-dns credentials JSON file
+  # Format: { "domain": { "username": "...", "password": "...", "fulldomain": "...", "subdomain": "..." } }
+  acmedns.json: |
+    {
+      "api.20-3-27-63.nip.io": {
+        "username": "ACME_DNS_USERNAME",
+        "password": "ACME_DNS_PASSWORD",
+        "fulldomain": "YOUR_SUBDOMAIN.acme-dns.example.com",
+        "subdomain": "YOUR_SUBDOMAIN",
+        "allowfrom": []
+      }
+    }
+
+---
+# ClusterIssuer using acme-dns for DNS-01 challenges
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-acmedns
+  labels:
+    app.kubernetes.io/name: cert-manager
+    app.kubernetes.io/component: cluster-issuer
+    app.kubernetes.io/part-of: unified-health
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: platform-admin@unifiedhealth.com
+    privateKeySecretRef:
+      name: letsencrypt-acmedns-account-key
+
+    solvers:
+    - dns01:
+        acmeDNS:
+          # acme-dns server URL
+          host: https://acme-dns.example.com
+          accountSecretRef:
+            name: acme-dns-credentials
+            key: acmedns.json
+
+---
+# Staging ClusterIssuer using acme-dns (for testing)
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging-acmedns
+  labels:
+    app.kubernetes.io/name: cert-manager
+    app.kubernetes.io/component: cluster-issuer
+    app.kubernetes.io/part-of: unified-health
+spec:
+  acme:
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    email: platform-admin@unifiedhealth.com
+    privateKeySecretRef:
+      name: letsencrypt-staging-acmedns-account-key
+
+    solvers:
+    - dns01:
+        acmeDNS:
+          host: https://acme-dns.example.com
+          accountSecretRef:
+            name: acme-dns-credentials
+            key: acmedns.json

@@ -30,6 +30,7 @@
     "db:reset": "bash scripts/reset-db.sh"
   },
   "dependencies": {
+    "apn": "^2.2.0",
     "@azure/identity": "^4.13.0",
     "@azure/keyvault-secrets": "^4.10.0",
     "@azure/storage-blob": "^12.17.0",
@@ -72,6 +73,7 @@
     "twilio": "^5.10.7",
     "uuid": "^13.0.0",
     "winston": "^3.11.0",
+    "web-push": "^3.6.7",
     "zod": "^3.22.4"
   },
   "devDependencies": {
