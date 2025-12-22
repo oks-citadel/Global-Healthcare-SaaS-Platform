@@ -464,7 +464,7 @@ ROLLBACK_DATABASE=true DB_BACKUP_NAME=backup-20240101-120000 ./scripts/rollback.
 |----------|-------------|---------|
 | `ENVIRONMENT` | Environment name (staging/production) | staging |
 | `LOCATION` | Azure region | eastus |
-| `ACR_NAME` | Azure Container Registry name | unifiedhealthacr |
+| `ACR_NAME` | Azure Container Registry name | acrunifiedhealthdev2 |
 | `RESOURCE_GROUP` | Azure resource group | unified-health-rg-{env} |
 | `AKS_CLUSTER` | AKS cluster name | unified-health-aks-{env} |
 | `SKIP_CONFIRMATION` | Skip confirmation prompts | false |

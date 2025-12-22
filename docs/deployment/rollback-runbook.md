@@ -371,7 +371,7 @@ kubectl describe deployment unified-health-api -n unified-health | grep Image
 
 # Or check container registry
 az acr repository show-tags \
-  --name unifiedhealthacr \
+  --name acrunifiedhealthdev2 \
   --repository unified-health-api \
   --orderby time_desc
 
@@ -388,7 +388,7 @@ az acr repository show-tags \
 ```bash
 # Set image to previous version
 kubectl set image deployment/unified-health-api \
-  api=acr.azurecr.io/unified-health-api:v1.1.0 \
+  api=acrunifiedhealthdev2.azurecr.io/unified-health-api:v1.1.0 \
   -n unified-health
 
 # Monitor rollout
@@ -640,7 +640,7 @@ SELECT * FROM _prisma_migrations ORDER BY finished_at DESC LIMIT 1;
 ```bash
 # Rollback to application version compatible with restored schema
 kubectl set image deployment/unified-health-api \
-  api=acr.azurecr.io/unified-health-api:v1.1.0 \
+  api=acrunifiedhealthdev2.azurecr.io/unified-health-api:v1.1.0 \
   -n unified-health
 
 # Scale back up

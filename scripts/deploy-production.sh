@@ -17,10 +17,10 @@ NC='\033[0m' # No Color
 # Configuration
 ENVIRONMENT="production"
 NAMESPACE="unified-health-prod"
-ACR_NAME="${ACR_NAME:-unifiedhealthacr}"
+ACR_NAME="${ACR_NAME:-acrunifiedhealthdev2}"
 ACR_LOGIN_SERVER="${ACR_NAME}.azurecr.io"
 AKS_CLUSTER="${AKS_CLUSTER:-unified-health-aks-prod}"
-RESOURCE_GROUP="${RESOURCE_GROUP:-unified-health-rg-prod}"
+RESOURCE_GROUP="${RESOURCE_GROUP:-rg-unified-health-dev2-prod}"
 VERSION="${VERSION:-$(git describe --tags --abbrev=0 2>/dev/null || git rev-parse --short HEAD)}"
 BUILD_TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 IMAGE_TAG="${VERSION}-${BUILD_TIMESTAMP}"

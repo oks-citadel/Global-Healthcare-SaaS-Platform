@@ -322,7 +322,7 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Login to Azure Container Registry
-        run: az acr login --name unifiedhealthacr
+        run: az acr login --name acrunifiedhealthdev2
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -334,8 +334,8 @@ jobs:
           file: ${{ matrix.service.dockerfile }}
           push: true
           tags: |
-            unifiedhealthacr.azurecr.io/unified-health-${{ matrix.service.name }}:${{ needs.analyze-commits.outputs.new_version }}
-            unifiedhealthacr.azurecr.io/unified-health-${{ matrix.service.name }}:latest
+            acrunifiedhealthdev2.azurecr.io/unified-health-${{ matrix.service.name }}:${{ needs.analyze-commits.outputs.new_version }}
+            acrunifiedhealthdev2.azurecr.io/unified-health-${{ matrix.service.name }}:latest
           cache-from: type=gha,scope=${{ matrix.service.name }}-release
           cache-to: type=gha,scope=${{ matrix.service.name }}-release,mode=max
 

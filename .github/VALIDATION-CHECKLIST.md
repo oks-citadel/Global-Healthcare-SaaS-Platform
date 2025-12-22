@@ -29,7 +29,7 @@ This checklist ensures all CI/CD components are properly configured and tested b
 ### Azure Configuration
 
 - [ ] Azure Container Registry (ACR) created
-  - [ ] Name: `unifiedhealthacr`
+  - [ ] Name: `acrunifiedhealthdev2`
   - [ ] Service principal access configured
   - [ ] Image retention policies set
 

@@ -7,9 +7,9 @@
 set -e
 
 # Configuration
-ACR_NAME="${ACR_NAME:-unifiedhealthacr}"
+ACR_NAME="${ACR_NAME:-acrunifiedhealthdev2}"
 ACR_REGISTRY="${ACR_NAME}.azurecr.io"
-RESOURCE_GROUP="${RESOURCE_GROUP:-unifiedhealth-rg}"
+RESOURCE_GROUP="${RESOURCE_GROUP:-rg-unified-health-dev2}"
 LOCATION="${LOCATION:-eastus}"
 IMAGE_TAG="${IMAGE_TAG:-$(git rev-parse --short HEAD 2>/dev/null || echo 'latest')}"
 

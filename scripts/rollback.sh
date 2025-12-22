@@ -18,9 +18,9 @@ NC='\033[0m' # No Color
 ENVIRONMENT="${1:-production}"
 TARGET_VERSION="${2:-}"
 NAMESPACE="unified-health-${ENVIRONMENT}"
-ACR_NAME="${ACR_NAME:-unifiedhealthacr}"
+ACR_NAME="${ACR_NAME:-acrunifiedhealthdev2}"
 ACR_LOGIN_SERVER="${ACR_NAME}.azurecr.io"
-RESOURCE_GROUP="${RESOURCE_GROUP:-unified-health-rg-${ENVIRONMENT}}"
+RESOURCE_GROUP="${RESOURCE_GROUP:-rg-unified-health-dev2-${ENVIRONMENT}}"
 AKS_CLUSTER="${AKS_CLUSTER:-unified-health-aks-${ENVIRONMENT}}"
 
 # Log functions

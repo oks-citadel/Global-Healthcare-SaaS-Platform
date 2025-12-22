@@ -130,7 +130,7 @@ Configure the following secrets in your GitHub repository:
 | Secret | Description | Example |
 |--------|-------------|---------|
 | `AZURE_CREDENTIALS` | Azure service principal JSON | `{"clientId":"...","clientSecret":"...","subscriptionId":"...","tenantId":"..."}` |
-| `ACR_NAME` | Container registry name | `unifiedhealthacr` |
+| `ACR_NAME` | Container registry name | `acrunifiedhealthdev2` |
 | `SLACK_WEBHOOK_URL` | Slack webhook for notifications | `https://hooks.slack.com/services/...` |
 | `STAGING_URL` | Staging environment URL | `https://staging.unified-health.com` |
 | `STAGING_API_URL` | Staging API URL | `https://api-staging.unified-health.com` |

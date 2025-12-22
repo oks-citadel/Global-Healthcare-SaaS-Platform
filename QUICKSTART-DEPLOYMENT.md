@@ -132,7 +132,7 @@ Add these secrets:
 
 ```
 AZURE_CREDENTIALS = <service-principal-json-from-step-1.1>
-ACR_NAME = unifiedhealthacr
+ACR_NAME = acrunifiedhealthdev2
 SLACK_WEBHOOK_URL = https://hooks.slack.com/services/YOUR/WEBHOOK/URL
 STAGING_URL = https://staging.unified-health.com
 STAGING_API_URL = https://api-staging.unified-health.com

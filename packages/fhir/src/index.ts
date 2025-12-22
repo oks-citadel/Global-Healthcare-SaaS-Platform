@@ -22,8 +22,24 @@ export * from './validation/schemas';
 export * from './validation/validator';
 
 // Export conversion utilities
-export * from './conversion/r4-to-r5';
-export * from './conversion/r5-to-r4';
+export {
+  ConversionResult,
+  convertPatientR4ToR5,
+  convertPractitionerR4ToR5,
+  convertOrganizationR4ToR5,
+  convertR4ToR5,
+  batchConvertR4ToR5,
+  convertBundleR4ToR5
+} from './conversion/r4-to-r5';
+
+export {
+  convertPatientR5ToR4,
+  convertPractitionerR5ToR4,
+  convertOrganizationR5ToR4,
+  convertR5ToR4,
+  batchConvertR5ToR4,
+  convertBundleR5ToR4
+} from './conversion/r5-to-r4';
 
 // Export terminology hooks
 export * from './terminology/hooks';

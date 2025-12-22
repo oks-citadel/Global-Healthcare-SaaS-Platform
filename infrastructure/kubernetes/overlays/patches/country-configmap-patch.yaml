@@ -1,0 +1,35 @@
+# Country-specific ConfigMap patch template
+# This file serves as a template for country-level configuration overrides
+# Each country overlay should create its own version with country-specific values
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: shared-config
+data:
+  # Country identification
+  country_code: "REPLACE_WITH_COUNTRY_CODE"
+
+  # Localization settings
+  currency: "REPLACE_WITH_CURRENCY"
+  timezone: "REPLACE_WITH_TIMEZONE"
+  language: "REPLACE_WITH_LANGUAGE"
+
+  # Compliance framework
+  compliance_framework: "REPLACE_WITH_COMPLIANCE"
+
+  # Data residency mode
+  # Options: "shared" (regional), "isolated" (country-specific)
+  data_residency_mode: "REPLACE_WITH_RESIDENCY_MODE"
+
+  # Country-specific endpoints (if applicable)
+  country_fhir_endpoint: "https://fhir-COUNTRY_CODE.healthcare-platform.com"
+
+  # Emergency services
+  emergency_hotline: "REPLACE_WITH_EMERGENCY_NUMBER"
+
+  # Payment processor (country-specific)
+  payment_processor_country: "REPLACE_WITH_PROCESSOR"
+
+  # Healthcare system type
+  healthcare_system_type: "REPLACE_WITH_SYSTEM_TYPE"

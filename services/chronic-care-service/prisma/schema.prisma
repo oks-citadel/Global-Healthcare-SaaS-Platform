@@ -204,3 +204,65 @@ enum AlertStatus {
   resolved
   dismissed
 }
+
+// ==========================================
+// Goal Management
+// ==========================================
+
+model Goal {
+  id              String       @id @default(uuid())
+  patientId       String
+  carePlanId      String?
+  title           String
+  description     String?
+  goalType        GoalType
+  targetValue     Float?
+  targetUnit      String?
+  targetDate      DateTime?
+  frequency       String?
+  status          GoalStatus   @default(active)
+
+  // Relations
+  progress        GoalProgress[]
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([patientId])
+  @@index([carePlanId])
+  @@index([status])
+  @@index([goalType])
+}
+
+model GoalProgress {
+  id              String       @id @default(uuid())
+  goalId          String
+  goal            Goal         @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  value           Float
+  notes           String?
+  recordedAt      DateTime     @default(now())
+
+  createdAt       DateTime     @default(now())
+
+  @@index([goalId])
+  @@index([recordedAt])
+}
+
+enum GoalType {
+  weight_loss
+  blood_pressure
+  blood_glucose
+  exercise
+  medication_adherence
+  diet
+  sleep
+  stress_management
+  other
+}
+
+enum GoalStatus {
+  active
+  completed
+  paused
+  cancelled
+}

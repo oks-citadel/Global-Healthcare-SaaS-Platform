@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Application } from 'express';
 import { createServer } from 'http';
 import { Server as SocketServer } from 'socket.io';
 import cors from 'cors';
@@ -11,7 +11,7 @@ import WebRTCService from './services/webrtc.service';
 
 dotenv.config();
 
-const app = express();
+const app: Application = express();
 const httpServer = createServer(app);
 const io = new SocketServer(httpServer, {
   cors: {

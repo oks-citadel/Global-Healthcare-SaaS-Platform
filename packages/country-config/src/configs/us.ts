@@ -6,6 +6,7 @@
 import type { CountryConfig } from '../types';
 
 export const USConfig: CountryConfig = {
+  regionId: 'americas',
   region: 'North America',
   countryCode: 'US',
   name: 'United States',
@@ -159,6 +160,32 @@ export const USConfig: CountryConfig = {
   timezone: 'America/New_York',
   languages: ['en', 'es'],
   currency: 'USD',
+
+  isolation: {
+    enabled: false,
+    dedicatedDatabase: false,
+    dedicatedKeyVault: false,
+    customerManagedKeys: false,
+    dedicatedNamespace: false,
+    dedicatedStorage: false,
+  },
+
+  tax: {
+    vatApplicable: false,
+    taxIdPattern: '^\\d{2}-\\d{7}$',
+    taxIdFieldName: 'EIN',
+    healthcareExemptions: ['medical-devices', 'prescription-drugs'],
+  },
+
+  locale: {
+    primaryLanguage: 'en-US',
+    supportedLanguages: ['en-US', 'es-US'],
+    dateFormat: 'MM/DD/YYYY',
+    timeFormat: '12h',
+    numberLocale: 'en-US',
+    addressFormat: 'street, city, state zip',
+    phoneFormat: '(XXX) XXX-XXXX',
+  },
 
   custom: {
     stateLaws: {

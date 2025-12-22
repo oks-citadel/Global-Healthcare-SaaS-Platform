@@ -20,9 +20,9 @@ on:
         default: false
 
 env:
-  ACR_NAME: unifiedhealthacr
+  ACR_NAME: acrunifiedhealthdev2
   AKS_CLUSTER: unified-health-aks-prod
-  RESOURCE_GROUP: unified-health-rg-prod
+  RESOURCE_GROUP: rg-unified-health-dev2-prod
   NAMESPACE: unified-health-prod
   NODE_VERSION: '20'
   PNPM_VERSION: '9'

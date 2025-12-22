@@ -22,9 +22,9 @@ on:
 #      - main
 
 env:
-  ACR_NAME: unifiedhealthacr
+  ACR_NAME: acrunifiedhealthdev2
   AKS_CLUSTER: unified-health-aks-staging
-  RESOURCE_GROUP: unified-health-rg-staging
+  RESOURCE_GROUP: rg-unified-health-dev2-staging
   NAMESPACE: unified-health-staging
   NODE_VERSION: '20'
   PNPM_VERSION: '9'

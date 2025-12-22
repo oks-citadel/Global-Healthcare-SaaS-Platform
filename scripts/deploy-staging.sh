@@ -17,10 +17,10 @@ NC='\033[0m' # No Color
 # Configuration
 ENVIRONMENT="staging"
 NAMESPACE="unified-health-staging"
-ACR_NAME="${ACR_NAME:-unifiedhealthacr}"
+ACR_NAME="${ACR_NAME:-acrunifiedhealthdev2}"
 ACR_LOGIN_SERVER="${ACR_NAME}.azurecr.io"
 AKS_CLUSTER="${AKS_CLUSTER:-unified-health-aks-staging}"
-RESOURCE_GROUP="${RESOURCE_GROUP:-unified-health-rg-staging}"
+RESOURCE_GROUP="${RESOURCE_GROUP:-rg-unified-health-dev2-staging}"
 VERSION="${VERSION:-$(git rev-parse --short HEAD)}"
 BUILD_TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 IMAGE_TAG="${VERSION}-${BUILD_TIMESTAMP}"

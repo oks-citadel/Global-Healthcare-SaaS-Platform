@@ -54,10 +54,10 @@ set_environment_variables() {
     # Azure configuration
     export AZURE_SUBSCRIPTION_ID="${AZURE_SUBSCRIPTION_ID:-$(az account show --query id -o tsv)}"
     export AZURE_TENANT_ID="${AZURE_TENANT_ID:-$(az account show --query tenantId -o tsv)}"
-    export AZURE_RESOURCE_GROUP="${AZURE_RESOURCE_GROUP:-unified-health-rg}"
+    export AZURE_RESOURCE_GROUP="${AZURE_RESOURCE_GROUP:-rg-unified-health-dev2}"
 
     # ACR configuration
-    export ACR_NAME="${ACR_NAME:-unifiedhealthacr}"
+    export ACR_NAME="${ACR_NAME:-acrunifiedhealthdev2}"
     export ACR_LOGIN_SERVER="${ACR_NAME}.azurecr.io"
 
     # AKS configuration

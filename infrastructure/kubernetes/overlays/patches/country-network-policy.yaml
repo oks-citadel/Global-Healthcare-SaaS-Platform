@@ -1,0 +1,67 @@
+# Country-specific Network Policy template
+# Use this for countries requiring strict data isolation
+# Apply to countries with strict data residency requirements
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: country-isolation-policy
+spec:
+  podSelector:
+    matchLabels:
+      data-residency: isolated
+  policyTypes:
+  - Ingress
+  - Egress
+
+  ingress:
+  # Allow traffic from within the same country namespace
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          country: COUNTRY_CODE
+    - podSelector: {}
+
+  # Allow traffic from monitoring namespace
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: monitoring
+    ports:
+    - protocol: TCP
+      port: 9090
+    - protocol: TCP
+      port: 8080
+
+  egress:
+  # Allow DNS queries
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    ports:
+    - protocol: UDP
+      port: 53
+
+  # Allow traffic to services within the same country namespace
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          country: COUNTRY_CODE
+    - podSelector: {}
+
+  # Allow traffic to country-specific databases
+  - to:
+    - podSelector:
+        matchLabels:
+          app: postgresql
+          country: COUNTRY_CODE
+
+  # Allow HTTPS for external APIs (with egress gateway)
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: istio-system
+    ports:
+    - protocol: TCP
+      port: 443

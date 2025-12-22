@@ -100,8 +100,8 @@ This Kubernetes configuration provides:
 2. **Azure Container Registry (ACR)**
    ```bash
    az acr create \
-     --resource-group unified-health-rg \
-     --name unifiedhealthacr \
+     --resource-group rg-unified-health-dev2 \
+     --name acrunifiedhealthdev2 \
      --sku Premium
    ```
 
@@ -346,7 +346,7 @@ az keyvault secret set \
 
 ```bash
 # Set environment variables
-export ACR_LOGIN_SERVER="unifiedhealthacr.azurecr.io"
+export ACR_LOGIN_SERVER="acrunifiedhealthdev2.azurecr.io"
 export AZURE_CLIENT_ID="${APPLICATION_CLIENT_ID}"
 export AZURE_TENANT_ID="$(az account show --query tenantId -o tsv)"
 
@@ -540,13 +540,13 @@ kubectl logs <pod-name> -n unified-health-production
 
 ```bash
 # Verify ACR access
-az acr login --name unifiedhealthacr
+az acr login --name acrunifiedhealthdev2
 
 # Attach ACR to AKS
 az aks update \
-  --resource-group unified-health-rg \
+  --resource-group rg-unified-health-dev2 \
   --name unified-health-aks \
-  --attach-acr unifiedhealthacr
+  --attach-acr acrunifiedhealthdev2
 ```
 
 #### Ingress Not Working

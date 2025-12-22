@@ -7,7 +7,7 @@
 global:
   environment: production
   region: us-east-1
-  imageRegistry: unifiedhealthacr.azurecr.io
+  imageRegistry: acrunifiedhealthdev2.azurecr.io
   imagePullSecrets:
     - name: acr-secret
 

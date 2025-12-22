@@ -269,7 +269,7 @@ Each workflow uses these environment variables:
 ```yaml
 NODE_VERSION: '20'
 PNPM_VERSION: '9'
-ACR_NAME: unifiedhealthacr
+ACR_NAME: acrunifiedhealthdev2
 AKS_CLUSTER: unified-health-aks-{env}
 RESOURCE_GROUP: unified-health-rg-{env}
 NAMESPACE: unified-health-{env}

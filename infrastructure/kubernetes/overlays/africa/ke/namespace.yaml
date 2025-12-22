@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: healthcare-ke
+  labels:
+    name: healthcare-ke
+    country: ke
+    region: africa
+    compliance: dpa
+    data-residency: shared
+    environment: production
+    istio-injection: enabled
+  annotations:
+    description: "Healthcare Platform - Kenya"
+    compliance-frameworks: "Data Protection Act 2019, Health Act 2017"
+    data-residency: "Kenya regional shared storage"

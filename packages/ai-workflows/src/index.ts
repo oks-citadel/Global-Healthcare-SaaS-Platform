@@ -64,6 +64,16 @@ export {
   InMemoryConsentRepository,
   type ConsentRepository
 } from './guardrails/ConsentChecker';
+export {
+  HumanReviewGuardrail,
+  createHITLGuardrail,
+  ReviewRequirement,
+  ReviewStatus,
+  type ReviewDecision,
+  type PendingReview,
+  type HITLConfig,
+  type HITLEvaluationResult
+} from './guardrails/HumanReviewGuardrail';
 
 // ============================================================================
 // Audit

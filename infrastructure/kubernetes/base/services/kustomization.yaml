@@ -20,6 +20,8 @@ resources:
 - laboratory-service/deployment.yaml
 - laboratory-service/service.yaml
 - laboratory-service/hpa.yaml
+- web/deployment.yaml
+- web/service.yaml
 
 commonLabels:
   app.kubernetes.io/part-of: healthcare-platform

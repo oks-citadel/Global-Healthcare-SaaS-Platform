@@ -30,8 +30,8 @@ on:
 #      - develop
 
 env:
-  ACR_NAME: unifiedhealthacr
-  REGISTRY: unifiedhealthacr.azurecr.io
+  ACR_NAME: acrunifiedhealthdev2
+  REGISTRY: acrunifiedhealthdev2.azurecr.io
   PROJECT_NAME: unifiedhealth
 
 jobs:

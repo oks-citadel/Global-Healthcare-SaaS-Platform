@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: healthcare-de
+  labels:
+    name: healthcare-de
+    country: de
+    region: europe
+    compliance: gdpr-strict
+    data-residency: isolated
+    environment: production
+    istio-injection: enabled
+    network-isolation: strict
+  annotations:
+    description: "Healthcare Platform - Germany (Strict Isolation)"
+    compliance-frameworks: "GDPR, BDSG, SGB V"
+    data-residency: "Germany isolated storage - no cross-border transfers"
+    isolation-level: "strict"
+    dedicated-resources: "true"

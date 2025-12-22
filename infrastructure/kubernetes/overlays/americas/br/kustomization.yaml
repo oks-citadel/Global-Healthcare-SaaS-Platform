@@ -1,0 +1,55 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Brazil Country Overlay - extends Americas region
+namespace: healthcare-br
+
+namePrefix: br-
+
+commonLabels:
+  country: br
+  region: americas
+  compliance: lgpd
+  data-residency: shared
+  environment: production
+
+# Inherit from parent Americas region overlay
+bases:
+- ../../americas
+
+resources:
+- namespace.yaml
+
+patchesStrategicMerge:
+- configmap-patch.yaml
+
+configMapGenerator:
+- name: country-specific-config
+  literals:
+  - country_code=br
+  - currency=BRL
+  - timezone=America/Sao_Paulo
+  - language=pt-BR
+  - compliance_framework=lgpd
+  - data_residency_mode=shared
+  - emergency_hotline=192
+  - payment_processor_country=mercadopago
+  - healthcare_system_type=mixed-public-private
+  - state_count=26
+  - sus_integration=enabled
+  - anvisa_compliance=enabled
+  behavior: merge
+
+images:
+- name: ghcr.io/healthcare-platform/api-gateway
+  newTag: v1.2.3-br
+- name: ghcr.io/healthcare-platform/telehealth-service
+  newTag: v1.2.3-br
+- name: ghcr.io/healthcare-platform/mental-health-service
+  newTag: v1.2.3-br
+- name: ghcr.io/healthcare-platform/chronic-care-service
+  newTag: v1.2.3-br
+- name: ghcr.io/healthcare-platform/pharmacy-service
+  newTag: v1.2.3-br
+- name: ghcr.io/healthcare-platform/laboratory-service
+  newTag: v1.2.3-br

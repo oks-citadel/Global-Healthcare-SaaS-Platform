@@ -22,8 +22,8 @@ on:
           - production
 
 env:
-  ACR_NAME: unifiedhealthacr
-  RESOURCE_GROUP: unifiedhealth-rg
+  ACR_NAME: acrunifiedhealthdev2
+  RESOURCE_GROUP: rg-unified-health-dev2
   NODE_VERSION: '20'
   PNPM_VERSION: '9'
 

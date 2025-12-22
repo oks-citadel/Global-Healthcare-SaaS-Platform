@@ -6,6 +6,7 @@
 import type { CountryConfig } from '../types';
 
 export const KenyaConfig: CountryConfig = {
+  regionId: 'africa',
   region: 'Africa',
   countryCode: 'KE',
   name: 'Kenya',
@@ -178,6 +179,38 @@ export const KenyaConfig: CountryConfig = {
   timezone: 'Africa/Nairobi',
   languages: ['en', 'sw'], // English and Swahili
   currency: 'KES',
+
+  isolation: {
+    enabled: false,
+    dedicatedDatabase: false,
+    dedicatedKeyVault: false,
+    customerManagedKeys: false,
+    dedicatedNamespace: false,
+    dedicatedStorage: false,
+  },
+
+  tax: {
+    vatApplicable: true,
+    standardVatRate: 16,
+    reducedRates: {
+      medicalServices: 0, // Exempt
+      medicalDevices: 0,
+      prescriptionDrugs: 0,
+    },
+    taxIdPattern: '^P\\d{9}[A-Z]$',
+    taxIdFieldName: 'KRA PIN',
+    healthcareExemptions: ['medical-services', 'medical-equipment', 'pharmaceuticals'],
+  },
+
+  locale: {
+    primaryLanguage: 'en-KE',
+    supportedLanguages: ['en-KE', 'sw-KE'],
+    dateFormat: 'DD/MM/YYYY',
+    timeFormat: '24h',
+    numberLocale: 'en-KE',
+    addressFormat: 'street, city, county postal-code',
+    phoneFormat: '+254 XXX XXX XXX',
+  },
 
   custom: {
     dataProtectionOfficer: {

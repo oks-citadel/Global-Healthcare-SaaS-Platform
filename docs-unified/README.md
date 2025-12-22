@@ -5,6 +5,16 @@
 > This folder contains all authoritative documentation for the UnifiedHealth Platform.
 > All guidance, PRDs, inventories, and runbooks live here.
 
+## Platform Overview
+
+The UnifiedHealth Platform is a **global healthcare SaaS** solution with:
+
+- **Global → Region → Country** segmentation for data residency
+- **FHIR R4** canonical clinical data with R5 compatibility
+- **AI-powered clinical workflows** with human-in-the-loop enforcement
+- **Multi-region deployment** via Azure (Americas, Europe, Africa)
+- **Comprehensive compliance** (HIPAA, GDPR, POPIA, NDPR)
+
 ## Documentation Structure
 
 ```
@@ -19,11 +29,17 @@
 │   ├── service-map.md           # Microservices mapping
 │   ├── data-flow.md             # Data flow diagrams
 │   ├── security-architecture.md # Security design
+│   ├── GLOBAL_SEGMENTATION.md   # Global→Region→Country architecture
+│   ├── MONOLITH_EXTRACTION_PLAN.md # Strangler pattern migration
 │   └── diagrams.mmd             # Mermaid diagrams
 ├── api/                         # API documentation
 │   ├── api-inventory.md         # Complete API endpoint inventory
 │   ├── openapi-guidelines.md    # OpenAPI specification standards
 │   └── versioning.md            # API versioning strategy
+├── fhir/                        # FHIR documentation
+│   └── fhir-resources.md        # FHIR R4/R5 resource documentation
+├── ai/                          # AI workflows documentation
+│   └── ai-guardrails.md         # AI safety and HITL requirements
 ├── services/                    # Service-specific documentation
 │   └── [service-name]/          # Per-service docs
 ├── prd/                         # Product requirements
@@ -39,7 +55,8 @@
 │   └── eas-deployment.md        # EAS build and deployment
 ├── infrastructure/              # Infrastructure documentation
 │   ├── terraform-guide.md       # Terraform usage
-│   └── aks-deployment.md        # AKS deployment guide
+│   ├── aks-deployment.md        # AKS deployment guide
+│   └── multi-region.md          # Multi-region deployment
 ├── cicd/                        # CI/CD documentation
 │   ├── github-actions.md        # GitHub Actions CI
 │   └── jenkins-cd.md            # Jenkins CD pipelines

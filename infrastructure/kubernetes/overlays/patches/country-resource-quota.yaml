@@ -1,0 +1,67 @@
+# Country-specific Resource Quota template
+# Use this for countries requiring dedicated resources (isolated deployments)
+# Ensures resource allocation is reserved and protected per country
+
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: country-quota
+spec:
+  hard:
+    # Compute resources
+    requests.cpu: "20"
+    requests.memory: 40Gi
+    limits.cpu: "40"
+    limits.memory: 80Gi
+
+    # Storage resources
+    requests.storage: 500Gi
+    persistentvolumeclaims: "10"
+
+    # Object counts
+    pods: "100"
+    services: "20"
+    secrets: "50"
+    configmaps: "50"
+
+    # Load balancers
+    services.loadbalancers: "5"
+    services.nodeports: "10"
+
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: country-limit-range
+spec:
+  limits:
+  # Pod limits
+  - type: Pod
+    max:
+      cpu: "8"
+      memory: 16Gi
+    min:
+      cpu: "100m"
+      memory: 128Mi
+
+  # Container limits
+  - type: Container
+    max:
+      cpu: "4"
+      memory: 8Gi
+    min:
+      cpu: "50m"
+      memory: 64Mi
+    default:
+      cpu: "500m"
+      memory: 512Mi
+    defaultRequest:
+      cpu: "250m"
+      memory: 256Mi
+
+  # PVC limits
+  - type: PersistentVolumeClaim
+    max:
+      storage: 100Gi
+    min:
+      storage: 1Gi

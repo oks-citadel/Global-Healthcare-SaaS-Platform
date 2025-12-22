@@ -1,0 +1,74 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: shared-config
+data:
+  # Country identification
+  country_code: "br"
+  country_name: "Brazil"
+
+  # Localization settings
+  currency: "BRL"
+  timezone: "America/Sao_Paulo"
+  language: "pt-BR"
+  supported_languages: "pt-BR"
+
+  # Compliance framework
+  compliance_framework: "lgpd"
+  lgpd_compliance: "true"
+  cfm_resolution_1643: "true"
+  anvisa_compliance: "enabled"
+
+  # Data residency mode
+  data_residency_mode: "shared"
+  data_residency_region: "sa-east-1"
+
+  # Country-specific endpoints
+  country_fhir_endpoint: "https://fhir-br.healthcare-platform.com"
+
+  # Emergency services
+  emergency_hotline: "192"
+  emergency_services_enabled: "true"
+
+  # Payment processor
+  payment_processor_country: "mercadopago"
+  payment_gateway_url: "https://api.mercadopago.com"
+  pix_payment_enabled: "true"
+  boleto_enabled: "true"
+
+  # Healthcare system configuration
+  healthcare_system_type: "mixed-public-private"
+
+  # Brazil-specific features
+  sus_integration: "enabled"
+  sus_card_validation: "enabled"
+  ans_compliance: "enabled"
+  datasus_reporting: "enabled"
+  cnes_integration: "enabled"
+  cbo_classification: "enabled"
+
+  # State support
+  state_count: "26"
+  municipal_health_integration: "enabled"
+
+  # Brazil-specific storage
+  medical_records_bucket: "healthcare-medical-records-br"
+  lab_results_bucket: "healthcare-lab-results-br"
+  medical_images_bucket: "healthcare-medical-images-br"
+
+  # Drug formularies
+  drug_formulary_source: "anvisa"
+  controlled_substances_tracking: "enabled"
+  rename_database: "enabled"
+
+  # Telehealth requirements
+  cfm_telehealth_compliance: "enabled"
+  telemedicine_prescription_enabled: "true"
+
+  # Insurance integrations
+  ans_operator_registry: "enabled"
+  private_insurance_integration: "enabled"
+
+  # Professional verification
+  crm_verification: "enabled"
+  professional_registry_check: "enabled"

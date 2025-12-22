@@ -1,9 +1,9 @@
-import { Router } from 'express';
+import { Router, IRouter } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
 import { UserRequest, requireUser } from '../middleware/extractUser';
 
-const router = Router();
+const router: IRouter = Router();
 const prisma = new PrismaClient();
 
 // Validation schemas

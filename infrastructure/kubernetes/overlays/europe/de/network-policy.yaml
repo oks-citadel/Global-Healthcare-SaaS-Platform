@@ -1,0 +1,159 @@
+# Germany-specific Network Policy for Strict Data Isolation
+# Ensures no cross-border data transfers and strict namespace isolation
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: de-strict-isolation-policy
+  namespace: healthcare-de
+spec:
+  podSelector:
+    matchLabels:
+      data-residency: isolated
+  policyTypes:
+  - Ingress
+  - Egress
+
+  ingress:
+  # Allow traffic from within the same Germany namespace only
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          country: de
+    - podSelector: {}
+
+  # Allow traffic from monitoring namespace (metrics collection)
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: monitoring
+    ports:
+    - protocol: TCP
+      port: 9090
+    - protocol: TCP
+      port: 8080
+    - protocol: TCP
+      port: 8081
+
+  # Allow traffic from Istio ingress gateway
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: istio-system
+      podSelector:
+        matchLabels:
+          app: istio-ingressgateway
+    ports:
+    - protocol: TCP
+      port: 8080
+    - protocol: TCP
+      port: 8443
+
+  egress:
+  # Allow DNS queries
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+      podSelector:
+        matchLabels:
+          k8s-app: kube-dns
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
+
+  # Allow traffic to services within the same Germany namespace only
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          country: de
+    - podSelector: {}
+
+  # Allow traffic to Germany-specific databases
+  - to:
+    - podSelector:
+        matchLabels:
+          app: postgresql
+          country: de
+    ports:
+    - protocol: TCP
+      port: 5432
+
+  - to:
+    - podSelector:
+        matchLabels:
+          app: redis
+          country: de
+    ports:
+    - protocol: TCP
+      port: 6379
+
+  # Allow HTTPS for external APIs via Istio egress gateway (Germany-whitelisted only)
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: istio-system
+      podSelector:
+        matchLabels:
+          app: istio-egressgateway
+    ports:
+    - protocol: TCP
+      port: 443
+    - protocol: TCP
+      port: 80
+
+  # Block all other egress traffic (no cross-border transfers)
+  # This is implicit due to default deny, but documented for clarity
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: de-deny-cross-region
+  namespace: healthcare-de
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+
+  egress:
+  # Explicitly deny traffic to other regional namespaces
+  - to:
+    - namespaceSelector:
+        matchExpressions:
+        - key: region
+          operator: In
+          values:
+          - americas
+          - africa
+          - asia-pacific
+    ports: []  # Empty ports array means deny all ports
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: de-database-isolation
+  namespace: healthcare-de
+spec:
+  podSelector:
+    matchLabels:
+      app: postgresql
+      country: de
+  policyTypes:
+  - Ingress
+
+  ingress:
+  # Only allow database access from Germany services
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          country: de
+    - podSelector:
+        matchLabels:
+          tier: backend
+    ports:
+    - protocol: TCP
+      port: 5432

@@ -19,7 +19,7 @@ NC := \033[0m # No Color
 # Configuration
 ENVIRONMENT ?= staging
 VERSION ?= $(shell git rev-parse --short HEAD)
-ACR_NAME ?= unifiedhealthacr
+ACR_NAME ?= acrunifiedhealthdev2
 ACR_LOGIN_SERVER := $(ACR_NAME).azurecr.io
 
 ##@ Help

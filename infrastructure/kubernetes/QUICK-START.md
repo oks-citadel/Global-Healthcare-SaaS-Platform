@@ -19,18 +19,18 @@ This guide provides quick commands to deploy the Unified Healthcare Platform to 
 ### 1. Set Environment Variables
 
 ```bash
-export ACR_LOGIN_SERVER="unifiedhealthacr.azurecr.io"
+export ACR_LOGIN_SERVER="acrunifiedhealthdev2.azurecr.io"
 export AZURE_CLIENT_ID="<your-client-id>"
 export AZURE_TENANT_ID="<your-tenant-id>"
 export AZURE_SUBSCRIPTION_ID="<your-subscription-id>"
-export AZURE_RESOURCE_GROUP="unified-health-rg"
+export AZURE_RESOURCE_GROUP="rg-unified-health-dev2"
 ```
 
 ### 2. Connect to AKS
 
 ```bash
 az aks get-credentials \
-  --resource-group unified-health-rg \
+  --resource-group rg-unified-health-dev2 \
   --name unified-health-aks
 ```
 
@@ -179,9 +179,9 @@ kubectl logs <pod-name> -n unified-health-production
 ```bash
 # Verify ACR attachment
 az aks update \
-  --resource-group unified-health-rg \
+  --resource-group rg-unified-health-dev2 \
   --name unified-health-aks \
-  --attach-acr unifiedhealthacr
+  --attach-acr acrunifiedhealthdev2
 ```
 
 ### Certificate Issues

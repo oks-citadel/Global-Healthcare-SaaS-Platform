@@ -6,6 +6,7 @@
 import type { CountryConfig } from '../types';
 
 export const GermanyConfig: CountryConfig = {
+  regionId: 'europe',
   region: 'Europe',
   countryCode: 'DE',
   name: 'Germany',
@@ -172,6 +173,38 @@ export const GermanyConfig: CountryConfig = {
   timezone: 'Europe/Berlin',
   languages: ['de', 'en'],
   currency: 'EUR',
+
+  isolation: {
+    enabled: true,
+    dedicatedDatabase: true,
+    dedicatedKeyVault: true,
+    customerManagedKeys: true,
+    dedicatedNamespace: true,
+    dedicatedStorage: true,
+  },
+
+  tax: {
+    vatApplicable: true,
+    standardVatRate: 19,
+    reducedRates: {
+      medicalServices: 0, // Exempt
+      medicalDevices: 7,
+      prescriptionDrugs: 19,
+    },
+    taxIdPattern: '^DE\\d{9}$',
+    taxIdFieldName: 'USt-IdNr',
+    healthcareExemptions: ['medical-services', 'hospital-services'],
+  },
+
+  locale: {
+    primaryLanguage: 'de-DE',
+    supportedLanguages: ['de-DE', 'en-GB'],
+    dateFormat: 'DD.MM.YYYY',
+    timeFormat: '24h',
+    numberLocale: 'de-DE',
+    addressFormat: 'street, PLZ city',
+    phoneFormat: '+49 XXX XXXXXXXX',
+  },
 
   custom: {
     dataProtectionOfficer: {

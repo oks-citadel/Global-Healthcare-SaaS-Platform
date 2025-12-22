@@ -1,0 +1,74 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Germany Country Overlay - extends Europe region
+# STRICT DATA ISOLATION - dedicated resources and network policies
+namespace: healthcare-de
+
+namePrefix: de-
+
+commonLabels:
+  country: de
+  region: europe
+  compliance: gdpr-strict
+  data-residency: isolated
+  environment: production
+
+# Inherit from parent Europe region overlay
+bases:
+- ../../europe
+
+resources:
+- namespace.yaml
+- network-policy.yaml
+- resource-quota.yaml
+- dedicated-pvc.yaml
+
+patchesStrategicMerge:
+- configmap-patch.yaml
+
+configMapGenerator:
+- name: country-specific-config
+  literals:
+  - country_code=de
+  - currency=EUR
+  - timezone=Europe/Berlin
+  - language=de-DE
+  - compliance_framework=gdpr-strict
+  - data_residency_mode=isolated
+  - emergency_hotline=112
+  - payment_processor_country=stripe-de
+  - healthcare_system_type=statutory-health-insurance
+  - strict_data_isolation=enabled
+  - dedicated_infrastructure=enabled
+  - cross_border_transfer=disabled
+  behavior: merge
+
+images:
+- name: ghcr.io/healthcare-platform/api-gateway
+  newTag: v1.2.3-de
+- name: ghcr.io/healthcare-platform/telehealth-service
+  newTag: v1.2.3-de
+- name: ghcr.io/healthcare-platform/mental-health-service
+  newTag: v1.2.3-de
+- name: ghcr.io/healthcare-platform/chronic-care-service
+  newTag: v1.2.3-de
+- name: ghcr.io/healthcare-platform/pharmacy-service
+  newTag: v1.2.3-de
+- name: ghcr.io/healthcare-platform/laboratory-service
+  newTag: v1.2.3-de
+
+# Increased replicas for dedicated deployment
+replicas:
+- name: api-gateway
+  count: 4
+- name: telehealth-service
+  count: 4
+- name: mental-health-service
+  count: 3
+- name: chronic-care-service
+  count: 3
+- name: pharmacy-service
+  count: 3
+- name: laboratory-service
+  count: 3

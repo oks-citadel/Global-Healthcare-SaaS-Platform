@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: healthcare-br
+  labels:
+    name: healthcare-br
+    country: br
+    region: americas
+    compliance: lgpd
+    data-residency: shared
+    environment: production
+    istio-injection: enabled
+  annotations:
+    description: "Healthcare Platform - Brazil"
+    compliance-frameworks: "LGPD, CFM Resolution 1643/2002"
+    data-residency: "Brazil regional shared storage"

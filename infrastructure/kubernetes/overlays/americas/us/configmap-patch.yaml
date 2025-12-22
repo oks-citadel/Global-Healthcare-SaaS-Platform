@@ -1,0 +1,65 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: shared-config
+data:
+  # Country identification
+  country_code: "us"
+  country_name: "United States"
+
+  # Localization settings
+  currency: "USD"
+  timezone: "America/New_York"
+  language: "en-US"
+  supported_languages: "en-US,es-US"
+
+  # Compliance framework
+  compliance_framework: "hipaa"
+  hipaa_mode: "true"
+  hitech_compliance: "true"
+  state_reporting_enabled: "true"
+
+  # Data residency mode
+  data_residency_mode: "shared"
+  data_residency_region: "us-east-1"
+
+  # Country-specific endpoints
+  country_fhir_endpoint: "https://fhir-us.healthcare-platform.com"
+
+  # Emergency services
+  emergency_hotline: "911"
+  emergency_services_enabled: "true"
+
+  # Payment processor
+  payment_processor_country: "stripe"
+  payment_gateway_url: "https://api.stripe.com"
+
+  # Healthcare system configuration
+  healthcare_system_type: "private-insurance"
+
+  # US-specific features
+  medicare_integration: "enabled"
+  medicaid_integration: "enabled"
+  prescription_monitoring_program: "enabled"
+  state_medicaid_programs: "enabled"
+  federal_reporting: "enabled"
+  cdc_integration: "enabled"
+  cms_reporting: "enabled"
+
+  # Insurance integrations
+  epic_integration: "enabled"
+  cerner_integration: "enabled"
+  allscripts_integration: "enabled"
+
+  # US-specific storage
+  medical_records_bucket: "healthcare-medical-records-us"
+  lab_results_bucket: "healthcare-lab-results-us"
+  medical_images_bucket: "healthcare-medical-images-us"
+
+  # Multi-state support
+  state_count: "50"
+  multi_state_licensing: "enabled"
+
+  # Drug formularies
+  drug_formulary_source: "fda"
+  controlled_substances_dea: "enabled"

@@ -1,0 +1,54 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# South Africa Country Overlay - extends Africa region
+namespace: healthcare-za
+
+namePrefix: za-
+
+commonLabels:
+  country: za
+  region: africa
+  compliance: popia
+  data-residency: shared
+  environment: production
+
+# Inherit from parent Africa region overlay
+bases:
+- ../../africa
+
+resources:
+- namespace.yaml
+
+patchesStrategicMerge:
+- configmap-patch.yaml
+
+configMapGenerator:
+- name: country-specific-config
+  literals:
+  - country_code=za
+  - currency=ZAR
+  - timezone=Africa/Johannesburg
+  - language=en-ZA
+  - compliance_framework=popia
+  - data_residency_mode=shared
+  - emergency_hotline=10177
+  - payment_processor_country=paystack
+  - healthcare_system_type=mixed-public-private
+  - medical_schemes_integration=enabled
+  - multilingual_support=enabled
+  behavior: merge
+
+images:
+- name: ghcr.io/healthcare-platform/api-gateway
+  newTag: v1.2.3-za
+- name: ghcr.io/healthcare-platform/telehealth-service
+  newTag: v1.2.3-za
+- name: ghcr.io/healthcare-platform/mental-health-service
+  newTag: v1.2.3-za
+- name: ghcr.io/healthcare-platform/chronic-care-service
+  newTag: v1.2.3-za
+- name: ghcr.io/healthcare-platform/pharmacy-service
+  newTag: v1.2.3-za
+- name: ghcr.io/healthcare-platform/laboratory-service
+  newTag: v1.2.3-za

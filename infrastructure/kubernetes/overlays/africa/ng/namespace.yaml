@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: healthcare-ng
+  labels:
+    name: healthcare-ng
+    country: ng
+    region: africa
+    compliance: ndpr
+    data-residency: shared
+    environment: production
+    istio-injection: enabled
+  annotations:
+    description: "Healthcare Platform - Nigeria"
+    compliance-frameworks: "NDPR, National Health Act 2014"
+    data-residency: "Nigeria regional shared storage"

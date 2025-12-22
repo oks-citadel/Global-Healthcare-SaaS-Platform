@@ -52,7 +52,7 @@ Create the following Kubernetes secrets before installation:
 ```bash
 # ACR credentials
 kubectl create secret docker-registry acr-secret \
-  --docker-server=unifiedhealthacr.azurecr.io \
+  --docker-server=acrunifiedhealthdev2.azurecr.io \
   --docker-username=<username> \
   --docker-password=<password> \
   --namespace=<namespace>
@@ -72,7 +72,7 @@ kubectl create secret generic unified-health-secrets \
 | Parameter | Description | Default |
 |-----------|-------------|---------|
 | `global.environment` | Environment name | `production` |
-| `global.imageRegistry` | Container registry | `unifiedhealthacr.azurecr.io` |
+| `global.imageRegistry` | Container registry | `acrunifiedhealthdev2.azurecr.io` |
 | `replicaCount.api` | API replica count | `3` |
 | `replicaCount.web` | Web replica count | `3` |
 | `autoscaling.enabled` | Enable HPA | `true` |

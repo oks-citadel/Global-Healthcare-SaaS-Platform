@@ -1,0 +1,102 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: shared-config
+data:
+  # Country identification
+  country_code: "ke"
+  country_name: "Kenya"
+
+  # Localization settings
+  currency: "KES"
+  timezone: "Africa/Nairobi"
+  language: "en-KE"
+  supported_languages: "en-KE,sw-KE"
+
+  # Compliance framework
+  compliance_framework: "dpa"
+  data_protection_act_2019: "enabled"
+  health_act_2017: "enabled"
+  odpc_compliance: "enabled"
+
+  # Data residency mode
+  data_residency_mode: "shared"
+  data_residency_region: "af-east-1"
+  data_location: "kenya"
+
+  # Country-specific endpoints
+  country_fhir_endpoint: "https://fhir-ke.healthcare-platform.com"
+
+  # Emergency services
+  emergency_hotline: "999"
+  emergency_services_enabled: "true"
+  ambulance_hotline: "999"
+
+  # Payment processor
+  payment_processor_country: "mpesa"
+  payment_gateway_url: "https://api.safaricom.co.ke"
+  mpesa_integration: "enabled"
+  mpesa_stk_push: "enabled"
+  mpesa_b2c: "enabled"
+  airtel_money_enabled: "true"
+
+  # Healthcare system configuration
+  healthcare_system_type: "mixed-public-private"
+
+  # Kenya-specific features
+  nhif_integration: "enabled"
+  nhif_validation: "enabled"
+  sha_integration: "enabled"
+  moh_reporting: "enabled"
+
+  # Professional verification
+  kmpdb_verification: "enabled"
+  nursing_council_verification: "enabled"
+  pharmacy_board_verification: "enabled"
+
+  # Kenya-specific storage
+  medical_records_bucket: "healthcare-medical-records-ke"
+  lab_results_bucket: "healthcare-lab-results-ke"
+  medical_images_bucket: "healthcare-medical-images-ke"
+
+  # Drug formularies
+  drug_formulary_source: "ppb"
+  pharmacy_poisons_board: "enabled"
+  essential_medicines_list: "enabled"
+
+  # County support
+  county_count: "47"
+  devolved_health_system: "enabled"
+  county_referral_hospitals: "enabled"
+
+  # Disease management programs
+  malaria_program: "enabled"
+  hiv_aids_program: "enabled"
+  tuberculosis_program: "enabled"
+  non_communicable_diseases: "enabled"
+
+  # Universal Health Coverage
+  uhc_integration: "enabled"
+  linda_mama_program: "enabled"
+  beyond_zero_initiative: "enabled"
+
+  # Mobile health
+  mobile_first_design: "enabled"
+  sms_reminders: "enabled"
+  ussd_access: "enabled"
+
+  # Laboratory services
+  kemri_integration: "enabled"
+  national_reference_lab: "enabled"
+
+  # Insurance integrations
+  private_insurance_integration: "enabled"
+  medical_scheme_validation: "enabled"
+
+  # Community health
+  community_health_units: "enabled"
+  chvs_integration: "enabled"
+
+  # National programs
+  afya_care_integration: "enabled"
+  digital_health_standards: "enabled"
