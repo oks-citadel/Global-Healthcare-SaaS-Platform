@@ -1,21 +1,10 @@
 # ============================================
 # UnifiedHealth Web Frontend - pnpm Monorepo Build
 # ============================================
-# This Dockerfile builds the web frontend from the monorepo root,
-# properly handling workspace dependencies (packages/sdk).
-# Designed for GitHub Actions CI/CD to Azure ACR.
-# ============================================
-
-# ============================================
-# Stage 1: Base with pnpm
-# ============================================
 FROM node:20-alpine AS base
 
-# Install required system dependencies
-RUN apk add --no-cache libc6-compat \
-    && rm -rf /var/cache/apk/*
+RUN apk add --no-cache libc6-compat && rm -rf /var/cache/apk/*
 
-# Enable and prepare pnpm
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable && corepack prepare pnpm@9 --activate
@@ -27,15 +16,10 @@ WORKDIR /app
 # ============================================
 FROM base AS deps
 
-# Copy workspace configuration files
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
-
-# Copy package.json files for all relevant packages
 COPY apps/web/package.json ./apps/web/
 COPY packages/sdk/package.json ./packages/sdk/
 
-# Install all dependencies (including dev deps for building)
-# Note: Using --no-frozen-lockfile because lockfile may be out of sync
 RUN pnpm install --no-frozen-lockfile
 
 # ============================================
@@ -45,15 +29,10 @@ FROM base AS sdk-builder
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/packages/sdk/node_modules ./packages/sdk/node_modules
-
-# Copy SDK source files
 COPY packages/sdk ./packages/sdk
 
-# Build SDK
 WORKDIR /app/packages/sdk
 RUN pnpm build
-
-# Verify build output
 RUN ls -la dist/ && test -f dist/index.js
 
 # ============================================
@@ -61,26 +40,17 @@ RUN ls -la dist/ && test -f dist/index.js
 # ============================================
 FROM base AS builder
 
-# Copy all node_modules
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules
-
-# Copy built SDK with its node_modules
 COPY --from=sdk-builder /app/packages/sdk ./packages/sdk
-
-# Copy web app source
 COPY apps/web ./apps/web
-
-# Copy root configs that might be needed
 COPY package.json pnpm-workspace.yaml turbo.json* ./
 
 WORKDIR /app/apps/web
 
-# Set build environment
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 
-# Build arguments for image metadata
 ARG BUILD_DATE
 ARG VERSION
 ARG GIT_SHA
@@ -91,38 +61,29 @@ ENV VERSION=${VERSION}
 ENV GIT_SHA=${GIT_SHA}
 ENV GIT_BRANCH=${GIT_BRANCH}
 
-# Build Next.js app with webpack (Turbopack has workspace root detection issues in Docker)
 RUN NEXT_TELEMETRY_DISABLED=1 npx next build --webpack
-
-# Verify standalone output exists
 RUN ls -la .next/standalone/ && ls -la .next/static/
+
+# Create dereferenced node_modules archive
+WORKDIR /app
+RUN tar -chf /tmp/node_modules.tar node_modules
 
 # ============================================
 # Stage 5: Production Runtime
 # ============================================
 FROM node:20-alpine AS production
 
-# Image metadata
 LABEL maintainer="UnifiedHealth Platform Team"
 LABEL org.opencontainers.image.title="UnifiedHealth Web Frontend"
 LABEL org.opencontainers.image.description="UnifiedHealth Patient Portal - Next.js Application"
 LABEL org.opencontainers.image.vendor="UnifiedHealth"
 
-# Install minimal runtime dependencies
-RUN apk add --no-cache \
-    dumb-init \
-    ca-certificates \
-    wget \
-    && apk upgrade --no-cache \
-    && rm -rf /var/cache/apk/*
+RUN apk add --no-cache dumb-init ca-certificates wget && apk upgrade --no-cache && rm -rf /var/cache/apk/*
 
 WORKDIR /app
 
-# Create non-root user for security
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nodejs -u 1001 -G nodejs
+RUN addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001 -G nodejs
 
-# Runtime environment
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
@@ -136,23 +97,15 @@ COPY --from=builder --chown=nodejs:nodejs /app/apps/web/.next/standalone/.next .
 COPY --from=builder --chown=nodejs:nodejs /app/apps/web/.next/static ./.next/static
 COPY --from=builder --chown=nodejs:nodejs /app/apps/web/public ./public
 
-# Install only production dependencies using npm (not pnpm, to avoid symlinks)
-COPY --from=builder /app/apps/web/package.json ./package.json
-RUN npm install --omit=dev --legacy-peer-deps --ignore-scripts && \
-    chown -R nodejs:nodejs node_modules
+# Extract dereferenced node_modules from tar
+COPY --from=builder /tmp/node_modules.tar /tmp/
+RUN tar -xf /tmp/node_modules.tar && rm /tmp/node_modules.tar && chown -R nodejs:nodejs node_modules
 
-# Switch to non-root user
 USER nodejs
-
-# Expose port
 EXPOSE 3000
 
-# Health check
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1
 
-# Use dumb-init for proper signal handling
 ENTRYPOINT ["dumb-init", "--"]
-
-# Start the application
 CMD ["node", "server.js"]
