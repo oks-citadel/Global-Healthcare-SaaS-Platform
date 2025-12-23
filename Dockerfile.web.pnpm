@@ -138,7 +138,7 @@ COPY --from=builder --chown=nodejs:nodejs /app/apps/web/public ./public
 
 # Install only production dependencies using npm (not pnpm, to avoid symlinks)
 COPY --from=builder /app/apps/web/package.json ./package.json
-RUN npm install --production --ignore-scripts && \
+RUN npm install --omit=dev --legacy-peer-deps --ignore-scripts && \
     chown -R nodejs:nodejs node_modules
 
 # Switch to non-root user
