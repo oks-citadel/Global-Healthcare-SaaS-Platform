@@ -131,6 +131,9 @@ ENV HOSTNAME="0.0.0.0"
 # Copy standalone build output
 # Next.js standalone output includes only necessary node_modules
 COPY --from=builder --chown=nodejs:nodejs /app/apps/web/.next/standalone ./
+# Debug: Show node_modules structure
+RUN ls -la node_modules/ 2>/dev/null | head -20 || echo "No node_modules"
+RUN ls -la node_modules/next 2>/dev/null || echo "No next module"
 COPY --from=builder --chown=nodejs:nodejs /app/apps/web/.next/static ./.next/static
 COPY --from=builder --chown=nodejs:nodejs /app/apps/web/public ./public
 
