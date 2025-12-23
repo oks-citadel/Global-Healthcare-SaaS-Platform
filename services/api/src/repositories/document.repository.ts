@@ -1,4 +1,4 @@
-import { Document, DocumentType, Prisma } from '@prisma/client';
+import { Document, DocumentType, Prisma } from '../generated/client';
 import { BaseRepository, PaginationOptions, PaginationResult } from './base.repository.js';
 import { prisma } from '../lib/prisma.js';
 

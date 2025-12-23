@@ -11,7 +11,7 @@
  * - Graceful connection management
  */
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../generated/client';
 import { config } from '../config/index.js';
 import { logger } from '../utils/logger.js';
 

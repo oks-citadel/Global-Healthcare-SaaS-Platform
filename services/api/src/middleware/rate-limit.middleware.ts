@@ -1,16 +1,102 @@
 import { Request, Response, NextFunction } from 'express';
+import { createClient, RedisClientType } from 'redis';
 import { TooManyRequestsError } from '../utils/errors.js';
 import { auditService } from '../services/audit.service.js';
 
 /**
- * HIPAA-Compliant Rate Limiting Middleware
- * Enhanced rate limiting with per-user tracking and IP-based blocking
+ * HIPAA-Compliant Distributed Rate Limiting Middleware
+ * Enhanced rate limiting with Redis support for distributed systems
+ * Uses Redis in production for multi-replica scaling, falls back to in-memory for development
  * Protects against brute force attacks and abuse
  */
 
+// ============================================
+// Redis Configuration
+// ============================================
+
+let redisClient: RedisClientType | null = null;
+let redisConnected = false;
+let redisConnectionAttempted = false;
+
 /**
- * Rate limit store (in-memory for development, use Redis in production)
+ * Initialize Redis client for distributed rate limiting
  */
+async function initializeRedisClient(): Promise<void> {
+  if (redisConnectionAttempted) return;
+  redisConnectionAttempted = true;
+
+  const redisEnabled = process.env.RATE_LIMIT_REDIS_ENABLED === 'true' ||
+    (process.env.NODE_ENV === 'production' && process.env.RATE_LIMIT_REDIS_ENABLED !== 'false');
+
+  if (!redisEnabled) {
+    console.log('[RateLimit] Redis disabled, using in-memory store');
+    return;
+  }
+
+  const redisUrl = process.env.REDIS_URL ||
+    `redis://${process.env.REDIS_HOST || 'localhost'}:${process.env.REDIS_PORT || 6379}`;
+
+  try {
+    redisClient = createClient({
+      url: redisUrl,
+      password: process.env.REDIS_PASSWORD || undefined,
+      socket: {
+        reconnectStrategy: (retries) => {
+          if (retries > 10) {
+            console.error('[RateLimit] Redis max reconnection attempts reached, falling back to in-memory');
+            return new Error('Max reconnection attempts reached');
+          }
+          return Math.min(retries * 100, 3000);
+        },
+        connectTimeout: 5000,
+      },
+    });
+
+    redisClient.on('error', (err) => {
+      console.error('[RateLimit] Redis client error:', err.message);
+      redisConnected = false;
+    });
+
+    redisClient.on('connect', () => {
+      console.log('[RateLimit] Redis client connected');
+      redisConnected = true;
+    });
+
+    redisClient.on('ready', () => {
+      console.log('[RateLimit] Redis client ready for rate limiting');
+      redisConnected = true;
+    });
+
+    redisClient.on('end', () => {
+      console.log('[RateLimit] Redis client disconnected');
+      redisConnected = false;
+    });
+
+    await redisClient.connect();
+    redisConnected = true;
+    console.log('[RateLimit] Redis store initialized successfully');
+  } catch (error) {
+    console.error('[RateLimit] Failed to connect to Redis:', error);
+    console.log('[RateLimit] Falling back to in-memory store');
+    redisClient = null;
+    redisConnected = false;
+  }
+}
+
+// Initialize Redis connection
+initializeRedisClient().catch(console.error);
+
+/**
+ * Check if Redis is available for rate limiting
+ */
+function isRedisAvailable(): boolean {
+  return redisClient !== null && redisConnected;
+}
+
+// ============================================
+// Rate Limit Store Interfaces
+// ============================================
+
 interface RateLimitEntry {
   count: number;
   firstRequest: number;
@@ -19,12 +105,24 @@ interface RateLimitEntry {
   blockExpiry?: number;
 }
 
-const rateLimitStore = new Map<string, RateLimitEntry>();
-const ipBlockList = new Map<string, number>(); // IP -> block expiry timestamp
+interface RateLimitResult {
+  allowed: boolean;
+  remaining: number;
+  resetTime: number;
+  blocked?: boolean;
+}
 
-/**
- * Rate limit configurations
- */
+// ============================================
+// In-Memory Store (Fallback)
+// ============================================
+
+const memoryRateLimitStore = new Map<string, RateLimitEntry>();
+const memoryIpBlockList = new Map<string, number>();
+
+// ============================================
+// Rate Limit Configurations
+// ============================================
+
 const RATE_LIMIT_CONFIG = {
   // General API requests
   general: {
@@ -72,16 +170,24 @@ const RATE_LIMIT_CONFIG = {
   },
 };
 
+// Redis key prefixes
+const REDIS_PREFIX = {
+  rateLimit: 'rl:',
+  ipBlock: 'rl:ipblock:',
+};
+
+// ============================================
+// Helper Functions
+// ============================================
+
 /**
  * Get client identifier (user ID or IP)
  */
 function getClientIdentifier(req: Request): string {
-  // Use user ID if authenticated
   if (req.user?.userId) {
     return `user:${req.user.userId}`;
   }
 
-  // Otherwise use IP address
   const forwarded = req.headers['x-forwarded-for'];
   if (forwarded) {
     const ips = typeof forwarded === 'string' ? forwarded.split(',') : forwarded;
@@ -122,56 +228,239 @@ function getRateLimitKey(identifier: string, limitType: string): string {
   return `${limitType}:${identifier}`;
 }
 
+// ============================================
+// Redis Store Operations
+// ============================================
+
 /**
- * Check if IP is blocked
+ * Check if IP is blocked (Redis)
  */
-function isIpBlocked(ip: string): boolean {
-  const blockExpiry = ipBlockList.get(ip);
+async function isIpBlockedRedis(ip: string): Promise<boolean> {
+  if (!isRedisAvailable()) return isIpBlockedMemory(ip);
+
+  try {
+    const blockKey = `${REDIS_PREFIX.ipBlock}${ip}`;
+    const blockExpiry = await redisClient!.get(blockKey);
+
+    if (!blockExpiry) return false;
+
+    const expiryTime = parseInt(blockExpiry, 10);
+    if (Date.now() < expiryTime) {
+      return true;
+    }
+
+    // Clean up expired block
+    await redisClient!.del(blockKey);
+    return false;
+  } catch (error) {
+    console.error('[RateLimit] Redis isIpBlocked error:', error);
+    return isIpBlockedMemory(ip);
+  }
+}
+
+/**
+ * Block IP address (Redis)
+ */
+async function blockIpRedis(ip: string, duration: number): Promise<void> {
+  const expiry = Date.now() + duration;
+
+  if (!isRedisAvailable()) {
+    blockIpMemory(ip, duration);
+    return;
+  }
+
+  try {
+    const blockKey = `${REDIS_PREFIX.ipBlock}${ip}`;
+    const ttlSeconds = Math.ceil(duration / 1000);
+    await redisClient!.setEx(blockKey, ttlSeconds, expiry.toString());
+    console.log(`[RateLimit] IP blocked in Redis: ${ip} until ${new Date(expiry).toISOString()}`);
+  } catch (error) {
+    console.error('[RateLimit] Redis blockIp error:', error);
+    blockIpMemory(ip, duration);
+  }
+}
+
+/**
+ * Check rate limit (Redis)
+ */
+async function checkRateLimitRedis(
+  key: string,
+  config: { windowMs: number; max: number; blockDuration?: number }
+): Promise<RateLimitResult> {
+  if (!isRedisAvailable()) {
+    return checkRateLimitMemory(key, config);
+  }
+
+  try {
+    const redisKey = `${REDIS_PREFIX.rateLimit}${key}`;
+    const now = Date.now();
+
+    // Use Redis transaction for atomic operations
+    const entryJson = await redisClient!.get(redisKey);
+    let entry: RateLimitEntry;
+
+    if (entryJson) {
+      entry = JSON.parse(entryJson);
+
+      const windowExpired = now - entry.firstRequest > config.windowMs;
+      const blockExpired = entry.blocked && entry.blockExpiry && now > entry.blockExpiry;
+
+      if (windowExpired && !entry.blocked) {
+        entry = {
+          count: 0,
+          firstRequest: now,
+          lastRequest: now,
+          blocked: false,
+        };
+      } else if (blockExpired) {
+        entry = {
+          count: 0,
+          firstRequest: now,
+          lastRequest: now,
+          blocked: false,
+        };
+      }
+    } else {
+      entry = {
+        count: 0,
+        firstRequest: now,
+        lastRequest: now,
+        blocked: false,
+      };
+    }
+
+    // Check if blocked
+    if (entry.blocked && entry.blockExpiry && now < entry.blockExpiry) {
+      return {
+        allowed: false,
+        remaining: 0,
+        resetTime: entry.blockExpiry,
+        blocked: true,
+      };
+    }
+
+    // Increment count
+    entry.count++;
+    entry.lastRequest = now;
+
+    // Check if limit exceeded
+    if (entry.count > config.max) {
+      if (config.blockDuration) {
+        entry.blocked = true;
+        entry.blockExpiry = now + config.blockDuration;
+      }
+
+      // Calculate TTL for Redis key
+      const ttlMs = entry.blocked && entry.blockExpiry
+        ? entry.blockExpiry - now
+        : config.windowMs - (now - entry.firstRequest);
+      const ttlSeconds = Math.max(Math.ceil(ttlMs / 1000), 1);
+
+      await redisClient!.setEx(redisKey, ttlSeconds, JSON.stringify(entry));
+
+      return {
+        allowed: false,
+        remaining: 0,
+        resetTime: entry.firstRequest + config.windowMs,
+        blocked: entry.blocked,
+      };
+    }
+
+    // Calculate TTL for Redis key
+    const ttlMs = config.windowMs - (now - entry.firstRequest);
+    const ttlSeconds = Math.max(Math.ceil(ttlMs / 1000), 1);
+
+    await redisClient!.setEx(redisKey, ttlSeconds, JSON.stringify(entry));
+
+    return {
+      allowed: true,
+      remaining: config.max - entry.count,
+      resetTime: entry.firstRequest + config.windowMs,
+    };
+  } catch (error) {
+    console.error('[RateLimit] Redis checkRateLimit error:', error);
+    return checkRateLimitMemory(key, config);
+  }
+}
+
+/**
+ * Decrement rate limit counter (Redis) - used for skipSuccessfulRequests
+ */
+async function decrementRateLimitRedis(key: string): Promise<void> {
+  if (!isRedisAvailable()) {
+    decrementRateLimitMemory(key);
+    return;
+  }
+
+  try {
+    const redisKey = `${REDIS_PREFIX.rateLimit}${key}`;
+    const entryJson = await redisClient!.get(redisKey);
+
+    if (entryJson) {
+      const entry: RateLimitEntry = JSON.parse(entryJson);
+      if (entry.count > 0) {
+        entry.count--;
+        const ttl = await redisClient!.ttl(redisKey);
+        if (ttl > 0) {
+          await redisClient!.setEx(redisKey, ttl, JSON.stringify(entry));
+        }
+      }
+    }
+  } catch (error) {
+    console.error('[RateLimit] Redis decrementRateLimit error:', error);
+    decrementRateLimitMemory(key);
+  }
+}
+
+// ============================================
+// In-Memory Store Operations (Fallback)
+// ============================================
+
+/**
+ * Check if IP is blocked (Memory)
+ */
+function isIpBlockedMemory(ip: string): boolean {
+  const blockExpiry = memoryIpBlockList.get(ip);
   if (!blockExpiry) return false;
 
   if (Date.now() < blockExpiry) {
     return true;
   }
 
-  // Unblock if expiry passed
-  ipBlockList.delete(ip);
+  memoryIpBlockList.delete(ip);
   return false;
 }
 
 /**
- * Block IP address
+ * Block IP address (Memory)
  */
-function blockIp(ip: string, duration: number): void {
+function blockIpMemory(ip: string, duration: number): void {
   const expiry = Date.now() + duration;
-  ipBlockList.set(ip, expiry);
-  console.log(`IP blocked: ${ip} until ${new Date(expiry).toISOString()}`);
+  memoryIpBlockList.set(ip, expiry);
+  console.log(`[RateLimit] IP blocked in memory: ${ip} until ${new Date(expiry).toISOString()}`);
 }
 
 /**
- * Check rate limit
+ * Check rate limit (Memory)
  */
-function checkRateLimit(
+function checkRateLimitMemory(
   key: string,
   config: { windowMs: number; max: number; blockDuration?: number }
-): { allowed: boolean; remaining: number; resetTime: number; blocked?: boolean } {
+): RateLimitResult {
   const now = Date.now();
-  let entry = rateLimitStore.get(key);
+  let entry = memoryRateLimitStore.get(key);
 
-  // Clean up expired entries
   if (entry) {
     const windowExpired = now - entry.firstRequest > config.windowMs;
     const blockExpired = entry.blocked && entry.blockExpiry && now > entry.blockExpiry;
 
     if (windowExpired && !entry.blocked) {
-      // Reset window
       entry = undefined;
     } else if (blockExpired) {
-      // Unblock
       entry = undefined;
     }
   }
 
-  // Create new entry if needed
   if (!entry) {
     entry = {
       count: 0,
@@ -179,10 +468,9 @@ function checkRateLimit(
       lastRequest: now,
       blocked: false,
     };
-    rateLimitStore.set(key, entry);
+    memoryRateLimitStore.set(key, entry);
   }
 
-  // Check if blocked
   if (entry.blocked && entry.blockExpiry && now < entry.blockExpiry) {
     return {
       allowed: false,
@@ -192,13 +480,10 @@ function checkRateLimit(
     };
   }
 
-  // Increment count
   entry.count++;
   entry.lastRequest = now;
 
-  // Check if limit exceeded
   if (entry.count > config.max) {
-    // Block if configured
     if (config.blockDuration) {
       entry.blocked = true;
       entry.blockExpiry = now + config.blockDuration;
@@ -220,6 +505,20 @@ function checkRateLimit(
 }
 
 /**
+ * Decrement rate limit counter (Memory)
+ */
+function decrementRateLimitMemory(key: string): void {
+  const entry = memoryRateLimitStore.get(key);
+  if (entry && entry.count > 0) {
+    entry.count--;
+  }
+}
+
+// ============================================
+// Middleware Factory
+// ============================================
+
+/**
  * Create rate limit middleware
  */
 function createRateLimiter(
@@ -237,9 +536,29 @@ function createRateLimiter(
       const ip = getClientIp(req);
 
       // Check IP block list
-      if (isIpBlocked(ip)) {
-        const blockExpiry = ipBlockList.get(ip);
-        const resetTime = blockExpiry ? new Date(blockExpiry).toISOString() : 'unknown';
+      const ipBlocked = await isIpBlockedRedis(ip);
+      if (ipBlocked) {
+        const blockKey = `${REDIS_PREFIX.ipBlock}${ip}`;
+        let resetTime = 'unknown';
+
+        if (isRedisAvailable()) {
+          try {
+            const blockExpiry = await redisClient!.get(blockKey);
+            if (blockExpiry) {
+              resetTime = new Date(parseInt(blockExpiry, 10)).toISOString();
+            }
+          } catch {
+            const memoryExpiry = memoryIpBlockList.get(ip);
+            if (memoryExpiry) {
+              resetTime = new Date(memoryExpiry).toISOString();
+            }
+          }
+        } else {
+          const memoryExpiry = memoryIpBlockList.get(ip);
+          if (memoryExpiry) {
+            resetTime = new Date(memoryExpiry).toISOString();
+          }
+        }
 
         await auditService.logEvent({
           userId: req.user?.userId || 'anonymous',
@@ -250,6 +569,7 @@ function createRateLimiter(
             path: req.path,
             reason: 'ip_blocked',
             resetTime,
+            store: isRedisAvailable() ? 'redis' : 'memory',
           },
           ipAddress: ip,
           userAgent: req.headers['user-agent'] || 'unknown',
@@ -268,17 +588,18 @@ function createRateLimiter(
       const key = getRateLimitKey(identifier, limitType);
 
       // Check rate limit
-      const result = checkRateLimit(key, config);
+      const result = await checkRateLimitRedis(key, config);
 
       // Set rate limit headers
       res.setHeader('X-RateLimit-Limit', config.max);
       res.setHeader('X-RateLimit-Remaining', result.remaining);
       res.setHeader('X-RateLimit-Reset', new Date(result.resetTime).toISOString());
+      res.setHeader('X-RateLimit-Store', isRedisAvailable() ? 'redis' : 'memory');
 
       if (!result.allowed) {
         // Block IP if this is an auth endpoint and user is blocked
         if (limitType === 'auth' && result.blocked) {
-          blockIp(ip, config.blockDuration || 0);
+          await blockIpRedis(ip, config.blockDuration || 0);
         }
 
         // Log rate limit violation
@@ -293,6 +614,7 @@ function createRateLimiter(
             path: req.path,
             blocked: result.blocked,
             resetTime: new Date(result.resetTime).toISOString(),
+            store: isRedisAvailable() ? 'redis' : 'memory',
           },
           ipAddress: ip,
           userAgent: req.headers['user-agent'] || 'unknown',
@@ -312,7 +634,7 @@ function createRateLimiter(
 
         let responseSent = false;
 
-        const decrementCounter = () => {
+        const decrementCounter = async () => {
           if (responseSent) return;
           responseSent = true;
 
@@ -321,31 +643,32 @@ function createRateLimiter(
             (options.skipFailedRequests && res.statusCode >= 400);
 
           if (shouldSkip) {
-            const entry = rateLimitStore.get(key);
-            if (entry && entry.count > 0) {
-              entry.count--;
-            }
+            await decrementRateLimitRedis(key);
           }
         };
 
         res.send = function(data: any) {
-          decrementCounter();
+          decrementCounter().catch(console.error);
           return originalSend.call(this, data);
         };
 
         res.json = function(data: any) {
-          decrementCounter();
+          decrementCounter().catch(console.error);
           return originalJson.call(this, data);
         };
       }
 
       next();
     } catch (error) {
-      console.error('Rate limit middleware error:', error);
+      console.error('[RateLimit] Middleware error:', error);
       next(error);
     }
   };
 }
+
+// ============================================
+// Exported Rate Limiters
+// ============================================
 
 /**
  * General rate limiter (100 req/15min)
@@ -407,67 +730,104 @@ export const perIpRateLimit = (max: number, windowMs: number) => {
   });
 };
 
+// ============================================
+// Cleanup and Maintenance
+// ============================================
+
 /**
- * Cleanup expired entries periodically
+ * Cleanup expired entries periodically (memory store only)
  */
-function cleanupRateLimits(): void {
+function cleanupMemoryRateLimits(): void {
   const now = Date.now();
   let cleaned = 0;
 
-  rateLimitStore.forEach((entry, key) => {
+  memoryRateLimitStore.forEach((entry, key) => {
     const windowExpired = now - entry.firstRequest > 60 * 60 * 1000; // 1 hour
     const blockExpired = entry.blocked && entry.blockExpiry && now > entry.blockExpiry;
 
-    if (windowExpired && !entry.blocked || blockExpired) {
-      rateLimitStore.delete(key);
+    if ((windowExpired && !entry.blocked) || blockExpired) {
+      memoryRateLimitStore.delete(key);
       cleaned++;
     }
   });
 
-  // Cleanup IP blocks
-  ipBlockList.forEach((expiry, ip) => {
+  memoryIpBlockList.forEach((expiry, ip) => {
     if (now > expiry) {
-      ipBlockList.delete(ip);
+      memoryIpBlockList.delete(ip);
       cleaned++;
     }
   });
 
   if (cleaned > 0) {
-    console.log(`Cleaned up ${cleaned} expired rate limit entries`);
+    console.log(`[RateLimit] Cleaned up ${cleaned} expired memory rate limit entries`);
   }
 }
 
-// Run cleanup every 5 minutes
-setInterval(cleanupRateLimits, 5 * 60 * 1000);
+// Run cleanup every 5 minutes (memory store only)
+setInterval(cleanupMemoryRateLimits, 5 * 60 * 1000);
+
+// ============================================
+// Statistics and Management Functions
+// ============================================
 
 /**
  * Get rate limit statistics
  */
-export function getRateLimitStats(): {
+export async function getRateLimitStats(): Promise<{
   totalEntries: number;
   blockedEntries: number;
   blockedIps: number;
-} {
-  let blockedEntries = 0;
+  store: 'redis' | 'memory';
+}> {
+  if (isRedisAvailable()) {
+    try {
+      // Get counts from Redis using SCAN
+      let totalEntries = 0;
+      let blockedIps = 0;
 
-  rateLimitStore.forEach(entry => {
+      // Count rate limit keys
+      const rlKeys = await redisClient!.keys(`${REDIS_PREFIX.rateLimit}*`);
+      totalEntries = rlKeys.length;
+
+      // Count blocked IPs
+      const blockKeys = await redisClient!.keys(`${REDIS_PREFIX.ipBlock}*`);
+      blockedIps = blockKeys.length;
+
+      // Note: Getting blockedEntries count from Redis would require reading all entries
+      // For performance, we return 0 here (or could implement sampling)
+
+      return {
+        totalEntries,
+        blockedEntries: 0, // Not efficiently calculable in Redis without scanning all values
+        blockedIps,
+        store: 'redis',
+      };
+    } catch (error) {
+      console.error('[RateLimit] Error getting Redis stats:', error);
+    }
+  }
+
+  // Fallback to memory stats
+  let blockedEntries = 0;
+  memoryRateLimitStore.forEach(entry => {
     if (entry.blocked) {
       blockedEntries++;
     }
   });
 
   return {
-    totalEntries: rateLimitStore.size,
+    totalEntries: memoryRateLimitStore.size,
     blockedEntries,
-    blockedIps: ipBlockList.size,
+    blockedIps: memoryIpBlockList.size,
+    store: 'memory',
   };
 }
 
 /**
  * Manually block an IP
  */
-export function manuallyBlockIp(ip: string, durationMs: number): void {
-  blockIp(ip, durationMs);
+export async function manuallyBlockIp(ip: string, durationMs: number): Promise<void> {
+  await blockIpRedis(ip, durationMs);
 
   auditService.logEvent({
     userId: 'system',
@@ -477,6 +837,7 @@ export function manuallyBlockIp(ip: string, durationMs: number): void {
       ip,
       duration: durationMs,
       expiry: new Date(Date.now() + durationMs).toISOString(),
+      store: isRedisAvailable() ? 'redis' : 'memory',
     },
     ipAddress: ip,
   }).catch(console.error);
@@ -485,15 +846,29 @@ export function manuallyBlockIp(ip: string, durationMs: number): void {
 /**
  * Manually unblock an IP
  */
-export function manuallyUnblockIp(ip: string): void {
-  ipBlockList.delete(ip);
-  console.log(`IP manually unblocked: ${ip}`);
+export async function manuallyUnblockIp(ip: string): Promise<void> {
+  if (isRedisAvailable()) {
+    try {
+      const blockKey = `${REDIS_PREFIX.ipBlock}${ip}`;
+      await redisClient!.del(blockKey);
+      console.log(`[RateLimit] IP manually unblocked from Redis: ${ip}`);
+    } catch (error) {
+      console.error('[RateLimit] Error unblocking IP in Redis:', error);
+    }
+  }
+
+  // Also clear from memory (in case of fallback)
+  memoryIpBlockList.delete(ip);
+  console.log(`[RateLimit] IP manually unblocked: ${ip}`);
 
   auditService.logEvent({
     userId: 'system',
     action: 'manual_ip_unblock',
     resource: 'rate_limit',
-    details: { ip },
+    details: {
+      ip,
+      store: isRedisAvailable() ? 'redis' : 'memory',
+    },
     ipAddress: ip,
   }).catch(console.error);
 }
@@ -501,17 +876,66 @@ export function manuallyUnblockIp(ip: string): void {
 /**
  * Clear all rate limits for a user
  */
-export function clearUserRateLimits(userId: string): void {
-  const userKeys: string[] = [];
+export async function clearUserRateLimits(userId: string): Promise<void> {
+  const pattern = `*user:${userId}*`;
 
-  rateLimitStore.forEach((_, key) => {
+  if (isRedisAvailable()) {
+    try {
+      const keys = await redisClient!.keys(`${REDIS_PREFIX.rateLimit}${pattern}`);
+      if (keys.length > 0) {
+        await redisClient!.del(keys);
+        console.log(`[RateLimit] Cleared ${keys.length} rate limit entries for user ${userId} from Redis`);
+      }
+    } catch (error) {
+      console.error('[RateLimit] Error clearing user rate limits in Redis:', error);
+    }
+  }
+
+  // Also clear from memory
+  const userKeys: string[] = [];
+  memoryRateLimitStore.forEach((_, key) => {
     if (key.includes(`user:${userId}`)) {
       userKeys.push(key);
     }
   });
 
-  userKeys.forEach(key => rateLimitStore.delete(key));
-  console.log(`Cleared ${userKeys.length} rate limit entries for user: ${userId}`);
+  userKeys.forEach(key => memoryRateLimitStore.delete(key));
+
+  if (userKeys.length > 0) {
+    console.log(`[RateLimit] Cleared ${userKeys.length} rate limit entries for user ${userId} from memory`);
+  }
+}
+
+/**
+ * Get Redis connection status
+ */
+export function getRedisStatus(): {
+  enabled: boolean;
+  connected: boolean;
+  url: string;
+} {
+  const redisUrl = process.env.REDIS_URL ||
+    `redis://${process.env.REDIS_HOST || 'localhost'}:${process.env.REDIS_PORT || 6379}`;
+
+  return {
+    enabled: redisClient !== null,
+    connected: redisConnected,
+    url: redisUrl.replace(/\/\/[^:]+:[^@]+@/, '//***:***@'), // Hide credentials
+  };
+}
+
+/**
+ * Gracefully close Redis connection
+ */
+export async function closeRedisConnection(): Promise<void> {
+  if (redisClient && redisConnected) {
+    try {
+      await redisClient.quit();
+      console.log('[RateLimit] Redis connection closed gracefully');
+    } catch (error) {
+      console.error('[RateLimit] Error closing Redis connection:', error);
+    }
+  }
 }
 
 export default {
@@ -528,4 +952,6 @@ export default {
   manuallyBlockIp,
   manuallyUnblockIp,
   clearUserRateLimits,
+  getRedisStatus,
+  closeRedisConnection,
 };

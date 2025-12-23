@@ -1,4 +1,4 @@
-import { PrismaClient, VitalType } from '@prisma/client';
+import { PrismaClient, VitalType } from '../generated/client';
 import AlertService from './AlertService';
 import EngagementService from './EngagementService';
 

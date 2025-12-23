@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { UserRequest, requireUser } from '../middleware/extractUser';
 import InventoryService from '../services/InventoryService';
 
-const router = Router();
+const router: ReturnType<typeof Router> = Router();
 
 const addInventorySchema = z.object({
   medicationId: z.string().uuid(),

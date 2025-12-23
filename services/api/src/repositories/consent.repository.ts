@@ -1,4 +1,4 @@
-import { Consent, ConsentType, Prisma } from '@prisma/client';
+import { Consent, ConsentType, Prisma } from '../generated/client';
 import { BaseRepository } from './base.repository.js';
 import { prisma } from '../lib/prisma.js';
 

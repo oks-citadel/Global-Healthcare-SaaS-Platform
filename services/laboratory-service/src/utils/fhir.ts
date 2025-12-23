@@ -1,4 +1,4 @@
-import { LabOrder, LabTest, LabResult } from '@prisma/client';
+import { LabOrder, LabTest, LabResult } from '../generated/client';
 import { FHIRDiagnosticReport, FHIRObservation } from '../types';
 
 export class FHIRConverter {

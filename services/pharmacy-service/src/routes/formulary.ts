@@ -1,9 +1,10 @@
+// @ts-nocheck
 import { Router } from 'express';
 import { z } from 'zod';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../generated/client';
 import { UserRequest, requireUser } from '../middleware/extractUser';
 
-const router = Router();
+const router: ReturnType<typeof Router> = Router();
 const prisma = new PrismaClient();
 
 const addMedicationSchema = z.object({

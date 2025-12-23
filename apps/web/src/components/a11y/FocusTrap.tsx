@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useCallback } from 'react';
 
-interface FocusTrapProps {
+export interface FocusTrapProps {
   children: React.ReactNode;
   active?: boolean;
   initialFocus?: boolean;

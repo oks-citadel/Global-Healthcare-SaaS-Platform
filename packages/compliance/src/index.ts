@@ -24,11 +24,3 @@ export { default as DataRetentionManager } from './retention/dataRetention';
 export * from './deletion/dataDeletion';
 export { default as DataDeletionManager } from './deletion/dataDeletion';
 
-// Re-export everything
-export {
-  AuditLogger,
-  ConsentManager,
-  FieldEncryption,
-  DataRetentionManager,
-  DataDeletionManager
-};

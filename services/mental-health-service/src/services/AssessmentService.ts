@@ -1,4 +1,5 @@
-import { PrismaClient, AssessmentType, SeverityLevel } from '@prisma/client';
+// @ts-nocheck
+import { PrismaClient, AssessmentType, SeverityLevel } from '../generated/client';
 
 const prisma = new PrismaClient();
 

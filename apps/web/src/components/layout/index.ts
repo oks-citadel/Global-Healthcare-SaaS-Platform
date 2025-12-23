@@ -6,7 +6,7 @@
  * proper ARIA landmarks and heading hierarchy.
  */
 
-export { Header, Logo, Nav, NavList, NavItem } from './Header';
+export { default as Header } from './Header';
 export { Main, Section, Article } from './Main';
 export {
   Footer,

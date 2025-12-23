@@ -9,6 +9,35 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 /**
+ * Environment mode detection
+ */
+const isProduction = process.env.NODE_ENV === 'production';
+const isDevelopment = process.env.NODE_ENV === 'development' || !process.env.NODE_ENV;
+
+/**
+ * Get a required environment variable for security configuration.
+ * In production: throws an error if not set.
+ * In development: returns fallback if provided.
+ */
+function getRequiredSecurityEnv(name: string, devFallback?: string): string {
+  const value = process.env[name];
+
+  if (value) {
+    return value;
+  }
+
+  if (isDevelopment && devFallback !== undefined) {
+    console.warn(`[SECURITY CONFIG WARNING] Using development fallback for ${name}. This is NOT safe for production.`);
+    return devFallback;
+  }
+
+  throw new Error(
+    `Required security environment variable ${name} is not set. ` +
+    `This is a critical security configuration that must be set before starting the application.`
+  );
+}
+
+/**
  * Security Configuration Object
  */
 export const securityConfig = {
@@ -58,8 +87,8 @@ export const securityConfig = {
    * JWT Token Configuration
    */
   jwt: {
-    // Access token secret (should be set via environment variable)
-    secret: process.env.JWT_SECRET || 'your-super-secret-key-change-in-production',
+    // Access token secret (REQUIRED - no hardcoded fallback)
+    secret: getRequiredSecurityEnv('JWT_SECRET', isDevelopment ? 'dev-only-insecure-jwt-secret-min-32-chars' : undefined),
 
     // Access token expiration (HIPAA recommends short-lived tokens)
     accessTokenExpiry: process.env.JWT_EXPIRY || '15m', // 15 minutes
@@ -132,8 +161,8 @@ export const securityConfig = {
     // PBKDF2 iterations
     iterations: 100000,
 
-    // Master encryption key (should be set via environment variable)
-    masterKey: process.env.ENCRYPTION_KEY || 'your-32-byte-encryption-key-here',
+    // Master encryption key (REQUIRED - no hardcoded fallback)
+    masterKey: getRequiredSecurityEnv('ENCRYPTION_KEY', isDevelopment ? 'dev-only-32-byte-encryption-key!' : undefined),
 
     // Key rotation interval (days)
     keyRotationInterval: 90,
@@ -530,14 +559,23 @@ export function validateSecurityConfig(): {
   const errors: string[] = [];
   const warnings: string[] = [];
 
-  // Check JWT secret in production
-  if (process.env.NODE_ENV === 'production') {
-    if (securityConfig.jwt.secret === 'your-super-secret-key-change-in-production') {
-      errors.push('JWT_SECRET must be set in production');
+  // Check JWT secret strength
+  if (securityConfig.jwt.secret.length < 32) {
+    if (isProduction) {
+      errors.push('JWT_SECRET must be at least 32 characters for production');
+    } else {
+      warnings.push('JWT_SECRET should be at least 32 characters');
+    }
+  }
+
+  // Check if using development fallbacks in production (should never happen due to fail-fast)
+  if (isProduction) {
+    if (securityConfig.jwt.secret.includes('dev-only')) {
+      errors.push('Development fallback detected for JWT_SECRET in production');
     }
 
-    if (securityConfig.encryption.masterKey === 'your-32-byte-encryption-key-here') {
-      errors.push('ENCRYPTION_KEY must be set in production');
+    if (securityConfig.encryption.masterKey.includes('dev-only')) {
+      errors.push('Development fallback detected for ENCRYPTION_KEY in production');
     }
 
     if (!securityConfig.session.cookie.secure) {
@@ -545,9 +583,9 @@ export function validateSecurityConfig(): {
     }
   }
 
-  // Check encryption key length
+  // Check encryption key length (must be 32 bytes for AES-256)
   if (securityConfig.encryption.masterKey.length < 32) {
-    errors.push('Encryption key must be at least 32 characters');
+    errors.push('Encryption key must be at least 32 characters (256 bits for AES-256)');
   }
 
   // Check Azure Key Vault configuration
@@ -556,7 +594,7 @@ export function validateSecurityConfig(): {
   }
 
   // Check CORS origins
-  if (process.env.NODE_ENV === 'production' && securityConfig.cors.origins.includes('http://localhost:3000')) {
+  if (isProduction && securityConfig.cors.origins.includes('http://localhost:3000')) {
     warnings.push('Localhost origins should be removed in production');
   }
 

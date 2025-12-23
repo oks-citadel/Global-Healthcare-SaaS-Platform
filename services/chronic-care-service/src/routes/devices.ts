@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../generated/client';
 import { z } from 'zod';
 import { UserRequest, requireUser } from '../middleware/extractUser';
 
-const router = Router();
+const router: ReturnType<typeof Router> = Router();
 const prisma = new PrismaClient();
 
 const registerDeviceSchema = z.object({
@@ -34,7 +34,13 @@ router.post('/', requireUser, async (req: UserRequest, res) => {
     const validatedData = registerDeviceSchema.parse(req.body);
 
     const device = await prisma.monitoringDevice.create({
-      data: { ...validatedData, patientId: userId },
+      data: {
+        deviceType: validatedData.deviceType,
+        serialNumber: validatedData.serialNumber,
+        manufacturer: validatedData.manufacturer,
+        model: validatedData.model,
+        patientId: userId,
+      },
     });
 
     res.status(201).json({ data: device, message: 'Device registered successfully' });

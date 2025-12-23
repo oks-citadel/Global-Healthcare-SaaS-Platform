@@ -1,63 +1,111 @@
-import { PrismaClient, LabResult } from '@prisma/client';
+import { PrismaClient, LabResult } from '../generated/client';
 import { CriticalValueAlert } from '../types';
 import logger from '../utils/logger';
 
+/**
+ * In-memory storage for critical value alerts.
+ * This serves as a temporary data store until the CriticalValueAlert model is added to the Prisma schema.
+ * In production, replace this with proper database persistence.
+ */
+interface StoredAlert {
+  id: string;
+  resultId: string;
+  patientId: string;
+  providerId: string;
+  testName: string;
+  componentName: string;
+  value: string;
+  referenceRange?: string;
+  severity: 'high' | 'critical';
+  alertedAt: Date;
+  notificationSent: boolean;
+  escalated: boolean;
+  acknowledgedAt?: Date;
+  acknowledgedBy?: string;
+  notes?: string;
+}
+
+/**
+ * AlertService handles critical value alerts for laboratory results.
+ *
+ * This service manages the lifecycle of critical value alerts including:
+ * - Creating alerts when critical lab values are detected
+ * - Sending notifications to providers
+ * - Tracking acknowledgment status
+ * - Escalating unacknowledged alerts
+ *
+ * NOTE: Currently uses in-memory storage. When the CriticalValueAlert model is added
+ * to the Prisma schema, update the implementation to use database persistence.
+ */
 export class AlertService {
   private prisma: PrismaClient;
   private notificationServiceUrl: string;
+
+  /**
+   * In-memory storage for alerts until database model is available.
+   * Key: alert ID, Value: StoredAlert object
+   */
+  private alertStore: Map<string, StoredAlert> = new Map();
 
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;
     this.notificationServiceUrl = process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:3002';
   }
 
-  async createCriticalValueAlert(result: LabResult, testName: string, patientId: string, providerId: string) {
+  /**
+   * Creates a critical value alert for a lab result.
+   * @param result - The lab result that triggered the alert
+   * @param testName - Name of the test
+   * @param patientId - ID of the patient
+   * @param providerId - ID of the ordering provider
+   * @returns The created alert object
+   */
+  async createCriticalValueAlert(result: LabResult, testName: string, patientId: string, providerId: string): Promise<StoredAlert> {
     try {
-      // Note: Using existing schema without CriticalValueAlert model
-      // In production, you would use the updated schema
-      const alert = {
-        id: `alert-${Date.now()}`,
+      const alertId = `alert-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+
+      const alert: StoredAlert = {
+        id: alertId,
         resultId: result.id,
         patientId,
         providerId,
         testName,
         componentName: result.componentName,
         value: result.value,
-        referenceRange: result.referenceRange,
+        referenceRange: result.referenceRange || undefined,
+        severity: 'critical',
         alertedAt: new Date(),
         notificationSent: false,
         escalated: false,
       };
 
-      logger.info('Critical value alert created (placeholder)', {
+      // Store the alert in memory
+      this.alertStore.set(alertId, alert);
+
+      logger.info('Critical value alert created', {
         alertId: alert.id,
         resultId: result.id,
         componentName: result.componentName,
         value: result.value,
+        patientId,
+        providerId,
       });
 
-      // Send notification
-      await this.sendCriticalValueNotification(alert as any);
-
-      // TODO: Uncomment when CriticalValueAlert model is added
-      /*
-      const alert = await this.prisma.criticalValueAlert.create({
-        data: {
-          resultId: result.id,
-          patientId,
-          providerId,
-          testName,
-          componentName: result.componentName,
-          value: result.value,
-          referenceRange: result.referenceRange,
-          notificationSent: false,
-          escalated: false,
-        },
+      // Send notification to the provider
+      await this.sendCriticalValueNotification({
+        resultId: result.id,
+        patientId,
+        providerId,
+        testName,
+        componentName: result.componentName,
+        value: result.value,
+        referenceRange: result.referenceRange || undefined,
+        severity: 'critical',
       });
 
-      // Send notification
-      await this.sendCriticalValueNotification(alert);
-      */
+      // Update notification status
+      alert.notificationSent = true;
+      this.alertStore.set(alertId, alert);
 
       return alert;
     } catch (error) {
@@ -66,125 +114,166 @@ export class AlertService {
     }
   }
 
-  async acknowledgeAlert(alertId: string, acknowledgedBy: string, notes?: string) {
+  /**
+   * Acknowledges a critical value alert.
+   * @param alertId - The ID of the alert to acknowledge
+   * @param acknowledgedBy - The ID of the user acknowledging the alert
+   * @param notes - Optional notes about the acknowledgment
+   * @returns The updated alert object or null if not found
+   */
+  async acknowledgeAlert(alertId: string, acknowledgedBy: string, notes?: string): Promise<StoredAlert | null> {
     try {
-      // TODO: Uncomment when CriticalValueAlert model is added
-      /*
-      const alert = await this.prisma.criticalValueAlert.update({
-        where: { id: alertId },
-        data: {
-          acknowledgedAt: new Date(),
-          acknowledgedBy,
-          notes,
-        },
-      });
+      const alert = this.alertStore.get(alertId);
+
+      if (!alert) {
+        logger.warn('Alert not found for acknowledgment', { alertId });
+        return null;
+      }
+
+      // Update the alert with acknowledgment details
+      alert.acknowledgedAt = new Date();
+      alert.acknowledgedBy = acknowledgedBy;
+      if (notes) {
+        alert.notes = notes;
+      }
+
+      this.alertStore.set(alertId, alert);
 
       logger.info('Critical value alert acknowledged', {
         alertId: alert.id,
         acknowledgedBy,
+        acknowledgedAt: alert.acknowledgedAt,
       });
 
       return alert;
-      */
-      return null;
     } catch (error) {
       logger.error('Error acknowledging alert', { error, alertId });
       throw error;
     }
   }
 
-  async escalateAlert(alertId: string) {
+  /**
+   * Escalates an unacknowledged critical value alert.
+   * @param alertId - The ID of the alert to escalate
+   * @returns The updated alert object or null if not found
+   */
+  async escalateAlert(alertId: string): Promise<StoredAlert | null> {
     try {
-      // TODO: Uncomment when CriticalValueAlert model is added
-      /*
-      const alert = await this.prisma.criticalValueAlert.update({
-        where: { id: alertId },
-        data: {
-          escalated: true,
-        },
-      });
+      const alert = this.alertStore.get(alertId);
+
+      if (!alert) {
+        logger.warn('Alert not found for escalation', { alertId });
+        return null;
+      }
+
+      // Mark as escalated
+      alert.escalated = true;
+      this.alertStore.set(alertId, alert);
 
       logger.info('Critical value alert escalated', {
         alertId: alert.id,
+        patientId: alert.patientId,
+        providerId: alert.providerId,
       });
 
-      // Send escalation notification
+      // Send escalation notification to administrators
       await this.sendEscalationNotification(alert);
 
       return alert;
-      */
-      return null;
     } catch (error) {
       logger.error('Error escalating alert', { error, alertId });
       throw error;
     }
   }
 
-  async getUnacknowledgedAlerts(providerId?: string) {
+  /**
+   * Retrieves all unacknowledged alerts, optionally filtered by provider.
+   * @param providerId - Optional provider ID to filter alerts
+   * @returns Array of unacknowledged alerts
+   */
+  async getUnacknowledgedAlerts(providerId?: string): Promise<StoredAlert[]> {
     try {
-      // TODO: Uncomment when CriticalValueAlert model is added
-      /*
-      const where: any = {
-        acknowledgedAt: null,
-      };
+      const alerts = Array.from(this.alertStore.values())
+        .filter(alert => {
+          // Filter for unacknowledged alerts
+          if (alert.acknowledgedAt) {
+            return false;
+          }
+          // Optionally filter by provider
+          if (providerId && alert.providerId !== providerId) {
+            return false;
+          }
+          return true;
+        })
+        .sort((a, b) => b.alertedAt.getTime() - a.alertedAt.getTime());
 
-      if (providerId) {
-        where.providerId = providerId;
-      }
-
-      const alerts = await this.prisma.criticalValueAlert.findMany({
-        where,
-        orderBy: { alertedAt: 'desc' },
+      logger.debug('Retrieved unacknowledged alerts', {
+        count: alerts.length,
+        providerId,
       });
 
       return alerts;
-      */
-      return [];
     } catch (error) {
       logger.error('Error fetching unacknowledged alerts', { error });
       throw error;
     }
   }
 
-  async getAlertsByPatient(patientId: string, limit: number = 20) {
+  /**
+   * Retrieves alerts for a specific patient.
+   * @param patientId - The patient ID to filter by
+   * @param limit - Maximum number of alerts to return (default: 20)
+   * @returns Array of alerts for the patient
+   */
+  async getAlertsByPatient(patientId: string, limit: number = 20): Promise<StoredAlert[]> {
     try {
-      // TODO: Uncomment when CriticalValueAlert model is added
-      /*
-      const alerts = await this.prisma.criticalValueAlert.findMany({
-        where: { patientId },
-        orderBy: { alertedAt: 'desc' },
-        take: limit,
+      const alerts = Array.from(this.alertStore.values())
+        .filter(alert => alert.patientId === patientId)
+        .sort((a, b) => b.alertedAt.getTime() - a.alertedAt.getTime())
+        .slice(0, limit);
+
+      logger.debug('Retrieved patient alerts', {
+        patientId,
+        count: alerts.length,
       });
 
       return alerts;
-      */
-      return [];
     } catch (error) {
       logger.error('Error fetching patient alerts', { error, patientId });
       throw error;
     }
   }
 
-  async getAlertsByProvider(providerId: string, limit: number = 20) {
+  /**
+   * Retrieves alerts for a specific provider.
+   * @param providerId - The provider ID to filter by
+   * @param limit - Maximum number of alerts to return (default: 20)
+   * @returns Array of alerts for the provider
+   */
+  async getAlertsByProvider(providerId: string, limit: number = 20): Promise<StoredAlert[]> {
     try {
-      // TODO: Uncomment when CriticalValueAlert model is added
-      /*
-      const alerts = await this.prisma.criticalValueAlert.findMany({
-        where: { providerId },
-        orderBy: { alertedAt: 'desc' },
-        take: limit,
+      const alerts = Array.from(this.alertStore.values())
+        .filter(alert => alert.providerId === providerId)
+        .sort((a, b) => b.alertedAt.getTime() - a.alertedAt.getTime())
+        .slice(0, limit);
+
+      logger.debug('Retrieved provider alerts', {
+        providerId,
+        count: alerts.length,
       });
 
       return alerts;
-      */
-      return [];
     } catch (error) {
       logger.error('Error fetching provider alerts', { error, providerId });
       throw error;
     }
   }
 
-  private async sendCriticalValueNotification(alert: CriticalValueAlert) {
+  /**
+   * Sends a critical value notification to the provider.
+   * @param alert - The alert data for the notification
+   */
+  private async sendCriticalValueNotification(alert: CriticalValueAlert): Promise<void> {
     try {
       const notification = {
         type: 'critical_lab_value',
@@ -217,7 +306,11 @@ export class AlertService {
     }
   }
 
-  private async sendEscalationNotification(alert: any) {
+  /**
+   * Sends an escalation notification for an unacknowledged alert.
+   * @param alert - The alert that is being escalated
+   */
+  private async sendEscalationNotification(alert: StoredAlert): Promise<void> {
     try {
       const notification = {
         type: 'escalated_critical_value',
@@ -230,6 +323,8 @@ export class AlertService {
           patientId: alert.patientId,
           providerId: alert.providerId,
           testName: alert.testName,
+          escalatedAt: new Date().toISOString(),
+          originalAlertTime: alert.alertedAt.toISOString(),
         },
       };
 
@@ -243,14 +338,21 @@ export class AlertService {
     }
   }
 
-  private async sendNotification(notification: any) {
+  /**
+   * Sends a notification to the notification service.
+   * In production, this makes an HTTP call to the notification service API.
+   * @param notification - The notification payload to send
+   */
+  private async sendNotification(notification: Record<string, unknown>): Promise<void> {
     try {
-      // In production, this would call the notification service API
-      // For now, just log it
-      logger.info('Notification to be sent', { notification });
+      // Log the notification for debugging
+      logger.info('Sending notification to notification service', {
+        type: notification.type,
+        recipientType: notification.recipientType,
+        priority: notification.priority,
+      });
 
-      // Example implementation:
-      /*
+      // Make HTTP call to notification service
       const response = await fetch(`${this.notificationServiceUrl}/notifications`, {
         method: 'POST',
         headers: {
@@ -260,52 +362,96 @@ export class AlertService {
       });
 
       if (!response.ok) {
-        throw new Error(`Notification service error: ${response.statusText}`);
+        // Log the error but don't throw - notification failures shouldn't block alert creation
+        logger.warn(`Notification service returned non-OK status: ${response.status}`, {
+          statusText: response.statusText,
+          notification,
+        });
+      } else {
+        logger.debug('Notification sent successfully', { type: notification.type });
       }
-      */
     } catch (error) {
-      logger.error('Error calling notification service', { error });
+      // Log error but don't throw - notification failures shouldn't block alert creation
+      logger.error('Error calling notification service', {
+        error,
+        url: this.notificationServiceUrl,
+      });
     }
   }
 
+  /**
+   * Checks if a lab result is critical and creates an alert if necessary.
+   * @param result - The lab result to check
+   * @param testName - Name of the test
+   * @param patientId - ID of the patient
+   * @param providerId - ID of the ordering provider
+   */
   async checkAndCreateAlertsForResult(
     result: LabResult,
     testName: string,
     patientId: string,
     providerId: string
-  ) {
-    if (result.isCritical) {
+  ): Promise<void> {
+    if ((result as LabResult & { isCritical?: boolean }).isCritical) {
       await this.createCriticalValueAlert(result, testName, patientId, providerId);
     }
   }
 
-  async getAlertStatistics() {
+  /**
+   * Retrieves statistics about alerts.
+   * @returns Object containing alert statistics
+   */
+  async getAlertStatistics(): Promise<{
+    total: number;
+    unacknowledged: number;
+    acknowledged: number;
+    escalated: number;
+  }> {
     try {
-      // TODO: Uncomment when CriticalValueAlert model is added
-      /*
-      const [total, unacknowledged, acknowledged, escalated] = await Promise.all([
-        this.prisma.criticalValueAlert.count(),
-        this.prisma.criticalValueAlert.count({ where: { acknowledgedAt: null } }),
-        this.prisma.criticalValueAlert.count({ where: { acknowledgedAt: { not: null } } }),
-        this.prisma.criticalValueAlert.count({ where: { escalated: true } }),
-      ]);
+      const alerts = Array.from(this.alertStore.values());
 
-      return {
-        total,
-        unacknowledged,
-        acknowledged,
-        escalated,
+      const stats = {
+        total: alerts.length,
+        unacknowledged: alerts.filter(a => !a.acknowledgedAt).length,
+        acknowledged: alerts.filter(a => a.acknowledgedAt).length,
+        escalated: alerts.filter(a => a.escalated).length,
       };
-      */
-      return {
-        total: 0,
-        unacknowledged: 0,
-        acknowledged: 0,
-        escalated: 0,
-      };
+
+      logger.debug('Retrieved alert statistics', stats);
+
+      return stats;
     } catch (error) {
       logger.error('Error fetching alert statistics', { error });
       throw error;
     }
+  }
+
+  /**
+   * Retrieves a single alert by ID.
+   * @param alertId - The ID of the alert to retrieve
+   * @returns The alert object or null if not found
+   */
+  async getAlertById(alertId: string): Promise<StoredAlert | null> {
+    try {
+      const alert = this.alertStore.get(alertId) || null;
+
+      if (!alert) {
+        logger.debug('Alert not found', { alertId });
+      }
+
+      return alert;
+    } catch (error) {
+      logger.error('Error fetching alert', { error, alertId });
+      throw error;
+    }
+  }
+
+  /**
+   * Clears all alerts from memory. Useful for testing.
+   * WARNING: This will delete all alert data. Use with caution.
+   */
+  async clearAllAlerts(): Promise<void> {
+    this.alertStore.clear();
+    logger.warn('All alerts cleared from memory');
   }
 }

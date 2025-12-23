@@ -1,4 +1,4 @@
-import { User, Role, UserStatus, Prisma } from '@prisma/client';
+import { User, Role, UserStatus, Prisma } from '../generated/client';
 import { BaseRepository } from './base.repository.js';
 import { prisma } from '../lib/prisma.js';
 

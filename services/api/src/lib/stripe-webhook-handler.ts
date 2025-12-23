@@ -1,5 +1,5 @@
 import Stripe from 'stripe';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../generated/client';
 import { logger } from '../utils/logger.js';
 import { constructWebhookEvent } from './stripe.js';
 import { sendEmail } from './email.js';

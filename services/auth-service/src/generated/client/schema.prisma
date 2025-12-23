@@ -1,0 +1,126 @@
+// Authentication Service Database Schema
+generator client {
+  output   = "./../src/generated/client"
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// User & Authentication
+// ==========================================
+
+model User {
+  id            String     @id @default(uuid())
+  email         String     @unique
+  passwordHash  String
+  firstName     String
+  lastName      String
+  phone         String?
+  dateOfBirth   DateTime?
+  role          Role       @default(patient)
+  status        UserStatus @default(active)
+  emailVerified Boolean    @default(false)
+
+  // Account security
+  failedLoginAttempts Int       @default(0)
+  lockedUntil         DateTime?
+  lastLoginAt         DateTime?
+  lastLoginIp         String?
+
+  // Relations
+  refreshTokens           RefreshToken[]
+  passwordResetTokens     PasswordResetToken[]
+  emailVerificationTokens EmailVerificationToken[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+  @@index([role])
+  @@index([status])
+  @@index([emailVerified])
+  @@index([lockedUntil])
+}
+
+enum Role {
+  patient
+  provider
+  admin
+}
+
+enum UserStatus {
+  active
+  inactive
+  pending
+  suspended
+}
+
+// ==========================================
+// Refresh Tokens (Token Rotation)
+// ==========================================
+
+model RefreshToken {
+  id     String @id @default(uuid())
+  token  String @unique
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Token rotation tracking
+  tokenFamily String // Same family for rotated tokens
+  isRevoked   Boolean @default(false)
+
+  // Metadata
+  userAgent String?
+  ipAddress String?
+
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([token])
+  @@index([tokenFamily])
+  @@index([expiresAt])
+  @@index([userId, isRevoked])
+}
+
+// ==========================================
+// Password Reset
+// ==========================================
+
+model PasswordResetToken {
+  id     String @id @default(uuid())
+  token  String @unique
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  isUsed    Boolean  @default(false)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+}
+
+// ==========================================
+// Email Verification
+// ==========================================
+
+model EmailVerificationToken {
+  id     String @id @default(uuid())
+  token  String @unique
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  isUsed    Boolean  @default(false)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+}

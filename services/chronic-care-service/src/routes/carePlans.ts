@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../generated/client';
 import { z } from 'zod';
 import { UserRequest, requireUser } from '../middleware/extractUser';
 
-const router = Router();
+const router: ReturnType<typeof Router> = Router();
 const prisma = new PrismaClient();
 
 const createCarePlanSchema = z.object({
@@ -50,7 +50,15 @@ router.post('/', requireUser, async (req: UserRequest, res) => {
 
     const validatedData = createCarePlanSchema.parse(req.body);
     const carePlan = await prisma.carePlan.create({
-      data: { ...validatedData, providerId: userId, nextReviewDate: validatedData.nextReviewDate ? new Date(validatedData.nextReviewDate) : null },
+      data: {
+        patientId: validatedData.patientId,
+        condition: validatedData.condition,
+        goals: validatedData.goals,
+        interventions: validatedData.interventions,
+        reviewSchedule: validatedData.reviewSchedule,
+        providerId: userId,
+        nextReviewDate: validatedData.nextReviewDate ? new Date(validatedData.nextReviewDate) : null,
+      },
     });
 
     res.status(201).json({ data: carePlan, message: 'Care plan created successfully' });

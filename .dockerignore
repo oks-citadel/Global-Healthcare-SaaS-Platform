@@ -1,104 +1,38 @@
-# ============================================
-# UnifiedHealth Platform - Root Docker Ignore
-# For root-level Docker builds
-# ============================================
+# Git
+.git
+.gitignore
 
-# Dependencies
-node_modules
+# Node modules (will be installed in container)
 **/node_modules
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-.pnpm-store
 
 # Build outputs
-dist
-build
-out
-.next
-*.tsbuildinfo
+**/dist
+**/.next
+**/out
+**/.turbo
 
-# Testing
-coverage
-**/.nyc_output
-**/tests
-**/__tests__
-**/__mocks__
-*.test.ts
-*.test.tsx
-*.spec.ts
-*.spec.tsx
-
-# Environment files
-.env
-.env.*
-!.env.example
+# Mobile app (not needed for web build)
+apps/mobile
 
 # IDE
 .vscode
 .idea
 *.swp
 *.swo
-*~
-.DS_Store
-*.sublime-*
-
-# Git
-.git
-.gitignore
-.gitattributes
-.gitmodules
 
 # Documentation
-README.md
-CHANGELOG.md
-LICENSE
 docs
-docs-unified
 *.md
+!README.md
 
-# CI/CD
-.github
-.gitlab-ci.yml
-.travis.yml
-Jenkinsfile
-azure-pipelines.yml
+# Tests
+**/*.test.*
+**/*.spec.*
+**/e2e
+**/__tests__
+**/coverage
 
-# Docker
-Dockerfile
-docker-compose*.yml
-.dockerignore
-
-# Logs
-logs
+# Development files
+.env.local
+.env.development
 *.log
-
-# Temporary files
-tmp
-temp
-.tmp
-
-# Editor config
-.editorconfig
-.eslintrc*
-.prettierrc*
-tsconfig*.json
-
-# Other
-.husky
-.commitlint*
-
-# Platform specific
-.expo
-.expo-shared
-.bundle
-ios
-android
-
-# Mobile app (not needed for web/api builds)
-apps/mobile
-
-# Turbo cache
-.turbo
-**/.turbo

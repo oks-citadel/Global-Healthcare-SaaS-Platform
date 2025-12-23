@@ -30,7 +30,6 @@
     "db:reset": "bash scripts/reset-db.sh"
   },
   "dependencies": {
-    "apn": "^2.2.0",
     "@azure/identity": "^4.13.0",
     "@azure/keyvault-secrets": "^4.10.0",
     "@azure/storage-blob": "^12.17.0",
@@ -50,6 +49,7 @@
     "@types/bull": "^4.10.4",
     "@types/node-cron": "^3.0.11",
     "@types/redis": "^4.0.10",
+    "apn": "^2.2.0",
     "bcryptjs": "^2.4.3",
     "bull": "^4.16.5",
     "cors": "^2.8.5",
@@ -72,8 +72,8 @@
     "swagger-ui-express": "^5.0.0",
     "twilio": "^5.10.7",
     "uuid": "^13.0.0",
-    "winston": "^3.11.0",
     "web-push": "^3.6.7",
+    "winston": "^3.11.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {
@@ -92,12 +92,12 @@
     "@typescript-eslint/eslint-plugin": "^6.15.0",
     "@typescript-eslint/parser": "^6.15.0",
     "@vitest/coverage-v8": "^1.1.0",
-    "eslint": "^9.39.2",
+    "eslint": "^8.57.1",
     "prisma": "^5.7.1",
     "supertest": "^6.3.3",
     "tsc-alias": "^1.8.8",
     "tsx": "^4.7.0",
-    "typescript": "^5.3.3",
+    "typescript": "^5.9.3",
     "vitest": "^1.1.0"
   },
   "prisma": {

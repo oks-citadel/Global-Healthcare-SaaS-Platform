@@ -1,4 +1,4 @@
-import { PrismaClient, LabResult } from '@prisma/client';
+import { PrismaClient, LabResult } from '../generated/client';
 import { CreateLabResultInput } from '../types';
 import logger from '../utils/logger';
 import { validateReferenceRange, validateCriticalValue } from '../utils/validators';

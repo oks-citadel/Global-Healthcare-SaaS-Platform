@@ -6,7 +6,7 @@ import {
   NotificationType,
   NotificationStatus,
   Prisma,
-} from '@prisma/client';
+} from '../generated/client';
 import { NotFoundError, BadRequestError } from '../utils/errors.js';
 import {
   RegisterDeviceInput,

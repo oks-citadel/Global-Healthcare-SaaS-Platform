@@ -8,7 +8,7 @@ import { extractUser } from './middleware/extractUser';
 
 dotenv.config();
 
-const app = express();
+const app: express.Application = express();
 const PORT = process.env.PORT || 3004;
 
 app.use(helmet());

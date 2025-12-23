@@ -1008,3 +1008,109 @@ This software is proprietary. See [LICENSE](LICENSE) for details.
 © 2025 UnifiedHealth Global. All rights reserved.
 
 </div>
+
+---
+
+## Global Growth Flywheel
+
+### How the Platform Scales
+
+UnifiedHealth's growth strategy is built on a self-reinforcing flywheel that accelerates adoption and revenue expansion across global markets:
+
+```
+                    ┌─────────────────────────────────┐
+                    │      PLATFORM EXPANSION         │
+                    │   (New Countries & Features)    │
+                    └─────────────────┬───────────────┘
+                                      │
+                                      ▼
+    ┌──────────────────┐      ┌───────────────────┐      ┌──────────────────┐
+    │  COST EFFICIENCY │◄────►│  CUSTOMER VALUE   │◄────►│  USAGE EXPANSION │
+    │  Lower unit costs│      │  Better outcomes  │      │  More services   │
+    │  Scale economies │      │  Higher retention │      │  Family members  │
+    └────────┬─────────┘      └─────────┬─────────┘      └────────┬─────────┘
+             │                          │                          │
+             │                          ▼                          │
+             └─────────────►┌───────────────────────┐◄─────────────┘
+                            │    REVENUE GROWTH     │
+                            │   ARPU × DAU × LTV    │
+                            └───────────────────────┘
+```
+
+### Revenue Model by Region
+
+| Region | Primary Revenue | Secondary Revenue | Growth Levers |
+|--------|----------------|-------------------|---------------|
+| **North America** | Enterprise B2B ($499/employee) | Individual subscriptions | Employer health benefits, insurance partnerships |
+| **Europe** | B2B2C insurance ($15/member) | Provider licensing | GDPR-compliant data services, NHS integration |
+| **Africa** | B2C subscriptions ($19-49/mo) | Mobile money micropayments | M-Pesa integration, offline-first features |
+| **Latin America** | Hybrid B2B + B2C | Pharmacy marketplace fees | Telemedicine adoption, chronic care programs |
+| **Asia-Pacific** | Provider SaaS ($10K+/clinic) | API access fees | Digital health mandates, interoperability |
+
+### Customer Usage Expansion Strategy
+
+**Stage 1: Land (Initial Adoption)**
+- Single user sign-up with Essential plan ($19/mo)
+- First virtual consultation completed
+- Health records imported
+
+**Stage 2: Adopt (Core Usage)**
+- 3+ consultations per quarter
+- At least 2 service categories used
+- Mobile app installed
+
+**Stage 3: Expand (Cross-Sell)**
+- Family members added (+$10/mo each)
+- Mental health or chronic care add-ons
+- Lab testing integration
+
+**Stage 4: Advocate (Network Effects)**
+- Provider referral to platform
+- Employer introduction
+- 3+ referrals generated
+
+### Cost Efficiency at Scale
+
+| Metric | Year 1 | Year 3 | Year 5 |
+|--------|--------|--------|--------|
+| **CAC (Customer Acquisition Cost)** | $45 | $28 | $18 |
+| **LTV (Lifetime Value)** | $380 | $720 | $1,200 |
+| **LTV:CAC Ratio** | 8.4x | 25.7x | 66.7x |
+| **Gross Margin** | 62% | 74% | 82% |
+| **Server Cost/User/Month** | $2.40 | $0.85 | $0.35 |
+
+**Cost Reduction Drivers:**
+1. **Infrastructure Scale** - Azure reserved instances, spot instances for non-critical workloads
+2. **AI Automation** - Symptom checker reduces unnecessary consultations by 40%
+3. **Shared Services** - Multi-tenant architecture spreads fixed costs
+4. **Provider Network** - Higher utilization means lower per-consultation costs
+5. **Data Leverage** - Anonymized insights improve matching, reduce churn
+
+### Strategic Advantages
+
+#### 1. Multi-Region Data Residency
+- Data stays in-country per compliance requirements
+- Enables government health program partnerships
+- Reduces latency for local users
+
+#### 2. Offline-First Architecture
+- Full functionality without internet (syncs when connected)
+- Critical for emerging markets with unreliable connectivity
+- Reduces data costs in mobile-heavy regions
+
+#### 3. Currency & Payment Flexibility
+- 50+ currencies supported natively
+- Local payment methods (M-Pesa, Paystack, Razorpay)
+- Automatic FX handling and settlement
+
+#### 4. AI-Native Platform
+- Symptom assessment reduces triage time by 60%
+- Drug interaction checking prevents errors
+- Predictive analytics identify at-risk patients
+- Automated documentation saves provider time
+
+#### 5. FHIR Interoperability
+- Seamless integration with hospital EHRs
+- Patient-controlled data portability
+- Reduced vendor lock-in for health systems
+

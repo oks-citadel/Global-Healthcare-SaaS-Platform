@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import apiClient, { getErrorMessage } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
 import {
@@ -92,20 +93,29 @@ export const useLogout = () => {
 export const useCurrentUser = () => {
   const { user, setUser, isAuthenticated } = useAuthStore();
 
-  return useQuery({
+  const query = useQuery({
     queryKey: ['currentUser'],
     queryFn: authApi.getCurrentUser,
     enabled: isAuthenticated && !user,
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: false,
-    onSuccess: (data) => {
-      setUser(data);
-    },
-    onError: (error) => {
-      console.error('Failed to fetch current user:', getErrorMessage(error));
-      setUser(null);
-    },
   });
+
+  // Handle success/error with useEffect since onSuccess/onError are removed in React Query v5
+  useEffect(() => {
+    if (query.data && !user) {
+      setUser(query.data);
+    }
+  }, [query.data, user, setUser]);
+
+  useEffect(() => {
+    if (query.error) {
+      console.error('Failed to fetch current user:', getErrorMessage(query.error));
+      setUser(null);
+    }
+  }, [query.error, setUser]);
+
+  return query;
 };
 
 // Hook to check if user is authenticated

@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Application } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
@@ -9,7 +9,7 @@ import authRoutes from './routes/auth.routes.js';
 import { generalLimiter } from './middleware/rate-limit.middleware.js';
 import { errorHandler, notFoundHandler } from './middleware/error.middleware.js';
 
-const app = express();
+const app: express.Application = express();
 
 // ==================== Security Middleware ====================
 

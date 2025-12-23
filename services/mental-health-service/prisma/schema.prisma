@@ -1,4 +1,5 @@
 generator client {
+  output = "./../src/generated/client"
   provider = "prisma-client-js"
 }
 
@@ -7,10 +8,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ==========================================
-// Mental Health Domain
-// ==========================================
-
 model TherapySession {
   id              String        @id @default(uuid())
   patientId       String
@@ -18,23 +15,16 @@ model TherapySession {
   sessionType     SessionType
   status          SessionStatus @default(scheduled)
   scheduledAt     DateTime
-  duration        Int           // in minutes
-  actualStartTime DateTime?
-  actualEndTime   DateTime?
-  modality        String?       // CBT, DBT, EMDR, etc.
+  duration        Int
+  modality        String?
   notes           String?
   homework        String?
   nextSessionDate DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
+  actualStartTime DateTime?
+  actualEndTime   DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
   @@index([patientId])
-  @@index([therapistId])
-  @@index([scheduledAt])
-  @@index([status])
-  @@index([patientId, scheduledAt])
-  @@index([therapistId, scheduledAt])
 }
 
 enum SessionType {
@@ -53,63 +43,51 @@ enum SessionStatus {
 }
 
 model MentalHealthAssessment {
-  id          String           @id @default(uuid())
-  patientId   String
-  assessedBy  String
-  assessmentType AssessmentType
-  score       Int?
-  severity    String?          // mild, moderate, severe
-  results     Json             // Detailed results
-  notes       String?
-  followUpRequired Boolean      @default(false)
-  followUpDate DateTime?
-
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-
+  id               String         @id @default(uuid())
+  patientId        String
+  assessedBy       String
+  assessmentType   AssessmentType
+  score            Int?
+  severity         SeverityLevel?
+  results          Json
+  notes            String?
+  followUpRequired Boolean        @default(false)
+  followUpDate     DateTime?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
   @@index([patientId])
-  @@index([assessedBy])
-  @@index([assessmentType])
-  @@index([patientId, createdAt])
 }
 
 enum AssessmentType {
-  PHQ9           // Depression
-  GAD7           // Anxiety
-  PCL5           // PTSD
-  AUDIT          // Alcohol Use
-  DAST           // Drug Use
-  MDQ            // Bipolar
-  YBOCS          // OCD
-  PSS            // Perceived Stress
+  PHQ9
+  GAD7
+  PCL5
+  AUDIT
+  DAST
+  MDQ
+  YBOCS
+  PSS
   general_intake
 }
 
 model CrisisIntervention {
-  id              String         @id @default(uuid())
-  patientId       String
-  responderId     String?
-  crisisType      CrisisType
-  severity        CrisisSeverity
-  status          CrisisStatus   @default(active)
-  description     String
-  interventions   String[]       // Actions taken
-  outcome         String?
-  referredTo      String?        // Emergency services, hospital, etc.
-  contactedAt     DateTime       @default(now())
-  resolvedAt      DateTime?
-  followUpNeeded  Boolean        @default(true)
-  followUpDate    DateTime?
-
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-
+  id             String         @id @default(uuid())
+  patientId      String
+  responderId    String?
+  crisisType     CrisisType
+  severity       CrisisSeverity
+  status         CrisisStatus   @default(active)
+  description    String
+  interventions  String[]
+  outcome        String?
+  referredTo     String?
+  contactedAt    DateTime       @default(now())
+  resolvedAt     DateTime?
+  followUpNeeded Boolean        @default(true)
+  followUpDate   DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
   @@index([patientId])
-  @@index([responderId])
-  @@index([status])
-  @@index([severity])
-  @@index([contactedAt])
-  @@index([patientId, contactedAt])
 }
 
 enum CrisisType {
@@ -138,77 +116,269 @@ enum CrisisStatus {
 }
 
 model TreatmentPlan {
-  id              String   @id @default(uuid())
-  patientId       String
-  providerId      String
-  diagnosis       String[]
-  goals           Json     // Array of treatment goals
-  interventions   Json     // Planned interventions
-  medications     Json?    // Current medications
-  frequency       String?  // e.g., "weekly", "bi-weekly"
-  startDate       DateTime
-  reviewDate      DateTime
-  status          String   @default("active") // active, completed, discontinued
-
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
+  id            String   @id @default(uuid())
+  patientId     String
+  providerId    String
+  diagnosis     String[]
+  goals         Json
+  interventions Json
+  medications   Json?
+  frequency     String?
+  startDate     DateTime
+  reviewDate    DateTime
+  status        String   @default("active")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
   @@index([patientId])
-  @@index([providerId])
-  @@index([status])
-  @@index([reviewDate])
 }
 
 model MoodLog {
-  id          String   @id @default(uuid())
-  patientId   String
-  moodRating  Int      // 1-10 scale
-  energy      Int?     // 1-10 scale
-  anxiety     Int?     // 1-10 scale
-  sleep       Int?     // hours
-  notes       String?
-  triggers    String[] // What affected mood
-  activities  String[] // What the patient did
-  logDate     DateTime @default(now())
-
-  createdAt   DateTime @default(now())
-
+  id         String   @id @default(uuid())
+  patientId  String
+  moodRating Int
+  notes      String?
+  triggers   String[]
+  activities String[]
+  logDate    DateTime @default(now())
+  createdAt  DateTime @default(now())
   @@index([patientId])
-  @@index([logDate])
-  @@index([patientId, logDate])
 }
 
 model SupportGroup {
-  id          String   @id @default(uuid())
-  name        String
-  description String
-  type        String   // Anxiety, Depression, PTSD, Addiction Recovery, etc.
+  id            String               @id @default(uuid())
+  name          String
+  description   String
+  type          String
   facilitatorId String
-  schedule    Json     // Meeting schedule
-  maxMembers  Int      @default(12)
-  isActive    Boolean  @default(true)
-
-  // Relations
-  members     SupportGroupMember[]
-
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@index([type])
+  schedule      Json
+  maxMembers    Int                  @default(12)
+  isActive      Boolean              @default(true)
+  members       SupportGroupMember[]
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
   @@index([facilitatorId])
-  @@index([isActive])
 }
 
 model SupportGroupMember {
-  id          String       @id @default(uuid())
-  groupId     String
-  group       SupportGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  patientId   String
-  joinedAt    DateTime     @default(now())
-  status      String       @default("active") // active, inactive, left
-
+  id        String       @id @default(uuid())
+  groupId   String
+  group     SupportGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  patientId String
+  joinedAt  DateTime     @default(now())
+  status    String       @default("active")
   @@unique([groupId, patientId])
   @@index([groupId])
+}
+
+model ConsentRecord {
+  id                     String        @id @default(uuid())
+  patientId              String
+  providerId             String
+  consentType            ConsentType
+  status                 ConsentStatus @default(pending)
+  signedAt               DateTime?
+  expiresAt              DateTime?
+  scope                  String[]
+  notes                  String?
+  grantedTo              String?
+  grantedAt              DateTime?
+  revokedAt              DateTime?
+  purpose                String?
+  disclosureScope        String[]
+  substanceUseDisclosure Boolean       @default(false)
+  createdAt              DateTime      @default(now())
+  updatedAt              DateTime      @updatedAt
   @@index([patientId])
   @@index([status])
+}
+
+enum ConsentType {
+  treatment
+  medication
+  information_sharing
+  information_release
+  telehealth
+  research
+  emergency_contact
+  cfr_part2
+}
+
+enum ConsentStatus {
+  pending
+  active
+  revoked
+  expired
+}
+
+model GroupSession {
+  id              String               @id @default(uuid())
+  name            String
+  medicationName  String?
+  description     String?
+  facilitatorId   String
+  sessionType     GroupSessionType     @default(support)
+  status          GroupSessionStatus   @default(scheduled)
+  scheduledAt     DateTime
+  sessionDate     DateTime?
+  duration        Int
+  modality        String?
+  maxParticipants Int                  @default(10)
+  topic           String?
+  notes           String?
+  homework        String?
+  nextSessionDate DateTime?
+  actualStartTime DateTime?
+  actualEndTime   DateTime?
+  objectives      String[]
+  materials       Json?
+  groupId         String?
+  attendees       GroupSessionAttendee[]
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+  @@index([facilitatorId])
+  @@index([status])
+}
+
+model GroupSessionAttendee {
+  id            String       @id @default(uuid())
+  sessionId     String
+  session       GroupSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  patientId     String
+  attended      Boolean      @default(false)
+  notes         String?
+  participation String?
+  createdAt     DateTime     @default(now())
+  @@unique([sessionId, patientId])
+  @@index([sessionId])
+}
+
+enum GroupSessionType {
+  support
+  psychoeducation
+  skills_training
+  process
+}
+
+enum GroupSessionStatus {
+  scheduled
+  in_progress
+  completed
+  cancelled
+  no_show
+}
+
+model PsychMedication {
+  id              String           @id @default(uuid())
+  patientId       String
+  prescriberId    String
+  name            String
+  medicationName  String?
+  dosage          String
+  frequency       String
+  medicationClass MedicationClass
+  status          MedicationStatus @default(active)
+  startDate       DateTime
+  endDate         DateTime?
+  reason          String?
+  sideEffects     String[]
+  interactions    String[]
+  notes           String?
+  homework        String?
+  nextSessionDate DateTime?
+  actualStartTime DateTime?
+  actualEndTime   DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  @@index([patientId])
+  @@index([status])
+}
+
+enum MedicationClass {
+  antidepressant
+  antianxiety
+  anxiolytic
+  antipsychotic
+  mood_stabilizer
+  stimulant
+  sedative
+  sedative_hypnotic
+  other
+}
+
+enum MedicationStatus {
+  active
+  completed
+  discontinued
+  on_hold
+  tapered
+}
+
+model ProgressNote {
+  id            String   @id @default(uuid())
+  patientId     String
+  providerId    String
+  sessionId     String?
+  noteType      NoteType
+  content       String
+  diagnosis     String[]
+  interventions String[]
+  plan          String?
+  isSigned      Boolean  @default(false)
+  signedAt      DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  @@index([patientId])
+  @@index([noteType])
+}
+
+enum NoteType {
+  initial_assessment
+  progress
+  discharge
+  crisis
+  consultation
+  group
+  SOAP
+  DAP
+  BIRP
+  GIRP
+}
+
+model TreatmentGoal {
+  id              String              @id @default(uuid())
+  treatmentPlanId String
+  title           String
+  description     String?
+  targetDate      DateTime?
+  status          TreatmentGoalStatus @default(in_progress)
+  progress        Int                 @default(0)
+  interventions   String[]
+  strategies      String[]
+  measurements    String[]
+  notes           String?
+  homework        String?
+  nextSessionDate DateTime?
+  actualStartTime DateTime?
+  actualEndTime   DateTime?
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  @@index([treatmentPlanId])
+  @@index([status])
+}
+
+enum TreatmentGoalStatus {
+  not_started
+  in_progress
+  achieved
+  modified
+  discontinued
+}
+
+enum SeverityLevel {
+  none
+  minimal
+  mild
+  moderate
+  moderately_severe
+  severe
 }

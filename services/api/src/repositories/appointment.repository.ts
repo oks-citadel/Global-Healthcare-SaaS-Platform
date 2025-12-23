@@ -1,4 +1,4 @@
-import { Appointment, AppointmentStatus, AppointmentType, Prisma } from '@prisma/client';
+import { Appointment, AppointmentStatus, AppointmentType, Prisma } from '../generated/client';
 import { BaseRepository, PaginationOptions, PaginationResult } from './base.repository.js';
 import { prisma } from '../lib/prisma.js';
 

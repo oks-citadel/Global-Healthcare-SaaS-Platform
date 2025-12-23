@@ -7,7 +7,7 @@
     "build": "npx next build",
     "start": "npx next start -p 3001",
     "lint": "npx next lint",
-    "type-check": "tsc --noEmit"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",

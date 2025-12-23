@@ -32,6 +32,7 @@ import { config } from '../config/index.js';
 import { BadRequestError, NotFoundError, InternalServerError } from '../utils/errors.js';
 import sharp from 'sharp';
 import crypto from 'crypto';
+import NodeClam from 'clamscan';
 
 // ==========================================
 // Configuration & Constants
@@ -41,6 +42,14 @@ const CONNECTION_STRING = process.env.AZURE_STORAGE_CONNECTION_STRING;
 const CONTAINER_NAME = process.env.AZURE_STORAGE_CONTAINER_NAME || 'healthcare-documents';
 const ACCOUNT_NAME = process.env.AZURE_STORAGE_ACCOUNT_NAME;
 const ACCOUNT_KEY = process.env.AZURE_STORAGE_ACCOUNT_KEY;
+
+// Virus Scanning Configuration
+const VIRUS_SCAN_ENABLED = process.env.VIRUS_SCAN_ENABLED === 'true';
+const CLAMAV_HOST = process.env.CLAMAV_HOST || 'localhost';
+const CLAMAV_PORT = parseInt(process.env.CLAMAV_PORT || '3310', 10);
+const CLAMAV_SOCKET = process.env.CLAMAV_SOCKET || '/var/run/clamav/clamd.ctl';
+const CLAMAV_TIMEOUT = parseInt(process.env.CLAMAV_TIMEOUT || '60000', 10); // 60 seconds default
+const QUARANTINE_CONTAINER_NAME = process.env.AZURE_QUARANTINE_CONTAINER_NAME || 'healthcare-quarantine';
 
 // Allowed MIME types for healthcare documents
 const ALLOWED_MIME_TYPES = [
@@ -114,6 +123,7 @@ export interface UploadResult {
   versionId?: string;
   thumbnailUrl?: string;
   metadata: Record<string, string>;
+  virusScanResult?: VirusScanResult;
 }
 
 export interface DownloadOptions {
@@ -152,6 +162,227 @@ export interface BlobInfo {
   isDeleted?: boolean;
   versionId?: string;
 }
+
+export interface VirusScanResult {
+  isClean: boolean;
+  isInfected: boolean;
+  viruses: string[];
+  scannedAt: Date;
+  scanDurationMs: number;
+  error?: string;
+}
+
+export interface VirusScanAuditLog {
+  fileName: string;
+  fileSize: number;
+  mimeType: string;
+  uploadedBy: string;
+  patientId: string;
+  scanResult: VirusScanResult;
+  action: 'allowed' | 'rejected' | 'quarantined' | 'scan_failed';
+  timestamp: Date;
+}
+
+// ==========================================
+// Virus Scanner Service Class
+// ==========================================
+
+class VirusScannerService {
+  private clamScanner: NodeClam | null = null;
+  private isInitialized: boolean = false;
+  private initializationError: string | null = null;
+
+  /**
+   * Initialize ClamAV scanner
+   */
+  async initialize(): Promise<void> {
+    if (!VIRUS_SCAN_ENABLED) {
+      console.log('[VirusScanner] Virus scanning is disabled');
+      return;
+    }
+
+    try {
+      this.clamScanner = await new NodeClam().init({
+        removeInfected: false, // We handle this ourselves
+        quarantineInfected: false, // We handle quarantine manually
+        scanLog: null, // Use our own logging
+        debugMode: process.env.NODE_ENV === 'development',
+        fileList: null,
+        scanRecursively: false,
+        clamdscan: {
+          socket: CLAMAV_SOCKET,
+          host: CLAMAV_HOST,
+          port: CLAMAV_PORT,
+          timeout: CLAMAV_TIMEOUT,
+          localFallback: true, // Use local clamscan if clamd not available
+          path: '/usr/bin/clamdscan', // Default path
+          configFile: '/etc/clamav/clamd.conf',
+          multiscan: false, // Disable multiscan for consistent results
+          reloadDb: false,
+          active: true,
+          bypassTest: false, // Always test connection
+        },
+        clamscan: {
+          path: '/usr/bin/clamscan', // Fallback scanner
+          db: null,
+          scanArchives: true,
+          active: true,
+        },
+        preference: 'clamdscan', // Prefer daemon for performance
+      });
+
+      this.isInitialized = true;
+      console.log('[VirusScanner] ClamAV scanner initialized successfully');
+    } catch (error) {
+      this.initializationError = error instanceof Error ? error.message : 'Unknown initialization error';
+      console.error('[VirusScanner] Failed to initialize ClamAV:', this.initializationError);
+
+      // In production, we might want to fail hard here
+      if (process.env.NODE_ENV === 'production' && process.env.VIRUS_SCAN_REQUIRED === 'true') {
+        throw new InternalServerError('Virus scanner initialization failed - uploads are blocked');
+      }
+    }
+  }
+
+  /**
+   * Check if virus scanning is available
+   */
+  isAvailable(): boolean {
+    return VIRUS_SCAN_ENABLED && this.isInitialized && this.clamScanner !== null;
+  }
+
+  /**
+   * Scan a buffer for viruses
+   */
+  async scanBuffer(buffer: Buffer, fileName: string): Promise<VirusScanResult> {
+    const startTime = Date.now();
+
+    // If scanning is disabled, return clean result
+    if (!VIRUS_SCAN_ENABLED) {
+      return {
+        isClean: true,
+        isInfected: false,
+        viruses: [],
+        scannedAt: new Date(),
+        scanDurationMs: 0,
+      };
+    }
+
+    // If scanner failed to initialize, handle gracefully
+    if (!this.isInitialized || !this.clamScanner) {
+      const errorMessage = this.initializationError || 'Scanner not initialized';
+      console.warn(`[VirusScanner] Scanner unavailable: ${errorMessage}`);
+
+      // In strict mode, reject all files if scanner is unavailable
+      if (process.env.VIRUS_SCAN_REQUIRED === 'true') {
+        return {
+          isClean: false,
+          isInfected: false,
+          viruses: [],
+          scannedAt: new Date(),
+          scanDurationMs: Date.now() - startTime,
+          error: `Virus scanner unavailable: ${errorMessage}`,
+        };
+      }
+
+      // In non-strict mode, allow files through with a warning
+      console.warn(`[VirusScanner] Allowing file '${fileName}' without scan (scanner unavailable)`);
+      return {
+        isClean: true,
+        isInfected: false,
+        viruses: [],
+        scannedAt: new Date(),
+        scanDurationMs: Date.now() - startTime,
+        error: `Scan skipped: ${errorMessage}`,
+      };
+    }
+
+    try {
+      console.log(`[VirusScanner] Scanning file: ${fileName} (${buffer.length} bytes)`);
+
+      // Create a readable stream from the buffer
+      const stream = Readable.from(buffer);
+
+      // Scan the stream
+      const result = await this.clamScanner.scanStream(stream);
+
+      const scanDurationMs = Date.now() - startTime;
+      const scanResult: VirusScanResult = {
+        isClean: !result.isInfected,
+        isInfected: result.isInfected || false,
+        viruses: result.viruses || [],
+        scannedAt: new Date(),
+        scanDurationMs,
+      };
+
+      // Log the result
+      if (scanResult.isInfected) {
+        console.error(
+          `[VirusScanner] INFECTED FILE DETECTED: ${fileName} - Viruses: ${scanResult.viruses.join(', ')}`
+        );
+      } else {
+        console.log(`[VirusScanner] File clean: ${fileName} (scanned in ${scanDurationMs}ms)`);
+      }
+
+      return scanResult;
+    } catch (error) {
+      const scanDurationMs = Date.now() - startTime;
+      const errorMessage = error instanceof Error ? error.message : 'Unknown scan error';
+
+      console.error(`[VirusScanner] Scan error for '${fileName}': ${errorMessage}`);
+
+      // In strict mode, reject files if scan fails
+      if (process.env.VIRUS_SCAN_REQUIRED === 'true') {
+        return {
+          isClean: false,
+          isInfected: false,
+          viruses: [],
+          scannedAt: new Date(),
+          scanDurationMs,
+          error: `Scan failed: ${errorMessage}`,
+        };
+      }
+
+      // In non-strict mode, allow with warning
+      return {
+        isClean: true,
+        isInfected: false,
+        viruses: [],
+        scannedAt: new Date(),
+        scanDurationMs,
+        error: `Scan failed (allowed): ${errorMessage}`,
+      };
+    }
+  }
+
+  /**
+   * Log virus scan result for audit trail
+   */
+  logScanResult(auditLog: VirusScanAuditLog): void {
+    const logEntry = {
+      ...auditLog,
+      logType: 'VIRUS_SCAN_AUDIT',
+      environment: process.env.NODE_ENV,
+    };
+
+    // Log to console in structured format for log aggregation
+    if (auditLog.scanResult.isInfected) {
+      console.error('[SECURITY_AUDIT] Infected file rejected:', JSON.stringify(logEntry));
+    } else if (auditLog.scanResult.error) {
+      console.warn('[SECURITY_AUDIT] Virus scan issue:', JSON.stringify(logEntry));
+    } else {
+      console.info('[SECURITY_AUDIT] File scan passed:', JSON.stringify(logEntry));
+    }
+
+    // In a production environment, you would also:
+    // - Send to Azure Monitor / Application Insights
+    // - Store in a dedicated audit log database table
+    // - Send to SIEM system for security monitoring
+  }
+}
+
+// Singleton instance for virus scanner
+const virusScannerService = new VirusScannerService();
 
 // ==========================================
 // Azure Storage Service Class
@@ -207,6 +438,9 @@ class AzureStorageService {
 
       // Enable versioning on container (if supported)
       await this.enableVersioning();
+
+      // Initialize virus scanner service
+      await virusScannerService.initialize();
 
       console.log('Azure Blob Storage initialized successfully');
     } catch (error) {
@@ -450,6 +684,167 @@ class AzureStorageService {
         versionId: uploadResponse.versionId,
         thumbnailUrl,
         metadata: { ...metadata, checksum },
+      };
+    } catch (error) {
+      console.error('Failed to upload document to Azure Blob Storage:', error);
+      throw new InternalServerError('Failed to upload document');
+    }
+  }
+
+  /**
+   * Upload document with virus scanning BEFORE permanent storage
+   * This is the recommended method for secure file uploads in healthcare applications
+   *
+   * Process:
+   * 1. Validate file type and size
+   * 2. Scan file for viruses using ClamAV
+   * 3. If infected, reject with detailed error message
+   * 4. If clean, upload to permanent storage
+   * 5. Log scan results for HIPAA audit trail
+   *
+   * @param buffer - The file content as a buffer
+   * @param options - Upload options including patient ID, file type, etc.
+   * @returns Upload result with scan information
+   * @throws BadRequestError if file is infected or scan fails in strict mode
+   */
+  async uploadDocumentWithVirusScan(
+    buffer: Buffer,
+    options: UploadOptions
+  ): Promise<UploadResult> {
+    if (!this.containerClient) {
+      await this.initialize();
+    }
+
+    // Validate inputs
+    this.validateMimeType(options.mimeType);
+    this.validateFileSize(buffer.length);
+
+    // Update file size from actual buffer length
+    const actualFileSize = buffer.length;
+
+    // Step 1: Scan for viruses BEFORE uploading
+    console.log(`[Upload] Starting virus scan for file: ${options.fileName}`);
+    const scanResult = await this.scanFileBeforeUpload(buffer, options.fileName, {
+      ...options,
+      fileSize: actualFileSize,
+    });
+
+    // Step 2: Handle scan results
+    if (scanResult.isInfected) {
+      const threatList = scanResult.viruses.join(', ');
+      console.error(
+        `[Upload] REJECTED: File '${options.fileName}' is infected with: ${threatList}`
+      );
+      throw new BadRequestError(
+        `File upload rejected: The file contains malware (${threatList}). Please scan your file with antivirus software and try again.`
+      );
+    }
+
+    // Handle scan failures in strict mode
+    if (scanResult.error && !scanResult.isClean) {
+      console.error(
+        `[Upload] REJECTED: Virus scan failed for '${options.fileName}': ${scanResult.error}`
+      );
+      throw new BadRequestError(
+        'File upload rejected: Unable to verify file safety. Please try again later.'
+      );
+    }
+
+    // Step 3: File is clean - proceed with upload
+    console.log(`[Upload] File '${options.fileName}' passed virus scan, proceeding with upload`);
+
+    const blobName = this.generateBlobName(options);
+    const blockBlobClient = this.containerClient!.getBlockBlobClient(blobName);
+
+    // Prepare metadata with scan information
+    const metadata: DocumentMetadata = {
+      patientId: options.patientId,
+      documentType: options.documentType,
+      uploadedBy: options.uploadedBy,
+      uploadedAt: new Date().toISOString(),
+      encryptionMethod: 'AES-256',
+      checksum: '', // Will be calculated
+      version: options.version?.toString() || '1',
+      virusScanned: 'true',
+      virusScanDate: scanResult.scannedAt.toISOString(),
+      virusScanResult: scanResult.isClean ? 'clean' : 'unknown',
+      ...(options.description && { description: options.description }),
+      ...(options.metadata || {}),
+    };
+
+    // Prepare tags for easy filtering
+    const tags: Tags = {
+      patientId: options.patientId,
+      documentType: options.documentType,
+      uploadedBy: options.uploadedBy,
+      hipaaCompliant: 'true',
+      virusScanned: 'true',
+    };
+
+    try {
+      // Calculate checksum from the buffer
+      const hash = crypto.createHash('sha256');
+      hash.update(buffer);
+      const checksum = hash.digest('hex');
+      metadata.checksum = checksum;
+
+      // Upload the blob from buffer
+      const uploadOptions = {
+        blobHTTPHeaders: {
+          blobContentType: options.mimeType,
+          blobContentDisposition: `attachment; filename="${options.fileName}"`,
+        },
+        metadata,
+        tags,
+      };
+
+      const uploadResponse = await blockBlobClient.uploadData(buffer, uploadOptions);
+
+      // Generate thumbnail if requested and file is an image
+      let thumbnailUrl: string | undefined;
+      if (options.generateThumbnail && IMAGE_MIME_TYPES.includes(options.mimeType.toLowerCase())) {
+        try {
+          const thumbnailBlobName = `${blobName}_thumbnail.jpg`;
+          const thumbnail = await sharp(buffer)
+            .resize(THUMBNAIL_MAX_WIDTH, THUMBNAIL_MAX_HEIGHT, {
+              fit: 'inside',
+              withoutEnlargement: true,
+            })
+            .jpeg({ quality: 80 })
+            .toBuffer();
+
+          const thumbnailClient = this.containerClient!.getBlockBlobClient(thumbnailBlobName);
+          await thumbnailClient.uploadData(thumbnail, {
+            blobHTTPHeaders: {
+              blobContentType: 'image/jpeg',
+            },
+            metadata: {
+              ...metadata,
+              isThumbnail: 'true',
+              originalBlob: blobName,
+            },
+          });
+
+          thumbnailUrl = thumbnailClient.url;
+        } catch (thumbError) {
+          console.error('Failed to generate thumbnail:', thumbError);
+          // Continue without thumbnail - not critical
+        }
+      }
+
+      console.log(`[Upload] Successfully uploaded '${options.fileName}' as '${blobName}'`);
+
+      return {
+        blobName,
+        url: blockBlobClient.url,
+        containerName: CONTAINER_NAME,
+        contentType: options.mimeType,
+        size: actualFileSize,
+        etag: uploadResponse.etag,
+        versionId: uploadResponse.versionId,
+        thumbnailUrl,
+        metadata: { ...metadata, checksum },
+        virusScanResult: scanResult,
       };
     } catch (error) {
       console.error('Failed to upload document to Azure Blob Storage:', error);
@@ -712,24 +1107,80 @@ class AzureStorageService {
   }
 
   /**
-   * Perform virus scanning integration (placeholder)
+   * Perform virus scanning on an already-uploaded blob
+   * Downloads the blob content and scans it using ClamAV
    *
-   * Note: Integrate with Azure Security Center or third-party antivirus service
-   * For production, use services like:
-   * - Microsoft Defender for Cloud
-   * - ClamAV
-   * - CloudAV
+   * @param blobName - The name of the blob to scan
+   * @returns Scan result with clean status and any detected threats
    */
   async scanForViruses(blobName: string): Promise<{ clean: boolean; threats?: string[] }> {
-    // TODO: Implement actual virus scanning integration
-    console.log(`[Virus Scan] Scanning blob: ${blobName}`);
+    if (!this.containerClient) {
+      await this.initialize();
+    }
 
-    // Placeholder - always return clean
-    // In production, integrate with actual antivirus service
-    return {
-      clean: true,
-      threats: [],
+    const blockBlobClient = this.containerClient!.getBlockBlobClient(blobName);
+
+    try {
+      // Download the blob content
+      const downloadResponse = await blockBlobClient.download();
+      const chunks: Buffer[] = [];
+
+      for await (const chunk of downloadResponse.readableStreamBody as Readable) {
+        chunks.push(Buffer.from(chunk));
+      }
+
+      const buffer = Buffer.concat(chunks);
+
+      // Scan the buffer using the virus scanner service
+      const scanResult = await virusScannerService.scanBuffer(buffer, blobName);
+
+      console.log(`[Virus Scan] Scanned blob '${blobName}': ${scanResult.isClean ? 'CLEAN' : 'INFECTED'}`);
+
+      return {
+        clean: scanResult.isClean && !scanResult.isInfected,
+        threats: scanResult.viruses.length > 0 ? scanResult.viruses : undefined,
+      };
+    } catch (error) {
+      console.error(`[Virus Scan] Error scanning blob '${blobName}':`, error);
+      throw new InternalServerError('Failed to scan document for viruses');
+    }
+  }
+
+  /**
+   * Scan a file buffer for viruses BEFORE upload
+   * This is the recommended method for scanning files before permanent storage
+   *
+   * @param buffer - The file content as a buffer
+   * @param fileName - The name of the file being scanned
+   * @param options - Upload options for audit logging
+   * @returns Scan result with detailed information
+   */
+  async scanFileBeforeUpload(
+    buffer: Buffer,
+    fileName: string,
+    options: UploadOptions
+  ): Promise<VirusScanResult> {
+    const scanResult = await virusScannerService.scanBuffer(buffer, fileName);
+
+    // Log the scan result for audit trail
+    const auditLog: VirusScanAuditLog = {
+      fileName,
+      fileSize: buffer.length,
+      mimeType: options.mimeType,
+      uploadedBy: options.uploadedBy,
+      patientId: options.patientId,
+      scanResult,
+      action: scanResult.isInfected
+        ? 'rejected'
+        : scanResult.error && !scanResult.isClean
+        ? 'scan_failed'
+        : 'allowed',
+      timestamp: new Date(),
     };
+
+    virusScannerService.logScanResult(auditLog);
+
+    return scanResult;
   }
 
   /**
@@ -765,5 +1216,13 @@ class AzureStorageService {
   }
 }
 
-// Export singleton instance
+// Export singleton instances
 export const azureStorageService = new AzureStorageService();
+
+// Export virus scanner service for direct access if needed
+export { virusScannerService };
+
+// Export virus scanning configuration check
+export const isVirusScanningEnabled = (): boolean => VIRUS_SCAN_ENABLED;
+export const isVirusScanningRequired = (): boolean =>
+  process.env.VIRUS_SCAN_REQUIRED === 'true';

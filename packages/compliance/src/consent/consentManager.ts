@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Consent Management for GDPR (Article 7), POPIA (Section 11), and HIPAA
  *

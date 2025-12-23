@@ -1,4 +1,4 @@
-import { AuditEvent, Prisma } from '@prisma/client';
+import { AuditEvent, Prisma } from '../generated/client';
 import { BaseRepository, PaginationOptions, PaginationResult } from './base.repository.js';
 import { prisma } from '../lib/prisma.js';
 

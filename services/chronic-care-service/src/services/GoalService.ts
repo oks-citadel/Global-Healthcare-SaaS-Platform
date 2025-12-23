@@ -1,4 +1,4 @@
-import { PrismaClient, GoalType, GoalStatus } from '@prisma/client';
+import { PrismaClient, GoalType, GoalStatus } from '../generated/client';
 import EngagementService from './EngagementService';
 
 const prisma = new PrismaClient();
@@ -114,7 +114,8 @@ export class GoalService {
 
     const progress = await prisma.goalProgress.create({
       data: {
-        goalId,
+        goal: { connect: { id: goalId } },
+        value: data.currentValue || 0,
         currentValue: data.currentValue,
         currentUnit: data.currentUnit,
         notes: data.notes,

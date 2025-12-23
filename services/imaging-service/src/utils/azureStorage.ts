@@ -23,7 +23,7 @@ class AzureStorageService {
 
       // Create container if it doesn't exist
       await this.containerClient.createIfNotExists({
-        access: 'private',
+        access: undefined,
       });
 
       logger.info('Azure Blob Storage initialized successfully');

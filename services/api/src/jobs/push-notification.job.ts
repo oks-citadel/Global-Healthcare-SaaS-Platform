@@ -7,7 +7,7 @@
 import { pushService } from '../services/push.service.js';
 import { prisma } from '../lib/prisma.js';
 import { logger } from '../utils/logger.js';
-import { NotificationType } from '@prisma/client';
+import { NotificationType } from '../generated/client';
 
 /**
  * Send appointment reminders for upcoming appointments

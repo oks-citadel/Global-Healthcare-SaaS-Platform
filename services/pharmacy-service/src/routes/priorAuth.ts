@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { UserRequest, requireUser } from '../middleware/extractUser';
 import PriorAuthService from '../services/PriorAuthService';
 
-const router = Router();
+const router: ReturnType<typeof Router> = Router();
 
 const createPriorAuthSchema = z.object({
   prescriptionId: z.string().uuid(),

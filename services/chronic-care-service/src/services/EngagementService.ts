@@ -1,4 +1,4 @@
-import { PrismaClient, EngagementType } from '@prisma/client';
+import { PrismaClient, EngagementType } from '../generated/client';
 
 const prisma = new PrismaClient();
 

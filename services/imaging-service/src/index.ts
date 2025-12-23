@@ -1,6 +1,6 @@
 import app from './app';
 import logger from './utils/logger';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from './generated/client';
 
 const prisma = new PrismaClient();
 const PORT = process.env.PORT || 3006;

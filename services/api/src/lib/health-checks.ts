@@ -4,7 +4,7 @@
  * Monitors database, cache, external services, and system health
  */
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../generated/client';
 import { logger } from '../utils/logger.js';
 import { CacheService } from './cache.js';
 import { circuitBreakerManager } from './circuit-breaker.js';

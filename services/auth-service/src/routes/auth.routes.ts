@@ -3,7 +3,7 @@ import { authController } from '../controllers/auth.controller.js';
 import { authenticate } from '../middleware/auth.middleware.js';
 import { authLimiter, passwordResetLimiter } from '../middleware/rate-limit.middleware.js';
 
-const router = Router();
+const router: ReturnType<typeof Router> = Router();
 
 /**
  * Public routes (with rate limiting)

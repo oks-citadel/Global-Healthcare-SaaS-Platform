@@ -6,7 +6,7 @@
  */
 
 import { pushService } from '../services/push.service.js';
-import { NotificationType } from '@prisma/client';
+import { NotificationType } from '../generated/client';
 import { logger } from '../utils/logger.js';
 
 /**

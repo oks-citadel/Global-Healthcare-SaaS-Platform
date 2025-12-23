@@ -4,7 +4,7 @@ import { authenticate } from '../middleware/auth';
 import { validate } from '../middleware/validation';
 import { createCriticalFindingValidator, paginationValidator } from '../utils/validators';
 
-const router = Router();
+const router: ReturnType<typeof Router> = Router();
 
 // Apply authentication middleware to all routes
 router.use(authenticate);

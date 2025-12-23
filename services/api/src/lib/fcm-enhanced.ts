@@ -1,7 +1,7 @@
 import admin from 'firebase-admin';
 import { getFirebaseMessaging } from '../config/firebase.config.js';
 import { logger } from '../utils/logger.js';
-import { Platform } from '@prisma/client';
+import { Platform } from '../generated/client';
 
 /**
  * Enhanced Firebase Cloud Messaging Service

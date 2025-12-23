@@ -9,7 +9,7 @@
     "build": "npx next build",
     "build:webpack": "npx next build --webpack",
     "start": "npx next start",
-    "lint": "npx next lint",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx --ignore-pattern node_modules --ignore-pattern .next",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",

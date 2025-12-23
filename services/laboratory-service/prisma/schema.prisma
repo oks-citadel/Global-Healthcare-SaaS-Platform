@@ -1,4 +1,5 @@
 generator client {
+  output = "./../src/generated/client"
   provider = "prisma-client-js"
 }
 
@@ -24,6 +25,7 @@ model LabOrder {
   orderedAt       DateTime     @default(now())
   collectedAt     DateTime?
   completedAt     DateTime?
+  reportUrl       String?
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
 
@@ -56,6 +58,10 @@ model LabTest {
   testName        String
   category        TestCategory
   status          TestStatus   @default(pending)
+  verifiedAt      DateTime?
+  performedBy     String?
+  performedAt     DateTime?
+  verifiedBy      String?
   results         LabResult[]
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
@@ -89,13 +95,19 @@ model LabResult {
   testId          String
   test            LabTest      @relation(fields: [testId], references: [id], onDelete: Cascade)
   componentName   String
+  componentCode   String?
+  numericValue    Float?
   value           String
   unit            String?
   referenceRange  String?
   isAbnormal      Boolean      @default(false)
+  isCritical      Boolean      @default(false)
   abnormalFlag    String?      // H (High), L (Low), A (Abnormal)
   notes           String?
+  interpretation  String?
+  verifiedAt      DateTime?
   performedBy     String?
+  performedAt     DateTime?
   verifiedBy      String?
   resultedAt      DateTime     @default(now())
   createdAt       DateTime     @default(now())

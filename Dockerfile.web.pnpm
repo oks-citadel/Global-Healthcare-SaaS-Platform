@@ -36,8 +36,7 @@ COPY packages/sdk/package.json ./packages/sdk/
 
 # Install all dependencies (including dev deps for building)
 # Note: Using --no-frozen-lockfile because lockfile may be out of sync
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
-    pnpm install --no-frozen-lockfile
+RUN pnpm install --no-frozen-lockfile
 
 # ============================================
 # Stage 3: Build SDK

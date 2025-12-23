@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { UserRequest, requireUser } from '../middleware/extractUser';
 import VitalSignService from '../services/VitalSignService';
 
-const router = Router();
+const router: ReturnType<typeof Router> = Router();
 
 const vitalReadingSchema = z.object({
   vitalType: z.enum(['blood_pressure_systolic', 'blood_pressure_diastolic', 'heart_rate', 'blood_glucose', 'oxygen_saturation', 'temperature', 'weight', 'respiratory_rate', 'peak_flow']),
@@ -26,7 +26,12 @@ router.post('/', requireUser, async (req: UserRequest, res) => {
     const validatedData = vitalReadingSchema.parse(req.body);
 
     const reading = await VitalSignService.submitVitalReading(userId, {
-      ...validatedData,
+      vitalType: validatedData.vitalType,
+      value: validatedData.value,
+      unit: validatedData.unit,
+      notes: validatedData.notes,
+      deviceId: validatedData.deviceId,
+      carePlanId: validatedData.carePlanId,
       recordedAt: validatedData.recordedAt ? new Date(validatedData.recordedAt) : undefined,
     });
 
@@ -55,7 +60,12 @@ router.post('/batch', requireUser, async (req: UserRequest, res) => {
     }
 
     const processedReadings = validatedData.readings.map(r => ({
-      ...r,
+      vitalType: r.vitalType,
+      value: r.value,
+      unit: r.unit,
+      notes: r.notes,
+      deviceId: r.deviceId,
+      carePlanId: r.carePlanId,
       recordedAt: r.recordedAt ? new Date(r.recordedAt) : undefined,
     }));
 

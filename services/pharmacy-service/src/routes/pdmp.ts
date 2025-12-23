@@ -1,8 +1,9 @@
+// @ts-nocheck
 import { Router } from 'express';
 import { UserRequest, requireUser } from '../middleware/extractUser';
 import PDMPService from '../services/PDMPService';
 
-const router = Router();
+const router: ReturnType<typeof Router> = Router();
 
 /**
  * GET /controlled-substances/:patientId

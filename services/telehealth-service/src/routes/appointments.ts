@@ -1,5 +1,5 @@
 import { Router, IRouter } from 'express';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../generated/client';
 import { z } from 'zod';
 import { UserRequest, requireUser } from '../middleware/extractUser';
 

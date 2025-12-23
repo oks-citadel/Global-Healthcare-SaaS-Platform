@@ -1,4 +1,4 @@
-import { PrismaClient, PrescriptionStatus } from '@prisma/client';
+import { PrismaClient, PrescriptionStatus } from '../generated/client';
 
 const prisma = new PrismaClient();
 

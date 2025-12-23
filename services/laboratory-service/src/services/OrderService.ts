@@ -1,4 +1,4 @@
-import { PrismaClient, OrderStatus, OrderPriority } from '@prisma/client';
+import { PrismaClient, OrderStatus, OrderPriority } from '../generated/client';
 import { CreateLabOrderInput, UpdateLabOrderInput, FilterOptions } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 import logger from '../utils/logger';

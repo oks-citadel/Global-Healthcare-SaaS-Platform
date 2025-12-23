@@ -1,4 +1,4 @@
-import { LabOrder, LabTest, LabResult } from '@prisma/client';
+import { LabOrder, LabTest, LabResult } from '../generated/client';
 import { HL7Message, HL7Segment } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 

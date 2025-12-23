@@ -1,10 +1,10 @@
 import { Router } from 'express';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../generated/client';
 import { z } from 'zod';
 import { UserRequest, requireUser } from '../middleware/extractUser';
 import { TreatmentPlanService } from '../services/TreatmentPlanService';
 
-const router = Router();
+const router: ReturnType<typeof Router> = Router();
 const prisma = new PrismaClient();
 
 // Validation schemas

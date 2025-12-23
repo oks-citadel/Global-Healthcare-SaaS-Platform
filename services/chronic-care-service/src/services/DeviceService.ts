@@ -1,4 +1,4 @@
-import { PrismaClient, DeviceType, DeviceStatus } from '@prisma/client';
+import { PrismaClient, DeviceType, DeviceStatus } from '../generated/client';
 import AlertService from './AlertService';
 import EngagementService from './EngagementService';
 

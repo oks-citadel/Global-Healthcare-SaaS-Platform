@@ -1,4 +1,5 @@
 generator client {
+  output = "./../src/generated/client"
   provider = "prisma-client-js"
 }
 
@@ -15,13 +16,13 @@ model CarePlan {
   id              String       @id @default(uuid())
   patientId       String
   providerId      String
-  condition       String       // Diabetes, Hypertension, COPD, etc.
+  condition       String
   status          PlanStatus   @default(active)
   startDate       DateTime     @default(now())
   endDate         DateTime?
-  goals           Json         // Treatment goals
-  interventions   Json         // Planned interventions
-  reviewSchedule  String?      // e.g., "monthly", "quarterly"
+  goals           Json
+  interventions   Json
+  reviewSchedule  String?
   nextReviewDate  DateTime?
 
   // Relations
@@ -52,7 +53,7 @@ model CareTask {
   title           String
   description     String?
   taskType        TaskType
-  frequency       String       // daily, weekly, as_needed, etc.
+  frequency       String
   dueDate         DateTime?
   completedAt     DateTime?
   status          TaskStatus   @default(pending)
@@ -91,9 +92,8 @@ model MonitoringDevice {
   serialNumber    String       @unique
   status          DeviceStatus @default(active)
   lastSyncAt      DateTime?
-  batteryLevel    Int?         // 0-100
+  batteryLevel    Int?
 
-  // Relations
   readings        VitalReading[]
 
   createdAt       DateTime     @default(now())
@@ -205,10 +205,6 @@ enum AlertStatus {
   dismissed
 }
 
-// ==========================================
-// Goal Management
-// ==========================================
-
 model Goal {
   id              String       @id @default(uuid())
   patientId       String
@@ -221,8 +217,8 @@ model Goal {
   targetDate      DateTime?
   frequency       String?
   status          GoalStatus   @default(active)
+  completedAt     DateTime?
 
-  // Relations
   progress        GoalProgress[]
 
   createdAt       DateTime     @default(now())
@@ -239,6 +235,8 @@ model GoalProgress {
   goalId          String
   goal            Goal         @relation(fields: [goalId], references: [id], onDelete: Cascade)
   value           Float
+  currentValue    Float?
+  currentUnit     String?
   notes           String?
   recordedAt      DateTime     @default(now())
 
@@ -249,6 +247,10 @@ model GoalProgress {
 }
 
 enum GoalType {
+  vital_sign
+  activity
+  lifestyle
+  clinical_outcome
   weight_loss
   blood_pressure
   blood_glucose
@@ -261,8 +263,81 @@ enum GoalType {
 }
 
 enum GoalStatus {
+  achieved
   active
   completed
   paused
   cancelled
+}
+
+model AlertThreshold {
+  id              String       @id @default(uuid())
+  patientId       String
+  carePlanId      String?
+  vitalType       VitalType
+  condition       String?
+  minValue        Float?
+  maxValue        Float?
+  criticalMin     Float?
+  criticalMax     Float?
+  warningMin      Float?
+  warningMax      Float?
+  isActive        Boolean      @default(true)
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([patientId])
+  @@index([vitalType])
+  @@index([isActive])
+}
+
+model CarePlanTemplate {
+  id              String       @id @default(uuid())
+  name            String
+  description     String?
+  condition       String
+  goals           Json
+  interventions   Json
+  tasks           Json?
+  reviewSchedule  String?
+  thresholds      Json?
+  version         Int          @default(1)
+  isActive        Boolean      @default(true)
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([condition])
+  @@index([isActive])
+}
+
+model PatientEngagement {
+  id              String           @id @default(uuid())
+  patientId       String
+  carePlanId      String?
+  engagementType  EngagementType
+  activityType    String
+  description     String?
+  metadata        Json?
+  recordedAt      DateTime         @default(now())
+
+  createdAt       DateTime         @default(now())
+
+  @@index([patientId])
+  @@index([carePlanId])
+  @@index([engagementType])
+  @@index([recordedAt])
+}
+
+enum EngagementType {
+  device_sync
+  vital_reading
+  goal_progress
+  medication_taken
+  appointment_kept
+  task_completed
+  education_viewed
+  message_sent
+  other
 }

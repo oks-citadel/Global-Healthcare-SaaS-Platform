@@ -1,12 +1,24 @@
 name: Test GitHub Actions
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/**'
   workflow_dispatch:
 
 jobs:
   test:
+    name: Validate GitHub Actions
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Hello World
         run: echo "GitHub Actions is working!"
 
@@ -14,3 +26,13 @@ jobs:
         run: |
           echo "Runner: $RUNNER_NAME"
           echo "OS: $RUNNER_OS"
+
+      - name: Validate workflow syntax
+        run: |
+          echo "Validating GitHub Actions workflow files..."
+          for file in .github/workflows/*.yml; do
+            echo "Checking: $file"
+            # Basic YAML syntax check
+            python3 -c "import yaml; yaml.safe_load(open('$file'))" && echo "  Valid YAML syntax" || echo "  Invalid YAML syntax"
+          done
+          echo "Workflow validation complete!"

@@ -1,4 +1,4 @@
-import { Priority, Modality, OrderStatus, StudyStatus, ReportStatus, Severity } from '@prisma/client';
+import { Priority, Modality, OrderStatus, StudyStatus, ReportStatus, Severity } from '../generated/client';
 
 export interface CreateImagingOrderDTO {
   patientId: string;

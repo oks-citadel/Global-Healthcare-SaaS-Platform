@@ -1,6 +1,7 @@
 // Imaging Service Database Schema
 
 generator client {
+  output = "./../src/generated/client"
   provider = "prisma-client-js"
 }
 

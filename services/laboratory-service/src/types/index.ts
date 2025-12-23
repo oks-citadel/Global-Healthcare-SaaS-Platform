@@ -1,4 +1,4 @@
-import { OrderStatus, OrderPriority, TestCategory, TestStatus } from '@prisma/client';
+import { OrderStatus, OrderPriority, TestCategory, TestStatus } from '../generated/client';
 
 export interface CreateLabOrderInput {
   patientId: string;

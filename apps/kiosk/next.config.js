@@ -5,12 +5,11 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react'],
   },
-  // Turbopack configuration (Next.js 16+)
-  turbopack: {},
+  
   // Transpile workspace packages for Turbopack compatibility
   transpilePackages: ['@unified-health/sdk'],
   // Optimize for kiosk deployment
-  output: 'standalone',
+  // output: 'standalone', // Disabled for Windows symlink issues
   poweredByHeader: false,
   compress: true,
 }

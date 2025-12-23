@@ -3,7 +3,7 @@
 import React from 'react';
 import { clsx } from 'clsx';
 
-interface VisuallyHiddenProps {
+export interface VisuallyHiddenProps {
   children: React.ReactNode;
   as?: keyof JSX.IntrinsicElements;
   className?: string;

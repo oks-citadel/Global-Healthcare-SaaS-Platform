@@ -3,8 +3,7 @@ const nextConfig = {
   reactStrictMode: true,
   // Transpile workspace packages for Turbopack compatibility
   transpilePackages: ['@unified-health/sdk'],
-  // Turbopack configuration (Next.js 16+)
-  turbopack: {},
+  
   experimental: {
     serverActions: {
       allowedOrigins: ["localhost:3001"],

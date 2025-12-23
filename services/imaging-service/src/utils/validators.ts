@@ -1,5 +1,5 @@
 import { body, param, query, ValidationChain } from 'express-validator';
-import { Priority, Modality, OrderStatus, StudyStatus, ReportStatus, Severity } from '@prisma/client';
+import { Priority, Modality, OrderStatus, StudyStatus, ReportStatus, Severity } from '../generated/client';
 
 export const createImagingOrderValidator: ValidationChain[] = [
   body('patientId').isString().notEmpty().withMessage('Patient ID is required'),

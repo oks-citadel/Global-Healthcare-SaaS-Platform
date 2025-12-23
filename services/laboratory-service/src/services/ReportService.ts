@@ -1,4 +1,4 @@
-import { PrismaClient, LabOrder, LabTest, LabResult } from '@prisma/client';
+import { PrismaClient, LabOrder, LabTest, LabResult } from '../generated/client';
 import { PDFReportOptions } from '../types';
 import logger from '../utils/logger';
 

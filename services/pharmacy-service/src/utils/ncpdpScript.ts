@@ -11,7 +11,7 @@ export interface NCPDPMessage {
   timestamp: string;
   sender: any;
   receiver: any;
-  patient: any;
+  patient?: any;
   prescriber?: any;
   pharmacy?: any;
   medication?: any;
@@ -91,7 +91,7 @@ export class NCPDPScriptUtil {
       npi?: string;
     };
     pharmacy: any;
-    patient: any;
+    patient?: any;
     medication: any;
   }): NCPDPMessage {
     return {
@@ -121,7 +121,7 @@ export class NCPDPScriptUtil {
   static generateREFRES(data: {
     messageId: string;
     prescriptionNumber: string;
-    patient: any;
+    patient?: any;
     medication: any;
     pharmacy: any;
     requestedRefillDate?: string;
@@ -153,7 +153,7 @@ export class NCPDPScriptUtil {
     denialReason?: string;
     newRefillsAuthorized?: number;
     prescriber: any;
-    patient: any;
+    patient?: any;
   }): NCPDPMessage {
     return {
       version: '2017071',
@@ -185,7 +185,7 @@ export class NCPDPScriptUtil {
       reason: string;
     };
     pharmacy: any;
-    patient: any;
+    patient?: any;
     medication: any;
   }): NCPDPMessage {
     return {
@@ -242,7 +242,7 @@ export class NCPDPScriptUtil {
     reason: string;
     prescriber: any;
     pharmacy: any;
-    patient: any;
+    patient?: any;
   }): NCPDPMessage {
     return {
       version: '2017071',

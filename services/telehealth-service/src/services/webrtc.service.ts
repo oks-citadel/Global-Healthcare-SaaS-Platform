@@ -1,5 +1,5 @@
 import { Server as SocketServer, Socket } from 'socket.io';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../generated/client';
 
 const prisma = new PrismaClient();
 

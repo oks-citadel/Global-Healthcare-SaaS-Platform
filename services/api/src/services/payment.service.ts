@@ -1,5 +1,5 @@
 import Stripe from 'stripe';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../generated/client';
 import {
   stripe,
   createStripeCustomer,

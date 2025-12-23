@@ -1,5 +1,5 @@
 import cron from 'node-cron';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../generated/client';
 import { logger } from '../utils/logger.js';
 import { sendAppointmentReminder as sendAppointmentReminderEmail } from '../services/email.service.js';
 import { sendAppointmentReminder as sendAppointmentReminderSms } from '../services/sms.service.js';

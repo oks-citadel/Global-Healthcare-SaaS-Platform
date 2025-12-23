@@ -3,7 +3,7 @@
 import React from 'react';
 import { clsx } from 'clsx';
 
-interface SkipLinkProps {
+export interface SkipLinkProps {
   targetId?: string;
   className?: string;
   children?: React.ReactNode;
@@ -90,7 +90,7 @@ export const SkipLink: React.FC<SkipLinkProps> = ({
  * />
  * ```
  */
-interface SkipLinksProps {
+export interface SkipLinksProps {
   links: Array<{
     targetId: string;
     label: string;

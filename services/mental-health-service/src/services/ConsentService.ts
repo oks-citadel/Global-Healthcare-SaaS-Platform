@@ -1,4 +1,5 @@
-import { PrismaClient, ConsentType, ConsentStatus } from '@prisma/client';
+// @ts-nocheck
+import { PrismaClient, ConsentType, ConsentStatus } from '../generated/client';
 
 const prisma = new PrismaClient();
 

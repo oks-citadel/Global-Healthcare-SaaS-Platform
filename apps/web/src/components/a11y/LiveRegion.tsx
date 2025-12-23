@@ -4,9 +4,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { clsx } from 'clsx';
 
 type AriaPoliteness = 'polite' | 'assertive' | 'off';
-type AriaRelevant = 'additions' | 'removals' | 'text' | 'all';
+type AriaRelevant = 'additions' | 'removals' | 'text' | 'all' | 'additions text' | 'additions removals' | 'removals additions' | 'removals text' | 'text additions' | 'text removals';
 
-interface LiveRegionProps {
+export interface LiveRegionProps {
   children: React.ReactNode;
   politeness?: AriaPoliteness;
   atomic?: boolean;
@@ -95,7 +95,7 @@ export const LiveRegion: React.FC<LiveRegionProps> = ({
  * return <Announcer ref={announcer.ref} />;
  * ```
  */
-interface AnnouncerProps {
+export interface AnnouncerProps {
   className?: string;
 }
 
@@ -214,7 +214,7 @@ export const useAnnouncer = () => {
  * </StatusMessage>
  * ```
  */
-interface StatusMessageProps {
+export interface StatusMessageProps {
   children: React.ReactNode;
   type?: 'success' | 'error' | 'warning' | 'info';
   icon?: React.ReactNode;

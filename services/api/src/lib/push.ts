@@ -1,5 +1,5 @@
 import { logger } from '../utils/logger.js';
-import { Platform } from '@prisma/client';
+import { Platform } from '../generated/client';
 import * as admin from 'firebase-admin';
 import apn from 'apn';
 import webpush from 'web-push';

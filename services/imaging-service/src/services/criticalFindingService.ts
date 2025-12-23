@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../generated/client';
 import axios from 'axios';
 import { CreateCriticalFindingDTO, UpdateCriticalFindingDTO } from '../types';
 import logger from '../utils/logger';

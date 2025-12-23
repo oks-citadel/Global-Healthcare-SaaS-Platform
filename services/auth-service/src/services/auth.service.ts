@@ -379,12 +379,12 @@ export class AuthService {
     };
 
     const signOptions: jwt.SignOptions = config.jwt.algorithm === 'RS256'
-      ? { algorithm: 'RS256', expiresIn: config.jwt.expiresIn as string }
-      : { algorithm: 'HS256', expiresIn: config.jwt.expiresIn as string };
+      ? { algorithm: 'RS256', expiresIn: config.jwt.expiresIn as jwt.SignOptions['expiresIn'] }
+      : { algorithm: 'HS256', expiresIn: config.jwt.expiresIn as jwt.SignOptions['expiresIn'] };
 
     const refreshSignOptions: jwt.SignOptions = config.jwt.algorithm === 'RS256'
-      ? { algorithm: 'RS256', expiresIn: config.jwt.refreshExpiresIn as string }
-      : { algorithm: 'HS256', expiresIn: config.jwt.refreshExpiresIn as string };
+      ? { algorithm: 'RS256', expiresIn: config.jwt.refreshExpiresIn as jwt.SignOptions['expiresIn'] }
+      : { algorithm: 'HS256', expiresIn: config.jwt.refreshExpiresIn as jwt.SignOptions['expiresIn'] };
 
     const secret = config.jwt.algorithm === 'RS256'
       ? config.jwt.privateKey!

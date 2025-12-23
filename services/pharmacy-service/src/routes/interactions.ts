@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { UserRequest, requireUser } from '../middleware/extractUser';
 import InteractionCheckService from '../services/InteractionCheckService';
 
-const router = Router();
+const router: ReturnType<typeof Router> = Router();
 
 const checkInteractionsSchema = z.object({
   medications: z.array(z.string()).min(2),

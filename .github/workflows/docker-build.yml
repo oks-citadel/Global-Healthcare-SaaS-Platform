@@ -3,31 +3,34 @@
 # Automated Docker image building and pushing to Azure ACR
 # All jobs run on GitHub-hosted runners with Azure Cloud
 # ============================================
-# WORKFLOW LOCKED - v1.0.0 deployed to production
-# Automatic triggers disabled to prevent accidental deployments
+# BRANCH PROTECTION RECOMMENDATIONS:
+# - Enable required status checks for: build, security-scan
+# - Protect main branch from direct pushes
+# - Require PR approvals for production deployments
 # ============================================
 
 name: Docker Build and Push
 
 on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+    paths:
+      - 'services/api/**'
+      - 'apps/web/**'
+      - 'Dockerfile'
+      - '.github/workflows/docker-build.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'services/api/**'
+      - 'apps/web/**'
+      - 'Dockerfile'
   workflow_dispatch:
-    inputs:
-      confirm:
-        description: 'Type "BUILD" to confirm manual trigger'
-        required: true
-        type: string
-# DISABLED AUTOMATIC TRIGGERS - Uncomment to re-enable:
-#  push:
-#    branches:
-#      - main
-#      - develop
-#      - 'release/**'
-#    tags:
-#      - 'v*'
-#  pull_request:
-#    branches:
-#      - main
-#      - develop
+    # Manual trigger available for ad-hoc builds (no confirmation required)
 
 env:
   ACR_NAME: acrunifiedhealthdev2

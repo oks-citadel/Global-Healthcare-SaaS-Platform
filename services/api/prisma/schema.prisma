@@ -2,6 +2,7 @@
 // Learn more: https://pris.ly/d/prisma-schema
 
 generator client {
+  output = "./../src/generated/client"
   provider = "prisma-client-js"
   previewFeatures = ["metrics", "tracing"]
 }

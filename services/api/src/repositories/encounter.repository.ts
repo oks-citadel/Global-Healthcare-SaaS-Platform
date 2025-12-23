@@ -1,4 +1,4 @@
-import { Encounter, EncounterStatus, EncounterType, ClinicalNote, Prisma } from '@prisma/client';
+import { Encounter, EncounterStatus, EncounterType, ClinicalNote, Prisma } from '../generated/client';
 import { BaseRepository } from './base.repository.js';
 import { prisma } from '../lib/prisma.js';
 

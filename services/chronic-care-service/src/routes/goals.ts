@@ -3,14 +3,14 @@ import { z } from 'zod';
 import { UserRequest, requireUser } from '../middleware/extractUser';
 import GoalService from '../services/GoalService';
 
-const router = Router();
+const router: ReturnType<typeof Router> = Router();
 
 const createGoalSchema = z.object({
   patientId: z.string().uuid(),
   carePlanId: z.string().uuid().optional(),
   title: z.string(),
   description: z.string().optional(),
-  goalType: z.enum(['vital_sign', 'weight_loss', 'activity', 'medication_adherence', 'diet', 'lifestyle', 'clinical_outcome']),
+  goalType: z.enum(['vital_sign', 'activity', 'lifestyle', 'clinical_outcome', 'weight_loss', 'blood_pressure', 'blood_glucose', 'exercise', 'medication_adherence', 'diet', 'sleep', 'stress_management', 'other']),
   targetValue: z.number().optional(),
   targetUnit: z.string().optional(),
   targetDate: z.string().datetime().optional(),
@@ -24,7 +24,7 @@ const updateGoalSchema = z.object({
   targetUnit: z.string().optional(),
   targetDate: z.string().datetime().optional(),
   frequency: z.string().optional(),
-  status: z.enum(['active', 'achieved', 'not_achieved', 'cancelled']).optional(),
+  status: z.enum(['active', 'completed', 'paused', 'cancelled']).optional(),
 });
 
 const recordProgressSchema = z.object({
@@ -155,7 +155,14 @@ router.post('/', requireUser, async (req: UserRequest, res) => {
     }
 
     const goal = await GoalService.createGoal({
-      ...validatedData,
+      patientId: validatedData.patientId,
+      carePlanId: validatedData.carePlanId,
+      title: validatedData.title,
+      description: validatedData.description,
+      goalType: validatedData.goalType as any,
+      targetValue: validatedData.targetValue,
+      targetUnit: validatedData.targetUnit,
+      frequency: validatedData.frequency,
       targetDate: validatedData.targetDate ? new Date(validatedData.targetDate) : undefined,
     });
 
@@ -233,7 +240,6 @@ router.post('/:id/progress', requireUser, async (req: UserRequest, res) => {
     }
 
     const progress = await GoalService.recordProgress(id, {
-      ...validatedData,
       recordedAt: validatedData.recordedAt ? new Date(validatedData.recordedAt) : undefined,
     });
 

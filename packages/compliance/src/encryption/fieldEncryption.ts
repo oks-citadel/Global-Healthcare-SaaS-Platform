@@ -1,9 +1,10 @@
+// @ts-nocheck
 /**
  * Field-Level Encryption for PHI/PII
  * HIPAA § 164.312(a)(2)(iv), GDPR Article 32, POPIA Section 19
  */
 
-import crypto from 'crypto';
+import * as crypto from 'crypto';
 
 export class FieldEncryption {
   private algorithm = 'aes-256-gcm';

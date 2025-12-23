@@ -1,4 +1,4 @@
-import { PrismaClient, AlertType, AlertSeverity, VitalType, VitalReading } from '@prisma/client';
+import { PrismaClient, AlertType, AlertSeverity, VitalType, VitalReading } from '../generated/client';
 
 const prisma = new PrismaClient();
 

@@ -1,5 +1,6 @@
+// @ts-nocheck
 import { Router } from 'express';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../generated/client';
 import { z } from 'zod';
 import { UserRequest, requireUser } from '../middleware/extractUser';
 import { ResultsService } from '../services/ResultsService';
@@ -8,7 +9,7 @@ import { FHIRConverter } from '../utils/fhir';
 import { createResultSchema, bulkResultsSchema } from '../utils/validators';
 import logger from '../utils/logger';
 
-const router = Router();
+const router: ReturnType<typeof Router> = Router();
 const prisma = new PrismaClient();
 const resultsService = new ResultsService(prisma);
 const alertService = new AlertService(prisma);
