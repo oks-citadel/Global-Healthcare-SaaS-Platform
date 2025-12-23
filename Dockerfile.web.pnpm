@@ -128,14 +128,20 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# Copy standalone build output
-# Next.js standalone output includes only necessary node_modules
-COPY --from=builder --chown=nodejs:nodejs /app/apps/web/.next/standalone ./
-# Debug: Show node_modules structure
-RUN ls -la node_modules/ 2>/dev/null | head -20 || echo "No node_modules"
-RUN ls -la node_modules/next 2>/dev/null || echo "No next module"
+# Copy standalone build output (server.js and .next folder)
+COPY --from=builder --chown=nodejs:nodejs /app/apps/web/.next/standalone/server.js ./
+COPY --from=builder --chown=nodejs:nodejs /app/apps/web/.next/standalone/.next ./.next
+
+# Copy static assets
 COPY --from=builder --chown=nodejs:nodejs /app/apps/web/.next/static ./.next/static
 COPY --from=builder --chown=nodejs:nodejs /app/apps/web/public ./public
+
+# Copy required node_modules from builder (not symlinks!)
+# We need next and react for server.js to run
+COPY --from=builder --chown=nodejs:nodejs /app/node_modules/.pnpm /app/node_modules/.pnpm
+COPY --from=builder --chown=nodejs:nodejs /app/node_modules/next /app/node_modules/next
+COPY --from=builder --chown=nodejs:nodejs /app/node_modules/react /app/node_modules/react
+COPY --from=builder --chown=nodejs:nodejs /app/node_modules/react-dom /app/node_modules/react-dom
 
 # Switch to non-root user
 USER nodejs
