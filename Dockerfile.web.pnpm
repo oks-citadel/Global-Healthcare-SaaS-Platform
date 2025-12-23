@@ -96,6 +96,7 @@ RUN NEXT_TELEMETRY_DISABLED=1 npx next build --webpack
 
 # Verify standalone output exists
 RUN ls -la .next/standalone/ && ls -la .next/static/
+RUN echo "=== Standalone structure ===" && find .next/standalone -type f -name "server.js" && find .next/standalone -maxdepth 3 -type f | head -30
 
 # ============================================
 # Stage 5: Production Runtime
