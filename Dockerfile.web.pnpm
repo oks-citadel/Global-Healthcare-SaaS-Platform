@@ -96,7 +96,6 @@ RUN NEXT_TELEMETRY_DISABLED=1 npx next build --webpack
 
 # Verify standalone output exists
 RUN ls -la .next/standalone/ && ls -la .next/static/
-RUN echo "=== Standalone structure ===" && find .next/standalone -type f -name "server.js" && find .next/standalone -maxdepth 3 -type f | head -30
 
 # ============================================
 # Stage 5: Production Runtime
@@ -132,8 +131,8 @@ ENV HOSTNAME="0.0.0.0"
 # Copy standalone build output
 # Next.js standalone output includes only necessary node_modules
 COPY --from=builder --chown=nodejs:nodejs /app/apps/web/.next/standalone ./
-COPY --from=builder --chown=nodejs:nodejs /app/apps/web/.next/static ./apps/web/.next/static
-COPY --from=builder --chown=nodejs:nodejs /app/apps/web/public ./apps/web/public
+COPY --from=builder --chown=nodejs:nodejs /app/apps/web/.next/static ./.next/static
+COPY --from=builder --chown=nodejs:nodejs /app/apps/web/public ./public
 
 # Switch to non-root user
 USER nodejs
@@ -149,4 +148,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
 ENTRYPOINT ["dumb-init", "--"]
 
 # Start the application
-CMD ["node", "apps/web/server.js"]
+CMD ["node", "server.js"]
