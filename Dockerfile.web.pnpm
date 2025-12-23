@@ -64,9 +64,15 @@ ENV GIT_BRANCH=${GIT_BRANCH}
 RUN NEXT_TELEMETRY_DISABLED=1 npx next build --webpack
 RUN ls -la .next/standalone/ && ls -la .next/static/
 
-# Create dereferenced node_modules archive
+# Extract actual next package location from pnpm
 WORKDIR /app
-RUN tar -chf /tmp/node_modules.tar node_modules
+RUN mkdir -p /tmp/prod_modules && \
+    NEXT_DIR=$(readlink -f node_modules/next) && \
+    REACT_DIR=$(readlink -f node_modules/react) && \
+    REACT_DOM_DIR=$(readlink -f node_modules/react-dom) && \
+    cp -rL "$NEXT_DIR" /tmp/prod_modules/next && \
+    cp -rL "$REACT_DIR" /tmp/prod_modules/react && \
+    cp -rL "$REACT_DOM_DIR" /tmp/prod_modules/react-dom
 
 # ============================================
 # Stage 5: Production Runtime
@@ -97,9 +103,10 @@ COPY --from=builder --chown=nodejs:nodejs /app/apps/web/.next/standalone/.next .
 COPY --from=builder --chown=nodejs:nodejs /app/apps/web/.next/static ./.next/static
 COPY --from=builder --chown=nodejs:nodejs /app/apps/web/public ./public
 
-# Extract dereferenced node_modules from tar
-COPY --from=builder /tmp/node_modules.tar /tmp/
-RUN tar -xf /tmp/node_modules.tar && rm /tmp/node_modules.tar && chown -R nodejs:nodejs node_modules
+# Copy dereferenced core modules
+COPY --from=builder --chown=nodejs:nodejs /tmp/prod_modules/next ./node_modules/next
+COPY --from=builder --chown=nodejs:nodejs /tmp/prod_modules/react ./node_modules/react
+COPY --from=builder --chown=nodejs:nodejs /tmp/prod_modules/react-dom ./node_modules/react-dom
 
 USER nodejs
 EXPOSE 3000
