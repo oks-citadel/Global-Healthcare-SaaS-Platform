@@ -97,6 +97,14 @@ RUN NEXT_TELEMETRY_DISABLED=1 npx next build --webpack
 # Verify standalone output exists
 RUN ls -la .next/standalone/ && ls -la .next/static/
 
+# Prepare standalone with dereferenced node_modules
+WORKDIR /app
+RUN mkdir -p /app/standalone && \
+    cp -r /app/apps/web/.next/standalone/* /app/standalone/ && \
+    rm -rf /app/standalone/node_modules && \
+    cp -rL /app/apps/web/.next/standalone/node_modules /app/standalone/node_modules 2>/dev/null || \
+    cp -rL /app/node_modules /app/standalone/node_modules
+
 # ============================================
 # Stage 5: Production Runtime
 # ============================================
@@ -128,20 +136,12 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# Copy standalone build output (server.js and .next folder)
-COPY --from=builder --chown=nodejs:nodejs /app/apps/web/.next/standalone/server.js ./
-COPY --from=builder --chown=nodejs:nodejs /app/apps/web/.next/standalone/.next ./.next
+# Copy prepared standalone with dereferenced node_modules
+COPY --from=builder --chown=nodejs:nodejs /app/standalone ./
 
 # Copy static assets
 COPY --from=builder --chown=nodejs:nodejs /app/apps/web/.next/static ./.next/static
 COPY --from=builder --chown=nodejs:nodejs /app/apps/web/public ./public
-
-# Copy required node_modules from builder (not symlinks!)
-# We need next and react for server.js to run
-COPY --from=builder --chown=nodejs:nodejs /app/node_modules/.pnpm /app/node_modules/.pnpm
-COPY --from=builder --chown=nodejs:nodejs /app/node_modules/next /app/node_modules/next
-COPY --from=builder --chown=nodejs:nodejs /app/node_modules/react /app/node_modules/react
-COPY --from=builder --chown=nodejs:nodejs /app/node_modules/react-dom /app/node_modules/react-dom
 
 # Switch to non-root user
 USER nodejs
