@@ -97,21 +97,6 @@ RUN NEXT_TELEMETRY_DISABLED=1 npx next build --webpack
 # Verify standalone output exists
 RUN ls -la .next/standalone/ && ls -la .next/static/
 
-# Create a production-ready bundle with resolved symlinks
-WORKDIR /app
-RUN mkdir -p /app/production && \
-    cp /app/apps/web/.next/standalone/server.js /app/production/ && \
-    cp -r /app/apps/web/.next/standalone/.next /app/production/.next && \
-    cp -r /app/apps/web/.next/static /app/production/.next/static && \
-    cp -r /app/apps/web/public /app/production/public && \
-    mkdir -p /app/production/node_modules && \
-    cd /app/node_modules && \
-    for dir in .pnpm next react react-dom; do \
-      if [ -e "$dir" ]; then \
-        cp -rL "$dir" /app/production/node_modules/ 2>/dev/null || cp -r "$dir" /app/production/node_modules/; \
-      fi; \
-    done
-
 # ============================================
 # Stage 5: Production Runtime
 # ============================================
@@ -143,8 +128,18 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# Copy the prepared production bundle
-COPY --from=builder --chown=nodejs:nodejs /app/production ./
+# Copy standalone server
+COPY --from=builder --chown=nodejs:nodejs /app/apps/web/.next/standalone/server.js ./
+COPY --from=builder --chown=nodejs:nodejs /app/apps/web/.next/standalone/.next ./.next
+
+# Copy static assets
+COPY --from=builder --chown=nodejs:nodejs /app/apps/web/.next/static ./.next/static
+COPY --from=builder --chown=nodejs:nodejs /app/apps/web/public ./public
+
+# Install only production dependencies using npm (not pnpm, to avoid symlinks)
+COPY --from=builder /app/apps/web/package.json ./package.json
+RUN npm install --production --ignore-scripts && \
+    chown -R nodejs:nodejs node_modules
 
 # Switch to non-root user
 USER nodejs
