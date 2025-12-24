@@ -22,6 +22,7 @@
 - [Executive Summary](#executive-summary)
 - [Key Features](#key-features)
 - [Architecture](#architecture)
+- [Microservices Architecture (Detailed)](#microservices-architecture-detailed)
 - [Project Structure](#project-structure)
 - [Technology Stack](#technology-stack)
 - [Business Logic & Domain Scope](#business-logic--domain-scope)
@@ -223,13 +224,13 @@ UnifiedHealth is uniquely positioned to capture this opportunity with the **only
          |                       |                       |
          v                       v                       v
 +-----------------------------------------------------------------------------+
-|                      MICROSERVICES LAYER (18 Services)                       |
+|                      MICROSERVICES LAYER (10 Services)                       |
 |                                                                              |
 |  +------------------------- CLINICAL DOMAIN ----------------------------+   |
 |  | +-----------+ +-----------+ +-----------+ +-----------+              |   |
 |  | |Telehealth | |  Mental   | | Chronic   | |   Auth    |              |   |
 |  | | Service   | |  Health   | |   Care    | |  Service  |              |   |
-|  | | (3001)    | |  (3002)   | |  (3003)   | |           |              |   |
+|  | | (3001)    | |  (3002)   | |  (3003)   | |  (3001)   |              |   |
 |  | +-----------+ +-----------+ +-----------+ +-----------+              |   |
 |  +----------------------------------------------------------------------+   |
 |                                                                              |
@@ -245,7 +246,7 @@ UnifiedHealth is uniquely positioned to capture this opportunity with the **only
 |  | +-----------+ +-----------+ +-----------+ +-----------+              |   |
 |  | |Notification| | Billing  | |   FHIR    | |  Audit    |              |   |
 |  | | Service   | | Service  | |  Service  | | Service   |              |   |
-|  | |           | |  Stripe  | |    R4     | |Compliance |              |   |
+|  | |  (3006)   | |  Stripe  | |    R4     | |Compliance |              |   |
 |  | +-----------+ +-----------+ +-----------+ +-----------+              |   |
 |  +----------------------------------------------------------------------+   |
 +-----------------------------------------------------------------------------+
@@ -300,6 +301,851 @@ UnifiedHealth is uniquely positioned to capture this opportunity with the **only
     +-------------+          +-------------+          +-------------+
 
     Data Residency: Patient data stays in-region per compliance requirements
+```
+
+---
+
+## Microservices Architecture (Detailed)
+
+The platform consists of **10 core microservices**, each following Domain-Driven Design principles with independent databases, APIs, and deployment lifecycles.
+
+### Service Overview
+
+| #   | Service               | Port | Database                      | Primary Responsibility                         |
+| --- | --------------------- | ---- | ----------------------------- | ---------------------------------------------- |
+| 1   | API Gateway           | 3000 | None (stateless)              | Request routing, JWT validation, rate limiting |
+| 2   | Auth Service          | 3001 | PostgreSQL (auth_db)          | Authentication, JWT issuance, MFA              |
+| 3   | Core API              | 8080 | PostgreSQL (healthcare_db)    | Patient/Provider management, Stripe billing    |
+| 4   | Telehealth Service    | 3001 | PostgreSQL (telehealth_db)    | Appointments, WebRTC video consultations       |
+| 5   | Mental Health Service | 3002 | PostgreSQL (mental_health_db) | Therapy sessions, clinical assessments         |
+| 6   | Chronic Care Service  | 3003 | PostgreSQL (chronic_care_db)  | Care plans, IoT vitals monitoring              |
+| 7   | Pharmacy Service      | 3004 | PostgreSQL (pharmacy_db)      | E-prescriptions, drug interactions             |
+| 8   | Laboratory Service    | 3005 | PostgreSQL (laboratory_db)    | Lab orders, results, test catalog              |
+| 9   | Imaging Service       | 3006 | PostgreSQL (imaging_db)       | DICOM imaging, radiology reports               |
+| 10  | Notification Service  | 3006 | PostgreSQL + Redis            | Email, SMS, Push notifications                 |
+
+---
+
+### 1. API Gateway Service
+
+| Property       | Details                           |
+| -------------- | --------------------------------- |
+| **Port**       | 3000                              |
+| **Tech Stack** | Express.js, http-proxy-middleware |
+| **Database**   | None (stateless proxy)            |
+
+**Responsibilities:**
+
+- Central entry point for all API requests
+- JWT token validation and authentication
+- Rate limiting and request throttling
+- CORS handling and security headers
+- Service discovery and request routing
+- Health check aggregation
+
+**Key Routes:**
+
+```
+POST   /auth/*           -> Auth Service (3001)
+GET    /api/v1/patients  -> API Service (8080)
+POST   /appointments     -> Telehealth Service (3001)
+GET    /mental-health/*  -> Mental Health Service (3002)
+GET    /chronic-care/*   -> Chronic Care Service (3003)
+POST   /pharmacy/*       -> Pharmacy Service (3004)
+GET    /laboratory/*     -> Laboratory Service (3005)
+GET    /imaging/*        -> Imaging Service (3006)
+```
+
+**Service Registry Configuration:**
+
+```javascript
+const services = {
+  auth: { target: "http://auth-service:3001", pathRewrite: { "^/auth": "" } },
+  api: { target: "http://api-service:8080", pathRewrite: { "^/api": "" } },
+  telehealth: { target: "http://telehealth-service:3001" },
+  mentalHealth: { target: "http://mental-health-service:3002" },
+  chronicCare: { target: "http://chronic-care-service:3003" },
+  pharmacy: { target: "http://pharmacy-service:3004" },
+  laboratory: { target: "http://laboratory-service:3005" },
+  imaging: { target: "http://imaging-service:3006" },
+};
+```
+
+**Dependencies:** `express`, `http-proxy-middleware`, `jsonwebtoken`, `express-rate-limit`, `helmet`, `cors`
+
+---
+
+### 2. Auth Service
+
+| Property       | Details                |
+| -------------- | ---------------------- |
+| **Port**       | 3001                   |
+| **Tech Stack** | Express.js, Prisma ORM |
+| **Database**   | PostgreSQL (`auth_db`) |
+
+**Responsibilities:**
+
+- User registration with email verification
+- Login/logout with JWT issuance
+- Refresh token rotation
+- Password reset flow
+- Multi-factor authentication (MFA)
+- OAuth2/OIDC integration (Google, Microsoft)
+- Session management
+
+**Key Endpoints:**
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/auth/register` | User registration |
+| `POST` | `/auth/login` | Login and JWT issuance |
+| `POST` | `/auth/logout` | Invalidate refresh tokens |
+| `POST` | `/auth/refresh` | Rotate refresh token |
+| `POST` | `/auth/forgot-password` | Password reset initiation |
+| `POST` | `/auth/reset-password` | Password reset completion |
+| `POST` | `/auth/verify-email` | Email verification |
+| `POST` | `/auth/mfa/enable` | Enable 2FA |
+| `POST` | `/auth/mfa/verify` | Verify 2FA code |
+
+**Database Models:**
+
+```prisma
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  passwordHash  String
+  role          Role     @default(PATIENT)
+  mfaEnabled    Boolean  @default(false)
+  mfaSecret     String?
+  emailVerified Boolean  @default(false)
+  refreshTokens RefreshToken[]
+  createdAt     DateTime @default(now())
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  expiresAt DateTime
+  revoked   Boolean  @default(false)
+}
+```
+
+**Inter-Service Communication:**
+
+- Publishes: `USER_REGISTERED`, `USER_VERIFIED`, `PASSWORD_CHANGED` events
+- Consumed by: Notification Service, API Service
+
+**Dependencies:** `bcryptjs`, `jsonwebtoken`, `speakeasy`, `nodemailer`, `@prisma/client`
+
+---
+
+### 3. Core API Service
+
+| Property       | Details                      |
+| -------------- | ---------------------------- |
+| **Port**       | 8080                         |
+| **Tech Stack** | Express.js, Prisma ORM       |
+| **Database**   | PostgreSQL (`healthcare_db`) |
+
+**Responsibilities:**
+
+- Patient profile management
+- Provider profile and availability
+- Health package management
+- Subscription and billing (Stripe integration)
+- Document management
+- Audit logging
+- FHIR R4 data export
+
+**Key Endpoints:**
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET/PUT` | `/patients/:id` | Patient profile CRUD |
+| `GET` | `/providers` | Search providers |
+| `GET/PUT` | `/providers/:id` | Provider profile |
+| `POST` | `/subscriptions` | Create subscription |
+| `POST` | `/payments` | Process payment |
+| `GET` | `/health-packages` | List health packages |
+| `POST` | `/health-packages/book` | Book health package |
+| `GET` | `/documents` | List patient documents |
+| `POST` | `/documents/upload` | Upload document |
+| `GET` | `/fhir/Patient/:id` | FHIR patient export |
+
+**Database Models (31 total):**
+
+```
+User, Patient, Provider, Appointment, Visit, Encounter, ClinicalNote,
+Document, Prescription, PrescriptionItem, HealthPackage, HealthPackageBooking,
+DiagnosticTest, LabResult, Plan, Subscription, Payment, PaymentMethod,
+Invoice, InvoiceItem, DeviceToken, PushNotification, NotificationPreference,
+AuditEvent, WebhookEventLog, Consent, ChatMessage, RefreshToken
+```
+
+**External Integrations:**
+
+- **Stripe**: Payment processing, subscription management
+- **AWS S3 / Azure Blob**: Document storage
+- **SendGrid**: Transactional emails
+
+**Dependencies:** `stripe`, `@aws-sdk/client-s3`, `multer`, `@prisma/client`, `winston`
+
+---
+
+### 4. Telehealth Service
+
+| Property       | Details                           |
+| -------------- | --------------------------------- |
+| **Port**       | 3001                              |
+| **Tech Stack** | Express.js, Socket.io, Prisma ORM |
+| **Database**   | PostgreSQL (`telehealth_db`)      |
+
+**Responsibilities:**
+
+- Appointment scheduling and management
+- Video consultation room management
+- WebRTC signaling for peer-to-peer video
+- Waiting room functionality
+- In-call chat messaging
+- Call recording consent
+- Post-consultation notes
+
+**Key Endpoints:**
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/appointments` | Create appointment |
+| `GET` | `/appointments/:id` | Get appointment details |
+| `PUT` | `/appointments/:id/status` | Update status |
+| `GET` | `/appointments/patient/:id` | Patient appointments |
+| `GET` | `/appointments/provider/:id` | Provider schedule |
+| `POST` | `/consultations/:id/start` | Start consultation |
+| `POST` | `/consultations/:id/end` | End consultation |
+
+**WebSocket Events:**
+| Event | Direction | Description |
+|-------|-----------|-------------|
+| `JOIN_ROOM` | Client -> Server | Join consultation room |
+| `LEAVE_ROOM` | Client -> Server | Leave consultation |
+| `OFFER` | Client <-> Client | WebRTC SDP offer |
+| `ANSWER` | Client <-> Client | WebRTC SDP answer |
+| `ICE_CANDIDATE` | Client <-> Client | ICE candidate exchange |
+| `CHAT_MESSAGE` | Bidirectional | In-call text chat |
+| `PARTICIPANT_JOINED` | Server -> Client | New participant notification |
+| `CALL_ENDED` | Server -> Client | Call termination |
+
+**Database Models:**
+
+```prisma
+model Appointment {
+  id          String   @id @default(uuid())
+  patientId   String
+  providerId  String
+  scheduledAt DateTime
+  duration    Int      @default(30)
+  type        AppointmentType // VIDEO, AUDIO, CHAT, IN_PERSON
+  status      AppointmentStatus // SCHEDULED, IN_PROGRESS, COMPLETED, CANCELLED
+  roomId      String?
+  notes       String?
+}
+
+model Consultation {
+  id            String   @id @default(uuid())
+  appointmentId String   @unique
+  startedAt     DateTime
+  endedAt       DateTime?
+  recording     Boolean  @default(false)
+  chatMessages  ChatMessage[]
+}
+```
+
+**Dependencies:** `socket.io`, `simple-peer`, `@prisma/client`, `ioredis` (for Socket.io adapter)
+
+---
+
+### 5. Mental Health Service
+
+| Property       | Details                         |
+| -------------- | ------------------------------- |
+| **Port**       | 3002                            |
+| **Tech Stack** | Express.js, Prisma ORM          |
+| **Database**   | PostgreSQL (`mental_health_db`) |
+
+**Responsibilities:**
+
+- Therapy session management (individual, couples, family, group)
+- Validated clinical assessments
+- Mood tracking and journaling
+- Crisis intervention protocols
+- Treatment plan management
+- Therapist matching
+- Digital therapeutic content
+
+**Key Endpoints:**
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/sessions` | Book therapy session |
+| `GET` | `/sessions/:patientId` | Patient session history |
+| `POST` | `/assessments` | Submit assessment |
+| `GET` | `/assessments/:patientId` | Assessment history |
+| `POST` | `/mood-entries` | Log mood entry |
+| `GET` | `/mood-entries/:patientId` | Mood tracking data |
+| `POST` | `/crisis/escalate` | Crisis escalation |
+| `GET` | `/therapists` | Search therapists |
+| `GET` | `/content/cbt-modules` | CBT content library |
+
+**Validated Assessments:**
+| Assessment | Description | Scoring |
+|------------|-------------|---------|
+| **PHQ-9** | Depression screening | 0-27 (>=10 moderate) |
+| **GAD-7** | Anxiety screening | 0-21 (>=10 moderate) |
+| **PCL-5** | PTSD checklist | 0-80 (>=33 probable PTSD) |
+| **AUDIT** | Alcohol use | 0-40 (>=8 hazardous) |
+| **DAST-10** | Drug abuse screening | 0-10 (>=3 moderate) |
+| **MDQ** | Bipolar disorder | Positive if >=7 |
+| **Y-BOCS** | OCD severity | 0-40 (>=16 moderate) |
+| **PSS** | Perceived stress | 0-40 (>=14 moderate) |
+
+**Database Models:**
+
+```prisma
+model TherapySession {
+  id          String   @id @default(uuid())
+  patientId   String
+  therapistId String
+  sessionType SessionType // INDIVIDUAL, COUPLES, FAMILY, GROUP
+  scheduledAt DateTime
+  duration    Int      @default(50)
+  notes       String?
+  status      SessionStatus
+}
+
+model Assessment {
+  id         String   @id @default(uuid())
+  patientId  String
+  type       AssessmentType
+  responses  Json
+  score      Int
+  severity   String
+  completedAt DateTime
+}
+
+model MoodEntry {
+  id        String   @id @default(uuid())
+  patientId String
+  mood      Int      // 1-10 scale
+  energy    Int      // 1-10 scale
+  anxiety   Int      // 1-10 scale
+  notes     String?
+  createdAt DateTime @default(now())
+}
+```
+
+**Crisis Protocol:**
+
+- Automatic escalation for high-risk scores
+- 24/7 crisis hotline integration
+- Emergency contact notification
+- Safety plan generation
+
+**Dependencies:** `@prisma/client`, `express-validator`, `winston`
+
+---
+
+### 6. Chronic Care Service
+
+| Property       | Details                                   |
+| -------------- | ----------------------------------------- |
+| **Port**       | 3003                                      |
+| **Tech Stack** | Express.js, Prisma ORM, Bull (job queues) |
+| **Database**   | PostgreSQL (`chronic_care_db`)            |
+
+**Responsibilities:**
+
+- Care plan creation and management
+- IoT device data ingestion
+- Vital signs monitoring
+- Alert generation and escalation
+- Medication adherence tracking
+- Goal setting and progress tracking
+- Disease-specific protocols (diabetes, hypertension, COPD, etc.)
+
+**Key Endpoints:**
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/care-plans` | Create care plan |
+| `GET` | `/care-plans/:patientId` | Get patient care plan |
+| `PUT` | `/care-plans/:id` | Update care plan |
+| `POST` | `/vitals` | Submit vital reading |
+| `GET` | `/vitals/:patientId` | Get vital history |
+| `POST` | `/devices/register` | Register IoT device |
+| `GET` | `/alerts/:patientId` | Get patient alerts |
+| `POST` | `/goals` | Set health goal |
+| `GET` | `/goals/:patientId/progress` | Goal progress |
+
+**Supported IoT Devices:**
+| Device Type | Metrics | Brands Supported |
+|-------------|---------|-----------------|
+| Blood Pressure Monitor | Systolic, Diastolic, Pulse | Omron, Withings, iHealth |
+| Glucose Meter | Blood glucose, HbA1c | Dexcom, Abbott, Accu-Chek |
+| Pulse Oximeter | SpO2, Heart Rate | Masimo, Nonin |
+| Smart Scale | Weight, BMI, Body Fat | Withings, Fitbit, Garmin |
+| Activity Tracker | Steps, Sleep, Heart Rate | Apple, Fitbit, Garmin |
+
+**Database Models:**
+
+```prisma
+model CarePlan {
+  id           String   @id @default(uuid())
+  patientId    String
+  condition    ChronicCondition // DIABETES, HYPERTENSION, COPD, HEART_DISEASE
+  status       CarePlanStatus
+  goals        Goal[]
+  medications  Medication[]
+  checkIns     CheckIn[]
+  createdAt    DateTime @default(now())
+}
+
+model VitalReading {
+  id        String   @id @default(uuid())
+  patientId String
+  type      VitalType // BP, GLUCOSE, SPO2, WEIGHT, HEART_RATE
+  value     Float
+  unit      String
+  deviceId  String?
+  recordedAt DateTime
+}
+
+model Alert {
+  id        String   @id @default(uuid())
+  patientId String
+  type      AlertType // CRITICAL, WARNING, INFO
+  message   String
+  vitalId   String?
+  acknowledged Boolean @default(false)
+  createdAt DateTime @default(now())
+}
+```
+
+**Alert Thresholds:**
+| Condition | Critical Alert | Warning Alert |
+|-----------|---------------|---------------|
+| Blood Pressure | >180/120 or <90/60 | >140/90 or <100/70 |
+| Blood Glucose | >300 or <70 mg/dL | >180 or <80 mg/dL |
+| SpO2 | <90% | <94% |
+| Heart Rate | >150 or <40 bpm | >100 or <50 bpm |
+
+**Dependencies:** `@prisma/client`, `bull`, `ioredis`, `node-cron`
+
+---
+
+### 7. Pharmacy Service
+
+| Property       | Details                    |
+| -------------- | -------------------------- |
+| **Port**       | 3004                       |
+| **Tech Stack** | Express.js, Prisma ORM     |
+| **Database**   | PostgreSQL (`pharmacy_db`) |
+
+**Responsibilities:**
+
+- E-prescription management
+- Drug database and formulary
+- Drug interaction checking
+- Allergy alert system
+- Refill management
+- Pharmacy network integration
+- Medication delivery tracking
+
+**Key Endpoints:**
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/prescriptions` | Create prescription |
+| `GET` | `/prescriptions/:id` | Get prescription |
+| `GET` | `/prescriptions/patient/:id` | Patient prescriptions |
+| `POST` | `/prescriptions/:id/refill` | Request refill |
+| `GET` | `/medications/search` | Search drug database |
+| `POST` | `/interactions/check` | Check drug interactions |
+| `GET` | `/pharmacies` | Find nearby pharmacies |
+| `POST` | `/orders` | Place pharmacy order |
+| `GET` | `/orders/:id/track` | Track delivery |
+
+**Drug Interaction Checking:**
+
+```javascript
+// Interaction severity levels
+CONTRAINDICATED; // Do not use together
+SEVERE; // Use alternative if possible
+MODERATE; // Monitor closely
+MINOR; // Generally safe, be aware
+```
+
+**Database Models:**
+
+```prisma
+model Prescription {
+  id          String   @id @default(uuid())
+  patientId   String
+  providerId  String
+  status      PrescriptionStatus // ACTIVE, FILLED, EXPIRED, CANCELLED
+  items       PrescriptionItem[]
+  pharmacyId  String?
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime
+}
+
+model PrescriptionItem {
+  id             String   @id @default(uuid())
+  prescriptionId String
+  medicationId   String
+  dosage         String
+  frequency      String
+  quantity       Int
+  refillsAllowed Int
+  refillsUsed    Int      @default(0)
+  instructions   String?
+}
+
+model Medication {
+  id             String   @id @default(uuid())
+  name           String
+  genericName    String
+  ndc            String   @unique // National Drug Code
+  strength       String
+  form           String   // TABLET, CAPSULE, LIQUID, INJECTION
+  manufacturer   String
+  interactions   Json     // Drug interaction data
+}
+```
+
+**External Integrations:**
+
+- **DrugBank API**: Drug information and interactions
+- **Surescripts**: E-prescribing network
+- **Pharmacy chains**: CVS, Walgreens, independent pharmacies
+
+**Dependencies:** `@prisma/client`, `axios`, `express-validator`
+
+---
+
+### 8. Laboratory Service
+
+| Property       | Details                      |
+| -------------- | ---------------------------- |
+| **Port**       | 3005                         |
+| **Tech Stack** | Express.js, Prisma ORM       |
+| **Database**   | PostgreSQL (`laboratory_db`) |
+
+**Responsibilities:**
+
+- Lab order management
+- Test catalog maintenance
+- Result processing and delivery
+- Reference range interpretation
+- Abnormal result flagging
+- HL7/FHIR result ingestion
+- Lab network integration
+
+**Key Endpoints:**
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/orders` | Create lab order |
+| `GET` | `/orders/:id` | Get order details |
+| `GET` | `/orders/patient/:id` | Patient lab orders |
+| `POST` | `/results` | Submit lab result |
+| `GET` | `/results/:orderId` | Get order results |
+| `GET` | `/tests` | List available tests |
+| `GET` | `/tests/:code` | Test details |
+| `GET` | `/labs` | Find lab locations |
+
+**Test Catalog (Sample):**
+| Category | Tests |
+|----------|-------|
+| **Hematology** | CBC, ESR, Coagulation Panel |
+| **Chemistry** | BMP, CMP, Lipid Panel, LFT, RFT |
+| **Endocrine** | TSH, T3, T4, Cortisol, HbA1c |
+| **Cardiac** | Troponin, BNP, CK-MB |
+| **Tumor Markers** | PSA, CA-125, CEA, AFP |
+| **Infectious** | HIV, Hepatitis Panel, STI Panel |
+| **Urinalysis** | Complete UA, Microalbumin |
+
+**Database Models:**
+
+```prisma
+model LabOrder {
+  id          String   @id @default(uuid())
+  patientId   String
+  providerId  String
+  status      OrderStatus // PENDING, COLLECTED, PROCESSING, COMPLETED
+  priority    Priority    // ROUTINE, URGENT, STAT
+  tests       LabOrderTest[]
+  results     LabResult[]
+  labId       String?
+  collectedAt DateTime?
+  createdAt   DateTime @default(now())
+}
+
+model LabResult {
+  id          String   @id @default(uuid())
+  orderId     String
+  testCode    String
+  value       String
+  unit        String
+  refRangeLow Float?
+  refRangeHigh Float?
+  flag        ResultFlag? // HIGH, LOW, CRITICAL, ABNORMAL
+  notes       String?
+  reportedAt  DateTime
+}
+
+model LabTest {
+  id           String   @id @default(uuid())
+  code         String   @unique // LOINC code
+  name         String
+  category     String
+  specimenType String   // BLOOD, URINE, SALIVA, STOOL
+  turnaround   Int      // Hours
+  price        Decimal
+}
+```
+
+**External Integrations:**
+
+- **Quest Diagnostics**: Lab network
+- **LabCorp**: Lab network
+- **HL7 FHIR**: DiagnosticReport resources
+
+**Dependencies:** `@prisma/client`, `hl7`, `fhir`, `decimal.js`
+
+---
+
+### 9. Imaging Service
+
+| Property       | Details                   |
+| -------------- | ------------------------- |
+| **Port**       | 3006                      |
+| **Tech Stack** | Express.js, Prisma ORM    |
+| **Database**   | PostgreSQL (`imaging_db`) |
+
+**Responsibilities:**
+
+- Radiology order management
+- DICOM image handling
+- Report generation and delivery
+- AI-assisted image analysis
+- PACS integration
+- Multi-modality support
+
+**Key Endpoints:**
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/orders` | Create imaging order |
+| `GET` | `/orders/:id` | Get order details |
+| `GET` | `/orders/patient/:id` | Patient imaging orders |
+| `POST` | `/studies/:id/upload` | Upload DICOM study |
+| `GET` | `/studies/:id` | Get study images |
+| `POST` | `/reports` | Submit radiology report |
+| `GET` | `/reports/:orderId` | Get imaging report |
+| `GET` | `/modalities` | List imaging modalities |
+
+**Supported Modalities:**
+| Modality | Description | AI Features |
+|----------|-------------|-------------|
+| **X-Ray** | General radiography | Lung nodule detection |
+| **CT** | Computed tomography | Abnormality highlighting |
+| **MRI** | Magnetic resonance | Brain lesion detection |
+| **Ultrasound** | Sonography | Measurement assistance |
+| **Mammography** | Breast imaging | CAD (Computer-Aided Detection) |
+| **DEXA** | Bone density | Osteoporosis scoring |
+| **ECG** | Electrocardiogram | Arrhythmia detection |
+
+**Database Models:**
+
+```prisma
+model ImagingOrder {
+  id          String   @id @default(uuid())
+  patientId   String
+  providerId  String
+  modality    Modality
+  bodyPart    String
+  indication  String
+  status      OrderStatus
+  priority    Priority
+  scheduledAt DateTime?
+  study       Study?
+  report      ImagingReport?
+  createdAt   DateTime @default(now())
+}
+
+model Study {
+  id        String   @id @default(uuid())
+  orderId   String   @unique
+  studyUid  String   @unique // DICOM Study Instance UID
+  accession String
+  images    Image[]
+  performedAt DateTime
+}
+
+model ImagingReport {
+  id           String   @id @default(uuid())
+  orderId      String   @unique
+  radiologistId String
+  findings     String
+  impression   String
+  critical     Boolean  @default(false)
+  signedAt     DateTime
+}
+```
+
+**External Integrations:**
+
+- **PACS Systems**: Orthanc, dcm4chee
+- **DICOM Standard**: Image storage and retrieval
+- **AI Providers**: Google Health AI, Aidoc
+
+**Dependencies:** `@prisma/client`, `dicom-parser`, `cornerstone-core`, `multer`
+
+---
+
+### 10. Notification Service
+
+| Property       | Details                               |
+| -------------- | ------------------------------------- |
+| **Port**       | 3006                                  |
+| **Tech Stack** | Express.js, Bull (job queues)         |
+| **Database**   | PostgreSQL (`notification_db`), Redis |
+
+**Responsibilities:**
+
+- Multi-channel notification delivery (Email, SMS, Push)
+- Template management
+- Notification preferences
+- Delivery tracking and analytics
+- Scheduled notifications
+- Batch processing
+
+**Key Endpoints:**
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/send` | Send notification |
+| `POST` | `/send/batch` | Batch send |
+| `GET` | `/history/:userId` | User notification history |
+| `PUT` | `/preferences/:userId` | Update preferences |
+| `GET` | `/preferences/:userId` | Get preferences |
+| `POST` | `/devices/register` | Register push device |
+| `DELETE` | `/devices/:token` | Unregister device |
+| `GET` | `/templates` | List templates |
+
+**Notification Channels:**
+| Channel | Provider | Use Cases |
+|---------|----------|-----------|
+| **Email** | SendGrid | Appointments, reports, billing |
+| **SMS** | Twilio | OTP, reminders, alerts |
+| **Push (iOS)** | APNs | Real-time updates |
+| **Push (Android)** | FCM | Real-time updates |
+| **In-App** | WebSocket | Live notifications |
+
+**Notification Types:**
+
+```javascript
+const notificationTypes = {
+  APPOINTMENT_REMINDER: {
+    channels: ["email", "sms", "push"],
+    timing: "-24h, -1h",
+  },
+  APPOINTMENT_CONFIRMED: { channels: ["email", "push"] },
+  LAB_RESULTS_READY: { channels: ["email", "sms", "push"] },
+  PRESCRIPTION_READY: { channels: ["sms", "push"] },
+  PAYMENT_RECEIVED: { channels: ["email"] },
+  CRITICAL_ALERT: { channels: ["sms", "push", "email"], priority: "high" },
+  MEDICATION_REMINDER: { channels: ["push"], recurring: true },
+};
+```
+
+**Database Models:**
+
+```prisma
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  type      String
+  channel   Channel  // EMAIL, SMS, PUSH, IN_APP
+  status    Status   // PENDING, SENT, DELIVERED, FAILED
+  content   Json
+  sentAt    DateTime?
+  deliveredAt DateTime?
+  failReason String?
+  createdAt DateTime @default(now())
+}
+
+model DeviceToken {
+  id       String   @id @default(uuid())
+  userId   String
+  token    String   @unique
+  platform Platform // IOS, ANDROID, WEB
+  active   Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model NotificationPreference {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  email     Boolean  @default(true)
+  sms       Boolean  @default(true)
+  push      Boolean  @default(true)
+  quietHoursStart String? // "22:00"
+  quietHoursEnd   String? // "07:00"
+}
+```
+
+**External Integrations:**
+
+- **SendGrid**: Transactional email (templates, tracking)
+- **Twilio**: SMS and voice
+- **Firebase Cloud Messaging (FCM)**: Android push
+- **Apple Push Notification Service (APNs)**: iOS push
+
+**Dependencies:** `@sendgrid/mail`, `twilio`, `firebase-admin`, `apn`, `bull`, `ioredis`
+
+---
+
+### Inter-Service Communication
+
+```
++-----------------------------------------------------------------------------+
+|                        EVENT-DRIVEN ARCHITECTURE                             |
++-----------------------------------------------------------------------------+
+|                                                                              |
+|   +----------+      Events        +-------------+                           |
+|   |   Auth   | -----------------> |             |                           |
+|   | Service  | USER_REGISTERED    |             |                           |
+|   +----------+ USER_VERIFIED      |             |                           |
+|                                    |             |                           |
+|   +----------+      Events        |             |     +--------------+      |
+|   |Telehealth| -----------------> |   Redis     | --> | Notification |      |
+|   | Service  | APPOINTMENT_BOOKED |   Pub/Sub   |     |   Service    |      |
+|   +----------+ CONSULTATION_ENDED |             |     +--------------+      |
+|                                    |             |                           |
+|   +----------+      Events        |             |                           |
+|   | Chronic  | -----------------> |             |                           |
+|   |   Care   | CRITICAL_ALERT     |             |                           |
+|   +----------+ GOAL_ACHIEVED      |             |                           |
+|                                    |             |                           |
+|   +----------+      Events        |             |                           |
+|   |Laboratory| -----------------> |             |                           |
+|   | Service  | RESULTS_READY      +-------------+                           |
+|   +----------+ CRITICAL_RESULT                                              |
+|                                                                              |
++-----------------------------------------------------------------------------+
+|                        SYNCHRONOUS HTTP CALLS                                |
++-----------------------------------------------------------------------------+
+|                                                                              |
+|   API Gateway ------> Auth Service (JWT validation)                         |
+|   Telehealth  ------> API Service (Patient lookup)                          |
+|   Pharmacy    ------> API Service (Prescription creation)                   |
+|   Laboratory  ------> API Service (Order creation)                          |
+|   All Services -----> Notification Service (Send notifications)             |
+|                                                                              |
++-----------------------------------------------------------------------------+
 ```
 
 ---
