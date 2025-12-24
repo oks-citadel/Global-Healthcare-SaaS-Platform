@@ -31,6 +31,12 @@ model User {
   lastLoginAt         DateTime?
   lastLoginIp         String?
 
+  // MFA (Multi-Factor Authentication)
+  mfaEnabled     Boolean   @default(false)
+  mfaSecret      String? // Encrypted TOTP secret
+  mfaBackupCodes String[] // Encrypted backup codes (array of hashed codes)
+  mfaVerifiedAt  DateTime? // When MFA was first verified/enabled
+
   // Relations
   refreshTokens           RefreshToken[]
   passwordResetTokens     PasswordResetToken[]
@@ -44,6 +50,7 @@ model User {
   @@index([status])
   @@index([emailVerified])
   @@index([lockedUntil])
+  @@index([mfaEnabled])
 }
 
 enum Role {
