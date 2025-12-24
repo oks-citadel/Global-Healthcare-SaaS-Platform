@@ -15,40 +15,40 @@ commonLabels:
 
 # Inherit from parent Africa region overlay
 bases:
-- ../../africa
+  - ../../africa
 
 resources:
-- namespace.yaml
+  - namespace.yaml
 
 patchesStrategicMerge:
-- configmap-patch.yaml
+  - configmap-patch.yaml
 
 configMapGenerator:
-- name: country-specific-config
-  literals:
-  - country_code=ke
-  - currency=KES
-  - timezone=Africa/Nairobi
-  - language=en-KE
-  - compliance_framework=dpa
-  - data_residency_mode=shared
-  - emergency_hotline=999
-  - payment_processor_country=mpesa
-  - healthcare_system_type=mixed-public-private
-  - nhif_integration=enabled
-  - county_count=47
-  behavior: merge
+  - name: country-specific-config
+    literals:
+      - country_code=ke
+      - currency=KES
+      - timezone=Africa/Nairobi
+      - language=en-KE
+      - compliance_framework=dpa
+      - data_residency_mode=shared
+      - emergency_hotline=999
+      - payment_processor_country=mpesa
+      - healthcare_system_type=mixed-public-private
+      - nhif_integration=enabled
+      - county_count=47
+    behavior: merge
 
 images:
-- name: ghcr.io/healthcare-platform/api-gateway
-  newTag: v1.2.3-ke
-- name: ghcr.io/healthcare-platform/telehealth-service
-  newTag: v1.2.3-ke
-- name: ghcr.io/healthcare-platform/mental-health-service
-  newTag: v1.2.3-ke
-- name: ghcr.io/healthcare-platform/chronic-care-service
-  newTag: v1.2.3-ke
-- name: ghcr.io/healthcare-platform/pharmacy-service
-  newTag: v1.2.3-ke
-- name: ghcr.io/healthcare-platform/laboratory-service
-  newTag: v1.2.3-ke
+  - name: unifiedhealthdevacr.azurecr.io/unifiedhealth/api-gateway
+    newTag: v1.2.3-ke
+  - name: unifiedhealthdevacr.azurecr.io/unifiedhealth/telehealth-service
+    newTag: v1.2.3-ke
+  - name: unifiedhealthdevacr.azurecr.io/unifiedhealth/mental-health-service
+    newTag: v1.2.3-ke
+  - name: unifiedhealthdevacr.azurecr.io/unifiedhealth/chronic-care-service
+    newTag: v1.2.3-ke
+  - name: unifiedhealthdevacr.azurecr.io/unifiedhealth/pharmacy-service
+    newTag: v1.2.3-ke
+  - name: unifiedhealthdevacr.azurecr.io/unifiedhealth/laboratory-service
+    newTag: v1.2.3-ke

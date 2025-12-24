@@ -1,8 +1,10 @@
-FROM node:20-alpine AS base
+FROM node:20-slim AS base
+RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+
 FROM base AS deps
 WORKDIR /app
-COPY package.json package-lock.json* ./
-RUN npm ci
+COPY package.json ./
+RUN npm install
 
 FROM base AS builder
 WORKDIR /app
@@ -14,13 +16,13 @@ RUN npm run build
 FROM base AS runner
 WORKDIR /app
 ENV NODE_ENV=production
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 pharmacy
+RUN groupadd --system --gid 1001 nodejs && useradd --system --uid 1001 pharmacy
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/src/generated ./dist/generated
 USER pharmacy
-EXPOSE 3004
-ENV PORT=3004
+EXPOSE 3007
+ENV PORT=3007
 CMD ["node", "dist/index.js"]

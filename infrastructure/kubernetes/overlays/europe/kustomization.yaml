@@ -10,61 +10,61 @@ commonLabels:
   environment: production
 
 bases:
-- ../../base/services/api-gateway
-- ../../base/services/telehealth-service
-- ../../base/services/mental-health-service
-- ../../base/services/chronic-care-service
-- ../../base/services/pharmacy-service
-- ../../base/services/laboratory-service
-- ../../base/shared
-- ../../base/ingress
+  - ../../base/services/api-gateway
+  - ../../base/services/telehealth-service
+  - ../../base/services/mental-health-service
+  - ../../base/services/chronic-care-service
+  - ../../base/services/pharmacy-service
+  - ../../base/services/laboratory-service
+  - ../../base/shared
+  - ../../base/ingress
 
 resources:
-- namespace.yaml
+  - namespace.yaml
 
 patchesStrategicMerge:
-- patches/replicas.yaml
-- patches/resources.yaml
-- configmap-patch.yaml
+  - patches/replicas.yaml
+  - patches/resources.yaml
+  - configmap-patch.yaml
 
 images:
-- name: ghcr.io/healthcare-platform/api-gateway
-  newTag: v1.2.3-europe
-- name: ghcr.io/healthcare-platform/telehealth-service
-  newTag: v1.2.3-europe
-- name: ghcr.io/healthcare-platform/mental-health-service
-  newTag: v1.2.3-europe
-- name: ghcr.io/healthcare-platform/chronic-care-service
-  newTag: v1.2.3-europe
-- name: ghcr.io/healthcare-platform/pharmacy-service
-  newTag: v1.2.3-europe
-- name: ghcr.io/healthcare-platform/laboratory-service
-  newTag: v1.2.3-europe
+  - name: unifiedhealthdevacr.azurecr.io/unifiedhealth/api-gateway
+    newTag: v1.2.3-europe
+  - name: unifiedhealthdevacr.azurecr.io/unifiedhealth/telehealth-service
+    newTag: v1.2.3-europe
+  - name: unifiedhealthdevacr.azurecr.io/unifiedhealth/mental-health-service
+    newTag: v1.2.3-europe
+  - name: unifiedhealthdevacr.azurecr.io/unifiedhealth/chronic-care-service
+    newTag: v1.2.3-europe
+  - name: unifiedhealthdevacr.azurecr.io/unifiedhealth/pharmacy-service
+    newTag: v1.2.3-europe
+  - name: unifiedhealthdevacr.azurecr.io/unifiedhealth/laboratory-service
+    newTag: v1.2.3-europe
 
 configMapGenerator:
-- name: region-specific-config
-  literals:
-  - region_code=europe
-  - timezone=Europe/London
-  - currency=EUR
-  - language=en-GB
-  - gdpr_compliance=enabled
+  - name: region-specific-config
+    literals:
+      - region_code=europe
+      - timezone=Europe/London
+      - currency=EUR
+      - language=en-GB
+      - gdpr_compliance=enabled
 
 secretGenerator:
-- name: region-specific-secrets
-  literals:
-  - region_encryption_key=CHANGEME_EUROPE_KEY
+  - name: region-specific-secrets
+    literals:
+      - region_encryption_key=CHANGEME_EUROPE_KEY
 
 replicas:
-- name: api-gateway
-  count: 4
-- name: telehealth-service
-  count: 4
-- name: mental-health-service
-  count: 3
-- name: chronic-care-service
-  count: 3
-- name: pharmacy-service
-  count: 3
-- name: laboratory-service
-  count: 3
+  - name: api-gateway
+    count: 4
+  - name: telehealth-service
+    count: 4
+  - name: mental-health-service
+    count: 3
+  - name: chronic-care-service
+    count: 3
+  - name: pharmacy-service
+    count: 3
+  - name: laboratory-service
+    count: 3

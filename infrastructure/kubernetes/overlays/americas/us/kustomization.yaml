@@ -15,43 +15,43 @@ commonLabels:
 
 # Inherit from parent Americas region overlay
 bases:
-- ../../americas
+  - ../../americas
 
 resources:
-- namespace.yaml
+  - namespace.yaml
 
 patchesStrategicMerge:
-- configmap-patch.yaml
+  - configmap-patch.yaml
 
 configMapGenerator:
-- name: country-specific-config
-  literals:
-  - country_code=us
-  - currency=USD
-  - timezone=America/New_York
-  - language=en-US
-  - compliance_framework=hipaa
-  - data_residency_mode=shared
-  - emergency_hotline=911
-  - payment_processor_country=stripe
-  - healthcare_system_type=private-insurance
-  - state_count=50
-  - federal_reporting=enabled
-  - medicare_integration=enabled
-  - medicaid_integration=enabled
-  - prescription_monitoring_program=enabled
-  behavior: merge
+  - name: country-specific-config
+    literals:
+      - country_code=us
+      - currency=USD
+      - timezone=America/New_York
+      - language=en-US
+      - compliance_framework=hipaa
+      - data_residency_mode=shared
+      - emergency_hotline=911
+      - payment_processor_country=stripe
+      - healthcare_system_type=private-insurance
+      - state_count=50
+      - federal_reporting=enabled
+      - medicare_integration=enabled
+      - medicaid_integration=enabled
+      - prescription_monitoring_program=enabled
+    behavior: merge
 
 images:
-- name: ghcr.io/healthcare-platform/api-gateway
-  newTag: v1.2.3-us
-- name: ghcr.io/healthcare-platform/telehealth-service
-  newTag: v1.2.3-us
-- name: ghcr.io/healthcare-platform/mental-health-service
-  newTag: v1.2.3-us
-- name: ghcr.io/healthcare-platform/chronic-care-service
-  newTag: v1.2.3-us
-- name: ghcr.io/healthcare-platform/pharmacy-service
-  newTag: v1.2.3-us
-- name: ghcr.io/healthcare-platform/laboratory-service
-  newTag: v1.2.3-us
+  - name: unifiedhealthdevacr.azurecr.io/unifiedhealth/api-gateway
+    newTag: v1.2.3-us
+  - name: unifiedhealthdevacr.azurecr.io/unifiedhealth/telehealth-service
+    newTag: v1.2.3-us
+  - name: unifiedhealthdevacr.azurecr.io/unifiedhealth/mental-health-service
+    newTag: v1.2.3-us
+  - name: unifiedhealthdevacr.azurecr.io/unifiedhealth/chronic-care-service
+    newTag: v1.2.3-us
+  - name: unifiedhealthdevacr.azurecr.io/unifiedhealth/pharmacy-service
+    newTag: v1.2.3-us
+  - name: unifiedhealthdevacr.azurecr.io/unifiedhealth/laboratory-service
+    newTag: v1.2.3-us

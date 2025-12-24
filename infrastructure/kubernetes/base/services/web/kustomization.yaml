@@ -18,5 +18,5 @@ commonLabels:
   app.kubernetes.io/version: "1.0.0"
 
 images:
-  - name: acrunifiedhealthdev2.azurecr.io/unifiedhealth/web
+  - name: unifiedhealthdevacr.azurecr.io/unifiedhealth/web
     newTag: latest

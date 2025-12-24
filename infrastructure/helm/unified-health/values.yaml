@@ -7,7 +7,7 @@
 global:
   environment: production
   region: us-east-1
-  imageRegistry: acrunifiedhealthdev2.azurecr.io
+  imageRegistry: unifiedhealthdevacr.azurecr.io
   imagePullSecrets:
     - name: acr-secret
 
@@ -184,7 +184,7 @@ persistence:
 
 # Database configuration
 database:
-  enabled: false  # Using external Azure PostgreSQL
+  enabled: false # Using external Azure PostgreSQL
   external:
     host: unified-health-db-prod.postgres.database.azure.com
     port: 5432
@@ -193,7 +193,7 @@ database:
 
 # Redis configuration
 redis:
-  enabled: false  # Using external Azure Redis
+  enabled: false # Using external Azure Redis
   external:
     host: unified-health-redis-prod.redis.cache.windows.net
     port: 6380

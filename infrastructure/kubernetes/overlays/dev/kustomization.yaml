@@ -34,7 +34,7 @@ replicas:
 
 # Development images with latest tag
 images:
-  - name: acrunifiedhealthdev2.azurecr.io/unifiedhealth/web
+  - name: unifiedhealthdevacr.azurecr.io/unifiedhealth/web
     newTag: latest
 
 # Patches for development

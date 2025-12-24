@@ -1,41 +1,28 @@
-FROM node:20-alpine AS base
+FROM node:20-slim AS base
+RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 
-# Install dependencies only when needed
 FROM base AS deps
 WORKDIR /app
+COPY package.json ./
+RUN npm install
 
-COPY package.json package-lock.json* ./
-RUN npm ci
-
-# Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-
-# Generate Prisma Client
 RUN npx prisma generate
-
 RUN npm run build
 
-# Production image, copy all the files and run
 FROM base AS runner
 WORKDIR /app
-
 ENV NODE_ENV=production
-
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 mentalhealth
-
+RUN groupadd --system --gid 1001 nodejs && useradd --system --uid 1001 mentalhealth
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/prisma ./prisma
-
+COPY --from=builder /app/src/generated ./dist/generated
 USER mentalhealth
-
-EXPOSE 3002
-
-ENV PORT=3002
-
+EXPOSE 3004
+ENV PORT=3004
 CMD ["node", "dist/index.js"]

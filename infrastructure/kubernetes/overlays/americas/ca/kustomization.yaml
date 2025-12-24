@@ -15,41 +15,41 @@ commonLabels:
 
 # Inherit from parent Americas region overlay
 bases:
-- ../../americas
+  - ../../americas
 
 resources:
-- namespace.yaml
+  - namespace.yaml
 
 patchesStrategicMerge:
-- configmap-patch.yaml
+  - configmap-patch.yaml
 
 configMapGenerator:
-- name: country-specific-config
-  literals:
-  - country_code=ca
-  - currency=CAD
-  - timezone=America/Toronto
-  - language=en-CA
-  - compliance_framework=pipeda
-  - data_residency_mode=shared
-  - emergency_hotline=911
-  - payment_processor_country=stripe
-  - healthcare_system_type=public-universal
-  - province_count=13
-  - provincial_health_integration=enabled
-  - bilingual_support=enabled
-  behavior: merge
+  - name: country-specific-config
+    literals:
+      - country_code=ca
+      - currency=CAD
+      - timezone=America/Toronto
+      - language=en-CA
+      - compliance_framework=pipeda
+      - data_residency_mode=shared
+      - emergency_hotline=911
+      - payment_processor_country=stripe
+      - healthcare_system_type=public-universal
+      - province_count=13
+      - provincial_health_integration=enabled
+      - bilingual_support=enabled
+    behavior: merge
 
 images:
-- name: ghcr.io/healthcare-platform/api-gateway
-  newTag: v1.2.3-ca
-- name: ghcr.io/healthcare-platform/telehealth-service
-  newTag: v1.2.3-ca
-- name: ghcr.io/healthcare-platform/mental-health-service
-  newTag: v1.2.3-ca
-- name: ghcr.io/healthcare-platform/chronic-care-service
-  newTag: v1.2.3-ca
-- name: ghcr.io/healthcare-platform/pharmacy-service
-  newTag: v1.2.3-ca
-- name: ghcr.io/healthcare-platform/laboratory-service
-  newTag: v1.2.3-ca
+  - name: unifiedhealthdevacr.azurecr.io/unifiedhealth/api-gateway
+    newTag: v1.2.3-ca
+  - name: unifiedhealthdevacr.azurecr.io/unifiedhealth/telehealth-service
+    newTag: v1.2.3-ca
+  - name: unifiedhealthdevacr.azurecr.io/unifiedhealth/mental-health-service
+    newTag: v1.2.3-ca
+  - name: unifiedhealthdevacr.azurecr.io/unifiedhealth/chronic-care-service
+    newTag: v1.2.3-ca
+  - name: unifiedhealthdevacr.azurecr.io/unifiedhealth/pharmacy-service
+    newTag: v1.2.3-ca
+  - name: unifiedhealthdevacr.azurecr.io/unifiedhealth/laboratory-service
+    newTag: v1.2.3-ca

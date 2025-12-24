@@ -5,7 +5,7 @@
 global:
   environment: production
   region: us-east-1
-  imageRegistry: acrunifiedhealthdev2.azurecr.io
+  imageRegistry: unifiedhealthdevacr.azurecr.io
 
 replicaCount:
   api: 5

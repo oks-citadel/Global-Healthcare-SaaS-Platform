@@ -19,7 +19,7 @@ spec:
       containers:
         - name: web
           # Use latest tag for development
-          image: acrunifiedhealthdev2.azurecr.io/unifiedhealth/web:latest
+          image: unifiedhealthdevacr.azurecr.io/unifiedhealth/web:latest
           imagePullPolicy: Always
           # Lower resource requests for dev environment
           resources:

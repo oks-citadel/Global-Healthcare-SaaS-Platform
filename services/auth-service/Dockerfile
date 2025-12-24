@@ -7,14 +7,14 @@ WORKDIR /app
 COPY package*.json ./
 COPY prisma ./prisma/
 
-# Install dependencies
-RUN npm ci
+# Install dependencies (remove lock file if exists to ensure clean install)
+RUN rm -f package-lock.json && npm install
 
 # Copy source code
 COPY . .
 
 # Generate Prisma Client
-RUN npx prisma generate
+RUN chmod +x ./node_modules/.bin/* && npx prisma generate
 
 # Build TypeScript
 RUN npm run build
@@ -28,8 +28,8 @@ WORKDIR /app
 COPY package*.json ./
 COPY prisma ./prisma/
 
-RUN npm ci --only=production && \
-    npx prisma generate && \
+RUN rm -f package-lock.json && npm install --omit=dev && \
+    chmod +x ./node_modules/.bin/* && npx prisma generate && \
     npm cache clean --force
 
 # Copy built files from builder

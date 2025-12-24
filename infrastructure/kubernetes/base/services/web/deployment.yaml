@@ -40,7 +40,7 @@ spec:
 
       containers:
         - name: web
-          image: acrunifiedhealthdev2.azurecr.io/unifiedhealth/web:latest
+          image: unifiedhealthdevacr.azurecr.io/unifiedhealth/web:latest
           imagePullPolicy: Always
 
           ports:

@@ -15,40 +15,40 @@ commonLabels:
 
 # Inherit from parent Europe region overlay
 bases:
-- ../../europe
+  - ../../europe
 
 resources:
-- namespace.yaml
+  - namespace.yaml
 
 patchesStrategicMerge:
-- configmap-patch.yaml
+  - configmap-patch.yaml
 
 configMapGenerator:
-- name: country-specific-config
-  literals:
-  - country_code=gb
-  - currency=GBP
-  - timezone=Europe/London
-  - language=en-GB
-  - compliance_framework=gdpr
-  - data_residency_mode=shared
-  - emergency_hotline=999
-  - payment_processor_country=stripe-gb
-  - healthcare_system_type=public-nhs
-  - nhs_integration=enabled
-  - uk_gdpr_compliance=enabled
-  behavior: merge
+  - name: country-specific-config
+    literals:
+      - country_code=gb
+      - currency=GBP
+      - timezone=Europe/London
+      - language=en-GB
+      - compliance_framework=gdpr
+      - data_residency_mode=shared
+      - emergency_hotline=999
+      - payment_processor_country=stripe-gb
+      - healthcare_system_type=public-nhs
+      - nhs_integration=enabled
+      - uk_gdpr_compliance=enabled
+    behavior: merge
 
 images:
-- name: ghcr.io/healthcare-platform/api-gateway
-  newTag: v1.2.3-gb
-- name: ghcr.io/healthcare-platform/telehealth-service
-  newTag: v1.2.3-gb
-- name: ghcr.io/healthcare-platform/mental-health-service
-  newTag: v1.2.3-gb
-- name: ghcr.io/healthcare-platform/chronic-care-service
-  newTag: v1.2.3-gb
-- name: ghcr.io/healthcare-platform/pharmacy-service
-  newTag: v1.2.3-gb
-- name: ghcr.io/healthcare-platform/laboratory-service
-  newTag: v1.2.3-gb
+  - name: unifiedhealthdevacr.azurecr.io/unifiedhealth/api-gateway
+    newTag: v1.2.3-gb
+  - name: unifiedhealthdevacr.azurecr.io/unifiedhealth/telehealth-service
+    newTag: v1.2.3-gb
+  - name: unifiedhealthdevacr.azurecr.io/unifiedhealth/mental-health-service
+    newTag: v1.2.3-gb
+  - name: unifiedhealthdevacr.azurecr.io/unifiedhealth/chronic-care-service
+    newTag: v1.2.3-gb
+  - name: unifiedhealthdevacr.azurecr.io/unifiedhealth/pharmacy-service
+    newTag: v1.2.3-gb
+  - name: unifiedhealthdevacr.azurecr.io/unifiedhealth/laboratory-service
+    newTag: v1.2.3-gb

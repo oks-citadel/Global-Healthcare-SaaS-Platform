@@ -1,49 +1,30 @@
-# Build stage
-FROM node:20-alpine AS builder
+FROM node:20-slim AS base
+RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 
+FROM base AS deps
 WORKDIR /app
+COPY package.json ./
+RUN npm install
 
-# Copy package files
-COPY package*.json ./
-COPY tsconfig.json ./
-
-# Install dependencies
-RUN npm ci
-
-# Copy prisma schema
-COPY prisma ./prisma/
-
-# Generate Prisma Client
+FROM base AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
 RUN npx prisma generate
-
-# Copy source code
-COPY src ./src
-
-# Build application
 RUN npm run build
 
-# Production stage
-FROM node:20-alpine
-
+FROM base AS runner
 WORKDIR /app
-
-# Install production dependencies only
-COPY package*.json ./
-RUN npm ci --only=production
-
-# Copy prisma schema and generate client
-COPY prisma ./prisma/
-RUN npx prisma generate
-
-# Copy built application from builder
+ENV NODE_ENV=production
+RUN groupadd --system --gid 1001 nodejs && useradd --system --uid 1001 imaging
 COPY --from=builder /app/dist ./dist
-
-# Expose port
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/src/generated ./dist/generated
+USER imaging
 EXPOSE 3006
-
-# Health check
+ENV PORT=3006
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3006/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
-
-# Start application
 CMD ["node", "dist/index.js"]
