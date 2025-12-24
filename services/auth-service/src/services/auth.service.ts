@@ -1,16 +1,16 @@
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import { randomBytes } from 'crypto';
-import { config } from '../config/index.js';
-import { prisma } from '../utils/prisma.js';
-import { logger } from '../utils/logger.js';
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { randomBytes } from "crypto";
+import { config } from "../config/index.js";
+import { prisma } from "../utils/prisma.js";
+import { logger } from "../utils/logger.js";
 import {
   ConflictError,
   UnauthorizedError,
   NotFoundError,
   BadRequestError,
   TooManyRequestsError,
-} from '../utils/errors.js';
+} from "../utils/errors.js";
 import {
   RegisterInput,
   LoginInput,
@@ -20,24 +20,30 @@ import {
   ForgotPasswordInput,
   ResetPasswordInput,
   VerifyEmailInput,
-} from '../dtos/auth.dto.js';
+} from "../dtos/auth.dto.js";
 
 export class AuthService {
   /**
    * Register a new user
    */
-  async register(input: RegisterInput, ipAddress?: string): Promise<AuthResponse> {
+  async register(
+    input: RegisterInput,
+    ipAddress?: string,
+  ): Promise<AuthResponse> {
     // Check if user exists
     const existingUser = await prisma.user.findUnique({
       where: { email: input.email.toLowerCase() },
     });
 
     if (existingUser) {
-      throw new ConflictError('Email already registered');
+      throw new ConflictError("Email already registered");
     }
 
     // Hash password
-    const passwordHash = await bcrypt.hash(input.password, config.security.bcryptRounds);
+    const passwordHash = await bcrypt.hash(
+      input.password,
+      config.security.bcryptRounds,
+    );
 
     // Create user
     const user = await prisma.user.create({
@@ -48,14 +54,14 @@ export class AuthService {
         lastName: input.lastName,
         phone: input.phone || null,
         dateOfBirth: input.dateOfBirth ? new Date(input.dateOfBirth) : null,
-        role: input.role || 'patient',
-        status: 'active',
+        role: input.role || "patient",
+        status: "active",
         emailVerified: false,
         lastLoginIp: ipAddress,
       },
     });
 
-    logger.info('User registered', { userId: user.id, email: input.email });
+    logger.info("User registered", { userId: user.id, email: input.email });
 
     // Create email verification token
     await this.createEmailVerificationToken(user.id);
@@ -67,7 +73,11 @@ export class AuthService {
   /**
    * Authenticate user
    */
-  async login(input: LoginInput, ipAddress?: string, userAgent?: string): Promise<AuthResponse> {
+  async login(
+    input: LoginInput,
+    ipAddress?: string,
+    userAgent?: string,
+  ): Promise<AuthResponse | MfaRequiredResponse> {
     const email = input.email.toLowerCase();
 
     // Find user
@@ -76,33 +86,38 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new UnauthorizedError('Invalid credentials');
+      throw new UnauthorizedError("Invalid credentials");
     }
 
     // Check if account is locked
     if (user.lockedUntil && user.lockedUntil > new Date()) {
-      const minutesLeft = Math.ceil((user.lockedUntil.getTime() - Date.now()) / 60000);
+      const minutesLeft = Math.ceil(
+        (user.lockedUntil.getTime() - Date.now()) / 60000,
+      );
       throw new TooManyRequestsError(
-        `Account is locked. Try again in ${minutesLeft} minute(s)`
+        `Account is locked. Try again in ${minutesLeft} minute(s)`,
       );
     }
 
     // Verify password
-    const validPassword = await bcrypt.compare(input.password, user.passwordHash);
+    const validPassword = await bcrypt.compare(
+      input.password,
+      user.passwordHash,
+    );
 
     if (!validPassword) {
       // Increment failed login attempts
       await this.handleFailedLogin(user.id);
-      throw new UnauthorizedError('Invalid credentials');
+      throw new UnauthorizedError("Invalid credentials");
     }
 
     // Check if account is suspended
-    if (user.status === 'suspended') {
-      throw new UnauthorizedError('Account has been suspended');
+    if (user.status === "suspended") {
+      throw new UnauthorizedError("Account has been suspended");
     }
 
-    if (user.status === 'inactive') {
-      throw new UnauthorizedError('Account is inactive');
+    if (user.status === "inactive") {
+      throw new UnauthorizedError("Account is inactive");
     }
 
     // Reset failed login attempts on successful login
@@ -116,7 +131,7 @@ export class AuthService {
       },
     });
 
-    logger.info('User logged in', { userId: user.id, email, ipAddress });
+    logger.info("User logged in", { userId: user.id, email, ipAddress });
 
     // Generate tokens
     return this.generateTokens(user, ipAddress, userAgent);
@@ -125,7 +140,11 @@ export class AuthService {
   /**
    * Refresh access token using refresh token
    */
-  async refresh(refreshToken: string, ipAddress?: string, userAgent?: string): Promise<AuthResponse> {
+  async refresh(
+    refreshToken: string,
+    ipAddress?: string,
+    userAgent?: string,
+  ): Promise<AuthResponse> {
     // Find token record
     const tokenRecord = await prisma.refreshToken.findUnique({
       where: { token: refreshToken },
@@ -133,18 +152,18 @@ export class AuthService {
     });
 
     if (!tokenRecord) {
-      throw new UnauthorizedError('Invalid refresh token');
+      throw new UnauthorizedError("Invalid refresh token");
     }
 
     // Check if token is revoked
     if (tokenRecord.isRevoked) {
       // Token reuse detected - revoke entire token family
       await this.revokeTokenFamily(tokenRecord.tokenFamily);
-      logger.warn('Token reuse detected - revoking token family', {
+      logger.warn("Token reuse detected - revoking token family", {
         userId: tokenRecord.userId,
         tokenFamily: tokenRecord.tokenFamily,
       });
-      throw new UnauthorizedError('Invalid refresh token');
+      throw new UnauthorizedError("Invalid refresh token");
     }
 
     // Check if token is expired
@@ -152,28 +171,30 @@ export class AuthService {
       await prisma.refreshToken.delete({
         where: { id: tokenRecord.id },
       });
-      throw new UnauthorizedError('Refresh token expired');
+      throw new UnauthorizedError("Refresh token expired");
     }
 
     // Verify JWT signature
     try {
-      const signOptions = config.jwt.algorithm === 'RS256'
-        ? { algorithms: ['RS256' as const] }
-        : { algorithms: ['HS256' as const] };
+      const signOptions =
+        config.jwt.algorithm === "RS256"
+          ? { algorithms: ["RS256" as const] }
+          : { algorithms: ["HS256" as const] };
 
-      const secret = config.jwt.algorithm === 'RS256'
-        ? config.jwt.publicKey!
-        : config.jwt.secret;
+      const secret =
+        config.jwt.algorithm === "RS256"
+          ? config.jwt.publicKey!
+          : config.jwt.secret;
 
       jwt.verify(refreshToken, secret, signOptions);
     } catch (error) {
-      throw new UnauthorizedError('Invalid refresh token');
+      throw new UnauthorizedError("Invalid refresh token");
     }
 
     const user = tokenRecord.user;
 
     if (!user) {
-      throw new UnauthorizedError('User not found');
+      throw new UnauthorizedError("User not found");
     }
 
     // Revoke old refresh token (token rotation)
@@ -182,10 +203,15 @@ export class AuthService {
       data: { isRevoked: true },
     });
 
-    logger.info('Access token refreshed', { userId: user.id });
+    logger.info("Access token refreshed", { userId: user.id });
 
     // Generate new tokens with same token family
-    return this.generateTokens(user, ipAddress, userAgent, tokenRecord.tokenFamily);
+    return this.generateTokens(
+      user,
+      ipAddress,
+      userAgent,
+      tokenRecord.tokenFamily,
+    );
   }
 
   /**
@@ -197,7 +223,7 @@ export class AuthService {
       data: { isRevoked: true },
     });
 
-    logger.info('User logged out', { userId });
+    logger.info("User logged out", { userId });
   }
 
   /**
@@ -209,7 +235,7 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new NotFoundError('User not found');
+      throw new NotFoundError("User not found");
     }
 
     return this.toUserResponse(user);
@@ -218,20 +244,24 @@ export class AuthService {
   /**
    * Forgot password - send reset token
    */
-  async forgotPassword(input: ForgotPasswordInput): Promise<{ message: string }> {
+  async forgotPassword(
+    input: ForgotPasswordInput,
+  ): Promise<{ message: string }> {
     const user = await prisma.user.findUnique({
       where: { email: input.email.toLowerCase() },
     });
 
     // Don't reveal if email exists
     if (!user) {
-      return { message: 'If the email exists, a reset link has been sent' };
+      return { message: "If the email exists, a reset link has been sent" };
     }
 
     // Create password reset token
     const token = this.generateSecureToken();
     const expiresAt = new Date();
-    expiresAt.setHours(expiresAt.getHours() + config.security.passwordResetExpiry);
+    expiresAt.setHours(
+      expiresAt.getHours() + config.security.passwordResetExpiry,
+    );
 
     await prisma.passwordResetToken.create({
       data: {
@@ -241,13 +271,13 @@ export class AuthService {
       },
     });
 
-    logger.info('Password reset requested', { userId: user.id });
+    logger.info("Password reset requested", { userId: user.id });
 
     // TODO: Send email with reset token
     // In production, integrate with email service (SendGrid, SES, etc.)
-    logger.info('Password reset token generated', { token, userId: user.id });
+    logger.info("Password reset token generated", { token, userId: user.id });
 
-    return { message: 'If the email exists, a reset link has been sent' };
+    return { message: "If the email exists, a reset link has been sent" };
   }
 
   /**
@@ -261,7 +291,7 @@ export class AuthService {
     });
 
     if (!tokenRecord || tokenRecord.isUsed) {
-      throw new BadRequestError('Invalid or expired reset token');
+      throw new BadRequestError("Invalid or expired reset token");
     }
 
     // Check if token is expired
@@ -269,11 +299,14 @@ export class AuthService {
       await prisma.passwordResetToken.delete({
         where: { id: tokenRecord.id },
       });
-      throw new BadRequestError('Reset token has expired');
+      throw new BadRequestError("Reset token has expired");
     }
 
     // Hash new password
-    const passwordHash = await bcrypt.hash(input.newPassword, config.security.bcryptRounds);
+    const passwordHash = await bcrypt.hash(
+      input.newPassword,
+      config.security.bcryptRounds,
+    );
 
     // Update password and mark token as used
     await prisma.$transaction([
@@ -292,9 +325,9 @@ export class AuthService {
       }),
     ]);
 
-    logger.info('Password reset successfully', { userId: tokenRecord.userId });
+    logger.info("Password reset successfully", { userId: tokenRecord.userId });
 
-    return { message: 'Password reset successfully' };
+    return { message: "Password reset successfully" };
   }
 
   /**
@@ -307,14 +340,14 @@ export class AuthService {
     });
 
     if (!tokenRecord || tokenRecord.isUsed) {
-      throw new BadRequestError('Invalid or expired verification token');
+      throw new BadRequestError("Invalid or expired verification token");
     }
 
     if (new Date() > tokenRecord.expiresAt) {
       await prisma.emailVerificationToken.delete({
         where: { id: tokenRecord.id },
       });
-      throw new BadRequestError('Verification token has expired');
+      throw new BadRequestError("Verification token has expired");
     }
 
     // Update user and mark token as used
@@ -329,9 +362,9 @@ export class AuthService {
       }),
     ]);
 
-    logger.info('Email verified', { userId: tokenRecord.userId });
+    logger.info("Email verified", { userId: tokenRecord.userId });
 
-    return { message: 'Email verified successfully' };
+    return { message: "Email verified successfully" };
   }
 
   /**
@@ -343,11 +376,13 @@ export class AuthService {
     });
 
     if (!user) {
-      return { message: 'If the email exists, a verification link has been sent' };
+      return {
+        message: "If the email exists, a verification link has been sent",
+      };
     }
 
     if (user.emailVerified) {
-      throw new BadRequestError('Email is already verified');
+      throw new BadRequestError("Email is already verified");
     }
 
     // Delete old tokens
@@ -358,7 +393,41 @@ export class AuthService {
     // Create new token
     await this.createEmailVerificationToken(user.id);
 
-    return { message: 'If the email exists, a verification link has been sent' };
+    return {
+      message: "If the email exists, a verification link has been sent",
+    };
+  }
+
+  /**
+   * Complete login after MFA verification
+   */
+  async completeMfaLogin(
+    userId: string,
+    ipAddress?: string,
+    userAgent?: string,
+  ): Promise<AuthResponse> {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundError("User not found");
+    }
+
+    // Update last login info
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        failedLoginAttempts: 0,
+        lockedUntil: null,
+        lastLoginAt: new Date(),
+        lastLoginIp: ipAddress,
+      },
+    });
+
+    logger.info("User logged in with MFA", { userId: user.id });
+
+    return this.generateTokens(user, ipAddress, userAgent);
   }
 
   // ==================== Private Methods ====================
@@ -370,7 +439,7 @@ export class AuthService {
     user: any,
     ipAddress?: string,
     userAgent?: string,
-    tokenFamily?: string
+    tokenFamily?: string,
   ): Promise<AuthResponse> {
     const payload: JwtPayload = {
       userId: user.id,
@@ -378,29 +447,50 @@ export class AuthService {
       role: user.role,
     };
 
-    const signOptions: jwt.SignOptions = config.jwt.algorithm === 'RS256'
-      ? { algorithm: 'RS256', expiresIn: config.jwt.expiresIn as jwt.SignOptions['expiresIn'] }
-      : { algorithm: 'HS256', expiresIn: config.jwt.expiresIn as jwt.SignOptions['expiresIn'] };
+    const signOptions: jwt.SignOptions =
+      config.jwt.algorithm === "RS256"
+        ? {
+            algorithm: "RS256",
+            expiresIn: config.jwt.expiresIn as jwt.SignOptions["expiresIn"],
+          }
+        : {
+            algorithm: "HS256",
+            expiresIn: config.jwt.expiresIn as jwt.SignOptions["expiresIn"],
+          };
 
-    const refreshSignOptions: jwt.SignOptions = config.jwt.algorithm === 'RS256'
-      ? { algorithm: 'RS256', expiresIn: config.jwt.refreshExpiresIn as jwt.SignOptions['expiresIn'] }
-      : { algorithm: 'HS256', expiresIn: config.jwt.refreshExpiresIn as jwt.SignOptions['expiresIn'] };
+    const refreshSignOptions: jwt.SignOptions =
+      config.jwt.algorithm === "RS256"
+        ? {
+            algorithm: "RS256",
+            expiresIn: config.jwt
+              .refreshExpiresIn as jwt.SignOptions["expiresIn"],
+          }
+        : {
+            algorithm: "HS256",
+            expiresIn: config.jwt
+              .refreshExpiresIn as jwt.SignOptions["expiresIn"],
+          };
 
-    const secret = config.jwt.algorithm === 'RS256'
-      ? config.jwt.privateKey!
-      : config.jwt.secret;
+    const secret =
+      config.jwt.algorithm === "RS256"
+        ? config.jwt.privateKey!
+        : config.jwt.secret;
 
     // Generate access token
     const accessToken = jwt.sign(payload, secret, signOptions);
 
     // Generate refresh token
-    const refreshToken = jwt.sign({ userId: user.id }, secret, refreshSignOptions);
+    const refreshToken = jwt.sign(
+      { userId: user.id },
+      secret,
+      refreshSignOptions,
+    );
 
     // Store refresh token with rotation support
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 30);
 
-    const newTokenFamily = tokenFamily || randomBytes(16).toString('hex');
+    const newTokenFamily = tokenFamily || randomBytes(16).toString("hex");
 
     await prisma.refreshToken.create({
       data: {
@@ -438,7 +528,9 @@ export class AuthService {
     // Lock account if max attempts reached
     if (newAttempts >= config.security.maxLoginAttempts) {
       const lockedUntil = new Date();
-      lockedUntil.setMinutes(lockedUntil.getMinutes() + config.security.lockoutDuration);
+      lockedUntil.setMinutes(
+        lockedUntil.getMinutes() + config.security.lockoutDuration,
+      );
 
       await prisma.user.update({
         where: { id: userId },
@@ -448,7 +540,7 @@ export class AuthService {
         },
       });
 
-      logger.warn('Account locked due to failed login attempts', { userId });
+      logger.warn("Account locked due to failed login attempts", { userId });
     } else {
       await prisma.user.update({
         where: { id: userId },
@@ -475,7 +567,9 @@ export class AuthService {
   private async createEmailVerificationToken(userId: string): Promise<void> {
     const token = this.generateSecureToken();
     const expiresAt = new Date();
-    expiresAt.setHours(expiresAt.getHours() + config.security.emailVerificationExpiry);
+    expiresAt.setHours(
+      expiresAt.getHours() + config.security.emailVerificationExpiry,
+    );
 
     await prisma.emailVerificationToken.create({
       data: {
@@ -486,14 +580,14 @@ export class AuthService {
     });
 
     // TODO: Send verification email
-    logger.info('Email verification token created', { token, userId });
+    logger.info("Email verification token created", { token, userId });
   }
 
   /**
    * Generate secure random token
    */
   private generateSecureToken(): string {
-    return randomBytes(32).toString('hex');
+    return randomBytes(32).toString("hex");
   }
 
   /**

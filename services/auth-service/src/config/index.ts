@@ -1,22 +1,19 @@
-import dotenv from 'dotenv';
-import { readFileSync } from 'fs';
-import { join } from 'path';
+import dotenv from "dotenv";
+import { readFileSync } from "fs";
 
 dotenv.config();
 
 /**
  * Environment mode detection
  */
-const isProduction = process.env.NODE_ENV === 'production';
-const isDevelopment = process.env.NODE_ENV === 'development' || !process.env.NODE_ENV;
+const isProduction = process.env.NODE_ENV === "production";
+const isDevelopment =
+  process.env.NODE_ENV === "development" || !process.env.NODE_ENV;
 
 /**
  * List of required environment variables for production
  */
-const REQUIRED_ENV_VARS = [
-  'JWT_SECRET',
-  'DATABASE_URL',
-] as const;
+const REQUIRED_ENV_VARS = ["JWT_SECRET", "DATABASE_URL"] as const;
 
 /**
  * Get a required environment variable.
@@ -31,13 +28,15 @@ function getRequiredEnv(name: string, devFallback?: string): string {
   }
 
   if (isDevelopment && devFallback !== undefined) {
-    console.warn(`[AUTH CONFIG WARNING] Using development fallback for ${name}. This is NOT safe for production.`);
+    console.warn(
+      `[AUTH CONFIG WARNING] Using development fallback for ${name}. This is NOT safe for production.`,
+    );
     return devFallback;
   }
 
   throw new Error(
     `Required environment variable ${name} is not set. ` +
-    `Please set this variable before starting the auth service.`
+      `Please set this variable before starting the auth service.`,
   );
 }
 
@@ -57,12 +56,12 @@ const loadRSAKeys = () => {
 
     if (privateKeyPath && publicKeyPath) {
       return {
-        privateKey: readFileSync(privateKeyPath, 'utf8'),
-        publicKey: readFileSync(publicKeyPath, 'utf8'),
+        privateKey: readFileSync(privateKeyPath, "utf8"),
+        publicKey: readFileSync(publicKeyPath, "utf8"),
       };
     }
   } catch (error) {
-    console.warn('Failed to load RSA keys, falling back to symmetric key');
+    console.warn("Failed to load RSA keys, falling back to symmetric key");
   }
 
   // Fallback to symmetric key (HS256) for development
@@ -88,7 +87,9 @@ export function validateConfig(): {
       if (isProduction) {
         errors.push(`Required environment variable ${envVar} is not set`);
       } else {
-        warnings.push(`Environment variable ${envVar} is not set (using development fallback)`);
+        warnings.push(
+          `Environment variable ${envVar} is not set (using development fallback)`,
+        );
       }
     }
   }
@@ -97,21 +98,29 @@ export function validateConfig(): {
   const jwtSecret = process.env.JWT_SECRET;
   if (jwtSecret && jwtSecret.length < 32) {
     if (isProduction) {
-      errors.push('JWT_SECRET must be at least 32 characters for production');
+      errors.push("JWT_SECRET must be at least 32 characters for production");
     } else {
-      warnings.push('JWT_SECRET should be at least 32 characters');
+      warnings.push("JWT_SECRET should be at least 32 characters");
     }
   }
 
   // Validate DATABASE_URL format
   const databaseUrl = process.env.DATABASE_URL;
-  if (databaseUrl && !databaseUrl.startsWith('postgresql://') && !databaseUrl.startsWith('postgres://')) {
-    warnings.push('DATABASE_URL does not appear to be a valid PostgreSQL connection string');
+  if (
+    databaseUrl &&
+    !databaseUrl.startsWith("postgresql://") &&
+    !databaseUrl.startsWith("postgres://")
+  ) {
+    warnings.push(
+      "DATABASE_URL does not appear to be a valid PostgreSQL connection string",
+    );
   }
 
   // Check RSA keys for production
   if (isProduction && !rsaKeys) {
-    warnings.push('RSA keys not configured - using symmetric JWT signing (HS256)');
+    warnings.push(
+      "RSA keys not configured - using symmetric JWT signing (HS256)",
+    );
   }
 
   return {
@@ -135,40 +144,55 @@ function enforceValidConfig(): void {
   // In production, fail fast on any errors
   if (!validation.valid) {
     const errorMessage = [
-      'Auth service configuration validation failed:',
-      ...validation.errors.map(e => `  - ${e}`),
-      '',
-      'Please set all required environment variables before starting the auth service.',
-    ].join('\n');
+      "Auth service configuration validation failed:",
+      ...validation.errors.map((e) => `  - ${e}`),
+      "",
+      "Please set all required environment variables before starting the auth service.",
+    ].join("\n");
 
     throw new Error(errorMessage);
   }
 }
 
 export const config = {
-  port: parseInt(getOptionalEnv('PORT', '3001'), 10),
-  env: process.env.NODE_ENV || 'development',
+  port: parseInt(getOptionalEnv("PORT", "3001"), 10),
+  env: process.env.NODE_ENV || "development",
 
   database: {
-    url: getRequiredEnv('DATABASE_URL', isDevelopment ? 'postgresql://localhost:5432/auth_dev' : undefined),
+    url: getRequiredEnv(
+      "DATABASE_URL",
+      isDevelopment ? "postgresql://localhost:5432/auth_dev" : undefined,
+    ),
   },
 
   jwt: {
     // Use RS256 in production, HS256 in development
-    algorithm: rsaKeys ? 'RS256' : 'HS256',
-    secret: getRequiredEnv('JWT_SECRET', isDevelopment ? 'dev-only-insecure-jwt-secret-min-32-chars' : undefined),
+    algorithm: rsaKeys ? "RS256" : "HS256",
+    secret: getRequiredEnv(
+      "JWT_SECRET",
+      isDevelopment ? "dev-only-insecure-jwt-secret-min-32-chars" : undefined,
+    ),
     privateKey: rsaKeys?.privateKey,
     publicKey: rsaKeys?.publicKey,
-    expiresIn: getOptionalEnv('JWT_EXPIRES_IN', '15m'),
-    refreshExpiresIn: getOptionalEnv('JWT_REFRESH_EXPIRES_IN', '30d'),
+    expiresIn: getOptionalEnv("JWT_EXPIRES_IN", "15m"),
+    refreshExpiresIn: getOptionalEnv("JWT_REFRESH_EXPIRES_IN", "30d"),
   },
 
   security: {
-    bcryptRounds: parseInt(getOptionalEnv('BCRYPT_ROUNDS', '12'), 10),
-    maxLoginAttempts: parseInt(getOptionalEnv('MAX_LOGIN_ATTEMPTS', '5'), 10),
-    lockoutDuration: parseInt(getOptionalEnv('LOCKOUT_DURATION_MINUTES', '15'), 10), // minutes
-    passwordResetExpiry: parseInt(getOptionalEnv('PASSWORD_RESET_EXPIRY_HOURS', '1'), 10), // hours
-    emailVerificationExpiry: parseInt(getOptionalEnv('EMAIL_VERIFICATION_EXPIRY_HOURS', '24'), 10), // hours
+    bcryptRounds: parseInt(getOptionalEnv("BCRYPT_ROUNDS", "12"), 10),
+    maxLoginAttempts: parseInt(getOptionalEnv("MAX_LOGIN_ATTEMPTS", "5"), 10),
+    lockoutDuration: parseInt(
+      getOptionalEnv("LOCKOUT_DURATION_MINUTES", "15"),
+      10,
+    ), // minutes
+    passwordResetExpiry: parseInt(
+      getOptionalEnv("PASSWORD_RESET_EXPIRY_HOURS", "1"),
+      10,
+    ), // hours
+    emailVerificationExpiry: parseInt(
+      getOptionalEnv("EMAIL_VERIFICATION_EXPIRY_HOURS", "24"),
+      10,
+    ), // hours
   },
 
   rateLimit: {
@@ -179,8 +203,16 @@ export const config = {
   },
 
   cors: {
-    origin: getOptionalEnv('CORS_ORIGIN', '*'),
+    origin: getOptionalEnv("CORS_ORIGIN", "*"),
     credentials: true,
+  },
+
+  mfa: {
+    issuer: getOptionalEnv("MFA_ISSUER", "UnifiedHealthcare"),
+    encryptionKey: getRequiredEnv(
+      "MFA_ENCRYPTION_KEY",
+      isDevelopment ? "dev-only-mfa-encryption-key-32chars!" : undefined,
+    ),
   },
 } as const;
 
