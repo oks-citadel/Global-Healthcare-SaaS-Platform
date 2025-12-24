@@ -32,12 +32,15 @@
     "docker:down": "docker compose down",
     "prepare": "husky install",
     "security:scan": "bash scripts/security-scan.sh",
+    "security:agent": "npx ts-node tools/security-agent/scan.ts",
     "security:audit": "pnpm audit --audit-level=moderate",
     "security:audit:fix": "pnpm audit --fix",
     "security:secrets": "gitleaks detect --verbose --no-git || echo 'Gitleaks not installed'",
     "security:container": "bash scripts/container-security-scan.sh",
     "security:sonar": "bash scripts/run-sonar-scan.sh",
-    "security:all": "pnpm security:audit && pnpm security:secrets && pnpm lint && pnpm typecheck"
+    "security:abuse-tests": "pnpm --filter @unified-health/api test -- tests/security/business-logic-abuse/",
+    "security:pr": "pnpm security:audit && pnpm security:agent && pnpm security:abuse-tests",
+    "security:all": "pnpm security:audit && pnpm security:secrets && pnpm security:agent && pnpm lint && pnpm typecheck"
   },
   "devDependencies": {
     "@commitlint/cli": "^18.4.3",
