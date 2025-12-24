@@ -20,6 +20,10 @@ COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 COPY apps/web/package.json ./apps/web/
 COPY packages/sdk/package.json ./packages/sdk/
 
+# Configure pnpm to handle peer dependency conflicts (React 19 + older packages like Stripe)
+RUN echo "auto-install-peers=true" > .npmrc && \
+    echo "strict-peer-dependencies=false" >> .npmrc
+
 RUN pnpm install --no-frozen-lockfile
 
 # ============================================
@@ -85,19 +89,11 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# Copy standalone server
-COPY --from=builder --chown=nodejs:nodejs /app/apps/web/.next/standalone/server.js ./
-COPY --from=builder --chown=nodejs:nodejs /app/apps/web/.next/standalone/.next ./.next
-
-# Copy static assets
+# Copy standalone build including node_modules from Next.js output
+# Next.js standalone output contains everything needed to run the app
+COPY --from=builder --chown=nodejs:nodejs /app/apps/web/.next/standalone/ ./
 COPY --from=builder --chown=nodejs:nodejs /app/apps/web/.next/static ./.next/static
 COPY --from=builder --chown=nodejs:nodejs /app/apps/web/public ./public
-
-# Install only runtime dependencies using pnpm with shamefully-hoist for flat structure
-RUN corepack enable && corepack prepare pnpm@9 --activate
-RUN echo '{"dependencies":{"next":"^16.0.0","react":"^19.0.0","react-dom":"^19.0.0"}}' > package.json && \
-    pnpm install --shamefully-hoist --ignore-scripts && \
-    chown -R nodejs:nodejs node_modules
 
 USER nodejs
 EXPOSE 3000
