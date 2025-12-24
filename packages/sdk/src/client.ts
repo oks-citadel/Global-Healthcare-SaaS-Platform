@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 import type {
   // Auth types
   RegisterInput,
@@ -45,13 +45,16 @@ import type {
   // Common types
   PaginatedResponse,
   ApiError,
-} from './types.js';
+} from "./types.js";
 
 export interface UnifiedHealthClientConfig {
   baseURL: string;
   accessToken?: string;
   refreshToken?: string;
-  onTokenRefresh?: (tokens: { accessToken: string; refreshToken: string }) => void;
+  onTokenRefresh?: (tokens: {
+    accessToken: string;
+    refreshToken: string;
+  }) => void;
   timeout?: number;
   headers?: Record<string, string>;
 }
@@ -60,7 +63,10 @@ export class UnifiedHealthClient {
   private client: AxiosInstance;
   private accessToken?: string;
   private refreshToken?: string;
-  private onTokenRefresh?: (tokens: { accessToken: string; refreshToken: string }) => void;
+  private onTokenRefresh?: (tokens: {
+    accessToken: string;
+    refreshToken: string;
+  }) => void;
   private isRefreshing = false;
   private refreshPromise: Promise<void> | null = null;
 
@@ -73,7 +79,7 @@ export class UnifiedHealthClient {
       baseURL: config.baseURL,
       timeout: config.timeout || 30000,
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         ...config.headers,
       },
     });
@@ -86,7 +92,7 @@ export class UnifiedHealthClient {
         }
         return config;
       },
-      (error) => Promise.reject(error)
+      (error) => Promise.reject(error),
     );
 
     // Response interceptor to handle token refresh
@@ -96,7 +102,11 @@ export class UnifiedHealthClient {
         const originalRequest = error.config;
 
         // If error is 401 and we haven't tried to refresh yet
-        if (error.response?.status === 401 && !originalRequest._retry && this.refreshToken) {
+        if (
+          error.response?.status === 401 &&
+          !originalRequest._retry &&
+          this.refreshToken
+        ) {
           originalRequest._retry = true;
 
           // If already refreshing, wait for it
@@ -121,19 +131,19 @@ export class UnifiedHealthClient {
         }
 
         return Promise.reject(error);
-      }
+      },
     );
   }
 
   private async refreshAccessToken(): Promise<void> {
     if (!this.refreshToken) {
-      throw new Error('No refresh token available');
+      throw new Error("No refresh token available");
     }
 
     try {
       const response = await axios.post<AuthResponse>(
         `${this.client.defaults.baseURL}/auth/refresh`,
-        { refreshToken: this.refreshToken }
+        { refreshToken: this.refreshToken },
       );
 
       const { accessToken, refreshToken } = response.data;
@@ -176,8 +186,8 @@ export class UnifiedHealthClient {
 
   public async register(input: RegisterInput): Promise<AuthResponse> {
     const response = await this.request<AuthResponse>({
-      method: 'POST',
-      url: '/auth/register',
+      method: "POST",
+      url: "/auth/register",
       data: input,
     });
     this.setTokens(response.accessToken, response.refreshToken);
@@ -186,8 +196,8 @@ export class UnifiedHealthClient {
 
   public async login(input: LoginInput): Promise<AuthResponse> {
     const response = await this.request<AuthResponse>({
-      method: 'POST',
-      url: '/auth/login',
+      method: "POST",
+      url: "/auth/login",
       data: input,
     });
     this.setTokens(response.accessToken, response.refreshToken);
@@ -196,26 +206,32 @@ export class UnifiedHealthClient {
 
   public async logout(): Promise<void> {
     await this.request<void>({
-      method: 'POST',
-      url: '/auth/logout',
+      method: "POST",
+      url: "/auth/logout",
     });
     this.clearTokens();
   }
 
   public async getCurrentUser(): Promise<User> {
     return this.request<User>({
-      method: 'GET',
-      url: '/auth/me',
+      method: "GET",
+      url: "/auth/me",
     });
   }
 
   public async refreshTokens(input: RefreshTokenInput): Promise<AuthResponse> {
     const response = await this.request<AuthResponse>({
-      method: 'POST',
-      url: '/auth/refresh',
+      method: "POST",
+      url: "/auth/refresh",
       data: input,
     });
     this.setTokens(response.accessToken, response.refreshToken);
+    if (this.onTokenRefresh) {
+      this.onTokenRefresh({
+        accessToken: response.accessToken,
+        refreshToken: response.refreshToken,
+      });
+    }
     return response;
   }
 
@@ -225,14 +241,17 @@ export class UnifiedHealthClient {
 
   public async getUser(userId: string): Promise<User> {
     return this.request<User>({
-      method: 'GET',
+      method: "GET",
       url: `/users/${userId}`,
     });
   }
 
-  public async updateUser(userId: string, input: UpdateUserInput): Promise<User> {
+  public async updateUser(
+    userId: string,
+    input: UpdateUserInput,
+  ): Promise<User> {
     return this.request<User>({
-      method: 'PATCH',
+      method: "PATCH",
       url: `/users/${userId}`,
       data: input,
     });
@@ -244,22 +263,25 @@ export class UnifiedHealthClient {
 
   public async createPatient(input: CreatePatientInput): Promise<Patient> {
     return this.request<Patient>({
-      method: 'POST',
-      url: '/patients',
+      method: "POST",
+      url: "/patients",
       data: input,
     });
   }
 
   public async getPatient(patientId: string): Promise<Patient> {
     return this.request<Patient>({
-      method: 'GET',
+      method: "GET",
       url: `/patients/${patientId}`,
     });
   }
 
-  public async updatePatient(patientId: string, input: UpdatePatientInput): Promise<Patient> {
+  public async updatePatient(
+    patientId: string,
+    input: UpdatePatientInput,
+  ): Promise<Patient> {
     return this.request<Patient>({
-      method: 'PATCH',
+      method: "PATCH",
       url: `/patients/${patientId}`,
       data: input,
     });
@@ -269,32 +291,39 @@ export class UnifiedHealthClient {
   // Appointment Methods
   // ==========================================
 
-  public async createAppointment(input: CreateAppointmentInput): Promise<Appointment> {
+  public async createAppointment(
+    input: CreateAppointmentInput,
+  ): Promise<Appointment> {
     return this.request<Appointment>({
-      method: 'POST',
-      url: '/appointments',
+      method: "POST",
+      url: "/appointments",
       data: input,
     });
   }
 
-  public async listAppointments(params?: ListAppointmentsParams): Promise<PaginatedResponse<Appointment>> {
+  public async listAppointments(
+    params?: ListAppointmentsParams,
+  ): Promise<PaginatedResponse<Appointment>> {
     return this.request<PaginatedResponse<Appointment>>({
-      method: 'GET',
-      url: '/appointments',
+      method: "GET",
+      url: "/appointments",
       params,
     });
   }
 
   public async getAppointment(appointmentId: string): Promise<Appointment> {
     return this.request<Appointment>({
-      method: 'GET',
+      method: "GET",
       url: `/appointments/${appointmentId}`,
     });
   }
 
-  public async updateAppointment(appointmentId: string, input: UpdateAppointmentInput): Promise<Appointment> {
+  public async updateAppointment(
+    appointmentId: string,
+    input: UpdateAppointmentInput,
+  ): Promise<Appointment> {
     return this.request<Appointment>({
-      method: 'PATCH',
+      method: "PATCH",
       url: `/appointments/${appointmentId}`,
       data: input,
     });
@@ -302,7 +331,7 @@ export class UnifiedHealthClient {
 
   public async deleteAppointment(appointmentId: string): Promise<void> {
     return this.request<void>({
-      method: 'DELETE',
+      method: "DELETE",
       url: `/appointments/${appointmentId}`,
     });
   }
@@ -311,32 +340,39 @@ export class UnifiedHealthClient {
   // Encounter Methods
   // ==========================================
 
-  public async createEncounter(input: CreateEncounterInput): Promise<Encounter> {
+  public async createEncounter(
+    input: CreateEncounterInput,
+  ): Promise<Encounter> {
     return this.request<Encounter>({
-      method: 'POST',
-      url: '/encounters',
+      method: "POST",
+      url: "/encounters",
       data: input,
     });
   }
 
-  public async listEncounters(params?: ListEncountersParams): Promise<PaginatedResponse<Encounter>> {
+  public async listEncounters(
+    params?: ListEncountersParams,
+  ): Promise<PaginatedResponse<Encounter>> {
     return this.request<PaginatedResponse<Encounter>>({
-      method: 'GET',
-      url: '/encounters',
+      method: "GET",
+      url: "/encounters",
       params,
     });
   }
 
   public async getEncounter(encounterId: string): Promise<Encounter> {
     return this.request<Encounter>({
-      method: 'GET',
+      method: "GET",
       url: `/encounters/${encounterId}`,
     });
   }
 
-  public async updateEncounter(encounterId: string, input: UpdateEncounterInput): Promise<Encounter> {
+  public async updateEncounter(
+    encounterId: string,
+    input: UpdateEncounterInput,
+  ): Promise<Encounter> {
     return this.request<Encounter>({
-      method: 'PATCH',
+      method: "PATCH",
       url: `/encounters/${encounterId}`,
       data: input,
     });
@@ -344,21 +380,24 @@ export class UnifiedHealthClient {
 
   public async startEncounter(encounterId: string): Promise<Encounter> {
     return this.request<Encounter>({
-      method: 'POST',
+      method: "POST",
       url: `/encounters/${encounterId}/start`,
     });
   }
 
   public async endEncounter(encounterId: string): Promise<Encounter> {
     return this.request<Encounter>({
-      method: 'POST',
+      method: "POST",
       url: `/encounters/${encounterId}/end`,
     });
   }
 
-  public async addClinicalNote(encounterId: string, input: CreateClinicalNoteInput): Promise<ClinicalNote> {
+  public async addClinicalNote(
+    encounterId: string,
+    input: CreateClinicalNoteInput,
+  ): Promise<ClinicalNote> {
     return this.request<ClinicalNote>({
-      method: 'POST',
+      method: "POST",
       url: `/encounters/${encounterId}/notes`,
       data: input,
     });
@@ -366,7 +405,7 @@ export class UnifiedHealthClient {
 
   public async getClinicalNotes(encounterId: string): Promise<ClinicalNote[]> {
     return this.request<ClinicalNote[]>({
-      method: 'GET',
+      method: "GET",
       url: `/encounters/${encounterId}/notes`,
     });
   }
@@ -377,58 +416,62 @@ export class UnifiedHealthClient {
 
   public async uploadDocument(input: UploadDocumentInput): Promise<Document> {
     const formData = new FormData();
-    formData.append('file', input.file);
-    formData.append('patientId', input.patientId);
-    formData.append('category', input.category);
+    formData.append("file", input.file);
+    formData.append("patientId", input.patientId);
+    formData.append("category", input.category);
     if (input.description) {
-      formData.append('description', input.description);
+      formData.append("description", input.description);
     }
     if (input.metadata) {
-      formData.append('metadata', JSON.stringify(input.metadata));
+      formData.append("metadata", JSON.stringify(input.metadata));
     }
 
     return this.request<Document>({
-      method: 'POST',
-      url: '/documents',
+      method: "POST",
+      url: "/documents",
       data: formData,
       headers: {
-        'Content-Type': 'multipart/form-data',
+        "Content-Type": "multipart/form-data",
       },
     });
   }
 
-  public async listDocuments(params?: ListDocumentsParams): Promise<PaginatedResponse<Document>> {
+  public async listDocuments(
+    params?: ListDocumentsParams,
+  ): Promise<PaginatedResponse<Document>> {
     return this.request<PaginatedResponse<Document>>({
-      method: 'GET',
-      url: '/documents',
+      method: "GET",
+      url: "/documents",
       params,
     });
   }
 
   public async getDocument(documentId: string): Promise<Document> {
     return this.request<Document>({
-      method: 'GET',
+      method: "GET",
       url: `/documents/${documentId}`,
     });
   }
 
-  public async getDocumentDownloadUrl(documentId: string): Promise<{ url: string; expiresAt: string }> {
+  public async getDocumentDownloadUrl(
+    documentId: string,
+  ): Promise<{ url: string; expiresAt: string }> {
     return this.request<{ url: string; expiresAt: string }>({
-      method: 'GET',
+      method: "GET",
       url: `/documents/${documentId}/download`,
     });
   }
 
   public async deleteDocument(documentId: string): Promise<void> {
     return this.request<void>({
-      method: 'DELETE',
+      method: "DELETE",
       url: `/documents/${documentId}`,
     });
   }
 
   public async getPatientDocuments(patientId: string): Promise<Document[]> {
     return this.request<Document[]>({
-      method: 'GET',
+      method: "GET",
       url: `/patients/${patientId}/documents`,
     });
   }
@@ -439,21 +482,24 @@ export class UnifiedHealthClient {
 
   public async startVisit(visitId: string): Promise<void> {
     return this.request<void>({
-      method: 'POST',
+      method: "POST",
       url: `/visits/${visitId}/start`,
     });
   }
 
   public async endVisit(visitId: string): Promise<void> {
     return this.request<void>({
-      method: 'POST',
+      method: "POST",
       url: `/visits/${visitId}/end`,
     });
   }
 
-  public async sendChatMessage(visitId: string, input: SendChatMessageInput): Promise<ChatMessage> {
+  public async sendChatMessage(
+    visitId: string,
+    input: SendChatMessageInput,
+  ): Promise<ChatMessage> {
     return this.request<ChatMessage>({
-      method: 'POST',
+      method: "POST",
       url: `/visits/${visitId}/chat`,
       data: input,
     });
@@ -465,8 +511,8 @@ export class UnifiedHealthClient {
 
   public async listPlans(): Promise<Plan[]> {
     return this.request<Plan[]>({
-      method: 'GET',
-      url: '/plans',
+      method: "GET",
+      url: "/plans",
     });
   }
 
@@ -474,17 +520,19 @@ export class UnifiedHealthClient {
   // Subscription Methods
   // ==========================================
 
-  public async createSubscription(input: CreateSubscriptionInput): Promise<Subscription> {
+  public async createSubscription(
+    input: CreateSubscriptionInput,
+  ): Promise<Subscription> {
     return this.request<Subscription>({
-      method: 'POST',
-      url: '/subscriptions',
+      method: "POST",
+      url: "/subscriptions",
       data: input,
     });
   }
 
   public async cancelSubscription(subscriptionId: string): Promise<void> {
     return this.request<void>({
-      method: 'DELETE',
+      method: "DELETE",
       url: `/subscriptions/${subscriptionId}`,
     });
   }
@@ -495,15 +543,15 @@ export class UnifiedHealthClient {
 
   public async createConsent(input: CreateConsentInput): Promise<Consent> {
     return this.request<Consent>({
-      method: 'POST',
-      url: '/consents',
+      method: "POST",
+      url: "/consents",
       data: input,
     });
   }
 
   public async getConsent(consentId: string): Promise<Consent> {
     return this.request<Consent>({
-      method: 'GET',
+      method: "GET",
       url: `/consents/${consentId}`,
     });
   }
@@ -512,10 +560,12 @@ export class UnifiedHealthClient {
   // Audit Methods
   // ==========================================
 
-  public async listAuditEvents(params?: ListAuditEventsParams): Promise<PaginatedResponse<AuditEvent>> {
+  public async listAuditEvents(
+    params?: ListAuditEventsParams,
+  ): Promise<PaginatedResponse<AuditEvent>> {
     return this.request<PaginatedResponse<AuditEvent>>({
-      method: 'GET',
-      url: '/audit/events',
+      method: "GET",
+      url: "/audit/events",
       params,
     });
   }
@@ -526,20 +576,22 @@ export class UnifiedHealthClient {
 
   public async getVersion(): Promise<{ version: string; buildDate: string }> {
     return this.request<{ version: string; buildDate: string }>({
-      method: 'GET',
-      url: '/version',
+      method: "GET",
+      url: "/version",
     });
   }
 
   public async getPublicConfig(): Promise<Record<string, any>> {
     return this.request<Record<string, any>>({
-      method: 'GET',
-      url: '/config/public',
+      method: "GET",
+      url: "/config/public",
     });
   }
 }
 
 // Export a factory function for convenience
-export function createClient(config: UnifiedHealthClientConfig): UnifiedHealthClient {
+export function createClient(
+  config: UnifiedHealthClientConfig,
+): UnifiedHealthClient {
   return new UnifiedHealthClient(config);
 }
