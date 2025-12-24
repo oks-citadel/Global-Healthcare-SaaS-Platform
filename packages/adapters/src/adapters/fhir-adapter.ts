@@ -15,6 +15,18 @@ import {
   ObservationQuery,
 } from "../types";
 
+/** FHIR Bundle response type */
+interface FhirBundleResponse extends Record<string, unknown> {
+  entry?: Array<{ resource: Record<string, unknown> }>;
+  total?: number;
+  issue?: Array<{ diagnostics?: string }>;
+}
+
+/** FHIR Resource response type */
+interface FhirResourceResponse extends Record<string, unknown> {
+  issue?: Array<{ diagnostics?: string }>;
+}
+
 /**
  * FHIR R4 Adapter for EHR integrations
  * Supports Epic, Cerner, and other FHIR R4 compliant systems
@@ -84,7 +96,7 @@ export class FhirR4Adapter extends BaseAdapter implements EhrOperations {
     await this.ensureAuthenticated();
 
     const response = await this.fhirRequest("GET", `/Patient/${patientId}`);
-    const data = await response.json();
+    const data = (await response.json()) as FhirResourceResponse;
 
     return {
       success: response.ok,
@@ -125,13 +137,13 @@ export class FhirR4Adapter extends BaseAdapter implements EhrOperations {
       "GET",
       `/Patient?${params.toString()}`,
     );
-    const data = await response.json();
+    const data = (await response.json()) as FhirBundleResponse;
 
     return {
       success: response.ok,
       data: response.ok
         ? {
-            patients: (data.entry || []).map((e: { resource: unknown }) =>
+            patients: (data.entry || []).map((e) =>
               this.transformPatient(e.resource),
             ),
             total: data.total || 0,
@@ -163,7 +175,7 @@ export class FhirR4Adapter extends BaseAdapter implements EhrOperations {
 
     const fhirPatient = this.toFhirPatient(patient);
     const response = await this.fhirRequest("POST", "/Patient", fhirPatient);
-    const data = await response.json();
+    const data = (await response.json()) as FhirResourceResponse;
 
     return {
       success: response.ok,
@@ -198,7 +210,7 @@ export class FhirR4Adapter extends BaseAdapter implements EhrOperations {
       `/Patient/${patientId}`,
       fhirPatient,
     );
-    const data = await response.json();
+    const data = (await response.json()) as FhirResourceResponse;
 
     return {
       success: response.ok,
@@ -227,7 +239,7 @@ export class FhirR4Adapter extends BaseAdapter implements EhrOperations {
     await this.ensureAuthenticated();
 
     const response = await this.fhirRequest("GET", `/Encounter/${encounterId}`);
-    const data = await response.json();
+    const data = (await response.json()) as FhirResourceResponse;
 
     return {
       success: response.ok,
@@ -270,13 +282,13 @@ export class FhirR4Adapter extends BaseAdapter implements EhrOperations {
       "GET",
       `/Encounter?${params.toString()}`,
     );
-    const data = await response.json();
+    const data = (await response.json()) as FhirBundleResponse;
 
     return {
       success: response.ok,
       data: response.ok
         ? {
-            encounters: (data.entry || []).map((e: { resource: unknown }) =>
+            encounters: (data.entry || []).map((e) =>
               this.transformEncounter(e.resource),
             ),
             total: data.total || 0,
@@ -322,13 +334,13 @@ export class FhirR4Adapter extends BaseAdapter implements EhrOperations {
       "GET",
       `/Observation?${params.toString()}`,
     );
-    const data = await response.json();
+    const data = (await response.json()) as FhirBundleResponse;
 
     return {
       success: response.ok,
       data: response.ok
         ? {
-            observations: (data.entry || []).map((e: { resource: unknown }) =>
+            observations: (data.entry || []).map((e) =>
               this.transformObservation(e.resource),
             ),
             total: data.total || 0,
@@ -362,13 +374,13 @@ export class FhirR4Adapter extends BaseAdapter implements EhrOperations {
       "GET",
       `/Condition?patient=${patientId}`,
     );
-    const data = await response.json();
+    const data = (await response.json()) as FhirBundleResponse;
 
     return {
       success: response.ok,
       data: response.ok
         ? {
-            conditions: (data.entry || []).map((e: { resource: unknown }) =>
+            conditions: (data.entry || []).map((e) =>
               this.transformCondition(e.resource),
             ),
             total: data.total || 0,
@@ -394,13 +406,13 @@ export class FhirR4Adapter extends BaseAdapter implements EhrOperations {
       "GET",
       `/MedicationRequest?patient=${patientId}`,
     );
-    const data = await response.json();
+    const data = (await response.json()) as FhirBundleResponse;
 
     return {
       success: response.ok,
       data: response.ok
         ? {
-            medications: (data.entry || []).map((e: { resource: unknown }) =>
+            medications: (data.entry || []).map((e) =>
               this.transformMedication(e.resource),
             ),
             total: data.total || 0,
@@ -426,13 +438,13 @@ export class FhirR4Adapter extends BaseAdapter implements EhrOperations {
       "GET",
       `/AllergyIntolerance?patient=${patientId}`,
     );
-    const data = await response.json();
+    const data = (await response.json()) as FhirBundleResponse;
 
     return {
       success: response.ok,
       data: response.ok
         ? {
-            allergies: (data.entry || []).map((e: { resource: unknown }) =>
+            allergies: (data.entry || []).map((e) =>
               this.transformAllergy(e.resource),
             ),
             total: data.total || 0,
@@ -458,13 +470,13 @@ export class FhirR4Adapter extends BaseAdapter implements EhrOperations {
       "GET",
       `/DocumentReference?patient=${patientId}`,
     );
-    const data = await response.json();
+    const data = (await response.json()) as FhirBundleResponse;
 
     return {
       success: response.ok,
       data: response.ok
         ? {
-            documents: (data.entry || []).map((e: { resource: unknown }) =>
+            documents: (data.entry || []).map((e) =>
               this.transformDocument(e.resource),
             ),
             total: data.total || 0,
@@ -490,7 +502,7 @@ export class FhirR4Adapter extends BaseAdapter implements EhrOperations {
       "GET",
       `/DocumentReference/${documentId}`,
     );
-    const data = await response.json();
+    const data = (await response.json()) as FhirResourceResponse;
 
     return {
       success: response.ok,
