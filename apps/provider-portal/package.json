@@ -4,9 +4,9 @@
   "description": "Healthcare Provider Portal for doctors, nurses, and specialists",
   "private": true,
   "scripts": {
-    "dev": "npx next dev -p 3001",
+    "dev": "npx next dev -p 3002",
     "build": "npx next build",
-    "start": "npx next start -p 3001",
+    "start": "npx next start -p 3002",
     "lint": "npx next lint",
     "typecheck": "tsc --noEmit"
   },
