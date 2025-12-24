@@ -1,0 +1,29 @@
+# ============================================
+# UnifiedHealth Web Frontend - Production Service
+# ============================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  namespace: unifiedhealth-production
+  labels:
+    app: web
+    environment: production
+    tier: frontend
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: /api/health
+    service.beta.kubernetes.io/azure-load-balancer-health-probe-protocol: http
+spec:
+  type: LoadBalancer
+  selector:
+    app: web
+    environment: production
+  ports:
+    - name: http
+      port: 80
+      targetPort: 3000
+      protocol: TCP
+  # Session affinity for consistent user experience
+  sessionAffinity: None
+  # External traffic policy for better performance
+  externalTrafficPolicy: Cluster
