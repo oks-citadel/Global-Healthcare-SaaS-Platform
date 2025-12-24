@@ -21,6 +21,7 @@ import {
   ResetPasswordInput,
   VerifyEmailInput,
 } from "../dtos/auth.dto.js";
+import { MfaRequiredResponse } from "../dtos/mfa.dto.js";
 
 export class AuthService {
   /**
