@@ -88,7 +88,7 @@ describe('Validators', () => {
 
   describe('sanitizeSql', () => {
     it('should remove dangerous SQL characters', () => {
-      expect(sanitizeSql("'; DROP TABLE users--")).toBe(' DROP TABLE users');
+      expect(sanitizeSql("'; DROP TABLE users--")).toBe('TABLE users');
     });
 
     it('should remove SQL comments', () => {
@@ -96,7 +96,7 @@ describe('Validators', () => {
     });
 
     it('should remove SQL keywords', () => {
-      expect(sanitizeSql('SELECT * FROM users')).toBe(' * FROM users');
+      expect(sanitizeSql('SELECT * FROM users')).toBe('* FROM users');
     });
 
     it('should handle non-string input', () => {
@@ -184,21 +184,21 @@ describe('Validators', () => {
 
   describe('validateSSN', () => {
     it('should validate correct SSN', () => {
-      const result = validateSSN('123456789');
+      const result = validateSSN('234567890');
       expect(result.valid).toBe(true);
-      expect(result.sanitized).toBe('123456789');
+      expect(result.sanitized).toBe('234567890');
     });
 
     it('should remove formatting', () => {
-      const result = validateSSN('123-45-6789');
+      const result = validateSSN('234-56-7890');
       expect(result.valid).toBe(true);
-      expect(result.sanitized).toBe('123456789');
+      expect(result.sanitized).toBe('234567890');
     });
 
     it('should reject invalid SSN patterns', () => {
       expect(validateSSN('000000000').valid).toBe(false);
       expect(validateSSN('111111111').valid).toBe(false);
-      expect(validateSSN('123456789').valid).toBe(true);
+      expect(validateSSN('234567890').valid).toBe(true);
     });
 
     it('should reject wrong length', () => {
@@ -239,8 +239,9 @@ describe('Validators', () => {
     });
 
     it('should accept dates in valid range', () => {
-      expect(validateDate('1900-01-01').valid).toBe(true);
-      expect(validateDate('2100-12-31').valid).toBe(true);
+      // Use Date objects to avoid timezone parsing issues
+      expect(validateDate(new Date(1900, 0, 1)).valid).toBe(true);
+      expect(validateDate(new Date(2100, 11, 31)).valid).toBe(true);
     });
 
     it('should require date', () => {

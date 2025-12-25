@@ -5,12 +5,12 @@ import {
   CacheKeys,
   CacheTTL,
 } from "../../../src/lib/cache.js";
-import { mockRedisClient } from "../helpers/mocks.js";
+import { sharedRedisClient, resetRedisClientMock } from "../helpers/mocks.js";
 import { mockRedisConfig } from "../helpers/fixtures.js";
 
 // Mock Redis
 vi.mock("redis", () => ({
-  createClient: vi.fn(() => mockRedisClient()),
+  createClient: vi.fn(() => sharedRedisClient),
 }));
 
 // Mock logger
@@ -23,14 +23,12 @@ vi.mock("../../../src/utils/logger.js", () => ({
   },
 }));
 
-describe.skip("CacheService", () => {
+describe("CacheService", () => {
   let cacheService: CacheService;
-  let redisClient: ReturnType<typeof mockRedisClient>;
-
   beforeEach(async () => {
     vi.clearAllMocks();
-    const { createClient } = await import("redis");
-    redisClient = createClient() as any;
+    resetRedisClientMock();
+    
     cacheService = new CacheService(mockRedisConfig);
     await cacheService.connect();
   });
@@ -41,31 +39,29 @@ describe.skip("CacheService", () => {
 
   describe("connect", () => {
     it("should connect to Redis successfully", async () => {
-      expect(redisClient.connect).toHaveBeenCalled();
+      expect(sharedRedisClient.connect).toHaveBeenCalled();
       expect(cacheService.isHealthy()).toBe(true);
     });
 
     it("should set up error handlers", async () => {
-      expect(redisClient.on).toHaveBeenCalledWith(
+      expect(sharedRedisClient.on).toHaveBeenCalledWith(
         "error",
         expect.any(Function),
       );
-      expect(redisClient.on).toHaveBeenCalledWith(
+      expect(sharedRedisClient.on).toHaveBeenCalledWith(
         "connect",
         expect.any(Function),
       );
-      expect(redisClient.on).toHaveBeenCalledWith(
+      expect(sharedRedisClient.on).toHaveBeenCalledWith(
         "reconnecting",
         expect.any(Function),
       );
     });
 
     it("should throw CacheError on connection failure", async () => {
-      const { createClient } = await import("redis");
-      vi.mocked(createClient).mockReturnValueOnce({
-        ...mockRedisClient(),
-        connect: vi.fn().mockRejectedValue(new Error("Connection failed")),
-      } as any);
+      sharedRedisClient.connect
+        .mockRejectedValueOnce(new Error("Connection failed"))
+        .mockRejectedValueOnce(new Error("Connection failed"));
 
       const newService = new CacheService(mockRedisConfig);
       await expect(newService.connect()).rejects.toThrow(CacheError);
@@ -79,7 +75,7 @@ describe.skip("CacheService", () => {
     it("should disconnect from Redis", async () => {
       await cacheService.disconnect();
 
-      expect(redisClient.quit).toHaveBeenCalled();
+      expect(sharedRedisClient.quit).toHaveBeenCalled();
       expect(cacheService.isHealthy()).toBe(false);
     });
 
@@ -87,23 +83,23 @@ describe.skip("CacheService", () => {
       await cacheService.disconnect();
       await cacheService.disconnect();
 
-      expect(redisClient.quit).toHaveBeenCalledTimes(1);
+      expect(sharedRedisClient.quit).toHaveBeenCalledTimes(1);
     });
   });
 
   describe("get", () => {
     it("should get value from cache", async () => {
       const testData = { id: "123", name: "Test" };
-      redisClient.get.mockResolvedValue(JSON.stringify(testData));
+      sharedRedisClient.get.mockResolvedValue(JSON.stringify(testData));
 
       const result = await cacheService.get("test-key");
 
-      expect(redisClient.get).toHaveBeenCalledWith("test:test-key");
+      expect(sharedRedisClient.get).toHaveBeenCalledWith("test:test-key");
       expect(result).toEqual(testData);
     });
 
     it("should return null for cache miss", async () => {
-      redisClient.get.mockResolvedValue(null);
+      sharedRedisClient.get.mockResolvedValue(null);
 
       const result = await cacheService.get("missing-key");
 
@@ -111,7 +107,7 @@ describe.skip("CacheService", () => {
     });
 
     it("should track cache hits", async () => {
-      redisClient.get.mockResolvedValue(JSON.stringify({ data: "test" }));
+      sharedRedisClient.get.mockResolvedValue(JSON.stringify({ data: "test" }));
 
       await cacheService.get("test-key");
       const stats = cacheService.getStats();
@@ -121,7 +117,7 @@ describe.skip("CacheService", () => {
     });
 
     it("should track cache misses", async () => {
-      redisClient.get.mockResolvedValue(null);
+      sharedRedisClient.get.mockResolvedValue(null);
 
       await cacheService.get("missing-key");
       const stats = cacheService.getStats();
@@ -131,7 +127,7 @@ describe.skip("CacheService", () => {
     });
 
     it("should calculate hit rate", async () => {
-      redisClient.get
+      sharedRedisClient.get
         .mockResolvedValueOnce(JSON.stringify({ data: "test" }))
         .mockResolvedValueOnce(null)
         .mockResolvedValueOnce(JSON.stringify({ data: "test" }));
@@ -145,7 +141,7 @@ describe.skip("CacheService", () => {
     });
 
     it("should handle JSON parse errors", async () => {
-      redisClient.get.mockResolvedValue("invalid-json{");
+      sharedRedisClient.get.mockResolvedValue("invalid-json{");
 
       const result = await cacheService.get("test-key");
 
@@ -158,11 +154,11 @@ describe.skip("CacheService", () => {
       const result = await cacheService.get("test-key");
 
       expect(result).toBeNull();
-      expect(redisClient.get).not.toHaveBeenCalled();
+      expect(sharedRedisClient.get).not.toHaveBeenCalled();
     });
 
     it("should handle Redis errors", async () => {
-      redisClient.get.mockRejectedValue(new Error("Redis error"));
+      sharedRedisClient.get.mockRejectedValue(new Error("Redis error"));
 
       const result = await cacheService.get("test-key");
 
@@ -178,7 +174,7 @@ describe.skip("CacheService", () => {
 
       await cacheService.set("test-key", testData);
 
-      expect(redisClient.setEx).toHaveBeenCalledWith(
+      expect(sharedRedisClient.setEx).toHaveBeenCalledWith(
         "test:test-key",
         3600,
         JSON.stringify(testData),
@@ -190,7 +186,7 @@ describe.skip("CacheService", () => {
 
       await cacheService.set("test-key", testData, 1800);
 
-      expect(redisClient.setEx).toHaveBeenCalledWith(
+      expect(sharedRedisClient.setEx).toHaveBeenCalledWith(
         "test:test-key",
         1800,
         JSON.stringify(testData),
@@ -209,7 +205,7 @@ describe.skip("CacheService", () => {
       await cacheService.set("number-key", 123);
       await cacheService.set("boolean-key", true);
 
-      expect(redisClient.setEx).toHaveBeenCalledTimes(3);
+      expect(sharedRedisClient.setEx).toHaveBeenCalledTimes(3);
     });
 
     it("should do nothing when cache not connected", async () => {
@@ -217,11 +213,11 @@ describe.skip("CacheService", () => {
 
       await cacheService.set("test-key", { data: "test" });
 
-      expect(redisClient.setEx).not.toHaveBeenCalled();
+      expect(sharedRedisClient.setEx).not.toHaveBeenCalled();
     });
 
     it("should throw CacheError on Redis error", async () => {
-      redisClient.setEx.mockRejectedValue(new Error("Redis error"));
+      sharedRedisClient.setEx.mockRejectedValue(new Error("Redis error"));
 
       await expect(
         cacheService.set("test-key", { data: "test" }),
@@ -233,7 +229,7 @@ describe.skip("CacheService", () => {
     it("should delete value from cache", async () => {
       await cacheService.delete("test-key");
 
-      expect(redisClient.del).toHaveBeenCalledWith("test:test-key");
+      expect(sharedRedisClient.del).toHaveBeenCalledWith("test:test-key");
     });
 
     it("should track cache deletes", async () => {
@@ -248,11 +244,11 @@ describe.skip("CacheService", () => {
 
       await cacheService.delete("test-key");
 
-      expect(redisClient.del).not.toHaveBeenCalled();
+      expect(sharedRedisClient.del).not.toHaveBeenCalled();
     });
 
     it("should throw CacheError on Redis error", async () => {
-      redisClient.del.mockRejectedValue(new Error("Redis error"));
+      sharedRedisClient.del.mockRejectedValue(new Error("Redis error"));
 
       await expect(cacheService.delete("test-key")).rejects.toThrow(CacheError);
     });
@@ -260,13 +256,13 @@ describe.skip("CacheService", () => {
 
   describe("deletePattern", () => {
     it("should delete keys matching pattern", async () => {
-      redisClient.keys.mockResolvedValue(["test:user:1", "test:user:2"]);
-      redisClient.del.mockResolvedValue(2);
+      sharedRedisClient.keys.mockResolvedValue(["test:user:1", "test:user:2"]);
+      sharedRedisClient.del.mockResolvedValue(2);
 
       const deleted = await cacheService.deletePattern("user:*");
 
-      expect(redisClient.keys).toHaveBeenCalledWith("test:user:*");
-      expect(redisClient.del).toHaveBeenCalledWith([
+      expect(sharedRedisClient.keys).toHaveBeenCalledWith("test:user:*");
+      expect(sharedRedisClient.del).toHaveBeenCalledWith([
         "test:user:1",
         "test:user:2",
       ]);
@@ -274,17 +270,17 @@ describe.skip("CacheService", () => {
     });
 
     it("should return 0 when no keys match", async () => {
-      redisClient.keys.mockResolvedValue([]);
+      sharedRedisClient.keys.mockResolvedValue([]);
 
       const deleted = await cacheService.deletePattern("nonexistent:*");
 
       expect(deleted).toBe(0);
-      expect(redisClient.del).not.toHaveBeenCalled();
+      expect(sharedRedisClient.del).not.toHaveBeenCalled();
     });
 
     it("should track deletes", async () => {
-      redisClient.keys.mockResolvedValue(["key1", "key2"]);
-      redisClient.del.mockResolvedValue(2);
+      sharedRedisClient.keys.mockResolvedValue(["key1", "key2"]);
+      sharedRedisClient.del.mockResolvedValue(2);
 
       await cacheService.deletePattern("pattern:*");
 
@@ -301,7 +297,7 @@ describe.skip("CacheService", () => {
     });
 
     it("should throw CacheError on Redis error", async () => {
-      redisClient.keys.mockRejectedValue(new Error("Redis error"));
+      sharedRedisClient.keys.mockRejectedValue(new Error("Redis error"));
 
       await expect(cacheService.deletePattern("test:*")).rejects.toThrow(
         CacheError,
@@ -311,16 +307,16 @@ describe.skip("CacheService", () => {
 
   describe("exists", () => {
     it("should return true if key exists", async () => {
-      redisClient.exists.mockResolvedValue(1);
+      sharedRedisClient.exists.mockResolvedValue(1);
 
       const result = await cacheService.exists("test-key");
 
       expect(result).toBe(true);
-      expect(redisClient.exists).toHaveBeenCalledWith("test:test-key");
+      expect(sharedRedisClient.exists).toHaveBeenCalledWith("test:test-key");
     });
 
     it("should return false if key does not exist", async () => {
-      redisClient.exists.mockResolvedValue(0);
+      sharedRedisClient.exists.mockResolvedValue(0);
 
       const result = await cacheService.exists("missing-key");
 
@@ -336,7 +332,7 @@ describe.skip("CacheService", () => {
     });
 
     it("should handle Redis errors", async () => {
-      redisClient.exists.mockRejectedValue(new Error("Redis error"));
+      sharedRedisClient.exists.mockRejectedValue(new Error("Redis error"));
 
       const result = await cacheService.exists("test-key");
 
@@ -346,12 +342,12 @@ describe.skip("CacheService", () => {
 
   describe("getTTL", () => {
     it("should return TTL for key", async () => {
-      redisClient.ttl.mockResolvedValue(3600);
+      sharedRedisClient.ttl.mockResolvedValue(3600);
 
       const ttl = await cacheService.getTTL("test-key");
 
       expect(ttl).toBe(3600);
-      expect(redisClient.ttl).toHaveBeenCalledWith("test:test-key");
+      expect(sharedRedisClient.ttl).toHaveBeenCalledWith("test:test-key");
     });
 
     it("should return -1 when cache not connected", async () => {
@@ -363,7 +359,7 @@ describe.skip("CacheService", () => {
     });
 
     it("should handle Redis errors", async () => {
-      redisClient.ttl.mockRejectedValue(new Error("Redis error"));
+      sharedRedisClient.ttl.mockRejectedValue(new Error("Redis error"));
 
       const ttl = await cacheService.getTTL("test-key");
 
@@ -374,19 +370,19 @@ describe.skip("CacheService", () => {
   describe("getOrSet", () => {
     it("should return cached value if exists", async () => {
       const cachedData = { id: "123", name: "Cached" };
-      redisClient.get.mockResolvedValue(JSON.stringify(cachedData));
+      sharedRedisClient.get.mockResolvedValue(JSON.stringify(cachedData));
 
       const factory = vi.fn();
       const result = await cacheService.getOrSet("test-key", factory);
 
       expect(result).toEqual(cachedData);
       expect(factory).not.toHaveBeenCalled();
-      expect(redisClient.setEx).not.toHaveBeenCalled();
+      expect(sharedRedisClient.setEx).not.toHaveBeenCalled();
     });
 
     it("should compute and cache value if not exists", async () => {
       const computedData = { id: "123", name: "Computed" };
-      redisClient.get.mockResolvedValue(null);
+      sharedRedisClient.get.mockResolvedValue(null);
       const factory = vi.fn().mockResolvedValue(computedData);
 
       const result = await cacheService.getOrSet("test-key", factory);
@@ -398,7 +394,7 @@ describe.skip("CacheService", () => {
     });
 
     it("should use custom TTL", async () => {
-      redisClient.get.mockResolvedValue(null);
+      sharedRedisClient.get.mockResolvedValue(null);
       const factory = vi.fn().mockResolvedValue({ data: "test" });
 
       await cacheService.getOrSet("test-key", factory, 1800);
@@ -407,7 +403,7 @@ describe.skip("CacheService", () => {
     });
 
     it("should handle factory errors", async () => {
-      redisClient.get.mockResolvedValue(null);
+      sharedRedisClient.get.mockResolvedValue(null);
       const factory = vi.fn().mockRejectedValue(new Error("Factory error"));
 
       await expect(cacheService.getOrSet("test-key", factory)).rejects.toThrow(
@@ -418,15 +414,15 @@ describe.skip("CacheService", () => {
 
   describe("invalidateByTag", () => {
     it("should invalidate cache by tag", async () => {
-      redisClient.keys.mockResolvedValue([
+      sharedRedisClient.keys.mockResolvedValue([
         "test:tag:user:1",
         "test:tag:user:2",
       ]);
-      redisClient.del.mockResolvedValue(2);
+      sharedRedisClient.del.mockResolvedValue(2);
 
       const deleted = await cacheService.invalidateByTag("user");
 
-      expect(redisClient.keys).toHaveBeenCalledWith("test:*:user:*");
+      expect(sharedRedisClient.keys).toHaveBeenCalledWith("test:*:user:*");
       expect(deleted).toBe(2);
     });
   });
@@ -435,7 +431,7 @@ describe.skip("CacheService", () => {
     it("should flush all cache entries", async () => {
       await cacheService.flush();
 
-      expect(redisClient.flushDb).toHaveBeenCalled();
+      expect(sharedRedisClient.flushDb).toHaveBeenCalled();
     });
 
     it("should do nothing when cache not connected", async () => {
@@ -443,11 +439,11 @@ describe.skip("CacheService", () => {
 
       await cacheService.flush();
 
-      expect(redisClient.flushDb).not.toHaveBeenCalled();
+      expect(sharedRedisClient.flushDb).not.toHaveBeenCalled();
     });
 
     it("should throw CacheError on Redis error", async () => {
-      redisClient.flushDb.mockRejectedValue(new Error("Redis error"));
+      sharedRedisClient.flushDb.mockRejectedValue(new Error("Redis error"));
 
       await expect(cacheService.flush()).rejects.toThrow(CacheError);
     });
@@ -483,7 +479,7 @@ describe.skip("CacheService", () => {
       const result = await cacheService.ping();
 
       expect(result).toBe(true);
-      expect(redisClient.ping).toHaveBeenCalled();
+      expect(sharedRedisClient.ping).toHaveBeenCalled();
     });
 
     it("should return false when cache not connected", async () => {
@@ -495,7 +491,7 @@ describe.skip("CacheService", () => {
     });
 
     it("should return false on ping error", async () => {
-      redisClient.ping.mockRejectedValue(new Error("Ping failed"));
+      sharedRedisClient.ping.mockRejectedValue(new Error("Ping failed"));
 
       const result = await cacheService.ping();
 

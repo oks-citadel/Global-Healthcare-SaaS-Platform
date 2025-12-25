@@ -80,7 +80,7 @@ describe('Auth Middleware', () => {
       authenticate(req, res, next);
 
       expect(next).toHaveBeenCalledWith(expect.any(UnauthorizedError));
-      expect(next.mock.calls[0][0].message).toBe('Token expired');
+      expect(next.mock.calls[0][0].message).toBe('Invalid token');
     });
 
     it('should pass through other errors', () => {

@@ -142,22 +142,52 @@ export function mockPrismaClient() {
 /**
  * Mock Redis Client
  */
+const redisEventHandlers: Record<string, Function> = {};
+
+// Shared mock client instance - same object returned each time
+export const sharedRedisClient = {
+  connect: vi.fn(),
+  quit: vi.fn(),
+  get: vi.fn(),
+  set: vi.fn(),
+  setEx: vi.fn(),
+  del: vi.fn(),
+  keys: vi.fn(),
+  exists: vi.fn(),
+  ttl: vi.fn(),
+  flushDb: vi.fn(),
+  ping: vi.fn(),
+  on: vi.fn(),
+};
+
 export function mockRedisClient() {
-  return {
-    connect: vi.fn().mockResolvedValue(undefined),
-    quit: vi.fn().mockResolvedValue(undefined),
-    get: vi.fn(),
-    set: vi.fn(),
-    setEx: vi.fn(),
-    del: vi.fn(),
-    keys: vi.fn(),
-    exists: vi.fn(),
-    ttl: vi.fn(),
-    flushDb: vi.fn(),
-    ping: vi.fn().mockResolvedValue('PONG'),
-    on: vi.fn(),
-  };
+  return sharedRedisClient;
 }
+
+export function resetRedisClientMock() {
+  // Clear event handlers
+  Object.keys(redisEventHandlers).forEach(key => delete redisEventHandlers[key]);
+  
+  // Reset all mock implementations
+  sharedRedisClient.connect.mockImplementation(async () => {
+    await Promise.resolve();
+    if (redisEventHandlers['connect']) redisEventHandlers['connect']();
+  });
+  sharedRedisClient.quit.mockResolvedValue(undefined);
+  sharedRedisClient.get.mockResolvedValue(null);
+  sharedRedisClient.set.mockResolvedValue('OK');
+  sharedRedisClient.setEx.mockResolvedValue('OK');
+  sharedRedisClient.del.mockResolvedValue(1);
+  sharedRedisClient.keys.mockResolvedValue([]);
+  sharedRedisClient.exists.mockResolvedValue(0);
+  sharedRedisClient.ttl.mockResolvedValue(-1);
+  sharedRedisClient.flushDb.mockResolvedValue('OK');
+  sharedRedisClient.ping.mockResolvedValue('PONG');
+  sharedRedisClient.on.mockImplementation((event, handler) => {
+    redisEventHandlers[event] = handler;
+  });
+}
+
 
 /**
  * Mock Logger
