@@ -4,9 +4,9 @@ const nextConfig = {
   poweredByHeader: false,
   output: 'standalone',
 
-  // Skip TypeScript errors during build (fix these later)
+  // TypeScript strict mode - do not ignore errors in production
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
 
 

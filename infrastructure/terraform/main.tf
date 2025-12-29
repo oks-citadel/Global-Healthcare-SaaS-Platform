@@ -16,6 +16,10 @@ terraform {
       source  = "hashicorp/azuread"
       version = "~> 3.7.0"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.6.0"
+    }
   }
 }
 
@@ -214,6 +218,38 @@ resource "azurerm_role_assignment" "aks_keyvault_secrets" {
 # PostgreSQL Flexible Server
 # ============================================
 
+# Generate secure random password for PostgreSQL admin
+resource "random_password" "postgresql_admin" {
+  length           = 32
+  special          = true
+  override_special = "!#$%&*()-_=+[]{}<>:?"
+  min_lower        = 4
+  min_upper        = 4
+  min_numeric      = 4
+  min_special      = 4
+}
+
+# Store PostgreSQL admin password in Key Vault
+resource "azurerm_key_vault_secret" "postgresql_admin_password" {
+  name         = "postgresql-admin-password"
+  value        = random_password.postgresql_admin.result
+  key_vault_id = azurerm_key_vault.main.id
+  content_type = "password"
+
+  tags = merge(local.common_tags, {
+    Purpose = "PostgreSQL Admin Password"
+  })
+
+  depends_on = [azurerm_role_assignment.terraform_keyvault_secrets]
+}
+
+# Grant Terraform service principal access to Key Vault secrets
+resource "azurerm_role_assignment" "terraform_keyvault_secrets" {
+  scope                = azurerm_key_vault.main.id
+  role_definition_name = "Key Vault Secrets Officer"
+  principal_id         = data.azurerm_client_config.current.object_id
+}
+
 resource "azurerm_private_dns_zone" "postgresql" {
   name                = "${var.project_name}-${var.environment}.postgres.database.azure.com"
   resource_group_name = azurerm_resource_group.main.name
@@ -236,7 +272,7 @@ resource "azurerm_postgresql_flexible_server" "main" {
   private_dns_zone_id           = azurerm_private_dns_zone.postgresql.id
   public_network_access_enabled = false
   administrator_login           = var.postgresql_admin_username
-  administrator_password        = var.postgresql_admin_password
+  administrator_password        = random_password.postgresql_admin.result
   zone                          = "1"
   storage_mb                    = var.postgresql_storage_mb
   sku_name                      = var.postgresql_sku
@@ -244,6 +280,14 @@ resource "azurerm_postgresql_flexible_server" "main" {
   tags                          = local.common_tags
 
   depends_on = [azurerm_private_dns_zone_virtual_network_link.postgresql]
+
+  lifecycle {
+    ignore_changes = [
+      # Prevent password from being reset on subsequent applies
+      # Password is managed via Key Vault
+      administrator_password
+    ]
+  }
 }
 
 resource "azurerm_postgresql_flexible_server_database" "unified_health" {

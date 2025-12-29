@@ -214,3 +214,79 @@ export function useDashboardStats() {
     },
   });
 }
+
+// Message types
+export interface Message {
+  id: string;
+  conversationId: string;
+  senderId: string;
+  content: string;
+  timestamp: string;
+  read: boolean;
+}
+
+export interface Conversation {
+  id: string;
+  participant: string;
+  role: string;
+  avatar?: string;
+  lastMessage: string;
+  timestamp: string;
+  unread: number;
+}
+
+export interface SendMessageData {
+  conversationId: string;
+  content: string;
+}
+
+// Query key factory for messages
+const messageKeys = {
+  all: ['messages'] as const,
+  conversations: () => [...messageKeys.all, 'conversations'] as const,
+  conversation: (id: string) => [...messageKeys.conversations(), id] as const,
+  messages: (conversationId: string) => [...messageKeys.all, 'messages', conversationId] as const,
+};
+
+// Fetch conversations
+export function useConversations() {
+  return useQuery<Conversation[]>({
+    queryKey: messageKeys.conversations(),
+    queryFn: async () => {
+      const response = await apiClient.get('/messages/conversations');
+      return response.data;
+    },
+  });
+}
+
+// Fetch messages for a conversation
+export function useMessages(conversationId: string) {
+  return useQuery<Message[]>({
+    queryKey: messageKeys.messages(conversationId),
+    queryFn: async () => {
+      const response = await apiClient.get(`/messages/conversations/${conversationId}/messages`);
+      return response.data;
+    },
+    enabled: !!conversationId,
+  });
+}
+
+// Send message mutation
+export function useSendMessage() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: SendMessageData) => {
+      const response = await apiClient.post(`/messages/conversations/${data.conversationId}/messages`, {
+        content: data.content,
+      });
+      return response.data;
+    },
+    onSuccess: (_data, variables) => {
+      // Invalidate messages for this conversation to refetch
+      queryClient.invalidateQueries({ queryKey: messageKeys.messages(variables.conversationId) });
+      // Also invalidate conversations to update last message
+      queryClient.invalidateQueries({ queryKey: messageKeys.conversations() });
+    },
+  });
+}

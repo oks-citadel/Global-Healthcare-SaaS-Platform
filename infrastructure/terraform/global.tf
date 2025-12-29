@@ -94,9 +94,14 @@ resource "azurerm_container_registry" "global" {
   network_rule_set {
     default_action = "Deny"
 
-    ip_rule {
-      action   = "Allow"
-      ip_range = "0.0.0.0/0" # Update with specific IPs in production
+    # Only allow specific IP ranges (CI/CD runners, VPN, etc.)
+    # SECURITY: Do NOT use 0.0.0.0/0 in production
+    dynamic "ip_rule" {
+      for_each = var.acr_allowed_cidrs
+      content {
+        action   = "Allow"
+        ip_range = ip_rule.value
+      }
     }
   }
 }

@@ -1,6 +1,5 @@
-// @ts-nocheck
-import { Router } from 'express';
-import { PrismaClient } from '../generated/client';
+import { Router, Response } from 'express';
+import { PrismaClient, Prisma } from '../generated/client';
 import { z } from 'zod';
 import { UserRequest, requireUser } from '../middleware/extractUser';
 
@@ -19,11 +18,11 @@ const createOrderSchema = z.object({
   clinicalInfo: z.string().optional(),
 });
 
-router.get('/', requireUser, async (req: UserRequest, res) => {
+router.get('/', requireUser, async (req: UserRequest, res: Response) => {
   try {
     const userId = req.user!.id;
     const userRole = req.user!.role;
-    const where: any = {};
+    const where: Prisma.LabOrderWhereInput = {};
 
     if (userRole === 'patient') {
       where.patientId = userId;
@@ -44,7 +43,7 @@ router.get('/', requireUser, async (req: UserRequest, res) => {
   }
 });
 
-router.get('/:id', requireUser, async (req: UserRequest, res) => {
+router.get('/:id', requireUser, async (req: UserRequest, res: Response) => {
   try {
     const { id } = req.params;
     const userId = req.user!.id;
@@ -75,7 +74,7 @@ router.get('/:id', requireUser, async (req: UserRequest, res) => {
   }
 });
 
-router.post('/', requireUser, async (req: UserRequest, res) => {
+router.post('/', requireUser, async (req: UserRequest, res: Response) => {
   try {
     const userId = req.user!.id;
     if (req.user!.role !== 'provider') {
@@ -111,7 +110,7 @@ router.post('/', requireUser, async (req: UserRequest, res) => {
   }
 });
 
-router.patch('/:id/status', requireUser, async (req: UserRequest, res) => {
+router.patch('/:id/status', requireUser, async (req: UserRequest, res: Response) => {
   try {
     const { id } = req.params;
     const { status } = req.body;

@@ -159,3 +159,21 @@ variable "monthly_budget_usd" {
   type        = number
   default     = 50000
 }
+
+# ============================================
+# Network Security
+# ============================================
+
+variable "acr_allowed_cidrs" {
+  description = "CIDR ranges allowed to access ACR (CI/CD runners, VPN IPs)"
+  type        = list(string)
+  default     = []
+  # Example: ["20.37.194.0/24", "20.42.5.0/24"]
+  # GitHub Actions IPs can be found at: https://api.github.com/meta
+}
+
+variable "keyvault_allowed_cidrs" {
+  description = "CIDR ranges allowed to access Key Vault"
+  type        = list(string)
+  default     = []
+}
