@@ -1,0 +1,468 @@
+# ============================================
+# UnifiedHealth Platform - CI Test Pipeline
+# Runs unit tests, integration tests, and security tests on PR/Push
+# ============================================
+
+name: CI Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+  push:
+    branches:
+      - main
+      - develop
+
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: "20"
+  PNPM_VERSION: "8"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ==========================================
+  # Setup - Cache dependencies
+  # ==========================================
+  setup:
+    name: Setup
+    runs-on: ubuntu-latest
+    outputs:
+      cache-key: ${{ steps.cache-key.outputs.key }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate cache key
+        id: cache-key
+        run: echo "key=${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}" >> $GITHUB_OUTPUT
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+  # ==========================================
+  # Unit Tests - API Service
+  # ==========================================
+  unit-tests-api:
+    name: Unit Tests - API
+    runs-on: ubuntu-latest
+    needs: setup
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+      - name: Restore pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: cd services/api && pnpm db:generate
+
+      - name: Run unit tests
+        run: cd services/api && pnpm test -- tests/unit/ --reporter=verbose
+        env:
+          NODE_ENV: test
+          JWT_SECRET: test-secret-key-for-ci-tests-only-32chars
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-results-api
+          path: services/api/coverage/
+          if-no-files-found: ignore
+
+  # ==========================================
+  # Unit Tests - Notification Service
+  # ==========================================
+  unit-tests-notification:
+    name: Unit Tests - Notification
+    runs-on: ubuntu-latest
+    needs: setup
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+      - name: Restore pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: cd services/notification-service && pnpm db:generate
+
+      - name: Run unit tests
+        run: cd services/notification-service && pnpm test --reporter=verbose
+        env:
+          NODE_ENV: test
+          JWT_SECRET: test-secret-key-for-ci-tests-only-32chars
+
+  # ==========================================
+  # Payment & Billing Tests
+  # ==========================================
+  payment-tests:
+    name: Payment & Billing Tests
+    runs-on: ubuntu-latest
+    needs: setup
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+      - name: Restore pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: cd services/api && pnpm db:generate
+
+      - name: Run payment tests
+        run: |
+          cd services/api
+          pnpm test -- tests/unit/services/payment.service.test.ts --reporter=verbose
+        env:
+          NODE_ENV: test
+          JWT_SECRET: test-secret-key-for-ci-tests-only-32chars
+          STRIPE_SECRET_KEY: sk_test_mock
+
+  # ==========================================
+  # Stripe Webhook Tests
+  # ==========================================
+  webhook-tests:
+    name: Stripe Webhook Tests
+    runs-on: ubuntu-latest
+    needs: setup
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+      - name: Restore pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: cd services/api && pnpm db:generate
+
+      - name: Run webhook tests
+        run: |
+          cd services/api
+          pnpm test -- tests/webhooks/ --reporter=verbose
+        env:
+          NODE_ENV: test
+          JWT_SECRET: test-secret-key-for-ci-tests-only-32chars
+          STRIPE_SECRET_KEY: sk_test_mock
+          STRIPE_WEBHOOK_SECRET: whsec_test_secret
+
+  # ==========================================
+  # Security Tests
+  # ==========================================
+  security-tests:
+    name: Security Tests
+    runs-on: ubuntu-latest
+    needs: setup
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+      - name: Restore pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: cd services/api && pnpm db:generate
+
+      - name: Run security tests
+        run: |
+          cd services/api
+          pnpm test -- tests/security/ --reporter=verbose
+        env:
+          NODE_ENV: test
+          JWT_SECRET: test-secret-key-for-ci-tests-only-32chars
+
+      - name: Upload security test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-test-results
+          path: services/api/coverage/
+          if-no-files-found: ignore
+
+  # ==========================================
+  # TypeScript Type Checking
+  # ==========================================
+  typecheck:
+    name: TypeScript Check
+    runs-on: ubuntu-latest
+    needs: setup
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+      - name: Restore pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Type check API service
+        run: cd services/api && pnpm typecheck
+
+      - name: Type check Notification service
+        run: cd services/notification-service && pnpm typecheck
+        continue-on-error: true
+
+  # ==========================================
+  # CI Gate Summary
+  # ==========================================
+  ci-gate:
+    name: CI Gate
+    runs-on: ubuntu-latest
+    needs:
+      - unit-tests-api
+      - unit-tests-notification
+      - payment-tests
+      - webhook-tests
+      - security-tests
+      - typecheck
+    if: always()
+
+    steps:
+      - name: Check all CI jobs
+        run: |
+          echo "Unit Tests API: ${{ needs.unit-tests-api.result }}"
+          echo "Unit Tests Notification: ${{ needs.unit-tests-notification.result }}"
+          echo "Payment Tests: ${{ needs.payment-tests.result }}"
+          echo "Webhook Tests: ${{ needs.webhook-tests.result }}"
+          echo "Security Tests: ${{ needs.security-tests.result }}"
+          echo "TypeScript Check: ${{ needs.typecheck.result }}"
+
+          FAILED=false
+
+          if [ "${{ needs.unit-tests-api.result }}" == "failure" ]; then
+            echo "::error::Unit tests for API service failed."
+            FAILED=true
+          fi
+
+          if [ "${{ needs.payment-tests.result }}" == "failure" ]; then
+            echo "::error::Payment tests failed."
+            FAILED=true
+          fi
+
+          if [ "${{ needs.webhook-tests.result }}" == "failure" ]; then
+            echo "::error::Webhook tests failed."
+            FAILED=true
+          fi
+
+          if [ "${{ needs.security-tests.result }}" == "failure" ]; then
+            echo "::error::Security tests failed. This is a blocker."
+            FAILED=true
+          fi
+
+          if [ "${{ needs.typecheck.result }}" == "failure" ]; then
+            echo "::error::TypeScript check failed."
+            FAILED=true
+          fi
+
+          if [ "$FAILED" == "true" ]; then
+            echo "::error::CI gate failed. Please fix the issues above."
+            exit 1
+          fi
+
+          echo "CI gate passed successfully!"
+
+      - name: Post summary to PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const results = {
+              'Unit Tests - API': '${{ needs.unit-tests-api.result }}',
+              'Unit Tests - Notification': '${{ needs.unit-tests-notification.result }}',
+              'Payment Tests': '${{ needs.payment-tests.result }}',
+              'Webhook Tests': '${{ needs.webhook-tests.result }}',
+              'Security Tests': '${{ needs.security-tests.result }}',
+              'TypeScript Check': '${{ needs.typecheck.result }}'
+            };
+
+            let table = '| Check | Status |\n|-------|--------|\n';
+            for (const [check, result] of Object.entries(results)) {
+              const emoji = result === 'success' ? '✅' : result === 'failure' ? '❌' : '⚠️';
+              table += `| ${check} | ${emoji} ${result} |\n`;
+            }
+
+            const allPassed = Object.values(results).every(r => r === 'success' || r === 'skipped');
+
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `## 🧪 CI Test Results\n\n${table}\n\n${allPassed ? '✅ All tests passed!' : '❌ Some tests failed. Please fix before merging.'}`
+            });

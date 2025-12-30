@@ -2,10 +2,14 @@ import { Router, Request, Response, NextFunction } from "express";
 import { z } from "zod";
 import { PrismaClient, NotificationChannel } from "../generated/client/index.js";
 import { NotificationError } from "../middleware/error.middleware.js";
+import { authenticate, requireOwnership } from "../middleware/auth.middleware.js";
 import { logger } from "../utils/logger.js";
 
 const router: Router = Router();
 const prisma = new PrismaClient();
+
+// All preference routes require authentication
+router.use(authenticate);
 
 // Validation schemas
 const NotificationPreferenceSchema = z.object({
@@ -25,9 +29,10 @@ const QuietHoursSchema = z.object({
   timezone: z.string().default("UTC"),
 });
 
-// Get user preferences
+// Get user preferences (requires ownership or admin)
 router.get(
   "/user/:userId",
+  requireOwnership,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { userId } = req.params;
@@ -68,9 +73,10 @@ router.get(
   },
 );
 
-// Update user preferences (bulk update)
+// Update user preferences (bulk update, requires ownership or admin)
 router.put(
   "/user/:userId",
+  requireOwnership,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { userId } = req.params;
@@ -132,9 +138,10 @@ router.put(
   },
 );
 
-// Update single preference by channel
+// Update single preference by channel (requires ownership or admin)
 router.patch(
   "/user/:userId/:channel",
+  requireOwnership,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { userId, channel } = req.params;
@@ -189,9 +196,10 @@ router.patch(
   },
 );
 
-// Get/Update quiet hours
+// Get quiet hours (requires ownership or admin)
 router.get(
   "/user/:userId/quiet-hours",
+  requireOwnership,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { userId } = req.params;
@@ -220,8 +228,10 @@ router.get(
   },
 );
 
+// Update quiet hours (requires ownership or admin)
 router.put(
   "/user/:userId/quiet-hours",
+  requireOwnership,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { userId } = req.params;
@@ -272,9 +282,10 @@ router.put(
   },
 );
 
-// Unsubscribe from all marketing
+// Unsubscribe from all marketing (requires ownership or admin)
 router.post(
   "/user/:userId/unsubscribe",
+  requireOwnership,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { userId } = req.params;
@@ -310,9 +321,10 @@ router.post(
   },
 );
 
-// Delete all preferences for a user
+// Delete all preferences for a user (requires ownership or admin)
 router.delete(
   "/user/:userId",
+  requireOwnership,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { userId } = req.params;
@@ -340,9 +352,10 @@ router.delete(
   },
 );
 
-// Initialize default preferences for a new user
+// Initialize default preferences for a new user (requires ownership or admin)
 router.post(
   "/user/:userId/initialize",
+  requireOwnership,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { userId } = req.params;

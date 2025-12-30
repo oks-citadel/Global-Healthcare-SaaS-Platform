@@ -2,10 +2,14 @@ import { Router, Request, Response, NextFunction } from "express";
 import { z } from "zod";
 import { PrismaClient, NotificationChannel, NotificationStatus, NotificationPriority } from "../generated/client/index.js";
 import { NotificationError } from "../middleware/error.middleware.js";
+import { authenticate, requireAdmin, requireOwnership, ForbiddenError } from "../middleware/auth.middleware.js";
 import { logger } from "../utils/logger.js";
 
 const router: Router = Router();
 const prisma = new PrismaClient();
+
+// Apply authentication to all routes
+router.use(authenticate);
 
 // Validation schemas
 const CreateNotificationSchema = z.object({
@@ -31,10 +35,15 @@ const BulkNotificationSchema = z.object({
   notifications: z.array(CreateNotificationSchema).min(1).max(1000),
 });
 
-// Send a notification
+// Send a notification (admin can send to any user, non-admin only to self)
 router.post("/", async (req: Request, res: Response, next: NextFunction) => {
   try {
     const validatedData = CreateNotificationSchema.parse(req.body);
+
+    // Non-admins can only send notifications to themselves
+    if (req.user?.role !== "admin" && validatedData.userId !== req.user?.userId) {
+      throw new ForbiddenError("You can only send notifications to yourself");
+    }
 
     logger.info(
       `Creating ${validatedData.channel} notification for user ${validatedData.userId}`,
@@ -76,9 +85,10 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
   }
 });
 
-// Get notifications for a user
+// Get notifications for a user (requires ownership or admin)
 router.get(
   "/user/:userId",
+  requireOwnership,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { userId } = req.params;
@@ -137,7 +147,7 @@ router.get(
   },
 );
 
-// Get a specific notification
+// Get a specific notification (user can only access their own, admin can access any)
 router.get(
   "/:notificationId",
   async (req: Request, res: Response, next: NextFunction) => {
@@ -157,6 +167,11 @@ router.get(
         throw new NotificationError("Notification not found", 404);
       }
 
+      // Check ownership (admin can access any notification)
+      if (req.user?.role !== "admin" && notification.userId !== req.user?.userId) {
+        throw new ForbiddenError("You can only access your own notifications");
+      }
+
       res.json({
         success: true,
         data: notification,
@@ -167,7 +182,7 @@ router.get(
   },
 );
 
-// Mark notification as read
+// Mark notification as read (user can only mark their own)
 router.patch(
   "/:notificationId/read",
   async (req: Request, res: Response, next: NextFunction) => {
@@ -185,6 +200,11 @@ router.patch(
 
       if (!existingNotification) {
         throw new NotificationError("Notification not found", 404);
+      }
+
+      // Check ownership (admin can mark any notification as read)
+      if (req.user?.role !== "admin" && existingNotification.userId !== req.user?.userId) {
+        throw new ForbiddenError("You can only mark your own notifications as read");
       }
 
       logger.info(`Marking notification ${notificationId} as read`);
@@ -207,9 +227,10 @@ router.patch(
   },
 );
 
-// Bulk send notifications
+// Bulk send notifications (admin only)
 router.post(
   "/bulk",
+  requireAdmin,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const validatedData = BulkNotificationSchema.parse(req.body);
@@ -262,9 +283,10 @@ router.post(
   },
 );
 
-// Mark multiple notifications as read
+// Mark multiple notifications as read (requires ownership or admin)
 router.patch(
   "/user/:userId/read-all",
+  requireOwnership,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { userId } = req.params;
@@ -299,7 +321,7 @@ router.patch(
   },
 );
 
-// Delete a notification
+// Delete a notification (user can only delete their own, admin can delete any)
 router.delete(
   "/:notificationId",
   async (req: Request, res: Response, next: NextFunction) => {
@@ -317,6 +339,11 @@ router.delete(
 
       if (!existingNotification) {
         throw new NotificationError("Notification not found", 404);
+      }
+
+      // Check ownership (admin can delete any notification)
+      if (req.user?.role !== "admin" && existingNotification.userId !== req.user?.userId) {
+        throw new ForbiddenError("You can only delete your own notifications");
       }
 
       await prisma.notification.delete({

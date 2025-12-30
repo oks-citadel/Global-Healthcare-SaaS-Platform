@@ -2,10 +2,16 @@ import { Router, Request, Response, NextFunction } from "express";
 import { z } from "zod";
 import { PrismaClient, NotificationChannel } from "../generated/client/index.js";
 import { NotificationError } from "../middleware/error.middleware.js";
+import { authenticate, requireAdmin } from "../middleware/auth.middleware.js";
 import { logger } from "../utils/logger.js";
 
 const router: Router = Router();
 const prisma = new PrismaClient();
+
+// All template routes require authentication
+router.use(authenticate);
+
+// All write operations require admin role (applied to individual routes below)
 
 // Validation schemas
 const CreateTemplateSchema = z.object({
@@ -142,8 +148,8 @@ router.get(
   },
 );
 
-// Create a new template
-router.post("/", async (req: Request, res: Response, next: NextFunction) => {
+// Create a new template (admin only)
+router.post("/", requireAdmin, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const validatedData = CreateTemplateSchema.parse(req.body);
 
@@ -189,9 +195,10 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
   }
 });
 
-// Update a template
+// Update a template (admin only)
 router.put(
   "/:templateId",
+  requireAdmin,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { templateId } = req.params;
@@ -257,9 +264,10 @@ router.put(
   },
 );
 
-// Toggle template active status
+// Toggle template active status (admin only)
 router.patch(
   "/:templateId/toggle",
+  requireAdmin,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { templateId } = req.params;
@@ -296,9 +304,10 @@ router.patch(
   },
 );
 
-// Delete a template
+// Delete a template (admin only)
 router.delete(
   "/:templateId",
+  requireAdmin,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { templateId } = req.params;

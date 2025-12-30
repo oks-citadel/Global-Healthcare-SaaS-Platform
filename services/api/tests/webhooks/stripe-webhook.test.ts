@@ -17,7 +17,7 @@ import { stripe } from '../../src/lib/stripe.js';
  * - Retry logic
  */
 
-describe.skip('Stripe Webhook Integration', () => {
+describe('Stripe Webhook Integration', () => {
   const WEBHOOK_SECRET = 'whsec_test_secret';
   const ENDPOINT = '/webhooks/stripe';
 
@@ -36,7 +36,7 @@ describe.skip('Stripe Webhook Integration', () => {
     vi.clearAllMocks();
   });
 
-  describe.skip('Webhook Signature Verification', () => {
+  describe('Webhook Signature Verification', () => {
     it('should reject webhook with invalid signature', async () => {
       const payload = JSON.stringify({
         id: 'evt_test_webhook',
@@ -106,7 +106,7 @@ describe.skip('Stripe Webhook Integration', () => {
     });
   });
 
-  describe.skip('Idempotency Handling', () => {
+  describe('Idempotency Handling', () => {
     it('should process event only once', async () => {
       const event = createMockEvent('payment_intent.succeeded', {
         id: 'pi_test_idempotency',
@@ -145,7 +145,7 @@ describe.skip('Stripe Webhook Integration', () => {
     });
   });
 
-  describe.skip('Payment Intent Events', () => {
+  describe('Payment Intent Events', () => {
     it('should handle payment_intent.succeeded', async () => {
       // Create test payment
       const payment = await prisma.payment.create({
@@ -216,7 +216,7 @@ describe.skip('Stripe Webhook Integration', () => {
     });
   });
 
-  describe.skip('Subscription Events', () => {
+  describe('Subscription Events', () => {
     it('should handle customer.subscription.created', async () => {
       const event = createMockEvent('customer.subscription.created', {
         id: 'sub_test_created',
@@ -310,7 +310,7 @@ describe.skip('Stripe Webhook Integration', () => {
     });
   });
 
-  describe.skip('Invoice Events', () => {
+  describe('Invoice Events', () => {
     it('should handle invoice.paid', async () => {
       const event = createMockEvent('invoice.paid', {
         id: 'in_test_paid',
@@ -366,7 +366,7 @@ describe.skip('Stripe Webhook Integration', () => {
     });
   });
 
-  describe.skip('Charge Events', () => {
+  describe('Charge Events', () => {
     it('should handle charge.refunded', async () => {
       // Create test payment
       const payment = await prisma.payment.create({
@@ -401,7 +401,7 @@ describe.skip('Stripe Webhook Integration', () => {
     });
   });
 
-  describe.skip('Error Handling', () => {
+  describe('Error Handling', () => {
     it('should retry failed operations', async () => {
       // Mock database error on first attempt, success on retry
       let attemptCount = 0;
@@ -451,7 +451,7 @@ describe.skip('Stripe Webhook Integration', () => {
     });
   });
 
-  describe.skip('Health Check', () => {
+  describe('Health Check', () => {
     it('should return health status', async () => {
       const response = await request(app).get(`${ENDPOINT}/health`);
 

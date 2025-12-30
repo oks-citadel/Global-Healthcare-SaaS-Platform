@@ -52,7 +52,7 @@ vi.mock("../../../src/config/index.js", () => ({
   },
 }));
 
-describe.skip("Subscription Gating and Payment Bypass Tests", () => {
+describe("Subscription Gating and Payment Bypass Tests", () => {
   let app: Express;
 
   const freeUser = {
@@ -81,7 +81,7 @@ describe.skip("Subscription Gating and Payment Bypass Tests", () => {
     vi.clearAllMocks();
   });
 
-  describe.skip("Free Tier Feature Restriction", () => {
+  describe("Free Tier Feature Restriction", () => {
     it("should deny free user access to premium telehealth features", async () => {
       const { prisma } = await import("../../../src/lib/prisma.js");
 
@@ -133,7 +133,7 @@ describe.skip("Subscription Gating and Payment Bypass Tests", () => {
     });
   });
 
-  describe.skip("Subscription Tier Bypass", () => {
+  describe("Subscription Tier Bypass", () => {
     it("should reject attempt to set subscription tier via request body", async () => {
       const response = await request(app)
         .patch("/api/v1/users/free-user-123")
@@ -161,7 +161,7 @@ describe.skip("Subscription Gating and Payment Bypass Tests", () => {
     });
   });
 
-  describe.skip("Price Manipulation", () => {
+  describe("Price Manipulation", () => {
     it("should reject subscription with client-provided price", async () => {
       const { prisma } = await import("../../../src/lib/prisma.js");
 
@@ -218,7 +218,7 @@ describe.skip("Subscription Gating and Payment Bypass Tests", () => {
     });
   });
 
-  describe.skip("Trial Abuse Prevention", () => {
+  describe("Trial Abuse Prevention", () => {
     it("should reject trial extension via request manipulation", async () => {
       const { prisma } = await import("../../../src/lib/prisma.js");
 
@@ -266,7 +266,7 @@ describe.skip("Subscription Gating and Payment Bypass Tests", () => {
     });
   });
 
-  describe.skip("Refund Abuse Prevention", () => {
+  describe("Refund Abuse Prevention", () => {
     it("should deny user self-refund (admin only)", async () => {
       const response = await request(app)
         .post("/api/v1/payments/pay-123/refund")
@@ -304,7 +304,7 @@ describe.skip("Subscription Gating and Payment Bypass Tests", () => {
     });
   });
 
-  describe.skip("Quota Manipulation", () => {
+  describe("Quota Manipulation", () => {
     it("should reject attempt to increase API quota", async () => {
       const response = await request(app)
         .patch("/api/v1/users/free-user-123")
@@ -330,7 +330,7 @@ describe.skip("Subscription Gating and Payment Bypass Tests", () => {
     });
   });
 
-  describe.skip("Feature Flag Manipulation", () => {
+  describe("Feature Flag Manipulation", () => {
     it("should reject attempt to enable premium features via user update", async () => {
       const response = await request(app)
         .patch("/api/v1/users/free-user-123")
@@ -348,7 +348,7 @@ describe.skip("Subscription Gating and Payment Bypass Tests", () => {
     });
   });
 
-  describe.skip("Billing Bypass", () => {
+  describe("Billing Bypass", () => {
     it("should reject subscription cancellation that refunds full amount", async () => {
       const response = await request(app)
         .delete("/api/v1/subscriptions/sub-123")

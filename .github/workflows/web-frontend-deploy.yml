@@ -171,9 +171,10 @@ jobs:
           context: .
           file: ./Dockerfile.web.pnpm
           push: true
+          # NOTE: We do NOT push :latest tag for production compliance
+          # Use semver-sha format (branch-sha-timestamp) for deployments
           tags: |
             ${{ env.ECR_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.image_tag }}
-            ${{ env.ECR_REGISTRY }}/${{ env.IMAGE_NAME }}:latest
             ${{ env.ECR_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.short_sha }}
           labels: |
             org.opencontainers.image.title=UnifiedHealth Web Frontend

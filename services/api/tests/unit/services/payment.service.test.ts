@@ -80,7 +80,7 @@ vi.mock('../../../src/utils/logger.js', () => ({
   },
 }));
 
-describe.skip('PaymentService', () => {
+describe('PaymentService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });

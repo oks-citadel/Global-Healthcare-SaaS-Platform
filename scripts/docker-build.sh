@@ -20,10 +20,12 @@ AWS_REGION="${AWS_REGION:-us-east-1}"
 AWS_ACCOUNT_ID="${AWS_ACCOUNT_ID:-$(aws sts get-caller-identity --query Account --output text 2>/dev/null || echo '')}"
 ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
 PROJECT_NAME="unifiedhealth"
-GIT_SHA=$(git rev-parse --short HEAD 2>/dev/null || echo "latest")
+GIT_SHA=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
 GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
 BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
 VERSION="${VERSION:-1.0.0}"
+# Semver-SHA format for production-compliant tagging
+VERSION_SHA="v${VERSION}-${GIT_SHA}"
 
 # Build mode: dev or prod
 BUILD_MODE="${BUILD_MODE:-prod}"
@@ -104,15 +106,18 @@ build_image() {
         target="development"
     fi
 
-    # Build the image
+    # Build the image with semver-sha format as primary tag
+    # NOTE: We intentionally do NOT push :latest to ECR for production compliance
+    # Use VERSION_SHA (e.g., v1.0.0-abc1234) for deployments
     docker build \
         --target ${target} \
+        --tag "${PROJECT_NAME}/${service}:${VERSION_SHA}" \
         --tag "${PROJECT_NAME}/${service}:${GIT_SHA}" \
         --tag "${PROJECT_NAME}/${service}:${VERSION}" \
         --tag "${PROJECT_NAME}/${service}:latest" \
+        --tag "${ECR_REGISTRY}/${PROJECT_NAME}-${service}:${VERSION_SHA}" \
         --tag "${ECR_REGISTRY}/${PROJECT_NAME}-${service}:${GIT_SHA}" \
         --tag "${ECR_REGISTRY}/${PROJECT_NAME}-${service}:${VERSION}" \
-        --tag "${ECR_REGISTRY}/${PROJECT_NAME}-${service}:latest" \
         ${DOCKER_BUILD_ARGS[@]} \
         -f "${dockerfile_path}" \
         "${context_path}"
@@ -148,10 +153,14 @@ push_image() {
 
     log_info "Pushing ${service} images to ECR..."
 
-    # Push all tags
+    # Push semver-sha format (primary production tag)
+    docker push "${ECR_REGISTRY}/${PROJECT_NAME}-${service}:${VERSION_SHA}"
+    # Push git SHA for traceability
     docker push "${ECR_REGISTRY}/${PROJECT_NAME}-${service}:${GIT_SHA}"
+    # Push version for releases
     docker push "${ECR_REGISTRY}/${PROJECT_NAME}-${service}:${VERSION}"
-    docker push "${ECR_REGISTRY}/${PROJECT_NAME}-${service}:latest"
+    # NOTE: We do NOT push :latest to ECR for production compliance
+    # Using :latest in production is an anti-pattern that breaks reproducibility
 
     if [ $? -eq 0 ]; then
         log_success "Successfully pushed ${service} images"
@@ -293,12 +302,13 @@ main() {
 
     log_success "Build completed successfully!"
     echo ""
-    echo "Built images:"
+    echo "Built images (semver-sha format for production):"
     for service in "${SERVICES[@]}"; do
+        echo "  - ${PROJECT_NAME}/${service}:${VERSION_SHA} (recommended for deployment)"
         echo "  - ${PROJECT_NAME}/${service}:${GIT_SHA}"
         echo "  - ${PROJECT_NAME}/${service}:${VERSION}"
-        echo "  - ${PROJECT_NAME}/${service}:latest"
-        echo "  - ${ECR_REGISTRY}/${PROJECT_NAME}-${service}:${GIT_SHA}"
+        echo "  - ${PROJECT_NAME}/${service}:latest (local only, NOT pushed to ECR)"
+        echo "  - ${ECR_REGISTRY}/${PROJECT_NAME}-${service}:${VERSION_SHA}"
     done
     echo ""
 

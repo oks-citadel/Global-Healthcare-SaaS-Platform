@@ -32,7 +32,9 @@ spec:
         fsGroup: 1001
       containers:
         - name: api
-          image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/unified-health-api:latest
+          # NOTE: IMAGE_TAG should be set to semver-sha format (e.g., v1.0.0-abc1234)
+          # NEVER use :latest in production - it breaks reproducibility
+          image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/unified-health-api:${IMAGE_TAG}
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
