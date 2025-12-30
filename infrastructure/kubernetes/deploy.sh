@@ -1,20 +1,33 @@
 #!/bin/bash
 
 # ============================================
-# UnifiedHealth Platform - Deployment Script
+# UnifiedHealth Platform - Deployment Script (AWS)
 # ============================================
+# This script deploys the application to AWS EKS
+# Usage: ./infrastructure/kubernetes/deploy.sh <environment> [action]
 
-set -e
+set -euo pipefail
 
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Functions
+# Configuration
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_NAME="unified-health"
+AWS_REGION="${AWS_REGION:-us-east-1}"
+AWS_ACCOUNT_ID="${AWS_ACCOUNT_ID:-}"
+
+# Log functions
 log_info() {
-    echo -e "${GREEN}[INFO]${NC} $1"
+    echo -e "${BLUE}[INFO]${NC} $1"
+}
+
+log_success() {
+    echo -e "${GREEN}[SUCCESS]${NC} $1"
 }
 
 log_warn() {
@@ -25,68 +38,130 @@ log_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
+# Error handler
+error_exit() {
+    log_error "$1"
+    exit 1
+}
+
 # Check prerequisites
 check_prerequisites() {
     log_info "Checking prerequisites..."
 
     if ! command -v kubectl &> /dev/null; then
-        log_error "kubectl is not installed"
-        exit 1
+        error_exit "kubectl is not installed"
     fi
 
     if ! command -v kustomize &> /dev/null; then
-        log_error "kustomize is not installed"
-        exit 1
+        error_exit "kustomize is not installed"
     fi
 
-    if ! command -v az &> /dev/null; then
-        log_error "Azure CLI is not installed"
-        exit 1
+    if ! command -v aws &> /dev/null; then
+        error_exit "AWS CLI is not installed"
     fi
 
-    log_info "All prerequisites satisfied"
+    if ! command -v envsubst &> /dev/null; then
+        error_exit "envsubst is not installed (install gettext package)"
+    fi
+
+    # Check AWS credentials
+    aws sts get-caller-identity >/dev/null 2>&1 || error_exit "Not authenticated with AWS. Run 'aws configure' or 'aws sso login'"
+
+    log_success "All prerequisites satisfied"
 }
 
 # Set environment variables
 set_environment_variables() {
-    log_info "Setting environment variables..."
+    local environment=$1
+    log_info "Setting environment variables for ${environment}..."
 
-    # Azure configuration
-    export AZURE_SUBSCRIPTION_ID="${AZURE_SUBSCRIPTION_ID:-$(az account show --query id -o tsv)}"
-    export AZURE_TENANT_ID="${AZURE_TENANT_ID:-$(az account show --query tenantId -o tsv)}"
-    export AZURE_RESOURCE_GROUP="${AZURE_RESOURCE_GROUP:-rg-unified-health-dev2}"
+    # AWS configuration
+    if [ -z "${AWS_ACCOUNT_ID}" ]; then
+        AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+    fi
+    export AWS_ACCOUNT_ID
 
-    # ACR configuration
-    export ACR_NAME="${ACR_NAME:-acrunifiedhealthdev2}"
-    export ACR_LOGIN_SERVER="${ACR_NAME}.azurecr.io"
+    # ECR configuration
+    export ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+    export ECR_REPOSITORY="${ECR_REGISTRY}/${PROJECT_NAME}"
 
-    # AKS configuration
-    export AKS_NAME="${AKS_NAME:-unified-health-aks}"
+    # EKS configuration
+    export EKS_CLUSTER="${EKS_CLUSTER:-${PROJECT_NAME}-eks-${environment}}"
 
-    log_info "Environment variables set"
+    # Image configuration
+    export IMAGE_TAG="${IMAGE_TAG:-latest}"
+
+    log_success "Environment variables set"
+    log_info "  AWS Account: ${AWS_ACCOUNT_ID}"
+    log_info "  AWS Region: ${AWS_REGION}"
+    log_info "  ECR Registry: ${ECR_REGISTRY}"
+    log_info "  EKS Cluster: ${EKS_CLUSTER}"
 }
 
-# Connect to AKS
-connect_to_aks() {
-    log_info "Connecting to AKS cluster..."
+# Login to ECR
+login_to_ecr() {
+    log_info "Logging in to Amazon ECR..."
+    aws ecr get-login-password --region "${AWS_REGION}" | docker login --username AWS --password-stdin "${ECR_REGISTRY}" || error_exit "Failed to login to ECR"
+    log_success "Logged in to ECR"
+}
 
-    az aks get-credentials \
-        --resource-group "${AZURE_RESOURCE_GROUP}" \
-        --name "${AKS_NAME}" \
-        --overwrite-existing
+# Connect to EKS
+connect_to_eks() {
+    log_info "Connecting to EKS cluster..."
 
-    log_info "Connected to AKS cluster"
+    aws eks update-kubeconfig \
+        --region "${AWS_REGION}" \
+        --name "${EKS_CLUSTER}" || error_exit "Failed to get EKS credentials"
+
+    log_success "Connected to EKS cluster"
     kubectl cluster-info
+}
+
+# Build and push images to ECR
+build_and_push_images() {
+    local environment=$1
+    log_info "Building and pushing images for ${environment}..."
+
+    # Ensure ECR repositories exist
+    for repo in "unified-health-api" "unified-health-web"; do
+        aws ecr describe-repositories --repository-names "${repo}" --region "${AWS_REGION}" 2>/dev/null || \
+            aws ecr create-repository --repository-name "${repo}" --region "${AWS_REGION}" --image-scanning-configuration scanOnPush=true
+    done
+
+    # Build and tag images
+    log_info "Building API service..."
+    docker build \
+        -t "${ECR_REGISTRY}/unified-health-api:${IMAGE_TAG}" \
+        -t "${ECR_REGISTRY}/unified-health-api:latest-${environment}" \
+        -f services/api/Dockerfile \
+        services/api || error_exit "Failed to build API image"
+
+    log_info "Building Web app..."
+    docker build \
+        -t "${ECR_REGISTRY}/unified-health-web:${IMAGE_TAG}" \
+        -t "${ECR_REGISTRY}/unified-health-web:latest-${environment}" \
+        -f apps/web/Dockerfile \
+        apps/web || error_exit "Failed to build Web image"
+
+    # Push images
+    log_info "Pushing images to ECR..."
+    docker push "${ECR_REGISTRY}/unified-health-api:${IMAGE_TAG}" || error_exit "Failed to push API image"
+    docker push "${ECR_REGISTRY}/unified-health-api:latest-${environment}" || error_exit "Failed to push API latest tag"
+    docker push "${ECR_REGISTRY}/unified-health-web:${IMAGE_TAG}" || error_exit "Failed to push Web image"
+    docker push "${ECR_REGISTRY}/unified-health-web:latest-${environment}" || error_exit "Failed to push Web latest tag"
+
+    log_success "All images built and pushed successfully"
 }
 
 # Deploy to environment
 deploy_to_environment() {
     local environment=$1
+    local namespace="unified-health-${environment}"
 
     log_info "Deploying to ${environment} environment..."
 
     # Navigate to overlay directory
-    cd "overlays/${environment}"
+    cd "${SCRIPT_DIR}/overlays/${environment}"
 
     # Build kustomization
     log_info "Building kustomization..."
@@ -97,12 +172,16 @@ deploy_to_environment() {
     head -n 50 "/tmp/unified-health-${environment}.yaml"
 
     # Ask for confirmation
-    read -p "Do you want to apply these changes? (yes/no): " confirmation
-
-    if [ "$confirmation" != "yes" ]; then
-        log_warn "Deployment cancelled"
-        exit 0
+    if [ "${SKIP_CONFIRMATION:-false}" != "true" ]; then
+        read -p "Do you want to apply these changes? (yes/no): " confirmation
+        if [ "$confirmation" != "yes" ]; then
+            log_warn "Deployment cancelled"
+            exit 0
+        fi
     fi
+
+    # Create namespace if not exists
+    kubectl create namespace "${namespace}" 2>/dev/null || true
 
     # Apply configuration
     log_info "Applying configuration..."
@@ -110,13 +189,13 @@ deploy_to_environment() {
 
     # Wait for rollout
     log_info "Waiting for rollout to complete..."
-    kubectl rollout status deployment/unified-health-api -n "unified-health-${environment}" --timeout=5m
+    kubectl rollout status deployment/unified-health-api -n "${namespace}" --timeout=5m || error_exit "Rollout failed"
 
-    log_info "Deployment successful!"
+    log_success "Deployment successful!"
 
     # Show status
     log_info "Current status:"
-    kubectl get all -n "unified-health-${environment}"
+    kubectl get all -n "${namespace}"
 }
 
 # Verify deployment
@@ -140,21 +219,33 @@ verify_deployment() {
 
     # Check pod logs
     log_info "Recent pod logs:"
-    kubectl logs -n "${namespace}" -l app=unified-health-api --tail=20
+    kubectl logs -n "${namespace}" -l app=unified-health-api --tail=20 || log_warn "No logs available"
 
     # Test health endpoint
     log_info "Testing health endpoint..."
     kubectl port-forward -n "${namespace}" svc/unified-health-api 8080:80 &
     PF_PID=$!
-    sleep 3
+    sleep 5
 
     if curl -s http://localhost:8080/health | grep -q "ok"; then
-        log_info "Health check passed!"
+        log_success "Health check passed!"
     else
         log_warn "Health check failed"
     fi
 
-    kill $PF_PID
+    kill $PF_PID 2>/dev/null || true
+
+    # Check CloudWatch metrics (if available)
+    log_info "Checking CloudWatch metrics..."
+    aws cloudwatch get-metric-statistics \
+        --namespace "AWS/EKS" \
+        --metric-name "cluster_failed_request_count" \
+        --dimensions "Name=ClusterName,Value=${EKS_CLUSTER}" \
+        --start-time "$(date -u -d '5 minutes ago' +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u -v-5M +%Y-%m-%dT%H:%M:%SZ)" \
+        --end-time "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+        --period 300 \
+        --statistics Sum \
+        --region "${AWS_REGION}" 2>/dev/null || log_warn "CloudWatch metrics not available"
 }
 
 # Rollback deployment
@@ -165,31 +256,54 @@ rollback_deployment() {
     log_warn "Rolling back deployment in ${environment}..."
 
     kubectl rollout undo deployment/unified-health-api -n "${namespace}"
-    kubectl rollout status deployment/unified-health-api -n "${namespace}"
+    kubectl rollout status deployment/unified-health-api -n "${namespace}" --timeout=5m
 
-    log_info "Rollback completed"
+    log_success "Rollback completed"
+}
+
+# Show usage
+show_usage() {
+    echo "============================================"
+    echo "UnifiedHealth Platform - AWS Deployment Script"
+    echo "============================================"
+    echo ""
+    echo "Usage: $0 <environment> [action]"
+    echo ""
+    echo "Environments:"
+    echo "  dev         - Deploy to development environment"
+    echo "  staging     - Deploy to staging environment"
+    echo "  production  - Deploy to production environment"
+    echo ""
+    echo "Actions:"
+    echo "  deploy      - Deploy application (default)"
+    echo "  build       - Build and push images only"
+    echo "  verify      - Verify deployment"
+    echo "  rollback    - Rollback to previous version"
+    echo ""
+    echo "Environment Variables:"
+    echo "  AWS_REGION          - AWS region (default: us-east-1)"
+    echo "  AWS_ACCOUNT_ID      - AWS account ID (auto-detected)"
+    echo "  EKS_CLUSTER         - EKS cluster name (default: unified-health-eks-<env>)"
+    echo "  IMAGE_TAG           - Docker image tag (default: latest)"
+    echo "  SKIP_CONFIRMATION   - Skip deployment confirmation (default: false)"
+    echo ""
+    echo "Examples:"
+    echo "  $0 staging deploy"
+    echo "  $0 production verify"
+    echo "  AWS_REGION=eu-west-1 $0 staging deploy"
+    echo ""
 }
 
 # Main script
 main() {
     echo "============================================"
-    echo "UnifiedHealth Platform - Deployment Script"
+    echo "UnifiedHealth Platform - AWS Deployment"
     echo "============================================"
     echo ""
 
     # Parse arguments
     if [ $# -eq 0 ]; then
-        echo "Usage: $0 <environment> [action]"
-        echo ""
-        echo "Environments:"
-        echo "  staging     - Deploy to staging environment"
-        echo "  production  - Deploy to production environment"
-        echo ""
-        echo "Actions:"
-        echo "  deploy      - Deploy application (default)"
-        echo "  verify      - Verify deployment"
-        echo "  rollback    - Rollback to previous version"
-        echo ""
+        show_usage
         exit 1
     fi
 
@@ -197,9 +311,9 @@ main() {
     local action=${2:-deploy}
 
     # Validate environment
-    if [ "$environment" != "staging" ] && [ "$environment" != "production" ]; then
+    if [ "$environment" != "dev" ] && [ "$environment" != "staging" ] && [ "$environment" != "production" ]; then
         log_error "Invalid environment: ${environment}"
-        log_error "Valid environments: staging, production"
+        log_error "Valid environments: dev, staging, production"
         exit 1
     fi
 
@@ -207,16 +321,23 @@ main() {
     check_prerequisites
 
     # Set environment variables
-    set_environment_variables
+    set_environment_variables "${environment}"
 
-    # Connect to AKS
-    connect_to_aks
+    # Login to ECR
+    login_to_ecr
+
+    # Connect to EKS
+    connect_to_eks
 
     # Execute action
     case $action in
         deploy)
+            build_and_push_images "${environment}"
             deploy_to_environment "${environment}"
             verify_deployment "${environment}"
+            ;;
+        build)
+            build_and_push_images "${environment}"
             ;;
         verify)
             verify_deployment "${environment}"
@@ -226,12 +347,21 @@ main() {
             ;;
         *)
             log_error "Invalid action: ${action}"
+            show_usage
             exit 1
             ;;
     esac
 
-    log_info "All done!"
+    log_success "All done!"
 }
+
+# Trap for cleanup
+cleanup() {
+    log_info "Cleaning up..."
+    # Kill any background processes
+    jobs -p | xargs -r kill 2>/dev/null || true
+}
+trap cleanup EXIT
 
 # Run main function
 main "$@"

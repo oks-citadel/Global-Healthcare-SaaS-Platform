@@ -1,54 +1,125 @@
-# Quick Start Guide - Kubernetes Deployment
+# Quick Start Guide - Kubernetes Deployment (AWS)
 
-This guide provides quick commands to deploy the Unified Healthcare Platform to Kubernetes.
+This guide provides quick commands to deploy the Unified Healthcare Platform to Amazon EKS.
 
 ## Prerequisites Checklist
 
+- [ ] AWS CLI v2 installed and configured
 - [ ] kubectl installed and configured
 - [ ] kustomize installed (v5.0+)
-- [ ] Azure CLI installed and logged in
-- [ ] AKS cluster created
-- [ ] ACR created and attached to AKS
-- [ ] Azure Key Vault created with secrets
+- [ ] eksctl installed (v0.150+)
+- [ ] EKS cluster created
+- [ ] ECR repositories created
+- [ ] AWS Secrets Manager configured
+- [ ] AWS Load Balancer Controller installed
 - [ ] NGINX Ingress Controller installed
 - [ ] cert-manager installed
-- [ ] Azure Workload Identity configured
+- [ ] AWS IRSA configured
+
+## AWS CLI Setup
+
+### Install AWS CLI v2
+
+```bash
+# macOS
+brew install awscli
+
+# Linux
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+
+# Windows (PowerShell)
+msiexec.exe /i https://awscli.amazonaws.com/AWSCLIV2.msi
+
+# Verify installation
+aws --version
+```
+
+### Configure AWS CLI
+
+```bash
+# Configure with IAM credentials
+aws configure
+# Enter: AWS Access Key ID, Secret Access Key, Region (us-east-1), Output format (json)
+
+# Or use SSO
+aws configure sso
+aws sso login --profile your-profile
+
+# Verify credentials
+aws sts get-caller-identity
+```
+
+### Install eksctl
+
+```bash
+# macOS
+brew tap weaveworks/tap
+brew install weaveworks/tap/eksctl
+
+# Linux
+curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+sudo mv /tmp/eksctl /usr/local/bin
+
+# Verify installation
+eksctl version
+```
 
 ## Quick Deploy Commands
 
 ### 1. Set Environment Variables
 
 ```bash
-export ACR_LOGIN_SERVER="acrunifiedhealthdev2.azurecr.io"
-export AZURE_CLIENT_ID="<your-client-id>"
-export AZURE_TENANT_ID="<your-tenant-id>"
-export AZURE_SUBSCRIPTION_ID="<your-subscription-id>"
-export AZURE_RESOURCE_GROUP="rg-unified-health-dev2"
+# AWS Configuration
+export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+export AWS_REGION="us-east-1"
+export ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+export EKS_CLUSTER_NAME="unified-health-dev-americas-eks"
+
+# Application Configuration
+export IMAGE_TAG="latest"  # Use specific version in production
 ```
 
-### 2. Connect to AKS
+### 2. Configure EKS Kubeconfig
 
 ```bash
-az aks get-credentials \
-  --resource-group rg-unified-health-dev2 \
-  --name unified-health-aks
+# Update kubeconfig for EKS cluster
+aws eks update-kubeconfig \
+  --region ${AWS_REGION} \
+  --name ${EKS_CLUSTER_NAME}
+
+# Verify connection
+kubectl cluster-info
+kubectl get nodes
 ```
 
-### 3. Deploy to Staging
+### 3. Authenticate to ECR
+
+```bash
+# Get ECR login password and authenticate Docker
+aws ecr get-login-password --region ${AWS_REGION} | \
+  docker login --username AWS --password-stdin ${ECR_REGISTRY}
+
+# Verify ECR access
+aws ecr describe-repositories --region ${AWS_REGION}
+```
+
+### 4. Deploy to Staging
 
 ```bash
 cd infrastructure/kubernetes
 kubectl apply -k overlays/staging
 ```
 
-### 4. Deploy to Production
+### 5. Deploy to Production
 
 ```bash
 cd infrastructure/kubernetes
 kubectl apply -k overlays/production
 ```
 
-### 5. Verify Deployment
+### 6. Verify Deployment
 
 ```bash
 # Check pods
@@ -62,6 +133,40 @@ kubectl get svc -n unified-health-production
 # Check ingress
 kubectl get ingress -n unified-health-staging
 kubectl get ingress -n unified-health-production
+
+# Check ALB
+aws elbv2 describe-load-balancers \
+  --query "LoadBalancers[?contains(LoadBalancerName, 'unified-health')].[LoadBalancerName,DNSName]" \
+  --output table
+```
+
+## Multi-Region Quick Deploy
+
+### Americas (us-east-1)
+
+```bash
+export AWS_REGION="us-east-1"
+export EKS_CLUSTER_NAME="unified-health-dev-americas-eks"
+aws eks update-kubeconfig --region ${AWS_REGION} --name ${EKS_CLUSTER_NAME}
+kubectl apply -k overlays/production
+```
+
+### Europe (eu-west-1)
+
+```bash
+export AWS_REGION="eu-west-1"
+export EKS_CLUSTER_NAME="unified-health-dev-europe-eks"
+aws eks update-kubeconfig --region ${AWS_REGION} --name ${EKS_CLUSTER_NAME}
+kubectl apply -k overlays/production
+```
+
+### Africa (af-south-1)
+
+```bash
+export AWS_REGION="af-south-1"
+export EKS_CLUSTER_NAME="unified-health-dev-africa-eks"
+aws eks update-kubeconfig --region ${AWS_REGION} --name ${EKS_CLUSTER_NAME}
+kubectl apply -k overlays/production
 ```
 
 ## Common Commands
@@ -74,6 +179,9 @@ kubectl logs -n unified-health-staging -l app=unified-health-api --tail=100 -f
 
 # Production
 kubectl logs -n unified-health-production -l app=unified-health-api --tail=100 -f
+
+# Stream logs to CloudWatch (via Fluent Bit)
+aws logs tail /aws/eks/${EKS_CLUSTER_NAME}/unified-health --follow
 ```
 
 ### Scale Deployment
@@ -159,6 +267,64 @@ kubectl rollout undo deployment/unified-health-api -n unified-health-production
 kubectl rollout undo deployment/unified-health-api --to-revision=2 -n unified-health-production
 ```
 
+## ECR Commands
+
+### List Images
+
+```bash
+aws ecr describe-images \
+  --repository-name unified-health/api-gateway \
+  --query 'imageDetails[*].[imageTags[0],imagePushedAt]' \
+  --output table
+```
+
+### Push Image
+
+```bash
+# Build and tag
+docker build -t ${ECR_REGISTRY}/unified-health/api-gateway:${IMAGE_TAG} .
+
+# Push to ECR
+docker push ${ECR_REGISTRY}/unified-health/api-gateway:${IMAGE_TAG}
+```
+
+### Delete Old Images
+
+```bash
+# Delete untagged images
+aws ecr batch-delete-image \
+  --repository-name unified-health/api-gateway \
+  --image-ids imageTag=old-tag
+```
+
+## AWS Secrets Manager Commands
+
+### List Secrets
+
+```bash
+aws secretsmanager list-secrets \
+  --filter Key="name",Values="unified-health" \
+  --query "SecretList[*].[Name,Description]" \
+  --output table
+```
+
+### Get Secret Value
+
+```bash
+aws secretsmanager get-secret-value \
+  --secret-id unified-health/jwt-secret \
+  --query SecretString \
+  --output text
+```
+
+### Update Secret
+
+```bash
+aws secretsmanager put-secret-value \
+  --secret-id unified-health/jwt-secret \
+  --secret-string '{"secret":"new-secret-value"}'
+```
+
 ## Troubleshooting Quick Fixes
 
 ### Pods Not Starting
@@ -172,16 +338,25 @@ kubectl describe pod <pod-name> -n unified-health-production
 
 # Check logs
 kubectl logs <pod-name> -n unified-health-production
+
+# Check previous container logs (if crashed)
+kubectl logs <pod-name> -n unified-health-production --previous
 ```
 
 ### Image Pull Errors
 
 ```bash
-# Verify ACR attachment
-az aks update \
-  --resource-group rg-unified-health-dev2 \
-  --name unified-health-aks \
-  --attach-acr acrunifiedhealthdev2
+# Verify ECR authentication
+aws ecr get-login-password --region ${AWS_REGION} | \
+  docker login --username AWS --password-stdin ${ECR_REGISTRY}
+
+# Check if image exists
+aws ecr describe-images \
+  --repository-name unified-health/api-gateway \
+  --image-ids imageTag=${IMAGE_TAG}
+
+# Verify node IAM role has ECR access
+kubectl describe node | grep -A 10 "Labels"
 ```
 
 ### Certificate Issues
@@ -191,9 +366,26 @@ az aks update \
 kubectl get certificate -n unified-health-production
 kubectl describe certificate unified-health-tls-cert -n unified-health-production
 
+# Check cert-manager logs
+kubectl logs -n cert-manager -l app=cert-manager --tail=100
+
 # Delete and recreate certificate
 kubectl delete certificate unified-health-tls-cert -n unified-health-production
 kubectl apply -f base/ingress.yaml
+```
+
+### ALB Issues
+
+```bash
+# Check AWS Load Balancer Controller logs
+kubectl logs -n kube-system -l app.kubernetes.io/name=aws-load-balancer-controller --tail=100
+
+# Describe ingress
+kubectl describe ingress -n unified-health-production
+
+# Check target group health
+aws elbv2 describe-target-health \
+  --target-group-arn <target-group-arn>
 ```
 
 ### Network Issues
@@ -204,6 +396,29 @@ kubectl run -it --rm debug --image=busybox --restart=Never -- nslookup google.co
 
 # Test database connectivity
 kubectl run -it --rm debug --image=postgres:15 --restart=Never -- psql "$DATABASE_URL"
+
+# Check VPC endpoints
+aws ec2 describe-vpc-endpoints \
+  --filters "Name=vpc-id,Values=<vpc-id>" \
+  --query "VpcEndpoints[*].[ServiceName,State]" \
+  --output table
+```
+
+### IRSA Issues
+
+```bash
+# Verify service account annotation
+kubectl get sa unified-health-api -n unified-health-production -o yaml | grep eks.amazonaws.com
+
+# Test assume role from pod
+kubectl run -it --rm test-irsa \
+  --image=amazon/aws-cli \
+  --serviceaccount=unified-health-api \
+  --namespace=unified-health-production \
+  -- aws sts get-caller-identity
+
+# Check IAM role trust relationship
+aws iam get-role --role-name unified-health-api-role --query "Role.AssumeRolePolicyDocument"
 ```
 
 ## Monitoring Commands
@@ -238,6 +453,22 @@ kubectl port-forward -n unified-health-production svc/unified-health-api 9090:90
 # Access metrics at http://localhost:9090/metrics
 ```
 
+### CloudWatch Commands
+
+```bash
+# Get log groups
+aws logs describe-log-groups --query "logGroups[?contains(logGroupName, 'unified-health')].[logGroupName]" --output table
+
+# Tail logs
+aws logs tail /aws/eks/${EKS_CLUSTER_NAME}/unified-health --follow
+
+# Query logs
+aws logs filter-log-events \
+  --log-group-name /aws/eks/${EKS_CLUSTER_NAME}/unified-health \
+  --filter-pattern "ERROR" \
+  --start-time $(date -d '1 hour ago' +%s)000
+```
+
 ## Cleanup Commands
 
 ### Delete Staging Environment
@@ -256,13 +487,15 @@ kubectl delete namespace unified-health-production
 ## Security Best Practices
 
 1. Never commit secrets to Git
-2. Use Azure Key Vault for secret management
-3. Rotate secrets regularly
-4. Enable Pod Security Policies
-5. Use Network Policies to restrict traffic
-6. Keep images updated with security patches
-7. Use RBAC for access control
-8. Enable audit logging
+2. Use AWS Secrets Manager for secret management
+3. Use IRSA for pod IAM credentials
+4. Rotate secrets regularly
+5. Enable Pod Security Standards
+6. Use Network Policies to restrict traffic
+7. Keep images updated with security patches
+8. Use RBAC for access control
+9. Enable CloudTrail for audit logging
+10. Enable GuardDuty for threat detection
 
 ## Performance Tuning
 
@@ -311,9 +544,10 @@ kubectl edit configmap unified-health-config -n unified-health-production
 
 For additional help, refer to:
 - Full README: [README.md](README.md)
+- Deployment Checklist: [DEPLOYMENT-CHECKLIST.md](DEPLOYMENT-CHECKLIST.md)
 - Kubernetes Documentation: https://kubernetes.io/docs/
-- Azure AKS Documentation: https://docs.microsoft.com/en-us/azure/aks/
+- Amazon EKS Documentation: https://docs.aws.amazon.com/eks/
 
 ---
 
-**Last Updated**: 2025-12-17
+**Last Updated**: 2025-12-29

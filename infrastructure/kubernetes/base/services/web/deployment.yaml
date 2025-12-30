@@ -40,7 +40,7 @@ spec:
 
       containers:
         - name: web
-          image: unifiedhealthdevacr.azurecr.io/unifiedhealth/web:latest
+          image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/unifiedhealth/web:latest
           imagePullPolicy: Always
 
           ports:

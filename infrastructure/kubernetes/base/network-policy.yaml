@@ -114,7 +114,7 @@ spec:
         - protocol: TCP
           port: 5432
 
-    # Allow to Azure PostgreSQL (external)
+    # Allow to AWS RDS PostgreSQL (external)
     - to:
         - podSelector: {}
       ports:
@@ -198,7 +198,7 @@ spec:
   policyTypes:
     - Egress
   egress:
-    # Allow HTTPS to external services (Azure, SendGrid, Twilio, etc.)
+    # Allow HTTPS to external services (AWS, SendGrid, Twilio, etc.)
     - to:
         - podSelector: {}
       ports:
@@ -305,11 +305,11 @@ spec:
           port: 465
 
 ---
-# Allow Egress to Azure Services
+# Allow Egress to AWS Services
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: allow-api-to-azure-services
+  name: allow-api-to-aws-services
   namespace: unified-health
   labels:
     app: unified-health-api
@@ -321,7 +321,7 @@ spec:
   policyTypes:
     - Egress
   egress:
-    # Allow to Azure Storage, Key Vault, etc.
+    # Allow to AWS S3, Secrets Manager, etc.
     - to:
         - podSelector: {}
       ports:

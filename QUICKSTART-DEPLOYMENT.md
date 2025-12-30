@@ -6,32 +6,33 @@ This guide will get you from zero to deployed in approximately 60 minutes.
 
 Before starting, ensure you have:
 
-- [ ] Azure subscription with admin access
-- [ ] Azure CLI installed and logged in (`az login`)
+- [ ] AWS account with admin access
+- [ ] AWS CLI installed and configured (`aws configure`)
+- [ ] eksctl installed
 - [ ] Docker installed and running
 - [ ] kubectl installed
 - [ ] Git repository access
 - [ ] Node.js 20+ and pnpm installed
 
-## Step 1: Initial Azure Setup (20 minutes)
+## Step 1: Initial AWS Setup (20 minutes)
 
-### 1.1 Create Service Principal
+### 1.1 Create IAM User for GitHub Actions
 
 ```bash
-# Login to Azure
-az login
+# Create IAM user
+aws iam create-user --user-name unified-health-deploy
 
-# Set your subscription
-az account set --subscription "Your Subscription Name"
+# Attach required policies
+aws iam attach-user-policy \
+  --user-name unified-health-deploy \
+  --policy-arn arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
 
-# Create service principal for automation
-az ad sp create-for-rbac \
-  --name "unified-health-deploy" \
-  --role contributor \
-  --scopes /subscriptions/$(az account show --query id -o tsv) \
-  --sdk-auth
+aws iam attach-user-policy \
+  --user-name unified-health-deploy \
+  --policy-arn arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess
 
-# Save the JSON output - you'll need it for GitHub Actions
+# Create access key - save the output for GitHub Actions
+aws iam create-access-key --user-name unified-health-deploy
 ```
 
 ### 1.2 Clone Repository
@@ -47,11 +48,11 @@ chmod +x scripts/*.sh
 ### 1.3 Setup Staging Infrastructure
 
 ```bash
-# This creates all Azure resources for staging
-./scripts/setup-azure.sh staging
+# This creates all AWS resources for staging
+./scripts/setup-aws.sh staging
 
 # Expected duration: ~15 minutes
-# Creates: AKS cluster, ACR, PostgreSQL, Redis, Key Vault, Storage
+# Creates: EKS cluster, ECR, RDS PostgreSQL, ElastiCache Redis, Secrets Manager, S3
 ```
 
 ### 1.4 Setup Secrets
@@ -70,10 +71,10 @@ chmod +x scripts/*.sh
 ### 1.5 Verify Setup
 
 ```bash
-# Get AKS credentials
-az aks get-credentials \
-  --resource-group unified-health-rg-staging \
-  --name unified-health-aks-staging
+# Get EKS credentials
+aws eks update-kubeconfig \
+  --region us-east-1 \
+  --name unified-health-eks-staging
 
 # Check cluster is running
 kubectl get nodes
@@ -131,8 +132,10 @@ Go to your GitHub repository: Settings → Secrets and variables → Actions
 Add these secrets:
 
 ```
-AZURE_CREDENTIALS = <service-principal-json-from-step-1.1>
-ACR_NAME = acrunifiedhealthdev2
+AWS_ACCESS_KEY_ID = <access-key-id-from-step-1.1>
+AWS_SECRET_ACCESS_KEY = <secret-access-key-from-step-1.1>
+AWS_REGION = us-east-1
+ECR_REGISTRY = <your-account-id>.dkr.ecr.us-east-1.amazonaws.com
 SLACK_WEBHOOK_URL = https://hooks.slack.com/services/YOUR/WEBHOOK/URL
 STAGING_URL = https://staging.unified-health.com
 STAGING_API_URL = https://api-staging.unified-health.com
@@ -158,7 +161,7 @@ git push origin main
 
 ```bash
 # Setup production environment
-./scripts/setup-azure.sh production
+./scripts/setup-aws.sh production
 
 # Setup secrets
 ./scripts/setup-secrets.sh production
@@ -168,9 +171,9 @@ git push origin main
 
 ```bash
 # Switch to production context
-az aks get-credentials \
-  --resource-group unified-health-rg-prod \
-  --name unified-health-aks-prod
+aws eks update-kubeconfig \
+  --region us-east-1 \
+  --name unified-health-eks-prod
 
 # Verify
 kubectl get nodes
@@ -294,19 +297,17 @@ make lint
 
 ## Troubleshooting Quick Fixes
 
-### Issue: Azure login failed
+### Issue: AWS credentials not working
 ```bash
-az login
-az account list
-az account set --subscription "Your Subscription"
+aws configure
+aws sts get-caller-identity
 ```
 
-### Issue: AKS credentials not working
+### Issue: EKS credentials not working
 ```bash
-az aks get-credentials \
-  --resource-group unified-health-rg-staging \
-  --name unified-health-aks-staging \
-  --overwrite-existing
+aws eks update-kubeconfig \
+  --region us-east-1 \
+  --name unified-health-eks-staging
 ```
 
 ### Issue: Pods not starting
@@ -391,7 +392,7 @@ docker build --no-cache -f services/api/Dockerfile services/api
 - On-call: +1-XXX-XXX-XXXX
 
 ### Useful Resources
-- [Azure AKS Docs](https://docs.microsoft.com/en-us/azure/aks/)
+- [AWS EKS Docs](https://docs.aws.amazon.com/eks/)
 - [Kubernetes Docs](https://kubernetes.io/docs/)
 - [Docker Docs](https://docs.docker.com/)
 
@@ -419,7 +420,7 @@ Before going live, verify:
 
 | Task | Duration |
 |------|----------|
-| Initial Azure Setup | 20 min |
+| Initial AWS Setup | 20 min |
 | First Deployment | 15 min |
 | GitHub Actions Setup | 10 min |
 | Production Setup | 15 min |

@@ -58,7 +58,7 @@ spec:
                 topologyKey: topology.kubernetes.io/zone
       containers:
         - name: telehealth-service
-          image: unifiedhealthdevacr.azurecr.io/unifiedhealth/telehealth-service:latest
+          image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/unifiedhealth/telehealth-service:latest
           imagePullPolicy: Always
           ports:
             - name: http

@@ -19,7 +19,7 @@ spec:
       containers:
         - name: web
           # Use latest tag for development
-          image: unifiedhealthdevacr.azurecr.io/unifiedhealth/web:latest
+          image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/unifiedhealth/web:latest
           imagePullPolicy: Always
           # Lower resource requests for dev environment
           resources:

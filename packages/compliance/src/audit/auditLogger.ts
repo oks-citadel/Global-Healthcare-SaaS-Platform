@@ -386,7 +386,7 @@ export class AuditLogger extends EventEmitter {
     try {
       if (!this.config.remoteLogEndpoint) return;
 
-      // In production, this would send to Azure Monitor, CloudWatch, or similar
+      // In production, this would send to CloudWatch, Elasticsearch, or similar
       // For now, we'll just emit an event
       this.emit('remote-log', entry);
 

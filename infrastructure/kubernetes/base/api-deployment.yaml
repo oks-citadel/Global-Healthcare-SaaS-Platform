@@ -32,7 +32,7 @@ spec:
         fsGroup: 1001
       containers:
         - name: api
-          image: ${ACR_LOGIN_SERVER}/unified-health-api:latest
+          image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/unified-health-api:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8080

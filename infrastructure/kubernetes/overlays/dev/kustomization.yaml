@@ -34,7 +34,7 @@ replicas:
 
 # Development images with latest tag
 images:
-  - name: unifiedhealthdevacr.azurecr.io/unifiedhealth/web
+  - name: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/unifiedhealth/web
     newTag: latest
 
 # Patches for development

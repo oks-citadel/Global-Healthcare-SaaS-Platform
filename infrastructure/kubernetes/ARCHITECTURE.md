@@ -12,7 +12,7 @@ Visual representation and detailed explanation of the Kubernetes deployment arch
                                  │ HTTPS (443)
                                  ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                     Azure Load Balancer                                  │
+│                   AWS Application Load Balancer                          │
 │                    (External Load Balancer)                              │
 └────────────────────────────────┬────────────────────────────────────────┘
                                  │
@@ -72,11 +72,11 @@ Visual representation and detailed explanation of the Kubernetes deployment arch
                     │            │            │
                     ▼            ▼            ▼
         ┌──────────────┐  ┌──────────┐  ┌─────────────┐
-        │  PostgreSQL  │  │  Redis   │  │  Azure      │
-        │  (Azure)     │  │  Cache   │  │  Services   │
+        │  PostgreSQL  │  │  Redis   │  │  AWS        │
+        │  (RDS)       │  │  Cache   │  │  Services   │
         │              │  │          │  │             │
-        │  Port: 5432  │  │Port: 6379│  │ • Key Vault │
-        │  SSL: TLS    │  │          │  │ • Storage   │
+        │  Port: 5432  │  │Port: 6379│  │ • Secrets   │
+        │  SSL: TLS    │  │          │  │ • S3        │
         └──────────────┘  └──────────┘  │ • SendGrid  │
                                         │ • Twilio    │
                                         └─────────────┘
@@ -86,7 +86,7 @@ Visual representation and detailed explanation of the Kubernetes deployment arch
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                        Kubernetes Cluster (AKS)                          │
+│                        Kubernetes Cluster (EKS)                          │
 │                                                                          │
 │  ┌────────────────────────────────────────────────────────────────┐    │
 │  │                    Namespace: unified-health                    │    │
@@ -109,7 +109,7 @@ Visual representation and detailed explanation of the Kubernetes deployment arch
 │  │  │ ✓ To: database namespace → Port: 5432 (PostgreSQL)       │  │    │
 │  │  │ ✓ To: same namespace → Port: 6379 (Redis)                │  │    │
 │  │  │ ✓ To: kube-system → Port: 53 (DNS)                       │  │    │
-│  │  │ ✓ To: any → Port: 443 (HTTPS - Azure services)           │  │    │
+│  │  │ ✓ To: any → Port: 443 (HTTPS - AWS services)             │  │    │
 │  │  │ ✓ To: any → Port: 587, 465 (SMTP - email)                │  │    │
 │  │  │ ✓ To: Kubernetes API → Port: 443, 6443                   │  │    │
 │  │  └──────────────────────────────────────────────────────────┘  │    │
@@ -125,10 +125,10 @@ Visual representation and detailed explanation of the Kubernetes deployment arch
 │                                                                          │
 │  Layer 1: Network Security                                              │
 │  ┌────────────────────────────────────────────────────────────────┐    │
-│  │ • Azure NSG (Network Security Groups)                           │    │
+│  │ • AWS Security Groups                                           │    │
 │  │ • Kubernetes Network Policies                                   │    │
-│  │ • Private AKS cluster (optional)                                │    │
-│  │ • Azure Firewall / Application Gateway                          │    │
+│  │ • Private EKS cluster (optional)                                │    │
+│  │ • AWS WAF / Application Load Balancer                           │    │
 │  └────────────────────────────────────────────────────────────────┘    │
 │                                                                          │
 │  Layer 2: Ingress Security                                              │
@@ -162,20 +162,20 @@ Visual representation and detailed explanation of the Kubernetes deployment arch
 │                                                                          │
 │  Layer 5: Identity & Access                                             │
 │  ┌────────────────────────────────────────────────────────────────┐    │
-│  │ • Azure Workload Identity                                       │    │
+│  │ • AWS IRSA (IAM Roles for Service Accounts)                     │    │
 │  │ • Kubernetes RBAC                                               │    │
 │  │ • Service Account with minimal permissions                      │    │
-│  │ • Azure Key Vault integration                                   │    │
-│  │ • Federated identity credentials                                │    │
+│  │ • AWS Secrets Manager integration                               │    │
+│  │ • OIDC provider trust policy                                    │    │
 │  └────────────────────────────────────────────────────────────────┘    │
 │                                                                          │
 │  Layer 6: Data Security                                                 │
 │  ┌────────────────────────────────────────────────────────────────┐    │
-│  │ • Encryption at rest (Azure Storage Service Encryption)         │    │
+│  │ • Encryption at rest (AWS KMS)                                  │    │
 │  │ • Encryption in transit (TLS 1.2+)                              │    │
 │  │ • PHI-specific encryption                                       │    │
-│  │ • Secret management (Azure Key Vault)                           │    │
-│  │ • Database encryption (PostgreSQL SSL)                          │    │
+│  │ • Secret management (AWS Secrets Manager)                       │    │
+│  │ • Database encryption (RDS PostgreSQL SSL)                      │    │
 │  └────────────────────────────────────────────────────────────────┘    │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
@@ -251,7 +251,7 @@ Visual representation and detailed explanation of the Kubernetes deployment arch
 │                                                                          │
 │  1. User Request                                                        │
 │     ↓                                                                   │
-│  2. Azure Load Balancer (L4 load balancing)                            │
+│  2. AWS Application Load Balancer (L7 load balancing)                  │
 │     ↓                                                                   │
 │  3. NGINX Ingress Controller                                            │
 │     ├─ TLS termination                                                 │
@@ -281,8 +281,8 @@ Visual representation and detailed explanation of the Kubernetes deployment arch
 │     └─ External services (if needed)                                   │
 │        ├─ Email (SendGrid)                                             │
 │        ├─ SMS (Twilio)                                                 │
-│        ├─ Storage (Azure Blob)                                         │
-│        └─ Secrets (Azure Key Vault)                                    │
+│        ├─ Storage (AWS S3)                                             │
+│        └─ Secrets (AWS Secrets Manager)                                │
 │     ↓                                                                   │
 │  7. Response                                                            │
 │     ├─ Data serialization (JSON)                                       │
@@ -313,7 +313,7 @@ Visual representation and detailed explanation of the Kubernetes deployment arch
 │  │      │                      ↓                                   │    │
 │  │      │              Grafana Dashboards                          │    │
 │  │      │                                                          │    │
-│  │      └──→ Azure Monitor / Application Insights                 │    │
+│  │      └──→ AWS CloudWatch / X-Ray                               │    │
 │  │                                                                 │    │
 │  └────────────────────────────────────────────────────────────────┘    │
 │                                                                          │
@@ -324,7 +324,7 @@ Visual representation and detailed explanation of the Kubernetes deployment arch
 │  │                      ↓                                          │    │
 │  │              Container Runtime                                  │    │
 │  │                      ↓                                          │    │
-│  │              Azure Monitor Logs                                 │    │
+│  │              AWS CloudWatch Logs                                │    │
 │  │                      ↓                                          │    │
 │  │              Log Analytics Workspace                            │    │
 │  │                      ↓                                          │    │
@@ -339,7 +339,7 @@ Visual representation and detailed explanation of the Kubernetes deployment arch
 │  │                      ↓                                          │    │
 │  │              OpenTelemetry Collector                            │    │
 │  │                      ↓                                          │    │
-│  │              Azure Monitor / Jaeger                             │    │
+│  │              AWS X-Ray / Jaeger                                 │    │
 │  │                                                                 │    │
 │  └────────────────────────────────────────────────────────────────┘    │
 │                                                                          │
@@ -371,7 +371,7 @@ Visual representation and detailed explanation of the Kubernetes deployment arch
 │     ├─ Git push to feature branch                                      │
 │     └─ Pull request created                                            │
 │                                                                          │
-│  2. CI Pipeline (GitHub Actions / Azure DevOps)                        │
+│  2. CI Pipeline (GitHub Actions / AWS CodePipeline)                    │
 │     │                                                                   │
 │     ├─ Checkout code                                                   │
 │     ├─ Run linting (ESLint, Prettier)                                  │
@@ -380,7 +380,7 @@ Visual representation and detailed explanation of the Kubernetes deployment arch
 │     ├─ Security scanning (Snyk, SonarQube)                             │
 │     ├─ Build Docker image                                              │
 │     ├─ Tag image (git commit SHA)                                      │
-│     ├─ Push to ACR                                                     │
+│     ├─ Push to ECR                                                     │
 │     └─ Generate deployment artifacts                                   │
 │                                                                          │
 │  3. Staging Deployment (Automatic)                                      │
@@ -483,7 +483,7 @@ Kubernetes Cluster
 │  ├─ cert-manager
 │  │  └─ Certificate Management
 │  │
-│  └─ azure-workload-identity-system
+│  └─ amazon-eks-pod-identity-system
 │     └─ Workload Identity Webhook
 │
 └─ Cluster-Wide Resources
@@ -535,8 +535,8 @@ HPA Scaling Logic:
 │  ┌────────────────────────────────────────────────────────────────┐    │
 │  │ • Kubernetes manifests: Git version control                     │    │
 │  │ • Database: Continuous backup to geo-redundant storage          │    │
-│  │ • Secrets: Azure Key Vault with geo-replication                 │    │
-│  │ • Container images: ACR with geo-replication                    │    │
+│  │ • Secrets: AWS Secrets Manager with cross-region replication    │    │
+│  │ • Container images: ECR with cross-region replication           │    │
 │  │ • Configuration state: Daily snapshots                          │    │
 │  └────────────────────────────────────────────────────────────────┘    │
 │                                                                          │

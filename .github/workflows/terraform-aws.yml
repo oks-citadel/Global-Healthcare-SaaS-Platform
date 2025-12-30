@@ -1,0 +1,396 @@
+# ============================================
+# UnifiedHealth Platform - AWS Terraform Pipeline
+# ============================================
+# AWS-ONLY Terraform Infrastructure Pipeline
+# This pipeline manages all AWS infrastructure
+# ============================================
+
+name: Terraform AWS
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'infrastructure/terraform-aws/**'
+      - '.github/workflows/terraform-aws.yml'
+
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'infrastructure/terraform-aws/**'
+      - '.github/workflows/terraform-aws.yml'
+
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy'
+        required: true
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+      action:
+        description: 'Terraform action'
+        required: true
+        type: choice
+        options:
+          - plan
+          - apply
+
+env:
+  TF_VERSION: "1.6.0"
+  TF_WORKING_DIR: "infrastructure/terraform-aws"
+  AWS_REGION: "us-east-1"
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+jobs:
+  # ==========================================
+  # AWS Provider Verification (MANDATORY)
+  # ==========================================
+  aws-provider-check:
+    name: Verify AWS Provider
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify AWS provider configuration
+        id: aws-check
+        run: |
+          echo "Verifying AWS provider configuration..."
+
+          # Check that AWS provider is configured
+          if ! grep -r "hashicorp/aws" ${{ env.TF_WORKING_DIR }} --include="*.tf" 2>/dev/null; then
+            echo "::error::AWS provider not found in Terraform configuration!"
+            echo "aws_configured=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+          echo "aws_configured=true" >> $GITHUB_OUTPUT
+          echo "AWS provider correctly configured - proceeding with deployment"
+
+      - name: Validate provider configuration
+        run: |
+          echo "============================================"
+          echo "AWS PROVIDER VERIFICATION PASSED"
+          echo "============================================"
+          echo ""
+          echo "AWS Terraform infrastructure verified."
+          echo ""
+
+  # ==========================================
+  # Terraform Validate
+  # ==========================================
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+    needs: aws-provider-check
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Terraform Format Check
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Init
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform init -backend=false
+
+      - name: Terraform Validate
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform validate
+
+  # ==========================================
+  # Terraform Plan (Dev)
+  # ==========================================
+  plan-dev:
+    name: Plan (Dev)
+    runs-on: ubuntu-latest
+    needs: [aws-provider-check, validate]
+    if: |
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'dev')
+    environment: dev
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN_DEV }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Terraform Init
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          terraform init \
+            -backend-config="bucket=${{ secrets.TF_STATE_BUCKET }}" \
+            -backend-config="key=env/dev/terraform.tfstate" \
+            -backend-config="region=${{ env.AWS_REGION }}" \
+            -backend-config="dynamodb_table=${{ secrets.TF_LOCK_TABLE }}"
+
+      - name: Terraform Plan
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          terraform plan \
+            -var-file=environments/dev.tfvars \
+            -out=tfplan-dev \
+            -no-color
+
+      - name: Upload Plan
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan-dev
+          path: ${{ env.TF_WORKING_DIR }}/tfplan-dev
+
+      - name: Post Plan to PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const output = `## Terraform Plan (Dev) 🚀
+
+            \`\`\`
+            ${{ steps.plan.outputs.stdout || 'Plan output captured in artifact' }}
+            \`\`\`
+
+            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            });
+
+  # ==========================================
+  # Terraform Apply (Dev)
+  # ==========================================
+  apply-dev:
+    name: Apply (Dev)
+    runs-on: ubuntu-latest
+    needs: plan-dev
+    if: |
+      github.event_name == 'workflow_dispatch' &&
+      github.event.inputs.environment == 'dev' &&
+      github.event.inputs.action == 'apply'
+    environment: dev
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN_DEV }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Download Plan
+        uses: actions/download-artifact@v4
+        with:
+          name: tfplan-dev
+          path: ${{ env.TF_WORKING_DIR }}
+
+      - name: Terraform Init
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          terraform init \
+            -backend-config="bucket=${{ secrets.TF_STATE_BUCKET }}" \
+            -backend-config="key=env/dev/terraform.tfstate" \
+            -backend-config="region=${{ env.AWS_REGION }}" \
+            -backend-config="dynamodb_table=${{ secrets.TF_LOCK_TABLE }}"
+
+      - name: Terraform Apply
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform apply -auto-approve tfplan-dev
+
+  # ==========================================
+  # Terraform Plan (Staging)
+  # ==========================================
+  plan-staging:
+    name: Plan (Staging)
+    runs-on: ubuntu-latest
+    needs: [aws-provider-check, validate]
+    if: |
+      github.event_name == 'workflow_dispatch' &&
+      github.event.inputs.environment == 'staging'
+    environment: staging
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN_STAGING }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Terraform Init
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          terraform init \
+            -backend-config="bucket=${{ secrets.TF_STATE_BUCKET }}" \
+            -backend-config="key=env/staging/terraform.tfstate" \
+            -backend-config="region=${{ env.AWS_REGION }}" \
+            -backend-config="dynamodb_table=${{ secrets.TF_LOCK_TABLE }}"
+
+      - name: Terraform Plan
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          terraform plan \
+            -var-file=environments/staging.tfvars \
+            -out=tfplan-staging
+
+      - name: Upload Plan
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan-staging
+          path: ${{ env.TF_WORKING_DIR }}/tfplan-staging
+
+  # ==========================================
+  # Terraform Apply (Staging) - Gated
+  # ==========================================
+  apply-staging:
+    name: Apply (Staging)
+    runs-on: ubuntu-latest
+    needs: plan-staging
+    if: |
+      github.event_name == 'workflow_dispatch' &&
+      github.event.inputs.environment == 'staging' &&
+      github.event.inputs.action == 'apply'
+    environment:
+      name: staging
+      # Requires manual approval
+      url: https://console.aws.amazon.com
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN_STAGING }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Download Plan
+        uses: actions/download-artifact@v4
+        with:
+          name: tfplan-staging
+          path: ${{ env.TF_WORKING_DIR }}
+
+      - name: Terraform Init
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          terraform init \
+            -backend-config="bucket=${{ secrets.TF_STATE_BUCKET }}" \
+            -backend-config="key=env/staging/terraform.tfstate" \
+            -backend-config="region=${{ env.AWS_REGION }}" \
+            -backend-config="dynamodb_table=${{ secrets.TF_LOCK_TABLE }}"
+
+      - name: Terraform Apply
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform apply -auto-approve tfplan-staging
+
+  # ==========================================
+  # Terraform Plan (Prod) - PLAN ONLY
+  # ==========================================
+  plan-prod:
+    name: Plan (Prod) - READ ONLY
+    runs-on: ubuntu-latest
+    needs: [aws-provider-check, validate]
+    if: |
+      github.event_name == 'workflow_dispatch' &&
+      github.event.inputs.environment == 'prod'
+    environment: prod
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN_PROD }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Terraform Init
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          terraform init \
+            -backend-config="bucket=${{ secrets.TF_STATE_BUCKET }}" \
+            -backend-config="key=env/prod/terraform.tfstate" \
+            -backend-config="region=${{ env.AWS_REGION }}" \
+            -backend-config="dynamodb_table=${{ secrets.TF_LOCK_TABLE }}"
+
+      - name: Terraform Plan
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          terraform plan \
+            -var-file=environments/prod.tfvars \
+            -out=tfplan-prod
+
+      - name: Upload Plan
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan-prod
+          path: ${{ env.TF_WORKING_DIR }}/tfplan-prod
+
+      - name: Block Apply in Pipeline
+        if: github.event.inputs.action == 'apply'
+        run: |
+          echo "============================================"
+          echo "PRODUCTION APPLY BLOCKED"
+          echo "============================================"
+          echo ""
+          echo "Terraform apply is NOT allowed for production via CI/CD."
+          echo "Production changes must be deployed via Kubernetes/GitOps only."
+          echo ""
+          echo "The plan has been generated for review."
+          exit 1

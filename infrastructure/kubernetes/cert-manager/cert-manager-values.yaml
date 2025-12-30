@@ -1,8 +1,8 @@
 # ============================================
-# cert-manager Helm Values for Azure Workload Identity
+# cert-manager Helm Values for AWS EKS with IRSA
 # ============================================
 # Use these values when installing/upgrading cert-manager
-# to enable Azure Workload Identity integration
+# to enable AWS IAM Roles for Service Accounts (IRSA) integration
 #
 # Install command:
 # helm upgrade --install cert-manager jetstack/cert-manager \
@@ -26,16 +26,15 @@ global:
 controller:
   replicas: 2
 
-  # Pod labels for Azure Workload Identity
-  podLabels:
-    azure.workload.identity/use: "true"
+  # Pod labels for AWS EKS
+  podLabels: {}
 
   # Service account configuration
   serviceAccount:
-    # Annotations for Azure Workload Identity
+    # Annotations for AWS IRSA (IAM Roles for Service Accounts)
     annotations:
-      # IMPORTANT: Replace with your managed identity client ID
-      azure.workload.identity/client-id: "YOUR_MANAGED_IDENTITY_CLIENT_ID"
+      # IMPORTANT: Replace with your IAM role ARN for cert-manager
+      eks.amazonaws.com/role-arn: "${CERT_MANAGER_IAM_ROLE_ARN}"
 
   # Resource limits
   resources:
@@ -76,14 +75,13 @@ controller:
 webhook:
   replicas: 2
 
-  # Pod labels for consistency
-  podLabels:
-    azure.workload.identity/use: "true"
+  # Pod labels for AWS EKS
+  podLabels: {}
 
   # Service account for webhook
   serviceAccount:
     annotations:
-      azure.workload.identity/client-id: "YOUR_MANAGED_IDENTITY_CLIENT_ID"
+      eks.amazonaws.com/role-arn: "${CERT_MANAGER_WEBHOOK_IAM_ROLE_ARN}"
 
   resources:
     requests:
@@ -118,12 +116,12 @@ cainjector:
   enabled: true
   replicas: 2
 
-  podLabels:
-    azure.workload.identity/use: "true"
+  # Pod labels for AWS EKS
+  podLabels: {}
 
   serviceAccount:
     annotations:
-      azure.workload.identity/client-id: "YOUR_MANAGED_IDENTITY_CLIENT_ID"
+      eks.amazonaws.com/role-arn: "${CERT_MANAGER_CAINJECTOR_IAM_ROLE_ARN}"
 
   resources:
     requests:

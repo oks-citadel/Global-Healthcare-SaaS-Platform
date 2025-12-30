@@ -58,7 +58,7 @@ spec:
                 topologyKey: topology.kubernetes.io/zone
       containers:
         - name: api-gateway
-          image: unifiedhealthdevacr.azurecr.io/unifiedhealth/api-gateway:latest
+          image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/unifiedhealth/api-gateway:latest
           imagePullPolicy: Always
           ports:
             - name: http

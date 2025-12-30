@@ -7,9 +7,9 @@
 global:
   environment: production
   region: us-east-1
-  imageRegistry: unifiedhealthdevacr.azurecr.io
+  imageRegistry: ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com
   imagePullSecrets:
-    - name: acr-secret
+    - name: ecr-secret
 
 # Replica counts
 replicaCount:
@@ -177,33 +177,33 @@ configMaps:
 # Persistence
 persistence:
   enabled: true
-  storageClass: managed-premium
+  storageClass: gp3
   accessMode: ReadWriteOnce
   size: 10Gi
   mountPath: /app/data
 
 # Database configuration
 database:
-  enabled: false # Using external Azure PostgreSQL
+  enabled: false # Using external Amazon RDS PostgreSQL
   external:
-    host: unified-health-db-prod.postgres.database.azure.com
+    host: unified-health-db-prod.cluster-xxxxx.us-east-1.rds.amazonaws.com
     port: 5432
     database: unified_health_prod
     sslMode: require
 
 # Redis configuration
 redis:
-  enabled: false # Using external Azure Redis
+  enabled: false # Using external Amazon ElastiCache Redis
   external:
-    host: unified-health-redis-prod.redis.cache.windows.net
-    port: 6380
+    host: unified-health-redis-prod.xxxxx.use1.cache.amazonaws.com
+    port: 6379
     ssl: true
 
 # Service Account
 serviceAccount:
   create: true
   annotations:
-    azure.workload.identity/client-id: "AZURE_CLIENT_ID"
+    eks.amazonaws.com/role-arn: "${AWS_IAM_ROLE_ARN}"
   name: unified-health-api
 
 # Pod Security

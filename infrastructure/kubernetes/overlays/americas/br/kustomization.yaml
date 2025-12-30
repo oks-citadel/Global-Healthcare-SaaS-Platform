@@ -41,15 +41,15 @@ configMapGenerator:
     behavior: merge
 
 images:
-  - name: unifiedhealthdevacr.azurecr.io/unifiedhealth/api-gateway
+  - name: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/unifiedhealth/api-gateway
     newTag: v1.2.3-br
-  - name: unifiedhealthdevacr.azurecr.io/unifiedhealth/telehealth-service
+  - name: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/unifiedhealth/telehealth-service
     newTag: v1.2.3-br
-  - name: unifiedhealthdevacr.azurecr.io/unifiedhealth/mental-health-service
+  - name: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/unifiedhealth/mental-health-service
     newTag: v1.2.3-br
-  - name: unifiedhealthdevacr.azurecr.io/unifiedhealth/chronic-care-service
+  - name: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/unifiedhealth/chronic-care-service
     newTag: v1.2.3-br
-  - name: unifiedhealthdevacr.azurecr.io/unifiedhealth/pharmacy-service
+  - name: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/unifiedhealth/pharmacy-service
     newTag: v1.2.3-br
-  - name: unifiedhealthdevacr.azurecr.io/unifiedhealth/laboratory-service
+  - name: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/unifiedhealth/laboratory-service
     newTag: v1.2.3-br

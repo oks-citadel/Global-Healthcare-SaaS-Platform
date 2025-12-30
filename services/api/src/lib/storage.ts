@@ -1,5 +1,5 @@
 /**
- * Azure Blob Storage Service for HIPAA-Compliant Document Management
+ * AWS S3 Storage Service for HIPAA-Compliant Document Management
  *
  * Features:
  * - Stream-based upload for large files
@@ -9,24 +9,27 @@
  * - Signed URLs for time-limited access
  * - Soft-delete support
  * - Metadata storage
- * - HIPAA-compliant encryption at rest
- * - Container organization by patient/document type
+ * - HIPAA-compliant encryption at rest (S3 SSE)
+ * - Bucket organization by patient/document type
  * - Thumbnail generation for images
  * - Document versioning support
  */
 
 import {
-  BlobServiceClient,
-  StorageSharedKeyCredential,
-  ContainerClient,
-  BlockBlobClient,
-  BlobSASPermissions,
-  generateBlobSASQueryParameters,
-  BlobDeleteOptions,
-  BlobUploadCommonResponse,
-  Tags,
-  ContainerCreateOptions,
-} from '@azure/storage-blob';
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+  DeleteObjectCommand,
+  HeadObjectCommand,
+  CreateBucketCommand,
+  HeadBucketCommand,
+  ListObjectsV2Command,
+  CopyObjectCommand,
+  DeleteObjectsCommand,
+  GetObjectTaggingCommand,
+  PutObjectTaggingCommand,
+} from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Readable, PassThrough } from 'stream';
 import { config } from '../config/index.js';
 import { BadRequestError, NotFoundError, InternalServerError } from '../utils/errors.js';
@@ -38,10 +41,10 @@ import NodeClam from 'clamscan';
 // Configuration & Constants
 // ==========================================
 
-const CONNECTION_STRING = process.env.AZURE_STORAGE_CONNECTION_STRING;
-const CONTAINER_NAME = process.env.AZURE_STORAGE_CONTAINER_NAME || 'healthcare-documents';
-const ACCOUNT_NAME = process.env.AZURE_STORAGE_ACCOUNT_NAME;
-const ACCOUNT_KEY = process.env.AZURE_STORAGE_ACCOUNT_KEY;
+const AWS_REGION = process.env.AWS_REGION || 'us-east-1';
+const AWS_ACCESS_KEY_ID = process.env.AWS_ACCESS_KEY_ID;
+const AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY;
+const BUCKET_NAME = process.env.AWS_S3_BUCKET || 'healthcare-documents';
 
 // Virus Scanning Configuration
 const VIRUS_SCAN_ENABLED = process.env.VIRUS_SCAN_ENABLED === 'true';
@@ -49,7 +52,7 @@ const CLAMAV_HOST = process.env.CLAMAV_HOST || 'localhost';
 const CLAMAV_PORT = parseInt(process.env.CLAMAV_PORT || '3310', 10);
 const CLAMAV_SOCKET = process.env.CLAMAV_SOCKET || '/var/run/clamav/clamd.ctl';
 const CLAMAV_TIMEOUT = parseInt(process.env.CLAMAV_TIMEOUT || '60000', 10); // 60 seconds default
-const QUARANTINE_CONTAINER_NAME = process.env.AZURE_QUARANTINE_CONTAINER_NAME || 'healthcare-quarantine';
+const QUARANTINE_BUCKET_NAME = process.env.AWS_QUARANTINE_BUCKET || 'healthcare-quarantine';
 
 // Allowed MIME types for healthcare documents
 const ALLOWED_MIME_TYPES = [
@@ -93,8 +96,8 @@ const IMAGE_MIME_TYPES = [
 const DEFAULT_MAX_FILE_SIZE = parseInt(process.env.MAX_FILE_SIZE || '104857600', 10); // 100MB
 const THUMBNAIL_MAX_WIDTH = 300;
 const THUMBNAIL_MAX_HEIGHT = 300;
-const SAS_URL_EXPIRY_MINUTES = 60; // 1 hour for downloads
-const UPLOAD_SAS_URL_EXPIRY_MINUTES = 15; // 15 minutes for uploads
+const PRESIGNED_URL_EXPIRY_SECONDS = 3600; // 1 hour for downloads
+const UPLOAD_PRESIGNED_URL_EXPIRY_SECONDS = 900; // 15 minutes for uploads
 
 // ==========================================
 // Types & Interfaces
@@ -114,9 +117,9 @@ export interface UploadOptions {
 }
 
 export interface UploadResult {
-  blobName: string;
+  key: string;
   url: string;
-  containerName: string;
+  bucketName: string;
   contentType: string;
   size: number;
   etag?: string;
@@ -127,7 +130,7 @@ export interface UploadResult {
 }
 
 export interface DownloadOptions {
-  expiryMinutes?: number;
+  expirySeconds?: number;
   downloadFileName?: string;
 }
 
@@ -143,23 +146,20 @@ export interface DocumentMetadata {
   [key: string]: string | undefined;
 }
 
-export interface ListBlobsOptions {
+export interface ListObjectsOptions {
   prefix?: string;
   maxResults?: number;
   includeMetadata?: boolean;
-  includeSnapshots?: boolean;
-  includeSoftDeleted?: boolean;
 }
 
-export interface BlobInfo {
-  name: string;
+export interface ObjectInfo {
+  key: string;
   url: string;
   size: number;
   contentType?: string;
   lastModified?: Date;
   metadata?: Record<string, string>;
   tags?: Record<string, string>;
-  isDeleted?: boolean;
   versionId?: string;
 }
 
@@ -203,9 +203,9 @@ class VirusScannerService {
 
     try {
       this.clamScanner = await new NodeClam().init({
-        removeInfected: false, // We handle this ourselves
-        quarantineInfected: false, // We handle quarantine manually
-        scanLog: null, // Use our own logging
+        removeInfected: false,
+        quarantineInfected: false,
+        scanLog: null,
         debugMode: process.env.NODE_ENV === 'development',
         fileList: null,
         scanRecursively: false,
@@ -214,21 +214,21 @@ class VirusScannerService {
           host: CLAMAV_HOST,
           port: CLAMAV_PORT,
           timeout: CLAMAV_TIMEOUT,
-          localFallback: true, // Use local clamscan if clamd not available
-          path: '/usr/bin/clamdscan', // Default path
+          localFallback: true,
+          path: '/usr/bin/clamdscan',
           configFile: '/etc/clamav/clamd.conf',
-          multiscan: false, // Disable multiscan for consistent results
+          multiscan: false,
           reloadDb: false,
           active: true,
-          bypassTest: false, // Always test connection
+          bypassTest: false,
         },
         clamscan: {
-          path: '/usr/bin/clamscan', // Fallback scanner
+          path: '/usr/bin/clamscan',
           db: null,
           scanArchives: true,
           active: true,
         },
-        preference: 'clamdscan', // Prefer daemon for performance
+        preference: 'clamdscan',
       });
 
       this.isInitialized = true;
@@ -237,7 +237,6 @@ class VirusScannerService {
       this.initializationError = error instanceof Error ? error.message : 'Unknown initialization error';
       console.error('[VirusScanner] Failed to initialize ClamAV:', this.initializationError);
 
-      // In production, we might want to fail hard here
       if (process.env.NODE_ENV === 'production' && process.env.VIRUS_SCAN_REQUIRED === 'true') {
         throw new InternalServerError('Virus scanner initialization failed - uploads are blocked');
       }
@@ -257,7 +256,6 @@ class VirusScannerService {
   async scanBuffer(buffer: Buffer, fileName: string): Promise<VirusScanResult> {
     const startTime = Date.now();
 
-    // If scanning is disabled, return clean result
     if (!VIRUS_SCAN_ENABLED) {
       return {
         isClean: true,
@@ -268,12 +266,10 @@ class VirusScannerService {
       };
     }
 
-    // If scanner failed to initialize, handle gracefully
     if (!this.isInitialized || !this.clamScanner) {
       const errorMessage = this.initializationError || 'Scanner not initialized';
       console.warn(`[VirusScanner] Scanner unavailable: ${errorMessage}`);
 
-      // In strict mode, reject all files if scanner is unavailable
       if (process.env.VIRUS_SCAN_REQUIRED === 'true') {
         return {
           isClean: false,
@@ -285,7 +281,6 @@ class VirusScannerService {
         };
       }
 
-      // In non-strict mode, allow files through with a warning
       console.warn(`[VirusScanner] Allowing file '${fileName}' without scan (scanner unavailable)`);
       return {
         isClean: true,
@@ -299,11 +294,7 @@ class VirusScannerService {
 
     try {
       console.log(`[VirusScanner] Scanning file: ${fileName} (${buffer.length} bytes)`);
-
-      // Create a readable stream from the buffer
       const stream = Readable.from(buffer);
-
-      // Scan the stream
       const result = await this.clamScanner.scanStream(stream);
 
       const scanDurationMs = Date.now() - startTime;
@@ -315,7 +306,6 @@ class VirusScannerService {
         scanDurationMs,
       };
 
-      // Log the result
       if (scanResult.isInfected) {
         console.error(
           `[VirusScanner] INFECTED FILE DETECTED: ${fileName} - Viruses: ${scanResult.viruses.join(', ')}`
@@ -331,7 +321,6 @@ class VirusScannerService {
 
       console.error(`[VirusScanner] Scan error for '${fileName}': ${errorMessage}`);
 
-      // In strict mode, reject files if scan fails
       if (process.env.VIRUS_SCAN_REQUIRED === 'true') {
         return {
           isClean: false,
@@ -343,7 +332,6 @@ class VirusScannerService {
         };
       }
 
-      // In non-strict mode, allow with warning
       return {
         isClean: true,
         isInfected: false,
@@ -365,7 +353,6 @@ class VirusScannerService {
       environment: process.env.NODE_ENV,
     };
 
-    // Log to console in structured format for log aggregation
     if (auditLog.scanResult.isInfected) {
       console.error('[SECURITY_AUDIT] Infected file rejected:', JSON.stringify(logEntry));
     } else if (auditLog.scanResult.error) {
@@ -373,11 +360,6 @@ class VirusScannerService {
     } else {
       console.info('[SECURITY_AUDIT] File scan passed:', JSON.stringify(logEntry));
     }
-
-    // In a production environment, you would also:
-    // - Send to Azure Monitor / Application Insights
-    // - Store in a dedicated audit log database table
-    // - Send to SIEM system for security monitoring
   }
 }
 
@@ -385,86 +367,53 @@ class VirusScannerService {
 const virusScannerService = new VirusScannerService();
 
 // ==========================================
-// Azure Storage Service Class
+// S3 Storage Service Class
 // ==========================================
 
-class AzureStorageService {
-  private blobServiceClient: BlobServiceClient | null = null;
-  private containerClient: ContainerClient | null = null;
-  private credential: StorageSharedKeyCredential | null = null;
+class S3StorageService {
+  private s3Client: S3Client | null = null;
 
   /**
-   * Initialize Azure Blob Storage client
+   * Initialize S3 client
    */
   async initialize(): Promise<void> {
     try {
-      // Option 1: Use connection string (recommended for simplicity)
-      if (CONNECTION_STRING) {
-        this.blobServiceClient = BlobServiceClient.fromConnectionString(CONNECTION_STRING);
-      }
-      // Option 2: Use account name and key
-      else if (ACCOUNT_NAME && ACCOUNT_KEY) {
-        this.credential = new StorageSharedKeyCredential(ACCOUNT_NAME, ACCOUNT_KEY);
-        this.blobServiceClient = new BlobServiceClient(
-          `https://${ACCOUNT_NAME}.blob.core.windows.net`,
-          this.credential
-        );
-      } else {
+      if (!AWS_ACCESS_KEY_ID || !AWS_SECRET_ACCESS_KEY) {
         throw new Error(
-          'Azure Storage credentials not configured. Set AZURE_STORAGE_CONNECTION_STRING or AZURE_STORAGE_ACCOUNT_NAME and AZURE_STORAGE_ACCOUNT_KEY'
+          'AWS credentials not configured. Set AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY'
         );
       }
 
-      // Get container client
-      this.containerClient = this.blobServiceClient.getContainerClient(CONTAINER_NAME);
-
-      // Create container if it doesn't exist
-      const containerOptions: ContainerCreateOptions = {
-        access: 'private', // Private access - require SAS tokens
-        metadata: {
-          purpose: 'healthcare-documents',
-          hipaaCompliant: 'true',
-          encryptionAtRest: 'true',
+      this.s3Client = new S3Client({
+        region: AWS_REGION,
+        credentials: {
+          accessKeyId: AWS_ACCESS_KEY_ID,
+          secretAccessKey: AWS_SECRET_ACCESS_KEY,
         },
-      };
+      });
 
-      const createResponse = await this.containerClient.createIfNotExists(containerOptions);
-
-      if (createResponse.succeeded) {
-        console.log(`Azure Blob container '${CONTAINER_NAME}' created successfully`);
-      } else {
-        console.log(`Azure Blob container '${CONTAINER_NAME}' already exists`);
+      // Check if bucket exists, create if not
+      try {
+        await this.s3Client.send(new HeadBucketCommand({ Bucket: BUCKET_NAME }));
+        console.log(`S3 bucket '${BUCKET_NAME}' already exists`);
+      } catch (error: any) {
+        if (error.name === 'NotFound' || error.$metadata?.httpStatusCode === 404) {
+          await this.s3Client.send(new CreateBucketCommand({
+            Bucket: BUCKET_NAME,
+          }));
+          console.log(`S3 bucket '${BUCKET_NAME}' created successfully`);
+        } else {
+          throw error;
+        }
       }
-
-      // Enable versioning on container (if supported)
-      await this.enableVersioning();
 
       // Initialize virus scanner service
       await virusScannerService.initialize();
 
-      console.log('Azure Blob Storage initialized successfully');
+      console.log('AWS S3 Storage initialized successfully');
     } catch (error) {
-      console.error('Failed to initialize Azure Blob Storage:', error);
+      console.error('Failed to initialize AWS S3 Storage:', error);
       throw new InternalServerError('Failed to initialize storage service');
-    }
-  }
-
-  /**
-   * Enable blob versioning for the container
-   */
-  private async enableVersioning(): Promise<void> {
-    try {
-      if (!this.blobServiceClient) {
-        throw new Error('Blob service client not initialized');
-      }
-
-      const properties = await this.blobServiceClient.getProperties();
-      console.log('Blob versioning status:', properties.defaultServiceVersion);
-
-      // Note: Versioning is typically enabled at the storage account level via Azure Portal or ARM templates
-      // This is just a check to ensure it's configured
-    } catch (error) {
-      console.warn('Could not verify blob versioning:', error);
     }
   }
 
@@ -496,9 +445,9 @@ class AzureStorageService {
   }
 
   /**
-   * Generate blob name with patient/document type organization
+   * Generate S3 key with patient/document type organization
    */
-  private generateBlobName(options: UploadOptions): string {
+  private generateKey(options: UploadOptions): string {
     const timestamp = Date.now();
     const random = crypto.randomBytes(8).toString('hex');
     const sanitizedFileName = this.sanitizeFileName(options.fileName);
@@ -512,47 +461,30 @@ class AzureStorageService {
    * Sanitize file name to prevent path traversal and special characters
    */
   private sanitizeFileName(fileName: string): string {
-    // Remove path separators and special characters
     return fileName
       .replace(/[\/\\]/g, '_')
       .replace(/[^a-zA-Z0-9._-]/g, '_')
-      .substring(0, 255); // Limit length
+      .substring(0, 255);
   }
 
   /**
    * Calculate file checksum (SHA256)
    */
-  private async calculateChecksum(stream: Readable): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const hash = crypto.createHash('sha256');
-      stream.on('data', (chunk) => hash.update(chunk));
-      stream.on('end', () => resolve(hash.digest('hex')));
-      stream.on('error', reject);
-    });
+  private calculateChecksum(buffer: Buffer): string {
+    const hash = crypto.createHash('sha256');
+    hash.update(buffer);
+    return hash.digest('hex');
   }
 
   /**
    * Generate thumbnail for images
    */
-  private async generateThumbnail(
-    stream: Readable,
-    mimeType: string
-  ): Promise<Buffer | null> {
+  private async generateThumbnail(buffer: Buffer, mimeType: string): Promise<Buffer | null> {
     if (!IMAGE_MIME_TYPES.includes(mimeType.toLowerCase())) {
       return null;
     }
 
     try {
-      const chunks: Buffer[] = [];
-
-      // Collect stream data
-      for await (const chunk of stream) {
-        chunks.push(Buffer.from(chunk));
-      }
-
-      const buffer = Buffer.concat(chunks);
-
-      // Generate thumbnail using sharp
       const thumbnail = await sharp(buffer)
         .resize(THUMBNAIL_MAX_WIDTH, THUMBNAIL_MAX_HEIGHT, {
           fit: 'inside',
@@ -569,149 +501,13 @@ class AzureStorageService {
   }
 
   /**
-   * Upload document to Azure Blob Storage with streaming
-   */
-  async uploadDocument(
-    stream: Readable,
-    options: UploadOptions
-  ): Promise<UploadResult> {
-    if (!this.containerClient) {
-      await this.initialize();
-    }
-
-    // Validate inputs
-    this.validateMimeType(options.mimeType);
-    this.validateFileSize(options.fileSize);
-
-    const blobName = this.generateBlobName(options);
-    const blockBlobClient = this.containerClient!.getBlockBlobClient(blobName);
-
-    // Prepare metadata
-    const metadata: DocumentMetadata = {
-      patientId: options.patientId,
-      documentType: options.documentType,
-      uploadedBy: options.uploadedBy,
-      uploadedAt: new Date().toISOString(),
-      encryptionMethod: 'AES-256', // Azure Storage encryption at rest
-      checksum: '', // Will be calculated
-      version: options.version?.toString() || '1',
-      ...(options.description && { description: options.description }),
-      ...(options.metadata || {}),
-    };
-
-    // Prepare tags for easy filtering
-    const tags: Tags = {
-      patientId: options.patientId,
-      documentType: options.documentType,
-      uploadedBy: options.uploadedBy,
-      hipaaCompliant: 'true',
-    };
-
-    try {
-      // Upload the blob with streaming
-      const uploadOptions = {
-        blobHTTPHeaders: {
-          blobContentType: options.mimeType,
-          blobContentDisposition: `attachment; filename="${options.fileName}"`,
-        },
-        metadata,
-        tags,
-      };
-
-      // For large files, use block upload with streaming
-      const uploadResponse: BlobUploadCommonResponse = await blockBlobClient.uploadStream(
-        stream,
-        undefined, // buffer size (default: 4MB)
-        undefined, // max concurrency (default: 5)
-        uploadOptions
-      );
-
-      // Generate thumbnail if requested and file is an image
-      let thumbnailUrl: string | undefined;
-      if (options.generateThumbnail && IMAGE_MIME_TYPES.includes(options.mimeType.toLowerCase())) {
-        try {
-          // Create a new stream for thumbnail generation
-          const thumbnailBlobName = `${blobName}_thumbnail.jpg`;
-          const thumbnailStream = this.containerClient!
-            .getBlockBlobClient(blobName)
-            .download();
-
-          const thumbnail = await this.generateThumbnail(
-            (await thumbnailStream).readableStreamBody as Readable,
-            options.mimeType
-          );
-
-          if (thumbnail) {
-            const thumbnailClient = this.containerClient!.getBlockBlobClient(thumbnailBlobName);
-            await thumbnailClient.uploadData(thumbnail, {
-              blobHTTPHeaders: {
-                blobContentType: 'image/jpeg',
-              },
-              metadata: {
-                ...metadata,
-                isThumbnail: 'true',
-                originalBlob: blobName,
-              },
-            });
-
-            thumbnailUrl = thumbnailClient.url;
-          }
-        } catch (thumbError) {
-          console.error('Failed to generate thumbnail:', thumbError);
-          // Continue without thumbnail - not critical
-        }
-      }
-
-      // Calculate checksum from the uploaded blob
-      const downloadResponse = await blockBlobClient.download();
-      const checksum = await this.calculateChecksum(
-        downloadResponse.readableStreamBody as Readable
-      );
-
-      // Update metadata with checksum
-      await blockBlobClient.setMetadata({
-        ...metadata,
-        checksum,
-      });
-
-      return {
-        blobName,
-        url: blockBlobClient.url,
-        containerName: CONTAINER_NAME,
-        contentType: options.mimeType,
-        size: options.fileSize,
-        etag: uploadResponse.etag,
-        versionId: uploadResponse.versionId,
-        thumbnailUrl,
-        metadata: { ...metadata, checksum },
-      };
-    } catch (error) {
-      console.error('Failed to upload document to Azure Blob Storage:', error);
-      throw new InternalServerError('Failed to upload document');
-    }
-  }
-
-  /**
-   * Upload document with virus scanning BEFORE permanent storage
-   * This is the recommended method for secure file uploads in healthcare applications
-   *
-   * Process:
-   * 1. Validate file type and size
-   * 2. Scan file for viruses using ClamAV
-   * 3. If infected, reject with detailed error message
-   * 4. If clean, upload to permanent storage
-   * 5. Log scan results for HIPAA audit trail
-   *
-   * @param buffer - The file content as a buffer
-   * @param options - Upload options including patient ID, file type, etc.
-   * @returns Upload result with scan information
-   * @throws BadRequestError if file is infected or scan fails in strict mode
+   * Upload document to S3 with virus scanning
    */
   async uploadDocumentWithVirusScan(
     buffer: Buffer,
     options: UploadOptions
   ): Promise<UploadResult> {
-    if (!this.containerClient) {
+    if (!this.s3Client) {
       await this.initialize();
     }
 
@@ -719,7 +515,6 @@ class AzureStorageService {
     this.validateMimeType(options.mimeType);
     this.validateFileSize(buffer.length);
 
-    // Update file size from actual buffer length
     const actualFileSize = buffer.length;
 
     // Step 1: Scan for viruses BEFORE uploading
@@ -740,7 +535,6 @@ class AzureStorageService {
       );
     }
 
-    // Handle scan failures in strict mode
     if (scanResult.error && !scanResult.isClean) {
       console.error(
         `[Upload] REJECTED: Virus scan failed for '${options.fileName}': ${scanResult.error}`
@@ -753,17 +547,17 @@ class AzureStorageService {
     // Step 3: File is clean - proceed with upload
     console.log(`[Upload] File '${options.fileName}' passed virus scan, proceeding with upload`);
 
-    const blobName = this.generateBlobName(options);
-    const blockBlobClient = this.containerClient!.getBlockBlobClient(blobName);
+    const key = this.generateKey(options);
+    const checksum = this.calculateChecksum(buffer);
 
-    // Prepare metadata with scan information
-    const metadata: DocumentMetadata = {
+    // Prepare metadata
+    const metadata: Record<string, string> = {
       patientId: options.patientId,
       documentType: options.documentType,
       uploadedBy: options.uploadedBy,
       uploadedAt: new Date().toISOString(),
       encryptionMethod: 'AES-256',
-      checksum: '', // Will be calculated
+      checksum,
       version: options.version?.toString() || '1',
       virusScanned: 'true',
       virusScanDate: scanResult.scannedAt.toISOString(),
@@ -772,137 +566,132 @@ class AzureStorageService {
       ...(options.metadata || {}),
     };
 
-    // Prepare tags for easy filtering
-    const tags: Tags = {
-      patientId: options.patientId,
-      documentType: options.documentType,
-      uploadedBy: options.uploadedBy,
-      hipaaCompliant: 'true',
-      virusScanned: 'true',
-    };
-
     try {
-      // Calculate checksum from the buffer
-      const hash = crypto.createHash('sha256');
-      hash.update(buffer);
-      const checksum = hash.digest('hex');
-      metadata.checksum = checksum;
+      // Upload the object
+      const command = new PutObjectCommand({
+        Bucket: BUCKET_NAME,
+        Key: key,
+        Body: buffer,
+        ContentType: options.mimeType,
+        ContentDisposition: `attachment; filename="${options.fileName}"`,
+        Metadata: metadata,
+        ServerSideEncryption: 'AES256',
+        Tagging: `patientId=${options.patientId}&documentType=${options.documentType}&uploadedBy=${options.uploadedBy}&hipaaCompliant=true&virusScanned=true`,
+      });
 
-      // Upload the blob from buffer
-      const uploadOptions = {
-        blobHTTPHeaders: {
-          blobContentType: options.mimeType,
-          blobContentDisposition: `attachment; filename="${options.fileName}"`,
-        },
-        metadata,
-        tags,
-      };
-
-      const uploadResponse = await blockBlobClient.uploadData(buffer, uploadOptions);
+      const response = await this.s3Client!.send(command);
 
       // Generate thumbnail if requested and file is an image
       let thumbnailUrl: string | undefined;
       if (options.generateThumbnail && IMAGE_MIME_TYPES.includes(options.mimeType.toLowerCase())) {
         try {
-          const thumbnailBlobName = `${blobName}_thumbnail.jpg`;
-          const thumbnail = await sharp(buffer)
-            .resize(THUMBNAIL_MAX_WIDTH, THUMBNAIL_MAX_HEIGHT, {
-              fit: 'inside',
-              withoutEnlargement: true,
-            })
-            .jpeg({ quality: 80 })
-            .toBuffer();
+          const thumbnail = await this.generateThumbnail(buffer, options.mimeType);
+          if (thumbnail) {
+            const thumbnailKey = `${key}_thumbnail.jpg`;
+            await this.s3Client!.send(new PutObjectCommand({
+              Bucket: BUCKET_NAME,
+              Key: thumbnailKey,
+              Body: thumbnail,
+              ContentType: 'image/jpeg',
+              Metadata: {
+                ...metadata,
+                isThumbnail: 'true',
+                originalKey: key,
+              },
+              ServerSideEncryption: 'AES256',
+            }));
 
-          const thumbnailClient = this.containerClient!.getBlockBlobClient(thumbnailBlobName);
-          await thumbnailClient.uploadData(thumbnail, {
-            blobHTTPHeaders: {
-              blobContentType: 'image/jpeg',
-            },
-            metadata: {
-              ...metadata,
-              isThumbnail: 'true',
-              originalBlob: blobName,
-            },
-          });
-
-          thumbnailUrl = thumbnailClient.url;
+            thumbnailUrl = `https://${BUCKET_NAME}.s3.${AWS_REGION}.amazonaws.com/${thumbnailKey}`;
+          }
         } catch (thumbError) {
           console.error('Failed to generate thumbnail:', thumbError);
-          // Continue without thumbnail - not critical
         }
       }
 
-      console.log(`[Upload] Successfully uploaded '${options.fileName}' as '${blobName}'`);
+      console.log(`[Upload] Successfully uploaded '${options.fileName}' as '${key}'`);
 
       return {
-        blobName,
-        url: blockBlobClient.url,
-        containerName: CONTAINER_NAME,
+        key,
+        url: `https://${BUCKET_NAME}.s3.${AWS_REGION}.amazonaws.com/${key}`,
+        bucketName: BUCKET_NAME,
         contentType: options.mimeType,
         size: actualFileSize,
-        etag: uploadResponse.etag,
-        versionId: uploadResponse.versionId,
+        etag: response.ETag,
+        versionId: response.VersionId,
         thumbnailUrl,
         metadata: { ...metadata, checksum },
         virusScanResult: scanResult,
       };
     } catch (error) {
-      console.error('Failed to upload document to Azure Blob Storage:', error);
+      console.error('Failed to upload document to S3:', error);
       throw new InternalServerError('Failed to upload document');
     }
   }
 
   /**
-   * Generate SAS URL for secure download with time limit
+   * Upload document to S3 (streaming)
    */
-  async generateDownloadUrl(
-    blobName: string,
-    options: DownloadOptions = {}
-  ): Promise<string> {
-    if (!this.containerClient) {
-      await this.initialize();
+  async uploadDocument(
+    stream: Readable,
+    options: UploadOptions
+  ): Promise<UploadResult> {
+    // Convert stream to buffer for virus scanning
+    const chunks: Buffer[] = [];
+    for await (const chunk of stream) {
+      chunks.push(Buffer.from(chunk));
     }
+    const buffer = Buffer.concat(chunks);
 
-    const blockBlobClient = this.containerClient!.getBlockBlobClient(blobName);
-
-    // Check if blob exists
-    const exists = await blockBlobClient.exists();
-    if (!exists) {
-      throw new NotFoundError(`Blob '${blobName}' not found`);
-    }
-
-    const expiryMinutes = options.expiryMinutes || SAS_URL_EXPIRY_MINUTES;
-    const startsOn = new Date();
-    const expiresOn = new Date(startsOn.getTime() + expiryMinutes * 60 * 1000);
-
-    // Generate SAS token
-    const sasToken = generateBlobSASQueryParameters(
-      {
-        containerName: CONTAINER_NAME,
-        blobName,
-        permissions: BlobSASPermissions.parse('r'), // Read-only
-        startsOn,
-        expiresOn,
-        contentDisposition: options.downloadFileName
-          ? `attachment; filename="${options.downloadFileName}"`
-          : undefined,
-      },
-      this.credential || this.blobServiceClient!.credential as StorageSharedKeyCredential
-    ).toString();
-
-    return `${blockBlobClient.url}?${sasToken}`;
+    return this.uploadDocumentWithVirusScan(buffer, options);
   }
 
   /**
-   * Generate SAS URL for direct upload (presigned URL)
+   * Generate presigned URL for secure download with time limit
+   */
+  async generateDownloadUrl(
+    key: string,
+    options: DownloadOptions = {}
+  ): Promise<string> {
+    if (!this.s3Client) {
+      await this.initialize();
+    }
+
+    // Check if object exists
+    try {
+      await this.s3Client!.send(new HeadObjectCommand({
+        Bucket: BUCKET_NAME,
+        Key: key,
+      }));
+    } catch (error: any) {
+      if (error.name === 'NotFound' || error.$metadata?.httpStatusCode === 404) {
+        throw new NotFoundError(`Object '${key}' not found`);
+      }
+      throw error;
+    }
+
+    const expirySeconds = options.expirySeconds || PRESIGNED_URL_EXPIRY_SECONDS;
+
+    const command = new GetObjectCommand({
+      Bucket: BUCKET_NAME,
+      Key: key,
+      ...(options.downloadFileName && {
+        ResponseContentDisposition: `attachment; filename="${options.downloadFileName}"`,
+      }),
+    });
+
+    return getSignedUrl(this.s3Client!, command, { expiresIn: expirySeconds });
+  }
+
+  /**
+   * Generate presigned URL for direct upload
    */
   async generateUploadUrl(
     patientId: string,
     documentType: string,
     fileName: string,
     mimeType: string
-  ): Promise<{ uploadUrl: string; blobName: string; expiresAt: Date }> {
-    if (!this.containerClient) {
+  ): Promise<{ uploadUrl: string; key: string; expiresAt: Date }> {
+    if (!this.s3Client) {
       await this.initialize();
     }
 
@@ -911,249 +700,172 @@ class AzureStorageService {
     const timestamp = Date.now();
     const random = crypto.randomBytes(8).toString('hex');
     const sanitizedFileName = this.sanitizeFileName(fileName);
-    const blobName = `${patientId}/${documentType}/${timestamp}_${random}_${sanitizedFileName}`;
+    const key = `${patientId}/${documentType}/${timestamp}_${random}_${sanitizedFileName}`;
 
-    const blockBlobClient = this.containerClient!.getBlockBlobClient(blobName);
+    const command = new PutObjectCommand({
+      Bucket: BUCKET_NAME,
+      Key: key,
+      ContentType: mimeType,
+      ServerSideEncryption: 'AES256',
+    });
 
-    const startsOn = new Date();
-    const expiresOn = new Date(startsOn.getTime() + UPLOAD_SAS_URL_EXPIRY_MINUTES * 60 * 1000);
+    const uploadUrl = await getSignedUrl(this.s3Client!, command, {
+      expiresIn: UPLOAD_PRESIGNED_URL_EXPIRY_SECONDS,
+    });
 
-    // Generate SAS token with write permissions
-    const sasToken = generateBlobSASQueryParameters(
-      {
-        containerName: CONTAINER_NAME,
-        blobName,
-        permissions: BlobSASPermissions.parse('w'), // Write-only
-        startsOn,
-        expiresOn,
-      },
-      this.credential || this.blobServiceClient!.credential as StorageSharedKeyCredential
-    ).toString();
+    const expiresAt = new Date(Date.now() + UPLOAD_PRESIGNED_URL_EXPIRY_SECONDS * 1000);
 
-    return {
-      uploadUrl: `${blockBlobClient.url}?${sasToken}`,
-      blobName,
-      expiresAt: expiresOn,
-    };
+    return { uploadUrl, key, expiresAt };
   }
 
   /**
-   * Delete document with soft-delete support
+   * Delete document
    */
-  async deleteDocument(blobName: string, softDelete: boolean = true): Promise<void> {
-    if (!this.containerClient) {
+  async deleteDocument(key: string): Promise<void> {
+    if (!this.s3Client) {
       await this.initialize();
     }
 
-    const blockBlobClient = this.containerClient!.getBlockBlobClient(blobName);
-
-    // Check if blob exists
-    const exists = await blockBlobClient.exists();
-    if (!exists) {
-      throw new NotFoundError(`Blob '${blobName}' not found`);
+    // Check if object exists
+    try {
+      await this.s3Client!.send(new HeadObjectCommand({
+        Bucket: BUCKET_NAME,
+        Key: key,
+      }));
+    } catch (error: any) {
+      if (error.name === 'NotFound' || error.$metadata?.httpStatusCode === 404) {
+        throw new NotFoundError(`Object '${key}' not found`);
+      }
+      throw error;
     }
 
     try {
-      const deleteOptions: BlobDeleteOptions = {};
-
-      if (softDelete) {
-        // Soft delete - blob can be recovered within retention period
-        deleteOptions.deleteSnapshots = 'include';
-      } else {
-        // Permanent delete
-        deleteOptions.deleteSnapshots = 'include';
-      }
-
-      await blockBlobClient.delete(deleteOptions);
+      await this.s3Client!.send(new DeleteObjectCommand({
+        Bucket: BUCKET_NAME,
+        Key: key,
+      }));
 
       // Also delete thumbnail if it exists
       try {
-        const thumbnailBlobName = `${blobName}_thumbnail.jpg`;
-        const thumbnailClient = this.containerClient!.getBlockBlobClient(thumbnailBlobName);
-        const thumbnailExists = await thumbnailClient.exists();
-
-        if (thumbnailExists) {
-          await thumbnailClient.delete(deleteOptions);
-        }
+        const thumbnailKey = `${key}_thumbnail.jpg`;
+        await this.s3Client!.send(new DeleteObjectCommand({
+          Bucket: BUCKET_NAME,
+          Key: thumbnailKey,
+        }));
       } catch (thumbError) {
-        console.warn('Failed to delete thumbnail:', thumbError);
-        // Continue - thumbnail deletion is not critical
+        // Thumbnail may not exist, ignore error
       }
     } catch (error) {
-      console.error('Failed to delete blob:', error);
+      console.error('Failed to delete object:', error);
       throw new InternalServerError('Failed to delete document');
     }
   }
 
   /**
-   * List blobs with filtering options
+   * List objects with filtering options
    */
-  async listBlobs(options: ListBlobsOptions = {}): Promise<BlobInfo[]> {
-    if (!this.containerClient) {
+  async listObjects(options: ListObjectsOptions = {}): Promise<ObjectInfo[]> {
+    if (!this.s3Client) {
       await this.initialize();
     }
 
-    const blobs: BlobInfo[] = [];
+    const objects: ObjectInfo[] = [];
     const maxResults = options.maxResults || 100;
 
     try {
-      const iterator = this.containerClient!.listBlobsFlat({
-        prefix: options.prefix,
-        includeMetadata: options.includeMetadata,
-        includeSnapshots: options.includeSnapshots,
-        includeTags: true,
+      const command = new ListObjectsV2Command({
+        Bucket: BUCKET_NAME,
+        Prefix: options.prefix,
+        MaxKeys: maxResults,
       });
 
-      for await (const blob of iterator) {
-        if (blobs.length >= maxResults) {
-          break;
+      const response = await this.s3Client!.send(command);
+
+      for (const obj of response.Contents || []) {
+        if (!obj.Key) continue;
+
+        const objectInfo: ObjectInfo = {
+          key: obj.Key,
+          url: `https://${BUCKET_NAME}.s3.${AWS_REGION}.amazonaws.com/${obj.Key}`,
+          size: obj.Size || 0,
+          lastModified: obj.LastModified,
+        };
+
+        if (options.includeMetadata) {
+          try {
+            const headResponse = await this.s3Client!.send(new HeadObjectCommand({
+              Bucket: BUCKET_NAME,
+              Key: obj.Key,
+            }));
+            objectInfo.contentType = headResponse.ContentType;
+            objectInfo.metadata = headResponse.Metadata;
+          } catch (error) {
+            console.warn(`Failed to get metadata for ${obj.Key}:`, error);
+          }
         }
 
-        blobs.push({
-          name: blob.name,
-          url: `${this.containerClient!.url}/${blob.name}`,
-          size: blob.properties.contentLength || 0,
-          contentType: blob.properties.contentType,
-          lastModified: blob.properties.lastModified,
-          metadata: blob.metadata,
-          tags: blob.tags,
-          versionId: blob.versionId,
-        });
+        objects.push(objectInfo);
       }
 
-      return blobs;
+      return objects;
     } catch (error) {
-      console.error('Failed to list blobs:', error);
+      console.error('Failed to list objects:', error);
       throw new InternalServerError('Failed to list documents');
     }
   }
 
   /**
-   * Get blob metadata
+   * Get object metadata
    */
-  async getBlobMetadata(blobName: string): Promise<DocumentMetadata> {
-    if (!this.containerClient) {
+  async getObjectMetadata(key: string): Promise<DocumentMetadata> {
+    if (!this.s3Client) {
       await this.initialize();
     }
 
-    const blockBlobClient = this.containerClient!.getBlockBlobClient(blobName);
-
     try {
-      const properties = await blockBlobClient.getProperties();
-      return properties.metadata as DocumentMetadata;
-    } catch (error) {
-      console.error('Failed to get blob metadata:', error);
-      throw new NotFoundError(`Blob '${blobName}' not found`);
+      const response = await this.s3Client!.send(new HeadObjectCommand({
+        Bucket: BUCKET_NAME,
+        Key: key,
+      }));
+
+      return response.Metadata as DocumentMetadata;
+    } catch (error: any) {
+      if (error.name === 'NotFound' || error.$metadata?.httpStatusCode === 404) {
+        throw new NotFoundError(`Object '${key}' not found`);
+      }
+      console.error('Failed to get object metadata:', error);
+      throw new InternalServerError('Failed to get document metadata');
     }
   }
 
   /**
-   * Update blob metadata
+   * Copy object for versioning
    */
-  async updateBlobMetadata(
-    blobName: string,
-    metadata: Partial<DocumentMetadata>
-  ): Promise<void> {
-    if (!this.containerClient) {
+  async createVersion(key: string, versionNumber: number): Promise<string> {
+    if (!this.s3Client) {
       await this.initialize();
     }
 
-    const blockBlobClient = this.containerClient!.getBlockBlobClient(blobName);
+    const versionedKey = `${key}_v${versionNumber}`;
 
     try {
-      const currentProperties = await blockBlobClient.getProperties();
-      const updatedMetadata = {
-        ...currentProperties.metadata,
-        ...metadata,
-      };
+      await this.s3Client!.send(new CopyObjectCommand({
+        Bucket: BUCKET_NAME,
+        CopySource: `${BUCKET_NAME}/${key}`,
+        Key: versionedKey,
+        MetadataDirective: 'COPY',
+        ServerSideEncryption: 'AES256',
+      }));
 
-      await blockBlobClient.setMetadata(updatedMetadata);
+      return versionedKey;
     } catch (error) {
-      console.error('Failed to update blob metadata:', error);
-      throw new InternalServerError('Failed to update document metadata');
-    }
-  }
-
-  /**
-   * Copy blob for versioning
-   */
-  async createVersion(blobName: string, versionNumber: number): Promise<string> {
-    if (!this.containerClient) {
-      await this.initialize();
-    }
-
-    const sourceBlobClient = this.containerClient!.getBlockBlobClient(blobName);
-    const versionedBlobName = `${blobName}_v${versionNumber}`;
-    const targetBlobClient = this.containerClient!.getBlockBlobClient(versionedBlobName);
-
-    try {
-      // Copy blob
-      const copyPoller = await targetBlobClient.beginCopyFromURL(sourceBlobClient.url);
-      await copyPoller.pollUntilDone();
-
-      // Update metadata with version info
-      const metadata = await this.getBlobMetadata(blobName);
-      await this.updateBlobMetadata(versionedBlobName, {
-        ...metadata,
-        version: versionNumber.toString(),
-        originalBlob: blobName,
-      });
-
-      return versionedBlobName;
-    } catch (error) {
-      console.error('Failed to create blob version:', error);
+      console.error('Failed to create object version:', error);
       throw new InternalServerError('Failed to create document version');
     }
   }
 
   /**
-   * Perform virus scanning on an already-uploaded blob
-   * Downloads the blob content and scans it using ClamAV
-   *
-   * @param blobName - The name of the blob to scan
-   * @returns Scan result with clean status and any detected threats
-   */
-  async scanForViruses(blobName: string): Promise<{ clean: boolean; threats?: string[] }> {
-    if (!this.containerClient) {
-      await this.initialize();
-    }
-
-    const blockBlobClient = this.containerClient!.getBlockBlobClient(blobName);
-
-    try {
-      // Download the blob content
-      const downloadResponse = await blockBlobClient.download();
-      const chunks: Buffer[] = [];
-
-      for await (const chunk of downloadResponse.readableStreamBody as Readable) {
-        chunks.push(Buffer.from(chunk));
-      }
-
-      const buffer = Buffer.concat(chunks);
-
-      // Scan the buffer using the virus scanner service
-      const scanResult = await virusScannerService.scanBuffer(buffer, blobName);
-
-      console.log(`[Virus Scan] Scanned blob '${blobName}': ${scanResult.isClean ? 'CLEAN' : 'INFECTED'}`);
-
-      return {
-        clean: scanResult.isClean && !scanResult.isInfected,
-        threats: scanResult.viruses.length > 0 ? scanResult.viruses : undefined,
-      };
-    } catch (error) {
-      console.error(`[Virus Scan] Error scanning blob '${blobName}':`, error);
-      throw new InternalServerError('Failed to scan document for viruses');
-    }
-  }
-
-  /**
-   * Scan a file buffer for viruses BEFORE upload
-   * This is the recommended method for scanning files before permanent storage
-   *
-   * @param buffer - The file content as a buffer
-   * @param fileName - The name of the file being scanned
-   * @param options - Upload options for audit logging
-   * @returns Scan result with detailed information
+   * Scan file before upload
    */
   async scanFileBeforeUpload(
     buffer: Buffer,
@@ -1162,7 +874,6 @@ class AzureStorageService {
   ): Promise<VirusScanResult> {
     const scanResult = await virusScannerService.scanBuffer(buffer, fileName);
 
-    // Log the scan result for audit trail
     const auditLog: VirusScanAuditLog = {
       fileName,
       fileSize: buffer.length,
@@ -1184,6 +895,41 @@ class AzureStorageService {
   }
 
   /**
+   * Scan existing object for viruses
+   */
+  async scanForViruses(key: string): Promise<{ clean: boolean; threats?: string[] }> {
+    if (!this.s3Client) {
+      await this.initialize();
+    }
+
+    try {
+      const response = await this.s3Client!.send(new GetObjectCommand({
+        Bucket: BUCKET_NAME,
+        Key: key,
+      }));
+
+      const chunks: Buffer[] = [];
+      const stream = response.Body as Readable;
+      for await (const chunk of stream) {
+        chunks.push(Buffer.from(chunk));
+      }
+      const buffer = Buffer.concat(chunks);
+
+      const scanResult = await virusScannerService.scanBuffer(buffer, key);
+
+      console.log(`[Virus Scan] Scanned object '${key}': ${scanResult.isClean ? 'CLEAN' : 'INFECTED'}`);
+
+      return {
+        clean: scanResult.isClean && !scanResult.isInfected,
+        threats: scanResult.viruses.length > 0 ? scanResult.viruses : undefined,
+      };
+    } catch (error) {
+      console.error(`[Virus Scan] Error scanning object '${key}':`, error);
+      throw new InternalServerError('Failed to scan document for viruses');
+    }
+  }
+
+  /**
    * Get storage usage statistics for a patient
    */
   async getPatientStorageStats(patientId: string): Promise<{
@@ -1191,7 +937,7 @@ class AzureStorageService {
     fileCount: number;
     documentTypes: Record<string, number>;
   }> {
-    const blobs = await this.listBlobs({
+    const objects = await this.listObjects({
       prefix: `${patientId}/`,
       includeMetadata: true,
     });
@@ -1199,25 +945,58 @@ class AzureStorageService {
     let totalSize = 0;
     const documentTypes: Record<string, number> = {};
 
-    for (const blob of blobs) {
-      totalSize += blob.size;
+    for (const obj of objects) {
+      totalSize += obj.size;
 
-      if (blob.metadata?.documentType) {
-        documentTypes[blob.metadata.documentType] =
-          (documentTypes[blob.metadata.documentType] || 0) + 1;
+      if (obj.metadata?.documentType) {
+        documentTypes[obj.metadata.documentType] =
+          (documentTypes[obj.metadata.documentType] || 0) + 1;
       }
     }
 
     return {
       totalSize,
-      fileCount: blobs.length,
+      fileCount: objects.length,
       documentTypes,
     };
+  }
+
+  /**
+   * Download object as buffer
+   */
+  async downloadObject(key: string): Promise<Buffer> {
+    if (!this.s3Client) {
+      await this.initialize();
+    }
+
+    try {
+      const response = await this.s3Client!.send(new GetObjectCommand({
+        Bucket: BUCKET_NAME,
+        Key: key,
+      }));
+
+      const chunks: Buffer[] = [];
+      const stream = response.Body as Readable;
+      for await (const chunk of stream) {
+        chunks.push(Buffer.from(chunk));
+      }
+
+      return Buffer.concat(chunks);
+    } catch (error: any) {
+      if (error.name === 'NotFound' || error.$metadata?.httpStatusCode === 404) {
+        throw new NotFoundError(`Object '${key}' not found`);
+      }
+      console.error('Failed to download object:', error);
+      throw new InternalServerError('Failed to download document');
+    }
   }
 }
 
 // Export singleton instances
-export const azureStorageService = new AzureStorageService();
+export const s3StorageService = new S3StorageService();
+
+// Export for backward compatibility with Azure naming
+export const azureStorageService = s3StorageService;
 
 // Export virus scanner service for direct access if needed
 export { virusScannerService };

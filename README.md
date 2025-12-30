@@ -263,9 +263,9 @@ UnifiedHealth is uniquely positioned to capture this opportunity with the **only
 |  +-----------+  +-----------+  +-----------+  +-----------+                 |
 |                                                                              |
 |  +-----------+  +-----------+  +-----------+  +-----------+                 |
-|  |  MongoDB  |  | HAPI FHIR |  |   Azure   |  |  Azure    |                 |
-|  |  7 (FHIR) |  |  Server   |  |   Blob    |  | Key Vault |                 |
-|  |           |  |    R4     |  |  Storage  |  |  Secrets  |                 |
+|  |  MongoDB  |  | HAPI FHIR |  |  Amazon   |  |   AWS     |                 |
+|  |  7 (FHIR) |  |  Server   |  |    S3     |  |  Secrets  |                 |
+|  |           |  |    R4     |  |  Storage  |  |  Manager  |                 |
 |  +-----------+  +-----------+  +-----------+  +-----------+                 |
 +-----------------------------------------------------------------------------+
                                  |
@@ -294,10 +294,10 @@ UnifiedHealth is uniquely positioned to capture this opportunity with the **only
     |  Americas   |          |   Europe    |          |Asia-Pacific |
     |  US-East-2  |          |  EU-West-1  |          |AP-Southeast |
     +-------------+          +-------------+          +-------------+
-    | - AKS       |          | - AKS       |          | - AKS       |
-    | - PostgreSQL|          | - PostgreSQL|          | - PostgreSQL|
-    | - Redis     |          | - Redis     |          | - Redis     |
-    | - Blob Store|          | - Blob Store|          | - Blob Store|
+    | - EKS       |          | - EKS       |          | - EKS       |
+    | - RDS       |          | - RDS       |          | - RDS       |
+    | - ElastiCache|         | - ElastiCache|         | - ElastiCache|
+    | - S3        |          | - S3        |          | - S3        |
     +-------------+          +-------------+          +-------------+
 
     Data Residency: Patient data stays in-region per compliance requirements
@@ -485,7 +485,7 @@ AuditEvent, WebhookEventLog, Consent, ChatMessage, RefreshToken
 **External Integrations:**
 
 - **Stripe**: Payment processing, subscription management
-- **AWS S3 / Azure Blob**: Document storage
+- **AWS S3**: Document storage
 - **SendGrid**: Transactional emails
 
 **Dependencies:** `stripe`, `@aws-sdk/client-s3`, `multer`, `@prisma/client`, `winston`
@@ -1236,20 +1236,20 @@ Global-Healthcare-SaaS-Platform/
 
 ### Infrastructure & DevOps
 
-| Technology                         | Purpose                    |
-| ---------------------------------- | -------------------------- |
-| **Azure Kubernetes Service (AKS)** | Container Orchestration    |
-| **Azure Container Registry (ACR)** | Docker Image Storage       |
-| **Azure Database for PostgreSQL**  | Managed Database           |
-| **Azure Cache for Redis**          | Managed Cache              |
-| **Azure Key Vault**                | Secrets Management         |
-| **Azure Blob Storage**             | File & Media Storage       |
-| **GitHub Actions**                 | CI/CD Pipelines            |
-| **Terraform**                      | Infrastructure as Code     |
-| **Helm**                           | Kubernetes Package Manager |
-| **Docker**                         | Containerization           |
-| **pnpm**                           | Package Manager            |
-| **Turbo**                          | Monorepo Build System      |
+| Technology                                | Purpose                    |
+| ----------------------------------------- | -------------------------- |
+| **Amazon Elastic Kubernetes Service (EKS)** | Container Orchestration    |
+| **Amazon Elastic Container Registry (ECR)** | Docker Image Storage       |
+| **Amazon RDS for PostgreSQL**               | Managed Database           |
+| **Amazon ElastiCache for Redis**            | Managed Cache              |
+| **AWS Secrets Manager**                     | Secrets Management         |
+| **Amazon S3**                               | File & Media Storage       |
+| **GitHub Actions**                          | CI/CD Pipelines            |
+| **Terraform**                               | Infrastructure as Code     |
+| **Helm**                                    | Kubernetes Package Manager |
+| **Docker**                                  | Containerization           |
+| **pnpm**                                    | Package Manager            |
+| **Turbo**                                   | Monorepo Build System      |
 
 ### Testing Stack
 
@@ -1419,9 +1419,9 @@ pnpm dev
 | ------------------------- | -------------------------------- |
 | **Authentication**        | JWT with refresh tokens, MFA     |
 | **Authorization**         | Role-based access control (RBAC) |
-| **Encryption at Rest**    | AES-256 via Azure                |
+| **Encryption at Rest**    | AES-256 via AWS KMS              |
 | **Encryption in Transit** | TLS 1.3                          |
-| **Secret Management**     | Azure Key Vault                  |
+| **Secret Management**     | AWS Secrets Manager              |
 | **Audit Logging**         | Immutable audit trails           |
 
 ### Compliance Certifications

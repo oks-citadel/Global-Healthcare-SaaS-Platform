@@ -1,12 +1,13 @@
-# GDPR Technical Controls for UnifiedHealth Platform
+# GDPR Technical Controls for UnifiedHealth Platform - AWS
 # Implements EU General Data Protection Regulation (EU) 2016/679
+# Migrated from Azure to AWS
 
 terraform {
   required_version = ">= 1.5.0"
   required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "~> 3.0"
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
     }
     random = {
       source  = "hashicorp/random"
@@ -21,9 +22,9 @@ variable "environment" {
 }
 
 variable "eu_region" {
-  description = "EU Azure region for GDPR data residency"
+  description = "EU AWS region for GDPR data residency"
   type        = string
-  default     = "westeurope" # Must be EU region
+  default     = "eu-west-1" # Ireland - Must be EU region
 }
 
 variable "organization_name" {
@@ -32,9 +33,30 @@ variable "organization_name" {
   default     = "unifiedhealth"
 }
 
-variable "resource_group_name" {
-  description = "Resource group for GDPR resources"
+variable "dpo_email" {
+  description = "Data Protection Officer email"
   type        = string
+}
+
+variable "legal_team_email" {
+  description = "Legal team email for GDPR alerts"
+  type        = string
+}
+
+variable "vpc_id" {
+  description = "VPC ID for GDPR resources"
+  type        = string
+}
+
+variable "private_subnet_ids" {
+  description = "Private subnet IDs for GDPR resources"
+  type        = list(string)
+}
+
+variable "eu_allowed_ip_ranges" {
+  description = "Allowed EU IP CIDR ranges"
+  type        = list(string)
+  default     = []
 }
 
 # GDPR compliant tags
@@ -50,494 +72,1230 @@ locals {
     DPO                = var.dpo_email
     RetentionPeriod    = "As-Per-Policy"
   }
-}
 
-# Azure Policy for GDPR Compliance
-resource "azurerm_policy_assignment" "gdpr_compliance" {
-  name                 = "gdpr-compliance-${var.environment}"
-  scope                = data.azurerm_resource_group.main.id
-  policy_definition_id = "/providers/Microsoft.Authorization/policyDefinitions/e56962a6-4747-49cd-b67b-bf8b01975c4c" # Allowed locations
-
-  display_name = "GDPR Data Residency Enforcement for ${var.environment}"
-  description  = "Ensures all resources are deployed in EU regions only"
-
-  parameters = jsonencode({
-    listOfAllowedLocations = {
-      value = [
-        "westeurope",
-        "northeurope",
-        "francecentral",
-        "germanywestcentral",
-        "switzerlandnorth",
-        "norwayeast"
-      ]
-    }
-  })
-
-  metadata = jsonencode({
-    category = "GDPR Compliance"
-    version  = "1.0.0"
-  })
-
-  non_compliance_message {
-    content = "Resource must be deployed in EU region for GDPR compliance"
-  }
-}
-
-# Azure Policy - Restrict resource types for GDPR
-resource "azurerm_policy_assignment" "restrict_non_eu_services" {
-  name                 = "restrict-non-eu-services-${var.environment}"
-  scope                = data.azurerm_resource_group.main.id
-  policy_definition_id = "/providers/Microsoft.Authorization/policyDefinitions/a451c1ef-c6ca-483d-87d-f49761e3ffb5" # Allowed resource types
-
-  display_name = "Restrict to EU-Available Services"
-  description  = "Only allow Azure services available in EU regions"
-
-  non_compliance_message {
-    content = "This resource type is not permitted for GDPR compliance"
-  }
-}
-
-# GDPR Compliant Key Vault for Personal Data encryption
-resource "azurerm_key_vault" "gdpr_kv" {
-  name                = "${var.organization_name}-gdpr-kv-${var.environment}"
-  location            = var.eu_region
-  resource_group_name = var.resource_group_name
-  tenant_id           = data.azurerm_client_config.current.tenant_id
-
-  sku_name = "premium"
-
-  # GDPR requires purge protection
-  purge_protection_enabled   = true
-  soft_delete_retention_days = 90
-
-  # Network isolation
-  network_acls {
-    bypass         = "AzureServices"
-    default_action = "Deny"
-
-    virtual_network_subnet_ids = [
-      azurerm_subnet.eu_healthcare_subnet.id
-    ]
-
-    ip_rules = var.eu_allowed_ip_ranges
-  }
-
-  enabled_for_deployment          = false
-  enabled_for_disk_encryption     = true
-  enabled_for_template_deployment = false
-
-  tags = local.gdpr_tags
-}
-
-# Customer Managed Key for Personal Data Encryption
-resource "azurerm_key_vault_key" "personal_data_encryption_key" {
-  name         = "personal-data-encryption-${var.environment}"
-  key_vault_id = azurerm_key_vault.gdpr_kv.id
-  key_type     = "RSA-HSM"
-  key_size     = 4096
-
-  key_opts = [
-    "decrypt",
-    "encrypt",
-    "sign",
-    "unwrapKey",
-    "verify",
-    "wrapKey",
+  # EU countries for geo-restriction
+  eu_countries = [
+    "AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR",
+    "DE", "GR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL",
+    "PL", "PT", "RO", "SK", "SI", "ES", "SE"
   ]
 
-  rotation_policy {
-    automatic {
-      time_before_expiry = "P30D"
-    }
+  # Allowed EU AWS regions
+  eu_regions = [
+    "eu-west-1",      # Ireland
+    "eu-west-2",      # London
+    "eu-west-3",      # Paris
+    "eu-central-1",   # Frankfurt
+    "eu-central-2",   # Zurich
+    "eu-north-1",     # Stockholm
+    "eu-south-1",     # Milan
+    "eu-south-2"      # Spain
+  ]
+}
 
-    expire_after         = "P90D"
-    notify_before_expiry = "P29D"
-  }
+# Data sources
+data "aws_caller_identity" "current" {}
+data "aws_region" "current" {}
+
+# =============================================================================
+# AWS KMS - Customer Managed Keys for Personal Data Encryption
+# =============================================================================
+
+resource "aws_kms_key" "personal_data_encryption_key" {
+  description              = "GDPR personal data encryption key for ${var.environment}"
+  deletion_window_in_days  = 30
+  enable_key_rotation      = true
+  is_enabled               = true
+  customer_master_key_spec = "SYMMETRIC_DEFAULT"
+  key_usage                = "ENCRYPT_DECRYPT"
+  multi_region             = false
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Id      = "gdpr-personal-data-key-policy"
+    Statement = [
+      {
+        Sid    = "Enable IAM User Permissions"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        }
+        Action   = "kms:*"
+        Resource = "*"
+      },
+      {
+        Sid    = "Allow CloudWatch Logs"
+        Effect = "Allow"
+        Principal = {
+          Service = "logs.${data.aws_region.current.name}.amazonaws.com"
+        }
+        Action = [
+          "kms:Encrypt*",
+          "kms:Decrypt*",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:Describe*"
+        ]
+        Resource = "*"
+        Condition = {
+          ArnLike = {
+            "kms:EncryptionContext:aws:logs:arn" = "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"
+          }
+        }
+      },
+      {
+        Sid    = "Allow S3 Service"
+        Effect = "Allow"
+        Principal = {
+          Service = "s3.amazonaws.com"
+        }
+        Action = [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:DescribeKey"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid    = "Allow RDS Service"
+        Effect = "Allow"
+        Principal = {
+          Service = "rds.amazonaws.com"
+        }
+        Action = [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:DescribeKey"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid    = "Allow Macie Service"
+        Effect = "Allow"
+        Principal = {
+          Service = "macie.amazonaws.com"
+        }
+        Action = [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:DescribeKey"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
 
   tags = merge(local.gdpr_tags, {
     Purpose = "Personal-Data-Encryption"
+    KeyType = "CMK"
   })
 }
 
-# GDPR Compliant Storage Account - EU Residency Enforced
-resource "azurerm_storage_account" "gdpr_storage" {
-  name                     = "${var.organization_name}gdpr${var.environment}"
-  resource_group_name      = var.resource_group_name
-  location                 = var.eu_region
-  account_tier             = "Standard"
-  account_replication_type = "GZRS" # Geo-zone redundant within EU
+resource "aws_kms_alias" "personal_data_encryption_key" {
+  name          = "alias/gdpr-personal-data-key-${var.environment}"
+  target_key_id = aws_kms_key.personal_data_encryption_key.key_id
+}
 
-  # Enforce EU replication only
-  account_kind = "StorageV2"
+# =============================================================================
+# AWS Macie - Data Classification (Replaces Azure Purview)
+# =============================================================================
 
-  enable_https_traffic_only       = true
-  min_tls_version                 = "TLS1_2"
-  allow_nested_items_to_be_public = false
-  shared_access_key_enabled       = false
+resource "aws_macie2_account" "gdpr" {
+  finding_publishing_frequency = "FIFTEEN_MINUTES"
+  status                       = "ENABLED"
+}
 
-  infrastructure_encryption_enabled = true
+resource "aws_macie2_classification_export_configuration" "gdpr" {
+  depends_on = [aws_macie2_account.gdpr]
 
-  identity {
-    type = "SystemAssigned"
+  s3_destination {
+    bucket_name = aws_s3_bucket.macie_findings.id
+    key_prefix  = "macie-findings/"
+    kms_key_arn = aws_kms_key.personal_data_encryption_key.arn
   }
+}
 
-  blob_properties {
-    versioning_enabled       = true
-    change_feed_enabled      = true
-    last_access_time_enabled = true
+# S3 bucket for Macie findings
+resource "aws_s3_bucket" "macie_findings" {
+  bucket = "${var.organization_name}-gdpr-macie-findings-${var.environment}-${data.aws_caller_identity.current.account_id}"
 
-    delete_retention_policy {
-      days = 30 # GDPR allows deletion after purpose fulfilled
+  tags = merge(local.gdpr_tags, {
+    Purpose = "Macie-Data-Classification"
+  })
+}
+
+resource "aws_s3_bucket_versioning" "macie_findings" {
+  bucket = aws_s3_bucket.macie_findings.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "macie_findings" {
+  bucket = aws_s3_bucket.macie_findings.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      kms_master_key_id = aws_kms_key.personal_data_encryption_key.arn
+      sse_algorithm     = "aws:kms"
+    }
+    bucket_key_enabled = true
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "macie_findings" {
+  bucket = aws_s3_bucket.macie_findings.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_policy" "macie_findings" {
+  bucket = aws_s3_bucket.macie_findings.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowMacie"
+        Effect = "Allow"
+        Principal = {
+          Service = "macie.amazonaws.com"
+        }
+        Action = [
+          "s3:PutObject",
+          "s3:GetBucketLocation"
+        ]
+        Resource = [
+          aws_s3_bucket.macie_findings.arn,
+          "${aws_s3_bucket.macie_findings.arn}/*"
+        ]
+        Condition = {
+          StringEquals = {
+            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+          }
+        }
+      },
+      {
+        Sid       = "DenyInsecureTransport"
+        Effect    = "Deny"
+        Principal = "*"
+        Action    = "s3:*"
+        Resource = [
+          aws_s3_bucket.macie_findings.arn,
+          "${aws_s3_bucket.macie_findings.arn}/*"
+        ]
+        Condition = {
+          Bool = {
+            "aws:SecureTransport" = "false"
+          }
+        }
+      }
+    ]
+  })
+}
+
+# =============================================================================
+# GDPR Compliant S3 Bucket - EU Residency Enforced
+# =============================================================================
+
+resource "aws_s3_bucket" "gdpr_storage" {
+  bucket = "${var.organization_name}-gdpr-personal-data-${var.environment}-${data.aws_caller_identity.current.account_id}"
+
+  tags = merge(local.gdpr_tags, {
+    Purpose = "Personal-Data-Storage"
+  })
+}
+
+resource "aws_s3_bucket_versioning" "gdpr_storage" {
+  bucket = aws_s3_bucket.gdpr_storage.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "gdpr_storage" {
+  bucket = aws_s3_bucket.gdpr_storage.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      kms_master_key_id = aws_kms_key.personal_data_encryption_key.arn
+      sse_algorithm     = "aws:kms"
+    }
+    bucket_key_enabled = true
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "gdpr_storage" {
+  bucket = aws_s3_bucket.gdpr_storage.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_logging" "gdpr_storage" {
+  bucket        = aws_s3_bucket.gdpr_storage.id
+  target_bucket = aws_s3_bucket.access_logs.id
+  target_prefix = "gdpr-storage-logs/"
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "gdpr_storage" {
+  bucket = aws_s3_bucket.gdpr_storage.id
+
+  rule {
+    id     = "gdpr-retention"
+    status = "Enabled"
+
+    transition {
+      days          = 90
+      storage_class = "STANDARD_IA"
     }
 
-    container_delete_retention_policy {
-      days = 30
+    transition {
+      days          = 365
+      storage_class = "GLACIER"
     }
 
-    # Enable point-in-time restore for accidental deletion
-    restore_policy {
-      days = 7
+    # GDPR allows deletion after purpose fulfilled
+    noncurrent_version_expiration {
+      noncurrent_days = 30
     }
   }
+}
 
-  network_rules {
-    default_action             = "Deny"
-    bypass                     = ["AzureServices"]
-    virtual_network_subnet_ids = [azurerm_subnet.eu_healthcare_subnet.id]
-    ip_rules                   = var.eu_allowed_ip_ranges
+resource "aws_s3_bucket_policy" "gdpr_storage" {
+  bucket = aws_s3_bucket.gdpr_storage.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "DenyInsecureTransport"
+        Effect    = "Deny"
+        Principal = "*"
+        Action    = "s3:*"
+        Resource = [
+          aws_s3_bucket.gdpr_storage.arn,
+          "${aws_s3_bucket.gdpr_storage.arn}/*"
+        ]
+        Condition = {
+          Bool = {
+            "aws:SecureTransport" = "false"
+          }
+        }
+      },
+      {
+        Sid       = "DenyUnencryptedUploads"
+        Effect    = "Deny"
+        Principal = "*"
+        Action    = "s3:PutObject"
+        Resource  = "${aws_s3_bucket.gdpr_storage.arn}/*"
+        Condition = {
+          StringNotEquals = {
+            "s3:x-amz-server-side-encryption" = "aws:kms"
+          }
+        }
+      },
+      {
+        Sid       = "EnforceEURegionOnly"
+        Effect    = "Deny"
+        Principal = "*"
+        Action    = "s3:*"
+        Resource = [
+          aws_s3_bucket.gdpr_storage.arn,
+          "${aws_s3_bucket.gdpr_storage.arn}/*"
+        ]
+        Condition = {
+          StringNotEquals = {
+            "aws:RequestedRegion" = local.eu_regions
+          }
+        }
+      }
+    ]
+  })
+}
+
+# S3 bucket for access logs
+resource "aws_s3_bucket" "access_logs" {
+  bucket = "${var.organization_name}-gdpr-access-logs-${var.environment}-${data.aws_caller_identity.current.account_id}"
+
+  tags = merge(local.gdpr_tags, {
+    Purpose = "Access-Logs"
+  })
+}
+
+resource "aws_s3_bucket_versioning" "access_logs" {
+  bucket = aws_s3_bucket.access_logs.id
+  versioning_configuration {
+    status = "Enabled"
   }
-
-  tags = local.gdpr_tags
 }
 
-# GDPR Compliant PostgreSQL Database (EU-hosted)
-resource "azurerm_postgresql_flexible_server" "gdpr_postgres" {
-  name                = "${var.organization_name}-gdpr-postgres-${var.environment}"
-  resource_group_name = var.resource_group_name
-  location            = var.eu_region
+resource "aws_s3_bucket_server_side_encryption_configuration" "access_logs" {
+  bucket = aws_s3_bucket.access_logs.id
 
-  administrator_login    = var.postgres_admin_username
-  administrator_password = random_password.postgres_admin_password.result
-
-  sku_name   = "GP_Standard_D4s_v3"
-  version    = "15"
-  storage_mb = 32768
-
-  backup_retention_days        = 35
-  geo_redundant_backup_enabled = true # Within EU only
-
-  # High availability within EU zone
-  high_availability {
-    mode                      = "ZoneRedundant"
-    standby_availability_zone = "2"
+  rule {
+    apply_server_side_encryption_by_default {
+      kms_master_key_id = aws_kms_key.personal_data_encryption_key.arn
+      sse_algorithm     = "aws:kms"
+    }
+    bucket_key_enabled = true
   }
+}
 
-  # Customer-managed key encryption
-  customer_managed_key {
-    key_vault_key_id = azurerm_key_vault_key.personal_data_encryption_key.id
+resource "aws_s3_bucket_public_access_block" "access_logs" {
+  bucket = aws_s3_bucket.access_logs.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "access_logs" {
+  bucket = aws_s3_bucket.access_logs.id
+
+  rule {
+    id     = "gdpr-log-retention"
+    status = "Enabled"
+
+    transition {
+      days          = 90
+      storage_class = "STANDARD_IA"
+    }
+
+    transition {
+      days          = 365
+      storage_class = "GLACIER"
+    }
+
+    expiration {
+      days = 730 # 2 years retention for audit logs
+    }
   }
-
-  # Private access only
-  delegated_subnet_id = azurerm_subnet.postgres_subnet.id
-  private_dns_zone_id = azurerm_private_dns_zone.postgres_dns.id
-
-  tags = local.gdpr_tags
 }
 
-# PostgreSQL Configuration for GDPR
-resource "azurerm_postgresql_flexible_server_configuration" "log_connections" {
-  name      = "log_connections"
-  server_id = azurerm_postgresql_flexible_server.gdpr_postgres.id
-  value     = "on"
+# DPIA (Data Protection Impact Assessment) storage
+resource "aws_s3_bucket" "dpia_documents" {
+  bucket = "${var.organization_name}-gdpr-dpia-${var.environment}-${data.aws_caller_identity.current.account_id}"
+
+  tags = merge(local.gdpr_tags, {
+    Purpose = "DPIA-Assessments"
+  })
 }
 
-resource "azurerm_postgresql_flexible_server_configuration" "log_disconnections" {
-  name      = "log_disconnections"
-  server_id = azurerm_postgresql_flexible_server.gdpr_postgres.id
-  value     = "on"
+resource "aws_s3_bucket_versioning" "dpia_documents" {
+  bucket = aws_s3_bucket.dpia_documents.id
+  versioning_configuration {
+    status = "Enabled"
+  }
 }
 
-resource "azurerm_postgresql_flexible_server_configuration" "log_statement" {
-  name      = "log_statement"
-  server_id = azurerm_postgresql_flexible_server.gdpr_postgres.id
-  value     = "all"
+resource "aws_s3_bucket_server_side_encryption_configuration" "dpia_documents" {
+  bucket = aws_s3_bucket.dpia_documents.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      kms_master_key_id = aws_kms_key.personal_data_encryption_key.arn
+      sse_algorithm     = "aws:kms"
+    }
+    bucket_key_enabled = true
+  }
 }
 
-# GDPR Audit Database
-resource "azurerm_postgresql_flexible_server_database" "gdpr_audit_db" {
-  name      = "gdpr_audit"
-  server_id = azurerm_postgresql_flexible_server.gdpr_postgres.id
-  charset   = "UTF8"
-  collation = "en_US.utf8"
+resource "aws_s3_bucket_public_access_block" "dpia_documents" {
+  bucket = aws_s3_bucket.dpia_documents.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }
 
-# Personal Data Database
-resource "azurerm_postgresql_flexible_server_database" "personal_data_db" {
-  name      = "personal_data"
-  server_id = azurerm_postgresql_flexible_server.gdpr_postgres.id
-  charset   = "UTF8"
-  collation = "en_US.utf8"
+# Consent records storage
+resource "aws_s3_bucket" "consent_records" {
+  bucket = "${var.organization_name}-gdpr-consent-${var.environment}-${data.aws_caller_identity.current.account_id}"
+
+  tags = merge(local.gdpr_tags, {
+    Purpose = "Consent-Records"
+  })
 }
 
-# Private DNS Zone for PostgreSQL
-resource "azurerm_private_dns_zone" "postgres_dns" {
-  name                = "privatelink.postgres.database.azure.com"
-  resource_group_name = var.resource_group_name
-
-  tags = local.gdpr_tags
+resource "aws_s3_bucket_versioning" "consent_records" {
+  bucket = aws_s3_bucket.consent_records.id
+  versioning_configuration {
+    status = "Enabled"
+  }
 }
 
-resource "azurerm_private_dns_zone_virtual_network_link" "postgres_dns_link" {
-  name                  = "postgres-dns-link"
-  resource_group_name   = var.resource_group_name
-  private_dns_zone_name = azurerm_private_dns_zone.postgres_dns.name
-  virtual_network_id    = azurerm_virtual_network.gdpr_vnet.id
+resource "aws_s3_bucket_server_side_encryption_configuration" "consent_records" {
+  bucket = aws_s3_bucket.consent_records.id
 
-  tags = local.gdpr_tags
+  rule {
+    apply_server_side_encryption_by_default {
+      kms_master_key_id = aws_kms_key.personal_data_encryption_key.arn
+      sse_algorithm     = "aws:kms"
+    }
+    bucket_key_enabled = true
+  }
 }
 
-# Virtual Network for GDPR resources (EU-only)
-resource "azurerm_virtual_network" "gdpr_vnet" {
-  name                = "${var.organization_name}-gdpr-vnet-${var.environment}"
-  location            = var.eu_region
-  resource_group_name = var.resource_group_name
-  address_space       = ["10.1.0.0/16"]
+resource "aws_s3_bucket_public_access_block" "consent_records" {
+  bucket = aws_s3_bucket.consent_records.id
 
-  tags = local.gdpr_tags
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }
 
-# Subnet for healthcare services
-resource "azurerm_subnet" "eu_healthcare_subnet" {
-  name                 = "healthcare-subnet"
-  resource_group_name  = var.resource_group_name
-  virtual_network_name = azurerm_virtual_network.gdpr_vnet.name
-  address_prefixes     = ["10.1.1.0/24"]
+# Data Subject Requests storage
+resource "aws_s3_bucket" "dsr_requests" {
+  bucket = "${var.organization_name}-gdpr-dsr-${var.environment}-${data.aws_caller_identity.current.account_id}"
 
-  service_endpoints = [
-    "Microsoft.Storage",
-    "Microsoft.Sql",
-    "Microsoft.KeyVault"
-  ]
+  tags = merge(local.gdpr_tags, {
+    Purpose = "Data-Subject-Requests"
+  })
 }
 
-# Subnet for PostgreSQL
-resource "azurerm_subnet" "postgres_subnet" {
-  name                 = "postgres-subnet"
-  resource_group_name  = var.resource_group_name
-  virtual_network_name = azurerm_virtual_network.gdpr_vnet.name
-  address_prefixes     = ["10.1.2.0/24"]
+resource "aws_s3_bucket_versioning" "dsr_requests" {
+  bucket = aws_s3_bucket.dsr_requests.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
 
-  delegation {
-    name = "postgres-delegation"
+resource "aws_s3_bucket_server_side_encryption_configuration" "dsr_requests" {
+  bucket = aws_s3_bucket.dsr_requests.id
 
-    service_delegation {
-      name = "Microsoft.DBforPostgreSQL/flexibleServers"
-      actions = [
-        "Microsoft.Network/virtualNetworks/subnets/join/action",
+  rule {
+    apply_server_side_encryption_by_default {
+      kms_master_key_id = aws_kms_key.personal_data_encryption_key.arn
+      sse_algorithm     = "aws:kms"
+    }
+    bucket_key_enabled = true
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "dsr_requests" {
+  bucket = aws_s3_bucket.dsr_requests.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+# =============================================================================
+# AWS CloudTrail - Access Logging
+# =============================================================================
+
+resource "aws_cloudtrail" "gdpr" {
+  name                          = "gdpr-cloudtrail-${var.environment}"
+  s3_bucket_name                = aws_s3_bucket.cloudtrail_logs.id
+  s3_key_prefix                 = "cloudtrail"
+  include_global_service_events = true
+  is_multi_region_trail         = false # EU region only
+  enable_logging                = true
+  enable_log_file_validation    = true
+  kms_key_id                    = aws_kms_key.personal_data_encryption_key.arn
+  cloud_watch_logs_group_arn    = "${aws_cloudwatch_log_group.cloudtrail.arn}:*"
+  cloud_watch_logs_role_arn     = aws_iam_role.cloudtrail_cloudwatch.arn
+
+  event_selector {
+    read_write_type           = "All"
+    include_management_events = true
+
+    data_resource {
+      type   = "AWS::S3::Object"
+      values = [
+        "${aws_s3_bucket.gdpr_storage.arn}/",
+        "${aws_s3_bucket.consent_records.arn}/",
+        "${aws_s3_bucket.dsr_requests.arn}/"
       ]
     }
   }
-}
 
-# Network Security Group for GDPR resources
-resource "azurerm_network_security_group" "gdpr_nsg" {
-  name                = "${var.organization_name}-gdpr-nsg-${var.environment}"
-  location            = var.eu_region
-  resource_group_name = var.resource_group_name
-
-  # Deny all inbound by default
-  security_rule {
-    name                       = "DenyAllInbound"
-    priority                   = 4096
-    direction                  = "Inbound"
-    access                     = "Deny"
-    protocol                   = "*"
-    source_port_range          = "*"
-    destination_port_range     = "*"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
+  insight_selector {
+    insight_type = "ApiCallRateInsight"
   }
 
-  # Allow HTTPS from EU only
-  security_rule {
-    name                       = "AllowHTTPSFromEU"
-    priority                   = 100
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "443"
-    source_address_prefixes    = var.eu_ip_ranges
-    destination_address_prefix = "*"
+  tags = merge(local.gdpr_tags, {
+    Purpose = "GDPR-Audit-Trail"
+  })
+
+  depends_on = [aws_s3_bucket_policy.cloudtrail_logs]
+}
+
+# CloudTrail S3 bucket
+resource "aws_s3_bucket" "cloudtrail_logs" {
+  bucket = "${var.organization_name}-gdpr-cloudtrail-${var.environment}-${data.aws_caller_identity.current.account_id}"
+
+  tags = merge(local.gdpr_tags, {
+    Purpose = "CloudTrail-Logs"
+  })
+}
+
+resource "aws_s3_bucket_versioning" "cloudtrail_logs" {
+  bucket = aws_s3_bucket.cloudtrail_logs.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "cloudtrail_logs" {
+  bucket = aws_s3_bucket.cloudtrail_logs.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      kms_master_key_id = aws_kms_key.personal_data_encryption_key.arn
+      sse_algorithm     = "aws:kms"
+    }
+    bucket_key_enabled = true
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "cloudtrail_logs" {
+  bucket = aws_s3_bucket.cloudtrail_logs.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "cloudtrail_logs" {
+  bucket = aws_s3_bucket.cloudtrail_logs.id
+
+  rule {
+    id     = "gdpr-log-retention"
+    status = "Enabled"
+
+    transition {
+      days          = 90
+      storage_class = "STANDARD_IA"
+    }
+
+    transition {
+      days          = 365
+      storage_class = "GLACIER"
+    }
+
+    expiration {
+      days = 730 # 2 years
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "cloudtrail_logs" {
+  bucket = aws_s3_bucket.cloudtrail_logs.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AWSCloudTrailAclCheck"
+        Effect = "Allow"
+        Principal = {
+          Service = "cloudtrail.amazonaws.com"
+        }
+        Action   = "s3:GetBucketAcl"
+        Resource = aws_s3_bucket.cloudtrail_logs.arn
+        Condition = {
+          StringEquals = {
+            "AWS:SourceArn" = "arn:aws:cloudtrail:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:trail/gdpr-cloudtrail-${var.environment}"
+          }
+        }
+      },
+      {
+        Sid    = "AWSCloudTrailWrite"
+        Effect = "Allow"
+        Principal = {
+          Service = "cloudtrail.amazonaws.com"
+        }
+        Action   = "s3:PutObject"
+        Resource = "${aws_s3_bucket.cloudtrail_logs.arn}/*"
+        Condition = {
+          StringEquals = {
+            "s3:x-amz-acl"  = "bucket-owner-full-control"
+            "AWS:SourceArn" = "arn:aws:cloudtrail:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:trail/gdpr-cloudtrail-${var.environment}"
+          }
+        }
+      },
+      {
+        Sid       = "DenyInsecureTransport"
+        Effect    = "Deny"
+        Principal = "*"
+        Action    = "s3:*"
+        Resource = [
+          aws_s3_bucket.cloudtrail_logs.arn,
+          "${aws_s3_bucket.cloudtrail_logs.arn}/*"
+        ]
+        Condition = {
+          Bool = {
+            "aws:SecureTransport" = "false"
+          }
+        }
+      }
+    ]
+  })
+}
+
+# CloudWatch Log Group for CloudTrail
+resource "aws_cloudwatch_log_group" "cloudtrail" {
+  name              = "/aws/cloudtrail/gdpr-${var.environment}"
+  retention_in_days = 730 # 2 years
+  kms_key_id        = aws_kms_key.personal_data_encryption_key.arn
+
+  tags = merge(local.gdpr_tags, {
+    Purpose = "CloudTrail-Logs"
+  })
+}
+
+# IAM role for CloudTrail to CloudWatch
+resource "aws_iam_role" "cloudtrail_cloudwatch" {
+  name = "gdpr-cloudtrail-cloudwatch-${var.environment}"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "cloudtrail.amazonaws.com"
+        }
+      }
+    ]
+  })
+
+  tags = local.gdpr_tags
+}
+
+resource "aws_iam_role_policy" "cloudtrail_cloudwatch" {
+  name = "cloudtrail-cloudwatch-policy"
+  role = aws_iam_role.cloudtrail_cloudwatch.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "${aws_cloudwatch_log_group.cloudtrail.arn}:*"
+      }
+    ]
+  })
+}
+
+# =============================================================================
+# AWS Config Rules for GDPR Compliance
+# =============================================================================
+
+resource "aws_config_config_rule" "s3_bucket_ssl_requests_only" {
+  name = "gdpr-s3-ssl-only-${var.environment}"
+
+  source {
+    owner             = "AWS"
+    source_identifier = "S3_BUCKET_SSL_REQUESTS_ONLY"
   }
 
   tags = local.gdpr_tags
 }
 
-resource "azurerm_subnet_network_security_group_association" "healthcare_nsg" {
-  subnet_id                 = azurerm_subnet.eu_healthcare_subnet.id
-  network_security_group_id = azurerm_network_security_group.gdpr_nsg.id
-}
+resource "aws_config_config_rule" "s3_bucket_server_side_encryption_enabled" {
+  name = "gdpr-s3-encryption-${var.environment}"
 
-# Azure Front Door for EU-only traffic routing with geo-filtering
-resource "azurerm_cdn_frontdoor_profile" "gdpr_frontdoor" {
-  name                = "${var.organization_name}-gdpr-fd-${var.environment}"
-  resource_group_name = var.resource_group_name
-  sku_name            = "Premium_AzureFrontDoor"
+  source {
+    owner             = "AWS"
+    source_identifier = "S3_BUCKET_SERVER_SIDE_ENCRYPTION_ENABLED"
+  }
 
   tags = local.gdpr_tags
 }
 
-resource "azurerm_cdn_frontdoor_firewall_policy" "geo_filter" {
-  name                              = "gdprgeofilter${var.environment}"
-  resource_group_name               = var.resource_group_name
-  sku_name                          = azurerm_cdn_frontdoor_profile.gdpr_frontdoor.sku_name
-  enabled                           = true
-  mode                              = "Prevention"
-  redirect_url                      = "https://www.unifiedhealth.com/not-available"
-  custom_block_response_status_code = 403
-  custom_block_response_body        = base64encode("Access denied due to GDPR data residency requirements")
+resource "aws_config_config_rule" "rds_storage_encrypted" {
+  name = "gdpr-rds-encrypted-${var.environment}"
 
-  # Allow only EU countries
-  custom_rule {
-    name                           = "AllowEUOnly"
-    enabled                        = true
-    priority                       = 1
-    rate_limit_duration_in_minutes = 1
-    rate_limit_threshold           = 100
-    type                           = "MatchRule"
-    action                         = "Allow"
+  source {
+    owner             = "AWS"
+    source_identifier = "RDS_STORAGE_ENCRYPTED"
+  }
 
-    match_condition {
-      match_variable     = "RemoteAddr"
-      operator           = "GeoMatch"
-      negation_condition = false
-      match_values = [
-        "AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR",
-        "DE", "GR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL",
-        "PL", "PT", "RO", "SK", "SI", "ES", "SE"
-      ]
+  tags = local.gdpr_tags
+}
+
+resource "aws_config_config_rule" "encrypted_volumes" {
+  name = "gdpr-encrypted-volumes-${var.environment}"
+
+  source {
+    owner             = "AWS"
+    source_identifier = "ENCRYPTED_VOLUMES"
+  }
+
+  tags = local.gdpr_tags
+}
+
+resource "aws_config_config_rule" "cloudtrail_enabled" {
+  name = "gdpr-cloudtrail-enabled-${var.environment}"
+
+  source {
+    owner             = "AWS"
+    source_identifier = "CLOUD_TRAIL_ENABLED"
+  }
+
+  tags = local.gdpr_tags
+}
+
+resource "aws_config_config_rule" "cmk_backing_key_rotation_enabled" {
+  name = "gdpr-kms-key-rotation-${var.environment}"
+
+  source {
+    owner             = "AWS"
+    source_identifier = "CMK_BACKING_KEY_ROTATION_ENABLED"
+  }
+
+  tags = local.gdpr_tags
+}
+
+# =============================================================================
+# CloudFront with Geo-Restriction for EU Only
+# =============================================================================
+
+resource "aws_cloudfront_distribution" "gdpr" {
+  enabled             = true
+  comment             = "GDPR compliant distribution - EU only"
+  is_ipv6_enabled     = true
+  price_class         = "PriceClass_100" # EU and US only
+  default_root_object = "index.html"
+
+  origin {
+    domain_name = aws_s3_bucket.gdpr_storage.bucket_regional_domain_name
+    origin_id   = "gdpr-storage"
+
+    s3_origin_config {
+      origin_access_identity = aws_cloudfront_origin_access_identity.gdpr.cloudfront_access_identity_path
     }
   }
 
-  # Block all non-EU countries
-  custom_rule {
-    name                           = "BlockNonEU"
-    enabled                        = true
-    priority                       = 2
-    rate_limit_duration_in_minutes = 1
-    rate_limit_threshold           = 100
-    type                           = "MatchRule"
-    action                         = "Block"
+  default_cache_behavior {
+    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = "gdpr-storage"
 
-    match_condition {
-      match_variable     = "RemoteAddr"
-      operator           = "GeoMatch"
-      negation_condition = true
-      match_values = [
-        "AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR",
-        "DE", "GR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL",
-        "PL", "PT", "RO", "SK", "SI", "ES", "SE"
-      ]
+    forwarded_values {
+      query_string = false
+      cookies {
+        forward = "none"
+      }
+    }
+
+    viewer_protocol_policy = "redirect-to-https"
+    min_ttl                = 0
+    default_ttl            = 3600
+    max_ttl                = 86400
+  }
+
+  restrictions {
+    geo_restriction {
+      restriction_type = "whitelist"
+      locations        = local.eu_countries
     }
   }
+
+  viewer_certificate {
+    cloudfront_default_certificate = true
+    minimum_protocol_version       = "TLSv1.2_2021"
+  }
+
+  logging_config {
+    bucket          = aws_s3_bucket.access_logs.bucket_domain_name
+    include_cookies = false
+    prefix          = "cloudfront-logs/"
+  }
+
+  tags = merge(local.gdpr_tags, {
+    Purpose = "EU-Only-Content-Delivery"
+  })
+}
+
+resource "aws_cloudfront_origin_access_identity" "gdpr" {
+  comment = "GDPR storage access identity"
+}
+
+# =============================================================================
+# SNS Topic for GDPR Alerts
+# =============================================================================
+
+resource "aws_sns_topic" "gdpr_alerts" {
+  name              = "gdpr-compliance-alerts-${var.environment}"
+  kms_master_key_id = aws_kms_key.personal_data_encryption_key.id
+
+  tags = merge(local.gdpr_tags, {
+    Purpose = "GDPR-Alerts"
+  })
+}
+
+resource "aws_sns_topic_policy" "gdpr_alerts" {
+  arn = aws_sns_topic.gdpr_alerts.arn
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowCloudWatchEvents"
+        Effect = "Allow"
+        Principal = {
+          Service = "events.amazonaws.com"
+        }
+        Action   = "sns:Publish"
+        Resource = aws_sns_topic.gdpr_alerts.arn
+      },
+      {
+        Sid    = "AllowCloudWatchAlarms"
+        Effect = "Allow"
+        Principal = {
+          Service = "cloudwatch.amazonaws.com"
+        }
+        Action   = "sns:Publish"
+        Resource = aws_sns_topic.gdpr_alerts.arn
+      }
+    ]
+  })
+}
+
+resource "aws_sns_topic_subscription" "dpo_email" {
+  topic_arn = aws_sns_topic.gdpr_alerts.arn
+  protocol  = "email"
+  endpoint  = var.dpo_email
+}
+
+resource "aws_sns_topic_subscription" "legal_email" {
+  topic_arn = aws_sns_topic.gdpr_alerts.arn
+  protocol  = "email"
+  endpoint  = var.legal_team_email
+}
+
+# =============================================================================
+# CloudWatch Alarms for GDPR Monitoring
+# =============================================================================
+
+resource "aws_cloudwatch_metric_alarm" "personal_data_access" {
+  alarm_name          = "gdpr-personal-data-access-${var.environment}"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  metric_name         = "PersonalDataAccessCount"
+  namespace           = "GDPR/DataAccess"
+  period              = 300
+  statistic           = "Sum"
+  threshold           = 100
+  alarm_description   = "High volume of personal data access detected"
+  alarm_actions       = [aws_sns_topic.gdpr_alerts.arn]
+  treat_missing_data  = "notBreaching"
+
+  tags = merge(local.gdpr_tags, {
+    AlertType = "Data-Access"
+  })
+}
+
+resource "aws_cloudwatch_metric_alarm" "data_export" {
+  alarm_name          = "gdpr-data-export-${var.environment}"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  metric_name         = "DataExportCount"
+  namespace           = "GDPR/DataExport"
+  period              = 300
+  statistic           = "Sum"
+  threshold           = 10
+  alarm_description   = "Data export activity detected - potential data transfer"
+  alarm_actions       = [aws_sns_topic.gdpr_alerts.arn]
+  treat_missing_data  = "notBreaching"
+
+  tags = merge(local.gdpr_tags, {
+    AlertType = "Data-Export"
+  })
+}
+
+resource "aws_cloudwatch_metric_alarm" "cross_region_access" {
+  alarm_name          = "gdpr-cross-region-access-${var.environment}"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  metric_name         = "CrossRegionAccessCount"
+  namespace           = "GDPR/DataResidency"
+  period              = 300
+  statistic           = "Sum"
+  threshold           = 0
+  alarm_description   = "Data access from non-EU region detected"
+  alarm_actions       = [aws_sns_topic.gdpr_alerts.arn]
+  treat_missing_data  = "notBreaching"
+
+  tags = merge(local.gdpr_tags, {
+    AlertType = "Data-Residency-Violation"
+  })
+}
+
+# =============================================================================
+# EventBridge Rules for GDPR Events
+# =============================================================================
+
+resource "aws_cloudwatch_event_rule" "macie_findings" {
+  name        = "gdpr-macie-findings-${var.environment}"
+  description = "Capture Macie findings for GDPR compliance"
+
+  event_pattern = jsonencode({
+    source      = ["aws.macie"]
+    detail-type = ["Macie Finding"]
+    detail = {
+      severity = {
+        score = [{ numeric = [">=", 4] }]
+      }
+    }
+  })
 
   tags = local.gdpr_tags
 }
 
-# Data Protection Impact Assessment (DPIA) Storage
-resource "azurerm_storage_container" "dpia_documents" {
-  name                  = "dpia-assessments"
-  storage_account_name  = azurerm_storage_account.gdpr_storage.name
-  container_access_type = "private"
+resource "aws_cloudwatch_event_target" "macie_sns" {
+  rule      = aws_cloudwatch_event_rule.macie_findings.name
+  target_id = "SendToSNS"
+  arn       = aws_sns_topic.gdpr_alerts.arn
 }
 
-# Consent Records Storage
-resource "azurerm_storage_container" "consent_records" {
-  name                  = "consent-records"
-  storage_account_name  = azurerm_storage_account.gdpr_storage.name
-  container_access_type = "private"
+# =============================================================================
+# AWS Secrets Manager - For storing database credentials
+# =============================================================================
+
+resource "aws_secretsmanager_secret" "database_credentials" {
+  name                    = "gdpr/database-credentials-${var.environment}"
+  description             = "GDPR compliant database credentials"
+  kms_key_id              = aws_kms_key.personal_data_encryption_key.arn
+  recovery_window_in_days = 30
+
+  tags = local.gdpr_tags
 }
 
-# Data Subject Requests Storage
-resource "azurerm_storage_container" "dsr_requests" {
-  name                  = "data-subject-requests"
-  storage_account_name  = azurerm_storage_account.gdpr_storage.name
-  container_access_type = "private"
-}
-
-# Random password for PostgreSQL
-resource "random_password" "postgres_admin_password" {
+resource "random_password" "database_password" {
   length  = 32
   special = true
 }
 
-resource "azurerm_key_vault_secret" "postgres_admin_password" {
-  name         = "postgres-admin-password"
-  value        = random_password.postgres_admin_password.result
-  key_vault_id = azurerm_key_vault.gdpr_kv.id
+resource "aws_secretsmanager_secret_version" "database_credentials" {
+  secret_id = aws_secretsmanager_secret.database_credentials.id
+  secret_string = jsonencode({
+    username = "gdpr_admin"
+    password = random_password.database_password.result
+  })
+}
+
+# =============================================================================
+# SSM Parameter Store for GDPR Configuration
+# =============================================================================
+
+resource "aws_ssm_parameter" "data_residency_config" {
+  name        = "/gdpr/${var.environment}/data-residency"
+  description = "GDPR data residency configuration"
+  type        = "SecureString"
+  key_id      = aws_kms_key.personal_data_encryption_key.arn
+  value = jsonencode({
+    enforced            = true
+    allowed_regions     = local.eu_regions
+    primary_region      = var.eu_region
+    failover_region     = "eu-central-1"
+    data_sovereignty    = "EU"
+    schrems_ii_compliant = true
+  })
 
   tags = local.gdpr_tags
 }
 
-# Data sources
-data "azurerm_client_config" "current" {}
+resource "aws_ssm_parameter" "cross_border_transfers" {
+  name        = "/gdpr/${var.environment}/cross-border-transfers"
+  description = "GDPR cross-border transfer configuration"
+  type        = "SecureString"
+  key_id      = aws_kms_key.personal_data_encryption_key.arn
+  value = jsonencode({
+    enabled                = false
+    require_scc            = true
+    require_tia            = true
+    require_dpo_approval   = true
+    allowed_countries      = local.eu_countries
+    adequacy_decisions     = []
+    additional_safeguards  = ["encryption", "anonymization", "pseudonymization"]
+  })
 
-data "azurerm_resource_group" "main" {
-  name = var.resource_group_name
+  tags = local.gdpr_tags
 }
 
-# Variables
-variable "dpo_email" {
-  description = "Data Protection Officer email"
-  type        = string
+# =============================================================================
+# AWS Backup for GDPR Compliance
+# =============================================================================
+
+resource "aws_backup_vault" "gdpr" {
+  name        = "gdpr-backup-vault-${var.environment}"
+  kms_key_arn = aws_kms_key.personal_data_encryption_key.arn
+
+  tags = merge(local.gdpr_tags, {
+    Purpose = "GDPR-Backup"
+  })
 }
 
-variable "postgres_admin_username" {
-  description = "PostgreSQL administrator username"
-  type        = string
-  sensitive   = true
+resource "aws_backup_plan" "gdpr" {
+  name = "gdpr-backup-plan-${var.environment}"
+
+  rule {
+    rule_name         = "daily-backup"
+    target_vault_name = aws_backup_vault.gdpr.name
+    schedule          = "cron(0 5 ? * * *)"
+
+    lifecycle {
+      cold_storage_after = 90
+      delete_after       = 730 # 2 years
+    }
+  }
+
+  rule {
+    rule_name         = "weekly-backup"
+    target_vault_name = aws_backup_vault.gdpr.name
+    schedule          = "cron(0 5 ? * SUN *)"
+
+    lifecycle {
+      cold_storage_after = 90
+      delete_after       = 730
+    }
+  }
+
+  tags = local.gdpr_tags
 }
 
-variable "eu_allowed_ip_ranges" {
-  description = "Allowed EU IP ranges"
-  type        = list(string)
-  default     = []
+resource "aws_backup_selection" "gdpr" {
+  iam_role_arn = aws_iam_role.backup_role.arn
+  name         = "gdpr-backup-selection-${var.environment}"
+  plan_id      = aws_backup_plan.gdpr.id
+
+  selection_tag {
+    type  = "STRINGEQUALS"
+    key   = "Compliance"
+    value = "GDPR"
+  }
 }
 
-variable "eu_ip_ranges" {
-  description = "EU IP ranges for geo-filtering"
-  type        = list(string)
+resource "aws_iam_role" "backup_role" {
+  name = "gdpr-backup-role-${var.environment}"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "backup.amazonaws.com"
+        }
+      }
+    ]
+  })
+
+  tags = local.gdpr_tags
 }
 
+resource "aws_iam_role_policy_attachment" "backup_policy" {
+  role       = aws_iam_role.backup_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForBackup"
+}
+
+resource "aws_iam_role_policy_attachment" "restore_policy" {
+  role       = aws_iam_role.backup_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForRestores"
+}
+
+# =============================================================================
 # Outputs
-output "gdpr_key_vault_id" {
-  description = "GDPR Key Vault ID"
-  value       = azurerm_key_vault.gdpr_kv.id
+# =============================================================================
+
+output "personal_data_encryption_key_arn" {
+  description = "Personal data encryption key ARN"
+  value       = aws_kms_key.personal_data_encryption_key.arn
 }
 
 output "personal_data_encryption_key_id" {
   description = "Personal data encryption key ID"
-  value       = azurerm_key_vault_key.personal_data_encryption_key.id
+  value       = aws_kms_key.personal_data_encryption_key.key_id
 }
 
-output "gdpr_storage_account_id" {
-  description = "GDPR storage account ID"
-  value       = azurerm_storage_account.gdpr_storage.id
+output "gdpr_storage_bucket" {
+  description = "GDPR personal data storage bucket name"
+  value       = aws_s3_bucket.gdpr_storage.id
 }
 
-output "gdpr_postgres_server_id" {
-  description = "GDPR PostgreSQL server ID"
-  value       = azurerm_postgresql_flexible_server.gdpr_postgres.id
+output "gdpr_storage_bucket_arn" {
+  description = "GDPR personal data storage bucket ARN"
+  value       = aws_s3_bucket.gdpr_storage.arn
 }
 
-output "gdpr_vnet_id" {
-  description = "GDPR Virtual Network ID"
-  value       = azurerm_virtual_network.gdpr_vnet.id
+output "consent_records_bucket" {
+  description = "Consent records bucket name"
+  value       = aws_s3_bucket.consent_records.id
 }
 
-output "gdpr_frontdoor_id" {
-  description = "GDPR Front Door ID"
-  value       = azurerm_cdn_frontdoor_profile.gdpr_frontdoor.id
+output "dsr_requests_bucket" {
+  description = "Data Subject Requests bucket name"
+  value       = aws_s3_bucket.dsr_requests.id
+}
+
+output "dpia_documents_bucket" {
+  description = "DPIA documents bucket name"
+  value       = aws_s3_bucket.dpia_documents.id
+}
+
+output "macie_account_id" {
+  description = "Macie account ID"
+  value       = aws_macie2_account.gdpr.id
+}
+
+output "cloudtrail_arn" {
+  description = "CloudTrail ARN"
+  value       = aws_cloudtrail.gdpr.arn
+}
+
+output "cloudfront_distribution_id" {
+  description = "CloudFront distribution ID"
+  value       = aws_cloudfront_distribution.gdpr.id
+}
+
+output "cloudfront_domain_name" {
+  description = "CloudFront domain name"
+  value       = aws_cloudfront_distribution.gdpr.domain_name
+}
+
+output "sns_topic_arn" {
+  description = "GDPR alerts SNS topic ARN"
+  value       = aws_sns_topic.gdpr_alerts.arn
+}
+
+output "backup_vault_arn" {
+  description = "GDPR backup vault ARN"
+  value       = aws_backup_vault.gdpr.arn
+}
+
+output "database_credentials_secret_arn" {
+  description = "Database credentials secret ARN"
+  value       = aws_secretsmanager_secret.database_credentials.arn
+}
+
+output "data_residency_config_arn" {
+  description = "Data residency configuration parameter ARN"
+  value       = aws_ssm_parameter.data_residency_config.arn
 }

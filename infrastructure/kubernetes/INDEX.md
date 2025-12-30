@@ -66,33 +66,33 @@ infrastructure/kubernetes/
 - `feature-prescription-management: "true"`
 
 #### 3. secrets.yaml (116 lines)
-**Purpose**: Template for sensitive configuration (Azure Key Vault integration)
+**Purpose**: Template for sensitive configuration (AWS Secrets Manager integration)
 **Contents**:
 - Database credentials (username, password, connection URL)
 - JWT secrets (signing, refresh)
 - Redis password
 - Encryption keys (general, PHI-specific)
 - API keys (SendGrid, Twilio, Stripe)
-- Azure Storage credentials
+- AWS S3 credentials
 - OAuth2/OIDC configuration
 - Session secrets
 - Webhook signing secrets
 
 **Important Notes**:
 - This is a TEMPLATE file with placeholders
-- Actual values should come from Azure Key Vault
+- Actual values should come from AWS Secrets Manager
 - Never commit actual secrets to source control
 - Supports multiple population methods (CSI Driver, External Secrets, envsubst)
 
 #### 4. service-account.yaml (189 lines)
-**Purpose**: Service account with Azure Workload Identity and RBAC
+**Purpose**: Service account with AWS IRSA (IAM Roles for Service Accounts) and RBAC
 **Contents**:
-- ServiceAccount with Azure Workload Identity annotations
+- ServiceAccount with AWS IRSA annotations
 - Role with minimal required permissions
 - RoleBinding to bind role to service account
 - ClusterRole for cluster-wide permissions
 - ClusterRoleBinding
-- Setup instructions for Azure Workload Identity
+- Setup instructions for AWS IRSA
 
 **Permissions Granted**:
 - Read ConfigMaps and Secrets
@@ -101,11 +101,11 @@ infrastructure/kubernetes/
 - Create Events (for logging)
 - Read Nodes (cluster awareness)
 
-**Azure Integration**:
-- Azure Workload Identity annotations
-- Federated identity credential configuration
-- Key Vault RBAC integration
-- Storage account RBAC integration
+**AWS Integration**:
+- AWS IRSA annotations
+- IAM role trust policy configuration
+- Secrets Manager RBAC integration
+- S3 bucket RBAC integration
 
 #### 5. api-deployment.yaml (155 lines)
 **Purpose**: Kubernetes Deployment for the API
@@ -189,7 +189,7 @@ infrastructure/kubernetes/
 - Allow egress to Kubernetes API server
 - Allow inter-pod communication within API
 - Allow egress to email services (SMTP)
-- Allow egress to Azure services
+- Allow egress to AWS services
 
 **Security Posture**:
 - Zero-trust network model
@@ -284,7 +284,7 @@ infrastructure/kubernetes/
 **Purpose**: Comprehensive deployment guide
 **Sections**:
 - Overview and architecture
-- Prerequisites (tools and Azure resources)
+- Prerequisites (tools and AWS resources)
 - Directory structure
 - Configuration file descriptions
 - Deployment process (step-by-step)
@@ -316,7 +316,7 @@ infrastructure/kubernetes/
 ### DEPLOYMENT-CHECKLIST.md
 **Purpose**: Comprehensive deployment checklist
 **Sections**:
-- Pre-deployment checklist (Azure infrastructure, secrets, components)
+- Pre-deployment checklist (AWS infrastructure, secrets, components)
 - Staging deployment checklist
 - Production deployment checklist
 - Security validation
@@ -380,13 +380,13 @@ infrastructure/kubernetes/
 ### Security Features
 - Network Policies (zero-trust model)
 - RBAC with minimal permissions
-- Azure Workload Identity
+- AWS IRSA (IAM Roles for Service Accounts)
 - TLS/SSL enforcement
 - Rate limiting
 - ModSecurity WAF
 - Security headers
 - Pod Security Context (non-root, read-only filesystem)
-- Secret management via Azure Key Vault
+- Secret management via AWS Secrets Manager
 
 ### Compliance Features
 - HIPAA compliance settings
@@ -414,9 +414,9 @@ infrastructure/kubernetes/
 
 ## Deployment Workflow
 
-1. **Prerequisites**: Install tools, create Azure resources
-2. **Configuration**: Populate Azure Key Vault with secrets
-3. **Azure Workload Identity**: Configure federated identity
+1. **Prerequisites**: Install tools, create AWS resources
+2. **Configuration**: Populate AWS Secrets Manager with secrets
+3. **AWS IRSA**: Configure IAM roles for service accounts
 4. **Staging Deployment**: Deploy and test in staging
 5. **Validation**: Run integration and E2E tests
 6. **Production Deployment**: Deploy to production with approval
@@ -458,7 +458,7 @@ infrastructure/kubernetes/
 This configuration was designed for:
 - **Platform**: Unified Healthcare Platform
 - **Compliance**: HIPAA, GDPR, SOC2
-- **Environment**: Azure Kubernetes Service (AKS)
+- **Environment**: Amazon Elastic Kubernetes Service (EKS)
 - **Features**: Multi-tenancy, telemedicine, AI diagnostics
 
 ---
@@ -466,7 +466,7 @@ This configuration was designed for:
 **Total Files Created**: 17
 **Total Lines of Configuration**: ~2,000+ lines
 **Environments Supported**: Staging, Production
-**Cloud Provider**: Microsoft Azure
+**Cloud Provider**: Amazon Web Services (AWS)
 **Orchestration**: Kubernetes with Kustomize
 
 ---

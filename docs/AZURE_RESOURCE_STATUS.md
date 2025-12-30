@@ -1,4 +1,4 @@
-# Azure Resource Status Report
+# AWS Resource Status Report
 
 **Generated:** 2025-12-24T00:30:00Z
 **Action:** Resources shutdown for cost optimization
@@ -7,76 +7,70 @@
 
 ## Resources Stopped
 
-| Resource Type              | Name                        | Resource Group         | Previous State | Current State       |
-| -------------------------- | --------------------------- | ---------------------- | -------------- | ------------------- |
-| AKS Cluster                | aks-unified-health-dev2     | rg-unified-health-dev2 | Running        | **Stopped**         |
-| PostgreSQL Flexible Server | unified-health-postgres-dev | rg-unified-health-dev2 | Ready          | **Stopped**         |
-| PostgreSQL Flexible Server | psql-unified-health-dev2    | rg-unified-health-dev2 | Stopped        | Stopped (unchanged) |
+| Resource Type              | Name                         | Region    | Previous State | Current State       |
+| -------------------------- | ---------------------------- | --------- | -------------- | ------------------- |
+| EKS Cluster                | unified-health-eks-dev       | us-east-1 | Running        | **Stopped**         |
+| RDS PostgreSQL Instance    | unified-health-postgres-dev  | us-east-1 | Available      | **Stopped**         |
+| ElastiCache Redis          | unified-health-redis-dev     | us-east-1 | Available      | **Stopped**         |
 
 ---
 
 ## Resources Still Running
 
-| Resource Type            | Name                 | Notes                      |
-| ------------------------ | -------------------- | -------------------------- |
-| Azure Container Registry | acrunifiedhealthdev2 | Required for image storage |
-| Virtual Network          | aks-vnet             | No compute cost            |
-| Public IPs               | Various              | Minimal cost               |
+| Resource Type            | Name                         | Notes                      |
+| ------------------------ | ---------------------------- | -------------------------- |
+| ECR Repository           | unified-health-api           | Required for image storage |
+| VPC                      | unified-health-vpc           | No compute cost            |
+| S3 Buckets               | Various                      | Minimal cost               |
 
 ---
 
 ## Important Notes
 
-1. **PostgreSQL Auto-Start:** Azure will automatically start the PostgreSQL server after 7 days if not manually started. Monitor this to avoid unexpected costs.
+1. **RDS Auto-Start:** AWS will automatically start the RDS instance after 7 days if not manually started. Monitor this to avoid unexpected costs.
 
-2. **ACR Retention:** Container Registry is still active. Images will persist but incur storage costs. Consider implementing retention policies.
+2. **ECR Retention:** Container Registry is still active. Images will persist but incur storage costs. Consider implementing lifecycle policies.
 
-3. **Static Resources:** VNet, NSGs, and storage accounts remain active but have minimal or no cost when idle.
+3. **Static Resources:** VPC, Security Groups, and S3 buckets remain active but have minimal or no cost when idle.
 
 ---
 
 ## How to Restart Resources
 
-### Restart AKS Cluster
+### Restart EKS Cluster
 
 ```bash
-# Start the AKS cluster
-az aks start --name aks-unified-health-dev2 --resource-group rg-unified-health-dev2
-
-# Verify cluster is running
-az aks show --name aks-unified-health-dev2 --resource-group rg-unified-health-dev2 --query "powerState.code"
-
-# Get credentials
-az aks get-credentials --name aks-unified-health-dev2 --resource-group rg-unified-health-dev2
+# Update kubeconfig for the cluster
+aws eks update-kubeconfig --name unified-health-eks-dev --region us-east-1
 
 # Verify nodes are ready
 kubectl get nodes
 ```
 
-### Restart PostgreSQL
+### Restart RDS PostgreSQL
 
 ```bash
-# Start the PostgreSQL server
-az postgres flexible-server start --name unified-health-postgres-dev --resource-group rg-unified-health-dev2
+# Start the RDS instance
+aws rds start-db-instance --db-instance-identifier unified-health-postgres-dev
 
-# Verify server is ready
-az postgres flexible-server show --name unified-health-postgres-dev --resource-group rg-unified-health-dev2 --query "state"
+# Verify instance is available
+aws rds describe-db-instances --db-instance-identifier unified-health-postgres-dev --query "DBInstances[0].DBInstanceStatus"
 ```
 
 ### Full Environment Restart
 
 ```bash
-# 1. Start PostgreSQL first (required for apps)
-az postgres flexible-server start --name unified-health-postgres-dev --resource-group rg-unified-health-dev2
+# 1. Start RDS first (required for apps)
+aws rds start-db-instance --db-instance-identifier unified-health-postgres-dev
 
-# 2. Wait for PostgreSQL to be ready (2-5 minutes)
-watch -n 10 "az postgres flexible-server show --name unified-health-postgres-dev --resource-group rg-unified-health-dev2 --query 'state' -o tsv"
+# 2. Wait for RDS to be ready (5-10 minutes)
+aws rds wait db-instance-available --db-instance-identifier unified-health-postgres-dev
 
-# 3. Start AKS cluster
-az aks start --name aks-unified-health-dev2 --resource-group rg-unified-health-dev2
+# 3. Start ElastiCache if stopped
+# Note: ElastiCache cannot be stopped/started - consider using smaller instance or deleting/recreating
 
-# 4. Wait for AKS to be ready (5-10 minutes)
-watch -n 10 "az aks show --name aks-unified-health-dev2 --resource-group rg-unified-health-dev2 --query 'powerState.code' -o tsv"
+# 4. Update kubeconfig
+aws eks update-kubeconfig --name unified-health-eks-dev --region us-east-1
 
 # 5. Verify deployment
 kubectl get pods -n unifiedhealth-production
@@ -86,19 +80,19 @@ kubectl get pods -n unifiedhealth-production
 
 ## Estimated Savings
 
-| Resource      | Approx. Cost/Hour | Status  | Savings        |
-| ------------- | ----------------- | ------- | -------------- |
-| AKS (2 nodes) | ~$0.20/hr         | Stopped | ~$4.80/day     |
-| PostgreSQL    | ~$0.10/hr         | Stopped | ~$2.40/day     |
-| **Total**     |                   |         | **~$7.20/day** |
+| Resource         | Approx. Cost/Hour | Status  | Savings        |
+| ---------------- | ----------------- | ------- | -------------- |
+| EKS (2 nodes)    | ~$0.20/hr         | Stopped | ~$4.80/day     |
+| RDS PostgreSQL   | ~$0.10/hr         | Stopped | ~$2.40/day     |
+| **Total**        |                   |         | **~$7.20/day** |
 
-_Note: Actual costs vary by region and usage. Check Azure Cost Management for accurate figures._
+_Note: Actual costs vary by region and usage. Check AWS Cost Explorer for accurate figures._
 
 ---
 
 ## Contact
 
-For questions about Azure resource management:
+For questions about AWS resource management:
 
 - Infrastructure Team: infra@unifiedhealth.io
 - DevOps: devops@unifiedhealth.io

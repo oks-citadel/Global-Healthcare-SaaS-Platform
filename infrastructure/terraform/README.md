@@ -1,33 +1,33 @@
-# UnifiedHealth Platform - Azure Infrastructure
+# UnifiedHealth Platform - AWS Infrastructure
 
-This directory contains Terraform configurations for deploying the UnifiedHealth Platform infrastructure on Azure.
+This directory contains Terraform configurations for deploying the UnifiedHealth Platform infrastructure on AWS.
 
 ## Architecture Overview
 
 The infrastructure consists of:
 
-- **Azure Kubernetes Service (AKS)**: Container orchestration for microservices
-- **Azure PostgreSQL Flexible Server**: Primary database with HIPAA-compliant configuration
-- **Azure Redis Cache**: Session management and caching layer
-- **Azure Container Registry (ACR)**: Private container image registry with geo-replication
-- **Azure Key Vault**: Secrets and certificate management
-- **Azure Storage Account**: Document storage with encryption and versioning
-- **Azure Virtual Network**: Network isolation with subnets and NSGs
-- **Log Analytics & Application Insights**: Monitoring and observability
-- **Azure Monitor Alerts**: Proactive alerting for critical metrics
+- **Amazon Elastic Kubernetes Service (EKS)**: Container orchestration for microservices
+- **Amazon RDS for PostgreSQL**: Primary database with HIPAA-compliant configuration
+- **Amazon ElastiCache for Redis**: Session management and caching layer
+- **Amazon Elastic Container Registry (ECR)**: Private container image registry with cross-region replication
+- **AWS Secrets Manager**: Secrets and certificate management
+- **Amazon S3**: Document storage with encryption and versioning
+- **Amazon VPC**: Network isolation with subnets and security groups
+- **Amazon CloudWatch**: Monitoring and observability
+- **Amazon SNS/CloudWatch Alarms**: Proactive alerting for critical metrics
 
 ### Optional Modules
 
-- **Azure Front Door**: Global CDN and load balancing with WAF
-- **Azure Application Gateway**: Regional load balancing with WAF
-- **Private Endpoints**: Private connectivity for Azure services
+- **Amazon CloudFront**: Global CDN with WAF
+- **Application Load Balancer (ALB)**: Regional load balancing with WAF
+- **VPC Endpoints**: Private connectivity for AWS services
 
 ## Prerequisites
 
-1. **Azure CLI** (>= 2.50.0)
+1. **AWS CLI** (>= 2.0.0)
    ```bash
-   az --version
-   az login
+   aws --version
+   aws configure
    ```
 
 2. **Terraform** (>= 1.6.0)
@@ -35,12 +35,12 @@ The infrastructure consists of:
    terraform --version
    ```
 
-3. **Azure Subscription** with appropriate permissions
-   - Contributor role or higher
-   - Ability to create service principals and role assignments
+3. **AWS Account** with appropriate permissions
+   - AdministratorAccess or equivalent IAM permissions
+   - Ability to create IAM roles and policies
 
-4. **Backend Storage Account** for Terraform state
-   - Run `./setup-backend.sh` to create storage accounts
+4. **Backend S3 Bucket** for Terraform state
+   - Run `./setup-backend.sh` to create S3 bucket and DynamoDB table
 
 ## Directory Structure
 
@@ -70,7 +70,7 @@ terraform/
 
 ### 1. Setup Backend Storage
 
-First-time setup to create Azure Storage accounts for Terraform state:
+First-time setup to create S3 bucket and DynamoDB table for Terraform state:
 
 ```bash
 # Make script executable
@@ -81,9 +81,9 @@ chmod +x setup-backend.sh
 ```
 
 This creates:
-- Resource group: `unified-health-tfstate-rg`
-- Storage accounts for dev, staging, and prod
-- Blob containers with versioning and soft delete enabled
+- S3 bucket: `unified-health-tfstate-{env}`
+- DynamoDB table for state locking
+- Bucket versioning and encryption enabled
 
 ### 2. Configure Environment Variables
 

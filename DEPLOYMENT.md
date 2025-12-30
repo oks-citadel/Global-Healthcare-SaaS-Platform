@@ -1,6 +1,6 @@
 # UnifiedHealth Platform - Deployment Guide
 
-Complete guide for deploying the UnifiedHealth Platform to Azure Kubernetes Service.
+Complete guide for deploying the UnifiedHealth Platform to Amazon Elastic Kubernetes Service (EKS).
 
 ## Table of Contents
 
@@ -21,21 +21,21 @@ Complete guide for deploying the UnifiedHealth Platform to Azure Kubernetes Serv
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                         Azure Cloud                          │
+│                         AWS Cloud                            │
 ├─────────────────────────────────────────────────────────────┤
 │                                                               │
 │  ┌──────────────┐      ┌──────────────┐                    │
-│  │   ACR        │      │  Key Vault   │                    │
-│  │ (Container   │      │  (Secrets)   │                    │
+│  │   ECR        │      │   Secrets    │                    │
+│  │ (Container   │      │   Manager    │                    │
 │  │  Registry)   │      └──────────────┘                    │
 │  └──────────────┘                                           │
 │                                                               │
 │  ┌─────────────────────────────────────────────────────┐   │
-│  │              AKS (Kubernetes Cluster)                │   │
+│  │              EKS (Kubernetes Cluster)                │   │
 │  │                                                       │   │
 │  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐ │   │
-│  │  │   Blue      │  │   Green     │  │   Ingress   │ │   │
-│  │  │ Deployment  │  │ Deployment  │  │  Controller │ │   │
+│  │  │   Blue      │  │   Green     │  │  ALB        │ │   │
+│  │  │ Deployment  │  │ Deployment  │  │  Ingress    │ │   │
 │  │  └─────────────┘  └─────────────┘  └─────────────┘ │   │
 │  │                                                       │   │
 │  │  ┌────────────────────────────────────────────────┐ │   │
@@ -47,14 +47,14 @@ Complete guide for deploying the UnifiedHealth Platform to Azure Kubernetes Serv
 │  └─────────────────────────────────────────────────────┘   │
 │                                                               │
 │  ┌──────────────┐      ┌──────────────┐      ┌───────────┐ │
+│  │  Amazon RDS  │      │  ElastiCache │      │    S3     │ │
 │  │  PostgreSQL  │      │    Redis     │      │  Storage  │ │
-│  │   Flexible   │      │    Cache     │      │  Account  │ │
-│  │    Server    │      └──────────────┘      └───────────┘ │
+│  │              │      └──────────────┘      └───────────┘ │
 │  └──────────────┘                                           │
 │                                                               │
 │  ┌──────────────┐      ┌──────────────┐                    │
-│  │   Log        │      │ Application  │                    │
-│  │  Analytics   │      │   Insights   │                    │
+│  │  CloudWatch  │      │    X-Ray     │                    │
+│  │    Logs      │      │   Tracing    │                    │
 │  └──────────────┘      └──────────────┘                    │
 │                                                               │
 └─────────────────────────────────────────────────────────────┘
@@ -65,48 +65,56 @@ Complete guide for deploying the UnifiedHealth Platform to Azure Kubernetes Serv
 - **Staging**: Rolling updates with automated deployment on main branch
 - **Production**: Blue-green deployment with manual approval
 - **Database**: Migrations with automatic backup and rollback
-- **Secrets**: Azure Key Vault with CSI driver integration
+- **Secrets**: AWS Secrets Manager with CSI driver integration
 
 ## Prerequisites
 
 ### Required Tools
 
-1. **Azure CLI** (v2.50+)
+1. **AWS CLI** (v2.0+)
    ```bash
    # Install
-   curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+   curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+   unzip awscliv2.zip
+   sudo ./aws/install
 
-   # Login
-   az login
-   az account set --subscription "Your Subscription"
+   # Configure
+   aws configure
    ```
 
-2. **kubectl** (v1.28+)
+2. **eksctl** (v0.150+)
+   ```bash
+   # Install
+   curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+   sudo mv /tmp/eksctl /usr/local/bin
+   ```
+
+4. **kubectl** (v1.28+)
    ```bash
    # Install
    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
    sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
    ```
 
-3. **Docker** (v24+)
+5. **Docker** (v24+)
    ```bash
    # Install
    curl -fsSL https://get.docker.com -o get-docker.sh
    sudo sh get-docker.sh
    ```
 
-4. **PostgreSQL Client** (v15+)
+6. **PostgreSQL Client** (v15+)
    ```bash
    # Ubuntu/Debian
    sudo apt-get install postgresql-client
    ```
 
-5. **jq** (JSON processor)
+7. **jq** (JSON processor)
    ```bash
    sudo apt-get install jq
    ```
 
-6. **Node.js** (v20+) and **pnpm**
+8. **Node.js** (v20+) and **pnpm**
    ```bash
    # Install Node.js
    curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
@@ -116,12 +124,13 @@ Complete guide for deploying the UnifiedHealth Platform to Azure Kubernetes Serv
    npm install -g pnpm
    ```
 
-### Azure Permissions
+### AWS Permissions
 
-Required Azure RBAC roles:
-- `Contributor` on subscription
-- `User Access Administrator` (for role assignments)
-- `Key Vault Administrator` (for Key Vault operations)
+Required AWS IAM permissions:
+- `eks:*` for EKS cluster management
+- `ecr:*` for container registry
+- `secretsmanager:*` for secrets management
+- `iam:*` for IAM roles (IRSA setup)
 
 ### GitHub Secrets
 
@@ -129,8 +138,10 @@ Configure the following secrets in your GitHub repository:
 
 | Secret | Description | Example |
 |--------|-------------|---------|
-| `AZURE_CREDENTIALS` | Azure service principal JSON | `{"clientId":"...","clientSecret":"...","subscriptionId":"...","tenantId":"..."}` |
-| `ACR_NAME` | Container registry name | `acrunifiedhealthdev2` |
+| `AWS_ACCESS_KEY_ID` | AWS access key ID | `AKIA...` |
+| `AWS_SECRET_ACCESS_KEY` | AWS secret access key | `wJalr...` |
+| `AWS_REGION` | AWS region | `us-east-1` |
+| `ECR_REGISTRY` | ECR registry URL | `123456789.dkr.ecr.us-east-1.amazonaws.com` |
 | `SLACK_WEBHOOK_URL` | Slack webhook for notifications | `https://hooks.slack.com/services/...` |
 | `STAGING_URL` | Staging environment URL | `https://staging.unified-health.com` |
 | `STAGING_API_URL` | Staging API URL | `https://api-staging.unified-health.com` |
@@ -140,20 +151,24 @@ Configure the following secrets in your GitHub repository:
 
 ## Initial Setup
 
-### 1. Create Azure Service Principal
+### 1. Create AWS IAM User for GitHub Actions
 
 ```bash
-# Create service principal
-az ad sp create-for-rbac \
-  --name "unified-health-github-actions" \
-  --role contributor \
-  --scopes /subscriptions/{subscription-id} \
-  --sdk-auth
+# Create IAM user
+aws iam create-user --user-name github-actions-unified-health
 
-# Output will be JSON credentials - add to GitHub Secrets as AZURE_CREDENTIALS
+# Create access key
+aws iam create-access-key --user-name github-actions-unified-health
+
+# Attach required policies
+aws iam attach-user-policy \
+  --user-name github-actions-unified-health \
+  --policy-arn arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
+
+# Save access key output for GitHub Secrets
 ```
 
-### 2. Setup Azure Infrastructure
+### 2. Setup AWS Infrastructure
 
 #### Staging Environment
 
@@ -166,7 +181,7 @@ cd unified-health-platform
 chmod +x scripts/*.sh
 
 # Create staging infrastructure
-./scripts/setup-azure.sh staging
+./scripts/setup-aws.sh staging
 
 # Setup secrets
 ./scripts/setup-secrets.sh staging
@@ -180,13 +195,13 @@ kubectl get namespaces
 
 ```bash
 # Create production infrastructure
-./scripts/setup-azure.sh production
+./scripts/setup-aws.sh production
 
 # Setup secrets
 ./scripts/setup-secrets.sh production
 
 # Switch context
-kubectl config use-context unified-health-aks-prod
+aws eks update-kubeconfig --name unified-health-eks-prod --region us-east-1
 ```
 
 ### 3. Configure DNS
@@ -584,10 +599,10 @@ PITR_TARGET_TIME="2024-01-01T12:00:00Z" \
    - Restore database from backup
    - Redeploy application
 
-3. **Azure region outage:**
-   - Failover to geo-replicated region
-   - Update DNS records
-   - Restore from geo-redundant backup
+3. **AWS region outage:**
+   - Failover to multi-region setup
+   - Update Route53 DNS records
+   - Restore from cross-region S3 backup
 
 ### Recovery Time Objectives (RTO)
 
@@ -605,7 +620,7 @@ PITR_TARGET_TIME="2024-01-01T12:00:00Z" \
 
 ### Secret Management
 
-All secrets stored in Azure Key Vault:
+All secrets stored in AWS Secrets Manager:
 - JWT secrets
 - Database passwords
 - API keys
@@ -690,7 +705,7 @@ kubectl top nodes
 
 - [Scripts Documentation](scripts/README.md)
 - [Kubernetes Documentation](https://kubernetes.io/docs/)
-- [Azure AKS Documentation](https://docs.microsoft.com/en-us/azure/aks/)
+- [AWS EKS Documentation](https://docs.aws.amazon.com/eks/)
 - [Docker Documentation](https://docs.docker.com/)
 - [PostgreSQL Documentation](https://www.postgresql.org/docs/)
 
@@ -710,7 +725,7 @@ kubectl top nodes
 
 ### Cost Optimization
 
-- Use Azure Reserved Instances for production
+- Use AWS Savings Plans or Reserved Instances for production
 - Scale down non-production environments after hours
 - Use spot instances for batch workloads
 - Enable autoscaling based on demand

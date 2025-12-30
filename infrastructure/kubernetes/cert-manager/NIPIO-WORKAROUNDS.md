@@ -16,13 +16,13 @@ Since port 80 is blocked by an external firewall, HTTP-01 challenges fail, and D
 **Cost**: ~$10-15/year for a domain
 
 1. Register a domain (e.g., `unifiedhealth.io`, `unified-health.dev`)
-2. Create an Azure DNS Zone for it
-3. Point domain nameservers to Azure DNS
-4. Use the DNS-01 ClusterIssuer with Azure DNS
+2. Create an AWS Route 53 Hosted Zone for it
+3. Point domain nameservers to Route 53
+4. Use the DNS-01 ClusterIssuer with Route 53
 
 **Files to use**:
-- `dns01-clusterissuer-azure.yaml`
-- `dns-zone-cert-manager.tf`
+- `dns01-clusterissuer-route53.yaml`
+- Route 53 Terraform module
 
 **Benefits**:
 - Full production-ready solution
@@ -103,17 +103,17 @@ But since you don't control `nip.io`, this won't work directly.
 
 ---
 
-### Option 5: Use Azure Front Door / Application Gateway with Managed Certificates
+### Option 5: Use AWS CloudFront / Application Load Balancer with ACM Certificates
 
-**Cost**: Azure Front Door/App Gateway pricing
+**Cost**: AWS CloudFront/ALB pricing + ACM (free for AWS-issued certificates)
 
-Azure services can provision and manage their own certificates:
+AWS services can provision and manage their own certificates:
 
-1. Deploy Azure Front Door or Application Gateway
-2. Configure managed certificates (Azure handles the ACME challenges)
+1. Deploy AWS CloudFront or Application Load Balancer
+2. Configure ACM certificates (AWS handles the certificate issuance)
 3. Point your services behind the managed endpoint
 
-**Note**: This changes the architecture significantly.
+**Note**: This changes the architecture significantly but is well-integrated with EKS.
 
 ---
 
@@ -150,7 +150,7 @@ kubectl create secret tls unified-health-tls \
 
 ### For Production:
 1. **Register a real domain** (Option 1)
-2. Set up Azure DNS with cert-manager DNS-01
+2. Set up Route 53 with cert-manager DNS-01
 3. Use the provided configuration files
 
 ### Quick Development Setup (Self-Signed)
@@ -200,11 +200,11 @@ kubectl patch ingress unified-health-ingress -n unified-health \
 
 | Option | Works with nip.io? | Production Ready? | Complexity | Cost |
 |--------|-------------------|-------------------|------------|------|
-| Real Domain + Azure DNS | N/A (replace nip.io) | Yes | Medium | ~$15/yr |
+| Real Domain + Route 53 | N/A (replace nip.io) | Yes | Medium | ~$15/yr |
 | sslip.io | Maybe | Maybe | Low | Free |
 | Self-Signed | Yes | No | Low | Free |
 | ACME-DNS | No (need owned domain) | Yes | High | Free |
-| Azure Front Door | Yes | Yes | Medium | $$$$ |
+| AWS CloudFront + ACM | Yes | Yes | Medium | $$ |
 | External Certificate | Yes | Yes (manual) | Medium | Free |
 
-**Recommendation**: For the UnifiedHealth platform moving towards production, register a real domain and use Azure DNS with DNS-01 challenges.
+**Recommendation**: For the UnifiedHealth platform moving towards production, register a real domain and use AWS Route 53 with DNS-01 challenges.

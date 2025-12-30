@@ -18,10 +18,10 @@ NC='\033[0m' # No Color
 ENVIRONMENT="${1:-production}"
 TARGET_VERSION="${2:-}"
 NAMESPACE="unified-health-${ENVIRONMENT}"
-ACR_NAME="${ACR_NAME:-acrunifiedhealthdev2}"
-ACR_LOGIN_SERVER="${ACR_NAME}.azurecr.io"
-RESOURCE_GROUP="${RESOURCE_GROUP:-rg-unified-health-dev2-${ENVIRONMENT}}"
-AKS_CLUSTER="${AKS_CLUSTER:-unified-health-aks-${ENVIRONMENT}}"
+AWS_REGION="${AWS_REGION:-us-east-1}"
+AWS_ACCOUNT_ID="${AWS_ACCOUNT_ID:-$(aws sts get-caller-identity --query Account --output text 2>/dev/null || echo '')}"
+ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+EKS_CLUSTER="${EKS_CLUSTER:-unified-health-eks-${ENVIRONMENT}}"
 
 # Log functions
 log_info() {
@@ -51,11 +51,17 @@ check_prerequisites() {
     log_info "Checking prerequisites..."
 
     command -v kubectl >/dev/null 2>&1 || error_exit "kubectl is not installed"
-    command -v az >/dev/null 2>&1 || error_exit "Azure CLI is not installed"
+    command -v aws >/dev/null 2>&1 || error_exit "AWS CLI is not installed"
     command -v jq >/dev/null 2>&1 || error_exit "jq is not installed"
 
-    # Check Azure login
-    az account show >/dev/null 2>&1 || error_exit "Not logged in to Azure. Run 'az login'"
+    # Check AWS credentials
+    aws sts get-caller-identity >/dev/null 2>&1 || error_exit "Not authenticated with AWS. Run 'aws configure' or 'aws sso login'"
+
+    # Get AWS Account ID if not set
+    if [ -z "${AWS_ACCOUNT_ID}" ]; then
+        AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+        ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+    fi
 
     log_success "Prerequisites check passed"
 }
@@ -66,6 +72,7 @@ confirm_rollback() {
     log_warning "ROLLBACK OPERATION"
     log_warning "Environment: ${ENVIRONMENT}"
     log_warning "Target Version: ${TARGET_VERSION:-previous}"
+    log_warning "AWS Region: ${AWS_REGION}"
     log_warning "=========================================="
 
     if [ "${SKIP_CONFIRMATION:-false}" != "true" ]; then
@@ -77,14 +84,13 @@ confirm_rollback() {
     fi
 }
 
-# Get AKS credentials
-get_aks_credentials() {
-    log_info "Getting AKS credentials..."
-    az aks get-credentials \
-        --resource-group "${RESOURCE_GROUP}" \
-        --name "${AKS_CLUSTER}" \
-        --overwrite-existing || error_exit "Failed to get AKS credentials"
-    log_success "AKS credentials retrieved"
+# Get EKS credentials
+get_eks_credentials() {
+    log_info "Getting EKS credentials..."
+    aws eks update-kubeconfig \
+        --region "${AWS_REGION}" \
+        --name "${EKS_CLUSTER}" || error_exit "Failed to get EKS credentials"
+    log_success "EKS credentials retrieved"
 }
 
 # Get previous version
@@ -115,7 +121,7 @@ rollback_kubernetes() {
     else
         # Rollback to specific version
         kubectl set image deployment/unified-health-api \
-            api="${ACR_LOGIN_SERVER}/unified-health-api:${TARGET_VERSION}" \
+            api="${ECR_REGISTRY}/unified-health-api:${TARGET_VERSION}" \
             -n "${NAMESPACE}" || error_exit "Failed to set image version"
     fi
 
@@ -205,13 +211,13 @@ rollback_database() {
 
 # List available versions
 list_available_versions() {
-    log_info "Available versions in ACR:"
+    log_info "Available versions in ECR:"
 
-    az acr repository show-tags \
-        --name "${ACR_NAME}" \
-        --repository unified-health-api \
-        --orderby time_desc \
-        --output table | head -n 10
+    aws ecr describe-images \
+        --repository-name unified-health-api \
+        --region "${AWS_REGION}" \
+        --query 'sort_by(imageDetails,& imagePushedAt)[*].imageTags[0]' \
+        --output table | head -n 15
 
     log_info "Recent Kubernetes rollout history:"
     kubectl rollout history deployment/unified-health-api -n "${NAMESPACE}"
@@ -240,12 +246,22 @@ send_notification() {
                 }]
             }" || log_warning "Failed to send notification"
     fi
+
+    # SNS notification (if configured)
+    if [ -n "${SNS_TOPIC_ARN:-}" ]; then
+        aws sns publish \
+            --topic-arn "${SNS_TOPIC_ARN}" \
+            --subject "Rollback ${status}" \
+            --message "${message}" \
+            --region "${AWS_REGION}" || log_warning "Failed to send SNS notification"
+    fi
 }
 
 # Main rollback flow
 main() {
     log_info "Starting rollback process..."
     log_info "Environment: ${ENVIRONMENT}"
+    log_info "AWS Region: ${AWS_REGION}"
 
     # Show available versions if no target specified
     if [ -z "${TARGET_VERSION}" ]; then
@@ -255,7 +271,7 @@ main() {
 
     check_prerequisites
     confirm_rollback
-    get_aks_credentials
+    get_eks_credentials
     get_previous_version
     rollback_database
     rollback_kubernetes

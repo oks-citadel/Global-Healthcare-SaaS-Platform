@@ -2,7 +2,7 @@
 # ============================================
 # UnifiedHealth Platform - Production Deployment
 # ============================================
-# This script deploys the application to production using blue-green deployment
+# This script deploys the application to production using blue-green deployment on AWS
 # Usage: ./scripts/deploy-production.sh
 
 set -euo pipefail
@@ -17,10 +17,10 @@ NC='\033[0m' # No Color
 # Configuration
 ENVIRONMENT="production"
 NAMESPACE="unified-health-prod"
-ACR_NAME="${ACR_NAME:-acrunifiedhealthdev2}"
-ACR_LOGIN_SERVER="${ACR_NAME}.azurecr.io"
-AKS_CLUSTER="${AKS_CLUSTER:-unified-health-aks-prod}"
-RESOURCE_GROUP="${RESOURCE_GROUP:-rg-unified-health-dev2-prod}"
+AWS_REGION="${AWS_REGION:-us-east-1}"
+AWS_ACCOUNT_ID="${AWS_ACCOUNT_ID:-$(aws sts get-caller-identity --query Account --output text 2>/dev/null || echo '')}"
+ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+EKS_CLUSTER="${EKS_CLUSTER:-unified-health-eks-prod}"
 VERSION="${VERSION:-$(git describe --tags --abbrev=0 2>/dev/null || git rev-parse --short HEAD)}"
 BUILD_TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 IMAGE_TAG="${VERSION}-${BUILD_TIMESTAMP}"
@@ -59,11 +59,17 @@ check_prerequisites() {
 
     command -v docker >/dev/null 2>&1 || error_exit "Docker is not installed"
     command -v kubectl >/dev/null 2>&1 || error_exit "kubectl is not installed"
-    command -v az >/dev/null 2>&1 || error_exit "Azure CLI is not installed"
+    command -v aws >/dev/null 2>&1 || error_exit "AWS CLI is not installed"
     command -v jq >/dev/null 2>&1 || error_exit "jq is not installed"
 
-    # Check Azure login
-    az account show >/dev/null 2>&1 || error_exit "Not logged in to Azure. Run 'az login'"
+    # Check AWS credentials
+    aws sts get-caller-identity >/dev/null 2>&1 || error_exit "Not authenticated with AWS. Run 'aws configure' or 'aws sso login'"
+
+    # Get AWS Account ID if not set
+    if [ -z "${AWS_ACCOUNT_ID}" ]; then
+        AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+        ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+    fi
 
     # Verify we're on main branch or a release tag
     CURRENT_BRANCH=$(git branch --show-current)
@@ -80,6 +86,7 @@ confirm_deployment() {
     log_warning "PRODUCTION DEPLOYMENT"
     log_warning "Version: ${IMAGE_TAG}"
     log_warning "Environment: ${ENVIRONMENT}"
+    log_warning "AWS Region: ${AWS_REGION}"
     log_warning "=========================================="
 
     if [ "${SKIP_CONFIRMATION:-false}" != "true" ]; then
@@ -91,11 +98,11 @@ confirm_deployment() {
     fi
 }
 
-# Login to ACR
-login_to_acr() {
-    log_info "Logging in to Azure Container Registry..."
-    az acr login --name "${ACR_NAME}" || error_exit "Failed to login to ACR"
-    log_success "Logged in to ACR"
+# Login to ECR
+login_to_ecr() {
+    log_info "Logging in to Amazon ECR..."
+    aws ecr get-login-password --region "${AWS_REGION}" | docker login --username AWS --password-stdin "${ECR_REGISTRY}" || error_exit "Failed to login to ECR"
+    log_success "Logged in to ECR"
 }
 
 # Build Docker images
@@ -105,43 +112,42 @@ build_images() {
     # Build API service
     log_info "Building API service..."
     docker build \
-        -t "${ACR_LOGIN_SERVER}/unified-health-api:${IMAGE_TAG}" \
-        -t "${ACR_LOGIN_SERVER}/unified-health-api:latest" \
+        -t "${ECR_REGISTRY}/unified-health-api:${IMAGE_TAG}" \
+        -t "${ECR_REGISTRY}/unified-health-api:latest" \
         -f services/api/Dockerfile \
         services/api || error_exit "Failed to build API image"
 
     # Build Web app
     log_info "Building Web app..."
     docker build \
-        -t "${ACR_LOGIN_SERVER}/unified-health-web:${IMAGE_TAG}" \
-        -t "${ACR_LOGIN_SERVER}/unified-health-web:latest" \
+        -t "${ECR_REGISTRY}/unified-health-web:${IMAGE_TAG}" \
+        -t "${ECR_REGISTRY}/unified-health-web:latest" \
         -f apps/web/Dockerfile \
         apps/web || error_exit "Failed to build Web image"
 
     log_success "All images built successfully"
 }
 
-# Push images to ACR
+# Push images to ECR
 push_images() {
-    log_info "Pushing images to ACR..."
+    log_info "Pushing images to ECR..."
 
-    docker push "${ACR_LOGIN_SERVER}/unified-health-api:${IMAGE_TAG}" || error_exit "Failed to push API image"
-    docker push "${ACR_LOGIN_SERVER}/unified-health-api:latest" || error_exit "Failed to push API latest tag"
+    docker push "${ECR_REGISTRY}/unified-health-api:${IMAGE_TAG}" || error_exit "Failed to push API image"
+    docker push "${ECR_REGISTRY}/unified-health-api:latest" || error_exit "Failed to push API latest tag"
 
-    docker push "${ACR_LOGIN_SERVER}/unified-health-web:${IMAGE_TAG}" || error_exit "Failed to push Web image"
-    docker push "${ACR_LOGIN_SERVER}/unified-health-web:latest" || error_exit "Failed to push Web latest tag"
+    docker push "${ECR_REGISTRY}/unified-health-web:${IMAGE_TAG}" || error_exit "Failed to push Web image"
+    docker push "${ECR_REGISTRY}/unified-health-web:latest" || error_exit "Failed to push Web latest tag"
 
     log_success "All images pushed successfully"
 }
 
-# Get AKS credentials
-get_aks_credentials() {
-    log_info "Getting AKS credentials..."
-    az aks get-credentials \
-        --resource-group "${RESOURCE_GROUP}" \
-        --name "${AKS_CLUSTER}" \
-        --overwrite-existing || error_exit "Failed to get AKS credentials"
-    log_success "AKS credentials retrieved"
+# Get EKS credentials
+get_eks_credentials() {
+    log_info "Getting EKS credentials..."
+    aws eks update-kubeconfig \
+        --region "${AWS_REGION}" \
+        --name "${EKS_CLUSTER}" || error_exit "Failed to get EKS credentials"
+    log_success "EKS credentials retrieved"
 }
 
 # Determine current and new colors for blue-green deployment
@@ -191,7 +197,7 @@ spec:
       restartPolicy: Never
       containers:
       - name: migration
-        image: ${ACR_LOGIN_SERVER}/unified-health-api:${IMAGE_TAG}
+        image: ${ECR_REGISTRY}/unified-health-api:${IMAGE_TAG}
         command: ["pnpm", "db:migrate:deploy"]
         env:
         - name: DATABASE_URL
@@ -256,7 +262,7 @@ spec:
         fsGroup: 1001
       containers:
         - name: api
-          image: ${ACR_LOGIN_SERVER}/unified-health-api:${IMAGE_TAG}
+          image: ${ECR_REGISTRY}/unified-health-api:${IMAGE_TAG}
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
@@ -498,9 +504,13 @@ send_notification() {
             }" || log_warning "Failed to send Slack notification"
     fi
 
-    # Email notification (if configured)
-    if [ -n "${NOTIFICATION_EMAIL:-}" ]; then
-        echo "${message}" | mail -s "Production Deployment ${status}" "${NOTIFICATION_EMAIL}" || log_warning "Failed to send email notification"
+    # SNS notification (if configured)
+    if [ -n "${SNS_TOPIC_ARN:-}" ]; then
+        aws sns publish \
+            --topic-arn "${SNS_TOPIC_ARN}" \
+            --subject "Production Deployment ${status}" \
+            --message "${message}" \
+            --region "${AWS_REGION}" || log_warning "Failed to send SNS notification"
     fi
 }
 
@@ -510,13 +520,14 @@ main() {
     log_info "Version: ${VERSION}"
     log_info "Image Tag: ${IMAGE_TAG}"
     log_info "Environment: ${ENVIRONMENT}"
+    log_info "AWS Region: ${AWS_REGION}"
 
     check_prerequisites
     confirm_deployment
-    login_to_acr
+    login_to_ecr
     build_images
     push_images
-    get_aks_credentials
+    get_eks_credentials
     determine_colors
     backup_database
     run_migrations

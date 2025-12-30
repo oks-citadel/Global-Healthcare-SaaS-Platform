@@ -1,8 +1,8 @@
 /**
- * Document Routes with Azure Blob Storage Integration
+ * Document Routes with AWS S3 Storage Integration
  *
  * HIPAA-Compliant Document Management
- * - Secure upload/download with signed URLs
+ * - Secure upload/download with presigned URLs
  * - Stream-based handling for large files
  * - Content validation and virus scanning
  * - Versioning and soft-delete
@@ -13,7 +13,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import multer from 'multer';
 import { Readable } from 'stream';
-import { azureStorageService } from '../lib/storage.js';
+import { s3StorageService } from '../lib/storage.js';
 import { documentService } from '../services/document.service.js';
 import { patientService } from '../services/patient.service.js';
 import { authenticate, authorize } from '../middleware/auth.middleware.js';
@@ -31,7 +31,7 @@ const router = Router();
 // Multer Configuration for File Uploads
 // ==========================================
 
-// Use memory storage for streaming to Azure Blob
+// Use memory storage for streaming to S3
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
@@ -161,11 +161,11 @@ router.post(
       // Check patient access
       await checkPatientAccess(req.user!.userId, req.user!.role, body.patientId);
 
-      // Convert buffer to stream for Azure Blob upload
+      // Convert buffer to stream for S3 upload
       const fileStream = bufferToStream(req.file.buffer);
 
-      // Upload to Azure Blob Storage
-      const uploadResult = await azureStorageService.uploadDocument(fileStream, {
+      // Upload to S3 Storage
+      const uploadResult = await s3StorageService.uploadDocument(fileStream, {
         patientId: body.patientId,
         documentType: body.type,
         fileName: req.file.originalname,
@@ -178,14 +178,14 @@ router.post(
       });
 
       // Perform virus scan (async - don't block response)
-      azureStorageService.scanForViruses(uploadResult.blobName).then((scanResult) => {
+      s3StorageService.scanForViruses(uploadResult.key).then((scanResult) => {
         if (!scanResult.clean) {
           console.error(
-            `[SECURITY ALERT] Virus detected in blob: ${uploadResult.blobName}`,
+            `[SECURITY ALERT] Virus detected in object: ${uploadResult.key}`,
             scanResult.threats
           );
-          // In production: delete the blob and notify administrators
-          // azureStorageService.deleteDocument(uploadResult.blobName, false);
+          // In production: delete the object and notify administrators
+          // s3StorageService.deleteDocument(uploadResult.key);
         }
       });
 
@@ -202,15 +202,15 @@ router.post(
         req.file.size
       );
 
-      // Update document with Azure blob URL
-      await documentService.updateDocumentUrl(document.id, uploadResult.url, uploadResult.blobName);
+      // Update document with S3 object URL
+      await documentService.updateDocumentUrl(document.id, uploadResult.url, uploadResult.key);
 
       res.status(201).json({
         success: true,
         message: 'Document uploaded successfully',
         data: {
           documentId: document.id,
-          blobName: uploadResult.blobName,
+          key: uploadResult.key,
           url: uploadResult.url,
           thumbnailUrl: uploadResult.thumbnailUrl,
           size: uploadResult.size,
@@ -241,7 +241,7 @@ router.post(
       await checkPatientAccess(req.user!.userId, req.user!.role, body.patientId);
 
       // Generate presigned upload URL
-      const { uploadUrl, blobName, expiresAt } = await azureStorageService.generateUploadUrl(
+      const { uploadUrl, key, expiresAt } = await s3StorageService.generateUploadUrl(
         body.patientId,
         body.type,
         body.fileName,
@@ -265,12 +265,11 @@ router.post(
         data: {
           documentId: document.id,
           uploadUrl,
-          blobName,
+          key,
           expiresAt,
           instructions: {
             method: 'PUT',
             headers: {
-              'x-ms-blob-type': 'BlockBlob',
               'Content-Type': body.mimeType,
             },
             note: 'Upload the file to this URL using a PUT request with the file content in the body',
@@ -293,10 +292,10 @@ router.post(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { id } = req.params;
-      const { blobName, fileSize } = req.body;
+      const { key, fileSize } = req.body;
 
-      if (!blobName || !fileSize) {
-        throw new BadRequestError('blobName and fileSize are required');
+      if (!key || !fileSize) {
+        throw new BadRequestError('key and fileSize are required');
       }
 
       // Get document
@@ -305,18 +304,20 @@ router.post(
       // Check access
       await checkPatientAccess(req.user!.userId, req.user!.role, document.patientId);
 
-      // Verify blob exists
-      const metadata = await azureStorageService.getBlobMetadata(blobName);
+      // Verify object exists
+      const metadata = await s3StorageService.getObjectMetadata(key);
 
       // Update document with size and confirmed upload
-      await documentService.updateDocumentUrl(id, `https://${process.env.AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net/${process.env.AZURE_STORAGE_CONTAINER_NAME}/${blobName}`, blobName);
+      const region = process.env.AWS_REGION || 'us-east-1';
+      const bucket = process.env.AWS_S3_BUCKET || 'healthcare-documents';
+      await documentService.updateDocumentUrl(id, `https://${bucket}.s3.${region}.amazonaws.com/${key}`, key);
 
       res.status(200).json({
         success: true,
         message: 'Upload completed successfully',
         data: {
           documentId: id,
-          blobName,
+          key,
           metadata,
         },
       });
@@ -332,7 +333,7 @@ router.post(
 
 /**
  * GET /api/documents/:id/download
- * Generate a secure download URL with SAS token
+ * Generate a secure presigned download URL
  */
 router.get(
   '/:id/download',
@@ -348,16 +349,16 @@ router.get(
       // Check access
       await checkPatientAccess(req.user!.userId, req.user!.role, document.patientId);
 
-      // Get blob name from document
-      const blobName = document.blobName || extractBlobNameFromUrl(document.fileUrl);
+      // Get S3 key from document
+      const key = document.blobName || extractKeyFromUrl(document.fileUrl);
 
-      if (!blobName) {
-        throw new InternalServerError('Document blob name not found');
+      if (!key) {
+        throw new InternalServerError('Document key not found');
       }
 
       // Generate secure download URL
-      const downloadUrl = await azureStorageService.generateDownloadUrl(blobName, {
-        expiryMinutes,
+      const downloadUrl = await s3StorageService.generateDownloadUrl(key, {
+        expirySeconds: expiryMinutes * 60,
         downloadFileName: document.fileName,
       });
 
@@ -395,19 +396,19 @@ router.get(
       // Check access
       await checkPatientAccess(req.user!.userId, req.user!.role, document.patientId);
 
-      // Get blob name from document
-      const blobName = document.blobName || extractBlobNameFromUrl(document.fileUrl);
+      // Get S3 key from document
+      const key = document.blobName || extractKeyFromUrl(document.fileUrl);
 
-      if (!blobName) {
-        throw new InternalServerError('Document blob name not found');
+      if (!key) {
+        throw new InternalServerError('Document key not found');
       }
 
-      // Thumbnail blob name
-      const thumbnailBlobName = `${blobName}_thumbnail.jpg`;
+      // Thumbnail key
+      const thumbnailKey = `${key}_thumbnail.jpg`;
 
       // Generate secure download URL for thumbnail
-      const thumbnailUrl = await azureStorageService.generateDownloadUrl(thumbnailBlobName, {
-        expiryMinutes: 60,
+      const thumbnailUrl = await s3StorageService.generateDownloadUrl(thumbnailKey, {
+        expirySeconds: 3600,
       });
 
       res.status(200).json({
@@ -517,14 +518,8 @@ router.patch(
       // Update database
       const updatedDocument = await documentService.updateDocument(id, updates);
 
-      // Update Azure Blob metadata
-      const blobName = document.blobName || extractBlobNameFromUrl(document.fileUrl);
-      if (blobName) {
-        await azureStorageService.updateBlobMetadata(blobName, {
-          description: updates.description,
-          documentType: updates.type,
-        });
-      }
+      // Note: S3 metadata is immutable after upload, so we only update the database record
+      // For full metadata updates, a copy operation would be needed
 
       res.status(200).json({
         success: true,
@@ -556,10 +551,10 @@ router.delete(
         throw new ForbiddenError('Only the uploader or admin can delete this document');
       }
 
-      // Delete from Azure Blob Storage
-      const blobName = document.blobName || extractBlobNameFromUrl(document.fileUrl);
-      if (blobName) {
-        await azureStorageService.deleteDocument(blobName, !permanent);
+      // Delete from S3 Storage
+      const key = document.blobName || extractKeyFromUrl(document.fileUrl);
+      if (key) {
+        await s3StorageService.deleteDocument(key);
       }
 
       // Delete from database
@@ -604,7 +599,7 @@ router.post(
 
       // Upload new version
       const fileStream = bufferToStream(req.file.buffer);
-      const uploadResult = await azureStorageService.uploadDocument(fileStream, {
+      const uploadResult = await s3StorageService.uploadDocument(fileStream, {
         patientId: document.patientId,
         documentType: document.type,
         fileName: req.file.originalname,
@@ -619,7 +614,7 @@ router.post(
       const updatedDocument = await documentService.updateDocument(id, {
         version: newVersion,
         fileUrl: uploadResult.url,
-        blobName: uploadResult.blobName,
+        blobName: uploadResult.key,
         size: req.file.size,
       });
 
@@ -629,7 +624,7 @@ router.post(
         data: {
           documentId: id,
           version: newVersion,
-          blobName: uploadResult.blobName,
+          key: uploadResult.key,
           url: uploadResult.url,
           size: uploadResult.size,
         },
@@ -684,7 +679,7 @@ router.get(
       // Check access
       await checkPatientAccess(req.user!.userId, req.user!.role, patientId);
 
-      const stats = await azureStorageService.getPatientStorageStats(patientId);
+      const stats = await s3StorageService.getPatientStorageStats(patientId);
 
       res.status(200).json({
         success: true,
@@ -701,14 +696,14 @@ router.get(
 // ==========================================
 
 /**
- * Extract blob name from Azure Blob URL
+ * Extract key from S3 URL
  */
-function extractBlobNameFromUrl(url: string): string | null {
+function extractKeyFromUrl(url: string): string | null {
   try {
     const urlObj = new URL(url);
-    const pathParts = urlObj.pathname.split('/');
-    // Remove container name and get blob path
-    return pathParts.slice(2).join('/');
+    const path = urlObj.pathname;
+    // Remove leading slash
+    return path.startsWith('/') ? path.slice(1) : path;
   } catch {
     return null;
   }

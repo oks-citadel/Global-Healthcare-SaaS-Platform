@@ -4,15 +4,14 @@ This document lists all the secrets that need to be configured in your GitHub re
 
 ## Required Secrets
 
-### Azure Authentication
+### AWS Authentication
 
 | Secret Name | Description | How to Get |
 |------------|-------------|------------|
-| `AZURE_CREDENTIALS` | Azure service principal credentials (JSON) | `az ad sp create-for-rbac --name "github-actions-sp" --role contributor --scopes /subscriptions/d8afbfb0-0c60-4d11-a1c7-a614235f5eb6 --sdk-auth` |
-| `AZURE_SUBSCRIPTION_ID` | Azure subscription ID | `d8afbfb0-0c60-4d11-a1c7-a614235f5eb6` |
-| `AZURE_TENANT_ID` | Azure tenant ID | From Azure portal or `az account show` |
-| `AZURE_CLIENT_ID` | Azure service principal client ID | From service principal creation output |
-| `AZURE_CLIENT_SECRET` | Azure service principal client secret | From service principal creation output |
+| `AWS_ACCESS_KEY_ID` | AWS access key ID | From IAM user creation or `aws iam create-access-key` |
+| `AWS_SECRET_ACCESS_KEY` | AWS secret access key | From IAM user creation output |
+| `AWS_REGION` | AWS region for deployment | e.g., `us-east-1` |
+| `AWS_ACCOUNT_ID` | AWS account ID | `aws sts get-caller-identity --query Account --output text` |
 
 ### Database
 
@@ -53,9 +52,11 @@ This document lists all the secrets that need to be configured in your GitHub re
 ### Using GitHub CLI
 
 ```bash
-# Azure credentials
-gh secret set AZURE_SUBSCRIPTION_ID --body "d8afbfb0-0c60-4d11-a1c7-a614235f5eb6"
-gh secret set AZURE_CREDENTIALS --body "$(cat azure-credentials.json)"
+# AWS credentials
+gh secret set AWS_ACCESS_KEY_ID --body "your-access-key-id"
+gh secret set AWS_SECRET_ACCESS_KEY --body "your-secret-access-key"
+gh secret set AWS_REGION --body "us-east-1"
+gh secret set AWS_ACCOUNT_ID --body "$(aws sts get-caller-identity --query Account --output text)"
 
 # Database
 gh secret set POSTGRESQL_ADMIN_PASSWORD --body "your-secure-password"
@@ -87,19 +88,28 @@ Create these secrets for each environment (staging, production):
 - `PROD_DATABASE_URL`
 - `PROD_REDIS_URL`
 
-## Creating Azure Service Principal
+## Creating AWS IAM User for GitHub Actions
 
-Run this command to create a service principal with the correct permissions:
+Run these commands to create an IAM user with the correct permissions:
 
 ```bash
-az ad sp create-for-rbac \
-  --name "github-actions-unified-health" \
-  --role contributor \
-  --scopes /subscriptions/d8afbfb0-0c60-4d11-a1c7-a614235f5eb6 \
-  --sdk-auth
+# Create IAM user
+aws iam create-user --user-name github-actions-unified-health
+
+# Attach required policies
+aws iam attach-user-policy \
+  --user-name github-actions-unified-health \
+  --policy-arn arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
+
+aws iam attach-user-policy \
+  --user-name github-actions-unified-health \
+  --policy-arn arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess
+
+# Create access key
+aws iam create-access-key --user-name github-actions-unified-health
 ```
 
-Save the output JSON and use it as the `AZURE_CREDENTIALS` secret.
+Save the output access key ID and secret and use them as `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` secrets.
 
 ## Verifying Secrets
 

@@ -2,7 +2,7 @@
 
 # ============================================
 # UnifiedHealth Platform - Docker Build Script
-# Builds, tags, and pushes Docker images
+# Builds, tags, and pushes Docker images to AWS ECR
 # ============================================
 
 set -e  # Exit on error
@@ -16,7 +16,9 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-REGISTRY="${DOCKER_REGISTRY:-unifiedhealth.azurecr.io}"
+AWS_REGION="${AWS_REGION:-us-east-1}"
+AWS_ACCOUNT_ID="${AWS_ACCOUNT_ID:-$(aws sts get-caller-identity --query Account --output text 2>/dev/null || echo '')}"
+ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
 PROJECT_NAME="unifiedhealth"
 GIT_SHA=$(git rev-parse --short HEAD 2>/dev/null || echo "latest")
 GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
@@ -67,6 +69,23 @@ print_header() {
 # Build Functions
 # ============================================
 
+check_aws_credentials() {
+    log_info "Checking AWS credentials..."
+
+    if ! aws sts get-caller-identity >/dev/null 2>&1; then
+        log_error "Not authenticated with AWS. Run 'aws configure' or 'aws sso login'"
+        exit 1
+    fi
+
+    # Get AWS Account ID if not set
+    if [ -z "${AWS_ACCOUNT_ID}" ]; then
+        AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+        ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+    fi
+
+    log_success "AWS credentials verified"
+}
+
 build_image() {
     local service=$1
     local context_path=$2
@@ -91,9 +110,9 @@ build_image() {
         --tag "${PROJECT_NAME}/${service}:${GIT_SHA}" \
         --tag "${PROJECT_NAME}/${service}:${VERSION}" \
         --tag "${PROJECT_NAME}/${service}:latest" \
-        --tag "${REGISTRY}/${PROJECT_NAME}/${service}:${GIT_SHA}" \
-        --tag "${REGISTRY}/${PROJECT_NAME}/${service}:${VERSION}" \
-        --tag "${REGISTRY}/${PROJECT_NAME}/${service}:latest" \
+        --tag "${ECR_REGISTRY}/${PROJECT_NAME}-${service}:${GIT_SHA}" \
+        --tag "${ECR_REGISTRY}/${PROJECT_NAME}-${service}:${VERSION}" \
+        --tag "${ECR_REGISTRY}/${PROJECT_NAME}-${service}:latest" \
         ${DOCKER_BUILD_ARGS[@]} \
         -f "${dockerfile_path}" \
         "${context_path}"
@@ -115,7 +134,7 @@ tag_image() {
 
     docker tag \
         "${PROJECT_NAME}/${service}:${GIT_SHA}" \
-        "${REGISTRY}/${PROJECT_NAME}/${service}:${additional_tag}"
+        "${ECR_REGISTRY}/${PROJECT_NAME}-${service}:${additional_tag}"
 
     if [ $? -eq 0 ]; then
         log_success "Successfully tagged ${service} with ${additional_tag}"
@@ -127,12 +146,12 @@ tag_image() {
 push_image() {
     local service=$1
 
-    log_info "Pushing ${service} images to registry..."
+    log_info "Pushing ${service} images to ECR..."
 
     # Push all tags
-    docker push "${REGISTRY}/${PROJECT_NAME}/${service}:${GIT_SHA}"
-    docker push "${REGISTRY}/${PROJECT_NAME}/${service}:${VERSION}"
-    docker push "${REGISTRY}/${PROJECT_NAME}/${service}:latest"
+    docker push "${ECR_REGISTRY}/${PROJECT_NAME}-${service}:${GIT_SHA}"
+    docker push "${ECR_REGISTRY}/${PROJECT_NAME}-${service}:${VERSION}"
+    docker push "${ECR_REGISTRY}/${PROJECT_NAME}-${service}:latest"
 
     if [ $? -eq 0 ]; then
         log_success "Successfully pushed ${service} images"
@@ -143,27 +162,33 @@ push_image() {
     fi
 }
 
-login_registry() {
-    log_info "Logging into Docker registry..."
+login_ecr() {
+    log_info "Logging into Amazon ECR..."
 
-    if [ -n "${DOCKER_USERNAME:-}" ] && [ -n "${DOCKER_PASSWORD:-}" ]; then
-        echo "${DOCKER_PASSWORD}" | docker login "${REGISTRY}" -u "${DOCKER_USERNAME}" --password-stdin
-    elif [ -n "${ACR_SERVICE_PRINCIPAL_ID:-}" ] && [ -n "${ACR_SERVICE_PRINCIPAL_PASSWORD:-}" ]; then
-        # Azure Container Registry login
-        echo "${ACR_SERVICE_PRINCIPAL_PASSWORD}" | docker login "${REGISTRY}" -u "${ACR_SERVICE_PRINCIPAL_ID}" --password-stdin
-    else
-        log_warning "No registry credentials provided, skipping login"
-        log_warning "Set DOCKER_USERNAME/DOCKER_PASSWORD or ACR credentials to push images"
-        return 1
-    fi
+    aws ecr get-login-password --region "${AWS_REGION}" | docker login --username AWS --password-stdin "${ECR_REGISTRY}"
 
     if [ $? -eq 0 ]; then
-        log_success "Successfully logged into registry"
+        log_success "Successfully logged into ECR"
         return 0
     else
-        log_error "Failed to login to registry"
+        log_error "Failed to login to ECR"
         return 1
     fi
+}
+
+create_ecr_repositories() {
+    log_info "Ensuring ECR repositories exist..."
+
+    for service in "${SERVICES[@]}"; do
+        local repo_name="${PROJECT_NAME}-${service}"
+        if ! aws ecr describe-repositories --repository-names "${repo_name}" --region "${AWS_REGION}" >/dev/null 2>&1; then
+            log_info "Creating ECR repository: ${repo_name}"
+            aws ecr create-repository \
+                --repository-name "${repo_name}" \
+                --region "${AWS_REGION}" \
+                --image-scanning-configuration scanOnPush=true || log_warning "Failed to create repository ${repo_name}"
+        fi
+    done
 }
 
 # ============================================
@@ -173,13 +198,17 @@ login_registry() {
 main() {
     print_header "UnifiedHealth Docker Build Script"
 
+    # Check AWS credentials first
+    check_aws_credentials
+
     log_info "Configuration:"
-    echo "  Registry:     ${REGISTRY}"
+    echo "  Registry:     ${ECR_REGISTRY}"
     echo "  Version:      ${VERSION}"
     echo "  Git SHA:      ${GIT_SHA}"
     echo "  Git Branch:   ${GIT_BRANCH}"
     echo "  Build Date:   ${BUILD_DATE}"
     echo "  Build Mode:   ${BUILD_MODE}"
+    echo "  AWS Region:   ${AWS_REGION}"
     echo ""
 
     # Check if Docker is running
@@ -234,9 +263,12 @@ main() {
 
     # Push images if PUSH=true
     if [ "${PUSH:-false}" = "true" ]; then
-        print_header "Pushing Images to Registry"
+        print_header "Pushing Images to ECR"
 
-        if login_registry; then
+        if login_ecr; then
+            # Ensure repositories exist
+            create_ecr_repositories
+
             local push_failed=0
 
             for service in "${SERVICES[@]}"; do
@@ -250,7 +282,7 @@ main() {
                 exit 1
             fi
         else
-            log_warning "Skipping push due to login failure"
+            log_warning "Skipping push due to ECR login failure"
         fi
     else
         log_info "Skipping push (set PUSH=true to push images)"
@@ -266,11 +298,12 @@ main() {
         echo "  - ${PROJECT_NAME}/${service}:${GIT_SHA}"
         echo "  - ${PROJECT_NAME}/${service}:${VERSION}"
         echo "  - ${PROJECT_NAME}/${service}:latest"
+        echo "  - ${ECR_REGISTRY}/${PROJECT_NAME}-${service}:${GIT_SHA}"
     done
     echo ""
 
     if [ "${PUSH:-false}" = "true" ]; then
-        echo "Images pushed to: ${REGISTRY}"
+        echo "Images pushed to: ${ECR_REGISTRY}"
     else
         echo "To push images, run: PUSH=true ./scripts/docker-build.sh"
     fi

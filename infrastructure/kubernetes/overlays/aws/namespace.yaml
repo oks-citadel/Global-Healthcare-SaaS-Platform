@@ -1,0 +1,15 @@
+# ============================================
+# UnifiedHealth API - AWS EKS Namespace
+# ============================================
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: unified-health
+  labels:
+    name: unified-health
+    environment: production
+    cloud-provider: aws
+    platform: eks
+  annotations:
+    description: "UnifiedHealth platform namespace for AWS EKS deployment"
+    iam.amazonaws.com/permitted: "*"

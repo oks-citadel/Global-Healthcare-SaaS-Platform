@@ -37,7 +37,7 @@
 - [ ] Configure HTTPS/TLS
 - [ ] Enable database encryption at rest
 - [ ] Set up VPC/network isolation
-- [ ] Configure secrets management (AWS Secrets Manager, Azure Key Vault, etc.)
+- [ ] Configure secrets management (AWS Secrets Manager)
 
 ### 5. Service Configuration
 - [ ] Review and adjust rate limits
@@ -152,12 +152,12 @@ Create ingress rules for routing to API Gateway
 4. Configure Memorystore for Redis
 5. Set up Cloud Load Balancer
 
-#### Azure Container Instances
-1. Build and push images to ACR
-2. Deploy container instances
-3. Configure Azure Database for PostgreSQL
-4. Configure Azure Cache for Redis
-5. Set up Azure Application Gateway
+#### AWS Fargate
+1. Build and push images to ECR
+2. Deploy Fargate tasks
+3. Configure Amazon RDS for PostgreSQL
+4. Configure Amazon ElastiCache for Redis
+5. Set up Application Load Balancer
 
 ---
 
@@ -230,9 +230,8 @@ npm install prom-client
 Options:
 1. **ELK Stack** (Elasticsearch, Logstash, Kibana)
 2. **Loki + Grafana**
-3. **CloudWatch** (AWS)
+3. **Amazon CloudWatch Logs** (AWS)
 4. **Stackdriver** (GCP)
-5. **Azure Monitor**
 
 ### Distributed Tracing
 Options:

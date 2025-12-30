@@ -34,7 +34,7 @@ replicas:
 # Staging images
 images:
   - name: unified-health-api
-    newName: ${ACR_LOGIN_SERVER}/unified-health-api
+    newName: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/unified-health-api
     newTag: staging-latest
 
 # Patches for staging

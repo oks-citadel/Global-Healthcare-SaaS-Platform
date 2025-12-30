@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nfeat: implement multiple platform improvements across services\n\nInfrastructure Security:\n- Replace 0.0.0.0/0 ACR rule with dynamic IP allowlist\n- Add PostgreSQL password auto-generation via random_password\n- Store PostgreSQL admin password in Azure Key Vault\n- Add variables for ACR and Key Vault allowed CIDRs\n\nNotification Service:\n- Implement full Prisma database queries for all routes\n- Add bulk notification sending with transaction support\n- Add mark-as-read functionality \\(single and batch\\)\n- Add proper validation and error handling with Zod\n\nFrontend Improvements:\n- Enable TypeScript strict mode \\(ignoreBuildErrors: false\\)\n- Add message sending with optimistic updates and error handling\n- Add loading states and disabled button during send\n\nFHIR Terminology:\n- Create cache utility with TTL and optional Redis support\n- Implement SNOMED CT service with Snowstorm API integration\n- Add lookup, search, descendants, and relationships methods\n\nTypeScript Fixes:\n- Remove @ts-nocheck from laboratory service orders.ts\n- Replace ''any'' type with proper Prisma.LabOrderWhereInput\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(find:*)",
+      "Bash(cat:*)"
+    ]
+  }
+}

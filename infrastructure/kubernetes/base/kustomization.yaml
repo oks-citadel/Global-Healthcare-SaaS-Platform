@@ -40,7 +40,7 @@ configMapGenerator:
       - KUSTOMIZE_VERSION=v1.0.0
 
 # Secret generator (optional, for dynamic secret generation)
-# Note: Actual secrets should come from Azure Key Vault
+# Note: Actual secrets should come from AWS Secrets Manager
 secretGenerator:
   - name: unified-health-runtime-secrets
     type: Opaque
@@ -49,7 +49,7 @@ secretGenerator:
 # Images to use
 images:
   - name: unified-health-api
-    newName: ${ACR_LOGIN_SERVER}/unified-health-api
+    newName: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/unified-health-api
     newTag: latest
 
 # Patches

@@ -22,7 +22,8 @@ const REQUIRED_ENV_VARS = [
  */
 const RECOMMENDED_ENV_VARS = [
   'REDIS_PASSWORD',
-  'AZURE_KEY_VAULT_URL',
+  'AWS_ACCESS_KEY_ID',
+  'AWS_SECRET_ACCESS_KEY',
 ] as const;
 
 /**
@@ -181,13 +182,16 @@ export const config = {
     key: getRequiredEnv('ENCRYPTION_KEY', isDevelopment ? 'dev-only-32-byte-encryption-key!' : undefined),
   },
 
-  azure: {
-    keyVaultUrl: process.env.AZURE_KEY_VAULT_URL,
-    storage: {
-      connectionString: process.env.AZURE_STORAGE_CONNECTION_STRING,
-      accountName: process.env.AZURE_STORAGE_ACCOUNT_NAME,
-      accountKey: process.env.AZURE_STORAGE_ACCOUNT_KEY,
-      containerName: getOptionalEnv('AZURE_STORAGE_CONTAINER_NAME', 'healthcare-documents'),
+  aws: {
+    region: getOptionalEnv('AWS_REGION', 'us-east-1'),
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    s3: {
+      bucket: getOptionalEnv('AWS_S3_BUCKET', 'healthcare-documents'),
+      quarantineBucket: getOptionalEnv('AWS_QUARANTINE_BUCKET', 'healthcare-quarantine'),
+    },
+    secretsManager: {
+      enabled: process.env.AWS_SECRETS_MANAGER_ENABLED === 'true',
     },
   },
 

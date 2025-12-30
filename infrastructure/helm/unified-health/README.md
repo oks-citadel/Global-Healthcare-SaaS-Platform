@@ -10,7 +10,7 @@ This Helm chart deploys the UnifiedHealth Global Platform on Kubernetes with sup
 - Pod Disruption Budgets (PDB)
 - Network policies for security
 - Prometheus metrics integration
-- Azure integration (ACR, Key Vault, PostgreSQL, Redis)
+- AWS integration (ECR, Secrets Manager, RDS, ElastiCache)
 - SSL/TLS termination
 - Health checks and readiness probes
 
@@ -18,9 +18,9 @@ This Helm chart deploys the UnifiedHealth Global Platform on Kubernetes with sup
 
 - Kubernetes 1.24+
 - Helm 3.8+
-- Azure Container Registry access
-- Configured Azure credentials
-- Ingress controller (nginx recommended)
+- Amazon ECR access
+- Configured AWS credentials
+- AWS Load Balancer Controller (ALB ingress recommended)
 - Cert-manager for TLS certificates
 
 ## Installation
@@ -50,11 +50,11 @@ helm install unified-health ./infrastructure/helm/unified-health \
 Create the following Kubernetes secrets before installation:
 
 ```bash
-# ACR credentials
-kubectl create secret docker-registry acr-secret \
-  --docker-server=acrunifiedhealthdev2.azurecr.io \
-  --docker-username=<username> \
-  --docker-password=<password> \
+# ECR credentials
+kubectl create secret docker-registry ecr-secret \
+  --docker-server=${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com \
+  --docker-username=AWS \
+  --docker-password=$(aws ecr get-login-password --region us-east-1) \
   --namespace=<namespace>
 
 # Application secrets
@@ -72,7 +72,7 @@ kubectl create secret generic unified-health-secrets \
 | Parameter | Description | Default |
 |-----------|-------------|---------|
 | `global.environment` | Environment name | `production` |
-| `global.imageRegistry` | Container registry | `acrunifiedhealthdev2.azurecr.io` |
+| `global.imageRegistry` | Container registry | `${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com` |
 | `replicaCount.api` | API replica count | `3` |
 | `replicaCount.web` | Web replica count | `3` |
 | `autoscaling.enabled` | Enable HPA | `true` |

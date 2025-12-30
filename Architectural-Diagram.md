@@ -184,8 +184,8 @@ The UnifiedHealth Global Platform is designed as a cloud-native, microservices-b
 │  └──────────────────────────────────────────────────────────────────────────────────┘  │
 │  ┌────────────────────────────── BLOB & MEDIA STORAGE ──────────────────────────────┐  │
 │  │  ┌────────────┐ ┌────────────┐ ┌────────────┐                                    │  │
-│  │  │  AWS S3 /  │ │ DICOM PACS │ │ CDN Assets │                                    │  │
-│  │  │ Azure Blob │ │  (Imaging) │ │(CloudFlare)│                                    │  │
+│  │  │  AWS S3    │ │ DICOM PACS │ │ CDN Assets │                                    │  │
+│  │  │  Storage   │ │  (Imaging) │ │(CloudFlare)│                                    │  │
 │  │  └────────────┘ └────────────┘ └────────────┘                                    │  │
 │  └──────────────────────────────────────────────────────────────────────────────────┘  │
 └─────────────────────────────────────────────────────────────────────────────────────────┘
@@ -416,8 +416,8 @@ The UnifiedHealth Global Platform is designed as a cloud-native, microservices-b
 | **Databases** | PostgreSQL 15, MongoDB 7, Redis 7, Elasticsearch 8 |
 | **Message Queue** | Apache Kafka, Redis Pub/Sub |
 | **AI/ML** | PyTorch, TensorFlow, Hugging Face, Claude AI, MLflow |
-| **Storage** | AWS S3/Azure Blob, DICOM PACS (Orthanc) |
-| **Container** | Docker, Kubernetes (EKS/AKS/GKE) |
+| **Storage** | AWS S3, DICOM PACS (Orthanc) |
+| **Container** | Docker, Kubernetes (EKS) |
 | **CI/CD** | GitHub Actions, ArgoCD, Terraform |
 | **Monitoring** | Prometheus, Grafana, Jaeger, Loki, PagerDuty |
 | **Security** | Auth0/Okta, HashiCorp Vault, CloudFlare WAF, Splunk SIEM |

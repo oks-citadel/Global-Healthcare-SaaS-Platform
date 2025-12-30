@@ -22,7 +22,8 @@ data:
   redis-port: "6379"
 
   # Database Configuration (non-sensitive)
-  database-host: "unified-health-postgres.postgres.database.azure.com"
+  # AWS RDS PostgreSQL endpoint
+  database-host: "${RDS_ENDPOINT}"
   database-port: "5432"
   database-name: "unifiedhealth"
   database-ssl-mode: "require"

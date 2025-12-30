@@ -1,6 +1,6 @@
-# Kubernetes Deployment Guide - Unified Healthcare Platform
+# Kubernetes Deployment Guide - Unified Healthcare Platform (AWS)
 
-Complete Kubernetes deployment configurations for the Unified Healthcare Platform API with production-ready configurations including security, high availability, and HIPAA/GDPR compliance.
+Complete Kubernetes deployment configurations for the Unified Healthcare Platform API on Amazon Web Services (AWS), with production-ready configurations including security, high availability, and HIPAA/GDPR/POPIA compliance.
 
 ## Table of Contents
 
@@ -15,47 +15,62 @@ Complete Kubernetes deployment configurations for the Unified Healthcare Platfor
 - [Monitoring and Observability](#monitoring-and-observability)
 - [Troubleshooting](#troubleshooting)
 - [Maintenance](#maintenance)
+- [Multi-Region Deployment](#multi-region-deployment)
 
 ## Overview
 
-This Kubernetes configuration provides:
+This Kubernetes configuration provides AWS-native deployment using Amazon EKS (Elastic Kubernetes Service):
 
-- **High Availability**: Multi-replica deployments with pod anti-affinity
-- **Auto-scaling**: Horizontal Pod Autoscaler (HPA) based on CPU and memory
-- **Security**: Network policies, RBAC, Azure Workload Identity integration
-- **Compliance**: HIPAA and GDPR-compliant configurations
-- **TLS/SSL**: Automated certificate management with cert-manager
-- **Rate Limiting**: NGINX ingress with rate limiting and DDoS protection
-- **Observability**: Prometheus metrics, health checks, and logging
+- **High Availability**: Multi-replica deployments with pod anti-affinity across Availability Zones
+- **Auto-scaling**: Horizontal Pod Autoscaler (HPA) and Cluster Autoscaler for EKS node groups
+- **Security**: Network policies, RBAC, AWS IRSA (IAM Roles for Service Accounts) integration
+- **Compliance**: HIPAA, GDPR, and POPIA-compliant configurations
+- **TLS/SSL**: Automated certificate management with cert-manager and AWS ACM
+- **Load Balancing**: AWS Load Balancer Controller for ALB/NLB integration
+- **DNS Management**: Amazon Route 53 for DNS and health checks
+- **Rate Limiting**: NGINX ingress with rate limiting and DDoS protection via AWS Shield
+- **Observability**: Amazon CloudWatch, Prometheus metrics, and AWS X-Ray tracing
 - **Resilience**: Pod Disruption Budgets (PDB) for zero-downtime deployments
 
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    NGINX Ingress Controller                  │
-│                  (TLS, Rate Limiting, WAF)                   │
-└───────────────────────┬─────────────────────────────────────┘
-                        │
-        ┌───────────────┴────────────────┐
-        │                                │
-┌───────▼─────────┐           ┌──────────▼──────────┐
-│  API Service    │           │  Metrics Service    │
-│  (ClusterIP)    │           │  (Prometheus)       │
-└───────┬─────────┘           └─────────────────────┘
-        │
-┌───────▼──────────────────────────────────────────┐
-│          API Deployment (3 replicas)              │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐       │
-│  │  Pod 1   │  │  Pod 2   │  │  Pod 3   │       │
-│  └──────────┘  └──────────┘  └──────────┘       │
-└────┬──────────────┬────────────────┬─────────────┘
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              Amazon Route 53                                  │
+│                         (DNS, Health Checks, Failover)                        │
+└───────────────────────────────────┬───────────────────────────────────────────┘
+                                    │
+┌───────────────────────────────────▼───────────────────────────────────────────┐
+│                    AWS Load Balancer Controller (ALB/NLB)                      │
+│                        (TLS Termination, WAF, Shield)                          │
+└───────────────────────────────────┬───────────────────────────────────────────┘
+                                    │
+┌───────────────────────────────────▼───────────────────────────────────────────┐
+│                       NGINX Ingress Controller                                 │
+│                    (Rate Limiting, Path Routing)                               │
+└───────────────────────────────────┬───────────────────────────────────────────┘
+                                    │
+            ┌───────────────────────┴────────────────┐
+            │                                        │
+    ┌───────▼─────────┐                   ┌──────────▼──────────┐
+    │  API Service    │                   │  Metrics Service    │
+    │  (ClusterIP)    │                   │  (Prometheus)       │
+    └───────┬─────────┘                   └─────────────────────┘
+            │
+┌───────────▼──────────────────────────────────────────┐
+│          API Deployment (3 replicas)                  │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐           │
+│  │  Pod 1   │  │  Pod 2   │  │  Pod 3   │           │
+│  │  (AZ-1a) │  │  (AZ-1b) │  │  (AZ-1c) │           │
+│  └──────────┘  └──────────┘  └──────────┘           │
+└────┬──────────────┬────────────────┬─────────────────┘
      │              │                │
      │              │                │
-┌────▼────┐    ┌───▼─────┐    ┌────▼─────┐
-│ Azure   │    │  Redis  │    │ External │
-│ PostgreSQL   │  Cache  │    │ Services │
-└─────────┘    └─────────┘    └──────────┘
+┌────▼────┐    ┌───▼─────┐    ┌────▼─────┐    ┌────────────┐
+│ Amazon  │    │ Amazon  │    │ Amazon   │    │   AWS      │
+│ RDS     │    │ Elasti- │    │ S3       │    │  Secrets   │
+│ (Aurora)│    │ Cache   │    │          │    │  Manager   │
+└─────────┘    └─────────┘    └──────────┘    └────────────┘
 ```
 
 ## Prerequisites
@@ -72,66 +87,74 @@ This Kubernetes configuration provides:
    kustomize version
    ```
 
-3. **Azure CLI** (v2.50+)
+3. **AWS CLI** (v2.0+)
    ```bash
-   az version
+   aws --version
    ```
 
-4. **Helm** (v3.12+)
+4. **eksctl** (v0.150+)
+   ```bash
+   eksctl version
+   ```
+
+5. **Helm** (v3.12+)
    ```bash
    helm version
    ```
 
-### Required Azure Resources
+### Required AWS Resources
 
-1. **Azure Kubernetes Service (AKS)**
+1. **Amazon Elastic Kubernetes Service (EKS)**
    ```bash
-   az aks create \
-     --resource-group unified-health-rg \
-     --name unified-health-aks \
-     --node-count 3 \
-     --enable-managed-identity \
-     --enable-workload-identity \
-     --enable-oidc-issuer \
-     --network-plugin azure \
-     --kubernetes-version 1.27
+   eksctl create cluster \
+     --name unified-health-eks \
+     --region us-east-1 \
+     --nodegroup-name standard-workers \
+     --node-type t3.large \
+     --nodes 3 \
+     --nodes-min 2 \
+     --nodes-max 5 \
+     --with-oidc \
+     --managed
    ```
 
-2. **Azure Container Registry (ACR)**
+2. **Amazon Elastic Container Registry (ECR)**
    ```bash
-   az acr create \
-     --resource-group rg-unified-health-dev2 \
-     --name acrunifiedhealthdev2 \
-     --sku Premium
+   aws ecr create-repository \
+     --repository-name unified-health-api \
+     --region us-east-1 \
+     --image-scanning-configuration scanOnPush=true
    ```
 
-3. **Azure Key Vault**
+3. **AWS Secrets Manager**
    ```bash
-   az keyvault create \
-     --name unified-health-kv \
-     --resource-group unified-health-rg \
-     --enable-rbac-authorization
+   aws secretsmanager create-secret \
+     --name unified-health/production \
+     --description "Production secrets for UnifiedHealth API"
    ```
 
-4. **Azure Database for PostgreSQL**
+4. **Amazon RDS for PostgreSQL**
    ```bash
-   az postgres flexible-server create \
-     --resource-group unified-health-rg \
-     --name unified-health-db \
-     --sku-name Standard_D4s_v3 \
-     --tier GeneralPurpose \
-     --version 15
+   aws rds create-db-instance \
+     --db-instance-identifier unified-health-db \
+     --db-instance-class db.r6g.large \
+     --engine postgres \
+     --engine-version 15 \
+     --master-username admin \
+     --master-user-password <password> \
+     --allocated-storage 100
    ```
 
 ### Required Kubernetes Components
 
-1. **NGINX Ingress Controller**
+1. **AWS Load Balancer Controller**
    ```bash
-   helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-   helm install ingress-nginx ingress-nginx/ingress-nginx \
-     --namespace ingress-nginx \
-     --create-namespace \
-     --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-request-path"=/healthz
+   helm repo add eks https://aws.github.io/eks-charts
+   helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
+     --namespace kube-system \
+     --set clusterName=unified-health-eks \
+     --set serviceAccount.create=false \
+     --set serviceAccount.name=aws-load-balancer-controller
    ```
 
 2. **cert-manager**
@@ -143,12 +166,14 @@ This Kubernetes configuration provides:
      --set installCRDs=true
    ```
 
-3. **Azure Workload Identity**
+3. **AWS Secrets Store CSI Driver**
    ```bash
-   helm repo add azure-workload-identity https://azure.github.io/azure-workload-identity/charts
-   helm install workload-identity-webhook azure-workload-identity/workload-identity-webhook \
-     --namespace azure-workload-identity-system \
-     --create-namespace
+   helm repo add secrets-store-csi-driver https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts
+   helm install csi-secrets-store secrets-store-csi-driver/secrets-store-csi-driver \
+     --namespace kube-system
+
+   # Install AWS provider
+   kubectl apply -f https://raw.githubusercontent.com/aws/secrets-store-csi-driver-provider-aws/main/deployment/aws-provider-installer.yaml
    ```
 
 ## Directory Structure
@@ -158,8 +183,8 @@ infrastructure/kubernetes/
 ├── base/                           # Base configurations
 │   ├── namespace.yaml             # Namespace definition
 │   ├── configmap.yaml             # Application configuration
-│   ├── secrets.yaml               # Secrets template (from Azure Key Vault)
-│   ├── service-account.yaml       # Service account with Azure Workload Identity
+│   ├── secrets.yaml               # Secrets template (from AWS Secrets Manager)
+│   ├── service-account.yaml       # Service account with AWS IRSA
 │   ├── api-deployment.yaml        # API deployment
 │   ├── api-service.yaml           # ClusterIP service
 │   ├── ingress.yaml               # NGINX ingress with TLS
@@ -172,6 +197,9 @@ infrastructure/kubernetes/
 │   └── production/
 │       ├── kustomization.yaml     # Production-specific patches
 │       └── production-pdb.yaml    # Production PDB override
+├── cert-manager/                   # Certificate management
+│   ├── dns01-clusterissuer-aws.yaml # Route 53 DNS01 challenge
+│   └── http01-clusterissuer.yaml    # HTTP01 challenge issuer
 └── README.md                       # This file
 ```
 
@@ -189,7 +217,7 @@ Non-sensitive application configuration including:
 
 ### 2. Secrets (base/secrets.yaml)
 
-Template for sensitive data (populated from Azure Key Vault):
+Template for sensitive data (populated from AWS Secrets Manager):
 - Database credentials
 - JWT secrets
 - Redis password
@@ -200,9 +228,9 @@ Template for sensitive data (populated from Azure Key Vault):
 ### 3. Service Account (base/service-account.yaml)
 
 Service account with:
-- Azure Workload Identity annotations
+- AWS IRSA (IAM Roles for Service Accounts) annotations
 - RBAC roles and bindings
-- Key Vault access permissions
+- Secrets Manager access permissions
 
 ### 4. Deployment (base/api-deployment.yaml)
 
@@ -248,96 +276,90 @@ PDB configuration:
 
 ## Deployment Process
 
-### Step 1: Connect to AKS Cluster
+### Step 1: Connect to EKS Cluster
 
 ```bash
-# Get AKS credentials
-az aks get-credentials \
-  --resource-group unified-health-rg \
-  --name unified-health-aks
+# Update kubeconfig for EKS
+aws eks update-kubeconfig \
+  --region us-east-1 \
+  --name unified-health-eks
 
 # Verify connection
 kubectl cluster-info
 kubectl get nodes
 ```
 
-### Step 2: Configure Azure Workload Identity
+### Step 2: Configure AWS IRSA (IAM Roles for Service Accounts)
 
 ```bash
 # Get OIDC issuer URL
-export AKS_OIDC_ISSUER=$(az aks show \
-  --resource-group unified-health-rg \
-  --name unified-health-aks \
-  --query "oidcIssuerProfile.issuerUrl" \
-  --output tsv)
+export OIDC_PROVIDER=$(aws eks describe-cluster \
+  --name unified-health-eks \
+  --query "cluster.identity.oidc.issuer" \
+  --output text | sed 's|https://||')
 
-# Create Azure AD application
-export APP_NAME="unified-health-api"
-az ad app create --display-name "${APP_NAME}"
-
-export APPLICATION_CLIENT_ID=$(az ad app list \
-  --display-name "${APP_NAME}" \
-  --query "[0].appId" \
-  --output tsv)
-
-# Create service principal
-az ad sp create --id "${APPLICATION_CLIENT_ID}"
-
-# Create federated identity credential
-cat <<EOF > federated-identity.json
+# Create IAM policy for the service account
+cat <<EOF > iam-policy.json
 {
-  "name": "unified-health-api-federated-identity",
-  "issuer": "${AKS_OIDC_ISSUER}",
-  "subject": "system:serviceaccount:unified-health:unified-health-api",
-  "audiences": [
-    "api://AzureADTokenExchange"
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:DescribeSecret"
+      ],
+      "Resource": "arn:aws:secretsmanager:*:*:secret:unified-health/*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:DeleteObject"
+      ],
+      "Resource": "arn:aws:s3:::unified-health-*/*"
+    }
   ]
 }
 EOF
 
-az ad app federated-credential create \
-  --id "${APPLICATION_CLIENT_ID}" \
-  --parameters @federated-identity.json
+aws iam create-policy \
+  --policy-name unified-health-api-policy \
+  --policy-document file://iam-policy.json
 
-# Grant Key Vault permissions
-export KEY_VAULT_NAME="unified-health-kv"
-export SERVICE_PRINCIPAL_ID=$(az ad sp list \
-  --display-name "${APP_NAME}" \
-  --query "[0].id" \
-  --output tsv)
-
-az role assignment create \
-  --role "Key Vault Secrets User" \
-  --assignee "${SERVICE_PRINCIPAL_ID}" \
-  --scope "/subscriptions/${AZURE_SUBSCRIPTION_ID}/resourceGroups/unified-health-rg/providers/Microsoft.KeyVault/vaults/${KEY_VAULT_NAME}"
+# Create IAM role with IRSA
+eksctl create iamserviceaccount \
+  --name unified-health-api \
+  --namespace unified-health \
+  --cluster unified-health-eks \
+  --attach-policy-arn arn:aws:iam::${AWS_ACCOUNT_ID}:policy/unified-health-api-policy \
+  --approve \
+  --override-existing-serviceaccounts
 ```
 
-### Step 3: Populate Secrets in Azure Key Vault
+### Step 3: Populate Secrets in AWS Secrets Manager
 
 ```bash
 # Database credentials
-az keyvault secret set \
-  --vault-name unified-health-kv \
-  --name database-url \
-  --value "postgresql://user:password@host:5432/dbname?sslmode=require"
+aws secretsmanager create-secret \
+  --name unified-health/database \
+  --secret-string '{"url":"postgresql://user:password@host:5432/dbname?sslmode=require"}'
 
 # JWT secret
-az keyvault secret set \
-  --vault-name unified-health-kv \
-  --name jwt-secret \
-  --value "$(openssl rand -base64 32)"
+aws secretsmanager create-secret \
+  --name unified-health/jwt \
+  --secret-string "{\"secret\":\"$(openssl rand -base64 32)\"}"
 
 # Redis password
-az keyvault secret set \
-  --vault-name unified-health-kv \
-  --name redis-password \
-  --value "$(openssl rand -base64 32)"
+aws secretsmanager create-secret \
+  --name unified-health/redis \
+  --secret-string "{\"password\":\"$(openssl rand -base64 32)\"}"
 
 # Encryption key
-az keyvault secret set \
-  --vault-name unified-health-kv \
-  --name encryption-key \
-  --value "$(openssl rand -base64 32)"
+aws secretsmanager create-secret \
+  --name unified-health/encryption \
+  --secret-string "{\"key\":\"$(openssl rand -base64 32)\"}"
 
 # Add other secrets as needed...
 ```
@@ -346,9 +368,8 @@ az keyvault secret set \
 
 ```bash
 # Set environment variables
-export ACR_LOGIN_SERVER="acrunifiedhealthdev2.azurecr.io"
-export AZURE_CLIENT_ID="${APPLICATION_CLIENT_ID}"
-export AZURE_TENANT_ID="$(az account show --query tenantId -o tsv)"
+export ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com"
+export AWS_IAM_ROLE_ARN="arn:aws:iam::${AWS_ACCOUNT_ID}:role/unified-health-api-role"
 
 # Build and apply staging configuration
 cd infrastructure/kubernetes/overlays/staging
@@ -462,13 +483,13 @@ Service account permissions:
 - Service discovery (endpoints, services, pods)
 - Event creation for logging
 
-### Azure Workload Identity
+### AWS IRSA (IAM Roles for Service Accounts)
 
 Benefits:
-- No service principal credentials stored in cluster
+- No AWS credentials stored in cluster
 - Automatic token rotation
-- Integration with Azure Key Vault
-- Fine-grained RBAC in Azure
+- Integration with AWS Secrets Manager
+- Fine-grained IAM policies
 
 ### Pod Security
 
@@ -539,14 +560,14 @@ kubectl logs <pod-name> -n unified-health-production
 #### Image Pull Errors
 
 ```bash
-# Verify ACR access
-az acr login --name acrunifiedhealthdev2
+# Verify ECR access
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com
 
-# Attach ACR to AKS
-az aks update \
-  --resource-group rg-unified-health-dev2 \
-  --name unified-health-aks \
-  --attach-acr acrunifiedhealthdev2
+# Create ECR pull secret
+kubectl create secret docker-registry ecr-secret \
+  --docker-server=${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com \
+  --docker-username=AWS \
+  --docker-password=$(aws ecr get-login-password --region us-east-1)
 ```
 
 #### Ingress Not Working
@@ -576,21 +597,21 @@ kubectl run -it --rm debug \
   -- psql "$DATABASE_URL"
 ```
 
-#### Azure Workload Identity Issues
+#### AWS IRSA Issues
 
 ```bash
 # Verify service account
 kubectl get sa unified-health-api -n unified-health-production -o yaml
 
-# Check federated identity
-az ad app federated-credential list --id "${APPLICATION_CLIENT_ID}"
+# Check IAM role association
+kubectl describe sa unified-health-api -n unified-health-production | grep eks.amazonaws.com
 
-# Test Key Vault access
-kubectl run -it --rm test-workload-identity \
-  --image=mcr.microsoft.com/azure-cli \
+# Test Secrets Manager access
+kubectl run -it --rm test-irsa \
+  --image=amazon/aws-cli \
   --serviceaccount=unified-health-api \
   --namespace=unified-health-production \
-  -- az keyvault secret list --vault-name unified-health-kv
+  -- aws secretsmanager list-secrets
 ```
 
 ## Maintenance
@@ -652,18 +673,61 @@ kubectl apply -f base/ingress.yaml
 
 1. **Version Control**: Always commit configuration changes to Git
 2. **GitOps**: Use ArgoCD or Flux for automated deployments
-3. **Secrets Management**: Never commit secrets to Git, use Azure Key Vault
+3. **Secrets Management**: Never commit secrets to Git, use AWS Secrets Manager
 4. **Testing**: Test in staging before deploying to production
-5. **Monitoring**: Set up alerts for critical metrics
-6. **Backup**: Regular backups of cluster state and data
+5. **Monitoring**: Set up CloudWatch alarms for critical metrics
+6. **Backup**: Regular backups using AWS Backup for EBS, RDS, and S3
 7. **Documentation**: Keep runbooks updated
 8. **Compliance**: Regular security audits and compliance checks
+9. **Cost Optimization**: Use Spot instances for non-critical workloads
+10. **Multi-Region**: Deploy across regions for disaster recovery
+
+## Multi-Region Deployment
+
+The platform supports deployment across multiple AWS regions for compliance and latency optimization:
+
+### Supported Regions
+
+| Region | AWS Region | Primary Use Case | Compliance |
+|--------|------------|------------------|------------|
+| Americas | us-east-1 | North/South America | HIPAA, SOC2 |
+| Europe | eu-west-1 | European Union | GDPR, ISO27001 |
+| Africa | af-south-1 | African continent | POPIA, ISO27001 |
+
+### Region-Specific Deployment
+
+```bash
+# Americas (US East)
+aws eks update-kubeconfig --region us-east-1 --name unified-health-dev-americas-eks
+kubectl apply -k overlays/production
+
+# Europe (Ireland)
+aws eks update-kubeconfig --region eu-west-1 --name unified-health-dev-europe-eks
+kubectl apply -k overlays/production
+
+# Africa (Cape Town)
+aws eks update-kubeconfig --region af-south-1 --name unified-health-dev-africa-eks
+kubectl apply -k overlays/production
+```
+
+### Cross-Region Considerations
+
+- **Data Residency**: Ensure data stays within regional boundaries for compliance
+- **ECR Replication**: Container images are automatically replicated across regions
+- **Route 53**: Configure latency-based or geolocation routing
+- **Database**: Use RDS read replicas for cross-region read access
+- **Secrets**: Replicate secrets to each region via AWS Secrets Manager
 
 ## Additional Resources
 
 - [Kubernetes Documentation](https://kubernetes.io/docs/)
 - [Kustomize Documentation](https://kustomize.io/)
-- [Azure Workload Identity](https://azure.github.io/azure-workload-identity/)
+- [Amazon EKS Documentation](https://docs.aws.amazon.com/eks/latest/userguide/)
+- [AWS IRSA](https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html)
+- [AWS Load Balancer Controller](https://kubernetes-sigs.github.io/aws-load-balancer-controller/)
+- [Amazon ECR Documentation](https://docs.aws.amazon.com/ecr/)
+- [Amazon Route 53 Documentation](https://docs.aws.amazon.com/Route53/)
+- [AWS Secrets Manager](https://docs.aws.amazon.com/secretsmanager/)
 - [NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/)
 - [cert-manager Documentation](https://cert-manager.io/)
 
@@ -676,5 +740,5 @@ For issues or questions:
 
 ---
 
-**Last Updated**: 2025-12-17
-**Version**: 1.0.0
+**Last Updated**: 2025-12-29
+**Version**: 2.0.0 (AWS)

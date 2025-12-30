@@ -37,7 +37,7 @@ replicas:
 # Production images with specific version tags
 images:
   - name: unified-health-api
-    newName: ${ACR_LOGIN_SERVER}/unified-health-api
+    newName: ${ECR_REGISTRY}/unified-health-api
     newTag: v1.0.0  # Use specific version tags in production
 
 # Patches for production
@@ -141,17 +141,14 @@ patches:
         path: /data/database-pool-size
         value: "50"
 
-  # Patch Service Account for production Azure identity
+  # Patch Service Account for production AWS IRSA
   - target:
       kind: ServiceAccount
       name: unified-health-api
     patch: |-
       - op: replace
-        path: /metadata/annotations/azure.workload.identity~1client-id
-        value: "${AZURE_PROD_CLIENT_ID}"
-      - op: replace
-        path: /metadata/annotations/azure.workload.identity~1tenant-id
-        value: "${AZURE_PROD_TENANT_ID}"
+        path: /metadata/annotations/eks.amazonaws.com~1role-arn
+        value: "${AWS_PROD_IAM_ROLE_ARN}"
 
 # ConfigMap generator for production-specific config
 configMapGenerator:
@@ -195,8 +192,10 @@ patchesStrategicMerge:
                       - key: node.kubernetes.io/instance-type
                         operator: In
                         values:
-                          - Standard_D4s_v5
-                          - Standard_D8s_v5
+                          - m5.xlarge
+                          - m5.2xlarge
+                          - m6i.xlarge
+                          - m6i.2xlarge
           # Production-specific tolerations
           tolerations:
             - key: "production"

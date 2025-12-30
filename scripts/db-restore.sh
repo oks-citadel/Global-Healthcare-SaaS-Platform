@@ -2,7 +2,7 @@
 # ============================================
 # UnifiedHealth Platform - Database Restore
 # ============================================
-# This script restores a PostgreSQL database from backup
+# This script restores a PostgreSQL database from backup in S3
 # Usage: ./scripts/db-restore.sh [backup_name] [environment]
 
 set -euo pipefail
@@ -17,10 +17,11 @@ NC='\033[0m' # No Color
 # Configuration
 BACKUP_NAME="${1:-}"
 ENVIRONMENT="${2:-production}"
-RESOURCE_GROUP="unified-health-rg-${ENVIRONMENT}"
-POSTGRES_SERVER="unified-health-postgres-${ENVIRONMENT}"
-STORAGE_ACCOUNT="unifiedhealthsa${ENVIRONMENT}"
-KEYVAULT_NAME="unified-health-kv-${ENVIRONMENT}"
+AWS_REGION="${AWS_REGION:-us-east-1}"
+AWS_ACCOUNT_ID="${AWS_ACCOUNT_ID:-$(aws sts get-caller-identity --query Account --output text 2>/dev/null || echo '')}"
+PROJECT_NAME="unified-health"
+RDS_INSTANCE="${PROJECT_NAME}-rds-${ENVIRONMENT}"
+S3_BUCKET="${PROJECT_NAME}-${ENVIRONMENT}-${AWS_ACCOUNT_ID}"
 RESTORE_DIR="/tmp/restore-${BACKUP_NAME}"
 
 # Log functions
@@ -50,12 +51,18 @@ error_exit() {
 check_prerequisites() {
     log_info "Checking prerequisites..."
 
-    command -v az >/dev/null 2>&1 || error_exit "Azure CLI is not installed"
+    command -v aws >/dev/null 2>&1 || error_exit "AWS CLI is not installed"
     command -v pg_restore >/dev/null 2>&1 || error_exit "pg_restore is not installed"
     command -v psql >/dev/null 2>&1 || error_exit "psql is not installed"
 
-    # Check Azure login
-    az account show >/dev/null 2>&1 || error_exit "Not logged in to Azure. Run 'az login'"
+    # Check AWS credentials
+    aws sts get-caller-identity >/dev/null 2>&1 || error_exit "Not authenticated with AWS. Run 'aws configure' or 'aws sso login'"
+
+    # Get AWS Account ID if not set
+    if [ -z "${AWS_ACCOUNT_ID}" ]; then
+        AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+        S3_BUCKET="${PROJECT_NAME}-${ENVIRONMENT}-${AWS_ACCOUNT_ID}"
+    fi
 
     log_success "Prerequisites check passed"
 }
@@ -73,32 +80,29 @@ get_backup_name() {
         fi
     fi
 
+    # Update restore directory
+    RESTORE_DIR="/tmp/restore-${BACKUP_NAME}"
+
     log_info "Backup to restore: ${BACKUP_NAME}"
 }
 
 # List available backups
 list_available_backups() {
-    log_info "Available backups:"
+    log_info "Available backups in S3:"
 
-    # Get storage account key
-    STORAGE_KEY=$(az keyvault secret show \
-        --vault-name "${KEYVAULT_NAME}" \
-        --name "storage-account-key" \
-        --query value -o tsv) || error_exit "Failed to get storage account key"
+    aws s3api list-objects-v2 \
+        --bucket "${S3_BUCKET}" \
+        --prefix "backups/backup-${ENVIRONMENT}-" \
+        --region "${AWS_REGION}" \
+        --query "Contents[?ends_with(Key, '.tar.gz')].{Key:Key, LastModified:LastModified, Size:Size}" \
+        --output table | head -n 25
 
-    az storage blob list \
-        --account-name "${STORAGE_ACCOUNT}" \
-        --account-key "${STORAGE_KEY}" \
-        --container-name "backups" \
-        --prefix "backup-${ENVIRONMENT}-" \
-        --query "[?ends_with(name, '.tar.gz')].{Name:name, LastModified:properties.lastModified, Size:properties.contentLength}" \
-        --output table | head -n 20
-
-    # Get latest backup from Key Vault
-    LATEST_BACKUP=$(az keyvault secret show \
-        --vault-name "${KEYVAULT_NAME}" \
-        --name "latest-backup-${ENVIRONMENT}" \
-        --query value -o tsv 2>/dev/null || echo "")
+    # Get latest backup from Secrets Manager
+    LATEST_BACKUP=$(aws secretsmanager get-secret-value \
+        --secret-id "${PROJECT_NAME}/${ENVIRONMENT}/latest-backup" \
+        --region "${AWS_REGION}" \
+        --query SecretString \
+        --output text 2>/dev/null || echo "")
 
     if [ -n "${LATEST_BACKUP}" ]; then
         log_info "Latest backup: ${LATEST_BACKUP}"
@@ -111,7 +115,8 @@ confirm_restore() {
     log_warning "DATABASE RESTORE"
     log_warning "Environment: ${ENVIRONMENT}"
     log_warning "Backup: ${BACKUP_NAME}"
-    log_warning "Server: ${POSTGRES_SERVER}"
+    log_warning "RDS Instance: ${RDS_INSTANCE}"
+    log_warning "AWS Region: ${AWS_REGION}"
     log_warning "=========================================="
     log_warning "This will OVERWRITE the current database!"
     log_warning "Make sure you have a recent backup before proceeding."
@@ -125,32 +130,33 @@ confirm_restore() {
     fi
 }
 
-# Get database credentials
+# Get database credentials from Secrets Manager
 get_database_credentials() {
-    log_info "Getting database credentials..."
+    log_info "Getting database credentials from Secrets Manager..."
 
-    # Get admin password from Key Vault
-    POSTGRES_PASSWORD=$(az keyvault secret show \
-        --vault-name "${KEYVAULT_NAME}" \
-        --name "postgres-admin-password" \
-        --query value -o tsv) || error_exit "Failed to get PostgreSQL password"
+    # Get admin password from Secrets Manager
+    POSTGRES_PASSWORD=$(aws secretsmanager get-secret-value \
+        --secret-id "${PROJECT_NAME}/${ENVIRONMENT}/rds-admin-password" \
+        --region "${AWS_REGION}" \
+        --query SecretString \
+        --output text) || error_exit "Failed to get PostgreSQL password from Secrets Manager"
 
-    POSTGRES_HOST="${POSTGRES_SERVER}.postgres.database.azure.com"
+    # Get RDS endpoint
+    POSTGRES_HOST=$(aws rds describe-db-instances \
+        --db-instance-identifier "${RDS_INSTANCE}" \
+        --region "${AWS_REGION}" \
+        --query 'DBInstances[0].Endpoint.Address' \
+        --output text) || error_exit "Failed to get RDS endpoint"
+
     POSTGRES_USER="unifiedhealthadmin"
     POSTGRES_PORT="5432"
 
     log_success "Database credentials retrieved"
 }
 
-# Download backup from Azure
+# Download backup from S3
 download_backup() {
-    log_info "Downloading backup from Azure Blob Storage..."
-
-    # Get storage account key
-    STORAGE_KEY=$(az keyvault secret show \
-        --vault-name "${KEYVAULT_NAME}" \
-        --name "storage-account-key" \
-        --query value -o tsv) || error_exit "Failed to get storage account key"
+    log_info "Downloading backup from S3..."
 
     # Create restore directory
     mkdir -p "${RESTORE_DIR}" || error_exit "Failed to create restore directory"
@@ -159,20 +165,16 @@ download_backup() {
     CHECKSUM_FILE="${RESTORE_DIR}/${BACKUP_NAME}.tar.gz.sha256"
 
     # Download backup
-    az storage blob download \
-        --account-name "${STORAGE_ACCOUNT}" \
-        --account-key "${STORAGE_KEY}" \
-        --container-name "backups" \
-        --name "${BACKUP_NAME}.tar.gz" \
-        --file "${BACKUP_FILE}" || error_exit "Failed to download backup"
+    aws s3 cp \
+        "s3://${S3_BUCKET}/backups/${BACKUP_NAME}.tar.gz" \
+        "${BACKUP_FILE}" \
+        --region "${AWS_REGION}" || error_exit "Failed to download backup from S3"
 
     # Download checksum
-    az storage blob download \
-        --account-name "${STORAGE_ACCOUNT}" \
-        --account-key "${STORAGE_KEY}" \
-        --container-name "backups" \
-        --name "${BACKUP_NAME}.tar.gz.sha256" \
-        --file "${CHECKSUM_FILE}" || log_warning "Checksum file not found"
+    aws s3 cp \
+        "s3://${S3_BUCKET}/backups/${BACKUP_NAME}.tar.gz.sha256" \
+        "${CHECKSUM_FILE}" \
+        --region "${AWS_REGION}" || log_warning "Checksum file not found"
 
     log_success "Backup downloaded"
 }
@@ -341,19 +343,22 @@ verify_restore() {
     log_success "Restore verified"
 }
 
-# Point-in-time recovery
+# Point-in-time recovery using RDS
 point_in_time_recovery() {
     if [ -n "${PITR_TARGET_TIME:-}" ]; then
         log_info "Performing point-in-time recovery to ${PITR_TARGET_TIME}..."
 
-        az postgres flexible-server restore \
-            --resource-group "${RESOURCE_GROUP}" \
-            --name "${POSTGRES_SERVER}-pitr-$(date +%Y%m%d-%H%M%S)" \
-            --source-server "${POSTGRES_SERVER}" \
-            --restore-time "${PITR_TARGET_TIME}" || error_exit "Point-in-time recovery failed"
+        NEW_INSTANCE="${RDS_INSTANCE}-pitr-$(date +%Y%m%d-%H%M%S)"
 
-        log_success "Point-in-time recovery completed"
-        log_warning "A new server has been created. You need to manually switch to it."
+        aws rds restore-db-instance-to-point-in-time \
+            --source-db-instance-identifier "${RDS_INSTANCE}" \
+            --target-db-instance-identifier "${NEW_INSTANCE}" \
+            --restore-time "${PITR_TARGET_TIME}" \
+            --region "${AWS_REGION}" || error_exit "Point-in-time recovery failed"
+
+        log_success "Point-in-time recovery initiated"
+        log_warning "A new RDS instance '${NEW_INSTANCE}' is being created."
+        log_warning "You need to manually switch to it once available."
     fi
 }
 
@@ -371,6 +376,12 @@ restart_application() {
     log_info "Restarting application pods..."
 
     NAMESPACE="unified-health-${ENVIRONMENT}"
+    EKS_CLUSTER="${PROJECT_NAME}-eks-${ENVIRONMENT}"
+
+    # Update kubeconfig
+    aws eks update-kubeconfig \
+        --region "${AWS_REGION}" \
+        --name "${EKS_CLUSTER}" 2>/dev/null || log_warning "Failed to get EKS credentials"
 
     kubectl rollout restart deployment/unified-health-api -n "${NAMESPACE}" 2>/dev/null || log_warning "Failed to restart API deployment"
 
@@ -397,6 +408,15 @@ send_notification() {
                 }]
             }" || log_warning "Failed to send notification"
     fi
+
+    # SNS notification
+    if [ -n "${SNS_TOPIC_ARN:-}" ]; then
+        aws sns publish \
+            --topic-arn "${SNS_TOPIC_ARN}" \
+            --subject "Database Restore ${status}" \
+            --message "Restore from ${BACKUP_NAME} completed for ${ENVIRONMENT}" \
+            --region "${AWS_REGION}" || log_warning "Failed to send SNS notification"
+    fi
 }
 
 # Output summary
@@ -406,7 +426,7 @@ output_summary() {
     log_success "=========================================="
     log_info "Backup: ${BACKUP_NAME}"
     log_info "Environment: ${ENVIRONMENT}"
-    log_info "Server: ${POSTGRES_SERVER}"
+    log_info "RDS Instance: ${RDS_INSTANCE}"
     log_success "=========================================="
 }
 
@@ -414,6 +434,7 @@ output_summary() {
 main() {
     log_info "Starting database restore..."
     log_info "Environment: ${ENVIRONMENT}"
+    log_info "AWS Region: ${AWS_REGION}"
 
     check_prerequisites
     get_backup_name

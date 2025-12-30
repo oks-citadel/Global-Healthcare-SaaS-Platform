@@ -167,11 +167,11 @@ export const securityConfig = {
     // Key rotation interval (days)
     keyRotationInterval: 90,
 
-    // Azure Key Vault configuration
-    keyVault: {
-      url: process.env.AZURE_KEY_VAULT_URL,
-      keyName: process.env.AZURE_KEY_VAULT_KEY_NAME || 'phi-encryption-key',
-      enabled: process.env.AZURE_KEY_VAULT_ENABLED === 'true',
+    // AWS Secrets Manager configuration
+    secretsManager: {
+      region: process.env.AWS_REGION || 'us-east-1',
+      keyName: process.env.AWS_SECRET_NAME || 'phi-encryption-key',
+      enabled: process.env.AWS_SECRETS_MANAGER_ENABLED === 'true',
     },
   },
 
@@ -588,9 +588,9 @@ export function validateSecurityConfig(): {
     errors.push('Encryption key must be at least 32 characters (256 bits for AES-256)');
   }
 
-  // Check Azure Key Vault configuration
-  if (securityConfig.encryption.keyVault.enabled && !securityConfig.encryption.keyVault.url) {
-    errors.push('Azure Key Vault URL must be set when Key Vault is enabled');
+  // Check AWS Secrets Manager configuration
+  if (securityConfig.encryption.secretsManager.enabled && !process.env.AWS_ACCESS_KEY_ID) {
+    errors.push('AWS credentials must be set when Secrets Manager is enabled');
   }
 
   // Check CORS origins

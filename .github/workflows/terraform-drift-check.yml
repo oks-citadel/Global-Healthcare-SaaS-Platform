@@ -1,0 +1,252 @@
+# ============================================
+# Terraform Drift Detection Workflow
+# ============================================
+# Runs scheduled drift checks to ensure
+# infrastructure matches Terraform state
+# ============================================
+
+name: Terraform Drift Check
+
+on:
+  schedule:
+    # Run every 6 hours
+    - cron: '0 */6 * * *'
+
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to check'
+        required: true
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+          - all
+
+env:
+  TF_VERSION: "1.6.0"
+  TF_WORKING_DIR: "infrastructure/terraform-aws"
+  AWS_REGION: "us-east-1"
+
+permissions:
+  id-token: write
+  contents: read
+  issues: write
+
+jobs:
+  drift-check-dev:
+    name: Drift Check (Dev)
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'schedule' ||
+      github.event.inputs.environment == 'dev' ||
+      github.event.inputs.environment == 'all'
+    environment: dev
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN_DEV }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Terraform Init
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          terraform init \
+            -backend-config="bucket=${{ secrets.TF_STATE_BUCKET }}" \
+            -backend-config="key=env/dev/terraform.tfstate" \
+            -backend-config="region=${{ env.AWS_REGION }}" \
+            -backend-config="dynamodb_table=${{ secrets.TF_LOCK_TABLE }}"
+
+      - name: Terraform Plan (Drift Detection)
+        id: plan
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          terraform plan \
+            -var-file=environments/dev.tfvars \
+            -detailed-exitcode \
+            -no-color \
+            -out=drift-check.tfplan 2>&1 | tee plan-output.txt
+          echo "exitcode=$?" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Check for Drift
+        id: drift
+        run: |
+          if [ "${{ steps.plan.outputs.exitcode }}" == "2" ]; then
+            echo "drift_detected=true" >> $GITHUB_OUTPUT
+            echo "::warning::Drift detected in Dev environment!"
+          else
+            echo "drift_detected=false" >> $GITHUB_OUTPUT
+            echo "No drift detected"
+          fi
+
+      - name: Create Issue for Drift
+        if: steps.drift.outputs.drift_detected == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const planOutput = fs.readFileSync('${{ env.TF_WORKING_DIR }}/plan-output.txt', 'utf8');
+
+            const truncatedOutput = planOutput.length > 60000
+              ? planOutput.substring(0, 60000) + '\n\n... (truncated)'
+              : planOutput;
+
+            const title = `[DRIFT] Infrastructure drift detected in Dev environment`;
+            const body = `## Infrastructure Drift Detected
+
+            **Environment:** Dev
+            **Detected:** ${new Date().toISOString()}
+
+            ### Terraform Plan Output
+
+            \`\`\`
+            ${truncatedOutput}
+            \`\`\`
+
+            ### Action Required
+
+            Review the drift and either:
+            1. Update Terraform code to match desired state
+            2. Run \`terraform apply\` to remediate drift
+            3. Mark as acceptable if drift is expected
+
+            cc: @platform-team`;
+
+            // Check for existing open drift issues
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'drift,dev'
+            });
+
+            if (issues.data.length === 0) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: title,
+                body: body,
+                labels: ['drift', 'dev', 'infrastructure']
+              });
+            } else {
+              // Update existing issue
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issues.data[0].number,
+                body: `### New Drift Detection - ${new Date().toISOString()}\n\n${body}`
+              });
+            }
+
+  drift-check-staging:
+    name: Drift Check (Staging)
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'schedule' ||
+      github.event.inputs.environment == 'staging' ||
+      github.event.inputs.environment == 'all'
+    environment: staging
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN_STAGING }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Terraform Init
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          terraform init \
+            -backend-config="bucket=${{ secrets.TF_STATE_BUCKET }}" \
+            -backend-config="key=env/staging/terraform.tfstate" \
+            -backend-config="region=${{ env.AWS_REGION }}" \
+            -backend-config="dynamodb_table=${{ secrets.TF_LOCK_TABLE }}"
+
+      - name: Terraform Plan (Drift Detection)
+        id: plan
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          terraform plan \
+            -var-file=environments/staging.tfvars \
+            -detailed-exitcode \
+            -no-color
+          echo "exitcode=$?" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Alert on Drift
+        if: steps.plan.outputs.exitcode == '2'
+        run: |
+          echo "::error::DRIFT DETECTED in Staging environment!"
+          echo "Review Terraform plan output and remediate."
+
+  drift-check-prod:
+    name: Drift Check (Prod)
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'schedule' ||
+      github.event.inputs.environment == 'prod' ||
+      github.event.inputs.environment == 'all'
+    environment: prod
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN_PROD }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Terraform Init
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          terraform init \
+            -backend-config="bucket=${{ secrets.TF_STATE_BUCKET }}" \
+            -backend-config="key=env/prod/terraform.tfstate" \
+            -backend-config="region=${{ env.AWS_REGION }}" \
+            -backend-config="dynamodb_table=${{ secrets.TF_LOCK_TABLE }}"
+
+      - name: Terraform Plan (Drift Detection)
+        id: plan
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          terraform plan \
+            -var-file=environments/prod.tfvars \
+            -detailed-exitcode \
+            -no-color
+          echo "exitcode=$?" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Critical Alert on Prod Drift
+        if: steps.plan.outputs.exitcode == '2'
+        run: |
+          echo "::error::CRITICAL: DRIFT DETECTED in Production!"
+          echo "Immediate review required."
+          # In a real scenario, this would trigger PagerDuty/OpsGenie

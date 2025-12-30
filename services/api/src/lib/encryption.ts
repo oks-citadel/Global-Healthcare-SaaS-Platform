@@ -1,13 +1,19 @@
 import crypto from 'crypto';
 import { config } from '../config/index.js';
-import { SecretClient } from '@azure/keyvault-secrets';
-import { DefaultAzureCredential } from '@azure/identity';
+import {
+  SecretsManagerClient,
+  GetSecretValueCommand,
+  CreateSecretCommand,
+  UpdateSecretCommand,
+  DescribeSecretCommand,
+} from '@aws-sdk/client-secrets-manager';
+import { KMSClient, GenerateDataKeyCommand, DecryptCommand } from '@aws-sdk/client-kms';
 import { logger, logSecurityEvent } from '../utils/logger.js';
 
 /**
  * HIPAA-Compliant Encryption Library
  * Implements AES-256-GCM encryption for PHI data
- * Compliant with HIPAA Encryption Standard (45 CFR § 164.312(a)(2)(iv))
+ * Compliant with HIPAA Encryption Standard (45 CFR SS 164.312(a)(2)(iv))
  */
 
 // AES-256-GCM configuration
@@ -135,9 +141,9 @@ export function decrypt(encryptedData: string, masterKey?: string): string {
  */
 export function hash(data: string, salt?: string): string {
   const saltBuffer = salt ? Buffer.from(salt, 'base64') : generateSalt();
-  const hash = crypto.pbkdf2Sync(data, saltBuffer, ITERATIONS, 64, 'sha256');
+  const hashResult = crypto.pbkdf2Sync(data, saltBuffer, ITERATIONS, 64, 'sha256');
 
-  return `${saltBuffer.toString('base64')}:${hash.toString('base64')}`;
+  return `${saltBuffer.toString('base64')}:${hashResult.toString('base64')}`;
 }
 
 /**
@@ -279,7 +285,7 @@ export function maskSensitiveData(
 }
 
 /**
- * Azure Key Vault Configuration and Client Management
+ * AWS Secrets Manager Configuration and Client Management
  */
 interface KeyCacheEntry {
   value: string;
@@ -294,8 +300,9 @@ export interface KeyRotationSchedule {
   nextRotation: number;
 }
 
-class AzureKeyVaultManager {
-  private client: SecretClient | null = null;
+class AWSSecretsManager {
+  private client: SecretsManagerClient | null = null;
+  private kmsClient: KMSClient | null = null;
   private keyCache: Map<string, KeyCacheEntry> = new Map();
   private rotationSchedules: Map<string, KeyRotationSchedule> = new Map();
   private readonly CACHE_TTL_MS = 3600000; // 1 hour
@@ -303,46 +310,51 @@ class AzureKeyVaultManager {
   private rotationTimers: Map<string, NodeJS.Timeout> = new Map();
 
   /**
-   * Initialize Azure Key Vault client with DefaultAzureCredential
-   * Uses managed identity in production, falls back to environment variables
+   * Initialize AWS Secrets Manager client
    */
-  private initializeClient(): SecretClient | null {
+  private initializeClient(): SecretsManagerClient | null {
     try {
-      const keyVaultUrl = config.azure?.keyVaultUrl || process.env.AZURE_KEY_VAULT_URL;
+      const region = process.env.AWS_REGION || 'us-east-1';
 
-      // Fallback to local keys in development
-      if (!keyVaultUrl) {
+      // Check for credentials
+      if (!process.env.AWS_ACCESS_KEY_ID || !process.env.AWS_SECRET_ACCESS_KEY) {
         if (config.env === 'development') {
-          logger.warn('Azure Key Vault URL not configured, using local encryption keys for development');
+          logger.warn('AWS credentials not configured, using local encryption keys for development');
           return null;
         } else {
-          throw new Error('Azure Key Vault URL is required in production environment');
+          throw new Error('AWS credentials are required in production environment');
         }
       }
 
-      // Initialize DefaultAzureCredential
-      // This automatically tries multiple authentication methods:
-      // 1. Environment variables (AZURE_TENANT_ID, AZURE_CLIENT_ID, AZURE_CLIENT_SECRET)
-      // 2. Managed Identity (in Azure environments)
-      // 3. Azure CLI credentials
-      // 4. Visual Studio Code credentials
-      const credential = new DefaultAzureCredential();
+      const client = new SecretsManagerClient({
+        region,
+        credentials: {
+          accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+        },
+      });
 
-      const client = new SecretClient(keyVaultUrl, credential);
+      this.kmsClient = new KMSClient({
+        region,
+        credentials: {
+          accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+        },
+      });
 
-      logger.info('Azure Key Vault client initialized successfully', {
-        keyVaultUrl: keyVaultUrl.replace(/https?:\/\//, '').split('.')[0] + '.***', // Mask URL
+      logger.info('AWS Secrets Manager client initialized successfully', {
+        region,
       });
 
       logSecurityEvent(
-        'KEY_VAULT_INITIALIZED',
+        'SECRETS_MANAGER_INITIALIZED',
         'low',
-        { keyVaultUrl: keyVaultUrl.split('.')[0] }
+        { region }
       );
 
       return client;
     } catch (error) {
-      logger.error('Failed to initialize Azure Key Vault client', {
+      logger.error('Failed to initialize AWS Secrets Manager client', {
         error: error instanceof Error ? error.message : 'Unknown error',
       });
 
@@ -355,9 +367,9 @@ class AzureKeyVaultManager {
   }
 
   /**
-   * Get or initialize the Key Vault client
+   * Get or initialize the Secrets Manager client
    */
-  private getClient(): SecretClient | null {
+  private getClient(): SecretsManagerClient | null {
     if (!this.client) {
       this.client = this.initializeClient();
     }
@@ -372,9 +384,9 @@ class AzureKeyVaultManager {
   }
 
   /**
-   * Retrieve encryption key from Azure Key Vault with caching
-   * @param keyName - Name of the key in Key Vault
-   * @param forceRefresh - Force refresh from Key Vault, bypassing cache
+   * Retrieve encryption key from AWS Secrets Manager with caching
+   * @param keyName - Name of the secret in Secrets Manager
+   * @param forceRefresh - Force refresh from Secrets Manager, bypassing cache
    * @returns Encryption key
    */
   async getEncryptionKey(keyName: string, forceRefresh: boolean = false): Promise<string> {
@@ -396,24 +408,38 @@ class AzureKeyVaultManager {
         return config.encryption.key;
       }
 
-      // Retrieve from Key Vault
-      logger.info('Retrieving encryption key from Azure Key Vault', { keyName });
+      // Retrieve from Secrets Manager
+      logger.info('Retrieving encryption key from AWS Secrets Manager', { keyName });
 
-      const secret = await client.getSecret(keyName);
+      const command = new GetSecretValueCommand({
+        SecretId: keyName,
+      });
 
-      if (!secret.value) {
-        throw new Error(`Key '${keyName}' has no value in Key Vault`);
+      const response = await client.send(command);
+      const secretValue = response.SecretString;
+
+      if (!secretValue) {
+        throw new Error(`Secret '${keyName}' has no value in Secrets Manager`);
+      }
+
+      // Parse JSON secret if applicable
+      let keyValue: string;
+      try {
+        const parsed = JSON.parse(secretValue);
+        keyValue = parsed.key || parsed.value || secretValue;
+      } catch {
+        keyValue = secretValue;
       }
 
       // Validate key length (must be at least 32 bytes for AES-256)
-      if (secret.value.length < 32) {
-        throw new Error(`Key '${keyName}' must be at least 32 characters for AES-256 encryption`);
+      if (keyValue.length < 32) {
+        throw new Error(`Secret '${keyName}' must be at least 32 characters for AES-256 encryption`);
       }
 
       // Cache the key
       const now = Date.now();
       this.keyCache.set(keyName, {
-        value: secret.value,
+        value: keyValue,
         timestamp: now,
         expiresAt: now + this.CACHE_TTL_MS,
       });
@@ -429,7 +455,7 @@ class AzureKeyVaultManager {
         { keyName, cached: false }
       );
 
-      return secret.value;
+      return keyValue;
     } catch (error) {
       logger.error('Failed to retrieve encryption key', {
         keyName,
@@ -463,16 +489,16 @@ class AzureKeyVaultManager {
   }
 
   /**
-   * Store encryption key in Azure Key Vault
-   * @param keyName - Name of the key
+   * Store encryption key in AWS Secrets Manager
+   * @param keyName - Name of the secret
    * @param keyValue - Key value to store
-   * @param contentType - Optional content type (default: 'application/x-encryption-key')
-   * @param tags - Optional tags for key metadata
+   * @param description - Optional description
+   * @param tags - Optional tags for secret metadata
    */
   async setEncryptionKey(
     keyName: string,
     keyValue: string,
-    contentType: string = 'application/x-encryption-key',
+    description?: string,
     tags?: Record<string, string>
   ): Promise<void> {
     try {
@@ -483,26 +509,56 @@ class AzureKeyVaultManager {
 
       const client = this.getClient();
 
-      // Skip Key Vault storage in development if not configured
+      // Skip Secrets Manager storage in development if not configured
       if (!client) {
-        logger.warn('Azure Key Vault not configured, key not stored remotely', { keyName });
+        logger.warn('AWS Secrets Manager not configured, key not stored remotely', { keyName });
         return;
       }
 
-      logger.info('Storing encryption key in Azure Key Vault', { keyName });
+      logger.info('Storing encryption key in AWS Secrets Manager', { keyName });
 
-      // Store in Key Vault with metadata
-      const secretOptions = {
-        contentType,
-        tags: {
-          createdAt: new Date().toISOString(),
-          environment: config.env,
-          purpose: 'encryption',
-          ...tags,
-        },
-      };
+      // Check if secret exists
+      let secretExists = false;
+      try {
+        await client.send(new DescribeSecretCommand({ SecretId: keyName }));
+        secretExists = true;
+      } catch (error: any) {
+        if (error.name !== 'ResourceNotFoundException') {
+          throw error;
+        }
+      }
 
-      await client.setSecret(keyName, keyValue, secretOptions);
+      const secretValue = JSON.stringify({
+        key: keyValue,
+        createdAt: new Date().toISOString(),
+        environment: config.env,
+        purpose: 'encryption',
+      });
+
+      if (secretExists) {
+        // Update existing secret
+        await client.send(new UpdateSecretCommand({
+          SecretId: keyName,
+          SecretString: secretValue,
+          Description: description,
+        }));
+      } else {
+        // Create new secret
+        const tagList = tags
+          ? Object.entries(tags).map(([Key, Value]) => ({ Key, Value }))
+          : [];
+
+        await client.send(new CreateSecretCommand({
+          Name: keyName,
+          SecretString: secretValue,
+          Description: description || `Encryption key for ${config.env} environment`,
+          Tags: [
+            { Key: 'Environment', Value: config.env },
+            { Key: 'Purpose', Value: 'encryption' },
+            ...tagList,
+          ],
+        }));
+      }
 
       // Update cache
       const now = Date.now();
@@ -556,17 +612,21 @@ class AzureKeyVaultManager {
       // Archive old key if requested and client is available
       if (archiveOldKey && client) {
         try {
-          const oldSecret = await client.getSecret(keyName);
-          if (oldSecret.value) {
+          const oldCommand = new GetSecretValueCommand({ SecretId: keyName });
+          const oldResponse = await client.send(oldCommand);
+
+          if (oldResponse.SecretString) {
             const archiveKeyName = `${keyName}-archived-${Date.now()}`;
-            await client.setSecret(archiveKeyName, oldSecret.value, {
-              contentType: 'application/x-encryption-key-archived',
-              tags: {
-                originalKeyName: keyName,
-                archivedAt: new Date().toISOString(),
-                reason: 'key-rotation',
-              },
-            });
+            await client.send(new CreateSecretCommand({
+              Name: archiveKeyName,
+              SecretString: oldResponse.SecretString,
+              Description: `Archived key from ${keyName}`,
+              Tags: [
+                { Key: 'OriginalKeyName', Value: keyName },
+                { Key: 'ArchivedAt', Value: new Date().toISOString() },
+                { Key: 'Reason', Value: 'key-rotation' },
+              ],
+            }));
             logger.info('Old key archived successfully', { keyName, archiveKeyName });
           }
         } catch (error) {
@@ -578,10 +638,7 @@ class AzureKeyVaultManager {
       }
 
       // Store new key
-      await this.setEncryptionKey(keyName, newKeyValue, 'application/x-encryption-key', {
-        rotatedAt: new Date().toISOString(),
-        rotationType: 'automatic',
-      });
+      await this.setEncryptionKey(keyName, newKeyValue, `Rotated at ${new Date().toISOString()}`);
 
       // Invalidate cache to force refresh
       this.keyCache.delete(keyName);
@@ -758,34 +815,35 @@ class AzureKeyVaultManager {
     this.rotationTimers.clear();
     this.rotationSchedules.clear();
     this.keyCache.clear();
-    logger.info('Key Vault manager cleaned up');
+    logger.info('Secrets Manager cleaned up');
   }
 }
 
 // Create singleton instance
-const keyVaultManager = new AzureKeyVaultManager();
+const secretsManager = new AWSSecretsManager();
 
 /**
- * Azure Key Vault Integration with full feature set
+ * AWS Secrets Manager Integration with full feature set
  * Production-ready with caching, rotation, and fallback support
+ * (Backward compatible with Azure Key Vault API)
  */
 export const keyVault = {
   /**
-   * Retrieve encryption key from Azure Key Vault
-   * @param keyName - Name of the key in Key Vault
-   * @param forceRefresh - Force refresh from Key Vault, bypassing cache
+   * Retrieve encryption key from AWS Secrets Manager
+   * @param keyName - Name of the secret in Secrets Manager
+   * @param forceRefresh - Force refresh from Secrets Manager, bypassing cache
    * @returns Encryption key
    */
   async getEncryptionKey(keyName: string, forceRefresh: boolean = false): Promise<string> {
-    return keyVaultManager.getEncryptionKey(keyName, forceRefresh);
+    return secretsManager.getEncryptionKey(keyName, forceRefresh);
   },
 
   /**
-   * Store encryption key in Azure Key Vault
-   * @param keyName - Name of the key
+   * Store encryption key in AWS Secrets Manager
+   * @param keyName - Name of the secret
    * @param keyValue - Key value to store
-   * @param contentType - Optional content type
-   * @param tags - Optional tags for key metadata
+   * @param contentType - Optional content type (ignored, for backward compatibility)
+   * @param tags - Optional tags for secret metadata
    */
   async setEncryptionKey(
     keyName: string,
@@ -793,7 +851,7 @@ export const keyVault = {
     contentType?: string,
     tags?: Record<string, string>
   ): Promise<void> {
-    return keyVaultManager.setEncryptionKey(keyName, keyValue, contentType, tags);
+    return secretsManager.setEncryptionKey(keyName, keyValue, undefined, tags);
   },
 
   /**
@@ -803,7 +861,7 @@ export const keyVault = {
    * @returns New key value
    */
   async rotateKey(keyName: string, archiveOldKey: boolean = true): Promise<string> {
-    return keyVaultManager.rotateKey(keyName, archiveOldKey);
+    return secretsManager.rotateKey(keyName, archiveOldKey);
   },
 
   /**
@@ -812,7 +870,7 @@ export const keyVault = {
    * @param rotationIntervalMs - Rotation interval in milliseconds (default: 90 days)
    */
   scheduleKeyRotation(keyName: string, rotationIntervalMs?: number): void {
-    return keyVaultManager.scheduleKeyRotation(keyName, rotationIntervalMs);
+    return secretsManager.scheduleKeyRotation(keyName, rotationIntervalMs);
   },
 
   /**
@@ -820,7 +878,7 @@ export const keyVault = {
    * @param keyName - Name of the key
    */
   cancelKeyRotation(keyName: string): void {
-    return keyVaultManager.cancelKeyRotation(keyName);
+    return secretsManager.cancelKeyRotation(keyName);
   },
 
   /**
@@ -829,7 +887,7 @@ export const keyVault = {
    * @returns Rotation schedule or null if not scheduled
    */
   getRotationSchedule(keyName: string): KeyRotationSchedule | null {
-    return keyVaultManager.getRotationSchedule(keyName);
+    return secretsManager.getRotationSchedule(keyName);
   },
 
   /**
@@ -837,23 +895,26 @@ export const keyVault = {
    * @param keyName - Optional key name to clear specific key
    */
   clearCache(keyName?: string): void {
-    return keyVaultManager.clearCache(keyName);
+    return secretsManager.clearCache(keyName);
   },
 
   /**
    * Get cache statistics
    */
   getCacheStats(): { size: number; keys: string[] } {
-    return keyVaultManager.getCacheStats();
+    return secretsManager.getCacheStats();
   },
 
   /**
    * Cleanup all timers and resources
    */
   cleanup(): void {
-    return keyVaultManager.cleanup();
+    return secretsManager.cleanup();
   },
 };
+
+// Export with AWS naming for direct access
+export const awsSecretsManager = secretsManager;
 
 /**
  * Data encryption helper for PHI fields
@@ -941,5 +1002,6 @@ export default {
   generateSecureCode,
   maskSensitiveData,
   keyVault,
+  awsSecretsManager,
   phiEncryption,
 };

@@ -55,7 +55,7 @@ spec:
 
 ---
 # Development/staging certificate for nip.io domain workaround
-# NOTE: This uses a custom domain registered in Azure DNS
+# NOTE: This uses a custom domain registered in Route 53
 # since nip.io doesn't support DNS-01 challenges
 apiVersion: cert-manager.io/v1
 kind: Certificate
@@ -75,7 +75,7 @@ spec:
     kind: ClusterIssuer
     group: cert-manager.io
 
-  # Development subdomain (registered in Azure DNS)
+  # Development subdomain (registered in Route 53)
   dnsNames:
   - "dev.unifiedhealth.com"
   - "*.dev.unifiedhealth.com"

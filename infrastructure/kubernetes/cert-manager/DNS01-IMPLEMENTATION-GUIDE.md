@@ -2,14 +2,14 @@
 
 ## Overview
 
-This document provides comprehensive guidance for implementing DNS-01 ACME challenges with cert-manager on the UnifiedHealth AKS platform. DNS-01 is required when HTTP-01 challenges fail due to firewall restrictions on port 80.
+This document provides comprehensive guidance for implementing DNS-01 ACME challenges with cert-manager on the UnifiedHealth EKS platform. DNS-01 is required when HTTP-01 challenges fail due to firewall restrictions on port 80.
 
 ## Table of Contents
 
 1. [Problem Statement](#problem-statement)
 2. [Solution Options](#solution-options)
-3. [Recommended Approach: Azure DNS with Workload Identity](#recommended-approach-azure-dns-with-workload-identity)
-4. [Alternative: Service Principal Authentication](#alternative-service-principal-authentication)
+3. [Recommended Approach: AWS Route53 with IRSA](#recommended-approach-aws-route53-with-irsa)
+4. [Alternative: IAM User Credentials](#alternative-iam-user-credentials)
 5. [Alternative: ACME-DNS for nip.io Domains](#alternative-acme-dns-for-nipio-domains)
 6. [Implementation Steps](#implementation-steps)
 7. [Troubleshooting](#troubleshooting)
@@ -20,9 +20,9 @@ This document provides comprehensive guidance for implementing DNS-01 ACME chall
 ## Problem Statement
 
 **Current Situation:**
-- Platform: Azure AKS (`aks-unified-health-dev2`)
-- Resource Group: `rg-unified-health-dev2`
-- Current Domain: `api.20-3-27-63.nip.io` (nip.io wildcard DNS)
+- Platform: AWS EKS (`unified-health-eks`)
+- Region: `us-east-1` (primary), `eu-west-1` (Europe), `af-south-1` (Africa)
+- Current Domain: `api.unifiedhealth.com`
 - Issue: HTTP-01 challenge fails because external firewall blocks port 80
 - cert-manager is installed with `letsencrypt-prod` ClusterIssuer
 
@@ -36,7 +36,7 @@ This document provides comprehensive guidance for implementing DNS-01 ACME chall
 - nip.io is a wildcard DNS service that resolves `*.IP.nip.io` to the IP address
 - You do NOT control the nip.io DNS zone
 - DNS-01 challenges are NOT possible with nip.io directly
-- **Solution**: Use a real domain with Azure DNS, or use ACME-DNS with CNAME delegation
+- **Solution**: Use a real domain with Route53, or use ACME-DNS with CNAME delegation
 
 ---
 
@@ -44,150 +44,181 @@ This document provides comprehensive guidance for implementing DNS-01 ACME chall
 
 | Option | Pros | Cons | Recommended For |
 |--------|------|------|-----------------|
-| **Azure DNS + Workload Identity** | Most secure, no secrets to manage | Requires owned domain | Production |
-| **Azure DNS + Service Principal** | Works without workload identity | Requires secret management | Legacy clusters |
+| **Route53 + IRSA** | Most secure, no secrets to manage | Requires owned domain | Production |
+| **Route53 + IAM User** | Works without IRSA | Requires secret management | Legacy clusters |
 | **ACME-DNS** | Works with any domain via CNAME | Additional infrastructure | nip.io workaround |
 | **External DNS Provider** | Flexibility | May have costs | Multi-cloud |
 
 ---
 
-## Recommended Approach: Azure DNS with Workload Identity
+## Recommended Approach: AWS Route53 with IRSA
 
 ### Prerequisites
 
 1. **Own a domain** (e.g., `unifiedhealth.com`)
-2. **Azure DNS Zone** in your subscription
-3. **AKS cluster** with OIDC issuer and workload identity enabled
-4. **Managed Identity** with DNS Zone Contributor role
+2. **Route53 Hosted Zone** in your AWS account
+3. **EKS cluster** with OIDC provider enabled
+4. **IAM Role** with Route53 permissions configured for IRSA
 
-### Step 1: Enable Workload Identity on AKS
+### Step 1: Enable OIDC Provider on EKS
 
 ```bash
-# Check if workload identity is enabled
-az aks show \
-  --name aks-unified-health-dev2 \
-  --resource-group rg-unified-health-dev2 \
-  --query "oidcIssuerProfile.enabled"
+# Check if OIDC provider is enabled
+aws eks describe-cluster \
+  --name unified-health-eks \
+  --region us-east-1 \
+  --query "cluster.identity.oidc.issuer" \
+  --output text
 
-# Enable if not already enabled
-az aks update \
-  --name aks-unified-health-dev2 \
-  --resource-group rg-unified-health-dev2 \
-  --enable-oidc-issuer \
-  --enable-workload-identity
+# Associate OIDC provider (if not already done)
+eksctl utils associate-iam-oidc-provider \
+  --cluster unified-health-eks \
+  --region us-east-1 \
+  --approve
 
 # Get the OIDC issuer URL
-az aks show \
-  --name aks-unified-health-dev2 \
-  --resource-group rg-unified-health-dev2 \
-  --query "oidcIssuerProfile.issuerUrl" -o tsv
+OIDC_ISSUER=$(aws eks describe-cluster \
+  --name unified-health-eks \
+  --region us-east-1 \
+  --query "cluster.identity.oidc.issuer" \
+  --output text)
+echo "OIDC Issuer: $OIDC_ISSUER"
 ```
 
-### Step 2: Create Azure DNS Zone
+### Step 2: Create Route53 Hosted Zone
 
 ```bash
-# Create resource group for DNS (if not exists)
-az group create --name rg-unified-health-dns --location eastus
-
-# Create DNS zone
-az network dns zone create \
+# Create hosted zone (if not exists)
+aws route53 create-hosted-zone \
   --name unifiedhealth.com \
-  --resource-group rg-unified-health-dns
+  --caller-reference $(date +%s)
+
+# Get hosted zone ID
+HOSTED_ZONE_ID=$(aws route53 list-hosted-zones-by-name \
+  --dns-name "unifiedhealth.com" \
+  --query "HostedZones[0].Id" \
+  --output text | cut -d'/' -f3)
+echo "Hosted Zone ID: $HOSTED_ZONE_ID"
 ```
 
-**Important**: After creating the zone, update your domain registrar's nameservers to point to Azure DNS. Get the nameservers with:
+**Important**: After creating the zone, update your domain registrar's nameservers to point to Route53. Get the nameservers with:
 
 ```bash
-az network dns zone show \
-  --name unifiedhealth.com \
-  --resource-group rg-unified-health-dns \
-  --query "nameServers" -o tsv
+aws route53 get-hosted-zone \
+  --id $HOSTED_ZONE_ID \
+  --query "DelegationSet.NameServers" \
+  --output text
 ```
 
-### Step 3: Create Managed Identity for cert-manager
+### Step 3: Create IAM Policy for cert-manager
 
 ```bash
-# Create managed identity
-az identity create \
-  --name id-cert-manager-dev2 \
-  --resource-group rg-unified-health-dev2
+# Create IAM policy document
+cat > cert-manager-route53-policy.json << EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "route53:GetChange",
+            "Resource": "arn:aws:route53:::change/*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "route53:ChangeResourceRecordSets",
+                "route53:ListResourceRecordSets"
+            ],
+            "Resource": "arn:aws:route53:::hostedzone/${HOSTED_ZONE_ID}"
+        },
+        {
+            "Effect": "Allow",
+            "Action": "route53:ListHostedZonesByName",
+            "Resource": "*"
+        }
+    ]
+}
+EOF
 
-# Get identity client ID
-IDENTITY_CLIENT_ID=$(az identity show \
-  --name id-cert-manager-dev2 \
-  --resource-group rg-unified-health-dev2 \
-  --query "clientId" -o tsv)
-
-echo "Identity Client ID: $IDENTITY_CLIENT_ID"
+# Create the policy
+aws iam create-policy \
+  --policy-name CertManagerRoute53Policy \
+  --policy-document file://cert-manager-route53-policy.json
 ```
 
-### Step 4: Assign DNS Zone Contributor Role
+### Step 4: Create IAM Role for IRSA
 
 ```bash
-# Get DNS zone ID
-DNS_ZONE_ID=$(az network dns zone show \
-  --name unifiedhealth.com \
-  --resource-group rg-unified-health-dns \
-  --query "id" -o tsv)
+# Get AWS account ID
+AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+OIDC_PROVIDER=$(echo $OIDC_ISSUER | sed 's|https://||')
 
-# Get identity principal ID
-IDENTITY_PRINCIPAL_ID=$(az identity show \
-  --name id-cert-manager-dev2 \
-  --resource-group rg-unified-health-dev2 \
-  --query "principalId" -o tsv)
+# Create trust policy
+cat > trust-policy.json << EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Federated": "arn:aws:iam::${AWS_ACCOUNT_ID}:oidc-provider/${OIDC_PROVIDER}"
+            },
+            "Action": "sts:AssumeRoleWithWebIdentity",
+            "Condition": {
+                "StringEquals": {
+                    "${OIDC_PROVIDER}:sub": "system:serviceaccount:cert-manager:cert-manager",
+                    "${OIDC_PROVIDER}:aud": "sts.amazonaws.com"
+                }
+            }
+        }
+    ]
+}
+EOF
 
-# Assign DNS Zone Contributor role
-az role assignment create \
-  --assignee $IDENTITY_PRINCIPAL_ID \
-  --role "DNS Zone Contributor" \
-  --scope $DNS_ZONE_ID
+# Create the role
+aws iam create-role \
+  --role-name CertManagerRoute53Role \
+  --assume-role-policy-document file://trust-policy.json
+
+# Attach the policy
+aws iam attach-role-policy \
+  --role-name CertManagerRoute53Role \
+  --policy-arn arn:aws:iam::${AWS_ACCOUNT_ID}:policy/CertManagerRoute53Policy
 ```
 
-### Step 5: Create Federated Credential
+### Step 5: Configure cert-manager with IRSA
 
 ```bash
-# Get AKS OIDC issuer URL
-AKS_OIDC_ISSUER=$(az aks show \
-  --name aks-unified-health-dev2 \
-  --resource-group rg-unified-health-dev2 \
-  --query "oidcIssuerProfile.issuerUrl" -o tsv)
+# Annotate cert-manager service account
+kubectl annotate serviceaccount cert-manager \
+  -n cert-manager \
+  eks.amazonaws.com/role-arn=arn:aws:iam::${AWS_ACCOUNT_ID}:role/CertManagerRoute53Role
 
-# Create federated credential
-az identity federated-credential create \
-  --name cert-manager-federated \
-  --identity-name id-cert-manager-dev2 \
-  --resource-group rg-unified-health-dev2 \
-  --issuer $AKS_OIDC_ISSUER \
-  --subject "system:serviceaccount:cert-manager:cert-manager" \
-  --audience "api://AzureADTokenExchange"
+# Restart cert-manager to pick up new credentials
+kubectl rollout restart deployment cert-manager -n cert-manager
 ```
 
-### Step 6: Update cert-manager with Workload Identity Labels
+Or install cert-manager with IRSA annotation:
 
 ```bash
-# Update cert-manager using Helm values
 helm upgrade cert-manager jetstack/cert-manager \
   --namespace cert-manager \
   --version v1.16.2 \
-  --values cert-manager-values.yaml \
-  --set "serviceAccount.annotations.azure\.workload\.identity/client-id=$IDENTITY_CLIENT_ID" \
-  --set "podLabels.azure\.workload\.identity/use=true"
+  --set "serviceAccount.annotations.eks\.amazonaws\.com/role-arn=arn:aws:iam::${AWS_ACCOUNT_ID}:role/CertManagerRoute53Role"
 ```
 
-### Step 7: Apply ClusterIssuer
+### Step 6: Apply ClusterIssuer
 
-Edit `dns01-clusterissuer-azure.yaml` with your values:
-- `subscriptionID`: Your Azure subscription ID
-- `resourceGroupName`: `rg-unified-health-dns`
-- `hostedZoneName`: `unifiedhealth.com`
-- `managedIdentity.clientID`: The managed identity client ID from Step 3
+Edit `dns01-clusterissuer-route53.yaml` with your values:
+- `region`: Your AWS region (e.g., `us-east-1`)
+- `hostedZoneID`: Your Route53 hosted zone ID
 
 ```bash
 # Apply the ClusterIssuer
-kubectl apply -f dns01-clusterissuer-azure.yaml
+kubectl apply -f dns01-clusterissuer-route53.yaml
 ```
 
-### Step 8: Verify Configuration
+### Step 7: Verify Configuration
 
 ```bash
 # Check ClusterIssuer status
@@ -205,39 +236,41 @@ kubectl describe certificate unified-health-tls-dns01 -n unified-health
 
 ---
 
-## Alternative: Service Principal Authentication
+## Alternative: IAM User Credentials
 
-Use this if workload identity is not available.
+Use this if IRSA is not available.
 
-### Create Service Principal
+### Create IAM User
 
 ```bash
-# Create service principal
-az ad sp create-for-rbac \
-  --name "sp-cert-manager-dns01" \
-  --role "DNS Zone Contributor" \
-  --scopes $DNS_ZONE_ID
+# Create IAM user
+aws iam create-user --user-name cert-manager-dns01
 
-# Output will include:
-# - appId (clientID)
-# - password (clientSecret)
-# - tenant (tenantID)
+# Attach policy
+aws iam attach-user-policy \
+  --user-name cert-manager-dns01 \
+  --policy-arn arn:aws:iam::${AWS_ACCOUNT_ID}:policy/CertManagerRoute53Policy
+
+# Create access key
+aws iam create-access-key --user-name cert-manager-dns01
+# Save the AccessKeyId and SecretAccessKey
 ```
 
 ### Create Kubernetes Secret
 
 ```bash
-kubectl create secret generic azure-dns-sp-secret \
+kubectl create secret generic aws-route53-credentials \
   --namespace cert-manager \
-  --from-literal=client-secret="YOUR_SP_PASSWORD"
+  --from-literal=access-key-id="YOUR_ACCESS_KEY_ID" \
+  --from-literal=secret-access-key="YOUR_SECRET_ACCESS_KEY"
 ```
 
-### Apply Service Principal ClusterIssuer
+### Apply IAM User ClusterIssuer
 
-Edit `dns01-clusterissuer-azure-sp.yaml` with your values and apply:
+Edit `dns01-clusterissuer-aws-iam.yaml` with your values and apply:
 
 ```bash
-kubectl apply -f dns01-clusterissuer-azure-sp.yaml
+kubectl apply -f dns01-clusterissuer-aws-iam.yaml
 ```
 
 ---
@@ -272,7 +305,7 @@ If you must use nip.io or don't have a custom domain, use ACME-DNS:
 
 3. **Create CNAME in your DNS** (if you control a parent zone):
    ```
-   _acme-challenge.api.20-3-27-63.nip.io CNAME your-subdomain.acme-dns.server
+   _acme-challenge.api.your-ip.nip.io CNAME your-subdomain.acme-dns.server
    ```
 
 4. **Apply acme-dns ClusterIssuer**:
@@ -287,23 +320,18 @@ If you must use nip.io or don't have a custom domain, use ACME-DNS:
 ### For Production (with owned domain):
 
 ```bash
-# 1. Prepare Azure resources (one-time setup)
-terraform apply -target=module.dns
+# 1. Run the automated setup script
+./setup-dns01-aws.sh
 
 # 2. Update domain registrar nameservers (manual step)
 
-# 3. Upgrade cert-manager with workload identity
-helm upgrade cert-manager jetstack/cert-manager \
-  --namespace cert-manager \
-  --values cert-manager-values.yaml
+# 3. Apply DNS-01 ClusterIssuer
+kubectl apply -f dns01-clusterissuer-route53.yaml
 
-# 4. Apply DNS-01 ClusterIssuer
-kubectl apply -f dns01-clusterissuer-azure.yaml
-
-# 5. Apply Certificates
+# 4. Apply Certificates
 kubectl apply -f dns01-certificate.yaml
 
-# 6. Update Ingress to use DNS-01 certificates
+# 5. Update Ingress to use DNS-01 certificates
 kubectl apply -f ingress-dns01.yaml
 ```
 
@@ -339,11 +367,11 @@ kubectl describe challenge <name> -n <namespace>
 
 | Issue | Solution |
 |-------|----------|
-| `AuthorizationFailed` | Check managed identity role assignment |
+| `AccessDenied` | Check IAM role permissions and IRSA configuration |
 | `NXDOMAIN` | DNS zone not propagated; wait or check nameservers |
-| `Timeout` | Check network connectivity to Azure DNS API |
+| `Timeout` | Check network connectivity to Route53 API |
 | `Unable to get TXT record` | Check DNS propagation with `dig _acme-challenge.domain TXT` |
-| `401 Unauthorized` | Check workload identity configuration |
+| `AssumeRoleWithWebIdentity` error | Verify OIDC provider and trust policy |
 
 ### Verify DNS Propagation
 
@@ -351,23 +379,22 @@ kubectl describe challenge <name> -n <namespace>
 # Check TXT record (during challenge)
 dig _acme-challenge.unifiedhealth.com TXT
 
-# Check Azure DNS directly
-az network dns record-set txt show \
-  --zone-name unifiedhealth.com \
-  --resource-group rg-unified-health-dns \
-  --name _acme-challenge
+# Check Route53 directly
+aws route53 list-resource-record-sets \
+  --hosted-zone-id $HOSTED_ZONE_ID \
+  --query "ResourceRecordSets[?Name=='_acme-challenge.unifiedhealth.com.']"
 ```
 
 ---
 
 ## References
 
-- [cert-manager Azure DNS Documentation](https://cert-manager.io/docs/configuration/acme/dns01/azuredns/)
-- [cert-manager AKS Tutorial](https://cert-manager.io/docs/tutorials/getting-started-aks-letsencrypt/)
-- [Azure Workload Identity](https://azure.github.io/azure-workload-identity/docs/)
+- [cert-manager Route53 Documentation](https://cert-manager.io/docs/configuration/acme/dns01/route53/)
+- [cert-manager EKS Tutorial](https://cert-manager.io/docs/tutorials/getting-started-with-cert-manager-on-aws-eks/)
+- [AWS IRSA Documentation](https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html)
 - [Let's Encrypt Challenge Types](https://letsencrypt.org/docs/challenge-types/)
 - [acme-dns GitHub](https://github.com/joohoi/acme-dns)
-- [AKS DNS-01 Solver Example](https://github.com/Mimetis/AKS_DNS01Solver)
+- [eksctl IRSA Documentation](https://eksctl.io/usage/iamserviceaccounts/)
 
 ---
 
@@ -375,10 +402,9 @@ az network dns record-set txt show \
 
 | File | Purpose |
 |------|---------|
-| `dns01-clusterissuer-azure.yaml` | ClusterIssuer with Workload Identity |
-| `dns01-clusterissuer-azure-sp.yaml` | ClusterIssuer with Service Principal |
+| `dns01-clusterissuer-route53.yaml` | ClusterIssuer with IRSA (Route53) |
+| `dns01-clusterissuer-aws-iam.yaml` | ClusterIssuer with IAM credentials |
 | `dns01-certificate.yaml` | Certificate resources |
 | `acme-dns-clusterissuer.yaml` | ACME-DNS ClusterIssuer (for nip.io workaround) |
 | `ingress-dns01.yaml` | Updated Ingress with DNS-01 annotations |
-| `cert-manager-values.yaml` | Helm values for cert-manager |
-| `dns-zone-cert-manager.tf` | Terraform for Azure DNS resources |
+| `setup-dns01-aws.sh` | Automated setup script for AWS |

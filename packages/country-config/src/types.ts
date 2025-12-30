@@ -74,8 +74,8 @@ export interface RegionConfig {
   /** Region display name */
   name: string;
 
-  /** Azure region location */
-  azureLocation: string;
+  /** AWS region location */
+  awsRegion: string;
 
   /** Short location code */
   locationShort: string;
@@ -123,8 +123,8 @@ export interface RegionalDataResidency {
  * Regional infrastructure settings
  */
 export interface RegionalInfrastructure {
-  /** AKS cluster tier */
-  aksTier: 'standard' | 'premium';
+  /** EKS cluster tier */
+  eksTier: 'standard' | 'premium';
   /** PostgreSQL SKU */
   postgresqlSku: string;
   /** Redis tier */
@@ -177,11 +177,11 @@ export interface CountryIsolation {
   enabled: boolean;
   /** Dedicated database */
   dedicatedDatabase: boolean;
-  /** Dedicated Key Vault */
-  dedicatedKeyVault: boolean;
+  /** Dedicated Secrets Manager */
+  dedicatedSecretsManager: boolean;
   /** Customer-managed keys */
   customerManagedKeys: boolean;
-  /** Dedicated AKS namespace */
+  /** Dedicated EKS namespace */
   dedicatedNamespace: boolean;
   /** Dedicated storage account */
   dedicatedStorage: boolean;
@@ -566,19 +566,19 @@ export interface PolicyEvaluationResult {
 export const AMERICAS_REGION: RegionConfig = {
   regionId: 'americas',
   name: 'Americas',
-  azureLocation: 'eastus',
-  locationShort: 'eus',
+  awsRegion: 'us-east-1',
+  locationShort: 'use1',
   enabled: true,
   complianceStandards: ['HIPAA', 'SOC2', 'ISO27001'],
   dataResidency: {
     phiContainment: true,
-    allowedReplicationRegions: ['eastus', 'westus2'],
+    allowedReplicationRegions: ['us-east-1', 'us-west-2'],
     crossRegionBackup: true,
     keyLocation: 'regional',
   },
   infrastructure: {
-    aksTier: 'premium',
-    postgresqlSku: 'GP_Standard_D4s_v3',
+    eksTier: 'premium',
+    postgresqlSku: 'db.r6g.xlarge',
     redisTier: 'premium',
     highAvailability: true,
     minNodes: 3,
@@ -606,19 +606,19 @@ export const AMERICAS_REGION: RegionConfig = {
 export const EUROPE_REGION: RegionConfig = {
   regionId: 'europe',
   name: 'Europe',
-  azureLocation: 'westeurope',
-  locationShort: 'weu',
+  awsRegion: 'eu-west-1',
+  locationShort: 'euw1',
   enabled: true,
   complianceStandards: ['GDPR', 'ISO27001', 'SOC2'],
   dataResidency: {
     phiContainment: true,
-    allowedReplicationRegions: ['westeurope', 'northeurope'],
+    allowedReplicationRegions: ['eu-west-1', 'eu-central-1'],
     crossRegionBackup: true,
     keyLocation: 'regional',
   },
   infrastructure: {
-    aksTier: 'premium',
-    postgresqlSku: 'GP_Standard_D4s_v3',
+    eksTier: 'premium',
+    postgresqlSku: 'db.r6g.xlarge',
     redisTier: 'premium',
     highAvailability: true,
     minNodes: 3,
@@ -646,19 +646,19 @@ export const EUROPE_REGION: RegionConfig = {
 export const AFRICA_REGION: RegionConfig = {
   regionId: 'africa',
   name: 'Africa',
-  azureLocation: 'southafricanorth',
-  locationShort: 'san',
+  awsRegion: 'af-south-1',
+  locationShort: 'afs1',
   enabled: true,
   complianceStandards: ['POPIA', 'NDPR', 'ISO27001'],
   dataResidency: {
     phiContainment: true,
-    allowedReplicationRegions: ['southafricanorth'],
+    allowedReplicationRegions: ['af-south-1'],
     crossRegionBackup: false,
     keyLocation: 'regional',
   },
   infrastructure: {
-    aksTier: 'standard',
-    postgresqlSku: 'GP_Standard_D4s_v3',
+    eksTier: 'standard',
+    postgresqlSku: 'db.r6g.xlarge',
     redisTier: 'premium',
     highAvailability: true,
     minNodes: 3,

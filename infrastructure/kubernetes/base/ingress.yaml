@@ -165,12 +165,9 @@ spec:
       - http01:
           ingress:
             class: nginx
-      # DNS-01 challenge for wildcard certificates (if using Azure DNS)
+      # DNS-01 challenge for wildcard certificates (using AWS Route53)
       - dns01:
-          azureDNS:
-            subscriptionID: "${AZURE_SUBSCRIPTION_ID}"
-            resourceGroupName: "${AZURE_RESOURCE_GROUP}"
-            hostedZoneName: unifiedhealth.com
-            environment: AzurePublicCloud
-            managedIdentity:
-              clientID: "${AZURE_CLIENT_ID}"
+          route53:
+            region: ${AWS_REGION}
+            hostedZoneID: ${ROUTE53_HOSTED_ZONE_ID}
+            # IRSA is used for authentication - no access keys needed

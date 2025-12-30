@@ -1,0 +1,120 @@
+# ============================================
+# AWS Provider Verification Check
+# ============================================
+# Runs on EVERY PR and push to ensure AWS
+# provider is properly configured and no Azure
+# contamination exists in the codebase
+# ============================================
+
+name: AWS Provider Check
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - 'feature/**'
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  verify-aws-only:
+    name: Verify AWS-Only Infrastructure
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check for Azure contamination in AWS Terraform
+        run: |
+          echo "============================================"
+          echo "AWS PROVIDER VERIFICATION CHECK"
+          echo "============================================"
+          echo ""
+          echo "Scanning infrastructure/terraform-aws/ for Azure contamination..."
+          echo ""
+
+          FAILED=0
+
+          # Check for azurerm provider
+          if grep -r "azurerm" infrastructure/terraform-aws/ --include="*.tf" 2>/dev/null; then
+            echo "::error::Azure 'azurerm' provider detected!"
+            FAILED=1
+          fi
+
+          # Check for azuread provider
+          if grep -r "azuread" infrastructure/terraform-aws/ --include="*.tf" 2>/dev/null; then
+            echo "::error::Azure 'azuread' provider detected!"
+            FAILED=1
+          fi
+
+          # Check for Azure resource types
+          if grep -r "azurerm_" infrastructure/terraform-aws/ --include="*.tf" 2>/dev/null; then
+            echo "::error::Azure resource types (azurerm_*) detected!"
+            FAILED=1
+          fi
+
+          if grep -r "azuread_" infrastructure/terraform-aws/ --include="*.tf" 2>/dev/null; then
+            echo "::error::Azure AD resource types (azuread_*) detected!"
+            FAILED=1
+          fi
+
+          # Check for Azure backend
+          if grep -r "azurerm" infrastructure/terraform-aws/ --include="backend.tf" 2>/dev/null; then
+            echo "::error::Azure backend detected!"
+            FAILED=1
+          fi
+
+          if [ $FAILED -eq 1 ]; then
+            echo ""
+            echo "============================================"
+            echo "FAILED: AZURE CONTAMINATION DETECTED"
+            echo "============================================"
+            echo ""
+            echo "This repository is AWS-ONLY."
+            echo "All Azure references must be removed."
+            echo ""
+            exit 1
+          fi
+
+          echo "No Azure providers detected"
+          echo ""
+          echo "============================================"
+          echo "PASSED: AWS-ONLY VERIFIED"
+          echo "============================================"
+
+      - name: Verify AWS provider exists
+        run: |
+          if ! grep -r "hashicorp/aws" infrastructure/terraform-aws/ --include="*.tf" 2>/dev/null; then
+            echo "::error::AWS provider not found! This is an AWS-only deployment."
+            exit 1
+          fi
+          echo "AWS provider correctly configured"
+
+      - name: Verify AWS credentials configuration
+        run: |
+          echo "Checking for proper AWS credential patterns..."
+
+          # Check that we're using AWS environment variables or IAM roles
+          if grep -r "aws-actions/configure-aws-credentials" .github/workflows/ --include="*.yml" 2>/dev/null; then
+            echo "AWS credentials action found in workflows"
+          fi
+
+          echo "AWS configuration check complete"
+
+      - name: Summary
+        run: |
+          echo "## AWS Provider Check Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Azure azurerm provider | Not found |" >> $GITHUB_STEP_SUMMARY
+          echo "| Azure azuread provider | Not found |" >> $GITHUB_STEP_SUMMARY
+          echo "| Azure resource types | Not found |" >> $GITHUB_STEP_SUMMARY
+          echo "| Azure backend | Not found |" >> $GITHUB_STEP_SUMMARY
+          echo "| AWS provider | Configured |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Result: AWS-ONLY deployment verified**" >> $GITHUB_STEP_SUMMARY

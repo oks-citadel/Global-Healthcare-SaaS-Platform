@@ -320,7 +320,7 @@ export class ReportService {
   private async savePDFReport(orderId: string, htmlContent: string): Promise<string> {
     // In production, you would:
     // 1. Convert HTML to PDF using a library like puppeteer or pdfkit
-    // 2. Upload to cloud storage (S3, Azure Blob, etc.)
+    // 2. Upload to cloud storage (AWS S3)
     // 3. Return the public URL
 
     // For now, simulate the process

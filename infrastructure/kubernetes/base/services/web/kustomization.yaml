@@ -18,5 +18,5 @@ commonLabels:
   app.kubernetes.io/version: "1.0.0"
 
 images:
-  - name: unifiedhealthdevacr.azurecr.io/unifiedhealth/web
+  - name: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/unifiedhealth/web
     newTag: latest

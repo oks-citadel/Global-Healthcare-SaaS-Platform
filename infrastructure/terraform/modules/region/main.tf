@@ -1,721 +1,1034 @@
 # ============================================
-# Regional Module - Main Infrastructure
+# Regional Module - AWS Infrastructure
 # ============================================
-# Deploys AKS, PostgreSQL, Redis, and networking
+# MIGRATED FROM AZURE TO AWS
+# Deploys EKS, Aurora PostgreSQL, ElastiCache, and networking
 # for a specific region with compliance controls
+# ============================================
 
 # ============================================
 # Local Variables
 # ============================================
 
 locals {
-  resource_suffix = "${var.region_name}-${var.environment}"
+  name_prefix = "${var.project_name}-${var.region_name}-${var.environment}"
 
   common_tags = merge(
     {
-      Project            = "UnifiedHealth"
-      Environment        = var.environment
-      Region             = var.region_name
-      Location           = var.location
-      ManagedBy          = "Terraform"
-      CostCenter         = "Healthcare-Platform"
-      DataResidency      = var.data_residency_required ? "Required" : "Optional"
+      Project             = "UnifiedHealth"
+      Environment         = var.environment
+      Region              = var.region_name
+      AWSRegion           = var.aws_region
+      ManagedBy           = "Terraform"
+      CostCenter          = "Healthcare-Platform"
+      DataResidency       = var.data_residency_required ? "Required" : "Optional"
       ComplianceStandards = join(",", var.compliance_standards)
     },
     var.additional_tags
   )
+
+  # Availability Zones for the region
+  azs = slice(data.aws_availability_zones.available.names, 0, 3)
 }
 
 # ============================================
-# Resource Group
+# Data Sources
 # ============================================
 
-resource "azurerm_resource_group" "region" {
-  name     = "rg-${var.project_name}-${local.resource_suffix}"
-  location = var.location
-  tags     = local.common_tags
+data "aws_availability_zones" "available" {
+  state = "available"
 }
+
+data "aws_caller_identity" "current" {}
 
 # ============================================
-# Virtual Network
+# VPC (Replaces: Azure Virtual Network)
 # ============================================
 
-resource "azurerm_virtual_network" "region" {
-  name                = "vnet-${var.project_name}-${local.resource_suffix}"
-  location            = azurerm_resource_group.region.location
-  resource_group_name = azurerm_resource_group.region.name
-  address_space       = [var.vnet_address_space]
-  tags                = local.common_tags
+resource "aws_vpc" "region" {
+  cidr_block           = var.vpc_cidr
+  enable_dns_hostnames = true
+  enable_dns_support   = true
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-vpc"
+  })
 }
 
-resource "azurerm_subnet" "aks" {
-  name                 = "snet-aks"
-  resource_group_name  = azurerm_resource_group.region.name
-  virtual_network_name = azurerm_virtual_network.region.name
-  address_prefixes     = [var.aks_subnet_prefix]
+# Internet Gateway
+resource "aws_internet_gateway" "region" {
+  vpc_id = aws_vpc.region.id
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-igw"
+  })
 }
 
-resource "azurerm_subnet" "database" {
-  name                 = "snet-database"
-  resource_group_name  = azurerm_resource_group.region.name
-  virtual_network_name = azurerm_virtual_network.region.name
-  address_prefixes     = [var.database_subnet_prefix]
+# Elastic IPs for NAT Gateways
+resource "aws_eip" "nat" {
+  count  = length(local.azs)
+  domain = "vpc"
 
-  delegation {
-    name = "postgresql-delegation"
-    service_delegation {
-      name    = "Microsoft.DBforPostgreSQL/flexibleServers"
-      actions = ["Microsoft.Network/virtualNetworks/subnets/join/action"]
-    }
-  }
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-nat-eip-${count.index + 1}"
+  })
+
+  depends_on = [aws_internet_gateway.region]
 }
 
-resource "azurerm_subnet" "appgw" {
-  name                 = "snet-appgw"
-  resource_group_name  = azurerm_resource_group.region.name
-  virtual_network_name = azurerm_virtual_network.region.name
-  address_prefixes     = [var.appgw_subnet_prefix]
-}
+# NAT Gateways (High Availability)
+resource "aws_nat_gateway" "region" {
+  count         = length(local.azs)
+  allocation_id = aws_eip.nat[count.index].id
+  subnet_id     = aws_subnet.public[count.index].id
 
-# ============================================
-# Network Security Groups
-# ============================================
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-nat-${count.index + 1}"
+  })
 
-resource "azurerm_network_security_group" "aks" {
-  name                = "nsg-aks-${local.resource_suffix}"
-  location            = azurerm_resource_group.region.location
-  resource_group_name = azurerm_resource_group.region.name
-  tags                = local.common_tags
-
-  security_rule {
-    name                       = "AllowAppGatewayInbound"
-    priority                   = 100
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_ranges    = ["443", "80"]
-    source_address_prefix      = var.appgw_subnet_prefix
-    destination_address_prefix = var.aks_subnet_prefix
-  }
-
-  security_rule {
-    name                       = "AllowKubeAPIInbound"
-    priority                   = 110
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "443"
-    source_address_prefix      = "AzureCloud"
-    destination_address_prefix = var.aks_subnet_prefix
-  }
-
-  security_rule {
-    name                       = "AllowInternalInbound"
-    priority                   = 120
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "*"
-    source_port_range          = "*"
-    destination_port_range     = "*"
-    source_address_prefix      = var.aks_subnet_prefix
-    destination_address_prefix = var.aks_subnet_prefix
-  }
-
-  security_rule {
-    name                       = "AllowAzureLoadBalancerInbound"
-    priority                   = 130
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "*"
-    source_port_range          = "*"
-    destination_port_range     = "*"
-    source_address_prefix      = "AzureLoadBalancer"
-    destination_address_prefix = "*"
-  }
-
-  security_rule {
-    name                       = "DenyAllInbound"
-    priority                   = 4096
-    direction                  = "Inbound"
-    access                     = "Deny"
-    protocol                   = "*"
-    source_port_range          = "*"
-    destination_port_range     = "*"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-
-  security_rule {
-    name                       = "AllowDatabaseOutbound"
-    priority                   = 100
-    direction                  = "Outbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "5432"
-    source_address_prefix      = var.aks_subnet_prefix
-    destination_address_prefix = var.database_subnet_prefix
-  }
-
-  security_rule {
-    name                       = "AllowVNetOutbound"
-    priority                   = 110
-    direction                  = "Outbound"
-    access                     = "Allow"
-    protocol                   = "*"
-    source_port_range          = "*"
-    destination_port_range     = "*"
-    source_address_prefix      = "VirtualNetwork"
-    destination_address_prefix = "VirtualNetwork"
-  }
-
-  security_rule {
-    name                       = "AllowAzureOutbound"
-    priority                   = 120
-    direction                  = "Outbound"
-    access                     = "Allow"
-    protocol                   = "*"
-    source_port_range          = "*"
-    destination_port_range     = "*"
-    source_address_prefix      = "VirtualNetwork"
-    destination_address_prefix = "AzureCloud"
-  }
-
-  security_rule {
-    name                       = "AllowInternetOutbound"
-    priority                   = 130
-    direction                  = "Outbound"
-    access                     = "Allow"
-    protocol                   = "*"
-    source_port_range          = "*"
-    destination_port_range     = "*"
-    source_address_prefix      = "VirtualNetwork"
-    destination_address_prefix = "Internet"
-  }
-}
-
-resource "azurerm_subnet_network_security_group_association" "aks" {
-  subnet_id                 = azurerm_subnet.aks.id
-  network_security_group_id = azurerm_network_security_group.aks.id
-}
-
-resource "azurerm_network_security_group" "database" {
-  name                = "nsg-database-${local.resource_suffix}"
-  location            = azurerm_resource_group.region.location
-  resource_group_name = azurerm_resource_group.region.name
-  tags                = local.common_tags
-
-  security_rule {
-    name                       = "AllowAKSPostgreSQLInbound"
-    priority                   = 100
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "5432"
-    source_address_prefix      = var.aks_subnet_prefix
-    destination_address_prefix = var.database_subnet_prefix
-  }
-
-  security_rule {
-    name                       = "DenyAllInbound"
-    priority                   = 4096
-    direction                  = "Inbound"
-    access                     = "Deny"
-    protocol                   = "*"
-    source_port_range          = "*"
-    destination_port_range     = "*"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-
-  security_rule {
-    name                       = "AllowAzureOutbound"
-    priority                   = 100
-    direction                  = "Outbound"
-    access                     = "Allow"
-    protocol                   = "*"
-    source_port_range          = "*"
-    destination_port_range     = "*"
-    source_address_prefix      = "VirtualNetwork"
-    destination_address_prefix = "AzureCloud"
-  }
-}
-
-resource "azurerm_subnet_network_security_group_association" "database" {
-  subnet_id                 = azurerm_subnet.database.id
-  network_security_group_id = azurerm_network_security_group.database.id
+  depends_on = [aws_internet_gateway.region]
 }
 
 # ============================================
-# VNet Peering (for cross-region connectivity)
+# Subnets
 # ============================================
 
-resource "azurerm_virtual_network_peering" "outbound" {
-  count = var.enable_vnet_peering ? length(var.peer_vnets) : 0
+# Public Subnets
+resource "aws_subnet" "public" {
+  count                   = length(local.azs)
+  vpc_id                  = aws_vpc.region.id
+  cidr_block              = cidrsubnet(var.vpc_cidr, 8, count.index)
+  availability_zone       = local.azs[count.index]
+  map_public_ip_on_launch = true
 
-  name                      = "peer-${var.region_name}-to-${var.peer_vnets[count.index].name}"
-  resource_group_name       = azurerm_resource_group.region.name
-  virtual_network_name      = azurerm_virtual_network.region.name
-  remote_virtual_network_id = var.peer_vnets[count.index].id
-
-  allow_virtual_network_access = true
-  allow_forwarded_traffic      = true
-  allow_gateway_transit        = false
+  tags = merge(local.common_tags, {
+    Name                                              = "${local.name_prefix}-public-${count.index + 1}"
+    Type                                              = "public"
+    "kubernetes.io/role/elb"                          = "1"
+    "kubernetes.io/cluster/${local.name_prefix}-eks" = "shared"
+  })
 }
 
-# ============================================
-# Azure Kubernetes Service (AKS)
-# ============================================
+# Private Subnets (EKS Nodes)
+resource "aws_subnet" "private" {
+  count             = length(local.azs)
+  vpc_id            = aws_vpc.region.id
+  cidr_block        = cidrsubnet(var.vpc_cidr, 8, count.index + 10)
+  availability_zone = local.azs[count.index]
 
-resource "azurerm_kubernetes_cluster" "region" {
-  name                = "aks-${var.project_name}-${local.resource_suffix}"
-  location            = azurerm_resource_group.region.location
-  resource_group_name = azurerm_resource_group.region.name
-  dns_prefix          = "${var.project_name}-${local.resource_suffix}"
-  kubernetes_version  = var.kubernetes_version
-  tags                = local.common_tags
-
-  default_node_pool {
-    name                = "system"
-    node_count          = var.aks_system_node_count
-    vm_size             = var.aks_system_node_size
-    vnet_subnet_id      = azurerm_subnet.aks.id
-    os_disk_size_gb     = 100
-    type                = "VirtualMachineScaleSets"
-    auto_scaling_enabled = true
-    min_count           = var.aks_system_node_min
-    max_count           = var.aks_system_node_max
-    zones               = ["1", "2", "3"]
-
-    node_labels = {
-      "nodepool-type" = "system"
-      "region"        = var.region_name
-    }
-  }
-
-  identity {
-    type = "SystemAssigned"
-  }
-
-  network_profile {
-    network_plugin    = "azure"
-    network_policy    = "calico"
-    load_balancer_sku = "standard"
-    service_cidr      = "10.0.0.0/16"
-    dns_service_ip    = "10.0.0.10"
-  }
-
-  oms_agent {
-    log_analytics_workspace_id = var.global_log_analytics_workspace_id
-  }
-
-  key_vault_secrets_provider {
-    secret_rotation_enabled = true
-  }
-
-  auto_scaler_profile {
-    balance_similar_node_groups      = true
-    expander                         = "random"
-    max_graceful_termination_sec     = 600
-    scale_down_delay_after_add       = "10m"
-    scale_down_unneeded              = "10m"
-    scale_down_utilization_threshold = 0.5
-  }
+  tags = merge(local.common_tags, {
+    Name                                                   = "${local.name_prefix}-private-${count.index + 1}"
+    Type                                                   = "private"
+    "kubernetes.io/role/internal-elb"                      = "1"
+    "kubernetes.io/cluster/${local.name_prefix}-eks"       = "shared"
+  })
 }
 
-# User node pool for workloads
-resource "azurerm_kubernetes_cluster_node_pool" "user" {
-  name                  = "user"
-  kubernetes_cluster_id = azurerm_kubernetes_cluster.region.id
-  vm_size               = var.aks_user_node_size
-  node_count            = var.aks_user_node_count
-  vnet_subnet_id        = azurerm_subnet.aks.id
-  auto_scaling_enabled  = true
-  min_count             = var.aks_user_node_min
-  max_count             = var.aks_user_node_max
-  os_disk_size_gb       = 100
-  zones                 = ["1", "2", "3"]
+# Database Subnets
+resource "aws_subnet" "database" {
+  count             = length(local.azs)
+  vpc_id            = aws_vpc.region.id
+  cidr_block        = cidrsubnet(var.vpc_cidr, 8, count.index + 20)
+  availability_zone = local.azs[count.index]
 
-  node_labels = {
-    "nodepool-type" = "user"
-    "workload"      = "unified-health"
-    "region"        = var.region_name
-  }
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-database-${count.index + 1}"
+    Type = "database"
+  })
+}
 
-  node_taints = [
-    "workload=unified-health:NoSchedule"
-  ]
+# ElastiCache Subnets
+resource "aws_subnet" "elasticache" {
+  count             = length(local.azs)
+  vpc_id            = aws_vpc.region.id
+  cidr_block        = cidrsubnet(var.vpc_cidr, 8, count.index + 30)
+  availability_zone = local.azs[count.index]
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-elasticache-${count.index + 1}"
+    Type = "elasticache"
+  })
+}
+
+# Subnet Groups
+resource "aws_db_subnet_group" "region" {
+  name        = "${local.name_prefix}-db-subnet-group"
+  description = "Database subnet group for ${local.name_prefix}"
+  subnet_ids  = aws_subnet.database[*].id
 
   tags = local.common_tags
 }
 
-# ACR pull role for AKS
-resource "azurerm_role_assignment" "aks_acr_pull" {
-  scope                = var.global_acr_id
-  role_definition_name = "AcrPull"
-  principal_id         = azurerm_kubernetes_cluster.region.kubelet_identity[0].object_id
+resource "aws_elasticache_subnet_group" "region" {
+  name        = "${local.name_prefix}-elasticache-subnet-group"
+  description = "ElastiCache subnet group for ${local.name_prefix}"
+  subnet_ids  = aws_subnet.elasticache[*].id
+
+  tags = local.common_tags
 }
 
 # ============================================
-# Regional Key Vault (for regional secrets)
+# Route Tables
 # ============================================
 
-data "azurerm_client_config" "current" {}
+# Public Route Table
+resource "aws_route_table" "public" {
+  vpc_id = aws_vpc.region.id
 
-resource "azurerm_key_vault" "region" {
-  name                       = "kv-${var.project_name}-${var.location_short}-${var.environment}"
-  location                   = azurerm_resource_group.region.location
-  resource_group_name        = azurerm_resource_group.region.name
-  tenant_id                  = data.azurerm_client_config.current.tenant_id
-  sku_name                   = "premium"
-  soft_delete_retention_days = 90
-  purge_protection_enabled   = true
-  enable_rbac_authorization  = true
-  tags                       = local.common_tags
-}
-
-# Key Vault access for AKS
-resource "azurerm_role_assignment" "aks_keyvault_secrets" {
-  scope                = azurerm_key_vault.region.id
-  role_definition_name = "Key Vault Secrets User"
-  principal_id         = azurerm_kubernetes_cluster.region.key_vault_secrets_provider[0].secret_identity[0].object_id
-}
-
-# ============================================
-# PostgreSQL Flexible Server
-# ============================================
-
-resource "azurerm_private_dns_zone" "postgresql" {
-  name                = "${var.project_name}-${local.resource_suffix}.postgres.database.azure.com"
-  resource_group_name = azurerm_resource_group.region.name
-  tags                = local.common_tags
-}
-
-resource "azurerm_private_dns_zone_virtual_network_link" "postgresql" {
-  name                  = "postgresql-vnet-link"
-  private_dns_zone_name = azurerm_private_dns_zone.postgresql.name
-  virtual_network_id    = azurerm_virtual_network.region.id
-  resource_group_name   = azurerm_resource_group.region.name
-}
-
-resource "azurerm_postgresql_flexible_server" "region" {
-  name                          = "psql-${var.project_name}-${local.resource_suffix}"
-  resource_group_name           = azurerm_resource_group.region.name
-  location                      = azurerm_resource_group.region.location
-  version                       = "15"
-  delegated_subnet_id           = azurerm_subnet.database.id
-  private_dns_zone_id           = azurerm_private_dns_zone.postgresql.id
-  public_network_access_enabled = false
-  administrator_login           = var.postgresql_admin_username
-  administrator_password        = var.postgresql_admin_password
-  zone                          = "1"
-  storage_mb                    = var.postgresql_storage_mb
-  sku_name                      = var.postgresql_sku
-  backup_retention_days         = 35
-  geo_redundant_backup_enabled  = var.data_residency_required ? false : true
-  tags                          = local.common_tags
-
-  high_availability {
-    mode                      = var.postgresql_high_availability ? "ZoneRedundant" : "Disabled"
-    standby_availability_zone = var.postgresql_high_availability ? "2" : null
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.region.id
   }
 
-  maintenance_window {
-    day_of_week  = 0
-    start_hour   = 2
-    start_minute = 0
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-public-rt"
+    Type = "public"
+  })
+}
+
+resource "aws_route_table_association" "public" {
+  count          = length(aws_subnet.public)
+  subnet_id      = aws_subnet.public[count.index].id
+  route_table_id = aws_route_table.public.id
+}
+
+# Private Route Tables (one per AZ for HA)
+resource "aws_route_table" "private" {
+  count  = length(local.azs)
+  vpc_id = aws_vpc.region.id
+
+  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.region[count.index].id
   }
 
-  depends_on = [azurerm_private_dns_zone_virtual_network_link.postgresql]
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-private-rt-${count.index + 1}"
+    Type = "private"
+  })
 }
 
-resource "azurerm_postgresql_flexible_server_database" "unified_health" {
-  name      = "unified_health"
-  server_id = azurerm_postgresql_flexible_server.region.id
-  charset   = "UTF8"
-  collation = "en_US.utf8"
+resource "aws_route_table_association" "private" {
+  count          = length(aws_subnet.private)
+  subnet_id      = aws_subnet.private[count.index].id
+  route_table_id = aws_route_table.private[count.index].id
 }
 
-resource "azurerm_postgresql_flexible_server_configuration" "log_connections" {
-  name      = "log_connections"
-  server_id = azurerm_postgresql_flexible_server.region.id
-  value     = "on"
+resource "aws_route_table_association" "database" {
+  count          = length(aws_subnet.database)
+  subnet_id      = aws_subnet.database[count.index].id
+  route_table_id = aws_route_table.private[count.index].id
 }
 
-resource "azurerm_postgresql_flexible_server_configuration" "log_disconnections" {
-  name      = "log_disconnections"
-  server_id = azurerm_postgresql_flexible_server.region.id
-  value     = "on"
+resource "aws_route_table_association" "elasticache" {
+  count          = length(aws_subnet.elasticache)
+  subnet_id      = aws_subnet.elasticache[count.index].id
+  route_table_id = aws_route_table.private[count.index].id
 }
 
 # ============================================
-# Redis Cache
+# Security Groups
 # ============================================
 
-resource "azurerm_redis_cache" "region" {
-  name                = "redis-${var.project_name}-${local.resource_suffix}"
-  location            = azurerm_resource_group.region.location
-  resource_group_name = azurerm_resource_group.region.name
-  capacity            = var.redis_capacity
-  family              = var.redis_family
-  sku_name            = var.redis_sku
-  non_ssl_port_enabled = false
-  minimum_tls_version = "1.2"
-  zones               = ["1", "2", "3"]
-  tags                = local.common_tags
+# EKS Cluster Security Group
+resource "aws_security_group" "eks_cluster" {
+  name        = "${local.name_prefix}-eks-cluster-sg"
+  description = "Security group for EKS cluster control plane"
+  vpc_id      = aws_vpc.region.id
 
-  redis_configuration {
-    maxmemory_policy              = "allkeys-lru"
-    rdb_backup_enabled            = true
-    rdb_backup_frequency          = 60
-    rdb_backup_max_snapshot_count = 1
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-eks-cluster-sg"
+  })
+}
+
+resource "aws_security_group_rule" "eks_cluster_egress" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.eks_cluster.id
+  description       = "Allow all egress"
+}
+
+resource "aws_security_group_rule" "eks_cluster_ingress_nodes" {
+  type                     = "ingress"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.eks_nodes.id
+  security_group_id        = aws_security_group.eks_cluster.id
+  description              = "Allow nodes to communicate with control plane"
+}
+
+# EKS Node Security Group
+resource "aws_security_group" "eks_nodes" {
+  name        = "${local.name_prefix}-eks-node-sg"
+  description = "Security group for EKS worker nodes"
+  vpc_id      = aws_vpc.region.id
+
+  tags = merge(local.common_tags, {
+    Name                                              = "${local.name_prefix}-eks-node-sg"
+    "kubernetes.io/cluster/${local.name_prefix}-eks" = "owned"
+  })
+}
+
+resource "aws_security_group_rule" "eks_nodes_egress" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.eks_nodes.id
+  description       = "Allow all egress"
+}
+
+resource "aws_security_group_rule" "eks_nodes_ingress_self" {
+  type              = "ingress"
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "-1"
+  self              = true
+  security_group_id = aws_security_group.eks_nodes.id
+  description       = "Allow node-to-node communication"
+}
+
+resource "aws_security_group_rule" "eks_nodes_ingress_cluster" {
+  type                     = "ingress"
+  from_port                = 1025
+  to_port                  = 65535
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.eks_cluster.id
+  security_group_id        = aws_security_group.eks_nodes.id
+  description              = "Allow control plane to communicate with nodes"
+}
+
+# RDS Security Group
+resource "aws_security_group" "rds" {
+  name        = "${local.name_prefix}-rds-sg"
+  description = "Security group for Aurora PostgreSQL"
+  vpc_id      = aws_vpc.region.id
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-rds-sg"
+  })
+}
+
+resource "aws_security_group_rule" "rds_ingress" {
+  type                     = "ingress"
+  from_port                = 5432
+  to_port                  = 5432
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.eks_nodes.id
+  security_group_id        = aws_security_group.rds.id
+  description              = "PostgreSQL from EKS"
+}
+
+resource "aws_security_group_rule" "rds_egress" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.rds.id
+  description       = "Allow all egress"
+}
+
+# Redis Security Group
+resource "aws_security_group" "redis" {
+  name        = "${local.name_prefix}-redis-sg"
+  description = "Security group for ElastiCache Redis"
+  vpc_id      = aws_vpc.region.id
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-redis-sg"
+  })
+}
+
+resource "aws_security_group_rule" "redis_ingress" {
+  type                     = "ingress"
+  from_port                = 6379
+  to_port                  = 6379
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.eks_nodes.id
+  security_group_id        = aws_security_group.redis.id
+  description              = "Redis from EKS"
+}
+
+resource "aws_security_group_rule" "redis_egress" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.redis.id
+  description       = "Allow all egress"
+}
+
+# ============================================
+# VPC Peering (for cross-region connectivity)
+# ============================================
+
+resource "aws_vpc_peering_connection" "peer" {
+  count = var.enable_vpc_peering ? length(var.peer_vpc_ids) : 0
+
+  vpc_id        = aws_vpc.region.id
+  peer_vpc_id   = var.peer_vpc_ids[count.index]
+  peer_region   = var.peer_vpc_regions[count.index]
+  auto_accept   = false
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-peer-${count.index + 1}"
+  })
+}
+
+# ============================================
+# KMS Keys for Encryption
+# ============================================
+
+resource "aws_kms_key" "region" {
+  description             = "Regional KMS key for ${local.name_prefix}"
+  deletion_window_in_days = 30
+  enable_key_rotation     = true
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "Enable IAM User Permissions"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        }
+        Action   = "kms:*"
+        Resource = "*"
+      },
+      {
+        Sid    = "Allow EKS"
+        Effect = "Allow"
+        Principal = {
+          Service = "eks.amazonaws.com"
+        }
+        Action = [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:DescribeKey"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid    = "Allow Secrets Manager"
+        Effect = "Allow"
+        Principal = {
+          Service = "secretsmanager.amazonaws.com"
+        }
+        Action = [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:DescribeKey"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-kms"
+  })
+}
+
+resource "aws_kms_alias" "region" {
+  name          = "alias/${local.name_prefix}"
+  target_key_id = aws_kms_key.region.key_id
+}
+
+# ============================================
+# EKS Cluster (Replaces: Azure Kubernetes Service)
+# ============================================
+
+# EKS Cluster IAM Role
+resource "aws_iam_role" "eks_cluster" {
+  name = "${local.name_prefix}-eks-cluster-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "eks.amazonaws.com"
+        }
+      }
+    ]
+  })
+
+  tags = local.common_tags
+}
+
+resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+  role       = aws_iam_role.eks_cluster.name
+}
+
+resource "aws_iam_role_policy_attachment" "eks_vpc_controller" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController"
+  role       = aws_iam_role.eks_cluster.name
+}
+
+# EKS CloudWatch Log Group
+resource "aws_cloudwatch_log_group" "eks" {
+  name              = "/aws/eks/${local.name_prefix}-eks/cluster"
+  retention_in_days = var.cloudwatch_retention_days
+
+  tags = local.common_tags
+}
+
+# EKS Cluster
+resource "aws_eks_cluster" "region" {
+  name     = "${local.name_prefix}-eks"
+  role_arn = aws_iam_role.eks_cluster.arn
+  version  = var.kubernetes_version
+
+  vpc_config {
+    subnet_ids              = aws_subnet.private[*].id
+    endpoint_private_access = true
+    endpoint_public_access  = var.eks_public_access
+    security_group_ids      = [aws_security_group.eks_cluster.id]
   }
-}
 
-# ============================================
-# Storage Account (for regional data)
-# ============================================
+  enabled_cluster_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
 
-resource "azurerm_storage_account" "region" {
-  name                     = "st${replace(var.project_name, "-", "")}${var.location_short}${var.environment}"
-  resource_group_name      = azurerm_resource_group.region.name
-  location                 = azurerm_resource_group.region.location
-  account_tier             = "Standard"
-  account_replication_type = var.data_residency_required ? "ZRS" : "GRS"
-  min_tls_version          = "TLS1_2"
-  tags                     = local.common_tags
-
-  blob_properties {
-    versioning_enabled       = true
-    change_feed_enabled      = true
-    last_access_time_enabled = true
-
-    delete_retention_policy {
-      days = 30
+  encryption_config {
+    provider {
+      key_arn = aws_kms_key.region.arn
     }
+    resources = ["secrets"]
+  }
 
-    container_delete_retention_policy {
-      days = 30
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-eks"
+  })
+
+  depends_on = [
+    aws_iam_role_policy_attachment.eks_cluster_policy,
+    aws_iam_role_policy_attachment.eks_vpc_controller,
+    aws_cloudwatch_log_group.eks
+  ]
+}
+
+# Node IAM Role
+resource "aws_iam_role" "eks_nodes" {
+  name = "${local.name_prefix}-eks-node-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      }
+    ]
+  })
+
+  tags = local.common_tags
+}
+
+resource "aws_iam_role_policy_attachment" "eks_node_policy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+  role       = aws_iam_role.eks_nodes.name
+}
+
+resource "aws_iam_role_policy_attachment" "eks_cni_policy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+  role       = aws_iam_role.eks_nodes.name
+}
+
+resource "aws_iam_role_policy_attachment" "eks_ecr_policy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+  role       = aws_iam_role.eks_nodes.name
+}
+
+resource "aws_iam_role_policy_attachment" "eks_ssm_policy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  role       = aws_iam_role.eks_nodes.name
+}
+
+# System Node Group
+resource "aws_eks_node_group" "system" {
+  cluster_name    = aws_eks_cluster.region.name
+  node_group_name = "${local.name_prefix}-system"
+  node_role_arn   = aws_iam_role.eks_nodes.arn
+  subnet_ids      = aws_subnet.private[*].id
+
+  instance_types = [var.eks_system_node_size]
+  capacity_type  = "ON_DEMAND"
+  disk_size      = 100
+
+  scaling_config {
+    desired_size = var.eks_system_node_count
+    max_size     = var.eks_system_node_max
+    min_size     = var.eks_system_node_min
+  }
+
+  update_config {
+    max_unavailable = 1
+  }
+
+  labels = {
+    "nodepool-type" = "system"
+    "region"        = var.region_name
+  }
+
+  taint {
+    key    = "CriticalAddonsOnly"
+    value  = "true"
+    effect = "PREFER_NO_SCHEDULE"
+  }
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-system-node-group"
+  })
+
+  depends_on = [
+    aws_iam_role_policy_attachment.eks_node_policy,
+    aws_iam_role_policy_attachment.eks_cni_policy,
+    aws_iam_role_policy_attachment.eks_ecr_policy,
+  ]
+
+  lifecycle {
+    ignore_changes = [scaling_config[0].desired_size]
+  }
+}
+
+# Application Node Group
+resource "aws_eks_node_group" "application" {
+  cluster_name    = aws_eks_cluster.region.name
+  node_group_name = "${local.name_prefix}-application"
+  node_role_arn   = aws_iam_role.eks_nodes.arn
+  subnet_ids      = aws_subnet.private[*].id
+
+  instance_types = [var.eks_user_node_size]
+  capacity_type  = var.environment == "prod" ? "ON_DEMAND" : "SPOT"
+  disk_size      = 100
+
+  scaling_config {
+    desired_size = var.eks_user_node_count
+    max_size     = var.eks_user_node_max
+    min_size     = var.eks_user_node_min
+  }
+
+  update_config {
+    max_unavailable_percentage = 25
+  }
+
+  labels = {
+    "nodepool-type" = "application"
+    "workload"      = "unified-health"
+    "region"        = var.region_name
+  }
+
+  taint {
+    key    = "workload"
+    value  = "unified-health"
+    effect = "NO_SCHEDULE"
+  }
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-application-node-group"
+  })
+
+  depends_on = [
+    aws_iam_role_policy_attachment.eks_node_policy,
+    aws_iam_role_policy_attachment.eks_cni_policy,
+    aws_iam_role_policy_attachment.eks_ecr_policy,
+  ]
+
+  lifecycle {
+    ignore_changes = [scaling_config[0].desired_size]
+  }
+}
+
+# OIDC Provider for IRSA
+data "tls_certificate" "eks" {
+  url = aws_eks_cluster.region.identity[0].oidc[0].issuer
+}
+
+resource "aws_iam_openid_connect_provider" "eks" {
+  client_id_list  = ["sts.amazonaws.com"]
+  thumbprint_list = [data.tls_certificate.eks.certificates[0].sha1_fingerprint]
+  url             = aws_eks_cluster.region.identity[0].oidc[0].issuer
+
+  tags = local.common_tags
+}
+
+# ============================================
+# RDS Aurora PostgreSQL (Replaces: Azure PostgreSQL)
+# ============================================
+
+# PostgreSQL Admin Password
+resource "random_password" "postgresql_admin" {
+  length           = 32
+  special          = true
+  override_special = "!#$%&*()-_=+[]{}<>:?"
+}
+
+resource "aws_secretsmanager_secret" "postgresql_admin" {
+  name        = "${local.name_prefix}/postgresql-admin"
+  description = "PostgreSQL admin credentials for ${local.name_prefix}"
+  kms_key_id  = aws_kms_key.region.arn
+
+  tags = local.common_tags
+}
+
+resource "aws_secretsmanager_secret_version" "postgresql_admin" {
+  secret_id = aws_secretsmanager_secret.postgresql_admin.id
+  secret_string = jsonencode({
+    username = var.postgresql_admin_username
+    password = random_password.postgresql_admin.result
+  })
+}
+
+# RDS Parameter Groups
+resource "aws_rds_cluster_parameter_group" "region" {
+  name        = "${local.name_prefix}-aurora-cluster-pg"
+  family      = "aurora-postgresql15"
+  description = "Aurora PostgreSQL cluster parameter group"
+
+  parameter {
+    name  = "log_statement"
+    value = "all"
+  }
+
+  parameter {
+    name  = "log_min_duration_statement"
+    value = "1000"
+  }
+
+  tags = local.common_tags
+}
+
+resource "aws_db_parameter_group" "region" {
+  name        = "${local.name_prefix}-aurora-instance-pg"
+  family      = "aurora-postgresql15"
+  description = "Aurora PostgreSQL instance parameter group"
+
+  parameter {
+    name  = "log_connections"
+    value = "1"
+  }
+
+  parameter {
+    name  = "log_disconnections"
+    value = "1"
+  }
+
+  tags = local.common_tags
+}
+
+# Aurora Cluster
+resource "aws_rds_cluster" "region" {
+  cluster_identifier = "${local.name_prefix}-aurora"
+  engine             = "aurora-postgresql"
+  engine_mode        = "provisioned"
+  engine_version     = "15.4"
+  database_name      = "unified_health"
+  master_username    = var.postgresql_admin_username
+  master_password    = random_password.postgresql_admin.result
+
+  db_subnet_group_name            = aws_db_subnet_group.region.name
+  vpc_security_group_ids          = [aws_security_group.rds.id]
+  db_cluster_parameter_group_name = aws_rds_cluster_parameter_group.region.name
+
+  storage_encrypted = true
+  kms_key_id        = aws_kms_key.region.arn
+
+  backup_retention_period      = 35
+  preferred_backup_window      = "03:00-04:00"
+  preferred_maintenance_window = "sun:04:00-sun:05:00"
+  copy_tags_to_snapshot        = true
+
+  deletion_protection = var.environment == "prod"
+  skip_final_snapshot = var.environment != "prod"
+
+  enabled_cloudwatch_logs_exports = ["postgresql"]
+
+  serverlessv2_scaling_configuration {
+    min_capacity = var.environment == "prod" ? 2 : 0.5
+    max_capacity = var.environment == "prod" ? 16 : 4
+  }
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-aurora"
+  })
+
+  lifecycle {
+    ignore_changes = [master_password]
+  }
+}
+
+# Aurora Instance
+resource "aws_rds_cluster_instance" "region" {
+  count = var.postgresql_high_availability ? 2 : 1
+
+  identifier         = "${local.name_prefix}-aurora-${count.index + 1}"
+  cluster_identifier = aws_rds_cluster.region.id
+  instance_class     = "db.serverless"
+  engine             = aws_rds_cluster.region.engine
+  engine_version     = aws_rds_cluster.region.engine_version
+
+  db_parameter_group_name = aws_db_parameter_group.region.name
+
+  publicly_accessible        = false
+  auto_minor_version_upgrade = true
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-aurora-${count.index + 1}"
+  })
+}
+
+# Store RDS connection info
+resource "aws_secretsmanager_secret" "rds_connection" {
+  name        = "${local.name_prefix}/rds-connection"
+  description = "RDS connection details for ${local.name_prefix}"
+  kms_key_id  = aws_kms_key.region.arn
+
+  tags = local.common_tags
+}
+
+resource "aws_secretsmanager_secret_version" "rds_connection" {
+  secret_id = aws_secretsmanager_secret.rds_connection.id
+  secret_string = jsonencode({
+    username = var.postgresql_admin_username
+    password = random_password.postgresql_admin.result
+    host     = aws_rds_cluster.region.endpoint
+    port     = aws_rds_cluster.region.port
+    database = "unified_health"
+  })
+}
+
+# ============================================
+# ElastiCache Redis (Replaces: Azure Redis Cache)
+# ============================================
+
+# Redis Auth Token
+resource "random_password" "redis_auth_token" {
+  length           = 32
+  special          = true
+  override_special = "!&#$^<>-"
+}
+
+resource "aws_secretsmanager_secret" "redis_auth_token" {
+  name        = "${local.name_prefix}/redis-auth-token"
+  description = "Redis auth token for ${local.name_prefix}"
+  kms_key_id  = aws_kms_key.region.arn
+
+  tags = local.common_tags
+}
+
+resource "aws_secretsmanager_secret_version" "redis_auth_token" {
+  secret_id     = aws_secretsmanager_secret.redis_auth_token.id
+  secret_string = random_password.redis_auth_token.result
+}
+
+# Redis Parameter Group
+resource "aws_elasticache_parameter_group" "region" {
+  name        = "${local.name_prefix}-redis-params"
+  family      = "redis7"
+  description = "Parameter group for Redis ${local.name_prefix}"
+
+  parameter {
+    name  = "maxmemory-policy"
+    value = "allkeys-lru"
+  }
+
+  tags = local.common_tags
+}
+
+# ElastiCache Replication Group
+resource "aws_elasticache_replication_group" "region" {
+  replication_group_id = "${local.name_prefix}-redis"
+  description          = "Redis cluster for ${local.name_prefix}"
+
+  engine               = "redis"
+  engine_version       = "7.0"
+  node_type            = var.redis_node_type
+  num_cache_clusters   = var.environment == "prod" ? 2 : 1
+  parameter_group_name = aws_elasticache_parameter_group.region.name
+  port                 = 6379
+
+  subnet_group_name  = aws_elasticache_subnet_group.region.name
+  security_group_ids = [aws_security_group.redis.id]
+
+  at_rest_encryption_enabled = true
+  transit_encryption_enabled = true
+  auth_token                 = random_password.redis_auth_token.result
+  kms_key_id                 = aws_kms_key.region.arn
+
+  automatic_failover_enabled = var.environment == "prod"
+  multi_az_enabled           = var.environment == "prod"
+
+  snapshot_retention_limit = 7
+  snapshot_window          = "04:00-05:00"
+  maintenance_window       = "sun:05:00-sun:06:00"
+
+  auto_minor_version_upgrade = true
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-redis"
+  })
+
+  lifecycle {
+    ignore_changes = [auth_token]
+  }
+}
+
+# ============================================
+# S3 Bucket (Replaces: Azure Storage Account)
+# ============================================
+
+resource "aws_s3_bucket" "region" {
+  bucket = "${local.name_prefix}-storage-${data.aws_caller_identity.current.account_id}"
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-storage"
+  })
+}
+
+resource "aws_s3_bucket_versioning" "region" {
+  bucket = aws_s3_bucket.region.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "region" {
+  bucket = aws_s3_bucket.region.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      kms_master_key_id = aws_kms_key.region.arn
+      sse_algorithm     = "aws:kms"
     }
   }
 }
 
-resource "azurerm_storage_container" "documents" {
-  name                  = "documents"
-  storage_account_name  = azurerm_storage_account.region.name
-  container_access_type = "private"
-}
+resource "aws_s3_bucket_public_access_block" "region" {
+  bucket = aws_s3_bucket.region.id
 
-resource "azurerm_storage_container" "backups" {
-  name                  = "backups"
-  storage_account_name  = azurerm_storage_account.region.name
-  container_access_type = "private"
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }
 
 # ============================================
-# Application Insights
+# CloudWatch / Monitoring (Replaces: Azure Monitor)
 # ============================================
 
-resource "azurerm_application_insights" "region" {
-  name                = "appi-${var.project_name}-${local.resource_suffix}"
-  location            = azurerm_resource_group.region.location
-  resource_group_name = azurerm_resource_group.region.name
-  workspace_id        = var.global_log_analytics_workspace_id
-  application_type    = "web"
-  retention_in_days   = 90
-  tags                = local.common_tags
+# CloudWatch Log Group
+resource "aws_cloudwatch_log_group" "region" {
+  name              = "/aws/unified-health/${local.name_prefix}"
+  retention_in_days = var.cloudwatch_retention_days
+
+  tags = local.common_tags
 }
 
-# ============================================
-# Monitoring & Alerting
-# ============================================
+# SNS Topic for Alerts
+resource "aws_sns_topic" "alerts" {
+  name              = "${local.name_prefix}-alerts"
+  kms_master_key_id = aws_kms_key.region.id
 
-resource "azurerm_monitor_action_group" "critical" {
-  name                = "ag-critical-${local.resource_suffix}"
-  resource_group_name = azurerm_resource_group.region.name
-  short_name          = "critical"
-  tags                = local.common_tags
-
-  email_receiver {
-    name          = "operations-team"
-    email_address = var.alert_email_address
-  }
-
-  dynamic "webhook_receiver" {
-    for_each = var.alert_webhook_url != "" ? [1] : []
-    content {
-      name        = "webhook-notifications"
-      service_uri = var.alert_webhook_url
-    }
-  }
+  tags = local.common_tags
 }
 
-# AKS alerts
-resource "azurerm_monitor_metric_alert" "aks_node_cpu" {
-  name                = "aks-node-cpu-high-${local.resource_suffix}"
-  resource_group_name = azurerm_resource_group.region.name
-  scopes              = [azurerm_kubernetes_cluster.region.id]
-  description         = "Alert when AKS node CPU exceeds threshold"
-  severity            = 2
-  frequency           = "PT5M"
-  window_size         = "PT15M"
-  tags                = local.common_tags
-
-  criteria {
-    metric_namespace = "Microsoft.ContainerService/managedClusters"
-    metric_name      = "node_cpu_usage_percentage"
-    aggregation      = "Average"
-    operator         = "GreaterThan"
-    threshold        = 80
-  }
-
-  action {
-    action_group_id = azurerm_monitor_action_group.critical.id
-  }
+resource "aws_sns_topic_subscription" "email" {
+  count     = var.alert_email_address != "" ? 1 : 0
+  topic_arn = aws_sns_topic.alerts.arn
+  protocol  = "email"
+  endpoint  = var.alert_email_address
 }
 
-resource "azurerm_monitor_metric_alert" "aks_node_memory" {
-  name                = "aks-node-memory-high-${local.resource_suffix}"
-  resource_group_name = azurerm_resource_group.region.name
-  scopes              = [azurerm_kubernetes_cluster.region.id]
-  description         = "Alert when AKS node memory exceeds threshold"
-  severity            = 2
-  frequency           = "PT5M"
-  window_size         = "PT15M"
-  tags                = local.common_tags
+# CloudWatch Alarms
+resource "aws_cloudwatch_metric_alarm" "eks_cpu" {
+  alarm_name          = "${local.name_prefix}-eks-cpu-high"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 3
+  metric_name         = "node_cpu_utilization"
+  namespace           = "ContainerInsights"
+  period              = 300
+  statistic           = "Average"
+  threshold           = 80
+  alarm_description   = "EKS node CPU utilization is high"
+  alarm_actions       = [aws_sns_topic.alerts.arn]
 
-  criteria {
-    metric_namespace = "Microsoft.ContainerService/managedClusters"
-    metric_name      = "node_memory_working_set_percentage"
-    aggregation      = "Average"
-    operator         = "GreaterThan"
-    threshold        = 80
+  dimensions = {
+    ClusterName = aws_eks_cluster.region.name
   }
 
-  action {
-    action_group_id = azurerm_monitor_action_group.critical.id
-  }
+  tags = local.common_tags
 }
 
-# PostgreSQL alerts
-resource "azurerm_monitor_metric_alert" "postgresql_cpu" {
-  name                = "postgresql-cpu-high-${local.resource_suffix}"
-  resource_group_name = azurerm_resource_group.region.name
-  scopes              = [azurerm_postgresql_flexible_server.region.id]
-  description         = "Alert when PostgreSQL CPU exceeds threshold"
-  severity            = 2
-  frequency           = "PT5M"
-  window_size         = "PT15M"
-  tags                = local.common_tags
+resource "aws_cloudwatch_metric_alarm" "eks_memory" {
+  alarm_name          = "${local.name_prefix}-eks-memory-high"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 3
+  metric_name         = "node_memory_utilization"
+  namespace           = "ContainerInsights"
+  period              = 300
+  statistic           = "Average"
+  threshold           = 80
+  alarm_description   = "EKS node memory utilization is high"
+  alarm_actions       = [aws_sns_topic.alerts.arn]
 
-  criteria {
-    metric_namespace = "Microsoft.DBforPostgreSQL/flexibleServers"
-    metric_name      = "cpu_percent"
-    aggregation      = "Average"
-    operator         = "GreaterThan"
-    threshold        = 80
+  dimensions = {
+    ClusterName = aws_eks_cluster.region.name
   }
 
-  action {
-    action_group_id = azurerm_monitor_action_group.critical.id
-  }
+  tags = local.common_tags
 }
 
-resource "azurerm_monitor_metric_alert" "postgresql_storage" {
-  name                = "postgresql-storage-high-${local.resource_suffix}"
-  resource_group_name = azurerm_resource_group.region.name
-  scopes              = [azurerm_postgresql_flexible_server.region.id]
-  description         = "Alert when PostgreSQL storage exceeds threshold"
-  severity            = 1
-  frequency           = "PT5M"
-  window_size         = "PT15M"
-  tags                = local.common_tags
+resource "aws_cloudwatch_metric_alarm" "rds_cpu" {
+  alarm_name          = "${local.name_prefix}-rds-cpu-high"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 3
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/RDS"
+  period              = 300
+  statistic           = "Average"
+  threshold           = 80
+  alarm_description   = "Aurora CPU utilization is high"
+  alarm_actions       = [aws_sns_topic.alerts.arn]
 
-  criteria {
-    metric_namespace = "Microsoft.DBforPostgreSQL/flexibleServers"
-    metric_name      = "storage_percent"
-    aggregation      = "Average"
-    operator         = "GreaterThan"
-    threshold        = 85
+  dimensions = {
+    DBClusterIdentifier = aws_rds_cluster.region.cluster_identifier
   }
 
-  action {
-    action_group_id = azurerm_monitor_action_group.critical.id
-  }
+  tags = local.common_tags
 }
 
-# Redis alerts
-resource "azurerm_monitor_metric_alert" "redis_cpu" {
-  name                = "redis-cpu-high-${local.resource_suffix}"
-  resource_group_name = azurerm_resource_group.region.name
-  scopes              = [azurerm_redis_cache.region.id]
-  description         = "Alert when Redis CPU exceeds threshold"
-  severity            = 2
-  frequency           = "PT5M"
-  window_size         = "PT15M"
-  tags                = local.common_tags
+resource "aws_cloudwatch_metric_alarm" "redis_cpu" {
+  alarm_name          = "${local.name_prefix}-redis-cpu-high"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 3
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/ElastiCache"
+  period              = 300
+  statistic           = "Average"
+  threshold           = 80
+  alarm_description   = "Redis CPU utilization is high"
+  alarm_actions       = [aws_sns_topic.alerts.arn]
 
-  criteria {
-    metric_namespace = "Microsoft.Cache/Redis"
-    metric_name      = "percentProcessorTime"
-    aggregation      = "Average"
-    operator         = "GreaterThan"
-    threshold        = 80
+  dimensions = {
+    CacheClusterId = aws_elasticache_replication_group.region.id
   }
 
-  action {
-    action_group_id = azurerm_monitor_action_group.critical.id
-  }
-}
-
-# ============================================
-# Diagnostic Settings
-# ============================================
-
-resource "azurerm_monitor_diagnostic_setting" "keyvault" {
-  name                       = "keyvault-diagnostics"
-  target_resource_id         = azurerm_key_vault.region.id
-  log_analytics_workspace_id = var.global_log_analytics_workspace_id
-
-  enabled_log {
-    category = "AuditEvent"
-  }
-
-  metric {
-    category = "AllMetrics"
-    enabled  = true
-  }
-}
-
-resource "azurerm_monitor_diagnostic_setting" "postgresql" {
-  name                       = "postgresql-diagnostics"
-  target_resource_id         = azurerm_postgresql_flexible_server.region.id
-  log_analytics_workspace_id = var.global_log_analytics_workspace_id
-
-  enabled_log {
-    category = "PostgreSQLLogs"
-  }
-
-  metric {
-    category = "AllMetrics"
-    enabled  = true
-  }
-}
-
-resource "azurerm_monitor_diagnostic_setting" "redis" {
-  name                       = "redis-diagnostics"
-  target_resource_id         = azurerm_redis_cache.region.id
-  log_analytics_workspace_id = var.global_log_analytics_workspace_id
-
-  enabled_log {
-    category = "ConnectedClientList"
-  }
-
-  metric {
-    category = "AllMetrics"
-    enabled  = true
-  }
+  tags = local.common_tags
 }

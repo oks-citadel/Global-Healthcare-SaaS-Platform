@@ -2,7 +2,7 @@ import { PrismaClient } from '../generated/client';
 import { CreateImageDTO } from '../types';
 import logger from '../utils/logger';
 import { AppError } from '../utils/errorHandler';
-import azureStorage from '../utils/azureStorage';
+import s3Storage from '../utils/s3Storage';
 
 const prisma = new PrismaClient();
 
@@ -99,10 +99,10 @@ class ImageService {
         throw new AppError('Image not found', 404);
       }
 
-      // Delete from Azure Blob Storage
+      // Delete from S3 Storage
       try {
-        const blobName = this.getBlobNameFromUrl(image.storageUrl);
-        await azureStorage.deleteImage(blobName);
+        const key = this.getKeyFromUrl(image.storageUrl);
+        await s3Storage.deleteImage(key);
       } catch (storageError) {
         logger.error('Error deleting image from storage', storageError);
         // Continue with database deletion even if storage deletion fails
@@ -126,9 +126,9 @@ class ImageService {
   async getImageUrl(id: string, expiresInMinutes: number = 60) {
     try {
       const image = await this.getImageById(id);
-      const blobName = this.getBlobNameFromUrl(image.storageUrl);
+      const key = this.getKeyFromUrl(image.storageUrl);
 
-      const url = await azureStorage.generateSasUrl(blobName, expiresInMinutes);
+      const url = await s3Storage.generatePresignedUrl(key, expiresInMinutes * 60);
 
       return url;
     } catch (error) {
@@ -163,10 +163,18 @@ class ImageService {
     }
   }
 
-  private getBlobNameFromUrl(url: string): string {
-    // Extract blob name from URL
-    const parts = url.split('/');
-    return parts[parts.length - 1];
+  private getKeyFromUrl(url: string): string {
+    // Extract S3 key from URL
+    // Handle both S3 URL formats: https://bucket.s3.region.amazonaws.com/key and https://s3.region.amazonaws.com/bucket/key
+    try {
+      const urlObj = new URL(url);
+      const path = urlObj.pathname;
+      // Remove leading slash
+      return path.startsWith('/') ? path.slice(1) : path;
+    } catch {
+      // Fallback: assume it's just a key
+      return url;
+    }
   }
 
   async updateImageMetadata(id: string, metadata: any) {

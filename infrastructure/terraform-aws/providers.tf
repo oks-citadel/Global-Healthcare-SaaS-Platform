@@ -1,0 +1,151 @@
+# ============================================
+# AWS Provider Configuration
+# ============================================
+# Multi-region deployment with assume role
+# ============================================
+
+provider "aws" {
+  region = var.aws_region
+
+  # Cross-account access via assume role
+  dynamic "assume_role" {
+    for_each = var.assume_role_arn != "" ? [1] : []
+    content {
+      role_arn     = var.assume_role_arn
+      session_name = "TerraformUnifiedHealth"
+      external_id  = var.assume_role_external_id
+    }
+  }
+
+  default_tags {
+    tags = {
+      Project        = "UnifiedHealth"
+      Environment    = var.environment
+      ManagedBy      = "terraform"
+      Owner          = "citadel-cloud-management"
+      CostCenter     = "healthcare-platform"
+      Compliance     = join(",", var.compliance_standards)
+      DataResidency  = var.aws_region
+    }
+  }
+}
+
+# ============================================
+# Regional Providers for Multi-Region Deployment
+# ============================================
+
+# Americas Region (Primary)
+provider "aws" {
+  alias  = "americas"
+  region = "us-east-1"
+
+  dynamic "assume_role" {
+    for_each = var.assume_role_arn != "" ? [1] : []
+    content {
+      role_arn     = var.assume_role_arn
+      session_name = "TerraformUnifiedHealthAmericas"
+      external_id  = var.assume_role_external_id
+    }
+  }
+
+  default_tags {
+    tags = {
+      Project     = "UnifiedHealth"
+      Environment = var.environment
+      ManagedBy   = "terraform"
+      Region      = "Americas"
+    }
+  }
+}
+
+# Europe Region (GDPR)
+provider "aws" {
+  alias  = "europe"
+  region = "eu-west-1"
+
+  dynamic "assume_role" {
+    for_each = var.assume_role_arn != "" ? [1] : []
+    content {
+      role_arn     = var.assume_role_arn
+      session_name = "TerraformUnifiedHealthEurope"
+      external_id  = var.assume_role_external_id
+    }
+  }
+
+  default_tags {
+    tags = {
+      Project     = "UnifiedHealth"
+      Environment = var.environment
+      ManagedBy   = "terraform"
+      Region      = "Europe"
+      Compliance  = "GDPR"
+    }
+  }
+}
+
+# Africa Region (POPIA)
+provider "aws" {
+  alias  = "africa"
+  region = "af-south-1"
+
+  dynamic "assume_role" {
+    for_each = var.assume_role_arn != "" ? [1] : []
+    content {
+      role_arn     = var.assume_role_arn
+      session_name = "TerraformUnifiedHealthAfrica"
+      external_id  = var.assume_role_external_id
+    }
+  }
+
+  default_tags {
+    tags = {
+      Project     = "UnifiedHealth"
+      Environment = var.environment
+      ManagedBy   = "terraform"
+      Region      = "Africa"
+      Compliance  = "POPIA"
+    }
+  }
+}
+
+# ============================================
+# Kubernetes Provider (configured after EKS)
+# ============================================
+
+provider "kubernetes" {
+  host                   = try(module.eks_americas[0].cluster_endpoint, "")
+  cluster_ca_certificate = try(base64decode(module.eks_americas[0].cluster_ca_certificate), "")
+
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    command     = "aws"
+    args = [
+      "eks",
+      "get-token",
+      "--cluster-name",
+      try(module.eks_americas[0].cluster_name, ""),
+      "--region",
+      var.aws_region
+    ]
+  }
+}
+
+provider "helm" {
+  kubernetes {
+    host                   = try(module.eks_americas[0].cluster_endpoint, "")
+    cluster_ca_certificate = try(base64decode(module.eks_americas[0].cluster_ca_certificate), "")
+
+    exec {
+      api_version = "client.authentication.k8s.io/v1beta1"
+      command     = "aws"
+      args = [
+        "eks",
+        "get-token",
+        "--cluster-name",
+        try(module.eks_americas[0].cluster_name, ""),
+        "--region",
+        var.aws_region
+      ]
+    }
+  }
+}
