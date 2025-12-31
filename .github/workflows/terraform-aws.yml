@@ -162,7 +162,7 @@ jobs:
             -no-color
 
       - name: Upload Plan
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: tfplan-dev
           path: ${{ env.TF_WORKING_DIR }}/tfplan-dev
@@ -278,7 +278,7 @@ jobs:
             -out=tfplan-staging
 
       - name: Upload Plan
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: tfplan-staging
           path: ${{ env.TF_WORKING_DIR }}/tfplan-staging
@@ -377,7 +377,7 @@ jobs:
             -out=tfplan-prod
 
       - name: Upload Plan
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: tfplan-prod
           path: ${{ env.TF_WORKING_DIR }}/tfplan-prod

@@ -123,7 +123,7 @@ jobs:
 
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: unit-test-results-api
           path: services/api/coverage/
@@ -328,7 +328,7 @@ jobs:
 
       - name: Upload security test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: security-test-results
           path: services/api/coverage/
