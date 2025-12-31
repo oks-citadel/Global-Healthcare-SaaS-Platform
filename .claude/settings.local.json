@@ -9,7 +9,10 @@
       "Bash(git push:*)",
       "Bash(pnpm run typecheck:*)",
       "Bash(npx tsc:*)",
-      "Bash(xargs cat:*)"
+      "Bash(xargs cat:*)",
+      "Bash(git fetch:*)",
+      "Bash(git merge:*)",
+      "Bash(git checkout:*)"
     ]
   }
 }
