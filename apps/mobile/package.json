@@ -34,7 +34,11 @@
     "axios": "^1.6.2",
     "zod": "^3.22.4",
     "socket.io-client": "^4.8.3",
+<<<<<<< HEAD
     "react-native-webrtc": "^124.0.7"
+=======
+    "react-native-webrtc": "^118.0.0"
+>>>>>>> origin/dependabot/npm_and_yarn/socket.io-client-4.8.3
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
