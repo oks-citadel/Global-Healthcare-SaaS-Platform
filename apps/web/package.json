@@ -42,7 +42,7 @@
     "@hookform/resolvers": "^5.2.2",
     "@stripe/react-stripe-js": "^2.4.0",
     "@stripe/stripe-js": "^8.6.0",
-    "@tanstack/react-query": "^5.17.0",
+    "@tanstack/react-query": "^5.90.14",
     "@unified-health/sdk": "workspace:*",
     "axios": "^1.6.2",
     "clsx": "^2.0.0",
