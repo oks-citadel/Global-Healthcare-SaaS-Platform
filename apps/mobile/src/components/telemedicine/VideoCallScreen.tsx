@@ -74,12 +74,10 @@ export default function VideoCallScreen({
     socketRef.current = socket;
 
     socket.on('connect', () => {
-      console.log('Socket connected:', socket.id);
       initializeCall();
     });
 
     socket.on('connect_error', (err) => {
-      console.error('Socket connection error:', err);
       setError('Failed to connect to server');
     });
 
@@ -110,7 +108,6 @@ export default function VideoCallScreen({
       setLocalStream(stream);
       return stream;
     } catch (err) {
-      console.error('Error accessing media devices:', err);
       setError('Failed to access camera/microphone');
       throw err;
     }
@@ -145,7 +142,6 @@ export default function VideoCallScreen({
         }
       );
     } catch (err) {
-      console.error('Error initializing call:', err);
       setIsConnecting(false);
     }
   };
@@ -168,7 +164,6 @@ export default function VideoCallScreen({
       // Handle remote stream
       peerConnection.ontrack = (event) => {
         if (event.streams && event.streams[0]) {
-          console.log('Received remote stream');
           setRemoteStream(event.streams[0]);
         }
       };
@@ -185,7 +180,6 @@ export default function VideoCallScreen({
 
       // Handle connection state changes
       peerConnection.onconnectionstatechange = () => {
-        console.log('Connection state:', peerConnection.connectionState);
         if (peerConnection.connectionState === 'connected') {
           setIsConnected(true);
         } else if (peerConnection.connectionState === 'disconnected') {
@@ -204,7 +198,6 @@ export default function VideoCallScreen({
         });
       }
     } catch (err) {
-      console.error('Error creating peer connection:', err);
       setError('Failed to establish connection');
     }
   };
@@ -212,7 +205,6 @@ export default function VideoCallScreen({
   // Handle receiving offer
   const handleReceiveOffer = async ({ from, signal }: any) => {
     try {
-      console.log('Received offer from:', from);
       if (!localStream) return;
 
       const peerConnection = new RTCPeerConnection(iceServers);
@@ -246,19 +238,18 @@ export default function VideoCallScreen({
         signal: answer,
       });
     } catch (err) {
-      console.error('Error handling offer:', err);
+      // Offer handling failed
     }
   };
 
   // Handle receiving answer
   const handleReceiveAnswer = async ({ signal }: any) => {
     try {
-      console.log('Received answer');
       await peerConnectionRef.current?.setRemoteDescription(
         new RTCSessionDescription(signal)
       );
     } catch (err) {
-      console.error('Error handling answer:', err);
+      // Answer handling failed
     }
   };
 
@@ -267,13 +258,12 @@ export default function VideoCallScreen({
     try {
       await peerConnectionRef.current?.addIceCandidate(new RTCIceCandidate(signal));
     } catch (err) {
-      console.error('Error handling ICE candidate:', err);
+      // ICE candidate handling failed
     }
   };
 
   // Handle peer joined
   const handlePeerJoined = ({ peer }: { peer: Peer }) => {
-    console.log('Peer joined:', peer);
     if (localStream) {
       createPeerConnection(peer.socketId, true, localStream);
     }
@@ -281,7 +271,6 @@ export default function VideoCallScreen({
 
   // Handle peer left
   const handlePeerLeft = () => {
-    console.log('Peer left');
     setRemoteStream(null);
     peerConnectionRef.current?.close();
     peerConnectionRef.current = null;

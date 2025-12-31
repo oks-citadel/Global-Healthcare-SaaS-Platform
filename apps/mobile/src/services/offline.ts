@@ -64,15 +64,13 @@ class OfflineService {
       const wasOnline = this.isOnline;
       this.isOnline = state.isConnected ?? false;
 
-      console.log('[OfflineService] Network state changed:', this.isOnline ? 'online' : 'offline');
-
       // Notify listeners
       this.notifyListeners();
 
       // If we just came online, trigger sync
       if (!wasOnline && this.isOnline) {
-        this.syncPendingActions().catch((error) => {
-          console.error('[OfflineService] Auto-sync error:', error);
+        this.syncPendingActions().catch(() => {
+          // Auto-sync failed
         });
       }
     });
@@ -80,8 +78,6 @@ class OfflineService {
     // Get initial network state
     const state = await NetInfo.fetch();
     this.isOnline = state.isConnected ?? false;
-
-    console.log('[OfflineService] Initialized, online:', this.isOnline);
   }
 
   /**
@@ -124,7 +120,6 @@ class OfflineService {
     actions.push(action);
     await this.savePendingActions(actions);
 
-    console.log('[OfflineService] Action queued:', action.id, type);
     return action.id;
   }
 
@@ -136,7 +131,6 @@ class OfflineService {
       const data = await AsyncStorage.getItem(STORAGE_KEYS.PENDING_ACTIONS);
       return data ? JSON.parse(data) : [];
     } catch (error) {
-      console.error('[OfflineService] Error getting pending actions:', error);
       return [];
     }
   }
@@ -148,7 +142,7 @@ class OfflineService {
     try {
       await AsyncStorage.setItem(STORAGE_KEYS.PENDING_ACTIONS, JSON.stringify(actions));
     } catch (error) {
-      console.error('[OfflineService] Error saving pending actions:', error);
+      // Failed to save pending actions
     }
   }
 
@@ -172,8 +166,6 @@ class OfflineService {
    * Execute a pending action
    */
   private async executeAction(action: PendingAction): Promise<void> {
-    console.log('[OfflineService] Executing action:', action.id, action.type);
-
     switch (action.type) {
       case 'send_message':
         await socketService.sendChatMessage(action.payload);
@@ -209,12 +201,10 @@ class OfflineService {
    */
   async syncPendingActions(): Promise<SyncResult> {
     if (this.syncInProgress) {
-      console.log('[OfflineService] Sync already in progress');
       return { success: false, processed: 0, failed: 0, errors: [] };
     }
 
     if (!this.isOnline) {
-      console.log('[OfflineService] Cannot sync while offline');
       return { success: false, processed: 0, failed: 0, errors: [] };
     }
 
@@ -228,7 +218,6 @@ class OfflineService {
 
     try {
       const actions = await this.getPendingActions();
-      console.log('[OfflineService] Syncing', actions.length, 'pending actions');
 
       if (actions.length === 0) {
         return result;
@@ -240,9 +229,7 @@ class OfflineService {
           await this.executeAction(action);
           await this.removeAction(action.id);
           result.processed++;
-          console.log('[OfflineService] Action synced:', action.id);
         } catch (error: any) {
-          console.error('[OfflineService] Action failed:', action.id, error);
 
           action.retries++;
           action.error = error.message;
@@ -272,7 +259,6 @@ class OfflineService {
 
       result.success = result.failed === 0;
     } catch (error) {
-      console.error('[OfflineService] Sync error:', error);
       result.success = false;
     } finally {
       this.syncInProgress = false;
@@ -293,7 +279,7 @@ class OfflineService {
       };
       await AsyncStorage.setItem(key, JSON.stringify(offlineData));
     } catch (error) {
-      console.error('[OfflineService] Error caching data:', error);
+      // Failed to cache data
     }
   }
 
@@ -308,7 +294,6 @@ class OfflineService {
       const offlineData: OfflineData<T> = JSON.parse(data);
       return offlineData.data;
     } catch (error) {
-      console.error('[OfflineService] Error getting cached data:', error);
       return null;
     }
   }
@@ -320,7 +305,7 @@ class OfflineService {
     try {
       await AsyncStorage.removeItem(key);
     } catch (error) {
-      console.error('[OfflineService] Error removing cached data:', error);
+      // Failed to remove cached data
     }
   }
 
@@ -378,7 +363,7 @@ class OfflineService {
         new Date().toISOString()
       );
     } catch (error) {
-      console.error('[OfflineService] Error updating sync timestamp:', error);
+      // Failed to update sync timestamp
     }
   }
 
@@ -389,7 +374,6 @@ class OfflineService {
     try {
       return await AsyncStorage.getItem(STORAGE_KEYS.SYNC_TIMESTAMP);
     } catch (error) {
-      console.error('[OfflineService] Error getting sync timestamp:', error);
       return null;
     }
   }
@@ -435,9 +419,8 @@ class OfflineService {
         AsyncStorage.removeItem(STORAGE_KEYS.USER_DATA_CACHE),
         AsyncStorage.removeItem(STORAGE_KEYS.SYNC_TIMESTAMP),
       ]);
-      console.log('[OfflineService] All offline data cleared');
     } catch (error) {
-      console.error('[OfflineService] Error clearing offline data:', error);
+      // Failed to clear offline data
     }
   }
 

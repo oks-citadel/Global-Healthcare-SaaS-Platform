@@ -1,28 +1,67 @@
-// @ts-nocheck
-import { PrismaClient } from '../generated/client';
+import { PrismaClient, TreatmentPlan, TreatmentGoal } from '../generated/client';
 
 const prisma = new PrismaClient();
+
+// Type definitions for treatment plan data
+interface TreatmentPlanGoalInput {
+  description: string;
+  targetDate?: Date;
+  strategies: string[];
+  measurements?: Record<string, unknown>;
+}
+
+interface CreateTreatmentPlanInput {
+  patientId: string;
+  providerId: string;
+  diagnosis: string[];
+  interventions: Record<string, unknown>;
+  medications?: Record<string, unknown>;
+  frequency?: string;
+  startDate: Date;
+  reviewDate: Date;
+  goals: TreatmentPlanGoalInput[];
+}
+
+interface UpdateTreatmentPlanInput {
+  diagnosis?: string[];
+  interventions?: Record<string, unknown>;
+  medications?: Record<string, unknown>;
+  frequency?: string;
+  reviewDate?: Date;
+  status?: string;
+}
+
+interface AddGoalInput {
+  treatmentPlanId: string;
+  description: string;
+  targetDate?: Date;
+  strategies: string[];
+  measurements?: Record<string, unknown>;
+}
+
+interface UpdateGoalProgressInput {
+  progress?: number;
+  status?: 'not_started' | 'in_progress' | 'achieved' | 'discontinued';
+  barriers?: string[];
+  strategies?: string[];
+}
+
+interface TreatmentPlanWithGoals extends TreatmentPlan {
+  goalRecords: TreatmentGoal[];
+}
+
+interface PlanProgressStats {
+  totalGoals: number;
+  achievedGoals: number;
+  inProgressGoals: number;
+  overallProgress: number;
+}
 
 export class TreatmentPlanService {
   /**
    * Create a new treatment plan with goals
    */
-  static async createTreatmentPlan(data: {
-    patientId: string;
-    providerId: string;
-    diagnosis: string[];
-    interventions: any;
-    medications?: any;
-    frequency?: string;
-    startDate: Date;
-    reviewDate: Date;
-    goals: Array<{
-      description: string;
-      targetDate?: Date;
-      strategies: string[];
-      measurements?: any;
-    }>;
-  }) {
+  static async createTreatmentPlan(data: CreateTreatmentPlanInput): Promise<TreatmentPlan> {
     const plan = await prisma.treatmentPlan.create({
       data: {
         patientId: data.patientId,
@@ -64,7 +103,7 @@ export class TreatmentPlanService {
   /**
    * Get treatment plan with goals
    */
-  static async getTreatmentPlanWithGoals(planId: string) {
+  static async getTreatmentPlanWithGoals(planId: string): Promise<TreatmentPlanWithGoals | null> {
     const plan = await prisma.treatmentPlan.findUnique({
       where: { id: planId },
     });
@@ -87,7 +126,7 @@ export class TreatmentPlanService {
   /**
    * Get active treatment plan for patient
    */
-  static async getActivePlanForPatient(patientId: string) {
+  static async getActivePlanForPatient(patientId: string): Promise<TreatmentPlanWithGoals | null> {
     const plan = await prisma.treatmentPlan.findFirst({
       where: {
         patientId,
@@ -116,15 +155,8 @@ export class TreatmentPlanService {
    */
   static async updateTreatmentPlan(
     planId: string,
-    data: {
-      diagnosis?: string[];
-      interventions?: any;
-      medications?: any;
-      frequency?: string;
-      reviewDate?: Date;
-      status?: string;
-    }
-  ) {
+    data: UpdateTreatmentPlanInput
+  ): Promise<TreatmentPlan> {
     return await prisma.treatmentPlan.update({
       where: { id: planId },
       data,
@@ -134,13 +166,7 @@ export class TreatmentPlanService {
   /**
    * Add goal to treatment plan
    */
-  static async addGoal(data: {
-    treatmentPlanId: string;
-    description: string;
-    targetDate?: Date;
-    strategies: string[];
-    measurements?: any;
-  }) {
+  static async addGoal(data: AddGoalInput): Promise<TreatmentGoal> {
     return await prisma.treatmentGoal.create({
       data: {
         treatmentPlanId: data.treatmentPlanId,
@@ -160,13 +186,8 @@ export class TreatmentPlanService {
    */
   static async updateGoalProgress(
     goalId: string,
-    data: {
-      progress?: number;
-      status?: 'not_started' | 'in_progress' | 'achieved' | 'discontinued';
-      barriers?: string[];
-      strategies?: string[];
-    }
-  ) {
+    data: UpdateGoalProgressInput
+  ): Promise<TreatmentGoal> {
     return await prisma.treatmentGoal.update({
       where: { id: goalId },
       data,
@@ -176,7 +197,7 @@ export class TreatmentPlanService {
   /**
    * Get goals for treatment plan
    */
-  static async getGoalsForPlan(treatmentPlanId: string) {
+  static async getGoalsForPlan(treatmentPlanId: string): Promise<TreatmentGoal[]> {
     return await prisma.treatmentGoal.findMany({
       where: { treatmentPlanId },
       orderBy: { createdAt: 'asc' },
@@ -186,7 +207,7 @@ export class TreatmentPlanService {
   /**
    * Calculate treatment plan progress
    */
-  static async calculatePlanProgress(planId: string) {
+  static async calculatePlanProgress(planId: string): Promise<PlanProgressStats> {
     const goals = await prisma.treatmentGoal.findMany({
       where: { treatmentPlanId: planId },
     });
@@ -200,9 +221,9 @@ export class TreatmentPlanService {
       };
     }
 
-    const achievedGoals = goals.filter((g: any) => g.status === 'achieved').length;
-    const inProgressGoals = goals.filter((g: any) => g.status === 'in_progress').length;
-    const overallProgress = goals.reduce((sum: number, g: any) => sum + g.progress, 0) / goals.length;
+    const achievedGoals = goals.filter((g) => g.status === 'achieved').length;
+    const inProgressGoals = goals.filter((g) => g.status === 'in_progress').length;
+    const overallProgress = goals.reduce((sum, g) => sum + g.progress, 0) / goals.length;
 
     return {
       totalGoals: goals.length,
@@ -215,7 +236,7 @@ export class TreatmentPlanService {
   /**
    * Check if plan needs review
    */
-  static async checkPlansDueForReview() {
+  static async checkPlansDueForReview(): Promise<TreatmentPlan[]> {
     return await prisma.treatmentPlan.findMany({
       where: {
         status: 'active',

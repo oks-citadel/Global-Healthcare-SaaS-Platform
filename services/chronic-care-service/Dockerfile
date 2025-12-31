@@ -1,5 +1,5 @@
-FROM node:20-slim AS base
-RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+FROM node:20.18-slim AS base
+RUN apt-get update && apt-get install -y openssl dumb-init curl && rm -rf /var/lib/apt/lists/*
 
 FROM base AS deps
 WORKDIR /app
@@ -25,4 +25,9 @@ COPY --from=builder /app/src/generated ./dist/generated
 USER chroniccare
 EXPOSE 3003
 ENV PORT=3003
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=20s --retries=3 \
+  CMD curl -f http://localhost:3003/health || exit 1
+
+ENTRYPOINT ["dumb-init", "--"]
 CMD ["node", "dist/index.js"]

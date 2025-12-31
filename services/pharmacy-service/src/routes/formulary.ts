@@ -1,11 +1,13 @@
-// @ts-nocheck
-import { Router } from 'express';
+import { Router, Response } from 'express';
 import { z } from 'zod';
-import { PrismaClient } from '../generated/client';
+import { PrismaClient, Prisma } from '../generated/client';
 import { UserRequest, requireUser } from '../middleware/extractUser';
 
 const router: ReturnType<typeof Router> = Router();
 const prisma = new PrismaClient();
+
+// Type for Prisma where clauses
+type MedicationWhereInput = Prisma.MedicationWhereInput;
 
 const addMedicationSchema = z.object({
   name: z.string(),
@@ -31,7 +33,7 @@ const addMedicationSchema = z.object({
  * GET /formulary
  * Search formulary
  */
-router.get('/', requireUser, async (req: UserRequest, res) => {
+router.get('/', requireUser, async (req: UserRequest, res: Response) => {
   try {
     const {
       search,
@@ -45,7 +47,7 @@ router.get('/', requireUser, async (req: UserRequest, res) => {
       offset,
     } = req.query;
 
-    const where: any = { isActive: true };
+    const where: MedicationWhereInput = { isActive: true };
 
     if (search) {
       where.OR = [
@@ -107,7 +109,7 @@ router.get('/', requireUser, async (req: UserRequest, res) => {
  * GET /formulary/:id
  * Get medication details
  */
-router.get('/:id', requireUser, async (req: UserRequest, res) => {
+router.get('/:id', requireUser, async (req: UserRequest, res: Response) => {
   try {
     const { id } = req.params;
 
@@ -142,7 +144,7 @@ router.get('/:id', requireUser, async (req: UserRequest, res) => {
  * POST /formulary
  * Add medication to formulary
  */
-router.post('/', requireUser, async (req: UserRequest, res) => {
+router.post('/', requireUser, async (req: UserRequest, res: Response) => {
   try {
     if (req.user!.role !== 'admin') {
       res.status(403).json({
@@ -180,7 +182,7 @@ router.post('/', requireUser, async (req: UserRequest, res) => {
  * PATCH /formulary/:id
  * Update medication in formulary
  */
-router.patch('/:id', requireUser, async (req: UserRequest, res) => {
+router.patch('/:id', requireUser, async (req: UserRequest, res: Response) => {
   try {
     if (req.user!.role !== 'admin') {
       res.status(403).json({
@@ -215,7 +217,7 @@ router.patch('/:id', requireUser, async (req: UserRequest, res) => {
  * DELETE /formulary/:id
  * Deactivate medication in formulary
  */
-router.delete('/:id', requireUser, async (req: UserRequest, res) => {
+router.delete('/:id', requireUser, async (req: UserRequest, res: Response) => {
   try {
     if (req.user!.role !== 'admin') {
       res.status(403).json({
@@ -249,7 +251,7 @@ router.delete('/:id', requireUser, async (req: UserRequest, res) => {
  * GET /formulary/by-ndc/:ndcCode
  * Look up medication by NDC code
  */
-router.get('/by-ndc/:ndcCode', requireUser, async (req: UserRequest, res) => {
+router.get('/by-ndc/:ndcCode', requireUser, async (req: UserRequest, res: Response) => {
   try {
     const { ndcCode } = req.params;
 
@@ -279,11 +281,11 @@ router.get('/by-ndc/:ndcCode', requireUser, async (req: UserRequest, res) => {
  * GET /formulary/controlled-substances
  * Get all controlled substances
  */
-router.get('/controlled-substances', requireUser, async (req: UserRequest, res) => {
+router.get('/controlled-substances', requireUser, async (req: UserRequest, res: Response) => {
   try {
     const { deaSchedule } = req.query;
 
-    const where: any = {
+    const where: MedicationWhereInput = {
       isActive: true,
       isControlled: true,
     };
@@ -314,7 +316,7 @@ router.get('/controlled-substances', requireUser, async (req: UserRequest, res) 
  * GET /formulary/therapeutic-classes
  * Get list of therapeutic classes
  */
-router.get('/therapeutic-classes', requireUser, async (req: UserRequest, res) => {
+router.get('/therapeutic-classes', requireUser, async (req: UserRequest, res: Response) => {
   try {
     const medications = await prisma.medication.findMany({
       where: { isActive: true },

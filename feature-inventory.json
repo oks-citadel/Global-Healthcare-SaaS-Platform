@@ -1,0 +1,1812 @@
+{
+  "metadata": {
+    "generatedAt": "2025-12-30T14:00:00Z",
+    "platform": "Global Healthcare SaaS Platform",
+    "version": "1.0.0",
+    "totalFeatures": 98,
+    "categories": {
+      "userFacing": 42,
+      "adminOperations": 18,
+      "platformSystem": 38
+    }
+  },
+  "features": {
+    "A_UserFacingFeatures": {
+      "authentication": [
+        {
+          "name": "User Login",
+          "description": "Email/password authentication with JWT tokens",
+          "location": [
+            "apps/web/src/app/login/page.tsx",
+            "apps/mobile/app/(auth)/login.tsx",
+            "services/auth-service/src/controllers/auth.controller.ts",
+            "services/api/src/routes/index.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": true,
+          "authRequired": false,
+          "revenueImpact": "Free",
+          "status": "Working"
+        },
+        {
+          "name": "User Registration",
+          "description": "New user signup with email verification",
+          "location": [
+            "apps/web/src/app/register/page.tsx",
+            "apps/mobile/app/(auth)/register.tsx",
+            "services/auth-service/src/routes/auth.routes.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": true,
+          "authRequired": false,
+          "revenueImpact": "Free",
+          "status": "Working"
+        },
+        {
+          "name": "Password Reset",
+          "description": "Forgot password and reset password flow",
+          "location": [
+            "apps/web/src/app/forgot-password/page.tsx",
+            "apps/web/src/app/reset-password/page.tsx",
+            "services/auth-service/src/routes/auth.routes.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": false,
+          "revenueImpact": "Free",
+          "status": "Working"
+        },
+        {
+          "name": "Multi-Factor Authentication (MFA)",
+          "description": "TOTP-based two-factor authentication",
+          "location": [
+            "services/auth-service/src/controllers/mfa.controller.ts",
+            "services/auth-service/src/routes/mfa.routes.ts",
+            "services/auth-service/src/services/mfa.service.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": true,
+          "authRequired": true,
+          "revenueImpact": "Free",
+          "status": "Working"
+        },
+        {
+          "name": "Email Verification",
+          "description": "Email confirmation after registration",
+          "location": [
+            "services/auth-service/src/routes/auth.routes.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": true,
+          "authRequired": false,
+          "revenueImpact": "Free",
+          "status": "Working"
+        }
+      ],
+      "patientPortal": [
+        {
+          "name": "Patient Dashboard",
+          "description": "Overview of patient health information, appointments, and alerts",
+          "location": [
+            "apps/web/src/app/(dashboard)/patient/page.tsx",
+            "apps/mobile/app/(tabs)/index.tsx"
+          ],
+          "webSupport": true,
+          "mobileSupport": true,
+          "authRequired": true,
+          "revenueImpact": "Free",
+          "status": "Working"
+        },
+        {
+          "name": "Patient Profile Management",
+          "description": "View and edit patient profile information",
+          "location": [
+            "apps/web/src/app/(dashboard)/patient/profile/page.tsx",
+            "apps/mobile/app/(tabs)/profile.tsx",
+            "services/api/src/controllers/patient.controller.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": true,
+          "authRequired": true,
+          "revenueImpact": "Free",
+          "status": "Working"
+        },
+        {
+          "name": "Patient Documents",
+          "description": "Upload, view, and manage medical documents",
+          "location": [
+            "apps/web/src/app/(dashboard)/patient/documents/page.tsx",
+            "apps/web/src/components/patient/DocumentUploader.tsx",
+            "services/api/src/controllers/document.controller.ts",
+            "services/api/src/routes/documents.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Patient Visit History",
+          "description": "View past and upcoming visits",
+          "location": [
+            "apps/web/src/app/(dashboard)/patient/visits/page.tsx",
+            "apps/web/src/components/patient/VisitCard.tsx"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Free",
+          "status": "Working"
+        },
+        {
+          "name": "Health Summary",
+          "description": "Overview of patient health metrics and conditions",
+          "location": [
+            "apps/web/src/components/patient/HealthSummary.tsx"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Free",
+          "status": "Working"
+        }
+      ],
+      "appointments": [
+        {
+          "name": "Appointment List View",
+          "description": "View all scheduled appointments",
+          "location": [
+            "apps/web/src/app/(dashboard)/appointments/page.tsx",
+            "apps/mobile/app/(tabs)/appointments.tsx",
+            "apps/provider-portal/src/app/appointments/page.tsx"
+          ],
+          "webSupport": true,
+          "mobileSupport": true,
+          "authRequired": true,
+          "revenueImpact": "Free",
+          "status": "Working"
+        },
+        {
+          "name": "Appointment Booking",
+          "description": "Schedule new appointments with providers",
+          "location": [
+            "apps/web/src/app/(dashboard)/appointments/book/page.tsx",
+            "apps/web/src/components/patient/BookingWizard.tsx",
+            "services/api/src/controllers/appointment.controller.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": true,
+          "authRequired": true,
+          "revenueImpact": "Free",
+          "status": "Working"
+        },
+        {
+          "name": "Appointment Cancellation/Modification",
+          "description": "Cancel or reschedule existing appointments",
+          "location": [
+            "services/api/src/controllers/appointment.controller.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": true,
+          "authRequired": true,
+          "revenueImpact": "Free",
+          "status": "Working"
+        }
+      ],
+      "telehealth": [
+        {
+          "name": "Video Consultation",
+          "description": "Real-time video calls with WebRTC",
+          "location": [
+            "apps/web/src/components/telemedicine/VideoCall.tsx",
+            "apps/web/src/components/telemedicine/VideoControls.tsx",
+            "apps/web/src/hooks/useVideoCall.ts",
+            "apps/mobile/src/components/telemedicine/VideoCallScreen.tsx",
+            "services/telehealth-service/src/services/webrtc.service.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": true,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Waiting Room",
+          "description": "Virtual waiting room before video call",
+          "location": [
+            "apps/web/src/components/telemedicine/WaitingRoom.tsx"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Call Quality Monitor",
+          "description": "Real-time call quality metrics and indicators",
+          "location": [
+            "apps/web/src/components/telemedicine/CallQuality.tsx",
+            "apps/web/src/hooks/useVideoCall.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "In-Call Chat",
+          "description": "Text chat during video consultation",
+          "location": [
+            "apps/web/src/components/telemedicine/ChatPanel.tsx",
+            "apps/mobile/src/components/telemedicine/ChatScreen.tsx",
+            "apps/mobile/src/components/telemedicine/ChatScreenV2.tsx"
+          ],
+          "webSupport": true,
+          "mobileSupport": true,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Telehealth Visits",
+          "description": "Create and manage telehealth visit sessions",
+          "location": [
+            "services/telehealth-service/src/routes/visits.ts",
+            "services/api/src/controllers/visit.controller.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": true,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        }
+      ],
+      "messaging": [
+        {
+          "name": "Secure Messaging",
+          "description": "HIPAA-compliant messaging between patients and providers",
+          "location": [
+            "apps/web/src/app/(dashboard)/messages/page.tsx",
+            "apps/web/src/hooks/useChat.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Free",
+          "status": "Working"
+        }
+      ],
+      "prescriptions": [
+        {
+          "name": "Prescription List",
+          "description": "View active and past prescriptions",
+          "location": [
+            "apps/web/src/app/(dashboard)/prescriptions/page.tsx",
+            "apps/provider-portal/src/app/prescriptions/page.tsx",
+            "services/pharmacy-service/src/routes/prescriptions.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "E-Prescribe",
+          "description": "Electronic prescription creation and submission",
+          "location": [
+            "services/pharmacy-service/src/routes/prescriptions.ts",
+            "services/pharmacy-service/src/routes/prescriptions-enhanced.ts",
+            "services/pharmacy-service/src/services/PrescriptionService.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Drug Interaction Check",
+          "description": "Check for drug-drug interactions",
+          "location": [
+            "services/pharmacy-service/src/routes/interactions.ts",
+            "services/pharmacy-service/src/services/InteractionCheckService.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Prior Authorization",
+          "description": "Prior authorization workflow for prescriptions",
+          "location": [
+            "services/pharmacy-service/src/routes/priorAuth.ts",
+            "services/pharmacy-service/src/services/PriorAuthService.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Partial"
+        },
+        {
+          "name": "PDMP Reporting",
+          "description": "Prescription Drug Monitoring Program integration",
+          "location": [
+            "services/pharmacy-service/src/routes/pdmp.ts",
+            "services/pharmacy-service/src/services/PDMPService.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Partial"
+        }
+      ],
+      "labResults": [
+        {
+          "name": "Lab Results View",
+          "description": "View laboratory test results",
+          "location": [
+            "apps/web/src/app/(dashboard)/lab-results/page.tsx",
+            "services/laboratory-service/src/routes/lab-results.ts",
+            "services/laboratory-service/src/routes/results.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Lab Order Creation",
+          "description": "Create laboratory test orders",
+          "location": [
+            "apps/provider-portal/src/app/lab-orders/page.tsx",
+            "services/laboratory-service/src/routes/lab-orders.ts",
+            "services/laboratory-service/src/services/OrderService.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Sample Tracking",
+          "description": "Track lab samples from collection to results",
+          "location": [
+            "services/laboratory-service/src/routes/samples.ts",
+            "services/laboratory-service/src/services/SampleTrackingService.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Test Catalog",
+          "description": "Browse available laboratory tests",
+          "location": [
+            "services/laboratory-service/src/routes/test-catalog.ts",
+            "services/laboratory-service/src/services/TestCatalogService.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Critical Lab Alerts",
+          "description": "Alerts for abnormal or critical lab values",
+          "location": [
+            "services/laboratory-service/src/services/AlertService.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        }
+      ],
+      "billing": [
+        {
+          "name": "Billing Dashboard",
+          "description": "View billing history and current charges",
+          "location": [
+            "apps/web/src/app/(dashboard)/billing/page.tsx",
+            "apps/web/src/components/billing/InvoiceList.tsx"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Payment Processing",
+          "description": "Stripe-based payment processing",
+          "location": [
+            "apps/web/src/components/billing/PaymentForm.tsx",
+            "apps/web/src/hooks/usePayment.ts",
+            "services/api/src/controllers/payment.controller.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Subscription Management",
+          "description": "Create, upgrade, and cancel subscriptions",
+          "location": [
+            "apps/web/src/components/billing/SubscriptionStatus.tsx",
+            "apps/web/src/components/billing/PlanSelector.tsx",
+            "services/api/src/controllers/subscription.controller.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Payment Methods",
+          "description": "Add, update, and remove payment methods",
+          "location": [
+            "services/api/src/controllers/payment.controller.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        }
+      ],
+      "settings": [
+        {
+          "name": "User Settings",
+          "description": "Personal account settings and preferences",
+          "location": [
+            "apps/web/src/app/(dashboard)/settings/page.tsx",
+            "apps/mobile/app/settings/_layout.tsx",
+            "apps/web/src/hooks/useSettings.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": true,
+          "authRequired": true,
+          "revenueImpact": "Free",
+          "status": "Working"
+        },
+        {
+          "name": "Language Selection",
+          "description": "Multi-language support with i18n",
+          "location": [
+            "apps/web/src/components/LanguageSwitcher.tsx",
+            "apps/mobile/app/settings/language.tsx",
+            "packages/i18n/src/hooks/useTranslation.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": true,
+          "authRequired": true,
+          "revenueImpact": "Free",
+          "status": "Working"
+        },
+        {
+          "name": "Password Change",
+          "description": "Change account password",
+          "location": [
+            "apps/mobile/app/settings/change-password.tsx"
+          ],
+          "webSupport": false,
+          "mobileSupport": true,
+          "authRequired": true,
+          "revenueImpact": "Free",
+          "status": "Working"
+        },
+        {
+          "name": "Privacy Settings",
+          "description": "Manage privacy and consent preferences",
+          "location": [
+            "apps/mobile/app/settings/privacy.tsx",
+            "services/api/src/controllers/consent.controller.ts"
+          ],
+          "webSupport": false,
+          "mobileSupport": true,
+          "authRequired": true,
+          "revenueImpact": "Free",
+          "status": "Working"
+        }
+      ],
+      "kioskFeatures": [
+        {
+          "name": "Kiosk Check-In",
+          "description": "Self-service patient check-in at facility",
+          "location": [
+            "apps/kiosk/src/app/check-in/page.tsx"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": false,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Kiosk Registration",
+          "description": "New patient registration at kiosk",
+          "location": [
+            "apps/kiosk/src/app/register/page.tsx"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": false,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Kiosk Payment",
+          "description": "Payment processing at kiosk",
+          "location": [
+            "apps/kiosk/src/app/payment/page.tsx"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": false,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Appointment Scheduling (Kiosk)",
+          "description": "Schedule appointments at kiosk",
+          "location": [
+            "apps/kiosk/src/app/schedule/page.tsx"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": false,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Queue Status",
+          "description": "View waiting queue status",
+          "location": [
+            "apps/kiosk/src/app/queue-status/page.tsx"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": false,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Facility Directions",
+          "description": "Wayfinding and directions within facility",
+          "location": [
+            "apps/kiosk/src/app/directions/page.tsx"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": false,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        }
+      ]
+    },
+    "B_AdminOperationsFeatures": {
+      "adminDashboard": [
+        {
+          "name": "Admin Dashboard",
+          "description": "Overview of platform metrics and status",
+          "location": [
+            "apps/admin/src/app/(dashboard)/dashboard/page.tsx",
+            "apps/web/src/app/(dashboard)/admin/page.tsx"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "System Health Monitoring",
+          "description": "Real-time system health indicators",
+          "location": [
+            "apps/web/src/components/admin/SystemHealthIndicator.tsx"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Dashboard Statistics",
+          "description": "Platform usage statistics and metrics",
+          "location": [
+            "apps/web/src/components/admin/StatsCard.tsx",
+            "services/api/src/controllers/dashboard.controller.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        }
+      ],
+      "userManagement": [
+        {
+          "name": "User List & Management",
+          "description": "View and manage all platform users",
+          "location": [
+            "apps/admin/src/app/(dashboard)/users/page.tsx",
+            "apps/web/src/app/(dashboard)/admin/users/page.tsx",
+            "apps/web/src/components/admin/UserTable.tsx"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "User Detail View",
+          "description": "View and edit individual user details",
+          "location": [
+            "apps/admin/src/app/(dashboard)/users/[id]/page.tsx",
+            "apps/web/src/app/(dashboard)/admin/users/[id]/page.tsx"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Role Management",
+          "description": "Assign and manage user roles",
+          "location": [
+            "services/api/src/routes/index.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        }
+      ],
+      "providerManagement": [
+        {
+          "name": "Provider List",
+          "description": "View and manage healthcare providers",
+          "location": [
+            "apps/admin/src/app/(dashboard)/providers/page.tsx"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Provider Detail",
+          "description": "View and edit provider information",
+          "location": [
+            "apps/admin/src/app/(dashboard)/providers/[id]/page.tsx"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        }
+      ],
+      "billingAdmin": [
+        {
+          "name": "Billing Administration",
+          "description": "Admin billing overview and controls",
+          "location": [
+            "apps/admin/src/app/(dashboard)/billing/page.tsx"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Subscription Administration",
+          "description": "Manage organization subscriptions",
+          "location": [
+            "apps/web/src/app/(dashboard)/admin/subscriptions/page.tsx"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        }
+      ],
+      "auditCompliance": [
+        {
+          "name": "Audit Log Viewer",
+          "description": "View and search audit logs",
+          "location": [
+            "apps/admin/src/app/(dashboard)/audit-logs/page.tsx",
+            "apps/web/src/app/(dashboard)/admin/audit/page.tsx",
+            "apps/web/src/components/admin/AuditLogTable.tsx",
+            "services/api/src/controllers/audit.controller.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        }
+      ],
+      "systemSettings": [
+        {
+          "name": "Admin Settings",
+          "description": "Platform-wide administrative settings",
+          "location": [
+            "apps/admin/src/app/(dashboard)/settings/page.tsx",
+            "apps/web/src/app/(dashboard)/admin/settings/page.tsx"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        }
+      ],
+      "reports": [
+        {
+          "name": "Reports Dashboard",
+          "description": "Generate and view platform reports",
+          "location": [
+            "apps/admin/src/app/(dashboard)/reports/page.tsx"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Partial"
+        }
+      ],
+      "appointmentAdmin": [
+        {
+          "name": "Appointment Management",
+          "description": "Admin view of all appointments",
+          "location": [
+            "apps/admin/src/app/(dashboard)/appointments/page.tsx"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        }
+      ]
+    },
+    "C_PlatformSystemFeatures": {
+      "providerPortal": [
+        {
+          "name": "Provider Dashboard",
+          "description": "Provider-specific dashboard with schedule and patients",
+          "location": [
+            "apps/provider-portal/src/app/dashboard/page.tsx",
+            "apps/web/src/app/(dashboard)/provider/page.tsx"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Patient List (Provider)",
+          "description": "View assigned patients",
+          "location": [
+            "apps/provider-portal/src/app/patients/page.tsx",
+            "apps/web/src/app/(dashboard)/provider/patients/page.tsx"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Patient Detail (Provider)",
+          "description": "Detailed patient view for providers",
+          "location": [
+            "apps/provider-portal/src/app/patients/[id]/page.tsx",
+            "apps/web/src/app/(dashboard)/provider/patients/[id]/page.tsx"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Provider Schedule",
+          "description": "Manage provider availability and schedule",
+          "location": [
+            "apps/provider-portal/src/app/schedule/page.tsx",
+            "apps/web/src/app/(dashboard)/provider/schedule/page.tsx",
+            "apps/web/src/components/provider/AppointmentCalendar.tsx"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Consultations",
+          "description": "Manage clinical consultations",
+          "location": [
+            "apps/provider-portal/src/app/consultations/page.tsx"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Provider Profile",
+          "description": "Provider profile management",
+          "location": [
+            "apps/provider-portal/src/app/profile/page.tsx"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        }
+      ],
+      "clinicalDocumentation": [
+        {
+          "name": "Encounter Management",
+          "description": "Create and manage clinical encounters",
+          "location": [
+            "apps/web/src/app/(dashboard)/provider/encounters/page.tsx",
+            "apps/web/src/app/(dashboard)/provider/encounters/[id]/page.tsx",
+            "services/api/src/controllers/encounter.controller.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Clinical Note Editor",
+          "description": "Create and edit clinical notes",
+          "location": [
+            "apps/web/src/components/provider/ClinicalNoteEditor.tsx",
+            "apps/web/src/components/provider/EncounterForm.tsx"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Medical Records View",
+          "description": "View comprehensive medical records",
+          "location": [
+            "apps/web/src/app/(dashboard)/records/page.tsx",
+            "apps/web/src/hooks/useMedicalRecords.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        }
+      ],
+      "imaging": [
+        {
+          "name": "Imaging Orders",
+          "description": "Create and manage imaging orders",
+          "location": [
+            "services/imaging-service/src/routes/orderRoutes.ts",
+            "services/imaging-service/src/services/orderService.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Imaging Studies",
+          "description": "View and manage imaging studies",
+          "location": [
+            "services/imaging-service/src/routes/studyRoutes.ts",
+            "services/imaging-service/src/services/studyService.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Image Viewer",
+          "description": "Medical image viewing with PACS integration",
+          "location": [
+            "services/imaging-service/src/routes/imageRoutes.ts",
+            "services/imaging-service/src/services/imageService.ts",
+            "services/imaging-service/src/services/pacsService.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Partial"
+        },
+        {
+          "name": "Radiology Reports",
+          "description": "Create and view radiology reports",
+          "location": [
+            "services/imaging-service/src/routes/reportRoutes.ts",
+            "services/imaging-service/src/services/reportService.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Critical Finding Alerts",
+          "description": "Alerts for critical imaging findings",
+          "location": [
+            "services/imaging-service/src/routes/criticalFindingRoutes.ts",
+            "services/imaging-service/src/services/criticalFindingService.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        }
+      ],
+      "mentalHealth": [
+        {
+          "name": "Mental Health Assessments",
+          "description": "Conduct and record mental health assessments",
+          "location": [
+            "services/mental-health-service/src/routes/assessments.ts",
+            "services/mental-health-service/src/services/AssessmentService.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Therapy Sessions",
+          "description": "Schedule and manage therapy sessions",
+          "location": [
+            "services/mental-health-service/src/routes/sessions.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Treatment Plans",
+          "description": "Create mental health treatment plans",
+          "location": [
+            "services/mental-health-service/src/routes/treatment-plans.ts",
+            "services/mental-health-service/src/services/TreatmentPlanService.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Progress Notes",
+          "description": "Document therapy session progress",
+          "location": [
+            "services/mental-health-service/src/routes/progress-notes.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Crisis Management",
+          "description": "Crisis intervention and emergency protocols",
+          "location": [
+            "services/mental-health-service/src/routes/crisis.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Partial"
+        },
+        {
+          "name": "Group Sessions",
+          "description": "Manage group therapy sessions",
+          "location": [
+            "services/mental-health-service/src/routes/group-sessions.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Psychiatric Medications",
+          "description": "Manage psychiatric medications",
+          "location": [
+            "services/mental-health-service/src/routes/medications.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        }
+      ],
+      "chronicCare": [
+        {
+          "name": "Care Plans",
+          "description": "Create and manage chronic care plans",
+          "location": [
+            "services/chronic-care-service/src/routes/carePlans.ts",
+            "services/chronic-care-service/src/services/CarePlanTemplateService.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Vital Signs Monitoring",
+          "description": "Track and monitor patient vital signs",
+          "location": [
+            "services/chronic-care-service/src/routes/vitals.ts",
+            "services/chronic-care-service/src/services/VitalSignService.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Health Goals",
+          "description": "Set and track health goals",
+          "location": [
+            "services/chronic-care-service/src/routes/goals.ts",
+            "services/chronic-care-service/src/services/GoalService.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Device Integration",
+          "description": "Connect health monitoring devices",
+          "location": [
+            "services/chronic-care-service/src/routes/devices.ts",
+            "services/chronic-care-service/src/services/DeviceService.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Partial"
+        },
+        {
+          "name": "Care Alerts",
+          "description": "Automated health alerts and reminders",
+          "location": [
+            "services/chronic-care-service/src/routes/alerts.ts",
+            "services/chronic-care-service/src/services/AlertService.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Patient Engagement",
+          "description": "Patient engagement and adherence tracking",
+          "location": [
+            "services/chronic-care-service/src/services/EngagementService.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        }
+      ],
+      "pharmacy": [
+        {
+          "name": "Pharmacy Locations",
+          "description": "Find and manage pharmacy locations",
+          "location": [
+            "services/pharmacy-service/src/routes/pharmacies.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Medication Dispensing",
+          "description": "Track medication dispensing",
+          "location": [
+            "services/pharmacy-service/src/routes/dispense.ts",
+            "services/pharmacy-service/src/services/DispenseService.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Formulary Management",
+          "description": "Manage medication formulary",
+          "location": [
+            "services/pharmacy-service/src/routes/formulary.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Inventory Management",
+          "description": "Track pharmacy inventory",
+          "location": [
+            "services/pharmacy-service/src/routes/inventory.ts",
+            "services/pharmacy-service/src/services/InventoryService.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        }
+      ],
+      "notifications": [
+        {
+          "name": "Push Notifications",
+          "description": "Mobile and web push notifications",
+          "location": [
+            "services/api/src/controllers/push.controller.ts",
+            "services/api/src/services/push.service.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": true,
+          "authRequired": true,
+          "revenueImpact": "Free",
+          "status": "Working"
+        },
+        {
+          "name": "Email Notifications",
+          "description": "Transactional email notifications",
+          "location": [
+            "services/api/src/controllers/notification.controller.ts",
+            "services/api/src/services/email.service.ts",
+            "services/api/src/services/email-templates.service.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": true,
+          "authRequired": true,
+          "revenueImpact": "Free",
+          "status": "Working"
+        },
+        {
+          "name": "SMS Notifications",
+          "description": "SMS text message notifications",
+          "location": [
+            "services/api/src/controllers/notification.controller.ts",
+            "services/api/src/services/sms.service.ts",
+            "services/api/src/services/sms-templates.service.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": true,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Notification Preferences",
+          "description": "User notification preference management",
+          "location": [
+            "services/notification-service/src/routes/preference.routes.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": true,
+          "authRequired": true,
+          "revenueImpact": "Free",
+          "status": "Working"
+        },
+        {
+          "name": "Notification Templates",
+          "description": "Customizable notification templates",
+          "location": [
+            "services/notification-service/src/routes/template.routes.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        }
+      ],
+      "aiFeatures": [
+        {
+          "name": "AI Symptom Analysis",
+          "description": "AI-powered symptom analysis (Premium)",
+          "location": [
+            "services/api/src/routes/premium.routes.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Partial"
+        },
+        {
+          "name": "AI Triage Assistant",
+          "description": "AI-assisted patient triage",
+          "location": [
+            "packages/ai-workflows/src/assistants/TriageAssistant.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Partial"
+        },
+        {
+          "name": "AI Documentation Assistant",
+          "description": "AI-powered clinical documentation",
+          "location": [
+            "packages/ai-workflows/src/assistants/DocumentationAssistant.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Partial"
+        },
+        {
+          "name": "AI Medication Safety",
+          "description": "AI-powered medication safety checks",
+          "location": [
+            "packages/ai-workflows/src/assistants/MedicationSafetyAssistant.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Partial"
+        },
+        {
+          "name": "AI Coding Assistant",
+          "description": "AI-assisted medical coding",
+          "location": [
+            "packages/ai-workflows/src/assistants/CodingAssistant.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Partial"
+        },
+        {
+          "name": "AI Patient Messaging",
+          "description": "AI-assisted patient communication",
+          "location": [
+            "packages/ai-workflows/src/assistants/PatientMessagingAssistant.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Partial"
+        },
+        {
+          "name": "AI Workflow Orchestration",
+          "description": "Orchestrate complex AI workflows",
+          "location": [
+            "packages/ai-workflows/src/orchestrator/WorkflowOrchestrator.ts",
+            "packages/ai-workflows/src/orchestrator/WorkflowDefinition.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "AI Guardrails",
+          "description": "Input/output guardrails for AI safety",
+          "location": [
+            "packages/ai-workflows/src/guardrails/InputGuardrail.ts",
+            "packages/ai-workflows/src/guardrails/OutputGuardrail.ts",
+            "packages/ai-workflows/src/guardrails/HumanReviewGuardrail.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        }
+      ],
+      "complianceSecurity": [
+        {
+          "name": "Audit Logging",
+          "description": "Comprehensive audit trail logging",
+          "location": [
+            "packages/compliance/src/audit/auditLogger.ts",
+            "packages/ai-workflows/src/audit/AIAuditLogger.ts",
+            "services/api/src/services/audit.service.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": true,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Consent Management",
+          "description": "Patient consent tracking and management",
+          "location": [
+            "packages/compliance/src/consent/consentManager.ts",
+            "packages/ai-workflows/src/guardrails/ConsentChecker.ts",
+            "services/api/src/services/consent.service.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": true,
+          "authRequired": true,
+          "revenueImpact": "Free",
+          "status": "Working"
+        },
+        {
+          "name": "Field-Level Encryption",
+          "description": "Encrypt sensitive data fields",
+          "location": [
+            "packages/compliance/src/encryption/fieldEncryption.ts",
+            "services/api/src/lib/encryption.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": true,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Data Retention",
+          "description": "Automated data retention policies",
+          "location": [
+            "packages/compliance/src/retention/dataRetention.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": true,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Data Deletion (Right to be Forgotten)",
+          "description": "GDPR-compliant data deletion",
+          "location": [
+            "packages/compliance/src/deletion/dataDeletion.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": true,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        }
+      ],
+      "interoperability": [
+        {
+          "name": "FHIR R4/R5 Support",
+          "description": "HL7 FHIR data exchange",
+          "location": [
+            "packages/fhir/src/types/",
+            "packages/fhir/src/conversion/",
+            "packages/fhir/src/validation/",
+            "packages/adapters/src/adapters/fhir-adapter.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": true,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Terminology Services",
+          "description": "SNOMED, LOINC, ICD code lookups",
+          "location": [
+            "packages/fhir/src/terminology/services/snomed.service.ts",
+            "packages/fhir/src/terminology/services/loinc.service.ts",
+            "packages/fhir/src/terminology/services/icd.service.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Medical Records Export",
+          "description": "Export medical records in standard formats",
+          "location": [
+            "services/api/src/routes/premium.routes.ts",
+            "packages/fhir/src/utils/export.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        }
+      ],
+      "entitlements": [
+        {
+          "name": "Subscription Entitlements",
+          "description": "Feature access based on subscription tier",
+          "location": [
+            "packages/entitlements/src/service.ts",
+            "packages/entitlements/src/types.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": true,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Usage Metering",
+          "description": "Track feature usage for billing",
+          "location": [
+            "packages/entitlements/src/service.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": true,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Feature Gating",
+          "description": "Enable/disable features by subscription",
+          "location": [
+            "packages/policy/src/feature-gate.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": true,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        }
+      ],
+      "countryCompliance": [
+        {
+          "name": "Country Configuration",
+          "description": "Country-specific regulatory compliance",
+          "location": [
+            "packages/country-config/src/configs/",
+            "packages/country-config/src/loader.ts",
+            "packages/country-config/src/types.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": true,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Policy Evaluation Engine",
+          "description": "Evaluate regulatory policies by country",
+          "location": [
+            "packages/policy/src/engine.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": true,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Data Residency Compliance",
+          "description": "Ensure data stays in required regions",
+          "location": [
+            "packages/policy/src/engine.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": true,
+          "authRequired": true,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        }
+      ],
+      "infrastructure": [
+        {
+          "name": "API Gateway",
+          "description": "Centralized API routing and rate limiting",
+          "location": [
+            "services/api-gateway/src/routes/index.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": true,
+          "authRequired": false,
+          "revenueImpact": "Free",
+          "status": "Working"
+        },
+        {
+          "name": "Health Check Endpoints",
+          "description": "Service health monitoring endpoints",
+          "location": [
+            "services/api/src/controllers/health.controller.ts",
+            "services/notification-service/src/routes/health.routes.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": true,
+          "authRequired": false,
+          "revenueImpact": "Free",
+          "status": "Working"
+        },
+        {
+          "name": "Metrics Collection",
+          "description": "Performance and usage metrics",
+          "location": [
+            "services/api/src/routes/metrics.ts",
+            "services/telehealth-service/src/lib/metrics.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": true,
+          "authRequired": false,
+          "revenueImpact": "Free",
+          "status": "Working"
+        },
+        {
+          "name": "Stripe Webhooks",
+          "description": "Payment event processing",
+          "location": [
+            "services/api/src/routes/webhooks/stripe.js",
+            "services/api/src/services/stripe-webhook.service.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": false,
+          "revenueImpact": "Paid",
+          "status": "Working"
+        },
+        {
+          "name": "Real-time Events",
+          "description": "WebSocket-based real-time updates",
+          "location": [
+            "services/api/src/controllers/realtime.controller.ts",
+            "apps/mobile/src/providers/SocketProvider.tsx",
+            "apps/mobile/src/hooks/useSocket.ts"
+          ],
+          "webSupport": true,
+          "mobileSupport": true,
+          "authRequired": true,
+          "revenueImpact": "Free",
+          "status": "Working"
+        },
+        {
+          "name": "Offline Sync",
+          "description": "Offline data synchronization for mobile",
+          "location": [
+            "apps/mobile/src/hooks/useOfflineSync.ts",
+            "apps/mobile/src/services/offline.ts"
+          ],
+          "webSupport": false,
+          "mobileSupport": true,
+          "authRequired": true,
+          "revenueImpact": "Free",
+          "status": "Working"
+        }
+      ],
+      "uiComponents": [
+        {
+          "name": "Shared UI Component Library",
+          "description": "Reusable UI components across apps",
+          "location": [
+            "packages/ui/src/components/"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": false,
+          "revenueImpact": "Free",
+          "status": "Working"
+        },
+        {
+          "name": "Accessibility Components",
+          "description": "WCAG-compliant accessibility features",
+          "location": [
+            "apps/web/src/components/a11y/FocusTrap.tsx",
+            "apps/web/src/components/a11y/LiveRegion.tsx",
+            "apps/web/src/components/a11y/SkipLink.tsx",
+            "apps/web/src/components/a11y/VisuallyHidden.tsx"
+          ],
+          "webSupport": true,
+          "mobileSupport": false,
+          "authRequired": false,
+          "revenueImpact": "Free",
+          "status": "Working"
+        }
+      ]
+    }
+  },
+  "summary": {
+    "totalFeatures": 98,
+    "byStatus": {
+      "Working": 85,
+      "Partial": 13,
+      "Broken": 0,
+      "Untested": 0
+    },
+    "byRevenueImpact": {
+      "Free": 22,
+      "Paid": 76,
+      "Upsell": 0,
+      "Trial": 0
+    },
+    "byPlatformSupport": {
+      "webOnly": 61,
+      "mobileOnly": 1,
+      "webAndMobile": 36
+    },
+    "authBreakdown": {
+      "requiresAuth": 89,
+      "publicAccess": 9
+    }
+  },
+  "applications": {
+    "web": {
+      "path": "apps/web",
+      "framework": "Next.js",
+      "features": 45
+    },
+    "mobile": {
+      "path": "apps/mobile",
+      "framework": "React Native/Expo",
+      "features": 15
+    },
+    "admin": {
+      "path": "apps/admin",
+      "framework": "Next.js",
+      "features": 10
+    },
+    "providerPortal": {
+      "path": "apps/provider-portal",
+      "framework": "Next.js",
+      "features": 8
+    },
+    "kiosk": {
+      "path": "apps/kiosk",
+      "framework": "Next.js",
+      "features": 6
+    }
+  },
+  "services": {
+    "api": {
+      "path": "services/api",
+      "description": "Core API service with main business logic"
+    },
+    "authService": {
+      "path": "services/auth-service",
+      "description": "Authentication and authorization"
+    },
+    "telehealthService": {
+      "path": "services/telehealth-service",
+      "description": "Video consultation and WebRTC"
+    },
+    "pharmacyService": {
+      "path": "services/pharmacy-service",
+      "description": "Prescription and medication management"
+    },
+    "laboratoryService": {
+      "path": "services/laboratory-service",
+      "description": "Lab orders and results"
+    },
+    "imagingService": {
+      "path": "services/imaging-service",
+      "description": "Medical imaging and PACS"
+    },
+    "mentalHealthService": {
+      "path": "services/mental-health-service",
+      "description": "Mental health features"
+    },
+    "chronicCareService": {
+      "path": "services/chronic-care-service",
+      "description": "Chronic disease management"
+    },
+    "notificationService": {
+      "path": "services/notification-service",
+      "description": "Email, SMS, and push notifications"
+    },
+    "apiGateway": {
+      "path": "services/api-gateway",
+      "description": "API gateway and routing"
+    }
+  },
+  "packages": {
+    "adapters": {
+      "path": "packages/adapters",
+      "description": "Data interchange adapters (FHIR, etc.)"
+    },
+    "aiWorkflows": {
+      "path": "packages/ai-workflows",
+      "description": "AI assistants and workflow orchestration"
+    },
+    "compliance": {
+      "path": "packages/compliance",
+      "description": "HIPAA, GDPR, POPIA compliance utilities"
+    },
+    "countryConfig": {
+      "path": "packages/country-config",
+      "description": "Country-specific regulatory configuration"
+    },
+    "entitlements": {
+      "path": "packages/entitlements",
+      "description": "Subscription and feature entitlements"
+    },
+    "fhir": {
+      "path": "packages/fhir",
+      "description": "FHIR data types and validation"
+    },
+    "i18n": {
+      "path": "packages/i18n",
+      "description": "Internationalization and translations"
+    },
+    "policy": {
+      "path": "packages/policy",
+      "description": "Policy evaluation engine"
+    },
+    "sdk": {
+      "path": "packages/sdk",
+      "description": "Platform SDK for external integrations"
+    },
+    "ui": {
+      "path": "packages/ui",
+      "description": "Shared UI component library"
+    }
+  }
+}

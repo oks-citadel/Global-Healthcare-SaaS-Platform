@@ -1,7 +1,9 @@
-// @ts-nocheck
 import { PrismaClient } from '../generated/client';
 
 const prisma = new PrismaClient();
+
+// Type for drug interaction records
+type DrugInteractionRecord = Awaited<ReturnType<typeof prisma.drugInteraction.findFirst>>;
 
 export interface DrugInteractionResult {
   hasCriticalInteractions: boolean;
@@ -42,7 +44,7 @@ export class InteractionCheckService {
       };
     }
 
-    const interactions: any[] = [];
+    const interactions: NonNullable<DrugInteractionRecord>[] = [];
 
     // Check all pairs of medications
     for (let i = 0; i < medicationNames.length; i++) {

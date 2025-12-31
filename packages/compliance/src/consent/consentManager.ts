@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Consent Management for GDPR (Article 7), POPIA (Section 11), and HIPAA
  *
@@ -67,7 +66,7 @@ export interface ConsentRecord {
   privacyPolicyUrl?: string;
 
   // Metadata
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 
   // Audit
   createdBy?: string;
@@ -80,6 +79,22 @@ export interface ConsentCheckResult {
   hasConsent: boolean;
   consentRecord?: ConsentRecord;
   reason?: string;
+}
+
+export interface ConsentRefreshEvent {
+  dataSubjectId: string;
+  purpose: ConsentPurpose;
+  previousConsent: ConsentRecord;
+}
+
+export interface ConsentExportResult {
+  consents: ConsentRecord[];
+  summary: {
+    totalConsents: number;
+    activeConsents: number;
+    withdrawnConsents: number;
+    expiredConsents: number;
+  };
 }
 
 export class ConsentManager extends EventEmitter {
@@ -102,7 +117,7 @@ export class ConsentManager extends EventEmitter {
     ipAddress?: string;
     userAgent?: string;
     expiresAt?: Date;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
   }): Promise<ConsentRecord> {
     // Validate consent requirements (GDPR Article 7)
     this.validateConsentRequirements(params);
@@ -291,26 +306,19 @@ export class ConsentManager extends EventEmitter {
 
     if (expiredConsent) {
       // Emit event to prompt user for re-consent
-      this.emit('consent-refresh-required', {
+      const event: ConsentRefreshEvent = {
         dataSubjectId,
         purpose,
         previousConsent: expiredConsent
-      });
+      };
+      this.emit('consent-refresh-required', event);
     }
   }
 
   /**
    * Export consent records for data subject access request
    */
-  async exportConsents(dataSubjectId: string): Promise<{
-    consents: ConsentRecord[];
-    summary: {
-      totalConsents: number;
-      activeConsents: number;
-      withdrawnConsents: number;
-      expiredConsents: number;
-    };
-  }> {
+  async exportConsents(dataSubjectId: string): Promise<ConsentExportResult> {
     const consents = await this.getConsents(dataSubjectId);
 
     return {
@@ -335,14 +343,14 @@ export class ConsentManager extends EventEmitter {
   /**
    * Check if processing is lawful under GDPR Article 6
    */
-  isProcessingLawful(
+  async isProcessingLawful(
     dataSubjectId: string,
     purpose: ConsentPurpose,
     alternativeLegalBasis?: LegalBasis
-  ): boolean {
+  ): Promise<boolean> {
     // If consent exists, check it
-    const consentCheck = this.checkConsent(dataSubjectId, purpose);
-    if (consentCheck) {
+    const consentCheck = await this.checkConsent(dataSubjectId, purpose);
+    if (consentCheck.hasConsent) {
       return true;
     }
 

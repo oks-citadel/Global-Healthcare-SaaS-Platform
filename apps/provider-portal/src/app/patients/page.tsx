@@ -1,102 +1,71 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { PatientCard } from '@/components/patients/PatientCard';
 import { Input, Button, Select } from '@/components/ui';
-import { Search, Plus, Filter } from 'lucide-react';
-import { Patient } from '@/types';
+import { Search, Plus, Filter, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
+import { Patient, PatientFilters } from '@/types';
+import { patientsApi } from '@/lib/api';
 
 export default function PatientsPage() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [genderFilter, setGenderFilter] = useState<string>('all');
   const [showFilters, setShowFilters] = useState(false);
 
-  // Mock data - replace with actual API call
-  const patients: Patient[] = [
-    {
-      id: '1',
-      mrn: 'MRN-001234',
-      firstName: 'John',
-      lastName: 'Smith',
-      dateOfBirth: '1980-05-15',
-      gender: 'male',
-      email: 'john.smith@email.com',
-      phone: '(555) 123-4567',
-      address: {
-        street: '123 Main St',
-        city: 'New York',
-        state: 'NY',
-        zipCode: '10001',
-        country: 'USA',
-      },
-      emergencyContact: {
-        name: 'Jane Smith',
-        relationship: 'Spouse',
-        phone: '(555) 987-6543',
-      },
-      insuranceInfo: [],
-      allergies: [
-        {
-          id: '1',
-          allergen: 'Penicillin',
-          reaction: 'Rash',
-          severity: 'moderate',
-          diagnosedDate: '2020-01-15',
-        },
-      ],
-      chronicConditions: ['Hypertension', 'Type 2 Diabetes'],
-      medications: [],
-      status: 'active',
-      preferredLanguage: 'English',
-      createdAt: '2023-01-15T00:00:00Z',
-      updatedAt: '2024-12-19T00:00:00Z',
-    },
-    {
-      id: '2',
-      mrn: 'MRN-001235',
-      firstName: 'Sarah',
-      lastName: 'Johnson',
-      dateOfBirth: '1992-08-22',
-      gender: 'female',
-      email: 'sarah.johnson@email.com',
-      phone: '(555) 234-5678',
-      address: {
-        street: '456 Oak Ave',
-        city: 'New York',
-        state: 'NY',
-        zipCode: '10002',
-        country: 'USA',
-      },
-      emergencyContact: {
-        name: 'Mike Johnson',
-        relationship: 'Father',
-        phone: '(555) 876-5432',
-      },
-      insuranceInfo: [],
-      allergies: [],
-      chronicConditions: [],
-      medications: [],
-      status: 'active',
-      preferredLanguage: 'English',
-      createdAt: '2023-03-20T00:00:00Z',
-      updatedAt: '2024-12-19T00:00:00Z',
-    },
-  ];
+  // API state
+  const [patients, setPatients] = useState<Patient[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
 
-  const filteredPatients = patients.filter((patient) => {
-    const matchesSearch =
-      searchQuery === '' ||
-      patient.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      patient.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      patient.mrn.toLowerCase().includes(searchQuery.toLowerCase());
+  const fetchPatients = async () => {
+    setLoading(true);
+    setError(null);
 
-    const matchesStatus = statusFilter === 'all' || patient.status === statusFilter;
+    try {
+      const filters: PatientFilters = {};
+      if (searchQuery) filters.search = searchQuery;
+      if (statusFilter !== 'all') filters.status = statusFilter as Patient['status'];
+      if (genderFilter !== 'all') filters.gender = genderFilter as Patient['gender'];
 
-    return matchesSearch && matchesStatus;
-  });
+      const response = await patientsApi.getPatients(page, 20, filters);
+      setPatients(response.data);
+      setTotalPages(response.totalPages);
+      setTotal(response.total);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load patients');
+      console.error('Error fetching patients:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPatients();
+  }, [page, statusFilter, genderFilter]);
+
+  // Debounced search
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (page === 1) {
+        fetchPatients();
+      } else {
+        setPage(1);
+      }
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery]);
+
+  const handleRetry = () => {
+    fetchPatients();
+  };
 
   return (
     <DashboardLayout>
@@ -150,6 +119,8 @@ export default function PatientsPage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Select
                   label="Gender"
+                  value={genderFilter}
+                  onChange={(e) => setGenderFilter(e.target.value)}
                   options={[
                     { value: 'all', label: 'All Genders' },
                     { value: 'male', label: 'Male' },
@@ -164,28 +135,74 @@ export default function PatientsPage() {
           )}
         </div>
 
-        {/* Results */}
-        <div>
-          <p className="text-sm text-gray-600 mb-4">
-            Showing {filteredPatients.length} patient(s)
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredPatients.map((patient) => (
-              <PatientCard
-                key={patient.id}
-                patient={patient}
-                onClick={() => router.push(`/patients/${patient.id}`)}
-              />
-            ))}
+        {/* Loading State */}
+        {loading && (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
+            <span className="ml-3 text-gray-600">Loading patients...</span>
           </div>
+        )}
 
-          {filteredPatients.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-gray-500">No patients found</p>
+        {/* Error State */}
+        {error && !loading && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-3" />
+            <h3 className="text-lg font-semibold text-red-800 mb-2">Failed to Load Patients</h3>
+            <p className="text-red-600 mb-4">{error}</p>
+            <Button variant="outline" onClick={handleRetry}>
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Retry
+            </Button>
+          </div>
+        )}
+
+        {/* Results */}
+        {!loading && !error && (
+          <div>
+            <p className="text-sm text-gray-600 mb-4">
+              Showing {patients.length} of {total} patient(s)
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {patients.map((patient) => (
+                <PatientCard
+                  key={patient.id}
+                  patient={patient}
+                  onClick={() => router.push(`/patients/${patient.id}`)}
+                />
+              ))}
             </div>
-          )}
-        </div>
+
+            {patients.length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-gray-500">No patients found</p>
+              </div>
+            )}
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center space-x-4 mt-6">
+                <Button
+                  variant="outline"
+                  disabled={page === 1}
+                  onClick={() => setPage(page - 1)}
+                >
+                  Previous
+                </Button>
+                <span className="text-sm text-gray-600">
+                  Page {page} of {totalPages}
+                </span>
+                <Button
+                  variant="outline"
+                  disabled={page === totalPages}
+                  onClick={() => setPage(page + 1)}
+                >
+                  Next
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </DashboardLayout>
   );

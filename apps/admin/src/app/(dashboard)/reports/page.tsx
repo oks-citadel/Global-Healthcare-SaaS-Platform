@@ -67,8 +67,7 @@ export default function ReportsPage() {
   })
 
   const handleExport = (reportType: string) => {
-    console.log(`Exporting ${reportType} report...`)
-    // Implement export functionality
+    // TODO: Implement export functionality
   }
 
   return (

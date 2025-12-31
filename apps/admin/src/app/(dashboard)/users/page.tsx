@@ -60,7 +60,7 @@ export default function UsersPage() {
       setNewUser({ name: '', email: '', password: '', role: 'patient' })
       refetch()
     } catch (error) {
-      console.error('Failed to create user:', error)
+      // Error handled by API interceptor
     }
   }
 
@@ -69,7 +69,7 @@ export default function UsersPage() {
       await usersApi.suspendUser(userId)
       refetch()
     } catch (error) {
-      console.error('Failed to suspend user:', error)
+      // Error handled by API interceptor
     }
   }
 
@@ -78,7 +78,7 @@ export default function UsersPage() {
       await usersApi.activateUser(userId)
       refetch()
     } catch (error) {
-      console.error('Failed to activate user:', error)
+      // Error handled by API interceptor
     }
   }
 

@@ -1,14 +1,17 @@
-// @ts-nocheck
-import { PrismaClient } from '../generated/client';
+import { PrismaClient, Prisma } from '../generated/client';
 
 const prisma = new PrismaClient();
+
+// Type for controlled substance log records
+type ControlledSubstanceLog = Awaited<ReturnType<typeof prisma.controlledSubstanceLog.findFirst>>;
+type ControlledSubstanceLogWhereInput = Prisma.ControlledSubstanceLogWhereInput;
 
 export interface PDMPCheckResult {
   patientId: string;
   hasAlerts: boolean;
   requiresIntervention: boolean;
   alerts: string[];
-  recentControlledSubstances: any[];
+  recentControlledSubstances: NonNullable<ControlledSubstanceLog>[];
   multipleProviders: boolean;
   multiplePharmacies: boolean;
   overlappingPrescriptions: boolean;
@@ -149,12 +152,12 @@ export class PDMPService {
       limit?: number;
     }
   ) {
-    const where: any = { patientId };
+    const where: ControlledSubstanceLogWhereInput = { patientId };
 
     if (options?.startDate || options?.endDate) {
       where.dispensedAt = {};
-      if (options.startDate) where.dispensedAt.gte = options.startDate;
-      if (options.endDate) where.dispensedAt.lte = options.endDate;
+      if (options.startDate) (where.dispensedAt as Record<string, Date>).gte = options.startDate;
+      if (options.endDate) (where.dispensedAt as Record<string, Date>).lte = options.endDate;
     }
 
     if (options?.schedule) {
@@ -211,9 +214,9 @@ export class PDMPService {
   /**
    * Helper: Detect overlapping prescriptions
    */
-  private detectOverlappingPrescriptions(dispensings: any[]): boolean {
+  private detectOverlappingPrescriptions(dispensings: NonNullable<ControlledSubstanceLog>[]): boolean {
     // Group by medication name
-    const byMedication: { [key: string]: any[] } = {};
+    const byMedication: { [key: string]: NonNullable<ControlledSubstanceLog>[] } = {};
 
     dispensings.forEach((d) => {
       if (!byMedication[d.medicationName]) {
@@ -253,9 +256,9 @@ export class PDMPService {
   /**
    * Helper: Detect early refills
    */
-  private detectEarlyRefills(dispensings: any[]): any[] {
-    const earlyRefills: any[] = [];
-    const byMedication: { [key: string]: any[] } = {};
+  private detectEarlyRefills(dispensings: NonNullable<ControlledSubstanceLog>[]): Array<{ medication: string; daysEarly: number; dispensedAt: Date }> {
+    const earlyRefills: Array<{ medication: string; daysEarly: number; dispensedAt: Date }> = [];
+    const byMedication: { [key: string]: NonNullable<ControlledSubstanceLog>[] } = {};
 
     // Filter only Schedule II (no refills allowed, each is a new prescription)
     const scheduleII = dispensings.filter((d) => d.schedule === 'II');
@@ -347,12 +350,12 @@ export class PDMPService {
     startDate?: Date;
     endDate?: Date;
   }) {
-    const where: any = {};
+    const where: ControlledSubstanceLogWhereInput = {};
 
     if (options?.startDate || options?.endDate) {
       where.dispensedAt = {};
-      if (options.startDate) where.dispensedAt.gte = options.startDate;
-      if (options.endDate) where.dispensedAt.lte = options.endDate;
+      if (options.startDate) (where.dispensedAt as Record<string, Date>).gte = options.startDate;
+      if (options.endDate) (where.dispensedAt as Record<string, Date>).lte = options.endDate;
     }
 
     const [

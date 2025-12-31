@@ -107,7 +107,6 @@ class SocketService {
    */
   async initialize(): Promise<void> {
     if (this.isInitialized && this.socket?.connected) {
-      console.log('[SocketService] Already initialized and connected');
       return;
     }
 
@@ -121,7 +120,6 @@ class SocketService {
       await this.connect(tokens);
       this.isInitialized = true;
     } catch (error) {
-      console.error('[SocketService] Initialization error:', error);
       this.setConnectionState('error');
       throw error;
     }
@@ -132,7 +130,6 @@ class SocketService {
    */
   private async connect(tokens: AuthTokens): Promise<void> {
     if (this.socket?.connected) {
-      console.log('[SocketService] Already connected');
       return;
     }
 
@@ -167,7 +164,6 @@ class SocketService {
 
     // Connection events
     this.socket.on('connect', () => {
-      console.log('[SocketService] Connected:', this.socket?.id);
       this.reconnectAttempts = 0;
       this.setConnectionState('connected');
       this.startKeepAlive();
@@ -175,7 +171,6 @@ class SocketService {
     });
 
     this.socket.on('disconnect', (reason: string) => {
-      console.log('[SocketService] Disconnected:', reason);
       this.setConnectionState('disconnected');
       this.stopKeepAlive();
       this.emit('disconnect', reason);
@@ -188,37 +183,31 @@ class SocketService {
     });
 
     this.socket.on('connect_error', (error: Error) => {
-      console.error('[SocketService] Connection error:', error.message);
       this.setConnectionState('error');
       this.emit('connect_error', error);
     });
 
     this.socket.on('reconnect', (attemptNumber: number) => {
-      console.log('[SocketService] Reconnected after', attemptNumber, 'attempts');
       this.setConnectionState('connected');
       this.emit('reconnect', attemptNumber);
     });
 
     this.socket.on('reconnect_attempt', (attemptNumber: number) => {
-      console.log('[SocketService] Reconnect attempt:', attemptNumber);
       this.reconnectAttempts = attemptNumber;
       this.emit('reconnect_attempt', attemptNumber);
     });
 
     this.socket.on('reconnect_error', (error: Error) => {
-      console.error('[SocketService] Reconnect error:', error.message);
       this.emit('reconnect_error', error);
     });
 
     this.socket.on('reconnect_failed', () => {
-      console.error('[SocketService] Reconnection failed after max attempts');
       this.setConnectionState('error');
       this.emit('reconnect_failed');
     });
 
     // Authentication error handling
     this.socket.on('unauthorized', async (error: any) => {
-      console.error('[SocketService] Unauthorized:', error);
       await this.refreshTokenAndReconnect();
     });
   }
@@ -240,7 +229,6 @@ class SocketService {
         this.socket.connect();
       }
     } catch (error) {
-      console.error('[SocketService] Token refresh failed:', error);
       this.disconnect();
     }
   }
@@ -250,7 +238,6 @@ class SocketService {
    */
   disconnect(): void {
     if (this.socket) {
-      console.log('[SocketService] Disconnecting...');
       this.stopKeepAlive();
       this.socket.removeAllListeners();
       this.socket.disconnect();
@@ -418,14 +405,12 @@ class SocketService {
 
     if (previousState === 'background' && nextAppState === 'active') {
       // App came to foreground
-      console.log('[SocketService] App foregrounded, reconnecting if needed');
       if (!this.socket?.connected) {
         await this.initialize();
       }
       this.updatePresence('online');
     } else if (previousState === 'active' && nextAppState === 'background') {
       // App went to background
-      console.log('[SocketService] App backgrounded');
       this.updatePresence('away');
 
       // On Android, keep connection alive
@@ -486,7 +471,6 @@ class SocketService {
   private setConnectionState(state: ConnectionState): void {
     if (this.connectionState !== state) {
       this.connectionState = state;
-      console.log('[SocketService] Connection state changed:', state);
     }
   }
 

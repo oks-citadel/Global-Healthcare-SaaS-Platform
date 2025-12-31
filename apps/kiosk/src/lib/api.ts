@@ -1,290 +1,461 @@
 /**
  * API Service Layer
  *
- * This file provides a centralized location for all API calls.
- * Currently using mock data - replace with actual API calls when backend is available.
+ * Provides real API integration for the kiosk application.
+ * All functions make actual API calls to the backend services.
  */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api'
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'
 
 // Types
 import type { Patient, Appointment, Payment, QueueStatus } from '@/types'
 
+// ============================================================================
+// API Response Types
+// ============================================================================
+
+export interface ApiError {
+  message: string
+  code?: string
+  statusCode?: number
+}
+
+export interface CheckInResponse {
+  success: boolean
+  message: string
+  queueNumber?: number
+  estimatedWaitTime?: number
+}
+
+export interface RegisterPatientResponse {
+  success: boolean
+  patientId: string
+  message?: string
+}
+
+export interface ScheduleAppointmentResponse {
+  success: boolean
+  appointmentId: string
+  confirmationNumber?: string
+}
+
+export interface PaymentResponse {
+  success: boolean
+  transactionId: string
+  receiptUrl?: string
+}
+
+export interface VerifyPatientResponse {
+  verified: boolean
+  patientId?: string
+  patientName?: string
+  appointments?: Array<{
+    id: string
+    dateTime: string
+    department: string
+    provider: string
+  }>
+}
+
+export interface InsuranceUploadResponse {
+  success: boolean
+  imageUrl: string
+  extractedData?: {
+    insuranceProvider?: string
+    policyNumber?: string
+    groupNumber?: string
+  }
+}
+
+export interface Department {
+  id: string
+  name: string
+  description: string
+  floor?: string
+  waitTime?: number
+}
+
+export interface Provider {
+  id: string
+  name: string
+  specialty: string
+  available?: boolean
+  nextAvailableSlot?: string
+}
+
+// ============================================================================
+// API Client Configuration
+// ============================================================================
+
 /**
- * Generic fetch wrapper with error handling
+ * Get the kiosk authentication token from session storage
+ * Kiosk devices use a device-level authentication token
+ */
+function getKioskToken(): string | null {
+  if (typeof window !== 'undefined') {
+    return sessionStorage.getItem('kiosk_token')
+  }
+  return null
+}
+
+/**
+ * Build request headers with authentication and content type
+ */
+function buildHeaders(contentType: string = 'application/json'): HeadersInit {
+  const headers: HeadersInit = {}
+
+  if (contentType) {
+    headers['Content-Type'] = contentType
+  }
+
+  const token = getKioskToken()
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`
+  }
+
+  // Add kiosk identifier header for tracking
+  headers['X-Kiosk-Device'] = typeof window !== 'undefined'
+    ? sessionStorage.getItem('kiosk_device_id') || 'unknown'
+    : 'unknown'
+
+  return headers
+}
+
+/**
+ * Generic fetch wrapper with comprehensive error handling
  */
 async function fetchAPI<T>(
   endpoint: string,
-  options?: RequestInit
+  options?: RequestInit & { skipContentType?: boolean }
 ): Promise<T> {
+  const url = `${API_URL}${endpoint}`
+
   try {
-    const response = await fetch(`${API_URL}${endpoint}`, {
+    const headers = options?.skipContentType
+      ? buildHeaders('')
+      : buildHeaders()
+
+    const response = await fetch(url, {
       ...options,
       headers: {
-        'Content-Type': 'application/json',
+        ...headers,
         ...options?.headers,
       },
     })
 
-    if (!response.ok) {
-      throw new Error(`API Error: ${response.status} ${response.statusText}`)
+    // Parse response body
+    let data: any
+    const contentType = response.headers.get('content-type')
+    if (contentType && contentType.includes('application/json')) {
+      data = await response.json()
+    } else {
+      data = await response.text()
     }
 
-    return await response.json()
+    if (!response.ok) {
+      const errorMessage = typeof data === 'object' && data.message
+        ? data.message
+        : `API Error: ${response.status} ${response.statusText}`
+
+      const error = new Error(errorMessage) as Error & {
+        statusCode?: number
+        code?: string
+      }
+      error.statusCode = response.status
+      error.code = typeof data === 'object' ? data.code : undefined
+      throw error
+    }
+
+    return data as T
   } catch (error) {
-    console.error('API request failed:', error)
+    if (error instanceof TypeError && error.message === 'Failed to fetch') {
+      throw new Error('Unable to connect to the server. Please check your connection or ask staff for assistance.')
+    }
     throw error
   }
 }
 
+// ============================================================================
+// Patient Check-In API
+// ============================================================================
+
 /**
- * Patient Check-In
+ * Check in a patient for their appointment
  */
 export async function checkInPatient(data: {
   dateOfBirth: string
   phoneNumber: string
   insuranceScanned: boolean
-}): Promise<{ success: boolean; message: string }> {
-  // TODO: Replace with actual API call
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        success: true,
-        message: 'Check-in successful',
-      })
-    }, 1000)
+  appointmentId?: string
+}): Promise<CheckInResponse> {
+  return fetchAPI<CheckInResponse>('/kiosk/check-in', {
+    method: 'POST',
+    body: JSON.stringify(data),
   })
-
-  // Actual implementation:
-  // return fetchAPI('/check-in', {
-  //   method: 'POST',
-  //   body: JSON.stringify(data),
-  // })
 }
 
+// ============================================================================
+// Patient Registration API
+// ============================================================================
+
 /**
- * Register New Patient
+ * Register a new patient in the system
  */
-export async function registerPatient(data: Partial<Patient>): Promise<{
-  success: boolean
-  patientId: string
-}> {
-  // TODO: Replace with actual API call
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        success: true,
-        patientId: `PAT-${Date.now()}`,
-      })
-    }, 1000)
+export async function registerPatient(data: Partial<Patient>): Promise<RegisterPatientResponse> {
+  return fetchAPI<RegisterPatientResponse>('/kiosk/patients', {
+    method: 'POST',
+    body: JSON.stringify(data),
   })
-
-  // Actual implementation:
-  // return fetchAPI('/patients', {
-  //   method: 'POST',
-  //   body: JSON.stringify(data),
-  // })
 }
 
+// ============================================================================
+// Appointment Scheduling API
+// ============================================================================
+
 /**
- * Schedule Appointment
+ * Schedule a new appointment
  */
 export async function scheduleAppointment(data: {
   department: string
   provider: string
   date: string
   time: string
-}): Promise<{
-  success: boolean
-  appointmentId: string
-}> {
-  // TODO: Replace with actual API call
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        success: true,
-        appointmentId: `APT-${Date.now()}`,
-      })
-    }, 1000)
+  patientId?: string
+  appointmentType?: string
+  notes?: string
+}): Promise<ScheduleAppointmentResponse> {
+  return fetchAPI<ScheduleAppointmentResponse>('/kiosk/appointments', {
+    method: 'POST',
+    body: JSON.stringify(data),
   })
-
-  // Actual implementation:
-  // return fetchAPI('/appointments', {
-  //   method: 'POST',
-  //   body: JSON.stringify(data),
-  // })
 }
 
 /**
- * Get Queue Status
- */
-export async function getQueueStatus(): Promise<QueueStatus[]> {
-  // TODO: Replace with actual API call
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve([
-        { department: 'Emergency Room', waitTime: 45, patientsWaiting: 12, status: 'high' },
-        { department: 'Primary Care', waitTime: 15, patientsWaiting: 4, status: 'low' },
-        { department: 'Radiology', waitTime: 30, patientsWaiting: 8, status: 'medium' },
-      ])
-    }, 500)
-  })
-
-  // Actual implementation:
-  // return fetchAPI('/queue-status')
-}
-
-/**
- * Process Payment
- */
-export async function processPayment(data: {
-  amount: number
-  paymentMethod: 'credit' | 'debit'
-}): Promise<{
-  success: boolean
-  transactionId: string
-}> {
-  // TODO: Replace with actual API call
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        success: true,
-        transactionId: `TXN-${Date.now()}`,
-      })
-    }, 2000)
-  })
-
-  // Actual implementation:
-  // return fetchAPI('/payments', {
-  //   method: 'POST',
-  //   body: JSON.stringify(data),
-  // })
-}
-
-/**
- * Get Available Appointments
+ * Get available appointment time slots
  */
 export async function getAvailableAppointments(params: {
   department: string
   provider: string
   date: string
 }): Promise<string[]> {
-  // TODO: Replace with actual API call
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(['09:00 AM', '10:00 AM', '11:00 AM', '01:00 PM', '02:00 PM'])
-    }, 500)
+  const queryParams = new URLSearchParams({
+    department: params.department,
+    provider: params.provider,
+    date: params.date,
   })
 
-  // Actual implementation:
-  // return fetchAPI(`/appointments/available?${new URLSearchParams(params)}`)
+  return fetchAPI<string[]>(`/kiosk/appointments/available?${queryParams}`)
 }
 
+// ============================================================================
+// Queue Status API
+// ============================================================================
+
 /**
- * Verify Patient Identity
+ * Get current queue status for all departments
+ */
+export async function getQueueStatus(): Promise<QueueStatus[]> {
+  return fetchAPI<QueueStatus[]>('/kiosk/queue-status')
+}
+
+// ============================================================================
+// Payment Processing API
+// ============================================================================
+
+/**
+ * Process a payment transaction
+ */
+export async function processPayment(data: {
+  amount: number
+  paymentMethod: 'credit' | 'debit'
+  patientId?: string
+  appointmentId?: string
+  invoiceId?: string
+}): Promise<PaymentResponse> {
+  return fetchAPI<PaymentResponse>('/kiosk/payments', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+}
+
+// ============================================================================
+// Patient Verification API
+// ============================================================================
+
+/**
+ * Verify patient identity using date of birth and phone number
  */
 export async function verifyPatient(data: {
   dateOfBirth: string
   phoneNumber: string
-}): Promise<{
-  verified: boolean
-  patientId?: string
-}> {
-  // TODO: Replace with actual API call
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        verified: true,
-        patientId: 'PAT-123456',
-      })
-    }, 1000)
+}): Promise<VerifyPatientResponse> {
+  return fetchAPI<VerifyPatientResponse>('/kiosk/patients/verify', {
+    method: 'POST',
+    body: JSON.stringify(data),
   })
-
-  // Actual implementation:
-  // return fetchAPI('/patients/verify', {
-  //   method: 'POST',
-  //   body: JSON.stringify(data),
-  // })
 }
 
+// ============================================================================
+// Insurance Card Upload API
+// ============================================================================
+
 /**
- * Upload Insurance Card Image
+ * Upload insurance card image for processing
  */
-export async function uploadInsuranceCard(imageData: File | Blob): Promise<{
-  success: boolean
-  imageUrl: string
-}> {
-  // TODO: Replace with actual API call
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        success: true,
-        imageUrl: '/placeholder-insurance-card.jpg',
-      })
-    }, 1500)
-  })
+export async function uploadInsuranceCard(imageData: File | Blob): Promise<InsuranceUploadResponse> {
+  const formData = new FormData()
+  formData.append('image', imageData)
 
-  // Actual implementation:
-  // const formData = new FormData()
-  // formData.append('image', imageData)
-  // return fetchAPI('/insurance/upload', {
-  //   method: 'POST',
-  //   body: formData,
-  //   headers: {}, // Let browser set Content-Type for FormData
-  // })
+  // For FormData, we don't set Content-Type - browser sets it with boundary
+  return fetchAPI<InsuranceUploadResponse>('/kiosk/insurance/upload', {
+    method: 'POST',
+    body: formData,
+    skipContentType: true,
+  })
 }
 
+// ============================================================================
+// Department API
+// ============================================================================
+
 /**
- * Get Departments
+ * Get all available departments
  */
-export async function getDepartments(): Promise<Array<{
-  id: string
-  name: string
-  description: string
-}>> {
-  // TODO: Replace with actual API call
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve([
-        { id: '1', name: 'Primary Care', description: 'General health services' },
-        { id: '2', name: 'Cardiology', description: 'Heart and cardiovascular care' },
-        { id: '3', name: 'Orthopedics', description: 'Bone and joint care' },
-      ])
-    }, 500)
-  })
-
-  // Actual implementation:
-  // return fetchAPI('/departments')
+export async function getDepartments(): Promise<Department[]> {
+  return fetchAPI<Department[]>('/kiosk/departments')
 }
 
+// ============================================================================
+// Provider API
+// ============================================================================
+
 /**
- * Get Providers by Department
+ * Get providers for a specific department
  */
-export async function getProviders(departmentId: string): Promise<Array<{
-  id: string
-  name: string
-  specialty: string
-}>> {
-  // TODO: Replace with actual API call
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve([
-        { id: '1', name: 'Dr. Sarah Johnson', specialty: 'Internal Medicine' },
-        { id: '2', name: 'Dr. Michael Chen', specialty: 'Family Medicine' },
-      ])
-    }, 500)
-  })
-
-  // Actual implementation:
-  // return fetchAPI(`/departments/${departmentId}/providers`)
+export async function getProviders(departmentId: string): Promise<Provider[]> {
+  return fetchAPI<Provider[]>(`/kiosk/departments/${departmentId}/providers`)
 }
 
+// ============================================================================
+// Error Handling Utilities
+// ============================================================================
+
 /**
- * Error handling helper
+ * Extract a user-friendly error message from an error object
  */
 export function handleAPIError(error: unknown): string {
   if (error instanceof Error) {
+    // Check for network errors
+    if (error.message.includes('Unable to connect')) {
+      return error.message
+    }
+
+    // Check for specific HTTP status codes
+    const statusError = error as Error & { statusCode?: number }
+    if (statusError.statusCode) {
+      switch (statusError.statusCode) {
+        case 400:
+          return error.message || 'Invalid request. Please check your information and try again.'
+        case 401:
+          return 'Session expired. Please start over.'
+        case 403:
+          return 'Access denied. Please ask staff for assistance.'
+        case 404:
+          return 'Record not found. Please verify your information.'
+        case 409:
+          return 'A conflict occurred. This may already be registered.'
+        case 422:
+          return error.message || 'Invalid data provided. Please check your entries.'
+        case 429:
+          return 'Too many requests. Please wait a moment and try again.'
+        case 500:
+        case 502:
+        case 503:
+          return 'Server error. Please try again or ask staff for assistance.'
+        default:
+          return error.message
+      }
+    }
+
     return error.message
   }
+
   return 'An unexpected error occurred. Please try again or ask staff for assistance.'
+}
+
+/**
+ * Check if an error is a network connectivity issue
+ */
+export function isNetworkError(error: unknown): boolean {
+  if (error instanceof TypeError && error.message === 'Failed to fetch') {
+    return true
+  }
+  if (error instanceof Error && error.message.includes('Unable to connect')) {
+    return true
+  }
+  return false
+}
+
+/**
+ * Check if an error indicates the patient was not found
+ */
+export function isPatientNotFoundError(error: unknown): boolean {
+  if (error instanceof Error) {
+    const statusError = error as Error & { statusCode?: number; code?: string }
+    return statusError.statusCode === 404 || statusError.code === 'PATIENT_NOT_FOUND'
+  }
+  return false
+}
+
+// ============================================================================
+// Kiosk Device Authentication
+// ============================================================================
+
+/**
+ * Authenticate the kiosk device with the backend
+ * This should be called when the kiosk application starts
+ */
+export async function authenticateKiosk(deviceId: string, deviceSecret: string): Promise<{
+  success: boolean
+  token: string
+  expiresAt: string
+}> {
+  const response = await fetchAPI<{
+    success: boolean
+    token: string
+    expiresAt: string
+  }>('/kiosk/auth/device', {
+    method: 'POST',
+    body: JSON.stringify({ deviceId, deviceSecret }),
+  })
+
+  if (response.success && typeof window !== 'undefined') {
+    sessionStorage.setItem('kiosk_token', response.token)
+    sessionStorage.setItem('kiosk_device_id', deviceId)
+  }
+
+  return response
+}
+
+/**
+ * Refresh the kiosk device authentication token
+ */
+export async function refreshKioskToken(): Promise<{
+  success: boolean
+  token: string
+  expiresAt: string
+}> {
+  const response = await fetchAPI<{
+    success: boolean
+    token: string
+    expiresAt: string
+  }>('/kiosk/auth/refresh', {
+    method: 'POST',
+  })
+
+  if (response.success && typeof window !== 'undefined') {
+    sessionStorage.setItem('kiosk_token', response.token)
+  }
+
+  return response
 }

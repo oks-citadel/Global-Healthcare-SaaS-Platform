@@ -61,17 +61,15 @@ export function useVideoCall(config: VideoCallConfig) {
     socketRef.current = socket;
 
     socket.on('connect', () => {
-      console.log('Socket connected:', socket.id);
+      // Connection established
     });
 
     socket.on('connect_error', (err) => {
-      console.error('Socket connection error:', err);
       setError('Failed to connect to server');
       setCallState('error');
     });
 
     socket.on('disconnect', (reason) => {
-      console.log('Socket disconnected:', reason);
       setCallState('disconnected');
     });
 
@@ -100,7 +98,6 @@ export function useVideoCall(config: VideoCallConfig) {
       setLocalStream(stream);
       return stream;
     } catch (err) {
-      console.error('Error accessing media devices:', err);
       setError('Failed to access camera/microphone');
       throw err;
     }
@@ -147,7 +144,6 @@ export function useVideoCall(config: VideoCallConfig) {
         }
       );
     } catch (err) {
-      console.error('Error joining room:', err);
       setCallState('error');
     }
   }, [config.visitId, config.role, getUserMedia]);
@@ -178,31 +174,25 @@ export function useVideoCall(config: VideoCallConfig) {
             signal,
           },
           (response: any) => {
-            if (response.error) {
-              console.error('Signaling error:', response.error);
-            }
+            // Handle signaling response silently
           }
         );
       });
 
       peer.on('stream', (remoteStream) => {
-        console.log('Received remote stream');
         setRemoteStream(remoteStream);
       });
 
       peer.on('connect', () => {
-        console.log('Peer connected');
         setCallState('connected');
         startStatsCollection(peer);
       });
 
       peer.on('error', (err) => {
-        console.error('Peer connection error:', err);
         setError('Connection error occurred');
       });
 
       peer.on('close', () => {
-        console.log('Peer connection closed');
         setCallState('disconnected');
         stopStatsCollection();
       });
@@ -221,7 +211,6 @@ export function useVideoCall(config: VideoCallConfig) {
     const socket = socketRef.current;
 
     socket.on('webrtc-offer', ({ from, signal }: any) => {
-      console.log('Received WebRTC offer from:', from);
       if (!localStreamRef.current) return;
 
       const peer = createPeerConnection(from, false, localStreamRef.current);
@@ -229,17 +218,14 @@ export function useVideoCall(config: VideoCallConfig) {
     });
 
     socket.on('webrtc-answer', ({ from, signal }: any) => {
-      console.log('Received WebRTC answer from:', from);
       peerConnectionRef.current?.signal(signal);
     });
 
     socket.on('ice-candidate', ({ from, signal }: any) => {
-      console.log('Received ICE candidate from:', from);
       peerConnectionRef.current?.signal(signal);
     });
 
     socket.on('peer-joined', ({ peer }: any) => {
-      console.log('Peer joined:', peer);
       setPeers((prev) => [...prev, peer]);
 
       // Initiate connection if we have local stream
@@ -249,7 +235,6 @@ export function useVideoCall(config: VideoCallConfig) {
     });
 
     socket.on('peer-left', ({ peerId }: any) => {
-      console.log('Peer left:', peerId);
       setPeers((prev) => prev.filter((p) => p.id !== peerId));
       setRemoteStream(null);
       peerConnectionRef.current?.destroy();
@@ -302,7 +287,7 @@ export function useVideoCall(config: VideoCallConfig) {
           });
         }
       } catch (err) {
-        console.error('Error collecting stats:', err);
+        // Stats collection error - non-critical
       }
     }, 5000); // Every 5 seconds
   }, [roomId]);
@@ -340,7 +325,7 @@ export function useVideoCall(config: VideoCallConfig) {
   const leaveRoom = useCallback(() => {
     if (roomId && socketRef.current) {
       socketRef.current.emit('leave-room', { roomId }, () => {
-        console.log('Left room');
+        // Room left successfully
       });
     }
 

@@ -69,7 +69,6 @@ export function I18nProvider({ children, initialLanguage }: I18nProviderProps) {
 
         setIsInitialized(true);
       } catch (err) {
-        console.error('Failed to initialize i18n:', err);
         setError(err instanceof Error ? err : new Error('Failed to initialize i18n'));
         // Initialize anyway to prevent app from hanging
         setIsInitialized(true);
@@ -86,7 +85,7 @@ export function I18nProvider({ children, initialLanguage }: I18nProviderProps) {
   }
 
   if (error) {
-    console.warn('I18n initialization error, using default language:', error);
+    // I18n initialization error - using default language
   }
 
   return <I18nextProvider i18n={i18n}>{children}</I18nextProvider>;
@@ -124,11 +123,7 @@ export function LanguageSwitcherProvider({ children }: { children: React.ReactNo
       await AsyncStorage.setItem(STORAGE_KEY, language);
 
       setCurrentLanguage(language);
-
-      // You can emit an event or call a callback here if needed
-      console.log(`Language changed to: ${language}`);
     } catch (error) {
-      console.error('Failed to change language:', error);
       throw error;
     } finally {
       setIsChanging(false);
@@ -218,7 +213,6 @@ export async function getStoredLanguage(): Promise<SupportedLanguage | null> {
     const storedLanguage = await AsyncStorage.getItem(STORAGE_KEY);
     return storedLanguage as SupportedLanguage | null;
   } catch (error) {
-    console.error('Failed to get stored language:', error);
     return null;
   }
 }
@@ -230,7 +224,7 @@ export async function clearStoredLanguage(): Promise<void> {
   try {
     await AsyncStorage.removeItem(STORAGE_KEY);
   } catch (error) {
-    console.error('Failed to clear stored language:', error);
+    // Failed to clear stored language
   }
 }
 

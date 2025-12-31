@@ -1,0 +1,583 @@
+generator client {
+  output   = "./../src/generated/client"
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// Vendor Risk Management Domain
+// ==========================================
+
+model Vendor {
+  id                  String             @id @default(uuid())
+  name                String
+  legalName           String?
+  dbaName             String?
+  taxId               String?
+  dunsNumber          String?
+  website             String?
+  description         String?
+  category            VendorCategory
+  tier                VendorTier         @default(TIER_3)
+  status              VendorStatus       @default(PENDING)
+  riskScore           Int                @default(0)
+  riskLevel           RiskLevel          @default(UNKNOWN)
+  primaryContactName  String?
+  primaryContactEmail String?
+  primaryContactPhone String?
+  address             Json?
+  dataAccessLevel     DataAccessLevel    @default(NONE)
+  phiAccess           Boolean            @default(false)
+  piiAccess           Boolean            @default(false)
+  onboardingDate      DateTime?
+  lastReviewDate      DateTime?
+  nextReviewDate      DateTime?
+  notes               String?
+
+  assessments         Assessment[]
+  contracts           Contract[]
+  certifications      Certification[]
+  incidents           Incident[]
+  remediations        RemediationTask[]
+  questionnaires      QuestionnaireResponse[]
+  auditLogs           VendorAuditLog[]
+
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+  createdBy           String?
+  updatedBy           String?
+
+  @@index([name])
+  @@index([status])
+  @@index([riskLevel])
+  @@index([category])
+  @@index([tier])
+  @@index([nextReviewDate])
+}
+
+enum VendorCategory {
+  CLOUD_HOSTING
+  SOFTWARE_SAAS
+  DATA_ANALYTICS
+  IT_SERVICES
+  CONSULTING
+  MEDICAL_DEVICES
+  LABORATORY
+  PHARMACY
+  BILLING
+  CLEARINGHOUSE
+  STORAGE_BACKUP
+  NETWORK_SECURITY
+  TELECOMMUNICATIONS
+  STAFFING
+  OTHER
+}
+
+enum VendorTier {
+  TIER_1  // Critical - highest risk, requires most scrutiny
+  TIER_2  // Important - moderate risk
+  TIER_3  // Standard - lower risk
+  TIER_4  // Minimal - minimal risk
+}
+
+enum VendorStatus {
+  PENDING
+  IN_REVIEW
+  APPROVED
+  CONDITIONAL
+  SUSPENDED
+  TERMINATED
+  ARCHIVED
+}
+
+enum RiskLevel {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+  MINIMAL
+  UNKNOWN
+}
+
+enum DataAccessLevel {
+  NONE
+  MINIMAL
+  LIMITED
+  MODERATE
+  EXTENSIVE
+  FULL
+}
+
+// ==========================================
+// Security Assessments
+// ==========================================
+
+model Assessment {
+  id                String           @id @default(uuid())
+  vendorId          String
+  vendor            Vendor           @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  type              AssessmentType
+  status            AssessmentStatus @default(PENDING)
+  dueDate           DateTime?
+  completedDate     DateTime?
+  score             Int?
+  maxScore          Int?
+  passThreshold     Int?
+  passed            Boolean?
+  reviewer          String?
+  reviewerEmail     String?
+  findings          Json?
+  recommendations   String?
+  attachments       Json?
+
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  createdBy         String?
+
+  @@index([vendorId])
+  @@index([type])
+  @@index([status])
+  @@index([dueDate])
+}
+
+enum AssessmentType {
+  INITIAL_ONBOARDING
+  ANNUAL_REVIEW
+  AD_HOC
+  SIG_CORE
+  SIG_LITE
+  CAIQ
+  HECVAT
+  VSAQ
+  CUSTOM
+}
+
+enum AssessmentStatus {
+  PENDING
+  IN_PROGRESS
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  EXPIRED
+  CANCELLED
+}
+
+// ==========================================
+// Security Questionnaires (SIG, CAIQ)
+// ==========================================
+
+model QuestionnaireTemplate {
+  id              String                  @id @default(uuid())
+  name            String
+  version         String
+  type            QuestionnaireType
+  description     String?
+  sections        Json                    // JSON array of sections with questions
+  totalQuestions  Int
+  isActive        Boolean                 @default(true)
+
+  responses       QuestionnaireResponse[]
+
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+
+  @@unique([name, version])
+  @@index([type])
+  @@index([isActive])
+}
+
+model QuestionnaireResponse {
+  id              String                @id @default(uuid())
+  vendorId        String
+  vendor          Vendor                @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  templateId      String
+  template        QuestionnaireTemplate @relation(fields: [templateId], references: [id])
+  status          QuestionnaireStatus   @default(NOT_STARTED)
+  responses       Json?                 // JSON object with question responses
+  score           Int?
+  maxScore        Int?
+  percentComplete Int                   @default(0)
+  submittedAt     DateTime?
+  reviewedAt      DateTime?
+  reviewedBy      String?
+  reviewNotes     String?
+  expiresAt       DateTime?
+
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+
+  @@index([vendorId])
+  @@index([templateId])
+  @@index([status])
+}
+
+enum QuestionnaireType {
+  SIG_CORE
+  SIG_LITE
+  CAIQ
+  HECVAT
+  VSAQ
+  CUSTOM
+}
+
+enum QuestionnaireStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  EXPIRED
+}
+
+// ==========================================
+// Contracts and BAA Tracking
+// ==========================================
+
+model Contract {
+  id                  String          @id @default(uuid())
+  vendorId            String
+  vendor              Vendor          @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  contractNumber      String?
+  type                ContractType
+  status              ContractStatus  @default(DRAFT)
+  title               String
+  description         String?
+  effectiveDate       DateTime?
+  expirationDate      DateTime?
+  autoRenewal         Boolean         @default(false)
+  renewalTermMonths   Int?
+  terminationNoticeDays Int?
+  value               Float?
+  currency            String          @default("USD")
+  paymentTerms        String?
+  slaTerms            Json?
+  securityRequirements Json?
+  dataRetentionDays   Int?
+  liabilityLimit      Float?
+  indemnification     Boolean         @default(false)
+  insuranceRequired   Boolean         @default(false)
+  insuranceMinimum    Float?
+  documentUrl         String?
+  signedDate          DateTime?
+  signedBy            String?
+  counterSignedDate   DateTime?
+  counterSignedBy     String?
+  notes               String?
+
+  amendments          ContractAmendment[]
+  renewalHistory      ContractRenewal[]
+
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+  createdBy           String?
+
+  @@index([vendorId])
+  @@index([type])
+  @@index([status])
+  @@index([expirationDate])
+}
+
+model ContractAmendment {
+  id              String   @id @default(uuid())
+  contractId      String
+  contract        Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  amendmentNumber Int
+  title           String
+  description     String?
+  effectiveDate   DateTime
+  documentUrl     String?
+  signedDate      DateTime?
+  signedBy        String?
+
+  createdAt       DateTime @default(now())
+
+  @@index([contractId])
+}
+
+model ContractRenewal {
+  id              String   @id @default(uuid())
+  contractId      String
+  contract        Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  previousEndDate DateTime
+  newEndDate      DateTime
+  renewalDate     DateTime @default(now())
+  renewedBy       String?
+  notes           String?
+
+  createdAt       DateTime @default(now())
+
+  @@index([contractId])
+}
+
+enum ContractType {
+  BAA
+  MSA
+  SLA
+  NDA
+  DPA
+  SOW
+  AMENDMENT
+  OTHER
+}
+
+enum ContractStatus {
+  DRAFT
+  PENDING_SIGNATURE
+  ACTIVE
+  EXPIRED
+  TERMINATED
+  RENEWED
+  SUSPENDED
+}
+
+// ==========================================
+// Certifications (SOC 2, HITRUST, etc.)
+// ==========================================
+
+model Certification {
+  id                  String              @id @default(uuid())
+  vendorId            String
+  vendor              Vendor              @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  type                CertificationType
+  name                String
+  issuingBody         String?
+  certificationNumber String?
+  scope               String?
+  issueDate           DateTime?
+  expirationDate      DateTime?
+  status              CertificationStatus @default(PENDING)
+  verified            Boolean             @default(false)
+  verifiedDate        DateTime?
+  verifiedBy          String?
+  documentUrl         String?
+  notes               String?
+
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+
+  @@index([vendorId])
+  @@index([type])
+  @@index([status])
+  @@index([expirationDate])
+}
+
+enum CertificationType {
+  SOC_2_TYPE_1
+  SOC_2_TYPE_2
+  SOC_1
+  HITRUST
+  ISO_27001
+  ISO_27017
+  ISO_27018
+  PCI_DSS
+  HIPAA_ATTESTATION
+  FedRAMP
+  StateRAMP
+  CSA_STAR
+  NIST_CSF
+  OTHER
+}
+
+enum CertificationStatus {
+  PENDING
+  VALID
+  EXPIRED
+  REVOKED
+  NOT_APPLICABLE
+}
+
+// ==========================================
+// Vendor Incidents and Breaches
+// ==========================================
+
+model Incident {
+  id                  String              @id @default(uuid())
+  vendorId            String
+  vendor              Vendor              @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  type                IncidentType
+  severity            IncidentSeverity    @default(MEDIUM)
+  status              IncidentStatus      @default(OPEN)
+  title               String
+  description         String
+  discoveredAt        DateTime
+  reportedAt          DateTime            @default(now())
+  resolvedAt          DateTime?
+  affectedSystems     String[]
+  affectedDataTypes   String[]
+  recordsAffected     Int?
+  phiInvolved         Boolean             @default(false)
+  piiInvolved         Boolean             @default(false)
+  rootCause           String?
+  immediateActions    String?
+  correctiveActions   String?
+  preventiveActions   String?
+  notificationRequired Boolean            @default(false)
+  notifiedParties     String[]
+  notificationDate    DateTime?
+  regulatoryReportRequired Boolean        @default(false)
+  regulatoryReportDate DateTime?
+  lessonLearned       String?
+  attachments         Json?
+
+  remediations        RemediationTask[]
+
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  createdBy           String?
+
+  @@index([vendorId])
+  @@index([type])
+  @@index([severity])
+  @@index([status])
+  @@index([discoveredAt])
+}
+
+enum IncidentType {
+  DATA_BREACH
+  SECURITY_INCIDENT
+  PRIVACY_VIOLATION
+  AVAILABILITY_ISSUE
+  COMPLIANCE_VIOLATION
+  UNAUTHORIZED_ACCESS
+  MALWARE
+  PHISHING
+  INSIDER_THREAT
+  PHYSICAL_SECURITY
+  OTHER
+}
+
+enum IncidentSeverity {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum IncidentStatus {
+  OPEN
+  INVESTIGATING
+  CONTAINED
+  REMEDIATED
+  CLOSED
+  MONITORING
+}
+
+// ==========================================
+// Compliance Gap Remediation
+// ==========================================
+
+model RemediationTask {
+  id              String              @id @default(uuid())
+  vendorId        String
+  vendor          Vendor              @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  incidentId      String?
+  incident        Incident?           @relation(fields: [incidentId], references: [id])
+  type            RemediationType
+  priority        TaskPriority        @default(MEDIUM)
+  status          TaskStatus          @default(OPEN)
+  title           String
+  description     String
+  requirement     String?
+  controlReference String?
+  dueDate         DateTime?
+  completedDate   DateTime?
+  assignedTo      String?
+  assignedToEmail String?
+  evidence        Json?
+  verifiedBy      String?
+  verifiedDate    DateTime?
+  notes           String?
+
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  createdBy       String?
+
+  @@index([vendorId])
+  @@index([incidentId])
+  @@index([status])
+  @@index([priority])
+  @@index([dueDate])
+}
+
+enum RemediationType {
+  CONTROL_GAP
+  ASSESSMENT_FINDING
+  INCIDENT_RESPONSE
+  CERTIFICATION_REQUIREMENT
+  CONTRACT_REQUIREMENT
+  POLICY_UPDATE
+  TRAINING
+  TECHNICAL_FIX
+  PROCESS_IMPROVEMENT
+  OTHER
+}
+
+enum TaskPriority {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum TaskStatus {
+  OPEN
+  IN_PROGRESS
+  PENDING_VERIFICATION
+  COMPLETED
+  DEFERRED
+  CANCELLED
+}
+
+// ==========================================
+// Audit Logging for Compliance
+// ==========================================
+
+model VendorAuditLog {
+  id          String   @id @default(uuid())
+  vendorId    String?
+  vendor      Vendor?  @relation(fields: [vendorId], references: [id], onDelete: SetNull)
+  action      String
+  entityType  String
+  entityId    String?
+  userId      String
+  userEmail   String?
+  userRole    String?
+  ipAddress   String?
+  userAgent   String?
+  oldValues   Json?
+  newValues   Json?
+  metadata    Json?
+
+  createdAt   DateTime @default(now())
+
+  @@index([vendorId])
+  @@index([userId])
+  @@index([action])
+  @@index([entityType])
+  @@index([createdAt])
+}
+
+// ==========================================
+// Risk Scoring Configuration
+// ==========================================
+
+model RiskScoringCriteria {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  category    String
+  weight      Float    @default(1.0)
+  maxPoints   Int
+  isActive    Boolean  @default(true)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([category])
+  @@index([isActive])
+}

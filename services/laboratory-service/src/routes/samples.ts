@@ -1,5 +1,4 @@
-// @ts-nocheck
-import { Router } from 'express';
+import { Router, Response } from 'express';
 import { PrismaClient } from '../generated/client';
 import { z } from 'zod';
 import { UserRequest, requireUser } from '../middleware/extractUser';
@@ -12,7 +11,7 @@ const prisma = new PrismaClient();
 const sampleService = new SampleTrackingService(prisma);
 
 // GET /samples - Track samples
-router.get('/', requireUser, async (req: UserRequest, res) => {
+router.get('/', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const userRole = req.user!.role;
 
@@ -45,7 +44,7 @@ router.get('/', requireUser, async (req: UserRequest, res) => {
 });
 
 // GET /samples/statistics - Get sample statistics
-router.get('/statistics', requireUser, async (req: UserRequest, res) => {
+router.get('/statistics', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const userRole = req.user!.role;
 
@@ -64,7 +63,7 @@ router.get('/statistics', requireUser, async (req: UserRequest, res) => {
 });
 
 // GET /samples/:id - Get sample details
-router.get('/:id', requireUser, async (req: UserRequest, res) => {
+router.get('/:id', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const userRole = req.user!.role;
@@ -89,7 +88,7 @@ router.get('/:id', requireUser, async (req: UserRequest, res) => {
 });
 
 // GET /samples/number/:sampleNumber - Get sample by number
-router.get('/number/:sampleNumber', requireUser, async (req: UserRequest, res) => {
+router.get('/number/:sampleNumber', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { sampleNumber } = req.params;
     const userRole = req.user!.role;
@@ -114,7 +113,7 @@ router.get('/number/:sampleNumber', requireUser, async (req: UserRequest, res) =
 });
 
 // GET /samples/order/:orderId - Get samples by order
-router.get('/order/:orderId', requireUser, async (req: UserRequest, res) => {
+router.get('/order/:orderId', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { orderId } = req.params;
     const userRole = req.user!.role;
@@ -134,7 +133,7 @@ router.get('/order/:orderId', requireUser, async (req: UserRequest, res) => {
 });
 
 // POST /samples - Create sample
-router.post('/', requireUser, async (req: UserRequest, res) => {
+router.post('/', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const userId = req.user!.id;
     const userRole = req.user!.role;
@@ -168,7 +167,7 @@ router.post('/', requireUser, async (req: UserRequest, res) => {
 });
 
 // PATCH /samples/:id - Update sample status
-router.patch('/:id', requireUser, async (req: UserRequest, res) => {
+router.patch('/:id', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const userRole = req.user!.role;
@@ -197,7 +196,7 @@ router.patch('/:id', requireUser, async (req: UserRequest, res) => {
 });
 
 // PATCH /samples/:id/receive - Mark sample as received
-router.patch('/:id/receive', requireUser, async (req: UserRequest, res) => {
+router.patch('/:id/receive', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const userId = req.user!.id;
@@ -222,7 +221,7 @@ router.patch('/:id/receive', requireUser, async (req: UserRequest, res) => {
 });
 
 // PATCH /samples/:id/reject - Reject sample
-router.patch('/:id/reject', requireUser, async (req: UserRequest, res) => {
+router.patch('/:id/reject', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const { reason } = req.body;
@@ -251,7 +250,7 @@ router.patch('/:id/reject', requireUser, async (req: UserRequest, res) => {
 });
 
 // PATCH /samples/:id/location - Update sample location
-router.patch('/:id/location', requireUser, async (req: UserRequest, res) => {
+router.patch('/:id/location', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const { location } = req.body;
@@ -280,7 +279,7 @@ router.patch('/:id/location', requireUser, async (req: UserRequest, res) => {
 });
 
 // DELETE /samples/:id/dispose - Dispose sample
-router.delete('/:id/dispose', requireUser, async (req: UserRequest, res) => {
+router.delete('/:id/dispose', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const userRole = req.user!.role;

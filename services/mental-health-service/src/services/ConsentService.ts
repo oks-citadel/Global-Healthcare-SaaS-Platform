@@ -1,7 +1,24 @@
-// @ts-nocheck
-import { PrismaClient, ConsentType, ConsentStatus } from '../generated/client';
+import { PrismaClient, ConsentType, ConsentRecord } from '../generated/client';
 
 const prisma = new PrismaClient();
+
+// Type definitions for consent data
+interface GrantConsentInput {
+  patientId: string;
+  providerId: string;
+  consentType: ConsentType;
+  purpose: string;
+  expiresAt?: Date;
+  substanceUseDisclosure?: boolean;
+  disclosureScope?: string;
+  redisclosure?: boolean;
+}
+
+interface AccessValidationResult {
+  allowed: boolean;
+  reason: string;
+  consentId?: string;
+}
 
 /**
  * ConsentService - Handles 42 CFR Part 2 compliance for substance use disorder records
@@ -65,16 +82,7 @@ export class ConsentService {
   /**
    * Grant consent for a provider
    */
-  static async grantConsent(data: {
-    patientId: string;
-    providerId: string;
-    consentType: ConsentType;
-    purpose: string;
-    expiresAt?: Date;
-    substanceUseDisclosure?: boolean;
-    disclosureScope?: string;
-    redisclosure?: boolean;
-  }) {
+  static async grantConsent(data: GrantConsentInput): Promise<ConsentRecord> {
     return await prisma.consentRecord.create({
       data: {
         patientId: data.patientId,
@@ -93,7 +101,7 @@ export class ConsentService {
   /**
    * Revoke consent
    */
-  static async revokeConsent(consentId: string, patientId: string) {
+  static async revokeConsent(consentId: string, patientId: string): Promise<ConsentRecord> {
     const consent = await prisma.consentRecord.findUnique({
       where: { id: consentId },
     });
@@ -114,7 +122,7 @@ export class ConsentService {
   /**
    * Get all active consents for a patient
    */
-  static async getPatientConsents(patientId: string) {
+  static async getPatientConsents(patientId: string): Promise<ConsentRecord[]> {
     return await prisma.consentRecord.findMany({
       where: {
         patientId,
@@ -127,7 +135,7 @@ export class ConsentService {
   /**
    * Check and update expired consents
    */
-  static async updateExpiredConsents() {
+  static async updateExpiredConsents(): Promise<{ count: number }> {
     return await prisma.consentRecord.updateMany({
       where: {
         status: 'active',
@@ -148,7 +156,7 @@ export class ConsentService {
     patientId: string,
     providerId: string,
     resourceType: string
-  ): Promise<{ allowed: boolean; reason: string; consentId?: string }> {
+  ): Promise<AccessValidationResult> {
     // Check for active consent
     const consent = await prisma.consentRecord.findFirst({
       where: {
@@ -197,7 +205,7 @@ export class ConsentService {
     patientId: string,
     providerId: string,
     emergencyReason: string
-  ) {
+  ): Promise<ConsentRecord> {
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + 72); // 72-hour emergency consent
 

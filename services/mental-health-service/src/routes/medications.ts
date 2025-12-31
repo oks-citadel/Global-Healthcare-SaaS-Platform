@@ -1,11 +1,13 @@
-// @ts-nocheck
-import { Router } from 'express';
-import { PrismaClient, MedicationClass, MedicationStatus } from '../generated/client';
+import { Router, Response } from 'express';
+import { PrismaClient, Prisma, PsychMedication } from '../generated/client';
 import { z } from 'zod';
 import { UserRequest, requireUser } from '../middleware/extractUser';
 
 const router: ReturnType<typeof Router> = Router();
 const prisma = new PrismaClient();
+
+// Type for Prisma where clause
+type PsychMedicationWhereInput = Prisma.PsychMedicationWhereInput;
 
 // Validation schemas
 const createMedicationSchema = z.object({
@@ -42,7 +44,7 @@ const updateMedicationSchema = z.object({
 });
 
 // Get medications for a patient
-router.get('/patient/:patientId', requireUser, async (req: UserRequest, res) => {
+router.get('/patient/:patientId', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { patientId } = req.params;
     const userId = req.user!.id;
@@ -63,9 +65,9 @@ router.get('/patient/:patientId', requireUser, async (req: UserRequest, res) => 
       return;
     }
 
-    const where: any = { patientId };
+    const where: PsychMedicationWhereInput = { patientId };
 
-    if (status) {
+    if (status && typeof status === 'string') {
       where.status = status;
     }
 
@@ -88,7 +90,7 @@ router.get('/patient/:patientId', requireUser, async (req: UserRequest, res) => 
 });
 
 // Get single medication
-router.get('/:id', requireUser, async (req: UserRequest, res) => {
+router.get('/:id', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const userId = req.user!.id;
@@ -131,7 +133,7 @@ router.get('/:id', requireUser, async (req: UserRequest, res) => {
 });
 
 // Prescribe medication
-router.post('/', requireUser, async (req: UserRequest, res) => {
+router.post('/', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const userId = req.user!.id;
     const userRole = req.user!.role;
@@ -188,7 +190,7 @@ router.post('/', requireUser, async (req: UserRequest, res) => {
 });
 
 // Update medication
-router.patch('/:id', requireUser, async (req: UserRequest, res) => {
+router.patch('/:id', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const userId = req.user!.id;
@@ -261,7 +263,7 @@ router.patch('/:id', requireUser, async (req: UserRequest, res) => {
 });
 
 // Discontinue medication
-router.post('/:id/discontinue', requireUser, async (req: UserRequest, res) => {
+router.post('/:id/discontinue', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const userId = req.user!.id;
@@ -318,7 +320,7 @@ router.post('/:id/discontinue', requireUser, async (req: UserRequest, res) => {
 });
 
 // Get active medications summary
-router.get('/patient/:patientId/active', requireUser, async (req: UserRequest, res) => {
+router.get('/patient/:patientId/active', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { patientId } = req.params;
     const userId = req.user!.id;
@@ -347,7 +349,7 @@ router.get('/patient/:patientId/active', requireUser, async (req: UserRequest, r
     });
 
     // Group by medication class
-    const byClass: Record<string, any[]> = {};
+    const byClass: Record<string, PsychMedication[]> = {};
 
     medications.forEach((med) => {
       const className = med.medicationClass;

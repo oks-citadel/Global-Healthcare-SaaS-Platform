@@ -1,0 +1,815 @@
+generator client {
+  output   = "./../src/generated/client"
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// Home Health Workforce Domain
+// ==========================================
+
+// Caregiver/Nurse Model
+model Caregiver {
+  id                String           @id @default(uuid())
+  userId            String           @unique
+  firstName         String
+  lastName          String
+  email             String           @unique
+  phone             String
+  licenseNumber     String?
+  licenseType       LicenseType?
+  licenseExpiry     DateTime?
+  certifications    Json?            // Array of certifications
+  specialties       String[]         // Array of specialties (wound care, pediatric, etc.)
+  languages         String[]         // Languages spoken
+  status            CaregiverStatus  @default(active)
+  hourlyRate        Float?
+  maxDailyVisits    Int              @default(8)
+  maxWeeklyHours    Float            @default(40)
+
+  // Location tracking
+  currentLatitude   Float?
+  currentLongitude  Float?
+  lastLocationUpdate DateTime?
+  homeLatitude      Float?
+  homeLongitude     Float?
+  homeAddress       String?
+  serviceRadius     Float            @default(25) // miles
+
+  // Relations
+  visits            HomeVisit[]
+  schedules         CaregiverSchedule[]
+  timeEntries       TimeEntry[]
+  mileageEntries    MileageEntry[]
+
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([licenseType])
+}
+
+enum LicenseType {
+  RN
+  LPN
+  LVN
+  CNA
+  HHA
+  PT
+  OT
+  ST
+  MSW
+  OTHER
+}
+
+enum CaregiverStatus {
+  active
+  inactive
+  on_leave
+  terminated
+}
+
+model CaregiverSchedule {
+  id              String       @id @default(uuid())
+  caregiverId     String
+  caregiver       Caregiver    @relation(fields: [caregiverId], references: [id], onDelete: Cascade)
+  dayOfWeek       Int          // 0=Sunday, 6=Saturday
+  startTime       String       // HH:MM format
+  endTime         String       // HH:MM format
+  isAvailable     Boolean      @default(true)
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@unique([caregiverId, dayOfWeek])
+  @@index([caregiverId])
+  @@index([dayOfWeek])
+}
+
+// Patient Home Profile
+model PatientHome {
+  id              String       @id @default(uuid())
+  patientId       String       @unique
+  address         String
+  addressLine2    String?
+  city            String
+  state           String
+  zipCode         String
+  country         String       @default("USA")
+  latitude        Float?
+  longitude       Float?
+
+  // Access information
+  accessInstructions String?
+  gateCode        String?
+  parkingInfo     String?
+  petInfo         String?
+  emergencyContact String?
+  emergencyPhone  String?
+
+  // Home assessment data
+  homeType        HomeType     @default(single_family)
+  hasStairs       Boolean      @default(false)
+  wheelchairAccessible Boolean @default(false)
+  oxygenInHome    Boolean      @default(false)
+  safetyHazards   String?
+  specialEquipment String[]
+
+  // Relations
+  visits          HomeVisit[]
+  assessments     HomeAssessment[]
+  equipment       PatientEquipment[]
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([patientId])
+  @@index([zipCode])
+}
+
+enum HomeType {
+  single_family
+  apartment
+  condo
+  townhouse
+  assisted_living
+  nursing_facility
+  group_home
+  other
+}
+
+// Home Visit Model
+model HomeVisit {
+  id              String          @id @default(uuid())
+  patientId       String
+  patientHomeId   String
+  patientHome     PatientHome     @relation(fields: [patientHomeId], references: [id])
+  caregiverId     String
+  caregiver       Caregiver       @relation(fields: [caregiverId], references: [id])
+
+  // Scheduling
+  scheduledDate   DateTime
+  scheduledStartTime String       // HH:MM format
+  scheduledEndTime String         // HH:MM format
+  estimatedDuration Int           // minutes
+  priority        VisitPriority   @default(routine)
+  visitType       VisitType
+
+  // Status tracking
+  status          VisitStatus     @default(scheduled)
+
+  // Actual times
+  actualStartTime DateTime?
+  actualEndTime   DateTime?
+  actualDuration  Int?            // minutes
+
+  // Location verification
+  startLatitude   Float?
+  startLongitude  Float?
+  endLatitude     Float?
+  endLongitude    Float?
+
+  // Visit details
+  reasonForVisit  String?
+  clinicalNotes   String?
+  patientCondition String?
+  followUpRequired Boolean        @default(false)
+  followUpNotes   String?
+
+  // Signatures
+  caregiverSignature String?
+  patientSignature String?
+  signedAt        DateTime?
+
+  // Relations
+  tasks           VisitTask[]
+  evvRecords      EVVRecord[]
+  medications     MedicationAdministration[]
+  incidents       Incident[]
+  documentation   VisitDocumentation[]
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@index([patientId])
+  @@index([caregiverId])
+  @@index([scheduledDate])
+  @@index([status])
+  @@index([patientHomeId])
+}
+
+enum VisitType {
+  skilled_nursing
+  physical_therapy
+  occupational_therapy
+  speech_therapy
+  home_health_aide
+  medical_social_services
+  wound_care
+  medication_management
+  post_surgical
+  chronic_care
+  palliative
+  hospice
+  pediatric
+  assessment
+  other
+}
+
+enum VisitPriority {
+  routine
+  urgent
+  emergency
+  prn
+}
+
+enum VisitStatus {
+  scheduled
+  confirmed
+  en_route
+  arrived
+  in_progress
+  completed
+  cancelled
+  no_show
+  rescheduled
+}
+
+// Visit Task Checklist
+model VisitTask {
+  id              String       @id @default(uuid())
+  visitId         String
+  visit           HomeVisit    @relation(fields: [visitId], references: [id], onDelete: Cascade)
+
+  taskType        CareTaskType
+  title           String
+  description     String?
+  isRequired      Boolean      @default(true)
+  sequence        Int          @default(0)
+
+  // Completion
+  status          TaskCompletionStatus @default(pending)
+  completedAt     DateTime?
+  completedBy     String?
+  notes           String?
+
+  // For vital sign tasks
+  vitalType       String?
+  vitalValue      Float?
+  vitalUnit       String?
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([visitId])
+  @@index([status])
+  @@index([taskType])
+}
+
+enum CareTaskType {
+  vital_signs
+  medication
+  wound_care
+  personal_care
+  mobility
+  nutrition
+  hydration
+  exercise
+  education
+  assessment
+  documentation
+  equipment_check
+  safety_check
+  communication
+  other
+}
+
+enum TaskCompletionStatus {
+  pending
+  completed
+  skipped
+  unable_to_complete
+  deferred
+}
+
+// Electronic Visit Verification (EVV) Record
+model EVVRecord {
+  id              String       @id @default(uuid())
+  visitId         String
+  visit           HomeVisit    @relation(fields: [visitId], references: [id], onDelete: Cascade)
+
+  recordType      EVVRecordType
+  timestamp       DateTime     @default(now())
+
+  // GPS verification
+  latitude        Float
+  longitude       Float
+  accuracy        Float?       // GPS accuracy in meters
+
+  // Device info
+  deviceId        String?
+  deviceType      String?
+  ipAddress       String?
+
+  // Verification
+  isVerified      Boolean      @default(false)
+  verificationMethod EVVVerificationMethod
+  verificationNotes String?
+
+  // Distance from patient home
+  distanceFromHome Float?      // meters
+  isWithinGeofence Boolean     @default(false)
+  geofenceRadius  Float        @default(100) // meters
+
+  createdAt       DateTime     @default(now())
+
+  @@index([visitId])
+  @@index([timestamp])
+  @@index([recordType])
+}
+
+enum EVVRecordType {
+  clock_in
+  clock_out
+  location_update
+  task_completion
+  signature_capture
+}
+
+enum EVVVerificationMethod {
+  gps
+  telephony
+  biometric
+  fixed_device
+  manual_override
+}
+
+// Time Entry for caregivers
+model TimeEntry {
+  id              String       @id @default(uuid())
+  caregiverId     String
+  caregiver       Caregiver    @relation(fields: [caregiverId], references: [id], onDelete: Cascade)
+  visitId         String?
+
+  entryType       TimeEntryType
+  startTime       DateTime
+  endTime         DateTime?
+  duration        Int?         // minutes
+
+  // Location
+  startLatitude   Float?
+  startLongitude  Float?
+  endLatitude     Float?
+  endLongitude    Float?
+
+  // Approval
+  status          ApprovalStatus @default(pending)
+  approvedBy      String?
+  approvedAt      DateTime?
+  notes           String?
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([caregiverId])
+  @@index([visitId])
+  @@index([startTime])
+  @@index([status])
+}
+
+enum TimeEntryType {
+  visit
+  travel
+  training
+  administrative
+  on_call
+  overtime
+  other
+}
+
+enum ApprovalStatus {
+  pending
+  approved
+  rejected
+  disputed
+}
+
+// Mileage Entry
+model MileageEntry {
+  id              String       @id @default(uuid())
+  caregiverId     String
+  caregiver       Caregiver    @relation(fields: [caregiverId], references: [id], onDelete: Cascade)
+
+  date            DateTime     @default(now())
+  startAddress    String
+  endAddress      String
+  distance        Float        // miles
+  purpose         String?
+
+  // GPS tracking
+  startLatitude   Float?
+  startLongitude  Float?
+  endLatitude     Float?
+  endLongitude    Float?
+  routeData       Json?        // Array of coordinates for the route
+
+  // Reimbursement
+  ratePerMile     Float        @default(0.67) // IRS rate
+  totalAmount     Float?
+  status          ApprovalStatus @default(pending)
+  approvedBy      String?
+  approvedAt      DateTime?
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([caregiverId])
+  @@index([date])
+  @@index([status])
+}
+
+// Home Assessment
+model HomeAssessment {
+  id              String       @id @default(uuid())
+  patientHomeId   String
+  patientHome     PatientHome  @relation(fields: [patientHomeId], references: [id], onDelete: Cascade)
+  assessorId      String
+  assessmentDate  DateTime     @default(now())
+
+  // Safety assessment
+  safetyScore     Int?         // 0-100
+  fallRisk        RiskLevel    @default(low)
+  fireRisk        RiskLevel    @default(low)
+  infectionRisk   RiskLevel    @default(low)
+
+  // Living conditions
+  cleanlinessScore Int?        // 0-100
+  adequateLighting Boolean     @default(true)
+  adequateVentilation Boolean  @default(true)
+  workingUtilities Boolean     @default(true)
+
+  // Accessibility
+  bathroomAccessible Boolean   @default(true)
+  bedroomAccessible Boolean    @default(true)
+  kitchenAccessible Boolean    @default(true)
+
+  // Recommendations
+  recommendations Json?        // Array of recommendations
+  requiredEquipment String[]
+  followUpDate    DateTime?
+
+  notes           String?
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([patientHomeId])
+  @@index([assessmentDate])
+}
+
+enum RiskLevel {
+  low
+  moderate
+  high
+  critical
+}
+
+// Medication Administration Record
+model MedicationAdministration {
+  id              String       @id @default(uuid())
+  visitId         String
+  visit           HomeVisit    @relation(fields: [visitId], references: [id], onDelete: Cascade)
+
+  medicationName  String
+  dosage          String
+  route           MedicationRoute
+  scheduledTime   DateTime
+  administeredTime DateTime?
+
+  status          MedicationStatus @default(pending)
+  refusedReason   String?
+  notes           String?
+
+  // Verification
+  administeredBy  String?
+  witnessedBy     String?
+
+  // Barcode/verification
+  medicationBarcode String?
+  patientBarcode  String?
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([visitId])
+  @@index([scheduledTime])
+  @@index([status])
+}
+
+enum MedicationRoute {
+  oral
+  sublingual
+  topical
+  inhaled
+  subcutaneous
+  intramuscular
+  intravenous
+  rectal
+  ophthalmic
+  otic
+  nasal
+  transdermal
+  other
+}
+
+enum MedicationStatus {
+  pending
+  administered
+  refused
+  held
+  not_available
+  self_administered
+}
+
+// Incident/Fall Reporting
+model Incident {
+  id              String       @id @default(uuid())
+  visitId         String?
+  visit           HomeVisit?   @relation(fields: [visitId], references: [id], onDelete: SetNull)
+  patientId       String
+  caregiverId     String?
+
+  incidentType    IncidentType
+  severity        IncidentSeverity
+  occurredAt      DateTime
+  location        String?
+
+  // Incident details
+  description     String
+  immediateAction String?
+  witnessNames    String?
+
+  // For falls specifically
+  fallType        FallType?
+  injuryOccurred  Boolean      @default(false)
+  injuryDescription String?
+  medicalAttentionRequired Boolean @default(false)
+  emergencyServicesNotified Boolean @default(false)
+
+  // Follow-up
+  status          IncidentStatus @default(reported)
+  investigatedBy  String?
+  investigatedAt  DateTime?
+  rootCause       String?
+  preventiveMeasures String?
+
+  // Notifications
+  familyNotified  Boolean      @default(false)
+  physicianNotified Boolean    @default(false)
+  supervisorNotified Boolean   @default(false)
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([patientId])
+  @@index([visitId])
+  @@index([incidentType])
+  @@index([occurredAt])
+  @@index([status])
+}
+
+enum IncidentType {
+  fall
+  medication_error
+  skin_injury
+  equipment_malfunction
+  behavioral
+  environmental
+  security
+  missing_patient
+  abuse_neglect
+  other
+}
+
+enum IncidentSeverity {
+  minor
+  moderate
+  major
+  critical
+}
+
+enum FallType {
+  witnessed
+  unwitnessed
+  near_miss
+  assisted_to_floor
+}
+
+enum IncidentStatus {
+  reported
+  under_investigation
+  investigated
+  closed
+  requires_action
+}
+
+// Visit Documentation
+model VisitDocumentation {
+  id              String       @id @default(uuid())
+  visitId         String
+  visit           HomeVisit    @relation(fields: [visitId], references: [id], onDelete: Cascade)
+
+  documentType    DocumentType
+  title           String
+  content         String?
+  fileUrl         String?
+  fileType        String?
+  fileSize        Int?
+
+  // For structured assessments
+  assessmentData  Json?
+
+  createdBy       String
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([visitId])
+  @@index([documentType])
+}
+
+enum DocumentType {
+  progress_note
+  assessment
+  care_plan
+  physician_order
+  consent_form
+  discharge_summary
+  wound_photo
+  vital_signs_log
+  medication_list
+  family_communication
+  other
+}
+
+// Patient Equipment Tracking
+model PatientEquipment {
+  id              String       @id @default(uuid())
+  patientHomeId   String
+  patientHome     PatientHome  @relation(fields: [patientHomeId], references: [id], onDelete: Cascade)
+
+  equipmentType   EquipmentType
+  name            String
+  serialNumber    String?
+  manufacturer    String?
+  model           String?
+
+  // Tracking
+  status          EquipmentStatus @default(active)
+  condition       EquipmentCondition @default(good)
+  deliveredDate   DateTime?
+  expectedReturnDate DateTime?
+  returnedDate    DateTime?
+
+  // Maintenance
+  lastMaintenanceDate DateTime?
+  nextMaintenanceDate DateTime?
+  maintenanceNotes String?
+
+  // Ownership
+  ownershipType   OwnershipType @default(rental)
+  rentalCompany   String?
+  monthlyRentalCost Float?
+
+  notes           String?
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([patientHomeId])
+  @@index([equipmentType])
+  @@index([status])
+}
+
+enum EquipmentType {
+  hospital_bed
+  wheelchair
+  walker
+  cane
+  oxygen_concentrator
+  oxygen_tank
+  nebulizer
+  suction_machine
+  feeding_pump
+  iv_pump
+  cpap
+  bipap
+  lift
+  commode
+  shower_chair
+  blood_pressure_monitor
+  glucose_monitor
+  pulse_oximeter
+  other
+}
+
+enum EquipmentStatus {
+  active
+  returned
+  lost
+  damaged
+  maintenance
+}
+
+enum EquipmentCondition {
+  excellent
+  good
+  fair
+  poor
+}
+
+enum OwnershipType {
+  rental
+  purchase
+  loan
+  insurance_provided
+}
+
+// Family/Caregiver Communication
+model FamilyCommunication {
+  id              String       @id @default(uuid())
+  patientId       String
+  familyMemberId  String?
+  caregiverId     String?
+
+  communicationType CommunicationType
+  subject         String?
+  message         String
+
+  // If related to a visit
+  visitId         String?
+
+  // Status
+  isRead          Boolean      @default(false)
+  readAt          DateTime?
+
+  // Reply chain
+  parentMessageId String?
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([patientId])
+  @@index([familyMemberId])
+  @@index([caregiverId])
+  @@index([visitId])
+  @@index([createdAt])
+}
+
+enum CommunicationType {
+  visit_update
+  schedule_change
+  medication_reminder
+  care_plan_update
+  general_inquiry
+  emergency_notification
+  documentation_shared
+  feedback
+  other
+}
+
+// Supply Tracking
+model SupplyOrder {
+  id              String       @id @default(uuid())
+  patientId       String
+  orderedBy       String
+
+  items           Json         // Array of supply items
+  totalCost       Float?
+
+  status          SupplyOrderStatus @default(pending)
+  orderedAt       DateTime     @default(now())
+  expectedDelivery DateTime?
+  deliveredAt     DateTime?
+  deliveryNotes   String?
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([patientId])
+  @@index([status])
+  @@index([orderedAt])
+}
+
+enum SupplyOrderStatus {
+  pending
+  ordered
+  shipped
+  delivered
+  cancelled
+  back_ordered
+}

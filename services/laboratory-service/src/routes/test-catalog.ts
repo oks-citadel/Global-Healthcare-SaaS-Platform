@@ -1,5 +1,4 @@
-// @ts-nocheck
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import { PrismaClient } from '../generated/client';
 import { z } from 'zod';
 import { UserRequest, requireUser } from '../middleware/extractUser';
@@ -12,10 +11,10 @@ const prisma = new PrismaClient();
 const testCatalogService = new TestCatalogService(prisma);
 
 // GET /test-catalog - List available tests
-router.get('/', async (req, res) => {
+router.get('/', async (req: Request, res: Response): Promise<void> => {
   try {
     const filters = {
-      category: req.query.category as any,
+      category: req.query.category as string | undefined,
       isActive: req.query.isActive === 'false' ? false : true,
       search: req.query.search as string,
       limit: req.query.limit ? Number(req.query.limit) : 50,
@@ -37,7 +36,7 @@ router.get('/', async (req, res) => {
 });
 
 // GET /test-catalog/statistics - Get catalog statistics
-router.get('/statistics', requireUser, async (req: UserRequest, res) => {
+router.get('/statistics', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const stats = await testCatalogService.getTestStatistics();
     res.json({ data: stats });
@@ -48,7 +47,7 @@ router.get('/statistics', requireUser, async (req: UserRequest, res) => {
 });
 
 // GET /test-catalog/search - Search tests
-router.get('/search', async (req, res) => {
+router.get('/search', async (req: Request, res: Response): Promise<void> => {
   try {
     const query = req.query.q as string;
     const limit = req.query.limit ? Number(req.query.limit) : 20;
@@ -71,7 +70,7 @@ router.get('/search', async (req, res) => {
 });
 
 // GET /test-catalog/:id - Get test details
-router.get('/:id', async (req, res) => {
+router.get('/:id', async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const test = await testCatalogService.getTestById(id);
@@ -89,7 +88,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // GET /test-catalog/code/:code - Get test by code
-router.get('/code/:code', async (req, res) => {
+router.get('/code/:code', async (req: Request, res: Response): Promise<void> => {
   try {
     const { code } = req.params;
     const test = await testCatalogService.getTestByCode(code);
@@ -107,7 +106,7 @@ router.get('/code/:code', async (req, res) => {
 });
 
 // POST /test-catalog - Add new test type
-router.post('/', requireUser, async (req: UserRequest, res) => {
+router.post('/', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const userRole = req.user!.role;
 
@@ -141,7 +140,7 @@ router.post('/', requireUser, async (req: UserRequest, res) => {
 });
 
 // PATCH /test-catalog/:id - Update test
-router.patch('/:id', requireUser, async (req: UserRequest, res) => {
+router.patch('/:id', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const userRole = req.user!.role;
@@ -164,7 +163,7 @@ router.patch('/:id', requireUser, async (req: UserRequest, res) => {
 });
 
 // DELETE /test-catalog/:id - Delete test
-router.delete('/:id', requireUser, async (req: UserRequest, res) => {
+router.delete('/:id', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const userRole = req.user!.role;
@@ -187,7 +186,7 @@ router.delete('/:id', requireUser, async (req: UserRequest, res) => {
 });
 
 // PATCH /test-catalog/:id/activate - Activate test
-router.patch('/:id/activate', requireUser, async (req: UserRequest, res) => {
+router.patch('/:id/activate', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const userRole = req.user!.role;
@@ -210,7 +209,7 @@ router.patch('/:id/activate', requireUser, async (req: UserRequest, res) => {
 });
 
 // PATCH /test-catalog/:id/deactivate - Deactivate test
-router.patch('/:id/deactivate', requireUser, async (req: UserRequest, res) => {
+router.patch('/:id/deactivate', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const userRole = req.user!.role;
@@ -233,7 +232,7 @@ router.patch('/:id/deactivate', requireUser, async (req: UserRequest, res) => {
 });
 
 // GET /test-catalog/:id/reference-ranges - Get reference ranges
-router.get('/:id/reference-ranges', async (req, res) => {
+router.get('/:id/reference-ranges', async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const ranges = await testCatalogService.getReferenceRanges(id);
@@ -246,7 +245,7 @@ router.get('/:id/reference-ranges', async (req, res) => {
 });
 
 // POST /test-catalog/:id/reference-ranges - Add reference range
-router.post('/:id/reference-ranges', requireUser, async (req: UserRequest, res) => {
+router.post('/:id/reference-ranges', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const userRole = req.user!.role;

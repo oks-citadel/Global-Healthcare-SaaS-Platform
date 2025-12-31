@@ -1,7 +1,9 @@
-// @ts-nocheck
-import { PrismaClient, PriorAuthStatus } from '../generated/client';
+import { PrismaClient, PriorAuthStatus, Prisma } from '../generated/client';
 
 const prisma = new PrismaClient();
+
+// Type for Prisma where clauses
+type PriorAuthWhereInput = Prisma.PriorAuthorizationWhereInput;
 
 export interface CreatePriorAuthData {
   prescriptionId: string;
@@ -13,7 +15,7 @@ export interface CreatePriorAuthData {
   ndcCode?: string;
   diagnosis: string[];
   justification: string;
-  supportingDocs?: any;
+  supportingDocs?: Record<string, unknown>;
 }
 
 export class PriorAuthService {
@@ -54,7 +56,7 @@ export class PriorAuthService {
     limit?: number;
     offset?: number;
   }) {
-    const where: any = {};
+    const where: PriorAuthWhereInput = {};
     if (filters.patientId) where.patientId = filters.patientId;
     if (filters.providerId) where.providerId = filters.providerId;
     if (filters.status) where.status = filters.status;
@@ -173,7 +175,7 @@ export class PriorAuthService {
   async hasActivePriorAuth(
     patientId: string,
     medicationName: string
-  ): Promise<{ hasAuth: boolean; priorAuth?: any }> {
+  ): Promise<{ hasAuth: boolean; priorAuth?: Awaited<ReturnType<typeof prisma.priorAuthorization.findFirst>> | undefined }> {
     const activePriorAuth = await prisma.priorAuthorization.findFirst({
       where: {
         patientId,
@@ -247,12 +249,12 @@ export class PriorAuthService {
     startDate?: Date;
     endDate?: Date;
   }) {
-    const where: any = {};
+    const where: PriorAuthWhereInput = {};
     if (filters?.providerId) where.providerId = filters.providerId;
     if (filters?.startDate || filters?.endDate) {
       where.requestDate = {};
-      if (filters.startDate) where.requestDate.gte = filters.startDate;
-      if (filters.endDate) where.requestDate.lte = filters.endDate;
+      if (filters.startDate) (where.requestDate as Record<string, Date>).gte = filters.startDate;
+      if (filters.endDate) (where.requestDate as Record<string, Date>).lte = filters.endDate;
     }
 
     const [total, approved, denied, pending, appealed] = await Promise.all([

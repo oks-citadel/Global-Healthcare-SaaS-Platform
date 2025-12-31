@@ -1,5 +1,4 @@
-// @ts-nocheck
-import { Router } from 'express';
+import { Router, Response } from 'express';
 import { PrismaClient } from '../generated/client';
 import { z } from 'zod';
 import { UserRequest, requireUser } from '../middleware/extractUser';
@@ -16,7 +15,7 @@ const orderService = new OrderService(prisma);
 const reportService = new ReportService(prisma);
 
 // GET /lab-orders - List orders with filters
-router.get('/', requireUser, async (req: UserRequest, res) => {
+router.get('/', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const userId = req.user!.id;
     const userRole = req.user!.role;
@@ -54,7 +53,7 @@ router.get('/', requireUser, async (req: UserRequest, res) => {
 });
 
 // GET /lab-orders/statistics - Get order statistics
-router.get('/statistics', requireUser, async (req: UserRequest, res) => {
+router.get('/statistics', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const userId = req.user!.id;
     const userRole = req.user!.role;
@@ -72,7 +71,7 @@ router.get('/statistics', requireUser, async (req: UserRequest, res) => {
 });
 
 // GET /lab-orders/:id - Get order details
-router.get('/:id', requireUser, async (req: UserRequest, res) => {
+router.get('/:id', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const userId = req.user!.id;
@@ -105,7 +104,7 @@ router.get('/:id', requireUser, async (req: UserRequest, res) => {
 });
 
 // POST /lab-orders - Create lab order
-router.post('/', requireUser, async (req: UserRequest, res) => {
+router.post('/', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const userId = req.user!.id;
     const userRole = req.user!.role;
@@ -140,7 +139,7 @@ router.post('/', requireUser, async (req: UserRequest, res) => {
 });
 
 // PATCH /lab-orders/:id - Update order
-router.patch('/:id', requireUser, async (req: UserRequest, res) => {
+router.patch('/:id', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const userRole = req.user!.role;
@@ -169,7 +168,7 @@ router.patch('/:id', requireUser, async (req: UserRequest, res) => {
 });
 
 // POST /lab-orders/:id/results - Submit results
-router.post('/:id/results', requireUser, async (req: UserRequest, res) => {
+router.post('/:id/results', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
 
@@ -190,7 +189,7 @@ router.post('/:id/results', requireUser, async (req: UserRequest, res) => {
 });
 
 // GET /lab-orders/:id/results - Get results
-router.get('/:id/results', requireUser, async (req: UserRequest, res) => {
+router.get('/:id/results', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const userId = req.user!.id;

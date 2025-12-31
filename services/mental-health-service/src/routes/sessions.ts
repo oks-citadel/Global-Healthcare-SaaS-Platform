@@ -1,11 +1,13 @@
-// @ts-nocheck
-import { Router } from 'express';
-import { PrismaClient } from '../generated/client';
+import { Router, Response } from 'express';
+import { PrismaClient, Prisma } from '../generated/client';
 import { z } from 'zod';
 import { UserRequest, requireUser } from '../middleware/extractUser';
 
 const router: ReturnType<typeof Router> = Router();
 const prisma = new PrismaClient();
+
+// Type for Prisma where clause
+type TherapySessionWhereInput = Prisma.TherapySessionWhereInput;
 
 // Validation schemas
 const createSessionSchema = z.object({
@@ -27,13 +29,13 @@ const updateSessionSchema = z.object({
 });
 
 // Get therapy sessions
-router.get('/', requireUser, async (req: UserRequest, res) => {
+router.get('/', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const userId = req.user!.id;
     const userRole = req.user!.role;
     const { status, startDate, endDate } = req.query;
 
-    const where: any = {};
+    const where: TherapySessionWhereInput = {};
 
     // Filter by role
     if (userRole === 'patient') {
@@ -43,7 +45,7 @@ router.get('/', requireUser, async (req: UserRequest, res) => {
     }
 
     // Filter by status
-    if (status) {
+    if (status && typeof status === 'string') {
       where.status = status;
     }
 
@@ -73,7 +75,7 @@ router.get('/', requireUser, async (req: UserRequest, res) => {
 });
 
 // Get single session
-router.get('/:id', requireUser, async (req: UserRequest, res) => {
+router.get('/:id', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const userId = req.user!.id;
@@ -115,7 +117,7 @@ router.get('/:id', requireUser, async (req: UserRequest, res) => {
 });
 
 // Create session
-router.post('/', requireUser, async (req: UserRequest, res) => {
+router.post('/', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const userId = req.user!.id;
     const userRole = req.user!.role;
@@ -165,7 +167,7 @@ router.post('/', requireUser, async (req: UserRequest, res) => {
 });
 
 // Update session
-router.patch('/:id', requireUser, async (req: UserRequest, res) => {
+router.patch('/:id', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const userId = req.user!.id;
@@ -238,7 +240,7 @@ router.patch('/:id', requireUser, async (req: UserRequest, res) => {
 });
 
 // Cancel session
-router.delete('/:id', requireUser, async (req: UserRequest, res) => {
+router.delete('/:id', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const userId = req.user!.id;

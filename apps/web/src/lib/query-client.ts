@@ -47,9 +47,6 @@ const defaultQueryOptions: DefaultOptions = {
  */
 const queryCache = new QueryCache({
   onError: (error: any, query) => {
-    // Log errors
-    console.error('Query error:', error, query);
-
     // Show toast for specific errors
     if (error?.response?.status === 401) {
       toast.error('Session expired. Please log in again.');
@@ -65,10 +62,7 @@ const queryCache = new QueryCache({
     }
   },
   onSuccess: (data, query) => {
-    // Optional: Log successful queries in development
-    if (process.env.NODE_ENV === 'development') {
-      console.debug('Query success:', query.queryKey);
-    }
+    // Query succeeded
   },
 });
 
@@ -77,8 +71,6 @@ const queryCache = new QueryCache({
  */
 const mutationCache = new MutationCache({
   onError: (error: any, variables, context, mutation) => {
-    console.error('Mutation error:', error, mutation);
-
     // Default error handling
     if (error?.response?.data?.message) {
       toast.error(error.response.data.message);
@@ -252,7 +244,7 @@ export const cacheUtils = {
 
       localStorage.setItem('REACT_QUERY_CACHE', JSON.stringify(serialized));
     } catch (error) {
-      console.error('Error persisting cache:', error);
+      // Cache persistence failed - non-critical
     }
   },
 
@@ -271,7 +263,7 @@ export const cacheUtils = {
         queryClient.setQueryData(query.queryKey, query.state.data);
       });
     } catch (error) {
-      console.error('Error restoring cache:', error);
+      // Cache restoration failed - clear corrupted cache
       localStorage.removeItem('REACT_QUERY_CACHE');
     }
   },
@@ -375,10 +367,7 @@ export const performanceMonitoring = {
         const fetchDuration = query.state.dataUpdatedAt - query.state.fetchFailureCount;
 
         if (fetchDuration > threshold) {
-          console.warn('Slow query detected:', {
-            queryKey: query.queryKey,
-            duration: fetchDuration,
-          });
+          // Slow query detected - could be reported to monitoring service
         }
       }
     });
@@ -406,7 +395,8 @@ export const performanceMonitoring = {
     return () => {
       const total = hits + misses;
       const hitRate = total > 0 ? (hits / total) * 100 : 0;
-      console.log(`Cache hit rate: ${hitRate.toFixed(2)}% (${hits}/${total})`);
+      // Cache hit rate can be reported to monitoring service if needed
+      return { hitRate, hits, total };
     };
   },
 };

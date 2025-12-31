@@ -10,6 +10,9 @@ export const CreateAppointmentSchema = z.object({
   }),
   reasonForVisit: z.string().optional(),
   notes: z.string().optional(),
+  // Billing options
+  paymentMethodId: z.string().optional(), // Stripe payment method ID for paid appointments
+  skipPayment: z.boolean().optional(), // Skip payment for this appointment (admin/provider use)
 });
 
 export const UpdateAppointmentSchema = z.object({
@@ -57,4 +60,94 @@ export interface PaginatedAppointments {
     total: number;
     totalPages: number;
   };
+}
+
+// ==========================================
+// Appointment Billing DTOs
+// ==========================================
+
+/**
+ * Schema for creating appointment payment (before or during booking)
+ */
+export const CreateAppointmentPaymentSchema = z.object({
+  appointmentId: z.string().uuid(),
+  paymentMethodId: z.string().optional(),
+  metadata: z.record(z.string()).optional(),
+});
+
+export type CreateAppointmentPaymentInput = z.infer<typeof CreateAppointmentPaymentSchema>;
+
+/**
+ * Schema for confirming appointment payment
+ */
+export const ConfirmAppointmentPaymentSchema = z.object({
+  paymentMethodId: z.string().min(1, 'Payment method ID is required'),
+});
+
+export type ConfirmAppointmentPaymentInput = z.infer<typeof ConfirmAppointmentPaymentSchema>;
+
+/**
+ * Schema for completing appointment billing (after appointment)
+ */
+export const CompleteAppointmentBillingSchema = z.object({
+  additionalCharges: z.number().int().positive().optional(),
+  paymentMethodId: z.string().optional(),
+  metadata: z.record(z.string()).optional(),
+});
+
+export type CompleteAppointmentBillingInput = z.infer<typeof CompleteAppointmentBillingSchema>;
+
+/**
+ * Schema for refunding appointment payment
+ */
+export const RefundAppointmentPaymentSchema = z.object({
+  amount: z.number().int().positive().optional(), // Partial refund in cents
+  reason: z.enum(['duplicate', 'fraudulent', 'requested_by_customer']).optional(),
+});
+
+export type RefundAppointmentPaymentInput = z.infer<typeof RefundAppointmentPaymentSchema>;
+
+/**
+ * Schema for getting appointment price estimate
+ */
+export const GetAppointmentPriceSchema = z.object({
+  type: z.enum(['video', 'audio', 'chat', 'in-person']),
+  duration: z.coerce.number().refine(val => [15, 30, 45, 60].includes(val), {
+    message: 'Duration must be 15, 30, 45, or 60 minutes',
+  }),
+});
+
+export type GetAppointmentPriceInput = z.infer<typeof GetAppointmentPriceSchema>;
+
+/**
+ * Appointment billing response with payment details
+ */
+export interface AppointmentWithBillingResponse extends AppointmentResponse {
+  billing?: {
+    paymentId?: string;
+    paymentIntentId?: string;
+    clientSecret?: string | null;
+    amount: number;
+    currency: string;
+    status: string;
+    requiresAction?: boolean;
+    isPaid: boolean;
+  };
+}
+
+/**
+ * Appointment billing summary response
+ */
+export interface AppointmentBillingSummaryResponse {
+  appointmentId: string;
+  totalCharged: number;
+  currency: string;
+  status: string;
+  payments: Array<{
+    id: string;
+    amount: number;
+    status: string;
+    description: string | null;
+    createdAt: Date;
+  }>;
 }

@@ -1,5 +1,4 @@
-// @ts-nocheck
-import { Router } from 'express';
+import { Router, Response } from 'express';
 import { PrismaClient } from '../generated/client';
 import { z } from 'zod';
 import { UserRequest, requireUser } from '../middleware/extractUser';
@@ -15,7 +14,7 @@ const resultsService = new ResultsService(prisma);
 const alertService = new AlertService(prisma);
 
 // GET /lab-results - Get all results (with filters)
-router.get('/', requireUser, async (req: UserRequest, res) => {
+router.get('/', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const userRole = req.user!.role;
 
@@ -45,7 +44,7 @@ router.get('/', requireUser, async (req: UserRequest, res) => {
 });
 
 // GET /lab-results/patient/:patientId - Get patient results
-router.get('/patient/:patientId', requireUser, async (req: UserRequest, res) => {
+router.get('/patient/:patientId', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { patientId } = req.params;
     const userId = req.user!.id;
@@ -80,7 +79,7 @@ router.get('/patient/:patientId', requireUser, async (req: UserRequest, res) => 
 });
 
 // GET /lab-results/test/:testId - Get results for a test
-router.get('/test/:testId', requireUser, async (req: UserRequest, res) => {
+router.get('/test/:testId', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { testId } = req.params;
 
@@ -94,7 +93,7 @@ router.get('/test/:testId', requireUser, async (req: UserRequest, res) => {
 });
 
 // GET /lab-results/order/:orderId - Get results for an order
-router.get('/order/:orderId', requireUser, async (req: UserRequest, res) => {
+router.get('/order/:orderId', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { orderId } = req.params;
     const userId = req.user!.id;
@@ -111,7 +110,7 @@ router.get('/order/:orderId', requireUser, async (req: UserRequest, res) => {
 });
 
 // GET /lab-results/abnormal - Get abnormal results
-router.get('/abnormal', requireUser, async (req: UserRequest, res) => {
+router.get('/abnormal', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const userId = req.user!.id;
     const userRole = req.user!.role;
@@ -130,7 +129,7 @@ router.get('/abnormal', requireUser, async (req: UserRequest, res) => {
 });
 
 // GET /lab-results/critical - Get critical results
-router.get('/critical', requireUser, async (req: UserRequest, res) => {
+router.get('/critical', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const userRole = req.user!.role;
 
@@ -151,7 +150,7 @@ router.get('/critical', requireUser, async (req: UserRequest, res) => {
 });
 
 // GET /lab-results/:id - Get result details
-router.get('/:id', requireUser, async (req: UserRequest, res) => {
+router.get('/:id', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
 
@@ -170,7 +169,7 @@ router.get('/:id', requireUser, async (req: UserRequest, res) => {
 });
 
 // POST /lab-results - Create result
-router.post('/', requireUser, async (req: UserRequest, res) => {
+router.post('/', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const userId = req.user!.id;
     const userRole = req.user!.role;
@@ -222,7 +221,7 @@ router.post('/', requireUser, async (req: UserRequest, res) => {
 });
 
 // POST /lab-results/bulk - Create multiple results for a test
-router.post('/bulk', requireUser, async (req: UserRequest, res) => {
+router.post('/bulk', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const userId = req.user!.id;
     const userRole = req.user!.role;
@@ -280,7 +279,7 @@ router.post('/bulk', requireUser, async (req: UserRequest, res) => {
 });
 
 // PATCH /lab-results/:id - Update result
-router.patch('/:id', requireUser, async (req: UserRequest, res) => {
+router.patch('/:id', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const userRole = req.user!.role;
@@ -303,7 +302,7 @@ router.patch('/:id', requireUser, async (req: UserRequest, res) => {
 });
 
 // PATCH /lab-results/:id/verify - Verify result
-router.patch('/:id/verify', requireUser, async (req: UserRequest, res) => {
+router.patch('/:id/verify', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const userId = req.user!.id;
@@ -327,7 +326,7 @@ router.patch('/:id/verify', requireUser, async (req: UserRequest, res) => {
 });
 
 // DELETE /lab-results/:id - Delete result
-router.delete('/:id', requireUser, async (req: UserRequest, res) => {
+router.delete('/:id', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const userRole = req.user!.role;
@@ -350,7 +349,7 @@ router.delete('/:id', requireUser, async (req: UserRequest, res) => {
 });
 
 // GET /lab-results/:id/fhir - Get FHIR Observation
-router.get('/:id/fhir', requireUser, async (req: UserRequest, res) => {
+router.get('/:id/fhir', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
 

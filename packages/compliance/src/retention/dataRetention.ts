@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Data Retention Policy Manager
  * HIPAA 7-year retention, GDPR storage limitation, POPIA retention requirements

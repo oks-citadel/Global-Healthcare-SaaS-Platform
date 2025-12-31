@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Comprehensive Audit Logger for HIPAA, GDPR, and POPIA compliance
  *
@@ -112,7 +111,7 @@ export interface AuditEntry {
   severity: AuditSeverity;
   regulation: ComplianceRegulation[];
   context: AuditContext;
-  details: Record<string, any>;
+  details: Record<string, unknown>;
   phiAccess?: PHIAccessDetails;
   outcome: 'SUCCESS' | 'FAILURE' | 'PARTIAL';
   errorMessage?: string;
@@ -151,7 +150,7 @@ export class AuditLogger extends EventEmitter {
     context: AuditContext,
     phiDetails: PHIAccessDetails,
     outcome: 'SUCCESS' | 'FAILURE' = 'SUCCESS',
-    additionalDetails?: Record<string, any>
+    additionalDetails?: Record<string, unknown>
   ): Promise<AuditEntry> {
     return this.log({
       eventType: AuditEventType.PHI_ACCESS,
@@ -213,7 +212,7 @@ export class AuditLogger extends EventEmitter {
     dataSubjectId: string,
     consentType: 'GRANTED' | 'WITHDRAWN' | 'UPDATED',
     purposes: string[],
-    consentDetails: Record<string, any>
+    consentDetails: Record<string, unknown>
   ): Promise<AuditEntry> {
     const eventType =
       consentType === 'GRANTED' ? AuditEventType.CONSENT_GRANTED :
@@ -248,7 +247,7 @@ export class AuditLogger extends EventEmitter {
     context: AuditContext,
     requestType: 'ACCESS' | 'RECTIFICATION' | 'DELETION' | 'PORTABILITY' | 'OBJECTION',
     dataSubjectId: string,
-    requestDetails: Record<string, any>
+    requestDetails: Record<string, unknown>
   ): Promise<AuditEntry> {
     const eventTypeMap = {
       ACCESS: AuditEventType.ACCESS_REQUEST,
@@ -281,8 +280,9 @@ export class AuditLogger extends EventEmitter {
     context: AuditContext,
     eventType: AuditEventType,
     severity: AuditSeverity,
-    details: Record<string, any>
+    details: Record<string, unknown>
   ): Promise<AuditEntry> {
+    const outcome = (details.outcome as 'SUCCESS' | 'FAILURE' | 'PARTIAL' | undefined) || 'SUCCESS';
     return this.log({
       eventType,
       severity,
@@ -292,7 +292,7 @@ export class AuditLogger extends EventEmitter {
         ComplianceRegulation.POPIA
       ],
       context,
-      outcome: details.outcome || 'SUCCESS',
+      outcome,
       details: {
         ...details,
         securityEvent: true,
@@ -312,7 +312,7 @@ export class AuditLogger extends EventEmitter {
     phiAccess?: PHIAccessDetails;
     outcome: 'SUCCESS' | 'FAILURE' | 'PARTIAL';
     errorMessage?: string;
-    details: Record<string, any>;
+    details: Record<string, unknown>;
   }): Promise<AuditEntry> {
     const entry: AuditEntry = {
       id: crypto.randomUUID(),

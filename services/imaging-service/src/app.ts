@@ -1,6 +1,7 @@
 import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import { errorHandler } from './utils/errorHandler';
 import logger from './utils/logger';
@@ -18,6 +19,16 @@ dotenv.config();
 
 const app: Application = express();
 
+// Rate limiting configuration
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: { error: 'Too Many Requests', message: 'Rate limit exceeded. Please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => req.path === '/health', // Skip health checks
+});
+
 // Security middleware
 app.use(helmet());
 
@@ -26,6 +37,9 @@ app.use(cors({
   origin: process.env.CORS_ORIGIN || '*',
   credentials: true,
 }));
+
+// Apply rate limiting
+app.use(limiter);
 
 // Body parser middleware
 app.use(express.json({ limit: '50mb' }));

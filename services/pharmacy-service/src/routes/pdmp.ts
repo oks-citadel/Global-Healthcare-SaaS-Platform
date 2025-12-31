@@ -1,5 +1,4 @@
-// @ts-nocheck
-import { Router } from 'express';
+import { Router, Response } from 'express';
 import { UserRequest, requireUser } from '../middleware/extractUser';
 import PDMPService from '../services/PDMPService';
 
@@ -9,7 +8,7 @@ const router: ReturnType<typeof Router> = Router();
  * GET /controlled-substances/:patientId
  * Check PDMP for patient controlled substance history
  */
-router.get('/:patientId', requireUser, async (req: UserRequest, res) => {
+router.get('/:patientId', requireUser, async (req: UserRequest, res: Response) => {
   try {
     if (req.user!.role !== 'provider' && req.user!.role !== 'pharmacist') {
       res.status(403).json({
@@ -48,7 +47,7 @@ router.get('/:patientId', requireUser, async (req: UserRequest, res) => {
  * GET /controlled-substances/history/:patientId
  * Get detailed controlled substance history
  */
-router.get('/history/:patientId', requireUser, async (req: UserRequest, res) => {
+router.get('/history/:patientId', requireUser, async (req: UserRequest, res: Response) => {
   try {
     if (req.user!.role !== 'provider' && req.user!.role !== 'pharmacist') {
       res.status(403).json({
@@ -88,7 +87,7 @@ router.get('/history/:patientId', requireUser, async (req: UserRequest, res) => 
  * POST /controlled-substances/report/:logId
  * Report controlled substance dispensing to PDMP
  */
-router.post('/report/:logId', requireUser, async (req: UserRequest, res) => {
+router.post('/report/:logId', requireUser, async (req: UserRequest, res: Response) => {
   try {
     if (req.user!.role !== 'pharmacist' && req.user!.role !== 'admin') {
       res.status(403).json({
@@ -119,7 +118,7 @@ router.post('/report/:logId', requireUser, async (req: UserRequest, res) => {
  * GET /controlled-substances/unreported
  * Get unreported controlled substance dispensings
  */
-router.get('/unreported', requireUser, async (req: UserRequest, res) => {
+router.get('/unreported', requireUser, async (req: UserRequest, res: Response) => {
   try {
     if (req.user!.role !== 'pharmacist' && req.user!.role !== 'admin') {
       res.status(403).json({
@@ -148,7 +147,7 @@ router.get('/unreported', requireUser, async (req: UserRequest, res) => {
  * POST /controlled-substances/bulk-report
  * Bulk report unreported controlled substance dispensings
  */
-router.post('/bulk-report', requireUser, async (req: UserRequest, res) => {
+router.post('/bulk-report', requireUser, async (req: UserRequest, res: Response) => {
   try {
     if (req.user!.role !== 'pharmacist' && req.user!.role !== 'admin') {
       res.status(403).json({
@@ -177,7 +176,7 @@ router.post('/bulk-report', requireUser, async (req: UserRequest, res) => {
  * GET /controlled-substances/statistics
  * Get PDMP statistics
  */
-router.get('/statistics', requireUser, async (req: UserRequest, res) => {
+router.get('/statistics', requireUser, async (req: UserRequest, res: Response) => {
   try {
     if (req.user!.role !== 'admin') {
       res.status(403).json({

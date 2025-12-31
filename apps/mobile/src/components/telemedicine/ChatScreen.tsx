@@ -61,12 +61,10 @@ export default function ChatScreen({
     socketRef.current = socket;
 
     socket.on('connect', () => {
-      console.log('Chat socket connected');
       setIsConnected(true);
     });
 
     socket.on('disconnect', () => {
-      console.log('Chat socket disconnected');
       setIsConnected(false);
     });
 
@@ -117,9 +115,7 @@ export default function ChatScreen({
         timestamp,
       },
       (response: any) => {
-        if (response.error) {
-          console.error('Error sending message:', response.error);
-        }
+        // Message sent or failed silently
       }
     );
 

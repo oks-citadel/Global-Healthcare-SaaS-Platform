@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Data Deletion Manager
  * GDPR Article 17 (Right to Erasure), POPIA Section 14
@@ -25,6 +24,11 @@ export interface DeletionRequest {
   verifiedAt?: Date;
   completedAt?: Date;
   errorMessage?: string;
+}
+
+export interface SystemDeletionEvent {
+  system: string;
+  dataSubjectId: string;
 }
 
 export class DataDeletionManager extends EventEmitter {
@@ -81,7 +85,8 @@ export class DataDeletionManager extends EventEmitter {
 
   private async deleteFromSystem(system: string, dataSubjectId: string): Promise<void> {
     // Implementation would delete from specific system
-    this.emit('system-deletion', { system, dataSubjectId });
+    const event: SystemDeletionEvent = { system, dataSubjectId };
+    this.emit('system-deletion', event);
   }
 }
 

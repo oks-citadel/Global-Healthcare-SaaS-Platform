@@ -33,7 +33,13 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// Body parsing
+// CRITICAL: Raw body parsing for Stripe webhooks MUST come BEFORE express.json()
+// Stripe webhook signature verification requires the raw body bytes
+app.use('/api/v1/webhooks/stripe', express.raw({ type: 'application/json' }));
+app.use('/api/v1/payments/webhook', express.raw({ type: 'application/json' }));
+app.use('/api/v1/billing/webhook', express.raw({ type: 'application/json' }));
+
+// Body parsing for all other routes
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 

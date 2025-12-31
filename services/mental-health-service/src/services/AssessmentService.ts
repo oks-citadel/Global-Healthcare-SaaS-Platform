@@ -1,7 +1,4 @@
-// @ts-nocheck
-import { PrismaClient, AssessmentType, SeverityLevel } from '../generated/client';
-
-const prisma = new PrismaClient();
+import { AssessmentType, SeverityLevel } from '../generated/client';
 
 export interface AssessmentQuestion {
   id: string;
@@ -413,7 +410,7 @@ export class AssessmentService {
 
   static scoreAssessment(
     type: AssessmentType,
-    responses: Record<string, any>
+    responses: Record<string, number | boolean>
   ): AssessmentResult {
     switch (type) {
       case 'PHQ9':

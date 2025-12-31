@@ -52,7 +52,6 @@ export function useChat(config: ChatConfig) {
     socketRef.current = socket;
 
     socket.on('connect', () => {
-      console.log('Chat socket connected:', socket.id);
       setIsConnected(true);
       setError(null);
     });
@@ -64,7 +63,6 @@ export function useChat(config: ChatConfig) {
     });
 
     socket.on('disconnect', (reason) => {
-      console.log('Chat socket disconnected:', reason);
       setIsConnected(false);
     });
 
@@ -80,7 +78,6 @@ export function useChat(config: ChatConfig) {
     const socket = socketRef.current;
 
     socket.on('chat-message', (message: ChatMessage) => {
-      console.log('Received chat message:', message);
       setMessages((prev) => {
         // Avoid duplicates
         if (prev.some((m) => m.id === message.id)) {
@@ -98,7 +95,6 @@ export function useChat(config: ChatConfig) {
     });
 
     socket.on('typing', (data: TypingIndicator) => {
-      console.log('Typing indicator:', data);
       setTypingUsers((prev) => {
         const next = new Map(prev);
         if (data.isTyping) {
@@ -134,10 +130,8 @@ export function useChat(config: ChatConfig) {
         },
         (response: any) => {
           if (response.error) {
-            console.error('Error sending message:', response.error);
             setError('Failed to send message');
           } else {
-            console.log('Message sent successfully');
             setError(null);
           }
         }

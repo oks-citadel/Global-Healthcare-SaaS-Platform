@@ -1,5 +1,4 @@
-// @ts-nocheck
-import { Router } from 'express';
+import { Router, Response } from 'express';
 import { PrismaClient } from '../generated/client';
 import { z } from 'zod';
 import { UserRequest, requireUser } from '../middleware/extractUser';
@@ -20,7 +19,7 @@ const createResultSchema = z.object({
   verifiedBy: z.string().optional(),
 });
 
-router.get('/patient/:patientId', requireUser, async (req: UserRequest, res) => {
+router.get('/patient/:patientId', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { patientId } = req.params;
     const userId = req.user!.id;
@@ -62,7 +61,7 @@ router.get('/patient/:patientId', requireUser, async (req: UserRequest, res) => 
   }
 });
 
-router.post('/', requireUser, async (req: UserRequest, res) => {
+router.post('/', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     if (req.user!.role !== 'provider' && req.user!.role !== 'admin') {
       res.status(403).json({ error: 'Forbidden', message: 'Only authorized personnel can add results' });

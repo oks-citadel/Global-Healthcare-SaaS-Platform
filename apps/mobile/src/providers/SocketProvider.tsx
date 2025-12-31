@@ -27,7 +27,7 @@ export function SocketProvider({ children }: SocketProviderProps) {
   useEffect(() => {
     // Initialize offline service
     offlineService.initialize().then(() => {
-      console.log('[SocketProvider] Offline service initialized');
+      // Offline service initialized
     });
 
     // Initialize socket when authenticated
@@ -35,11 +35,10 @@ export function SocketProvider({ children }: SocketProviderProps) {
       socketService
         .initialize()
         .then(() => {
-          console.log('[SocketProvider] Socket service initialized');
           setInitialized(true);
         })
         .catch((error) => {
-          console.error('[SocketProvider] Socket initialization error:', error);
+          // Socket initialization failed
         });
     } else {
       socketService.disconnect();

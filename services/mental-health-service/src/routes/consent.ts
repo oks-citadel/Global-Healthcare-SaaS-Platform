@@ -1,6 +1,5 @@
-// @ts-nocheck
-import { Router } from 'express';
-import { PrismaClient, ConsentType, ConsentStatus } from '../generated/client';
+import { Router, Request, Response } from 'express';
+import { PrismaClient } from '../generated/client';
 import { z } from 'zod';
 import { UserRequest, requireUser } from '../middleware/extractUser';
 import { ConsentService } from '../services/ConsentService';
@@ -20,7 +19,7 @@ const grantConsentSchema = z.object({
 });
 
 // Grant consent (patient grants consent to provider)
-router.post('/grant', requireUser, async (req: UserRequest, res) => {
+router.post('/grant', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const userId = req.user!.id;
     const userRole = req.user!.role;
@@ -69,7 +68,7 @@ router.post('/grant', requireUser, async (req: UserRequest, res) => {
 });
 
 // Get patient's consents
-router.get('/my-consents', requireUser, async (req: UserRequest, res) => {
+router.get('/my-consents', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const userId = req.user!.id;
     const userRole = req.user!.role;
@@ -99,7 +98,7 @@ router.get('/my-consents', requireUser, async (req: UserRequest, res) => {
 });
 
 // Check if provider has consent
-router.get('/check/:patientId/:providerId', requireUser, async (req: UserRequest, res) => {
+router.get('/check/:patientId/:providerId', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { patientId, providerId } = req.params;
     const userId = req.user!.id;
@@ -141,7 +140,7 @@ router.get('/check/:patientId/:providerId', requireUser, async (req: UserRequest
 });
 
 // Revoke consent
-router.post('/:consentId/revoke', requireUser, async (req: UserRequest, res) => {
+router.post('/:consentId/revoke', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { consentId } = req.params;
     const userId = req.user!.id;
@@ -172,7 +171,7 @@ router.post('/:consentId/revoke', requireUser, async (req: UserRequest, res) => 
 });
 
 // Get consent by ID
-router.get('/:consentId', requireUser, async (req: UserRequest, res) => {
+router.get('/:consentId', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { consentId } = req.params;
     const userId = req.user!.id;
@@ -215,7 +214,7 @@ router.get('/:consentId', requireUser, async (req: UserRequest, res) => {
 });
 
 // Get 42 CFR Part 2 compliance info
-router.get('/compliance/cfr-part2', (req, res) => {
+router.get('/compliance/cfr-part2', (_req: Request, res: Response): void => {
   res.json({
     regulation: '42 CFR Part 2',
     description: 'Federal regulations protecting the confidentiality of substance use disorder patient records',
@@ -242,7 +241,7 @@ router.get('/compliance/cfr-part2', (req, res) => {
 });
 
 // Create emergency consent (72-hour limited consent)
-router.post('/emergency', requireUser, async (req: UserRequest, res) => {
+router.post('/emergency', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const userId = req.user!.id;
     const userRole = req.user!.role;

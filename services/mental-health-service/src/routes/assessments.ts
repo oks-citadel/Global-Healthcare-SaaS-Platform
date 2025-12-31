@@ -1,11 +1,26 @@
-// @ts-nocheck
-import { Router } from 'express';
-import { PrismaClient } from '../generated/client';
+import { Router, Response } from 'express';
+import { PrismaClient, Prisma, MentalHealthAssessment } from '../generated/client';
 import { z } from 'zod';
 import { UserRequest, requireUser } from '../middleware/extractUser';
 
 const router: ReturnType<typeof Router> = Router();
 const prisma = new PrismaClient();
+
+// Type for Prisma where clause
+type MentalHealthAssessmentWhereInput = Prisma.MentalHealthAssessmentWhereInput;
+
+// Type for assessment stats
+interface AssessmentScoreEntry {
+  score: number | null;
+  date: Date;
+}
+
+interface AssessmentTypeStats {
+  count: number;
+  scores: AssessmentScoreEntry[];
+  latestScore: number | null;
+  trend: 'improving' | 'declining' | 'stable' | null;
+}
 
 // Validation schema
 const createAssessmentSchema = z.object({
@@ -30,19 +45,19 @@ const createAssessmentSchema = z.object({
 });
 
 // Get assessments
-router.get('/', requireUser, async (req: UserRequest, res) => {
+router.get('/', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const userId = req.user!.id;
     const userRole = req.user!.role;
     const { patientId, assessmentType } = req.query;
 
-    const where: any = {};
+    const where: MentalHealthAssessmentWhereInput = {};
 
     // Access control
     if (userRole === 'patient') {
       where.patientId = userId;
     } else if (userRole === 'provider') {
-      if (patientId) {
+      if (patientId && typeof patientId === 'string') {
         where.patientId = patientId;
       } else {
         where.assessedBy = userId;
@@ -50,7 +65,7 @@ router.get('/', requireUser, async (req: UserRequest, res) => {
     }
 
     // Filter by assessment type
-    if (assessmentType) {
+    if (assessmentType && typeof assessmentType === 'string') {
       where.assessmentType = assessmentType;
     }
 
@@ -73,7 +88,7 @@ router.get('/', requireUser, async (req: UserRequest, res) => {
 });
 
 // Get single assessment
-router.get('/:id', requireUser, async (req: UserRequest, res) => {
+router.get('/:id', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const userId = req.user!.id;
@@ -116,7 +131,7 @@ router.get('/:id', requireUser, async (req: UserRequest, res) => {
 });
 
 // Create assessment
-router.post('/', requireUser, async (req: UserRequest, res) => {
+router.post('/', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const userId = req.user!.id;
     const userRole = req.user!.role;
@@ -170,7 +185,7 @@ router.post('/', requireUser, async (req: UserRequest, res) => {
 });
 
 // Get assessment statistics for a patient
-router.get('/stats/:patientId', requireUser, async (req: UserRequest, res) => {
+router.get('/stats/:patientId', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { patientId } = req.params;
     const userId = req.user!.id;
@@ -196,7 +211,7 @@ router.get('/stats/:patientId', requireUser, async (req: UserRequest, res) => {
     });
 
     // Group by assessment type
-    const stats: Record<string, any> = {};
+    const stats: Record<string, AssessmentTypeStats> = {};
 
     assessments.forEach((assessment) => {
       const type = assessment.assessmentType;
@@ -223,10 +238,12 @@ router.get('/stats/:patientId', requireUser, async (req: UserRequest, res) => {
     Object.keys(stats).forEach((type) => {
       const scores = stats[type].scores;
       if (scores.length >= 2) {
-        const first = scores[0].score;
-        const last = scores[scores.length - 1].score;
-        const change = last - first;
-        stats[type].trend = change > 0 ? 'improving' : change < 0 ? 'declining' : 'stable';
+        const firstScore = scores[0].score;
+        const lastScore = scores[scores.length - 1].score;
+        if (firstScore !== null && lastScore !== null) {
+          const change = lastScore - firstScore;
+          stats[type].trend = change > 0 ? 'improving' : change < 0 ? 'declining' : 'stable';
+        }
       }
     });
 

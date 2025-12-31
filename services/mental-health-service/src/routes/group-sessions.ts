@@ -1,11 +1,13 @@
-// @ts-nocheck
-import { Router } from 'express';
-import { PrismaClient, SessionStatus } from '../generated/client';
+import { Router, Response } from 'express';
+import { PrismaClient, Prisma } from '../generated/client';
 import { z } from 'zod';
 import { UserRequest, requireUser } from '../middleware/extractUser';
 
 const router: ReturnType<typeof Router> = Router();
 const prisma = new PrismaClient();
+
+// Type for Prisma where clause
+type GroupSessionWhereInput = Prisma.GroupSessionWhereInput;
 
 // Validation schemas
 const createGroupSessionSchema = z.object({
@@ -38,7 +40,7 @@ const recordAttendanceSchema = z.object({
 });
 
 // Create group session
-router.post('/', requireUser, async (req: UserRequest, res) => {
+router.post('/', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const userId = req.user!.id;
     const userRole = req.user!.role;
@@ -112,16 +114,16 @@ router.post('/', requireUser, async (req: UserRequest, res) => {
 });
 
 // Get group sessions
-router.get('/', requireUser, async (req: UserRequest, res) => {
+router.get('/', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const userId = req.user!.id;
     const userRole = req.user!.role;
     const { groupId, status, startDate, endDate } = req.query;
 
-    const where: any = {};
+    const where: GroupSessionWhereInput = {};
 
     // Filter by group
-    if (groupId) {
+    if (groupId && typeof groupId === 'string') {
       where.groupId = groupId;
     }
 
@@ -131,7 +133,7 @@ router.get('/', requireUser, async (req: UserRequest, res) => {
     }
 
     // Filter by status
-    if (status) {
+    if (status && typeof status === 'string') {
       where.status = status;
     }
 
@@ -161,7 +163,7 @@ router.get('/', requireUser, async (req: UserRequest, res) => {
 });
 
 // Get single group session
-router.get('/:id', requireUser, async (req: UserRequest, res) => {
+router.get('/:id', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const userId = req.user!.id;
@@ -212,7 +214,7 @@ router.get('/:id', requireUser, async (req: UserRequest, res) => {
 });
 
 // Update group session
-router.patch('/:id', requireUser, async (req: UserRequest, res) => {
+router.patch('/:id', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const userId = req.user!.id;
@@ -284,7 +286,7 @@ router.patch('/:id', requireUser, async (req: UserRequest, res) => {
 });
 
 // Record attendance
-router.post('/:id/attendance', requireUser, async (req: UserRequest, res) => {
+router.post('/:id/attendance', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const userId = req.user!.id;
@@ -367,7 +369,7 @@ router.post('/:id/attendance', requireUser, async (req: UserRequest, res) => {
 });
 
 // Get patient's group sessions
-router.get('/patient/:patientId/sessions', requireUser, async (req: UserRequest, res) => {
+router.get('/patient/:patientId/sessions', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { patientId } = req.params;
     const userId = req.user!.id;

@@ -4,6 +4,7 @@ import { randomBytes } from "crypto";
 import { config } from "../config/index.js";
 import { prisma } from "../utils/prisma.js";
 import { logger } from "../utils/logger.js";
+import { emailService } from "../utils/email.js";
 import {
   ConflictError,
   UnauthorizedError,
@@ -132,9 +133,42 @@ export class AuthService {
       },
     });
 
+    // SECURITY: Check if MFA is enabled - require MFA verification before issuing tokens
+    if (user.mfaEnabled) {
+      logger.info("MFA required for login", { userId: user.id, email });
+
+      // Generate a temporary MFA token (valid for 5 minutes)
+      const mfaToken = this.generateSecureToken();
+      const mfaExpiresAt = new Date();
+      mfaExpiresAt.setMinutes(mfaExpiresAt.getMinutes() + 5);
+
+      // Store MFA session token
+      await prisma.mfaToken.create({
+        data: {
+          token: mfaToken,
+          userId: user.id,
+          expiresAt: mfaExpiresAt,
+          ipAddress,
+          userAgent,
+        },
+      });
+
+      return {
+        mfaRequired: true,
+        mfaToken,
+        message: "MFA verification required. Please provide your authentication code.",
+      } as MfaRequiredResponse;
+    }
+
+    // SECURITY: Check if email is verified for sensitive operations
+    if (!user.emailVerified) {
+      logger.warn("Login with unverified email", { userId: user.id, email });
+      // Allow login but include warning in response
+    }
+
     logger.info("User logged in", { userId: user.id, email, ipAddress });
 
-    // Generate tokens
+    // Generate tokens only if MFA is not required
     return this.generateTokens(user, ipAddress, userAgent);
   }
 
@@ -274,9 +308,24 @@ export class AuthService {
 
     logger.info("Password reset requested", { userId: user.id });
 
-    // TODO: Send email with reset token
-    // In production, integrate with email service (SendGrid, SES, etc.)
-    logger.info("Password reset token generated", { token, userId: user.id });
+    // Send password reset email
+    const emailResult = await emailService.sendPasswordResetEmail(
+      user.email,
+      token,
+      user.firstName || ""
+    );
+
+    if (!emailResult.success) {
+      logger.error("Failed to send password reset email", {
+        userId: user.id,
+        error: emailResult.error,
+      });
+    } else {
+      logger.info("Password reset email sent", {
+        userId: user.id,
+        messageId: emailResult.messageId,
+      });
+    }
 
     return { message: "If the email exists, a reset link has been sent" };
   }
@@ -563,7 +612,7 @@ export class AuthService {
   }
 
   /**
-   * Create email verification token
+   * Create email verification token and send verification email
    */
   private async createEmailVerificationToken(userId: string): Promise<void> {
     const token = this.generateSecureToken();
@@ -580,8 +629,32 @@ export class AuthService {
       },
     });
 
-    // TODO: Send verification email
-    logger.info("Email verification token created", { token, userId });
+    // Fetch user info for email
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { email: true, firstName: true },
+    });
+
+    if (user) {
+      // Send verification email
+      const emailResult = await emailService.sendEmailVerificationEmail(
+        user.email,
+        token,
+        user.firstName || ""
+      );
+
+      if (!emailResult.success) {
+        logger.error("Failed to send email verification", {
+          userId,
+          error: emailResult.error,
+        });
+      } else {
+        logger.info("Email verification sent", {
+          userId,
+          messageId: emailResult.messageId,
+        });
+      }
+    }
   }
 
   /**

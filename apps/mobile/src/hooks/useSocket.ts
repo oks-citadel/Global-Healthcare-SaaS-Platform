@@ -55,7 +55,6 @@ export function useSocket(options: UseSocketOptions = {}): UseSocketReturn {
    */
   const connect = useCallback(async () => {
     if (!isAuthenticated) {
-      console.log('[useSocket] Not authenticated, skipping connection');
       return;
     }
 
@@ -66,7 +65,6 @@ export function useSocket(options: UseSocketOptions = {}): UseSocketReturn {
       setConnectionState(socketService.getConnectionState());
       setSocketId(socketService.getSocketId());
     } catch (err: any) {
-      console.error('[useSocket] Connection error:', err);
       setError(err);
       setIsConnected(false);
       setConnectionState('error');
@@ -93,7 +91,6 @@ export function useSocket(options: UseSocketOptions = {}): UseSocketReturn {
       } catch (err: any) {
         // If offline, queue the action
         if (!offlineService.getIsOnline()) {
-          console.log('[useSocket] Offline, queueing action:', event);
           await offlineService.queueAction(event as any, data);
         }
         throw err;
@@ -126,10 +123,8 @@ export function useSocket(options: UseSocketOptions = {}): UseSocketReturn {
         } else {
           // Queue message for later sending
           await offlineService.queueAction('send_message', { roomId, message });
-          console.log('[useSocket] Message queued for offline sync');
         }
       } catch (err: any) {
-        console.error('[useSocket] Send message error:', err);
         // Queue for retry
         await offlineService.queueAction('send_message', { roomId, message });
         throw err;
@@ -145,7 +140,6 @@ export function useSocket(options: UseSocketOptions = {}): UseSocketReturn {
     try {
       await socketService.joinRoom(roomId);
     } catch (err: any) {
-      console.error('[useSocket] Join room error:', err);
       throw err;
     }
   }, []);
@@ -157,7 +151,6 @@ export function useSocket(options: UseSocketOptions = {}): UseSocketReturn {
     try {
       await socketService.leaveRoom(roomId);
     } catch (err: any) {
-      console.error('[useSocket] Leave room error:', err);
       throw err;
     }
   }, []);
@@ -233,7 +226,6 @@ export function useSocket(options: UseSocketOptions = {}): UseSocketReturn {
   useEffect(() => {
     const unsubscribe = offlineService.subscribe((online) => {
       if (online && isAuthenticated && !isConnected) {
-        console.log('[useSocket] Network online, reconnecting...');
         // Delay reconnection slightly to ensure network is stable
         reconnectTimeout.current = setTimeout(() => {
           connect();
@@ -327,8 +319,8 @@ export function useChatMessages(roomId: string) {
    */
   useEffect(() => {
     // Join room
-    joinRoom(roomId).catch((err) => {
-      console.error('[useChatMessages] Failed to join room:', err);
+    joinRoom(roomId).catch(() => {
+      // Failed to join room
     });
 
     // Listen for messages
@@ -363,8 +355,8 @@ export function useChatMessages(roomId: string) {
     return () => {
       unsubscribeMessages();
       unsubscribeTyping();
-      leaveRoom(roomId).catch((err) => {
-        console.error('[useChatMessages] Failed to leave room:', err);
+      leaveRoom(roomId).catch(() => {
+        // Failed to leave room
       });
       stopTyping();
     };

@@ -21,10 +21,10 @@ RUN apk add --no-cache \
 WORKDIR /app
 
 # Enable pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
 
 # Install EAS CLI globally
-RUN npm install -g eas-cli@latest expo-cli@latest
+RUN npm install -g eas-cli@12.6.2 expo-cli@6.3.12
 
 # ============================================
 # Stage 1: Dependencies

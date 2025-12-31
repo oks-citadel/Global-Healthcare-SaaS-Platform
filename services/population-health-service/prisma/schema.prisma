@@ -1,0 +1,676 @@
+generator client {
+  output   = "./../src/generated/client"
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// Population Health Analytics Domain
+// ==========================================
+
+// Population represents a defined group of patients
+model Population {
+  id              String           @id @default(uuid())
+  name            String
+  description     String?
+  organizationId  String
+  definitionType  DefinitionType   @default(custom)
+  criteria        Json             // Flexible criteria for population definition
+  memberCount     Int              @default(0)
+  status          PopulationStatus @default(active)
+  fhirGroupId     String?          // FHIR R4 Group resource reference
+
+  // Relations
+  cohorts         Cohort[]
+  qualityMeasures PopulationQualityMeasure[]
+  analytics       AnalyticsReport[]
+  sdohFactors     SdohFactor[]
+
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  createdBy       String?
+
+  @@index([organizationId])
+  @@index([status])
+  @@index([definitionType])
+  @@index([fhirGroupId])
+}
+
+enum DefinitionType {
+  geographic
+  demographic
+  condition_based
+  payer_based
+  provider_panel
+  custom
+}
+
+enum PopulationStatus {
+  active
+  inactive
+  archived
+}
+
+// PopulationMember tracks individual members of a population
+model PopulationMember {
+  id              String           @id @default(uuid())
+  populationId    String
+  patientId       String
+  fhirPatientRef  String?          // FHIR R4 Patient reference
+  enrolledAt      DateTime         @default(now())
+  disenrolledAt   DateTime?
+  status          MemberStatus     @default(active)
+
+  // Risk and health status
+  currentRiskScore    Float?
+  riskTier            RiskTier?
+
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@unique([populationId, patientId])
+  @@index([populationId])
+  @@index([patientId])
+  @@index([status])
+  @@index([riskTier])
+}
+
+enum MemberStatus {
+  active
+  inactive
+  deceased
+  transferred
+}
+
+// Cohort for risk stratification and targeted interventions
+model Cohort {
+  id              String           @id @default(uuid())
+  name            String
+  description     String?
+  populationId    String
+  population      Population       @relation(fields: [populationId], references: [id], onDelete: Cascade)
+  cohortType      CohortType
+  criteria        Json             // Criteria defining cohort membership
+  memberCount     Int              @default(0)
+  fhirGroupId     String?          // FHIR R4 Group resource reference
+
+  // Risk stratification
+  riskLevel       RiskTier?
+  interventionPriority Int?        // 1-5 priority scale
+
+  // Care gap tracking
+  careGaps        CareGap[]
+
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  createdBy       String?
+
+  @@index([populationId])
+  @@index([cohortType])
+  @@index([riskLevel])
+}
+
+enum CohortType {
+  risk_stratification
+  disease_registry
+  care_management
+  quality_improvement
+  research
+  custom
+}
+
+enum RiskTier {
+  low
+  moderate
+  high
+  very_high
+  critical
+}
+
+// CohortMember tracks individual members of a cohort
+model CohortMember {
+  id              String           @id @default(uuid())
+  cohortId        String
+  patientId       String
+  fhirPatientRef  String?          // FHIR R4 Patient reference
+  assignedAt      DateTime         @default(now())
+  removedAt       DateTime?
+  status          MemberStatus     @default(active)
+  riskScore       Float?
+
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@unique([cohortId, patientId])
+  @@index([cohortId])
+  @@index([patientId])
+  @@index([status])
+}
+
+// Quality measures following HEDIS, CMS Stars standards
+model QualityMeasure {
+  id                  String               @id @default(uuid())
+  measureId           String               @unique // e.g., "NQF-0059", "HEDIS-BCS"
+  name                String
+  description         String?
+  measureType         MeasureType
+  category            MeasureCategory
+  steward             String?              // Measure steward (e.g., NCQA, CMS)
+  domain              String?              // Clinical domain
+
+  // FHIR R4 Measure resource compatibility
+  fhirMeasureId       String?
+  fhirVersion         String?
+
+  // Calculation details
+  numeratorCriteria   Json?
+  denominatorCriteria Json?
+  exclusionCriteria   Json?
+  targetRate          Float?               // Target performance rate
+
+  // Measure period
+  measurePeriodStart  DateTime?
+  measurePeriodEnd    DateTime?
+  reportingYear       Int?
+
+  isActive            Boolean              @default(true)
+
+  // Relations
+  populationMeasures  PopulationQualityMeasure[]
+  patientMeasures     PatientQualityMeasure[]
+
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+
+  @@index([measureType])
+  @@index([category])
+  @@index([reportingYear])
+  @@index([isActive])
+}
+
+enum MeasureType {
+  process
+  outcome
+  structure
+  patient_experience
+  intermediate_outcome
+  composite
+}
+
+enum MeasureCategory {
+  hedis
+  cms_stars
+  mips
+  pcmh
+  aco
+  state_medicaid
+  commercial
+  custom
+}
+
+// Population-level quality measure tracking
+model PopulationQualityMeasure {
+  id                  String           @id @default(uuid())
+  populationId        String
+  population          Population       @relation(fields: [populationId], references: [id], onDelete: Cascade)
+  qualityMeasureId    String
+  qualityMeasure      QualityMeasure   @relation(fields: [qualityMeasureId], references: [id], onDelete: Cascade)
+
+  // Performance metrics
+  numerator           Int              @default(0)
+  denominator         Int              @default(0)
+  exclusions          Int              @default(0)
+  performanceRate     Float?           // Calculated: numerator / (denominator - exclusions)
+
+  // Benchmark comparison
+  benchmarkRate       Float?
+  benchmarkPercentile Int?
+  starRating          Int?             // 1-5 stars for CMS Stars
+
+  // Period tracking
+  measurePeriod       String           // e.g., "2024-Q1", "2024"
+  calculatedAt        DateTime         @default(now())
+
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+
+  @@unique([populationId, qualityMeasureId, measurePeriod])
+  @@index([populationId])
+  @@index([qualityMeasureId])
+  @@index([measurePeriod])
+  @@index([performanceRate])
+}
+
+// Patient-level quality measure tracking
+model PatientQualityMeasure {
+  id                  String               @id @default(uuid())
+  patientId           String
+  fhirPatientRef      String?              // FHIR R4 Patient reference
+  qualityMeasureId    String
+  qualityMeasure      QualityMeasure       @relation(fields: [qualityMeasureId], references: [id], onDelete: Cascade)
+
+  // Measure status
+  inDenominator       Boolean              @default(false)
+  inNumerator         Boolean              @default(false)
+  isExcluded          Boolean              @default(false)
+  exclusionReason     String?
+
+  // Compliance tracking
+  status              ComplianceStatus     @default(pending)
+  dueDate             DateTime?
+  completedDate       DateTime?
+
+  // Evidence/documentation
+  evidenceRef         String?              // Reference to supporting documentation
+  notes               String?
+
+  measurePeriod       String               // e.g., "2024-Q1", "2024"
+
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+
+  @@unique([patientId, qualityMeasureId, measurePeriod])
+  @@index([patientId])
+  @@index([qualityMeasureId])
+  @@index([status])
+  @@index([measurePeriod])
+}
+
+enum ComplianceStatus {
+  pending
+  compliant
+  non_compliant
+  excluded
+  not_applicable
+}
+
+// Risk scoring for patients
+model RiskScore {
+  id              String           @id @default(uuid())
+  patientId       String
+  fhirPatientRef  String?          // FHIR R4 Patient reference
+
+  // Risk model details
+  modelName       String           // e.g., "HCC", "CDPS", "Custom"
+  modelVersion    String?
+  scoreType       ScoreType
+
+  // Scores
+  rawScore        Float
+  normalizedScore Float?           // 0-100 scale
+  percentile      Int?             // Population percentile
+  riskTier        RiskTier
+
+  // Contributing factors
+  riskFactors     Json?            // Array of contributing risk factors
+  clinicalFactors Json?            // Clinical conditions contributing to risk
+  socialFactors   Json?            // SDOH factors contributing to risk
+
+  // Predictions
+  predictedCost   Float?           // Predicted annual cost
+  predictedEvents Json?            // Predicted clinical events
+
+  // Validity period
+  effectiveDate   DateTime         @default(now())
+  expirationDate  DateTime?
+  isActive        Boolean          @default(true)
+
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@index([patientId])
+  @@index([modelName])
+  @@index([riskTier])
+  @@index([effectiveDate])
+  @@index([isActive])
+}
+
+enum ScoreType {
+  hcc_raf              // CMS HCC Risk Adjustment Factor
+  cdps                 // Chronic Illness and Disability Payment System
+  hospitalization_risk
+  ed_utilization
+  readmission_risk
+  mortality_risk
+  cost_prediction
+  composite
+  custom
+}
+
+// Care Gap identification
+model CareGap {
+  id              String           @id @default(uuid())
+  patientId       String
+  fhirPatientRef  String?          // FHIR R4 Patient reference
+  cohortId        String?
+  cohort          Cohort?          @relation(fields: [cohortId], references: [id], onDelete: SetNull)
+
+  gapType         GapType
+  title           String
+  description     String?
+  priority        GapPriority      @default(medium)
+
+  // Measure linkage
+  qualityMeasureId String?
+
+  // Recommended action
+  recommendedAction String?
+  actionDueDate   DateTime?
+
+  // Status tracking
+  status          GapStatus        @default(open)
+  identifiedAt    DateTime         @default(now())
+  resolvedAt      DateTime?
+  resolvedBy      String?
+  resolutionNotes String?
+
+  // FHIR references
+  fhirConditionRef    String?      // Related Condition resource
+  fhirProcedureRef    String?      // Related Procedure resource
+  fhirMedicationRef   String?      // Related MedicationRequest resource
+
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@index([patientId])
+  @@index([cohortId])
+  @@index([gapType])
+  @@index([status])
+  @@index([priority])
+  @@index([qualityMeasureId])
+}
+
+enum GapType {
+  preventive_care
+  chronic_disease_management
+  medication_adherence
+  screening
+  immunization
+  follow_up
+  lab_test
+  specialist_referral
+  wellness_visit
+  other
+}
+
+enum GapPriority {
+  low
+  medium
+  high
+  urgent
+}
+
+enum GapStatus {
+  open
+  in_progress
+  scheduled
+  resolved
+  closed
+  patient_declined
+}
+
+// Social Determinants of Health (SDOH) tracking
+model SdohFactor {
+  id              String           @id @default(uuid())
+  patientId       String?          // Individual patient SDOH
+  populationId    String?          // Population-level SDOH aggregates
+  population      Population?      @relation(fields: [populationId], references: [id], onDelete: SetNull)
+  fhirPatientRef  String?          // FHIR R4 Patient reference
+
+  category        SdohCategory
+  factor          String           // Specific SDOH factor
+  value           String?          // Value/description
+  severity        SdohSeverity?
+
+  // Assessment details
+  assessmentDate  DateTime         @default(now())
+  assessmentTool  String?          // e.g., "PRAPARE", "AHC-HRSN"
+
+  // Screening results
+  screeningScore  Float?
+  isPositiveScreen Boolean         @default(false)
+
+  // Intervention tracking
+  interventionNeeded Boolean       @default(false)
+  interventionType   String?
+  interventionStatus String?
+  referralMade    Boolean          @default(false)
+  referralDetails String?
+
+  // FHIR references
+  fhirObservationRef String?       // SDOH Observation resource
+  fhirConditionRef   String?       // SDOH-related Condition
+
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@index([patientId])
+  @@index([populationId])
+  @@index([category])
+  @@index([isPositiveScreen])
+  @@index([interventionNeeded])
+}
+
+enum SdohCategory {
+  food_insecurity
+  housing_instability
+  transportation
+  utilities
+  interpersonal_safety
+  education
+  employment
+  financial_strain
+  social_isolation
+  health_literacy
+  stress
+  other
+}
+
+enum SdohSeverity {
+  none
+  mild
+  moderate
+  severe
+}
+
+// Disease prevalence and incidence tracking
+model DiseaseRegistry {
+  id              String           @id @default(uuid())
+  conditionCode   String           // ICD-10 or SNOMED code
+  conditionName   String
+  populationId    String?
+
+  // Epidemiological metrics
+  prevalenceCount Int              @default(0)
+  prevalenceRate  Float?           // Per 1000 population
+  incidenceCount  Int              @default(0)
+  incidenceRate   Float?           // Per 1000 person-years
+
+  // Time period
+  periodStart     DateTime
+  periodEnd       DateTime
+
+  // Demographics breakdown (stored as JSON for flexibility)
+  ageDistribution     Json?
+  genderDistribution  Json?
+  raceDistribution    Json?
+
+  // Trend data
+  previousPeriodPrevalence Float?
+  trendDirection          TrendDirection?
+
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@unique([conditionCode, populationId, periodStart])
+  @@index([conditionCode])
+  @@index([populationId])
+  @@index([periodStart])
+}
+
+enum TrendDirection {
+  increasing
+  stable
+  decreasing
+}
+
+// Health Equity Analytics
+model HealthEquityMetric {
+  id              String           @id @default(uuid())
+  populationId    String?
+  measureType     EquityMeasureType
+
+  // Stratification dimensions
+  stratificationDimension String   // e.g., "race", "ethnicity", "income", "geography"
+  stratificationValue     String   // e.g., "Hispanic", "Rural"
+
+  // Metric values
+  metricName      String
+  metricValue     Float
+  referenceValue  Float?           // Comparison/benchmark value
+  disparityIndex  Float?           // Ratio or difference from reference
+
+  // Statistical significance
+  confidenceInterval Json?         // {lower: float, upper: float}
+  pValue          Float?
+  sampleSize      Int?
+
+  // Period
+  measurePeriod   String           // e.g., "2024-Q1"
+
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@index([populationId])
+  @@index([measureType])
+  @@index([stratificationDimension])
+  @@index([measurePeriod])
+}
+
+enum EquityMeasureType {
+  access_to_care
+  quality_of_care
+  health_outcomes
+  patient_experience
+  utilization
+  cost
+}
+
+// Analytics Reports
+model AnalyticsReport {
+  id              String           @id @default(uuid())
+  populationId    String?
+  population      Population?      @relation(fields: [populationId], references: [id], onDelete: SetNull)
+
+  reportType      ReportType
+  title           String
+  description     String?
+
+  // Report parameters
+  parameters      Json?            // Filter parameters used
+
+  // Report data
+  data            Json             // Report results/data
+  visualizations  Json?            // Chart configurations
+
+  // Report metadata
+  generatedAt     DateTime         @default(now())
+  generatedBy     String?
+  periodStart     DateTime?
+  periodEnd       DateTime?
+
+  // Export tracking
+  exportFormats   Json?            // Available export formats
+  lastExportedAt  DateTime?
+
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@index([populationId])
+  @@index([reportType])
+  @@index([generatedAt])
+}
+
+enum ReportType {
+  population_dashboard
+  quality_scorecard
+  risk_stratification
+  care_gap_analysis
+  sdoh_assessment
+  disease_surveillance
+  health_equity
+  trend_analysis
+  predictive_model
+  custom
+}
+
+// Predictive Model configurations and results
+model PredictiveModel {
+  id              String           @id @default(uuid())
+  name            String
+  description     String?
+  modelType       PredictiveModelType
+
+  // Model configuration
+  algorithm       String           // e.g., "logistic_regression", "random_forest"
+  features        Json             // Input features used
+  hyperparameters Json?            // Model hyperparameters
+
+  // Model performance
+  accuracy        Float?
+  auc             Float?           // Area Under ROC Curve
+  precision       Float?
+  recall          Float?
+  f1Score         Float?
+
+  // Model versioning
+  version         String
+  isActive        Boolean          @default(true)
+  trainedAt       DateTime?
+  trainingSampleSize Int?
+
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@index([modelType])
+  @@index([isActive])
+}
+
+enum PredictiveModelType {
+  hospitalization
+  readmission
+  ed_visit
+  mortality
+  disease_progression
+  cost
+  medication_adherence
+  care_gap_closure
+  custom
+}
+
+// Audit log for analytics activities
+model AnalyticsAuditLog {
+  id              String           @id @default(uuid())
+  userId          String
+  action          String           // e.g., "VIEW_REPORT", "EXPORT_DATA", "RUN_MODEL"
+  resourceType    String           // e.g., "Population", "Report", "RiskScore"
+  resourceId      String?
+
+  // Request details
+  ipAddress       String?
+  userAgent       String?
+
+  // Additional context
+  metadata        Json?
+
+  createdAt       DateTime         @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([resourceType])
+  @@index([createdAt])
+}

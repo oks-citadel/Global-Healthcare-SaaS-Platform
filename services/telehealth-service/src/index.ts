@@ -3,6 +3,7 @@ import { createServer } from 'http';
 import { Server as SocketServer } from 'socket.io';
 import cors from 'cors';
 import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import appointmentsRouter from './routes/appointments';
 import visitsRouter from './routes/visits';
@@ -22,12 +23,23 @@ const io = new SocketServer(httpServer, {
 
 const PORT = process.env.PORT || 3001;
 
+// Rate limiting configuration
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: { error: 'Too Many Requests', message: 'Rate limit exceeded. Please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => req.path === '/health' || req.path === '/stats', // Skip health checks
+});
+
 // Middleware
 app.use(helmet());
 app.use(cors({
   origin: process.env.CORS_ORIGIN || '*',
   credentials: true,
 }));
+app.use(limiter);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

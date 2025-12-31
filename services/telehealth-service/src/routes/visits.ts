@@ -212,11 +212,17 @@ router.post('/:visitId/end', requireUser, async (req: UserRequest, res) => {
       return;
     }
 
+    // Calculate visit duration for billing
+    const startedAt = visit.startedAt || new Date();
+    const endedAt = new Date();
+    const durationMinutes = Math.ceil((endedAt.getTime() - startedAt.getTime()) / 60000);
+
     const updated = await prisma.visit.update({
       where: { id: visitId },
       data: {
         status: 'completed',
-        endedAt: new Date(),
+        endedAt,
+        durationMinutes,
       },
     });
 
@@ -226,8 +232,39 @@ router.post('/:visitId/end', requireUser, async (req: UserRequest, res) => {
       data: { status: 'completed' },
     });
 
+    // Trigger billing event for telehealth consultation
+    // This emits an event that the main API billing service can consume
+    const billingEvent = {
+      type: 'TELEHEALTH_VISIT_COMPLETED',
+      visitId: updated.id,
+      appointmentId: visit.appointmentId,
+      patientId: visit.appointment.patientId,
+      providerId: visit.appointment.providerId,
+      durationMinutes,
+      completedAt: endedAt.toISOString(),
+      billable: true,
+    };
+
+    // Post billing event to main API (async, non-blocking)
+    const apiUrl = process.env.API_URL || 'http://localhost:3001';
+    fetch(`${apiUrl}/api/billing/telehealth-visit`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Service-Key': process.env.SERVICE_API_KEY || '',
+      },
+      body: JSON.stringify(billingEvent),
+    }).catch((err) => {
+      console.error('Failed to send billing event:', err);
+      // Log but don't fail the visit completion
+    });
+
     res.json({
-      data: updated,
+      data: {
+        ...updated,
+        durationMinutes,
+        billingTriggered: true,
+      },
       message: 'Visit ended successfully',
     });
   } catch (error) {

@@ -4,15 +4,23 @@ import {
   ListAppointmentsInput,
   AppointmentResponse,
   PaginatedAppointments,
+  AppointmentWithBillingResponse,
 } from '../dtos/appointment.dto.js';
 import { NotFoundError } from '../utils/errors.js';
 import { prisma } from '../lib/prisma.js';
+import { appointmentBillingService } from './appointment-billing.service.js';
+import { logger } from '../utils/logger.js';
 
 export const appointmentService = {
   /**
    * Create appointment
+   * If the appointment type is paid and skipPayment is not true,
+   * a payment intent will be created for the appointment.
    */
-  async createAppointment(input: CreateAppointmentInput): Promise<AppointmentResponse> {
+  async createAppointment(
+    input: CreateAppointmentInput,
+    userId?: string
+  ): Promise<AppointmentWithBillingResponse> {
     const appointment = await prisma.appointment.create({
       data: {
         patientId: input.patientId,
@@ -26,7 +34,7 @@ export const appointmentService = {
       },
     });
 
-    return {
+    const response: AppointmentWithBillingResponse = {
       id: appointment.id,
       patientId: appointment.patientId,
       providerId: appointment.providerId,
@@ -39,6 +47,69 @@ export const appointmentService = {
       createdAt: appointment.createdAt.toISOString(),
       updatedAt: appointment.updatedAt.toISOString(),
     };
+
+    // Check if payment is required for this appointment type
+    const isPaidType = appointmentBillingService.isAppointmentTypePaid(input.type);
+
+    if (isPaidType && !input.skipPayment && userId) {
+      try {
+        // Create payment intent for the appointment
+        const billingResult = await appointmentBillingService.createAppointmentPayment(
+          userId,
+          {
+            appointmentId: appointment.id,
+            patientId: input.patientId,
+            providerId: input.providerId,
+            appointmentType: input.type,
+            duration: input.duration,
+            paymentMethodId: input.paymentMethodId,
+          }
+        );
+
+        response.billing = {
+          paymentId: billingResult.paymentId,
+          paymentIntentId: billingResult.paymentIntentId,
+          clientSecret: billingResult.clientSecret,
+          amount: billingResult.amount,
+          currency: billingResult.currency,
+          status: billingResult.status,
+          requiresAction: billingResult.requiresAction,
+          isPaid: billingResult.status === 'succeeded',
+        };
+
+        logger.info(`Created appointment ${appointment.id} with payment ${billingResult.paymentId}`);
+      } catch (error) {
+        // Log error but don't fail appointment creation
+        // Payment can be collected later
+        logger.error(`Failed to create payment for appointment ${appointment.id}:`, error);
+
+        // Add billing info without payment
+        const { amount, currency } = appointmentBillingService.calculateAppointmentPrice(
+          input.type,
+          input.duration
+        );
+        response.billing = {
+          amount,
+          currency,
+          status: 'payment_required',
+          isPaid: false,
+        };
+      }
+    } else if (isPaidType && !input.skipPayment) {
+      // Appointment requires payment but no userId provided - include price info
+      const { amount, currency } = appointmentBillingService.calculateAppointmentPrice(
+        input.type,
+        input.duration
+      );
+      response.billing = {
+        amount,
+        currency,
+        status: 'payment_required',
+        isPaid: false,
+      };
+    }
+
+    return response;
   },
 
   /**
@@ -170,14 +241,39 @@ export const appointmentService = {
 
   /**
    * Cancel appointment
+   * Also cancels any pending payments associated with the appointment
    */
-  async cancelAppointment(id: string): Promise<void> {
+  async cancelAppointment(id: string, refundIfPaid: boolean = false): Promise<void> {
     const appointment = await prisma.appointment.findUnique({
       where: { id },
     });
 
     if (!appointment) {
       throw new NotFoundError('Appointment not found');
+    }
+
+    // Cancel or refund any associated payments
+    try {
+      const payment = await appointmentBillingService.getAppointmentPayment(id);
+
+      if (payment) {
+        if (payment.status === 'succeeded' && refundIfPaid) {
+          // Refund the payment
+          await appointmentBillingService.refundAppointmentPayment(
+            id,
+            undefined, // Full refund
+            'requested_by_customer'
+          );
+          logger.info(`Refunded payment for cancelled appointment ${id}`);
+        } else if (payment.status !== 'succeeded') {
+          // Cancel the pending payment
+          await appointmentBillingService.cancelAppointmentPayment(id);
+          logger.info(`Cancelled pending payment for appointment ${id}`);
+        }
+      }
+    } catch (error) {
+      // Log but don't fail the cancellation
+      logger.error(`Error handling payment for cancelled appointment ${id}:`, error);
     }
 
     await prisma.appointment.update({

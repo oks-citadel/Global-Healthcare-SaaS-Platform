@@ -1,10 +1,12 @@
-// @ts-nocheck
 import { PrismaClient, DispensingStatus } from '../generated/client';
 import InteractionCheckService from './InteractionCheckService';
 import InventoryService from './InventoryService';
 import PDMPService from './PDMPService';
 
 const prisma = new PrismaClient();
+
+// Type for controlled substance log records
+type ControlledSubstanceLogRecord = Awaited<ReturnType<typeof prisma.controlledSubstanceLog.create>> | null;
 
 export interface DispenseRequest {
   prescriptionId: string;
@@ -97,7 +99,7 @@ export class DispenseService {
     }
 
     // 7. Check if controlled substance requires PDMP check
-    let controlledSubstanceLog = null;
+    let controlledSubstanceLog: ControlledSubstanceLogRecord = null;
     if (medication.isControlled && medication.schedule) {
       const pdmpCheck = await PDMPService.checkPDMP(
         request.patientId,

@@ -214,6 +214,16 @@ export const config = {
       isDevelopment ? "dev-only-mfa-encryption-key-32chars!" : undefined,
     ),
   },
+
+  email: {
+    provider: getOptionalEnv("EMAIL_PROVIDER", "sendgrid"),
+    sendgridApiKey: getOptionalEnv("SENDGRID_API_KEY", ""),
+    sesRegion: getOptionalEnv("AWS_SES_REGION", "us-east-1"),
+    fromAddress: getOptionalEnv("EMAIL_FROM_ADDRESS", "noreply@unified-health.com"),
+    fromName: getOptionalEnv("EMAIL_FROM_NAME", "Unified Healthcare"),
+    appUrl: getOptionalEnv("APP_URL", "http://localhost:3000"),
+    enabled: getOptionalEnv("EMAIL_ENABLED", isDevelopment ? "false" : "true") === "true",
+  },
 } as const;
 
 // Enforce valid configuration at module load time

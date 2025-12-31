@@ -58,12 +58,10 @@ export function useOfflineSync(options: UseOfflineSyncOptions = {}): UseOfflineS
    */
   const sync = useCallback(async (): Promise<SyncResult> => {
     if (!isAuthenticated) {
-      console.log('[useOfflineSync] Not authenticated, skipping sync');
       return { success: false, processed: 0, failed: 0, errors: [] };
     }
 
     if (!isOnline) {
-      console.log('[useOfflineSync] Offline, skipping sync');
       return { success: false, processed: 0, failed: 0, errors: [] };
     }
 
@@ -71,7 +69,6 @@ export function useOfflineSync(options: UseOfflineSyncOptions = {}): UseOfflineS
     setError(null);
 
     try {
-      console.log('[useOfflineSync] Starting sync...');
       const result = await offlineService.syncPendingActions();
 
       if (isMounted.current) {
@@ -81,10 +78,8 @@ export function useOfflineSync(options: UseOfflineSyncOptions = {}): UseOfflineS
         onSyncComplete?.(result);
       }
 
-      console.log('[useOfflineSync] Sync completed:', result);
       return result;
     } catch (err: any) {
-      console.error('[useOfflineSync] Sync error:', err);
       if (isMounted.current) {
         setError(err);
         onSyncError?.(err);
@@ -122,7 +117,6 @@ export function useOfflineSync(options: UseOfflineSyncOptions = {}): UseOfflineS
       await offlineService.clearPendingActions();
       setPendingActions([]);
     } catch (err: any) {
-      console.error('[useOfflineSync] Clear pending error:', err);
       throw err;
     }
   }, []);
@@ -150,7 +144,7 @@ export function useOfflineSync(options: UseOfflineSyncOptions = {}): UseOfflineS
           setLastSync(timestamp);
         }
       } catch (err) {
-        console.error('[useOfflineSync] Load initial state error:', err);
+        // Failed to load initial state
       }
     };
 
@@ -166,9 +160,8 @@ export function useOfflineSync(options: UseOfflineSyncOptions = {}): UseOfflineS
 
       // Auto-sync when coming online
       if (online && autoSync && isAuthenticated) {
-        console.log('[useOfflineSync] Network online, triggering sync');
-        sync().catch((err) => {
-          console.error('[useOfflineSync] Auto-sync error:', err);
+        sync().catch(() => {
+          // Auto-sync failed silently
         });
       }
     });
@@ -183,9 +176,8 @@ export function useOfflineSync(options: UseOfflineSyncOptions = {}): UseOfflineS
     if (autoSync && isOnline && isAuthenticated && syncInterval > 0) {
       syncIntervalRef.current = setInterval(() => {
         if (pendingActions.length > 0) {
-          console.log('[useOfflineSync] Auto-sync interval triggered');
-          sync().catch((err) => {
-            console.error('[useOfflineSync] Auto-sync interval error:', err);
+          sync().catch(() => {
+            // Auto-sync interval failed silently
           });
         }
       }, syncInterval);
@@ -279,7 +271,6 @@ export function useCachedData<T>(
         }
       }
     } catch (err: any) {
-      console.error('[useCachedData] Fetch error:', err);
 
       // Try to load from cache on error
       try {
@@ -329,7 +320,6 @@ export function useCachedData<T>(
    */
   useEffect(() => {
     if (refetchOnReconnect && isOnline && data && isStale()) {
-      console.log('[useCachedData] Refetching on reconnect');
       fetch();
     }
   }, [refetchOnReconnect, isOnline, data, isStale, fetch]);
@@ -406,7 +396,6 @@ export function useOptimisticUpdate<T>() {
           await offlineService.queueAction('update_profile' as ActionType, optimisticData);
         }
       } catch (err: any) {
-        console.error('[useOptimisticUpdate] Update error:', err);
 
         // Rollback function
         const rollback = () => {

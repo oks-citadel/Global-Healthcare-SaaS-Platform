@@ -5,7 +5,11 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(find:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(git push:*)",
+      "Bash(pnpm run typecheck:*)",
+      "Bash(npx tsc:*)",
+      "Bash(xargs cat:*)"
     ]
   }
 }

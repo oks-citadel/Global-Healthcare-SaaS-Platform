@@ -26,7 +26,17 @@ export const authenticate = (
     }
 
     const token = authHeader.substring(7);
-    const secret = process.env.JWT_SECRET || 'your-secret-key';
+
+    // SECURITY: JWT_SECRET must be set in production - no fallback allowed
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      console.error('CRITICAL: JWT_SECRET environment variable is not set');
+      res.status(500).json({
+        error: 'Internal Server Error',
+        message: 'Authentication service misconfigured',
+      });
+      return;
+    }
 
     const decoded = jwt.verify(token, secret) as {
       userId: string;

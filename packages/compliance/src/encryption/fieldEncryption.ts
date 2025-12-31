@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Field-Level Encryption for PHI/PII
  * HIPAA § 164.312(a)(2)(iv), GDPR Article 32, POPIA Section 19
@@ -109,40 +108,42 @@ export class FieldEncryption {
   /**
    * Encrypt object fields selectively
    */
-  encryptFields<T extends Record<string, any>>(
+  encryptFields<T extends Record<string, unknown>>(
     obj: T,
     fields: Array<keyof T>,
     context?: string
   ): T {
-    const result = { ...obj };
+    const result = { ...obj } as Record<string, unknown>;
 
     for (const field of fields) {
-      if (result[field] !== undefined && result[field] !== null) {
-        const value = String(result[field]);
-        result[field] = this.encrypt(value, context) as any;
+      const key = field as string;
+      if (result[key] !== undefined && result[key] !== null) {
+        const value = String(result[key]);
+        result[key] = this.encrypt(value, context);
       }
     }
 
-    return result;
+    return result as T;
   }
 
   /**
    * Decrypt object fields
    */
-  decryptFields<T extends Record<string, any>>(
+  decryptFields<T extends Record<string, unknown>>(
     obj: T,
     fields: Array<keyof T>,
     context?: string
   ): T {
-    const result = { ...obj };
+    const result = { ...obj } as Record<string, unknown>;
 
     for (const field of fields) {
-      if (result[field]) {
-        result[field] = this.decrypt(String(result[field]), context) as any;
+      const key = field as string;
+      if (result[key]) {
+        result[key] = this.decrypt(String(result[key]), context);
       }
     }
 
-    return result;
+    return result as T;
   }
 }
 

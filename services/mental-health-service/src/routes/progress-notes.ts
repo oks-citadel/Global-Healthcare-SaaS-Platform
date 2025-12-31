@@ -1,6 +1,5 @@
-// @ts-nocheck
-import { Router } from 'express';
-import { PrismaClient, NoteType } from '../generated/client';
+import { Router, Response } from 'express';
+import { PrismaClient } from '../generated/client';
 import { z } from 'zod';
 import { UserRequest, requireUser } from '../middleware/extractUser';
 import { ConsentService } from '../services/ConsentService';
@@ -52,7 +51,7 @@ const updateProgressNoteSchema = z.object({
 });
 
 // Create progress note
-router.post('/', requireUser, async (req: UserRequest, res) => {
+router.post('/', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const userId = req.user!.id;
     const userRole = req.user!.role;
@@ -134,7 +133,7 @@ router.post('/', requireUser, async (req: UserRequest, res) => {
 });
 
 // Get progress notes for a patient
-router.get('/patient/:patientId', requireUser, async (req: UserRequest, res) => {
+router.get('/patient/:patientId', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { patientId } = req.params;
     const userId = req.user!.id;
@@ -175,7 +174,7 @@ router.get('/patient/:patientId', requireUser, async (req: UserRequest, res) => 
 });
 
 // Get progress notes for a session
-router.get('/session/:sessionId', requireUser, async (req: UserRequest, res) => {
+router.get('/session/:sessionId', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { sessionId } = req.params;
     const userId = req.user!.id;
@@ -227,7 +226,7 @@ router.get('/session/:sessionId', requireUser, async (req: UserRequest, res) => 
 });
 
 // Get single progress note
-router.get('/:id', requireUser, async (req: UserRequest, res) => {
+router.get('/:id', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const userId = req.user!.id;
@@ -278,7 +277,7 @@ router.get('/:id', requireUser, async (req: UserRequest, res) => {
 });
 
 // Update progress note
-router.patch('/:id', requireUser, async (req: UserRequest, res) => {
+router.patch('/:id', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const userId = req.user!.id;
@@ -360,7 +359,7 @@ router.patch('/:id', requireUser, async (req: UserRequest, res) => {
 });
 
 // Add note to session (convenience endpoint)
-router.post('/sessions/:sessionId/notes', requireUser, async (req: UserRequest, res) => {
+router.post('/sessions/:sessionId/notes', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { sessionId } = req.params;
     const userId = req.user!.id;

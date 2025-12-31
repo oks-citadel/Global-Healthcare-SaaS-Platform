@@ -15,8 +15,11 @@ import { notificationController } from '../controllers/notification.controller.j
 import { paymentController } from '../controllers/payment.controller.js';
 import { pushController } from '../controllers/push.controller.js';
 import { dashboardController } from '../controllers/dashboard.controller.js';
-import { authenticate, authorize } from '../middleware/auth.middleware.js';
+import { authenticate, authorize, requireSubscription, requireEmailVerified } from '../middleware/auth.middleware.js';
 import stripeWebhookRouter from './webhooks/stripe.js';
+import { premiumRoutes } from './premium.routes.js';
+import { postDischargeRoutes } from './post-discharge.routes.js';
+import { surgicalRoutes } from './surgical.routes.js';
 
 const router = Router();
 
@@ -53,6 +56,14 @@ router.get('/users/:id', authenticate, userController.getUser);
 router.patch('/users/:id', authenticate, userController.updateUser);
 
 // ==========================================
+// GDPR Data Subject Rights Endpoints
+// ==========================================
+// Article 20: Right to data portability
+router.get('/users/me/export', authenticate, userController.exportUserData);
+// Article 17: Right to erasure
+router.delete('/users/me', authenticate, userController.deleteAccount);
+
+// ==========================================
 // Patient Endpoints
 // ==========================================
 router.post('/patients', authenticate, patientController.createPatient);
@@ -82,13 +93,24 @@ router.delete('/documents/:id', authenticate, documentController.deleteDocument)
 router.get('/patients/:patientId/documents', authenticate, documentController.getPatientDocuments);
 
 // ==========================================
-// Appointment Endpoints
+// Appointment Endpoints (Subscription Required)
 // ==========================================
-router.post('/appointments', authenticate, appointmentController.createAppointment);
+router.post('/appointments', authenticate, requireSubscription, appointmentController.createAppointment);
 router.get('/appointments', authenticate, appointmentController.listAppointments);
+router.get('/appointments/pricing', authenticate, appointmentController.getAppointmentPrice);
 router.get('/appointments/:id', authenticate, appointmentController.getAppointment);
-router.patch('/appointments/:id', authenticate, appointmentController.updateAppointment);
+router.patch('/appointments/:id', authenticate, requireSubscription, appointmentController.updateAppointment);
 router.delete('/appointments/:id', authenticate, appointmentController.deleteAppointment);
+
+// ==========================================
+// Appointment Billing Endpoints
+// ==========================================
+router.post('/appointments/:id/payment', authenticate, appointmentController.createAppointmentPayment);
+router.get('/appointments/:id/payment', authenticate, appointmentController.getAppointmentPayment);
+router.post('/appointments/:id/payment/confirm', authenticate, appointmentController.confirmAppointmentPayment);
+router.post('/appointments/:id/payment/refund', authenticate, authorize('admin'), appointmentController.refundAppointmentPayment);
+router.post('/appointments/:id/billing/complete', authenticate, authorize('provider', 'admin'), appointmentController.completeAppointmentBilling);
+router.get('/appointments/:id/billing/summary', authenticate, appointmentController.getAppointmentBillingSummary);
 
 // ==========================================
 // Visit Endpoints
@@ -120,6 +142,78 @@ router.post('/billing/webhook', subscriptionController.handleWebhook);
 // Configure in your main app.ts before JSON parsing:
 // app.use('/webhooks/stripe', express.raw({ type: 'application/json' }));
 router.use('/webhooks/stripe', stripeWebhookRouter);
+
+// ==========================================
+// Internal Billing Endpoints (Service-to-Service)
+// ==========================================
+// Telehealth service billing webhook - receives billing events from telehealth service
+router.post('/billing/telehealth-visit', async (req, res) => {
+  try {
+    const serviceKey = req.headers['x-service-key'];
+    const expectedKey = process.env.SERVICE_API_KEY;
+
+    // Verify service-to-service authentication
+    if (!expectedKey || serviceKey !== expectedKey) {
+      res.status(401).json({ error: 'Unauthorized service request' });
+      return;
+    }
+
+    const {
+      visitId,
+      appointmentId,
+      patientId,
+      providerId,
+      durationMinutes,
+      completedAt,
+      billable,
+    } = req.body;
+
+    if (!billable) {
+      res.json({ success: true, message: 'Visit not billable, skipped' });
+      return;
+    }
+
+    // Import appointment billing service and process the billing
+    const { appointmentBillingService } = await import('../services/appointment-billing.service.js');
+    const { logger } = await import('../utils/logger.js');
+
+    logger.info('Telehealth billing event received', {
+      visitId,
+      appointmentId,
+      durationMinutes,
+    });
+
+    // Complete the appointment billing
+    const billingResult = await appointmentBillingService.completeAppointmentBilling(
+      patientId,
+      {
+        appointmentId,
+        appointmentType: 'video',
+        durationMinutes,
+        providerId,
+      }
+    );
+
+    logger.info('Telehealth billing completed', {
+      visitId,
+      appointmentId,
+      paymentId: billingResult.payment?.id,
+    });
+
+    res.json({
+      success: true,
+      message: 'Telehealth visit billed successfully',
+      billingResult,
+    });
+  } catch (error: any) {
+    const { logger } = await import('../utils/logger.js');
+    logger.error('Telehealth billing error', { error: error.message });
+    res.status(500).json({
+      error: 'Billing failed',
+      message: error.message,
+    });
+  }
+});
 
 // ==========================================
 // Payment Endpoints (Stripe)
@@ -181,5 +275,22 @@ router.put('/push/preferences', authenticate, pushController.updatePreferences);
 // Admin endpoints
 router.post('/push/send', authenticate, authorize('admin'), pushController.sendNotification);
 router.post('/push/send-batch', authenticate, authorize('admin'), pushController.sendBatchNotifications);
+
+// ==========================================
+// Premium Feature Routes (Subscription Gated)
+// ==========================================
+router.use('/', premiumRoutes);
+
+// ==========================================
+// Post-Discharge Follow-Up Routes
+// ==========================================
+router.use('/discharges', postDischargeRoutes);
+
+// ==========================================
+// Surgical Scheduling Routes
+// ==========================================
+// Provides OR block management, case scheduling, duration prediction,
+// schedule optimization, emergency insertion, and utilization analytics
+router.use('/surgical', surgicalRoutes);
 
 export { router as routes };

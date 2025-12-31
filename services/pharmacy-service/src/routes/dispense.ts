@@ -1,5 +1,4 @@
-// @ts-nocheck
-import { Router } from 'express';
+import { Router, Response } from 'express';
 import { z } from 'zod';
 import { UserRequest, requireUser } from '../middleware/extractUser';
 import DispenseService from '../services/DispenseService';
@@ -25,7 +24,7 @@ const dispenseSchema = z.object({
  * POST /dispense
  * Dispense medication with full safety checks
  */
-router.post('/', requireUser, async (req: UserRequest, res) => {
+router.post('/', requireUser, async (req: UserRequest, res: Response) => {
   try {
     const pharmacistId = req.user!.id;
 
@@ -69,7 +68,7 @@ router.post('/', requireUser, async (req: UserRequest, res) => {
  * GET /dispense/patient/:patientId
  * Get dispensing history for a patient
  */
-router.get('/patient/:patientId', requireUser, async (req: UserRequest, res) => {
+router.get('/patient/:patientId', requireUser, async (req: UserRequest, res: Response) => {
   try {
     const { patientId } = req.params;
     const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
@@ -96,7 +95,7 @@ router.get('/patient/:patientId', requireUser, async (req: UserRequest, res) => 
  * GET /dispense/:id
  * Get specific dispensing record
  */
-router.get('/:id', requireUser, async (req: UserRequest, res) => {
+router.get('/:id', requireUser, async (req: UserRequest, res: Response) => {
   try {
     const { id } = req.params;
 
@@ -124,7 +123,7 @@ router.get('/:id', requireUser, async (req: UserRequest, res) => {
  * POST /dispense/:id/return
  * Return dispensed medication
  */
-router.post('/:id/return', requireUser, async (req: UserRequest, res) => {
+router.post('/:id/return', requireUser, async (req: UserRequest, res: Response) => {
   try {
     if (req.user!.role !== 'pharmacist' && req.user!.role !== 'admin') {
       res.status(403).json({
@@ -167,7 +166,7 @@ router.post('/:id/return', requireUser, async (req: UserRequest, res) => {
 router.get(
   '/current-medications/:patientId',
   requireUser,
-  async (req: UserRequest, res) => {
+  async (req: UserRequest, res: Response) => {
     try {
       const { patientId } = req.params;
 
