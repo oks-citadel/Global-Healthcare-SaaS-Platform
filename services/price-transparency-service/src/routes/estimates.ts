@@ -266,7 +266,7 @@ router.post('/gfe/:id/line-items', requireUser, requireOrganization, async (req:
     const gfe = await estimateService.addLineItems(id, lineItems.map(item => ({
       ...item,
       estimatedDate: item.estimatedDate ? new Date(item.estimatedDate) : undefined,
-    })));
+    })) as any);
 
     res.json({
       data: gfe,

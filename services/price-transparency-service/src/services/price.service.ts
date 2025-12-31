@@ -85,11 +85,11 @@ export class PriceService {
     };
 
     // Add payer-specific rates if available
-    if (chargemasterItem.payerRates && chargemasterItem.payerRates.length > 0) {
-      priceInfo.payerSpecificRates = chargemasterItem.payerRates.map(rate => ({
-        payerId: rate.payerContract.payerId,
-        payerName: rate.payerContract.payerName,
-        planType: rate.payerContract.planType,
+    if (chargemasterItem.payerRates && Array.isArray(chargemasterItem.payerRates) && chargemasterItem.payerRates.length > 0) {
+      priceInfo.payerSpecificRates = chargemasterItem.payerRates.map((rate: any) => ({
+        payerId: rate.payerContract?.payerId,
+        payerName: rate.payerContract?.payerName,
+        planType: rate.payerContract?.planType,
         negotiatedRate: rate.negotiatedRate,
         rateType: rate.rateType,
       }));

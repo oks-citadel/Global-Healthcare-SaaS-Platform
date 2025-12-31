@@ -305,7 +305,7 @@ router.post('/estimates', requireUser, async (req: UserRequest, res: Response) =
     const estimate = await priceService.createPriceEstimate({
       organizationId,
       ...validation.data,
-    });
+    } as any);
 
     res.status(201).json({
       data: estimate,
