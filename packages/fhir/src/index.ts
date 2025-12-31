@@ -46,3 +46,22 @@ export * from './terminology/hooks';
 
 // Export utilities
 export * from './utils/export';
+
+// Export C-CDA (Clinical Document Architecture) module
+// Provides support for HL7 C-CDA 2.1 documents including parsing, generation,
+// and bidirectional mapping to FHIR R4 resources
+export * as ccda from './ccda';
+
+// Export X12 EDI transaction support
+export * from './x12';
+
+// Export SMART on FHIR authorization support
+// Provides SMART App Launch IG 2.0 compliant authorization including
+// EHR launch, standalone launch, backend services, and bulk data export
+export * as smart from './smart';
+
+// Export DICOM/DICOMweb integration module
+// Provides comprehensive DICOM support including DICOMweb client (QIDO-RS, WADO-RS,
+// STOW-RS, UPS-RS), FHIR-DICOM bidirectional mapping, Modality Worklist (MWL),
+// and MPPS support per DICOM PS3.18 and IHE Radiology profiles
+export * as dicom from './dicom';
