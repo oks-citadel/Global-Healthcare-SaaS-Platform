@@ -40,15 +40,9 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
-<<<<<<< HEAD
-    "@stripe/react-stripe-js": "^2.4.0",
+    "@stripe/react-stripe-js": "^5.4.1",
     "@stripe/stripe-js": "^8.6.0",
     "@tanstack/react-query": "^5.90.14",
-=======
-    "@stripe/react-stripe-js": "^5.4.1",
-    "@stripe/stripe-js": "^2.4.0",
-    "@tanstack/react-query": "^5.17.0",
->>>>>>> origin/dependabot/npm_and_yarn/stripe/react-stripe-js-5.4.1
     "@unified-health/sdk": "workspace:*",
     "axios": "^1.6.2",
     "clsx": "^2.0.0",
