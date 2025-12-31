@@ -54,13 +54,8 @@
     "bcryptjs": "^2.4.3",
     "bull": "^4.16.5",
     "cors": "^2.8.5",
-<<<<<<< HEAD
     "dotenv": "^17.2.3",
-    "express": "^4.18.2",
-=======
-    "dotenv": "^16.3.1",
     "express": "^5.2.1",
->>>>>>> origin/dependabot/npm_and_yarn/services/api/multi-b251156d90
     "express-rate-limit": "^7.1.5",
     "firebase-admin": "^13.6.0",
     "helmet": "^7.1.0",
@@ -95,13 +90,8 @@
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.6",
     "@types/uuid": "^9.0.7",
-<<<<<<< HEAD
     "@typescript-eslint/eslint-plugin": "^8.50.1",
-    "@typescript-eslint/parser": "^6.15.0",
-=======
-    "@typescript-eslint/eslint-plugin": "^6.15.0",
     "@typescript-eslint/parser": "^8.50.1",
->>>>>>> origin/dependabot/npm_and_yarn/services/api/typescript-eslint/parser-8.50.1
     "@vitest/coverage-v8": "^1.1.0",
     "eslint": "^8.57.1",
     "prisma": "^7.2.0",

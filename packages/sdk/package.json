@@ -49,13 +49,8 @@
   },
   "devDependencies": {
     "@types/node": "^25.0.3",
-<<<<<<< HEAD
     "@typescript-eslint/eslint-plugin": "^8.50.1",
-    "@typescript-eslint/parser": "^8.50.0",
-=======
-    "@typescript-eslint/eslint-plugin": "^6.15.0",
     "@typescript-eslint/parser": "^8.50.1",
->>>>>>> origin/dependabot/npm_and_yarn/packages/sdk/typescript-eslint/parser-8.50.1
     "eslint": "^9.39.2",
     "tsup": "^8.0.1",
     "typescript": "^5.3.3",
