@@ -237,7 +237,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\kogun\\OneDrive\\Documents\\Global Healthcare\\Global-Healthcare-SaaS-Platform\\services\\laboratory-service\\src\\generated\\client",
+      "value": "C:\\Users\\citad\\OneDrive\\Documents\\Global-Healthcare-SaaS-Platform\\services\\laboratory-service\\src\\generated\\client",
       "fromEnvVar": null
     },
     "config": {
@@ -251,7 +251,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\kogun\\OneDrive\\Documents\\Global Healthcare\\Global-Healthcare-SaaS-Platform\\services\\laboratory-service\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\Users\\citad\\OneDrive\\Documents\\Global-Healthcare-SaaS-Platform\\services\\laboratory-service\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {

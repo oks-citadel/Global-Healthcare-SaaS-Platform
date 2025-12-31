@@ -63,6 +63,56 @@ export type CarePlanTemplate = $Result.DefaultSelection<Prisma.$CarePlanTemplate
  * 
  */
 export type PatientEngagement = $Result.DefaultSelection<Prisma.$PatientEngagementPayload>
+/**
+ * Model DeviceVulnerability
+ * 
+ */
+export type DeviceVulnerability = $Result.DefaultSelection<Prisma.$DeviceVulnerabilityPayload>
+/**
+ * Model DevicePatch
+ * 
+ */
+export type DevicePatch = $Result.DefaultSelection<Prisma.$DevicePatchPayload>
+/**
+ * Model SecurityIncident
+ * 
+ */
+export type SecurityIncident = $Result.DefaultSelection<Prisma.$SecurityIncidentPayload>
+/**
+ * Model NetworkSegment
+ * 
+ */
+export type NetworkSegment = $Result.DefaultSelection<Prisma.$NetworkSegmentPayload>
+/**
+ * Model DeviceNetworkAssignment
+ * 
+ */
+export type DeviceNetworkAssignment = $Result.DefaultSelection<Prisma.$DeviceNetworkAssignmentPayload>
+/**
+ * Model FDARecall
+ * 
+ */
+export type FDARecall = $Result.DefaultSelection<Prisma.$FDARecallPayload>
+/**
+ * Model DeviceRecallStatus
+ * 
+ */
+export type DeviceRecallStatus = $Result.DefaultSelection<Prisma.$DeviceRecallStatusPayload>
+/**
+ * Model SecurityAuditLog
+ * 
+ */
+export type SecurityAuditLog = $Result.DefaultSelection<Prisma.$SecurityAuditLogPayload>
+/**
+ * Model ManufacturerAdvisory
+ * 
+ */
+export type ManufacturerAdvisory = $Result.DefaultSelection<Prisma.$ManufacturerAdvisoryPayload>
+/**
+ * Model DeviceRiskAssessment
+ * 
+ */
+export type DeviceRiskAssessment = $Result.DefaultSelection<Prisma.$DeviceRiskAssessmentPayload>
 
 /**
  * Enums
@@ -214,6 +264,186 @@ export const EngagementType: {
 
 export type EngagementType = (typeof EngagementType)[keyof typeof EngagementType]
 
+
+export const VulnerabilitySeverity: {
+  critical: 'critical',
+  high: 'high',
+  medium: 'medium',
+  low: 'low',
+  informational: 'informational'
+};
+
+export type VulnerabilitySeverity = (typeof VulnerabilitySeverity)[keyof typeof VulnerabilitySeverity]
+
+
+export const VulnerabilityStatus: {
+  open: 'open',
+  in_progress: 'in_progress',
+  mitigated: 'mitigated',
+  resolved: 'resolved',
+  accepted_risk: 'accepted_risk',
+  false_positive: 'false_positive'
+};
+
+export type VulnerabilityStatus = (typeof VulnerabilityStatus)[keyof typeof VulnerabilityStatus]
+
+
+export const PatchCriticality: {
+  critical: 'critical',
+  security: 'security',
+  recommended: 'recommended',
+  optional: 'optional'
+};
+
+export type PatchCriticality = (typeof PatchCriticality)[keyof typeof PatchCriticality]
+
+
+export const PatchStatus: {
+  pending: 'pending',
+  approved: 'approved',
+  scheduled: 'scheduled',
+  in_progress: 'in_progress',
+  completed: 'completed',
+  failed: 'failed',
+  rolled_back: 'rolled_back',
+  cancelled: 'cancelled'
+};
+
+export type PatchStatus = (typeof PatchStatus)[keyof typeof PatchStatus]
+
+
+export const IncidentType: {
+  unauthorized_access: 'unauthorized_access',
+  data_breach: 'data_breach',
+  malware: 'malware',
+  ransomware: 'ransomware',
+  firmware_tampering: 'firmware_tampering',
+  network_intrusion: 'network_intrusion',
+  denial_of_service: 'denial_of_service',
+  physical_tampering: 'physical_tampering',
+  configuration_change: 'configuration_change',
+  anomalous_behavior: 'anomalous_behavior',
+  credential_compromise: 'credential_compromise',
+  other: 'other'
+};
+
+export type IncidentType = (typeof IncidentType)[keyof typeof IncidentType]
+
+
+export const IncidentSeverity: {
+  critical: 'critical',
+  high: 'high',
+  medium: 'medium',
+  low: 'low'
+};
+
+export type IncidentSeverity = (typeof IncidentSeverity)[keyof typeof IncidentSeverity]
+
+
+export const IncidentStatus: {
+  detected: 'detected',
+  investigating: 'investigating',
+  contained: 'contained',
+  eradicating: 'eradicating',
+  recovering: 'recovering',
+  resolved: 'resolved',
+  closed: 'closed'
+};
+
+export type IncidentStatus = (typeof IncidentStatus)[keyof typeof IncidentStatus]
+
+
+export const SecurityLevel: {
+  critical: 'critical',
+  high: 'high',
+  medium: 'medium',
+  low: 'low',
+  public: 'public'
+};
+
+export type SecurityLevel = (typeof SecurityLevel)[keyof typeof SecurityLevel]
+
+
+export const IsolationLevel: {
+  air_gapped: 'air_gapped',
+  strict: 'strict',
+  standard: 'standard',
+  relaxed: 'relaxed'
+};
+
+export type IsolationLevel = (typeof IsolationLevel)[keyof typeof IsolationLevel]
+
+
+export const AssignmentStatus: {
+  active: 'active',
+  suspended: 'suspended',
+  removed: 'removed'
+};
+
+export type AssignmentStatus = (typeof AssignmentStatus)[keyof typeof AssignmentStatus]
+
+
+export const ComplianceStatus: {
+  compliant: 'compliant',
+  non_compliant: 'non_compliant',
+  pending: 'pending',
+  exempt: 'exempt'
+};
+
+export type ComplianceStatus = (typeof ComplianceStatus)[keyof typeof ComplianceStatus]
+
+
+export const RecallClass: {
+  class_I: 'class_I',
+  class_II: 'class_II',
+  class_III: 'class_III'
+};
+
+export type RecallClass = (typeof RecallClass)[keyof typeof RecallClass]
+
+
+export const RecallStatus: {
+  ongoing: 'ongoing',
+  completed: 'completed',
+  terminated: 'terminated'
+};
+
+export type RecallStatus = (typeof RecallStatus)[keyof typeof RecallStatus]
+
+
+export const DeviceRecallAction: {
+  pending: 'pending',
+  under_review: 'under_review',
+  device_replaced: 'device_replaced',
+  device_repaired: 'device_repaired',
+  device_removed: 'device_removed',
+  no_action_required: 'no_action_required',
+  patient_contacted: 'patient_contacted'
+};
+
+export type DeviceRecallAction = (typeof DeviceRecallAction)[keyof typeof DeviceRecallAction]
+
+
+export const AdvisoryStatus: {
+  active: 'active',
+  superseded: 'superseded',
+  resolved: 'resolved',
+  archived: 'archived'
+};
+
+export type AdvisoryStatus = (typeof AdvisoryStatus)[keyof typeof AdvisoryStatus]
+
+
+export const RiskLevel: {
+  critical: 'critical',
+  high: 'high',
+  medium: 'medium',
+  low: 'low',
+  minimal: 'minimal'
+};
+
+export type RiskLevel = (typeof RiskLevel)[keyof typeof RiskLevel]
+
 }
 
 export type PlanStatus = $Enums.PlanStatus
@@ -263,6 +493,70 @@ export const GoalStatus: typeof $Enums.GoalStatus
 export type EngagementType = $Enums.EngagementType
 
 export const EngagementType: typeof $Enums.EngagementType
+
+export type VulnerabilitySeverity = $Enums.VulnerabilitySeverity
+
+export const VulnerabilitySeverity: typeof $Enums.VulnerabilitySeverity
+
+export type VulnerabilityStatus = $Enums.VulnerabilityStatus
+
+export const VulnerabilityStatus: typeof $Enums.VulnerabilityStatus
+
+export type PatchCriticality = $Enums.PatchCriticality
+
+export const PatchCriticality: typeof $Enums.PatchCriticality
+
+export type PatchStatus = $Enums.PatchStatus
+
+export const PatchStatus: typeof $Enums.PatchStatus
+
+export type IncidentType = $Enums.IncidentType
+
+export const IncidentType: typeof $Enums.IncidentType
+
+export type IncidentSeverity = $Enums.IncidentSeverity
+
+export const IncidentSeverity: typeof $Enums.IncidentSeverity
+
+export type IncidentStatus = $Enums.IncidentStatus
+
+export const IncidentStatus: typeof $Enums.IncidentStatus
+
+export type SecurityLevel = $Enums.SecurityLevel
+
+export const SecurityLevel: typeof $Enums.SecurityLevel
+
+export type IsolationLevel = $Enums.IsolationLevel
+
+export const IsolationLevel: typeof $Enums.IsolationLevel
+
+export type AssignmentStatus = $Enums.AssignmentStatus
+
+export const AssignmentStatus: typeof $Enums.AssignmentStatus
+
+export type ComplianceStatus = $Enums.ComplianceStatus
+
+export const ComplianceStatus: typeof $Enums.ComplianceStatus
+
+export type RecallClass = $Enums.RecallClass
+
+export const RecallClass: typeof $Enums.RecallClass
+
+export type RecallStatus = $Enums.RecallStatus
+
+export const RecallStatus: typeof $Enums.RecallStatus
+
+export type DeviceRecallAction = $Enums.DeviceRecallAction
+
+export const DeviceRecallAction: typeof $Enums.DeviceRecallAction
+
+export type AdvisoryStatus = $Enums.AdvisoryStatus
+
+export const AdvisoryStatus: typeof $Enums.AdvisoryStatus
+
+export type RiskLevel = $Enums.RiskLevel
+
+export const RiskLevel: typeof $Enums.RiskLevel
 
 /**
  * ##  Prisma Client ʲˢ
@@ -486,6 +780,106 @@ export class PrismaClient<
     * ```
     */
   get patientEngagement(): Prisma.PatientEngagementDelegate<ExtArgs>;
+
+  /**
+   * `prisma.deviceVulnerability`: Exposes CRUD operations for the **DeviceVulnerability** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more DeviceVulnerabilities
+    * const deviceVulnerabilities = await prisma.deviceVulnerability.findMany()
+    * ```
+    */
+  get deviceVulnerability(): Prisma.DeviceVulnerabilityDelegate<ExtArgs>;
+
+  /**
+   * `prisma.devicePatch`: Exposes CRUD operations for the **DevicePatch** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more DevicePatches
+    * const devicePatches = await prisma.devicePatch.findMany()
+    * ```
+    */
+  get devicePatch(): Prisma.DevicePatchDelegate<ExtArgs>;
+
+  /**
+   * `prisma.securityIncident`: Exposes CRUD operations for the **SecurityIncident** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more SecurityIncidents
+    * const securityIncidents = await prisma.securityIncident.findMany()
+    * ```
+    */
+  get securityIncident(): Prisma.SecurityIncidentDelegate<ExtArgs>;
+
+  /**
+   * `prisma.networkSegment`: Exposes CRUD operations for the **NetworkSegment** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more NetworkSegments
+    * const networkSegments = await prisma.networkSegment.findMany()
+    * ```
+    */
+  get networkSegment(): Prisma.NetworkSegmentDelegate<ExtArgs>;
+
+  /**
+   * `prisma.deviceNetworkAssignment`: Exposes CRUD operations for the **DeviceNetworkAssignment** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more DeviceNetworkAssignments
+    * const deviceNetworkAssignments = await prisma.deviceNetworkAssignment.findMany()
+    * ```
+    */
+  get deviceNetworkAssignment(): Prisma.DeviceNetworkAssignmentDelegate<ExtArgs>;
+
+  /**
+   * `prisma.fDARecall`: Exposes CRUD operations for the **FDARecall** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more FDARecalls
+    * const fDARecalls = await prisma.fDARecall.findMany()
+    * ```
+    */
+  get fDARecall(): Prisma.FDARecallDelegate<ExtArgs>;
+
+  /**
+   * `prisma.deviceRecallStatus`: Exposes CRUD operations for the **DeviceRecallStatus** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more DeviceRecallStatuses
+    * const deviceRecallStatuses = await prisma.deviceRecallStatus.findMany()
+    * ```
+    */
+  get deviceRecallStatus(): Prisma.DeviceRecallStatusDelegate<ExtArgs>;
+
+  /**
+   * `prisma.securityAuditLog`: Exposes CRUD operations for the **SecurityAuditLog** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more SecurityAuditLogs
+    * const securityAuditLogs = await prisma.securityAuditLog.findMany()
+    * ```
+    */
+  get securityAuditLog(): Prisma.SecurityAuditLogDelegate<ExtArgs>;
+
+  /**
+   * `prisma.manufacturerAdvisory`: Exposes CRUD operations for the **ManufacturerAdvisory** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ManufacturerAdvisories
+    * const manufacturerAdvisories = await prisma.manufacturerAdvisory.findMany()
+    * ```
+    */
+  get manufacturerAdvisory(): Prisma.ManufacturerAdvisoryDelegate<ExtArgs>;
+
+  /**
+   * `prisma.deviceRiskAssessment`: Exposes CRUD operations for the **DeviceRiskAssessment** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more DeviceRiskAssessments
+    * const deviceRiskAssessments = await prisma.deviceRiskAssessment.findMany()
+    * ```
+    */
+  get deviceRiskAssessment(): Prisma.DeviceRiskAssessmentDelegate<ExtArgs>;
 }
 
 export namespace Prisma {
@@ -936,7 +1330,17 @@ export namespace Prisma {
     GoalProgress: 'GoalProgress',
     AlertThreshold: 'AlertThreshold',
     CarePlanTemplate: 'CarePlanTemplate',
-    PatientEngagement: 'PatientEngagement'
+    PatientEngagement: 'PatientEngagement',
+    DeviceVulnerability: 'DeviceVulnerability',
+    DevicePatch: 'DevicePatch',
+    SecurityIncident: 'SecurityIncident',
+    NetworkSegment: 'NetworkSegment',
+    DeviceNetworkAssignment: 'DeviceNetworkAssignment',
+    FDARecall: 'FDARecall',
+    DeviceRecallStatus: 'DeviceRecallStatus',
+    SecurityAuditLog: 'SecurityAuditLog',
+    ManufacturerAdvisory: 'ManufacturerAdvisory',
+    DeviceRiskAssessment: 'DeviceRiskAssessment'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -952,7 +1356,7 @@ export namespace Prisma {
 
   export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> = {
     meta: {
-      modelProps: "carePlan" | "careTask" | "monitoringDevice" | "vitalReading" | "alert" | "goal" | "goalProgress" | "alertThreshold" | "carePlanTemplate" | "patientEngagement"
+      modelProps: "carePlan" | "careTask" | "monitoringDevice" | "vitalReading" | "alert" | "goal" | "goalProgress" | "alertThreshold" | "carePlanTemplate" | "patientEngagement" | "deviceVulnerability" | "devicePatch" | "securityIncident" | "networkSegment" | "deviceNetworkAssignment" | "fDARecall" | "deviceRecallStatus" | "securityAuditLog" | "manufacturerAdvisory" | "deviceRiskAssessment"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1656,6 +2060,706 @@ export namespace Prisma {
           }
         }
       }
+      DeviceVulnerability: {
+        payload: Prisma.$DeviceVulnerabilityPayload<ExtArgs>
+        fields: Prisma.DeviceVulnerabilityFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.DeviceVulnerabilityFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceVulnerabilityPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.DeviceVulnerabilityFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceVulnerabilityPayload>
+          }
+          findFirst: {
+            args: Prisma.DeviceVulnerabilityFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceVulnerabilityPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.DeviceVulnerabilityFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceVulnerabilityPayload>
+          }
+          findMany: {
+            args: Prisma.DeviceVulnerabilityFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceVulnerabilityPayload>[]
+          }
+          create: {
+            args: Prisma.DeviceVulnerabilityCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceVulnerabilityPayload>
+          }
+          createMany: {
+            args: Prisma.DeviceVulnerabilityCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.DeviceVulnerabilityCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceVulnerabilityPayload>[]
+          }
+          delete: {
+            args: Prisma.DeviceVulnerabilityDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceVulnerabilityPayload>
+          }
+          update: {
+            args: Prisma.DeviceVulnerabilityUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceVulnerabilityPayload>
+          }
+          deleteMany: {
+            args: Prisma.DeviceVulnerabilityDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.DeviceVulnerabilityUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.DeviceVulnerabilityUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceVulnerabilityPayload>
+          }
+          aggregate: {
+            args: Prisma.DeviceVulnerabilityAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateDeviceVulnerability>
+          }
+          groupBy: {
+            args: Prisma.DeviceVulnerabilityGroupByArgs<ExtArgs>
+            result: $Utils.Optional<DeviceVulnerabilityGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.DeviceVulnerabilityCountArgs<ExtArgs>
+            result: $Utils.Optional<DeviceVulnerabilityCountAggregateOutputType> | number
+          }
+        }
+      }
+      DevicePatch: {
+        payload: Prisma.$DevicePatchPayload<ExtArgs>
+        fields: Prisma.DevicePatchFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.DevicePatchFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DevicePatchPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.DevicePatchFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DevicePatchPayload>
+          }
+          findFirst: {
+            args: Prisma.DevicePatchFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DevicePatchPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.DevicePatchFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DevicePatchPayload>
+          }
+          findMany: {
+            args: Prisma.DevicePatchFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DevicePatchPayload>[]
+          }
+          create: {
+            args: Prisma.DevicePatchCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DevicePatchPayload>
+          }
+          createMany: {
+            args: Prisma.DevicePatchCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.DevicePatchCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DevicePatchPayload>[]
+          }
+          delete: {
+            args: Prisma.DevicePatchDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DevicePatchPayload>
+          }
+          update: {
+            args: Prisma.DevicePatchUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DevicePatchPayload>
+          }
+          deleteMany: {
+            args: Prisma.DevicePatchDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.DevicePatchUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.DevicePatchUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DevicePatchPayload>
+          }
+          aggregate: {
+            args: Prisma.DevicePatchAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateDevicePatch>
+          }
+          groupBy: {
+            args: Prisma.DevicePatchGroupByArgs<ExtArgs>
+            result: $Utils.Optional<DevicePatchGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.DevicePatchCountArgs<ExtArgs>
+            result: $Utils.Optional<DevicePatchCountAggregateOutputType> | number
+          }
+        }
+      }
+      SecurityIncident: {
+        payload: Prisma.$SecurityIncidentPayload<ExtArgs>
+        fields: Prisma.SecurityIncidentFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SecurityIncidentFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SecurityIncidentPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SecurityIncidentFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SecurityIncidentPayload>
+          }
+          findFirst: {
+            args: Prisma.SecurityIncidentFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SecurityIncidentPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SecurityIncidentFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SecurityIncidentPayload>
+          }
+          findMany: {
+            args: Prisma.SecurityIncidentFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SecurityIncidentPayload>[]
+          }
+          create: {
+            args: Prisma.SecurityIncidentCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SecurityIncidentPayload>
+          }
+          createMany: {
+            args: Prisma.SecurityIncidentCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SecurityIncidentCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SecurityIncidentPayload>[]
+          }
+          delete: {
+            args: Prisma.SecurityIncidentDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SecurityIncidentPayload>
+          }
+          update: {
+            args: Prisma.SecurityIncidentUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SecurityIncidentPayload>
+          }
+          deleteMany: {
+            args: Prisma.SecurityIncidentDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SecurityIncidentUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.SecurityIncidentUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SecurityIncidentPayload>
+          }
+          aggregate: {
+            args: Prisma.SecurityIncidentAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSecurityIncident>
+          }
+          groupBy: {
+            args: Prisma.SecurityIncidentGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SecurityIncidentGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SecurityIncidentCountArgs<ExtArgs>
+            result: $Utils.Optional<SecurityIncidentCountAggregateOutputType> | number
+          }
+        }
+      }
+      NetworkSegment: {
+        payload: Prisma.$NetworkSegmentPayload<ExtArgs>
+        fields: Prisma.NetworkSegmentFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.NetworkSegmentFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$NetworkSegmentPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.NetworkSegmentFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$NetworkSegmentPayload>
+          }
+          findFirst: {
+            args: Prisma.NetworkSegmentFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$NetworkSegmentPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.NetworkSegmentFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$NetworkSegmentPayload>
+          }
+          findMany: {
+            args: Prisma.NetworkSegmentFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$NetworkSegmentPayload>[]
+          }
+          create: {
+            args: Prisma.NetworkSegmentCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$NetworkSegmentPayload>
+          }
+          createMany: {
+            args: Prisma.NetworkSegmentCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.NetworkSegmentCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$NetworkSegmentPayload>[]
+          }
+          delete: {
+            args: Prisma.NetworkSegmentDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$NetworkSegmentPayload>
+          }
+          update: {
+            args: Prisma.NetworkSegmentUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$NetworkSegmentPayload>
+          }
+          deleteMany: {
+            args: Prisma.NetworkSegmentDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.NetworkSegmentUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.NetworkSegmentUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$NetworkSegmentPayload>
+          }
+          aggregate: {
+            args: Prisma.NetworkSegmentAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateNetworkSegment>
+          }
+          groupBy: {
+            args: Prisma.NetworkSegmentGroupByArgs<ExtArgs>
+            result: $Utils.Optional<NetworkSegmentGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.NetworkSegmentCountArgs<ExtArgs>
+            result: $Utils.Optional<NetworkSegmentCountAggregateOutputType> | number
+          }
+        }
+      }
+      DeviceNetworkAssignment: {
+        payload: Prisma.$DeviceNetworkAssignmentPayload<ExtArgs>
+        fields: Prisma.DeviceNetworkAssignmentFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.DeviceNetworkAssignmentFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceNetworkAssignmentPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.DeviceNetworkAssignmentFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceNetworkAssignmentPayload>
+          }
+          findFirst: {
+            args: Prisma.DeviceNetworkAssignmentFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceNetworkAssignmentPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.DeviceNetworkAssignmentFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceNetworkAssignmentPayload>
+          }
+          findMany: {
+            args: Prisma.DeviceNetworkAssignmentFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceNetworkAssignmentPayload>[]
+          }
+          create: {
+            args: Prisma.DeviceNetworkAssignmentCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceNetworkAssignmentPayload>
+          }
+          createMany: {
+            args: Prisma.DeviceNetworkAssignmentCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.DeviceNetworkAssignmentCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceNetworkAssignmentPayload>[]
+          }
+          delete: {
+            args: Prisma.DeviceNetworkAssignmentDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceNetworkAssignmentPayload>
+          }
+          update: {
+            args: Prisma.DeviceNetworkAssignmentUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceNetworkAssignmentPayload>
+          }
+          deleteMany: {
+            args: Prisma.DeviceNetworkAssignmentDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.DeviceNetworkAssignmentUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.DeviceNetworkAssignmentUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceNetworkAssignmentPayload>
+          }
+          aggregate: {
+            args: Prisma.DeviceNetworkAssignmentAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateDeviceNetworkAssignment>
+          }
+          groupBy: {
+            args: Prisma.DeviceNetworkAssignmentGroupByArgs<ExtArgs>
+            result: $Utils.Optional<DeviceNetworkAssignmentGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.DeviceNetworkAssignmentCountArgs<ExtArgs>
+            result: $Utils.Optional<DeviceNetworkAssignmentCountAggregateOutputType> | number
+          }
+        }
+      }
+      FDARecall: {
+        payload: Prisma.$FDARecallPayload<ExtArgs>
+        fields: Prisma.FDARecallFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.FDARecallFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FDARecallPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.FDARecallFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FDARecallPayload>
+          }
+          findFirst: {
+            args: Prisma.FDARecallFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FDARecallPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.FDARecallFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FDARecallPayload>
+          }
+          findMany: {
+            args: Prisma.FDARecallFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FDARecallPayload>[]
+          }
+          create: {
+            args: Prisma.FDARecallCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FDARecallPayload>
+          }
+          createMany: {
+            args: Prisma.FDARecallCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.FDARecallCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FDARecallPayload>[]
+          }
+          delete: {
+            args: Prisma.FDARecallDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FDARecallPayload>
+          }
+          update: {
+            args: Prisma.FDARecallUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FDARecallPayload>
+          }
+          deleteMany: {
+            args: Prisma.FDARecallDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.FDARecallUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.FDARecallUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FDARecallPayload>
+          }
+          aggregate: {
+            args: Prisma.FDARecallAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateFDARecall>
+          }
+          groupBy: {
+            args: Prisma.FDARecallGroupByArgs<ExtArgs>
+            result: $Utils.Optional<FDARecallGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.FDARecallCountArgs<ExtArgs>
+            result: $Utils.Optional<FDARecallCountAggregateOutputType> | number
+          }
+        }
+      }
+      DeviceRecallStatus: {
+        payload: Prisma.$DeviceRecallStatusPayload<ExtArgs>
+        fields: Prisma.DeviceRecallStatusFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.DeviceRecallStatusFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceRecallStatusPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.DeviceRecallStatusFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceRecallStatusPayload>
+          }
+          findFirst: {
+            args: Prisma.DeviceRecallStatusFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceRecallStatusPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.DeviceRecallStatusFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceRecallStatusPayload>
+          }
+          findMany: {
+            args: Prisma.DeviceRecallStatusFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceRecallStatusPayload>[]
+          }
+          create: {
+            args: Prisma.DeviceRecallStatusCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceRecallStatusPayload>
+          }
+          createMany: {
+            args: Prisma.DeviceRecallStatusCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.DeviceRecallStatusCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceRecallStatusPayload>[]
+          }
+          delete: {
+            args: Prisma.DeviceRecallStatusDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceRecallStatusPayload>
+          }
+          update: {
+            args: Prisma.DeviceRecallStatusUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceRecallStatusPayload>
+          }
+          deleteMany: {
+            args: Prisma.DeviceRecallStatusDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.DeviceRecallStatusUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.DeviceRecallStatusUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceRecallStatusPayload>
+          }
+          aggregate: {
+            args: Prisma.DeviceRecallStatusAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateDeviceRecallStatus>
+          }
+          groupBy: {
+            args: Prisma.DeviceRecallStatusGroupByArgs<ExtArgs>
+            result: $Utils.Optional<DeviceRecallStatusGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.DeviceRecallStatusCountArgs<ExtArgs>
+            result: $Utils.Optional<DeviceRecallStatusCountAggregateOutputType> | number
+          }
+        }
+      }
+      SecurityAuditLog: {
+        payload: Prisma.$SecurityAuditLogPayload<ExtArgs>
+        fields: Prisma.SecurityAuditLogFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SecurityAuditLogFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SecurityAuditLogPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SecurityAuditLogFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SecurityAuditLogPayload>
+          }
+          findFirst: {
+            args: Prisma.SecurityAuditLogFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SecurityAuditLogPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SecurityAuditLogFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SecurityAuditLogPayload>
+          }
+          findMany: {
+            args: Prisma.SecurityAuditLogFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SecurityAuditLogPayload>[]
+          }
+          create: {
+            args: Prisma.SecurityAuditLogCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SecurityAuditLogPayload>
+          }
+          createMany: {
+            args: Prisma.SecurityAuditLogCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SecurityAuditLogCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SecurityAuditLogPayload>[]
+          }
+          delete: {
+            args: Prisma.SecurityAuditLogDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SecurityAuditLogPayload>
+          }
+          update: {
+            args: Prisma.SecurityAuditLogUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SecurityAuditLogPayload>
+          }
+          deleteMany: {
+            args: Prisma.SecurityAuditLogDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SecurityAuditLogUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.SecurityAuditLogUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SecurityAuditLogPayload>
+          }
+          aggregate: {
+            args: Prisma.SecurityAuditLogAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSecurityAuditLog>
+          }
+          groupBy: {
+            args: Prisma.SecurityAuditLogGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SecurityAuditLogGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SecurityAuditLogCountArgs<ExtArgs>
+            result: $Utils.Optional<SecurityAuditLogCountAggregateOutputType> | number
+          }
+        }
+      }
+      ManufacturerAdvisory: {
+        payload: Prisma.$ManufacturerAdvisoryPayload<ExtArgs>
+        fields: Prisma.ManufacturerAdvisoryFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ManufacturerAdvisoryFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ManufacturerAdvisoryPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ManufacturerAdvisoryFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ManufacturerAdvisoryPayload>
+          }
+          findFirst: {
+            args: Prisma.ManufacturerAdvisoryFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ManufacturerAdvisoryPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ManufacturerAdvisoryFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ManufacturerAdvisoryPayload>
+          }
+          findMany: {
+            args: Prisma.ManufacturerAdvisoryFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ManufacturerAdvisoryPayload>[]
+          }
+          create: {
+            args: Prisma.ManufacturerAdvisoryCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ManufacturerAdvisoryPayload>
+          }
+          createMany: {
+            args: Prisma.ManufacturerAdvisoryCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ManufacturerAdvisoryCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ManufacturerAdvisoryPayload>[]
+          }
+          delete: {
+            args: Prisma.ManufacturerAdvisoryDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ManufacturerAdvisoryPayload>
+          }
+          update: {
+            args: Prisma.ManufacturerAdvisoryUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ManufacturerAdvisoryPayload>
+          }
+          deleteMany: {
+            args: Prisma.ManufacturerAdvisoryDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ManufacturerAdvisoryUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.ManufacturerAdvisoryUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ManufacturerAdvisoryPayload>
+          }
+          aggregate: {
+            args: Prisma.ManufacturerAdvisoryAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateManufacturerAdvisory>
+          }
+          groupBy: {
+            args: Prisma.ManufacturerAdvisoryGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ManufacturerAdvisoryGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ManufacturerAdvisoryCountArgs<ExtArgs>
+            result: $Utils.Optional<ManufacturerAdvisoryCountAggregateOutputType> | number
+          }
+        }
+      }
+      DeviceRiskAssessment: {
+        payload: Prisma.$DeviceRiskAssessmentPayload<ExtArgs>
+        fields: Prisma.DeviceRiskAssessmentFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.DeviceRiskAssessmentFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceRiskAssessmentPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.DeviceRiskAssessmentFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceRiskAssessmentPayload>
+          }
+          findFirst: {
+            args: Prisma.DeviceRiskAssessmentFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceRiskAssessmentPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.DeviceRiskAssessmentFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceRiskAssessmentPayload>
+          }
+          findMany: {
+            args: Prisma.DeviceRiskAssessmentFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceRiskAssessmentPayload>[]
+          }
+          create: {
+            args: Prisma.DeviceRiskAssessmentCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceRiskAssessmentPayload>
+          }
+          createMany: {
+            args: Prisma.DeviceRiskAssessmentCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.DeviceRiskAssessmentCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceRiskAssessmentPayload>[]
+          }
+          delete: {
+            args: Prisma.DeviceRiskAssessmentDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceRiskAssessmentPayload>
+          }
+          update: {
+            args: Prisma.DeviceRiskAssessmentUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceRiskAssessmentPayload>
+          }
+          deleteMany: {
+            args: Prisma.DeviceRiskAssessmentDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.DeviceRiskAssessmentUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.DeviceRiskAssessmentUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeviceRiskAssessmentPayload>
+          }
+          aggregate: {
+            args: Prisma.DeviceRiskAssessmentAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateDeviceRiskAssessment>
+          }
+          groupBy: {
+            args: Prisma.DeviceRiskAssessmentGroupByArgs<ExtArgs>
+            result: $Utils.Optional<DeviceRiskAssessmentGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.DeviceRiskAssessmentCountArgs<ExtArgs>
+            result: $Utils.Optional<DeviceRiskAssessmentCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1867,10 +2971,22 @@ export namespace Prisma {
 
   export type MonitoringDeviceCountOutputType = {
     readings: number
+    vulnerabilities: number
+    patches: number
+    incidents: number
+    networkAssignments: number
+    recallStatuses: number
+    riskAssessments: number
   }
 
   export type MonitoringDeviceCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     readings?: boolean | MonitoringDeviceCountOutputTypeCountReadingsArgs
+    vulnerabilities?: boolean | MonitoringDeviceCountOutputTypeCountVulnerabilitiesArgs
+    patches?: boolean | MonitoringDeviceCountOutputTypeCountPatchesArgs
+    incidents?: boolean | MonitoringDeviceCountOutputTypeCountIncidentsArgs
+    networkAssignments?: boolean | MonitoringDeviceCountOutputTypeCountNetworkAssignmentsArgs
+    recallStatuses?: boolean | MonitoringDeviceCountOutputTypeCountRecallStatusesArgs
+    riskAssessments?: boolean | MonitoringDeviceCountOutputTypeCountRiskAssessmentsArgs
   }
 
   // Custom InputTypes
@@ -1889,6 +3005,48 @@ export namespace Prisma {
    */
   export type MonitoringDeviceCountOutputTypeCountReadingsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: VitalReadingWhereInput
+  }
+
+  /**
+   * MonitoringDeviceCountOutputType without action
+   */
+  export type MonitoringDeviceCountOutputTypeCountVulnerabilitiesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DeviceVulnerabilityWhereInput
+  }
+
+  /**
+   * MonitoringDeviceCountOutputType without action
+   */
+  export type MonitoringDeviceCountOutputTypeCountPatchesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DevicePatchWhereInput
+  }
+
+  /**
+   * MonitoringDeviceCountOutputType without action
+   */
+  export type MonitoringDeviceCountOutputTypeCountIncidentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SecurityIncidentWhereInput
+  }
+
+  /**
+   * MonitoringDeviceCountOutputType without action
+   */
+  export type MonitoringDeviceCountOutputTypeCountNetworkAssignmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DeviceNetworkAssignmentWhereInput
+  }
+
+  /**
+   * MonitoringDeviceCountOutputType without action
+   */
+  export type MonitoringDeviceCountOutputTypeCountRecallStatusesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DeviceRecallStatusWhereInput
+  }
+
+  /**
+   * MonitoringDeviceCountOutputType without action
+   */
+  export type MonitoringDeviceCountOutputTypeCountRiskAssessmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DeviceRiskAssessmentWhereInput
   }
 
 
@@ -1920,6 +3078,68 @@ export namespace Prisma {
    */
   export type GoalCountOutputTypeCountProgressArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: GoalProgressWhereInput
+  }
+
+
+  /**
+   * Count Type NetworkSegmentCountOutputType
+   */
+
+  export type NetworkSegmentCountOutputType = {
+    devices: number
+  }
+
+  export type NetworkSegmentCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    devices?: boolean | NetworkSegmentCountOutputTypeCountDevicesArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * NetworkSegmentCountOutputType without action
+   */
+  export type NetworkSegmentCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the NetworkSegmentCountOutputType
+     */
+    select?: NetworkSegmentCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * NetworkSegmentCountOutputType without action
+   */
+  export type NetworkSegmentCountOutputTypeCountDevicesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DeviceNetworkAssignmentWhereInput
+  }
+
+
+  /**
+   * Count Type FDARecallCountOutputType
+   */
+
+  export type FDARecallCountOutputType = {
+    affectedDevices: number
+  }
+
+  export type FDARecallCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    affectedDevices?: boolean | FDARecallCountOutputTypeCountAffectedDevicesArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * FDARecallCountOutputType without action
+   */
+  export type FDARecallCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FDARecallCountOutputType
+     */
+    select?: FDARecallCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * FDARecallCountOutputType without action
+   */
+  export type FDARecallCountOutputTypeCountAffectedDevicesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DeviceRecallStatusWhereInput
   }
 
 
@@ -4058,6 +5278,10 @@ export namespace Prisma {
     status: $Enums.DeviceStatus | null
     lastSyncAt: Date | null
     batteryLevel: number | null
+    firmwareVersion: string | null
+    softwareVersion: string | null
+    certificateExpiry: Date | null
+    lastSecurityScan: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -4072,6 +5296,10 @@ export namespace Prisma {
     status: $Enums.DeviceStatus | null
     lastSyncAt: Date | null
     batteryLevel: number | null
+    firmwareVersion: string | null
+    softwareVersion: string | null
+    certificateExpiry: Date | null
+    lastSecurityScan: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -4086,6 +5314,10 @@ export namespace Prisma {
     status: number
     lastSyncAt: number
     batteryLevel: number
+    firmwareVersion: number
+    softwareVersion: number
+    certificateExpiry: number
+    lastSecurityScan: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -4110,6 +5342,10 @@ export namespace Prisma {
     status?: true
     lastSyncAt?: true
     batteryLevel?: true
+    firmwareVersion?: true
+    softwareVersion?: true
+    certificateExpiry?: true
+    lastSecurityScan?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -4124,6 +5360,10 @@ export namespace Prisma {
     status?: true
     lastSyncAt?: true
     batteryLevel?: true
+    firmwareVersion?: true
+    softwareVersion?: true
+    certificateExpiry?: true
+    lastSecurityScan?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -4138,6 +5378,10 @@ export namespace Prisma {
     status?: true
     lastSyncAt?: true
     batteryLevel?: true
+    firmwareVersion?: true
+    softwareVersion?: true
+    certificateExpiry?: true
+    lastSecurityScan?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -4239,6 +5483,10 @@ export namespace Prisma {
     status: $Enums.DeviceStatus
     lastSyncAt: Date | null
     batteryLevel: number | null
+    firmwareVersion: string | null
+    softwareVersion: string | null
+    certificateExpiry: Date | null
+    lastSecurityScan: Date | null
     createdAt: Date
     updatedAt: Date
     _count: MonitoringDeviceCountAggregateOutputType | null
@@ -4272,9 +5520,19 @@ export namespace Prisma {
     status?: boolean
     lastSyncAt?: boolean
     batteryLevel?: boolean
+    firmwareVersion?: boolean
+    softwareVersion?: boolean
+    certificateExpiry?: boolean
+    lastSecurityScan?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     readings?: boolean | MonitoringDevice$readingsArgs<ExtArgs>
+    vulnerabilities?: boolean | MonitoringDevice$vulnerabilitiesArgs<ExtArgs>
+    patches?: boolean | MonitoringDevice$patchesArgs<ExtArgs>
+    incidents?: boolean | MonitoringDevice$incidentsArgs<ExtArgs>
+    networkAssignments?: boolean | MonitoringDevice$networkAssignmentsArgs<ExtArgs>
+    recallStatuses?: boolean | MonitoringDevice$recallStatusesArgs<ExtArgs>
+    riskAssessments?: boolean | MonitoringDevice$riskAssessmentsArgs<ExtArgs>
     _count?: boolean | MonitoringDeviceCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["monitoringDevice"]>
 
@@ -4288,6 +5546,10 @@ export namespace Prisma {
     status?: boolean
     lastSyncAt?: boolean
     batteryLevel?: boolean
+    firmwareVersion?: boolean
+    softwareVersion?: boolean
+    certificateExpiry?: boolean
+    lastSecurityScan?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["monitoringDevice"]>
@@ -4302,12 +5564,22 @@ export namespace Prisma {
     status?: boolean
     lastSyncAt?: boolean
     batteryLevel?: boolean
+    firmwareVersion?: boolean
+    softwareVersion?: boolean
+    certificateExpiry?: boolean
+    lastSecurityScan?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
   export type MonitoringDeviceInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     readings?: boolean | MonitoringDevice$readingsArgs<ExtArgs>
+    vulnerabilities?: boolean | MonitoringDevice$vulnerabilitiesArgs<ExtArgs>
+    patches?: boolean | MonitoringDevice$patchesArgs<ExtArgs>
+    incidents?: boolean | MonitoringDevice$incidentsArgs<ExtArgs>
+    networkAssignments?: boolean | MonitoringDevice$networkAssignmentsArgs<ExtArgs>
+    recallStatuses?: boolean | MonitoringDevice$recallStatusesArgs<ExtArgs>
+    riskAssessments?: boolean | MonitoringDevice$riskAssessmentsArgs<ExtArgs>
     _count?: boolean | MonitoringDeviceCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type MonitoringDeviceIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -4316,6 +5588,12 @@ export namespace Prisma {
     name: "MonitoringDevice"
     objects: {
       readings: Prisma.$VitalReadingPayload<ExtArgs>[]
+      vulnerabilities: Prisma.$DeviceVulnerabilityPayload<ExtArgs>[]
+      patches: Prisma.$DevicePatchPayload<ExtArgs>[]
+      incidents: Prisma.$SecurityIncidentPayload<ExtArgs>[]
+      networkAssignments: Prisma.$DeviceNetworkAssignmentPayload<ExtArgs>[]
+      recallStatuses: Prisma.$DeviceRecallStatusPayload<ExtArgs>[]
+      riskAssessments: Prisma.$DeviceRiskAssessmentPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -4327,6 +5605,10 @@ export namespace Prisma {
       status: $Enums.DeviceStatus
       lastSyncAt: Date | null
       batteryLevel: number | null
+      firmwareVersion: string | null
+      softwareVersion: string | null
+      certificateExpiry: Date | null
+      lastSecurityScan: Date | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["monitoringDevice"]>
@@ -4694,6 +5976,12 @@ export namespace Prisma {
   export interface Prisma__MonitoringDeviceClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     readings<T extends MonitoringDevice$readingsArgs<ExtArgs> = {}>(args?: Subset<T, MonitoringDevice$readingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$VitalReadingPayload<ExtArgs>, T, "findMany"> | Null>
+    vulnerabilities<T extends MonitoringDevice$vulnerabilitiesArgs<ExtArgs> = {}>(args?: Subset<T, MonitoringDevice$vulnerabilitiesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DeviceVulnerabilityPayload<ExtArgs>, T, "findMany"> | Null>
+    patches<T extends MonitoringDevice$patchesArgs<ExtArgs> = {}>(args?: Subset<T, MonitoringDevice$patchesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DevicePatchPayload<ExtArgs>, T, "findMany"> | Null>
+    incidents<T extends MonitoringDevice$incidentsArgs<ExtArgs> = {}>(args?: Subset<T, MonitoringDevice$incidentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SecurityIncidentPayload<ExtArgs>, T, "findMany"> | Null>
+    networkAssignments<T extends MonitoringDevice$networkAssignmentsArgs<ExtArgs> = {}>(args?: Subset<T, MonitoringDevice$networkAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DeviceNetworkAssignmentPayload<ExtArgs>, T, "findMany"> | Null>
+    recallStatuses<T extends MonitoringDevice$recallStatusesArgs<ExtArgs> = {}>(args?: Subset<T, MonitoringDevice$recallStatusesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DeviceRecallStatusPayload<ExtArgs>, T, "findMany"> | Null>
+    riskAssessments<T extends MonitoringDevice$riskAssessmentsArgs<ExtArgs> = {}>(args?: Subset<T, MonitoringDevice$riskAssessmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DeviceRiskAssessmentPayload<ExtArgs>, T, "findMany"> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4732,6 +6020,10 @@ export namespace Prisma {
     readonly status: FieldRef<"MonitoringDevice", 'DeviceStatus'>
     readonly lastSyncAt: FieldRef<"MonitoringDevice", 'DateTime'>
     readonly batteryLevel: FieldRef<"MonitoringDevice", 'Int'>
+    readonly firmwareVersion: FieldRef<"MonitoringDevice", 'String'>
+    readonly softwareVersion: FieldRef<"MonitoringDevice", 'String'>
+    readonly certificateExpiry: FieldRef<"MonitoringDevice", 'DateTime'>
+    readonly lastSecurityScan: FieldRef<"MonitoringDevice", 'DateTime'>
     readonly createdAt: FieldRef<"MonitoringDevice", 'DateTime'>
     readonly updatedAt: FieldRef<"MonitoringDevice", 'DateTime'>
   }
@@ -5065,6 +6357,126 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: VitalReadingScalarFieldEnum | VitalReadingScalarFieldEnum[]
+  }
+
+  /**
+   * MonitoringDevice.vulnerabilities
+   */
+  export type MonitoringDevice$vulnerabilitiesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceVulnerability
+     */
+    select?: DeviceVulnerabilitySelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceVulnerabilityInclude<ExtArgs> | null
+    where?: DeviceVulnerabilityWhereInput
+    orderBy?: DeviceVulnerabilityOrderByWithRelationInput | DeviceVulnerabilityOrderByWithRelationInput[]
+    cursor?: DeviceVulnerabilityWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DeviceVulnerabilityScalarFieldEnum | DeviceVulnerabilityScalarFieldEnum[]
+  }
+
+  /**
+   * MonitoringDevice.patches
+   */
+  export type MonitoringDevice$patchesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DevicePatch
+     */
+    select?: DevicePatchSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DevicePatchInclude<ExtArgs> | null
+    where?: DevicePatchWhereInput
+    orderBy?: DevicePatchOrderByWithRelationInput | DevicePatchOrderByWithRelationInput[]
+    cursor?: DevicePatchWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DevicePatchScalarFieldEnum | DevicePatchScalarFieldEnum[]
+  }
+
+  /**
+   * MonitoringDevice.incidents
+   */
+  export type MonitoringDevice$incidentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SecurityIncident
+     */
+    select?: SecurityIncidentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SecurityIncidentInclude<ExtArgs> | null
+    where?: SecurityIncidentWhereInput
+    orderBy?: SecurityIncidentOrderByWithRelationInput | SecurityIncidentOrderByWithRelationInput[]
+    cursor?: SecurityIncidentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SecurityIncidentScalarFieldEnum | SecurityIncidentScalarFieldEnum[]
+  }
+
+  /**
+   * MonitoringDevice.networkAssignments
+   */
+  export type MonitoringDevice$networkAssignmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceNetworkAssignment
+     */
+    select?: DeviceNetworkAssignmentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceNetworkAssignmentInclude<ExtArgs> | null
+    where?: DeviceNetworkAssignmentWhereInput
+    orderBy?: DeviceNetworkAssignmentOrderByWithRelationInput | DeviceNetworkAssignmentOrderByWithRelationInput[]
+    cursor?: DeviceNetworkAssignmentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DeviceNetworkAssignmentScalarFieldEnum | DeviceNetworkAssignmentScalarFieldEnum[]
+  }
+
+  /**
+   * MonitoringDevice.recallStatuses
+   */
+  export type MonitoringDevice$recallStatusesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceRecallStatus
+     */
+    select?: DeviceRecallStatusSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceRecallStatusInclude<ExtArgs> | null
+    where?: DeviceRecallStatusWhereInput
+    orderBy?: DeviceRecallStatusOrderByWithRelationInput | DeviceRecallStatusOrderByWithRelationInput[]
+    cursor?: DeviceRecallStatusWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DeviceRecallStatusScalarFieldEnum | DeviceRecallStatusScalarFieldEnum[]
+  }
+
+  /**
+   * MonitoringDevice.riskAssessments
+   */
+  export type MonitoringDevice$riskAssessmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceRiskAssessment
+     */
+    select?: DeviceRiskAssessmentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceRiskAssessmentInclude<ExtArgs> | null
+    where?: DeviceRiskAssessmentWhereInput
+    orderBy?: DeviceRiskAssessmentOrderByWithRelationInput | DeviceRiskAssessmentOrderByWithRelationInput[]
+    cursor?: DeviceRiskAssessmentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DeviceRiskAssessmentScalarFieldEnum | DeviceRiskAssessmentScalarFieldEnum[]
   }
 
   /**
@@ -12253,6 +13665,10773 @@ export namespace Prisma {
 
 
   /**
+   * Model DeviceVulnerability
+   */
+
+  export type AggregateDeviceVulnerability = {
+    _count: DeviceVulnerabilityCountAggregateOutputType | null
+    _avg: DeviceVulnerabilityAvgAggregateOutputType | null
+    _sum: DeviceVulnerabilitySumAggregateOutputType | null
+    _min: DeviceVulnerabilityMinAggregateOutputType | null
+    _max: DeviceVulnerabilityMaxAggregateOutputType | null
+  }
+
+  export type DeviceVulnerabilityAvgAggregateOutputType = {
+    cvssScore: number | null
+  }
+
+  export type DeviceVulnerabilitySumAggregateOutputType = {
+    cvssScore: number | null
+  }
+
+  export type DeviceVulnerabilityMinAggregateOutputType = {
+    id: string | null
+    deviceId: string | null
+    cveId: string | null
+    title: string | null
+    description: string | null
+    severity: $Enums.VulnerabilitySeverity | null
+    cvssScore: number | null
+    affectedVersion: string | null
+    fixedVersion: string | null
+    exploitAvailable: boolean | null
+    status: $Enums.VulnerabilityStatus | null
+    discoveredAt: Date | null
+    resolvedAt: Date | null
+    resolvedBy: string | null
+    resolutionNotes: string | null
+    source: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type DeviceVulnerabilityMaxAggregateOutputType = {
+    id: string | null
+    deviceId: string | null
+    cveId: string | null
+    title: string | null
+    description: string | null
+    severity: $Enums.VulnerabilitySeverity | null
+    cvssScore: number | null
+    affectedVersion: string | null
+    fixedVersion: string | null
+    exploitAvailable: boolean | null
+    status: $Enums.VulnerabilityStatus | null
+    discoveredAt: Date | null
+    resolvedAt: Date | null
+    resolvedBy: string | null
+    resolutionNotes: string | null
+    source: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type DeviceVulnerabilityCountAggregateOutputType = {
+    id: number
+    deviceId: number
+    cveId: number
+    title: number
+    description: number
+    severity: number
+    cvssScore: number
+    affectedVersion: number
+    fixedVersion: number
+    exploitAvailable: number
+    status: number
+    discoveredAt: number
+    resolvedAt: number
+    resolvedBy: number
+    resolutionNotes: number
+    source: number
+    references: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type DeviceVulnerabilityAvgAggregateInputType = {
+    cvssScore?: true
+  }
+
+  export type DeviceVulnerabilitySumAggregateInputType = {
+    cvssScore?: true
+  }
+
+  export type DeviceVulnerabilityMinAggregateInputType = {
+    id?: true
+    deviceId?: true
+    cveId?: true
+    title?: true
+    description?: true
+    severity?: true
+    cvssScore?: true
+    affectedVersion?: true
+    fixedVersion?: true
+    exploitAvailable?: true
+    status?: true
+    discoveredAt?: true
+    resolvedAt?: true
+    resolvedBy?: true
+    resolutionNotes?: true
+    source?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type DeviceVulnerabilityMaxAggregateInputType = {
+    id?: true
+    deviceId?: true
+    cveId?: true
+    title?: true
+    description?: true
+    severity?: true
+    cvssScore?: true
+    affectedVersion?: true
+    fixedVersion?: true
+    exploitAvailable?: true
+    status?: true
+    discoveredAt?: true
+    resolvedAt?: true
+    resolvedBy?: true
+    resolutionNotes?: true
+    source?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type DeviceVulnerabilityCountAggregateInputType = {
+    id?: true
+    deviceId?: true
+    cveId?: true
+    title?: true
+    description?: true
+    severity?: true
+    cvssScore?: true
+    affectedVersion?: true
+    fixedVersion?: true
+    exploitAvailable?: true
+    status?: true
+    discoveredAt?: true
+    resolvedAt?: true
+    resolvedBy?: true
+    resolutionNotes?: true
+    source?: true
+    references?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type DeviceVulnerabilityAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DeviceVulnerability to aggregate.
+     */
+    where?: DeviceVulnerabilityWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DeviceVulnerabilities to fetch.
+     */
+    orderBy?: DeviceVulnerabilityOrderByWithRelationInput | DeviceVulnerabilityOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: DeviceVulnerabilityWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DeviceVulnerabilities from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DeviceVulnerabilities.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned DeviceVulnerabilities
+    **/
+    _count?: true | DeviceVulnerabilityCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: DeviceVulnerabilityAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: DeviceVulnerabilitySumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: DeviceVulnerabilityMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: DeviceVulnerabilityMaxAggregateInputType
+  }
+
+  export type GetDeviceVulnerabilityAggregateType<T extends DeviceVulnerabilityAggregateArgs> = {
+        [P in keyof T & keyof AggregateDeviceVulnerability]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateDeviceVulnerability[P]>
+      : GetScalarType<T[P], AggregateDeviceVulnerability[P]>
+  }
+
+
+
+
+  export type DeviceVulnerabilityGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DeviceVulnerabilityWhereInput
+    orderBy?: DeviceVulnerabilityOrderByWithAggregationInput | DeviceVulnerabilityOrderByWithAggregationInput[]
+    by: DeviceVulnerabilityScalarFieldEnum[] | DeviceVulnerabilityScalarFieldEnum
+    having?: DeviceVulnerabilityScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: DeviceVulnerabilityCountAggregateInputType | true
+    _avg?: DeviceVulnerabilityAvgAggregateInputType
+    _sum?: DeviceVulnerabilitySumAggregateInputType
+    _min?: DeviceVulnerabilityMinAggregateInputType
+    _max?: DeviceVulnerabilityMaxAggregateInputType
+  }
+
+  export type DeviceVulnerabilityGroupByOutputType = {
+    id: string
+    deviceId: string
+    cveId: string | null
+    title: string
+    description: string
+    severity: $Enums.VulnerabilitySeverity
+    cvssScore: number | null
+    affectedVersion: string | null
+    fixedVersion: string | null
+    exploitAvailable: boolean
+    status: $Enums.VulnerabilityStatus
+    discoveredAt: Date
+    resolvedAt: Date | null
+    resolvedBy: string | null
+    resolutionNotes: string | null
+    source: string | null
+    references: JsonValue | null
+    createdAt: Date
+    updatedAt: Date
+    _count: DeviceVulnerabilityCountAggregateOutputType | null
+    _avg: DeviceVulnerabilityAvgAggregateOutputType | null
+    _sum: DeviceVulnerabilitySumAggregateOutputType | null
+    _min: DeviceVulnerabilityMinAggregateOutputType | null
+    _max: DeviceVulnerabilityMaxAggregateOutputType | null
+  }
+
+  type GetDeviceVulnerabilityGroupByPayload<T extends DeviceVulnerabilityGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<DeviceVulnerabilityGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof DeviceVulnerabilityGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], DeviceVulnerabilityGroupByOutputType[P]>
+            : GetScalarType<T[P], DeviceVulnerabilityGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type DeviceVulnerabilitySelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    deviceId?: boolean
+    cveId?: boolean
+    title?: boolean
+    description?: boolean
+    severity?: boolean
+    cvssScore?: boolean
+    affectedVersion?: boolean
+    fixedVersion?: boolean
+    exploitAvailable?: boolean
+    status?: boolean
+    discoveredAt?: boolean
+    resolvedAt?: boolean
+    resolvedBy?: boolean
+    resolutionNotes?: boolean
+    source?: boolean
+    references?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    device?: boolean | MonitoringDeviceDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["deviceVulnerability"]>
+
+  export type DeviceVulnerabilitySelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    deviceId?: boolean
+    cveId?: boolean
+    title?: boolean
+    description?: boolean
+    severity?: boolean
+    cvssScore?: boolean
+    affectedVersion?: boolean
+    fixedVersion?: boolean
+    exploitAvailable?: boolean
+    status?: boolean
+    discoveredAt?: boolean
+    resolvedAt?: boolean
+    resolvedBy?: boolean
+    resolutionNotes?: boolean
+    source?: boolean
+    references?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    device?: boolean | MonitoringDeviceDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["deviceVulnerability"]>
+
+  export type DeviceVulnerabilitySelectScalar = {
+    id?: boolean
+    deviceId?: boolean
+    cveId?: boolean
+    title?: boolean
+    description?: boolean
+    severity?: boolean
+    cvssScore?: boolean
+    affectedVersion?: boolean
+    fixedVersion?: boolean
+    exploitAvailable?: boolean
+    status?: boolean
+    discoveredAt?: boolean
+    resolvedAt?: boolean
+    resolvedBy?: boolean
+    resolutionNotes?: boolean
+    source?: boolean
+    references?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type DeviceVulnerabilityInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    device?: boolean | MonitoringDeviceDefaultArgs<ExtArgs>
+  }
+  export type DeviceVulnerabilityIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    device?: boolean | MonitoringDeviceDefaultArgs<ExtArgs>
+  }
+
+  export type $DeviceVulnerabilityPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "DeviceVulnerability"
+    objects: {
+      device: Prisma.$MonitoringDevicePayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      deviceId: string
+      cveId: string | null
+      title: string
+      description: string
+      severity: $Enums.VulnerabilitySeverity
+      cvssScore: number | null
+      affectedVersion: string | null
+      fixedVersion: string | null
+      exploitAvailable: boolean
+      status: $Enums.VulnerabilityStatus
+      discoveredAt: Date
+      resolvedAt: Date | null
+      resolvedBy: string | null
+      resolutionNotes: string | null
+      source: string | null
+      references: Prisma.JsonValue | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["deviceVulnerability"]>
+    composites: {}
+  }
+
+  type DeviceVulnerabilityGetPayload<S extends boolean | null | undefined | DeviceVulnerabilityDefaultArgs> = $Result.GetResult<Prisma.$DeviceVulnerabilityPayload, S>
+
+  type DeviceVulnerabilityCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<DeviceVulnerabilityFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: DeviceVulnerabilityCountAggregateInputType | true
+    }
+
+  export interface DeviceVulnerabilityDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['DeviceVulnerability'], meta: { name: 'DeviceVulnerability' } }
+    /**
+     * Find zero or one DeviceVulnerability that matches the filter.
+     * @param {DeviceVulnerabilityFindUniqueArgs} args - Arguments to find a DeviceVulnerability
+     * @example
+     * // Get one DeviceVulnerability
+     * const deviceVulnerability = await prisma.deviceVulnerability.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends DeviceVulnerabilityFindUniqueArgs>(args: SelectSubset<T, DeviceVulnerabilityFindUniqueArgs<ExtArgs>>): Prisma__DeviceVulnerabilityClient<$Result.GetResult<Prisma.$DeviceVulnerabilityPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one DeviceVulnerability that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {DeviceVulnerabilityFindUniqueOrThrowArgs} args - Arguments to find a DeviceVulnerability
+     * @example
+     * // Get one DeviceVulnerability
+     * const deviceVulnerability = await prisma.deviceVulnerability.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends DeviceVulnerabilityFindUniqueOrThrowArgs>(args: SelectSubset<T, DeviceVulnerabilityFindUniqueOrThrowArgs<ExtArgs>>): Prisma__DeviceVulnerabilityClient<$Result.GetResult<Prisma.$DeviceVulnerabilityPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first DeviceVulnerability that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeviceVulnerabilityFindFirstArgs} args - Arguments to find a DeviceVulnerability
+     * @example
+     * // Get one DeviceVulnerability
+     * const deviceVulnerability = await prisma.deviceVulnerability.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends DeviceVulnerabilityFindFirstArgs>(args?: SelectSubset<T, DeviceVulnerabilityFindFirstArgs<ExtArgs>>): Prisma__DeviceVulnerabilityClient<$Result.GetResult<Prisma.$DeviceVulnerabilityPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first DeviceVulnerability that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeviceVulnerabilityFindFirstOrThrowArgs} args - Arguments to find a DeviceVulnerability
+     * @example
+     * // Get one DeviceVulnerability
+     * const deviceVulnerability = await prisma.deviceVulnerability.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends DeviceVulnerabilityFindFirstOrThrowArgs>(args?: SelectSubset<T, DeviceVulnerabilityFindFirstOrThrowArgs<ExtArgs>>): Prisma__DeviceVulnerabilityClient<$Result.GetResult<Prisma.$DeviceVulnerabilityPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more DeviceVulnerabilities that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeviceVulnerabilityFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all DeviceVulnerabilities
+     * const deviceVulnerabilities = await prisma.deviceVulnerability.findMany()
+     * 
+     * // Get first 10 DeviceVulnerabilities
+     * const deviceVulnerabilities = await prisma.deviceVulnerability.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const deviceVulnerabilityWithIdOnly = await prisma.deviceVulnerability.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends DeviceVulnerabilityFindManyArgs>(args?: SelectSubset<T, DeviceVulnerabilityFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DeviceVulnerabilityPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a DeviceVulnerability.
+     * @param {DeviceVulnerabilityCreateArgs} args - Arguments to create a DeviceVulnerability.
+     * @example
+     * // Create one DeviceVulnerability
+     * const DeviceVulnerability = await prisma.deviceVulnerability.create({
+     *   data: {
+     *     // ... data to create a DeviceVulnerability
+     *   }
+     * })
+     * 
+     */
+    create<T extends DeviceVulnerabilityCreateArgs>(args: SelectSubset<T, DeviceVulnerabilityCreateArgs<ExtArgs>>): Prisma__DeviceVulnerabilityClient<$Result.GetResult<Prisma.$DeviceVulnerabilityPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many DeviceVulnerabilities.
+     * @param {DeviceVulnerabilityCreateManyArgs} args - Arguments to create many DeviceVulnerabilities.
+     * @example
+     * // Create many DeviceVulnerabilities
+     * const deviceVulnerability = await prisma.deviceVulnerability.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends DeviceVulnerabilityCreateManyArgs>(args?: SelectSubset<T, DeviceVulnerabilityCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many DeviceVulnerabilities and returns the data saved in the database.
+     * @param {DeviceVulnerabilityCreateManyAndReturnArgs} args - Arguments to create many DeviceVulnerabilities.
+     * @example
+     * // Create many DeviceVulnerabilities
+     * const deviceVulnerability = await prisma.deviceVulnerability.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many DeviceVulnerabilities and only return the `id`
+     * const deviceVulnerabilityWithIdOnly = await prisma.deviceVulnerability.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends DeviceVulnerabilityCreateManyAndReturnArgs>(args?: SelectSubset<T, DeviceVulnerabilityCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DeviceVulnerabilityPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a DeviceVulnerability.
+     * @param {DeviceVulnerabilityDeleteArgs} args - Arguments to delete one DeviceVulnerability.
+     * @example
+     * // Delete one DeviceVulnerability
+     * const DeviceVulnerability = await prisma.deviceVulnerability.delete({
+     *   where: {
+     *     // ... filter to delete one DeviceVulnerability
+     *   }
+     * })
+     * 
+     */
+    delete<T extends DeviceVulnerabilityDeleteArgs>(args: SelectSubset<T, DeviceVulnerabilityDeleteArgs<ExtArgs>>): Prisma__DeviceVulnerabilityClient<$Result.GetResult<Prisma.$DeviceVulnerabilityPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one DeviceVulnerability.
+     * @param {DeviceVulnerabilityUpdateArgs} args - Arguments to update one DeviceVulnerability.
+     * @example
+     * // Update one DeviceVulnerability
+     * const deviceVulnerability = await prisma.deviceVulnerability.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends DeviceVulnerabilityUpdateArgs>(args: SelectSubset<T, DeviceVulnerabilityUpdateArgs<ExtArgs>>): Prisma__DeviceVulnerabilityClient<$Result.GetResult<Prisma.$DeviceVulnerabilityPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more DeviceVulnerabilities.
+     * @param {DeviceVulnerabilityDeleteManyArgs} args - Arguments to filter DeviceVulnerabilities to delete.
+     * @example
+     * // Delete a few DeviceVulnerabilities
+     * const { count } = await prisma.deviceVulnerability.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends DeviceVulnerabilityDeleteManyArgs>(args?: SelectSubset<T, DeviceVulnerabilityDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DeviceVulnerabilities.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeviceVulnerabilityUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many DeviceVulnerabilities
+     * const deviceVulnerability = await prisma.deviceVulnerability.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends DeviceVulnerabilityUpdateManyArgs>(args: SelectSubset<T, DeviceVulnerabilityUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one DeviceVulnerability.
+     * @param {DeviceVulnerabilityUpsertArgs} args - Arguments to update or create a DeviceVulnerability.
+     * @example
+     * // Update or create a DeviceVulnerability
+     * const deviceVulnerability = await prisma.deviceVulnerability.upsert({
+     *   create: {
+     *     // ... data to create a DeviceVulnerability
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the DeviceVulnerability we want to update
+     *   }
+     * })
+     */
+    upsert<T extends DeviceVulnerabilityUpsertArgs>(args: SelectSubset<T, DeviceVulnerabilityUpsertArgs<ExtArgs>>): Prisma__DeviceVulnerabilityClient<$Result.GetResult<Prisma.$DeviceVulnerabilityPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of DeviceVulnerabilities.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeviceVulnerabilityCountArgs} args - Arguments to filter DeviceVulnerabilities to count.
+     * @example
+     * // Count the number of DeviceVulnerabilities
+     * const count = await prisma.deviceVulnerability.count({
+     *   where: {
+     *     // ... the filter for the DeviceVulnerabilities we want to count
+     *   }
+     * })
+    **/
+    count<T extends DeviceVulnerabilityCountArgs>(
+      args?: Subset<T, DeviceVulnerabilityCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], DeviceVulnerabilityCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a DeviceVulnerability.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeviceVulnerabilityAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends DeviceVulnerabilityAggregateArgs>(args: Subset<T, DeviceVulnerabilityAggregateArgs>): Prisma.PrismaPromise<GetDeviceVulnerabilityAggregateType<T>>
+
+    /**
+     * Group by DeviceVulnerability.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeviceVulnerabilityGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends DeviceVulnerabilityGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: DeviceVulnerabilityGroupByArgs['orderBy'] }
+        : { orderBy?: DeviceVulnerabilityGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, DeviceVulnerabilityGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetDeviceVulnerabilityGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the DeviceVulnerability model
+   */
+  readonly fields: DeviceVulnerabilityFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for DeviceVulnerability.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__DeviceVulnerabilityClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    device<T extends MonitoringDeviceDefaultArgs<ExtArgs> = {}>(args?: Subset<T, MonitoringDeviceDefaultArgs<ExtArgs>>): Prisma__MonitoringDeviceClient<$Result.GetResult<Prisma.$MonitoringDevicePayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the DeviceVulnerability model
+   */ 
+  interface DeviceVulnerabilityFieldRefs {
+    readonly id: FieldRef<"DeviceVulnerability", 'String'>
+    readonly deviceId: FieldRef<"DeviceVulnerability", 'String'>
+    readonly cveId: FieldRef<"DeviceVulnerability", 'String'>
+    readonly title: FieldRef<"DeviceVulnerability", 'String'>
+    readonly description: FieldRef<"DeviceVulnerability", 'String'>
+    readonly severity: FieldRef<"DeviceVulnerability", 'VulnerabilitySeverity'>
+    readonly cvssScore: FieldRef<"DeviceVulnerability", 'Float'>
+    readonly affectedVersion: FieldRef<"DeviceVulnerability", 'String'>
+    readonly fixedVersion: FieldRef<"DeviceVulnerability", 'String'>
+    readonly exploitAvailable: FieldRef<"DeviceVulnerability", 'Boolean'>
+    readonly status: FieldRef<"DeviceVulnerability", 'VulnerabilityStatus'>
+    readonly discoveredAt: FieldRef<"DeviceVulnerability", 'DateTime'>
+    readonly resolvedAt: FieldRef<"DeviceVulnerability", 'DateTime'>
+    readonly resolvedBy: FieldRef<"DeviceVulnerability", 'String'>
+    readonly resolutionNotes: FieldRef<"DeviceVulnerability", 'String'>
+    readonly source: FieldRef<"DeviceVulnerability", 'String'>
+    readonly references: FieldRef<"DeviceVulnerability", 'Json'>
+    readonly createdAt: FieldRef<"DeviceVulnerability", 'DateTime'>
+    readonly updatedAt: FieldRef<"DeviceVulnerability", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * DeviceVulnerability findUnique
+   */
+  export type DeviceVulnerabilityFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceVulnerability
+     */
+    select?: DeviceVulnerabilitySelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceVulnerabilityInclude<ExtArgs> | null
+    /**
+     * Filter, which DeviceVulnerability to fetch.
+     */
+    where: DeviceVulnerabilityWhereUniqueInput
+  }
+
+  /**
+   * DeviceVulnerability findUniqueOrThrow
+   */
+  export type DeviceVulnerabilityFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceVulnerability
+     */
+    select?: DeviceVulnerabilitySelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceVulnerabilityInclude<ExtArgs> | null
+    /**
+     * Filter, which DeviceVulnerability to fetch.
+     */
+    where: DeviceVulnerabilityWhereUniqueInput
+  }
+
+  /**
+   * DeviceVulnerability findFirst
+   */
+  export type DeviceVulnerabilityFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceVulnerability
+     */
+    select?: DeviceVulnerabilitySelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceVulnerabilityInclude<ExtArgs> | null
+    /**
+     * Filter, which DeviceVulnerability to fetch.
+     */
+    where?: DeviceVulnerabilityWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DeviceVulnerabilities to fetch.
+     */
+    orderBy?: DeviceVulnerabilityOrderByWithRelationInput | DeviceVulnerabilityOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DeviceVulnerabilities.
+     */
+    cursor?: DeviceVulnerabilityWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DeviceVulnerabilities from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DeviceVulnerabilities.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DeviceVulnerabilities.
+     */
+    distinct?: DeviceVulnerabilityScalarFieldEnum | DeviceVulnerabilityScalarFieldEnum[]
+  }
+
+  /**
+   * DeviceVulnerability findFirstOrThrow
+   */
+  export type DeviceVulnerabilityFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceVulnerability
+     */
+    select?: DeviceVulnerabilitySelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceVulnerabilityInclude<ExtArgs> | null
+    /**
+     * Filter, which DeviceVulnerability to fetch.
+     */
+    where?: DeviceVulnerabilityWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DeviceVulnerabilities to fetch.
+     */
+    orderBy?: DeviceVulnerabilityOrderByWithRelationInput | DeviceVulnerabilityOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DeviceVulnerabilities.
+     */
+    cursor?: DeviceVulnerabilityWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DeviceVulnerabilities from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DeviceVulnerabilities.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DeviceVulnerabilities.
+     */
+    distinct?: DeviceVulnerabilityScalarFieldEnum | DeviceVulnerabilityScalarFieldEnum[]
+  }
+
+  /**
+   * DeviceVulnerability findMany
+   */
+  export type DeviceVulnerabilityFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceVulnerability
+     */
+    select?: DeviceVulnerabilitySelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceVulnerabilityInclude<ExtArgs> | null
+    /**
+     * Filter, which DeviceVulnerabilities to fetch.
+     */
+    where?: DeviceVulnerabilityWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DeviceVulnerabilities to fetch.
+     */
+    orderBy?: DeviceVulnerabilityOrderByWithRelationInput | DeviceVulnerabilityOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing DeviceVulnerabilities.
+     */
+    cursor?: DeviceVulnerabilityWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DeviceVulnerabilities from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DeviceVulnerabilities.
+     */
+    skip?: number
+    distinct?: DeviceVulnerabilityScalarFieldEnum | DeviceVulnerabilityScalarFieldEnum[]
+  }
+
+  /**
+   * DeviceVulnerability create
+   */
+  export type DeviceVulnerabilityCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceVulnerability
+     */
+    select?: DeviceVulnerabilitySelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceVulnerabilityInclude<ExtArgs> | null
+    /**
+     * The data needed to create a DeviceVulnerability.
+     */
+    data: XOR<DeviceVulnerabilityCreateInput, DeviceVulnerabilityUncheckedCreateInput>
+  }
+
+  /**
+   * DeviceVulnerability createMany
+   */
+  export type DeviceVulnerabilityCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many DeviceVulnerabilities.
+     */
+    data: DeviceVulnerabilityCreateManyInput | DeviceVulnerabilityCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * DeviceVulnerability createManyAndReturn
+   */
+  export type DeviceVulnerabilityCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceVulnerability
+     */
+    select?: DeviceVulnerabilitySelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many DeviceVulnerabilities.
+     */
+    data: DeviceVulnerabilityCreateManyInput | DeviceVulnerabilityCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceVulnerabilityIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * DeviceVulnerability update
+   */
+  export type DeviceVulnerabilityUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceVulnerability
+     */
+    select?: DeviceVulnerabilitySelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceVulnerabilityInclude<ExtArgs> | null
+    /**
+     * The data needed to update a DeviceVulnerability.
+     */
+    data: XOR<DeviceVulnerabilityUpdateInput, DeviceVulnerabilityUncheckedUpdateInput>
+    /**
+     * Choose, which DeviceVulnerability to update.
+     */
+    where: DeviceVulnerabilityWhereUniqueInput
+  }
+
+  /**
+   * DeviceVulnerability updateMany
+   */
+  export type DeviceVulnerabilityUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update DeviceVulnerabilities.
+     */
+    data: XOR<DeviceVulnerabilityUpdateManyMutationInput, DeviceVulnerabilityUncheckedUpdateManyInput>
+    /**
+     * Filter which DeviceVulnerabilities to update
+     */
+    where?: DeviceVulnerabilityWhereInput
+  }
+
+  /**
+   * DeviceVulnerability upsert
+   */
+  export type DeviceVulnerabilityUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceVulnerability
+     */
+    select?: DeviceVulnerabilitySelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceVulnerabilityInclude<ExtArgs> | null
+    /**
+     * The filter to search for the DeviceVulnerability to update in case it exists.
+     */
+    where: DeviceVulnerabilityWhereUniqueInput
+    /**
+     * In case the DeviceVulnerability found by the `where` argument doesn't exist, create a new DeviceVulnerability with this data.
+     */
+    create: XOR<DeviceVulnerabilityCreateInput, DeviceVulnerabilityUncheckedCreateInput>
+    /**
+     * In case the DeviceVulnerability was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<DeviceVulnerabilityUpdateInput, DeviceVulnerabilityUncheckedUpdateInput>
+  }
+
+  /**
+   * DeviceVulnerability delete
+   */
+  export type DeviceVulnerabilityDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceVulnerability
+     */
+    select?: DeviceVulnerabilitySelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceVulnerabilityInclude<ExtArgs> | null
+    /**
+     * Filter which DeviceVulnerability to delete.
+     */
+    where: DeviceVulnerabilityWhereUniqueInput
+  }
+
+  /**
+   * DeviceVulnerability deleteMany
+   */
+  export type DeviceVulnerabilityDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DeviceVulnerabilities to delete
+     */
+    where?: DeviceVulnerabilityWhereInput
+  }
+
+  /**
+   * DeviceVulnerability without action
+   */
+  export type DeviceVulnerabilityDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceVulnerability
+     */
+    select?: DeviceVulnerabilitySelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceVulnerabilityInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model DevicePatch
+   */
+
+  export type AggregateDevicePatch = {
+    _count: DevicePatchCountAggregateOutputType | null
+    _min: DevicePatchMinAggregateOutputType | null
+    _max: DevicePatchMaxAggregateOutputType | null
+  }
+
+  export type DevicePatchMinAggregateOutputType = {
+    id: string | null
+    deviceId: string | null
+    patchVersion: string | null
+    currentVersion: string | null
+    description: string | null
+    releaseNotes: string | null
+    criticality: $Enums.PatchCriticality | null
+    scheduledDate: Date | null
+    appliedDate: Date | null
+    appliedBy: string | null
+    status: $Enums.PatchStatus | null
+    rollbackVersion: string | null
+    testingRequired: boolean | null
+    testingCompletedAt: Date | null
+    testingNotes: string | null
+    approvedBy: string | null
+    approvedAt: Date | null
+    failureReason: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type DevicePatchMaxAggregateOutputType = {
+    id: string | null
+    deviceId: string | null
+    patchVersion: string | null
+    currentVersion: string | null
+    description: string | null
+    releaseNotes: string | null
+    criticality: $Enums.PatchCriticality | null
+    scheduledDate: Date | null
+    appliedDate: Date | null
+    appliedBy: string | null
+    status: $Enums.PatchStatus | null
+    rollbackVersion: string | null
+    testingRequired: boolean | null
+    testingCompletedAt: Date | null
+    testingNotes: string | null
+    approvedBy: string | null
+    approvedAt: Date | null
+    failureReason: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type DevicePatchCountAggregateOutputType = {
+    id: number
+    deviceId: number
+    patchVersion: number
+    currentVersion: number
+    description: number
+    releaseNotes: number
+    criticality: number
+    scheduledDate: number
+    appliedDate: number
+    appliedBy: number
+    status: number
+    rollbackVersion: number
+    testingRequired: number
+    testingCompletedAt: number
+    testingNotes: number
+    approvedBy: number
+    approvedAt: number
+    failureReason: number
+    vulnerabilitiesFixed: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type DevicePatchMinAggregateInputType = {
+    id?: true
+    deviceId?: true
+    patchVersion?: true
+    currentVersion?: true
+    description?: true
+    releaseNotes?: true
+    criticality?: true
+    scheduledDate?: true
+    appliedDate?: true
+    appliedBy?: true
+    status?: true
+    rollbackVersion?: true
+    testingRequired?: true
+    testingCompletedAt?: true
+    testingNotes?: true
+    approvedBy?: true
+    approvedAt?: true
+    failureReason?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type DevicePatchMaxAggregateInputType = {
+    id?: true
+    deviceId?: true
+    patchVersion?: true
+    currentVersion?: true
+    description?: true
+    releaseNotes?: true
+    criticality?: true
+    scheduledDate?: true
+    appliedDate?: true
+    appliedBy?: true
+    status?: true
+    rollbackVersion?: true
+    testingRequired?: true
+    testingCompletedAt?: true
+    testingNotes?: true
+    approvedBy?: true
+    approvedAt?: true
+    failureReason?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type DevicePatchCountAggregateInputType = {
+    id?: true
+    deviceId?: true
+    patchVersion?: true
+    currentVersion?: true
+    description?: true
+    releaseNotes?: true
+    criticality?: true
+    scheduledDate?: true
+    appliedDate?: true
+    appliedBy?: true
+    status?: true
+    rollbackVersion?: true
+    testingRequired?: true
+    testingCompletedAt?: true
+    testingNotes?: true
+    approvedBy?: true
+    approvedAt?: true
+    failureReason?: true
+    vulnerabilitiesFixed?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type DevicePatchAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DevicePatch to aggregate.
+     */
+    where?: DevicePatchWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DevicePatches to fetch.
+     */
+    orderBy?: DevicePatchOrderByWithRelationInput | DevicePatchOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: DevicePatchWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DevicePatches from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DevicePatches.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned DevicePatches
+    **/
+    _count?: true | DevicePatchCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: DevicePatchMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: DevicePatchMaxAggregateInputType
+  }
+
+  export type GetDevicePatchAggregateType<T extends DevicePatchAggregateArgs> = {
+        [P in keyof T & keyof AggregateDevicePatch]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateDevicePatch[P]>
+      : GetScalarType<T[P], AggregateDevicePatch[P]>
+  }
+
+
+
+
+  export type DevicePatchGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DevicePatchWhereInput
+    orderBy?: DevicePatchOrderByWithAggregationInput | DevicePatchOrderByWithAggregationInput[]
+    by: DevicePatchScalarFieldEnum[] | DevicePatchScalarFieldEnum
+    having?: DevicePatchScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: DevicePatchCountAggregateInputType | true
+    _min?: DevicePatchMinAggregateInputType
+    _max?: DevicePatchMaxAggregateInputType
+  }
+
+  export type DevicePatchGroupByOutputType = {
+    id: string
+    deviceId: string
+    patchVersion: string
+    currentVersion: string
+    description: string | null
+    releaseNotes: string | null
+    criticality: $Enums.PatchCriticality
+    scheduledDate: Date | null
+    appliedDate: Date | null
+    appliedBy: string | null
+    status: $Enums.PatchStatus
+    rollbackVersion: string | null
+    testingRequired: boolean
+    testingCompletedAt: Date | null
+    testingNotes: string | null
+    approvedBy: string | null
+    approvedAt: Date | null
+    failureReason: string | null
+    vulnerabilitiesFixed: JsonValue | null
+    createdAt: Date
+    updatedAt: Date
+    _count: DevicePatchCountAggregateOutputType | null
+    _min: DevicePatchMinAggregateOutputType | null
+    _max: DevicePatchMaxAggregateOutputType | null
+  }
+
+  type GetDevicePatchGroupByPayload<T extends DevicePatchGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<DevicePatchGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof DevicePatchGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], DevicePatchGroupByOutputType[P]>
+            : GetScalarType<T[P], DevicePatchGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type DevicePatchSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    deviceId?: boolean
+    patchVersion?: boolean
+    currentVersion?: boolean
+    description?: boolean
+    releaseNotes?: boolean
+    criticality?: boolean
+    scheduledDate?: boolean
+    appliedDate?: boolean
+    appliedBy?: boolean
+    status?: boolean
+    rollbackVersion?: boolean
+    testingRequired?: boolean
+    testingCompletedAt?: boolean
+    testingNotes?: boolean
+    approvedBy?: boolean
+    approvedAt?: boolean
+    failureReason?: boolean
+    vulnerabilitiesFixed?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    device?: boolean | MonitoringDeviceDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["devicePatch"]>
+
+  export type DevicePatchSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    deviceId?: boolean
+    patchVersion?: boolean
+    currentVersion?: boolean
+    description?: boolean
+    releaseNotes?: boolean
+    criticality?: boolean
+    scheduledDate?: boolean
+    appliedDate?: boolean
+    appliedBy?: boolean
+    status?: boolean
+    rollbackVersion?: boolean
+    testingRequired?: boolean
+    testingCompletedAt?: boolean
+    testingNotes?: boolean
+    approvedBy?: boolean
+    approvedAt?: boolean
+    failureReason?: boolean
+    vulnerabilitiesFixed?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    device?: boolean | MonitoringDeviceDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["devicePatch"]>
+
+  export type DevicePatchSelectScalar = {
+    id?: boolean
+    deviceId?: boolean
+    patchVersion?: boolean
+    currentVersion?: boolean
+    description?: boolean
+    releaseNotes?: boolean
+    criticality?: boolean
+    scheduledDate?: boolean
+    appliedDate?: boolean
+    appliedBy?: boolean
+    status?: boolean
+    rollbackVersion?: boolean
+    testingRequired?: boolean
+    testingCompletedAt?: boolean
+    testingNotes?: boolean
+    approvedBy?: boolean
+    approvedAt?: boolean
+    failureReason?: boolean
+    vulnerabilitiesFixed?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type DevicePatchInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    device?: boolean | MonitoringDeviceDefaultArgs<ExtArgs>
+  }
+  export type DevicePatchIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    device?: boolean | MonitoringDeviceDefaultArgs<ExtArgs>
+  }
+
+  export type $DevicePatchPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "DevicePatch"
+    objects: {
+      device: Prisma.$MonitoringDevicePayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      deviceId: string
+      patchVersion: string
+      currentVersion: string
+      description: string | null
+      releaseNotes: string | null
+      criticality: $Enums.PatchCriticality
+      scheduledDate: Date | null
+      appliedDate: Date | null
+      appliedBy: string | null
+      status: $Enums.PatchStatus
+      rollbackVersion: string | null
+      testingRequired: boolean
+      testingCompletedAt: Date | null
+      testingNotes: string | null
+      approvedBy: string | null
+      approvedAt: Date | null
+      failureReason: string | null
+      vulnerabilitiesFixed: Prisma.JsonValue | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["devicePatch"]>
+    composites: {}
+  }
+
+  type DevicePatchGetPayload<S extends boolean | null | undefined | DevicePatchDefaultArgs> = $Result.GetResult<Prisma.$DevicePatchPayload, S>
+
+  type DevicePatchCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<DevicePatchFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: DevicePatchCountAggregateInputType | true
+    }
+
+  export interface DevicePatchDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['DevicePatch'], meta: { name: 'DevicePatch' } }
+    /**
+     * Find zero or one DevicePatch that matches the filter.
+     * @param {DevicePatchFindUniqueArgs} args - Arguments to find a DevicePatch
+     * @example
+     * // Get one DevicePatch
+     * const devicePatch = await prisma.devicePatch.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends DevicePatchFindUniqueArgs>(args: SelectSubset<T, DevicePatchFindUniqueArgs<ExtArgs>>): Prisma__DevicePatchClient<$Result.GetResult<Prisma.$DevicePatchPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one DevicePatch that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {DevicePatchFindUniqueOrThrowArgs} args - Arguments to find a DevicePatch
+     * @example
+     * // Get one DevicePatch
+     * const devicePatch = await prisma.devicePatch.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends DevicePatchFindUniqueOrThrowArgs>(args: SelectSubset<T, DevicePatchFindUniqueOrThrowArgs<ExtArgs>>): Prisma__DevicePatchClient<$Result.GetResult<Prisma.$DevicePatchPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first DevicePatch that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DevicePatchFindFirstArgs} args - Arguments to find a DevicePatch
+     * @example
+     * // Get one DevicePatch
+     * const devicePatch = await prisma.devicePatch.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends DevicePatchFindFirstArgs>(args?: SelectSubset<T, DevicePatchFindFirstArgs<ExtArgs>>): Prisma__DevicePatchClient<$Result.GetResult<Prisma.$DevicePatchPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first DevicePatch that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DevicePatchFindFirstOrThrowArgs} args - Arguments to find a DevicePatch
+     * @example
+     * // Get one DevicePatch
+     * const devicePatch = await prisma.devicePatch.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends DevicePatchFindFirstOrThrowArgs>(args?: SelectSubset<T, DevicePatchFindFirstOrThrowArgs<ExtArgs>>): Prisma__DevicePatchClient<$Result.GetResult<Prisma.$DevicePatchPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more DevicePatches that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DevicePatchFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all DevicePatches
+     * const devicePatches = await prisma.devicePatch.findMany()
+     * 
+     * // Get first 10 DevicePatches
+     * const devicePatches = await prisma.devicePatch.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const devicePatchWithIdOnly = await prisma.devicePatch.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends DevicePatchFindManyArgs>(args?: SelectSubset<T, DevicePatchFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DevicePatchPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a DevicePatch.
+     * @param {DevicePatchCreateArgs} args - Arguments to create a DevicePatch.
+     * @example
+     * // Create one DevicePatch
+     * const DevicePatch = await prisma.devicePatch.create({
+     *   data: {
+     *     // ... data to create a DevicePatch
+     *   }
+     * })
+     * 
+     */
+    create<T extends DevicePatchCreateArgs>(args: SelectSubset<T, DevicePatchCreateArgs<ExtArgs>>): Prisma__DevicePatchClient<$Result.GetResult<Prisma.$DevicePatchPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many DevicePatches.
+     * @param {DevicePatchCreateManyArgs} args - Arguments to create many DevicePatches.
+     * @example
+     * // Create many DevicePatches
+     * const devicePatch = await prisma.devicePatch.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends DevicePatchCreateManyArgs>(args?: SelectSubset<T, DevicePatchCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many DevicePatches and returns the data saved in the database.
+     * @param {DevicePatchCreateManyAndReturnArgs} args - Arguments to create many DevicePatches.
+     * @example
+     * // Create many DevicePatches
+     * const devicePatch = await prisma.devicePatch.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many DevicePatches and only return the `id`
+     * const devicePatchWithIdOnly = await prisma.devicePatch.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends DevicePatchCreateManyAndReturnArgs>(args?: SelectSubset<T, DevicePatchCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DevicePatchPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a DevicePatch.
+     * @param {DevicePatchDeleteArgs} args - Arguments to delete one DevicePatch.
+     * @example
+     * // Delete one DevicePatch
+     * const DevicePatch = await prisma.devicePatch.delete({
+     *   where: {
+     *     // ... filter to delete one DevicePatch
+     *   }
+     * })
+     * 
+     */
+    delete<T extends DevicePatchDeleteArgs>(args: SelectSubset<T, DevicePatchDeleteArgs<ExtArgs>>): Prisma__DevicePatchClient<$Result.GetResult<Prisma.$DevicePatchPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one DevicePatch.
+     * @param {DevicePatchUpdateArgs} args - Arguments to update one DevicePatch.
+     * @example
+     * // Update one DevicePatch
+     * const devicePatch = await prisma.devicePatch.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends DevicePatchUpdateArgs>(args: SelectSubset<T, DevicePatchUpdateArgs<ExtArgs>>): Prisma__DevicePatchClient<$Result.GetResult<Prisma.$DevicePatchPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more DevicePatches.
+     * @param {DevicePatchDeleteManyArgs} args - Arguments to filter DevicePatches to delete.
+     * @example
+     * // Delete a few DevicePatches
+     * const { count } = await prisma.devicePatch.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends DevicePatchDeleteManyArgs>(args?: SelectSubset<T, DevicePatchDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DevicePatches.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DevicePatchUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many DevicePatches
+     * const devicePatch = await prisma.devicePatch.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends DevicePatchUpdateManyArgs>(args: SelectSubset<T, DevicePatchUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one DevicePatch.
+     * @param {DevicePatchUpsertArgs} args - Arguments to update or create a DevicePatch.
+     * @example
+     * // Update or create a DevicePatch
+     * const devicePatch = await prisma.devicePatch.upsert({
+     *   create: {
+     *     // ... data to create a DevicePatch
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the DevicePatch we want to update
+     *   }
+     * })
+     */
+    upsert<T extends DevicePatchUpsertArgs>(args: SelectSubset<T, DevicePatchUpsertArgs<ExtArgs>>): Prisma__DevicePatchClient<$Result.GetResult<Prisma.$DevicePatchPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of DevicePatches.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DevicePatchCountArgs} args - Arguments to filter DevicePatches to count.
+     * @example
+     * // Count the number of DevicePatches
+     * const count = await prisma.devicePatch.count({
+     *   where: {
+     *     // ... the filter for the DevicePatches we want to count
+     *   }
+     * })
+    **/
+    count<T extends DevicePatchCountArgs>(
+      args?: Subset<T, DevicePatchCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], DevicePatchCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a DevicePatch.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DevicePatchAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends DevicePatchAggregateArgs>(args: Subset<T, DevicePatchAggregateArgs>): Prisma.PrismaPromise<GetDevicePatchAggregateType<T>>
+
+    /**
+     * Group by DevicePatch.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DevicePatchGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends DevicePatchGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: DevicePatchGroupByArgs['orderBy'] }
+        : { orderBy?: DevicePatchGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, DevicePatchGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetDevicePatchGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the DevicePatch model
+   */
+  readonly fields: DevicePatchFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for DevicePatch.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__DevicePatchClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    device<T extends MonitoringDeviceDefaultArgs<ExtArgs> = {}>(args?: Subset<T, MonitoringDeviceDefaultArgs<ExtArgs>>): Prisma__MonitoringDeviceClient<$Result.GetResult<Prisma.$MonitoringDevicePayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the DevicePatch model
+   */ 
+  interface DevicePatchFieldRefs {
+    readonly id: FieldRef<"DevicePatch", 'String'>
+    readonly deviceId: FieldRef<"DevicePatch", 'String'>
+    readonly patchVersion: FieldRef<"DevicePatch", 'String'>
+    readonly currentVersion: FieldRef<"DevicePatch", 'String'>
+    readonly description: FieldRef<"DevicePatch", 'String'>
+    readonly releaseNotes: FieldRef<"DevicePatch", 'String'>
+    readonly criticality: FieldRef<"DevicePatch", 'PatchCriticality'>
+    readonly scheduledDate: FieldRef<"DevicePatch", 'DateTime'>
+    readonly appliedDate: FieldRef<"DevicePatch", 'DateTime'>
+    readonly appliedBy: FieldRef<"DevicePatch", 'String'>
+    readonly status: FieldRef<"DevicePatch", 'PatchStatus'>
+    readonly rollbackVersion: FieldRef<"DevicePatch", 'String'>
+    readonly testingRequired: FieldRef<"DevicePatch", 'Boolean'>
+    readonly testingCompletedAt: FieldRef<"DevicePatch", 'DateTime'>
+    readonly testingNotes: FieldRef<"DevicePatch", 'String'>
+    readonly approvedBy: FieldRef<"DevicePatch", 'String'>
+    readonly approvedAt: FieldRef<"DevicePatch", 'DateTime'>
+    readonly failureReason: FieldRef<"DevicePatch", 'String'>
+    readonly vulnerabilitiesFixed: FieldRef<"DevicePatch", 'Json'>
+    readonly createdAt: FieldRef<"DevicePatch", 'DateTime'>
+    readonly updatedAt: FieldRef<"DevicePatch", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * DevicePatch findUnique
+   */
+  export type DevicePatchFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DevicePatch
+     */
+    select?: DevicePatchSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DevicePatchInclude<ExtArgs> | null
+    /**
+     * Filter, which DevicePatch to fetch.
+     */
+    where: DevicePatchWhereUniqueInput
+  }
+
+  /**
+   * DevicePatch findUniqueOrThrow
+   */
+  export type DevicePatchFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DevicePatch
+     */
+    select?: DevicePatchSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DevicePatchInclude<ExtArgs> | null
+    /**
+     * Filter, which DevicePatch to fetch.
+     */
+    where: DevicePatchWhereUniqueInput
+  }
+
+  /**
+   * DevicePatch findFirst
+   */
+  export type DevicePatchFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DevicePatch
+     */
+    select?: DevicePatchSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DevicePatchInclude<ExtArgs> | null
+    /**
+     * Filter, which DevicePatch to fetch.
+     */
+    where?: DevicePatchWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DevicePatches to fetch.
+     */
+    orderBy?: DevicePatchOrderByWithRelationInput | DevicePatchOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DevicePatches.
+     */
+    cursor?: DevicePatchWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DevicePatches from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DevicePatches.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DevicePatches.
+     */
+    distinct?: DevicePatchScalarFieldEnum | DevicePatchScalarFieldEnum[]
+  }
+
+  /**
+   * DevicePatch findFirstOrThrow
+   */
+  export type DevicePatchFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DevicePatch
+     */
+    select?: DevicePatchSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DevicePatchInclude<ExtArgs> | null
+    /**
+     * Filter, which DevicePatch to fetch.
+     */
+    where?: DevicePatchWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DevicePatches to fetch.
+     */
+    orderBy?: DevicePatchOrderByWithRelationInput | DevicePatchOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DevicePatches.
+     */
+    cursor?: DevicePatchWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DevicePatches from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DevicePatches.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DevicePatches.
+     */
+    distinct?: DevicePatchScalarFieldEnum | DevicePatchScalarFieldEnum[]
+  }
+
+  /**
+   * DevicePatch findMany
+   */
+  export type DevicePatchFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DevicePatch
+     */
+    select?: DevicePatchSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DevicePatchInclude<ExtArgs> | null
+    /**
+     * Filter, which DevicePatches to fetch.
+     */
+    where?: DevicePatchWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DevicePatches to fetch.
+     */
+    orderBy?: DevicePatchOrderByWithRelationInput | DevicePatchOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing DevicePatches.
+     */
+    cursor?: DevicePatchWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DevicePatches from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DevicePatches.
+     */
+    skip?: number
+    distinct?: DevicePatchScalarFieldEnum | DevicePatchScalarFieldEnum[]
+  }
+
+  /**
+   * DevicePatch create
+   */
+  export type DevicePatchCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DevicePatch
+     */
+    select?: DevicePatchSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DevicePatchInclude<ExtArgs> | null
+    /**
+     * The data needed to create a DevicePatch.
+     */
+    data: XOR<DevicePatchCreateInput, DevicePatchUncheckedCreateInput>
+  }
+
+  /**
+   * DevicePatch createMany
+   */
+  export type DevicePatchCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many DevicePatches.
+     */
+    data: DevicePatchCreateManyInput | DevicePatchCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * DevicePatch createManyAndReturn
+   */
+  export type DevicePatchCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DevicePatch
+     */
+    select?: DevicePatchSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many DevicePatches.
+     */
+    data: DevicePatchCreateManyInput | DevicePatchCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DevicePatchIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * DevicePatch update
+   */
+  export type DevicePatchUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DevicePatch
+     */
+    select?: DevicePatchSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DevicePatchInclude<ExtArgs> | null
+    /**
+     * The data needed to update a DevicePatch.
+     */
+    data: XOR<DevicePatchUpdateInput, DevicePatchUncheckedUpdateInput>
+    /**
+     * Choose, which DevicePatch to update.
+     */
+    where: DevicePatchWhereUniqueInput
+  }
+
+  /**
+   * DevicePatch updateMany
+   */
+  export type DevicePatchUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update DevicePatches.
+     */
+    data: XOR<DevicePatchUpdateManyMutationInput, DevicePatchUncheckedUpdateManyInput>
+    /**
+     * Filter which DevicePatches to update
+     */
+    where?: DevicePatchWhereInput
+  }
+
+  /**
+   * DevicePatch upsert
+   */
+  export type DevicePatchUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DevicePatch
+     */
+    select?: DevicePatchSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DevicePatchInclude<ExtArgs> | null
+    /**
+     * The filter to search for the DevicePatch to update in case it exists.
+     */
+    where: DevicePatchWhereUniqueInput
+    /**
+     * In case the DevicePatch found by the `where` argument doesn't exist, create a new DevicePatch with this data.
+     */
+    create: XOR<DevicePatchCreateInput, DevicePatchUncheckedCreateInput>
+    /**
+     * In case the DevicePatch was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<DevicePatchUpdateInput, DevicePatchUncheckedUpdateInput>
+  }
+
+  /**
+   * DevicePatch delete
+   */
+  export type DevicePatchDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DevicePatch
+     */
+    select?: DevicePatchSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DevicePatchInclude<ExtArgs> | null
+    /**
+     * Filter which DevicePatch to delete.
+     */
+    where: DevicePatchWhereUniqueInput
+  }
+
+  /**
+   * DevicePatch deleteMany
+   */
+  export type DevicePatchDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DevicePatches to delete
+     */
+    where?: DevicePatchWhereInput
+  }
+
+  /**
+   * DevicePatch without action
+   */
+  export type DevicePatchDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DevicePatch
+     */
+    select?: DevicePatchSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DevicePatchInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model SecurityIncident
+   */
+
+  export type AggregateSecurityIncident = {
+    _count: SecurityIncidentCountAggregateOutputType | null
+    _min: SecurityIncidentMinAggregateOutputType | null
+    _max: SecurityIncidentMaxAggregateOutputType | null
+  }
+
+  export type SecurityIncidentMinAggregateOutputType = {
+    id: string | null
+    deviceId: string | null
+    incidentType: $Enums.IncidentType | null
+    severity: $Enums.IncidentSeverity | null
+    title: string | null
+    description: string | null
+    detectedAt: Date | null
+    detectedBy: string | null
+    reportedBy: string | null
+    status: $Enums.IncidentStatus | null
+    assignedTo: string | null
+    containedAt: Date | null
+    resolvedAt: Date | null
+    rootCause: string | null
+    lessonsLearned: string | null
+    notificationsSent: boolean | null
+    regulatoryReported: boolean | null
+    regulatoryReportDate: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SecurityIncidentMaxAggregateOutputType = {
+    id: string | null
+    deviceId: string | null
+    incidentType: $Enums.IncidentType | null
+    severity: $Enums.IncidentSeverity | null
+    title: string | null
+    description: string | null
+    detectedAt: Date | null
+    detectedBy: string | null
+    reportedBy: string | null
+    status: $Enums.IncidentStatus | null
+    assignedTo: string | null
+    containedAt: Date | null
+    resolvedAt: Date | null
+    rootCause: string | null
+    lessonsLearned: string | null
+    notificationsSent: boolean | null
+    regulatoryReported: boolean | null
+    regulatoryReportDate: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SecurityIncidentCountAggregateOutputType = {
+    id: number
+    deviceId: number
+    incidentType: number
+    severity: number
+    title: number
+    description: number
+    affectedSystems: number
+    affectedPatients: number
+    detectedAt: number
+    detectedBy: number
+    reportedBy: number
+    status: number
+    assignedTo: number
+    containedAt: number
+    resolvedAt: number
+    rootCause: number
+    remediationSteps: number
+    lessonsLearned: number
+    timeline: number
+    evidence: number
+    notificationsSent: number
+    regulatoryReported: number
+    regulatoryReportDate: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type SecurityIncidentMinAggregateInputType = {
+    id?: true
+    deviceId?: true
+    incidentType?: true
+    severity?: true
+    title?: true
+    description?: true
+    detectedAt?: true
+    detectedBy?: true
+    reportedBy?: true
+    status?: true
+    assignedTo?: true
+    containedAt?: true
+    resolvedAt?: true
+    rootCause?: true
+    lessonsLearned?: true
+    notificationsSent?: true
+    regulatoryReported?: true
+    regulatoryReportDate?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SecurityIncidentMaxAggregateInputType = {
+    id?: true
+    deviceId?: true
+    incidentType?: true
+    severity?: true
+    title?: true
+    description?: true
+    detectedAt?: true
+    detectedBy?: true
+    reportedBy?: true
+    status?: true
+    assignedTo?: true
+    containedAt?: true
+    resolvedAt?: true
+    rootCause?: true
+    lessonsLearned?: true
+    notificationsSent?: true
+    regulatoryReported?: true
+    regulatoryReportDate?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SecurityIncidentCountAggregateInputType = {
+    id?: true
+    deviceId?: true
+    incidentType?: true
+    severity?: true
+    title?: true
+    description?: true
+    affectedSystems?: true
+    affectedPatients?: true
+    detectedAt?: true
+    detectedBy?: true
+    reportedBy?: true
+    status?: true
+    assignedTo?: true
+    containedAt?: true
+    resolvedAt?: true
+    rootCause?: true
+    remediationSteps?: true
+    lessonsLearned?: true
+    timeline?: true
+    evidence?: true
+    notificationsSent?: true
+    regulatoryReported?: true
+    regulatoryReportDate?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type SecurityIncidentAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SecurityIncident to aggregate.
+     */
+    where?: SecurityIncidentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SecurityIncidents to fetch.
+     */
+    orderBy?: SecurityIncidentOrderByWithRelationInput | SecurityIncidentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SecurityIncidentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SecurityIncidents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SecurityIncidents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned SecurityIncidents
+    **/
+    _count?: true | SecurityIncidentCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SecurityIncidentMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SecurityIncidentMaxAggregateInputType
+  }
+
+  export type GetSecurityIncidentAggregateType<T extends SecurityIncidentAggregateArgs> = {
+        [P in keyof T & keyof AggregateSecurityIncident]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSecurityIncident[P]>
+      : GetScalarType<T[P], AggregateSecurityIncident[P]>
+  }
+
+
+
+
+  export type SecurityIncidentGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SecurityIncidentWhereInput
+    orderBy?: SecurityIncidentOrderByWithAggregationInput | SecurityIncidentOrderByWithAggregationInput[]
+    by: SecurityIncidentScalarFieldEnum[] | SecurityIncidentScalarFieldEnum
+    having?: SecurityIncidentScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SecurityIncidentCountAggregateInputType | true
+    _min?: SecurityIncidentMinAggregateInputType
+    _max?: SecurityIncidentMaxAggregateInputType
+  }
+
+  export type SecurityIncidentGroupByOutputType = {
+    id: string
+    deviceId: string | null
+    incidentType: $Enums.IncidentType
+    severity: $Enums.IncidentSeverity
+    title: string
+    description: string
+    affectedSystems: JsonValue | null
+    affectedPatients: JsonValue | null
+    detectedAt: Date
+    detectedBy: string
+    reportedBy: string
+    status: $Enums.IncidentStatus
+    assignedTo: string | null
+    containedAt: Date | null
+    resolvedAt: Date | null
+    rootCause: string | null
+    remediationSteps: JsonValue | null
+    lessonsLearned: string | null
+    timeline: JsonValue | null
+    evidence: JsonValue | null
+    notificationsSent: boolean
+    regulatoryReported: boolean
+    regulatoryReportDate: Date | null
+    createdAt: Date
+    updatedAt: Date
+    _count: SecurityIncidentCountAggregateOutputType | null
+    _min: SecurityIncidentMinAggregateOutputType | null
+    _max: SecurityIncidentMaxAggregateOutputType | null
+  }
+
+  type GetSecurityIncidentGroupByPayload<T extends SecurityIncidentGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SecurityIncidentGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SecurityIncidentGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SecurityIncidentGroupByOutputType[P]>
+            : GetScalarType<T[P], SecurityIncidentGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SecurityIncidentSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    deviceId?: boolean
+    incidentType?: boolean
+    severity?: boolean
+    title?: boolean
+    description?: boolean
+    affectedSystems?: boolean
+    affectedPatients?: boolean
+    detectedAt?: boolean
+    detectedBy?: boolean
+    reportedBy?: boolean
+    status?: boolean
+    assignedTo?: boolean
+    containedAt?: boolean
+    resolvedAt?: boolean
+    rootCause?: boolean
+    remediationSteps?: boolean
+    lessonsLearned?: boolean
+    timeline?: boolean
+    evidence?: boolean
+    notificationsSent?: boolean
+    regulatoryReported?: boolean
+    regulatoryReportDate?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    device?: boolean | SecurityIncident$deviceArgs<ExtArgs>
+  }, ExtArgs["result"]["securityIncident"]>
+
+  export type SecurityIncidentSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    deviceId?: boolean
+    incidentType?: boolean
+    severity?: boolean
+    title?: boolean
+    description?: boolean
+    affectedSystems?: boolean
+    affectedPatients?: boolean
+    detectedAt?: boolean
+    detectedBy?: boolean
+    reportedBy?: boolean
+    status?: boolean
+    assignedTo?: boolean
+    containedAt?: boolean
+    resolvedAt?: boolean
+    rootCause?: boolean
+    remediationSteps?: boolean
+    lessonsLearned?: boolean
+    timeline?: boolean
+    evidence?: boolean
+    notificationsSent?: boolean
+    regulatoryReported?: boolean
+    regulatoryReportDate?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    device?: boolean | SecurityIncident$deviceArgs<ExtArgs>
+  }, ExtArgs["result"]["securityIncident"]>
+
+  export type SecurityIncidentSelectScalar = {
+    id?: boolean
+    deviceId?: boolean
+    incidentType?: boolean
+    severity?: boolean
+    title?: boolean
+    description?: boolean
+    affectedSystems?: boolean
+    affectedPatients?: boolean
+    detectedAt?: boolean
+    detectedBy?: boolean
+    reportedBy?: boolean
+    status?: boolean
+    assignedTo?: boolean
+    containedAt?: boolean
+    resolvedAt?: boolean
+    rootCause?: boolean
+    remediationSteps?: boolean
+    lessonsLearned?: boolean
+    timeline?: boolean
+    evidence?: boolean
+    notificationsSent?: boolean
+    regulatoryReported?: boolean
+    regulatoryReportDate?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type SecurityIncidentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    device?: boolean | SecurityIncident$deviceArgs<ExtArgs>
+  }
+  export type SecurityIncidentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    device?: boolean | SecurityIncident$deviceArgs<ExtArgs>
+  }
+
+  export type $SecurityIncidentPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "SecurityIncident"
+    objects: {
+      device: Prisma.$MonitoringDevicePayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      deviceId: string | null
+      incidentType: $Enums.IncidentType
+      severity: $Enums.IncidentSeverity
+      title: string
+      description: string
+      affectedSystems: Prisma.JsonValue | null
+      affectedPatients: Prisma.JsonValue | null
+      detectedAt: Date
+      detectedBy: string
+      reportedBy: string
+      status: $Enums.IncidentStatus
+      assignedTo: string | null
+      containedAt: Date | null
+      resolvedAt: Date | null
+      rootCause: string | null
+      remediationSteps: Prisma.JsonValue | null
+      lessonsLearned: string | null
+      timeline: Prisma.JsonValue | null
+      evidence: Prisma.JsonValue | null
+      notificationsSent: boolean
+      regulatoryReported: boolean
+      regulatoryReportDate: Date | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["securityIncident"]>
+    composites: {}
+  }
+
+  type SecurityIncidentGetPayload<S extends boolean | null | undefined | SecurityIncidentDefaultArgs> = $Result.GetResult<Prisma.$SecurityIncidentPayload, S>
+
+  type SecurityIncidentCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<SecurityIncidentFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: SecurityIncidentCountAggregateInputType | true
+    }
+
+  export interface SecurityIncidentDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SecurityIncident'], meta: { name: 'SecurityIncident' } }
+    /**
+     * Find zero or one SecurityIncident that matches the filter.
+     * @param {SecurityIncidentFindUniqueArgs} args - Arguments to find a SecurityIncident
+     * @example
+     * // Get one SecurityIncident
+     * const securityIncident = await prisma.securityIncident.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SecurityIncidentFindUniqueArgs>(args: SelectSubset<T, SecurityIncidentFindUniqueArgs<ExtArgs>>): Prisma__SecurityIncidentClient<$Result.GetResult<Prisma.$SecurityIncidentPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one SecurityIncident that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {SecurityIncidentFindUniqueOrThrowArgs} args - Arguments to find a SecurityIncident
+     * @example
+     * // Get one SecurityIncident
+     * const securityIncident = await prisma.securityIncident.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SecurityIncidentFindUniqueOrThrowArgs>(args: SelectSubset<T, SecurityIncidentFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SecurityIncidentClient<$Result.GetResult<Prisma.$SecurityIncidentPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first SecurityIncident that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SecurityIncidentFindFirstArgs} args - Arguments to find a SecurityIncident
+     * @example
+     * // Get one SecurityIncident
+     * const securityIncident = await prisma.securityIncident.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SecurityIncidentFindFirstArgs>(args?: SelectSubset<T, SecurityIncidentFindFirstArgs<ExtArgs>>): Prisma__SecurityIncidentClient<$Result.GetResult<Prisma.$SecurityIncidentPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first SecurityIncident that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SecurityIncidentFindFirstOrThrowArgs} args - Arguments to find a SecurityIncident
+     * @example
+     * // Get one SecurityIncident
+     * const securityIncident = await prisma.securityIncident.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SecurityIncidentFindFirstOrThrowArgs>(args?: SelectSubset<T, SecurityIncidentFindFirstOrThrowArgs<ExtArgs>>): Prisma__SecurityIncidentClient<$Result.GetResult<Prisma.$SecurityIncidentPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more SecurityIncidents that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SecurityIncidentFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all SecurityIncidents
+     * const securityIncidents = await prisma.securityIncident.findMany()
+     * 
+     * // Get first 10 SecurityIncidents
+     * const securityIncidents = await prisma.securityIncident.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const securityIncidentWithIdOnly = await prisma.securityIncident.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SecurityIncidentFindManyArgs>(args?: SelectSubset<T, SecurityIncidentFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SecurityIncidentPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a SecurityIncident.
+     * @param {SecurityIncidentCreateArgs} args - Arguments to create a SecurityIncident.
+     * @example
+     * // Create one SecurityIncident
+     * const SecurityIncident = await prisma.securityIncident.create({
+     *   data: {
+     *     // ... data to create a SecurityIncident
+     *   }
+     * })
+     * 
+     */
+    create<T extends SecurityIncidentCreateArgs>(args: SelectSubset<T, SecurityIncidentCreateArgs<ExtArgs>>): Prisma__SecurityIncidentClient<$Result.GetResult<Prisma.$SecurityIncidentPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many SecurityIncidents.
+     * @param {SecurityIncidentCreateManyArgs} args - Arguments to create many SecurityIncidents.
+     * @example
+     * // Create many SecurityIncidents
+     * const securityIncident = await prisma.securityIncident.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SecurityIncidentCreateManyArgs>(args?: SelectSubset<T, SecurityIncidentCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many SecurityIncidents and returns the data saved in the database.
+     * @param {SecurityIncidentCreateManyAndReturnArgs} args - Arguments to create many SecurityIncidents.
+     * @example
+     * // Create many SecurityIncidents
+     * const securityIncident = await prisma.securityIncident.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many SecurityIncidents and only return the `id`
+     * const securityIncidentWithIdOnly = await prisma.securityIncident.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SecurityIncidentCreateManyAndReturnArgs>(args?: SelectSubset<T, SecurityIncidentCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SecurityIncidentPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a SecurityIncident.
+     * @param {SecurityIncidentDeleteArgs} args - Arguments to delete one SecurityIncident.
+     * @example
+     * // Delete one SecurityIncident
+     * const SecurityIncident = await prisma.securityIncident.delete({
+     *   where: {
+     *     // ... filter to delete one SecurityIncident
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SecurityIncidentDeleteArgs>(args: SelectSubset<T, SecurityIncidentDeleteArgs<ExtArgs>>): Prisma__SecurityIncidentClient<$Result.GetResult<Prisma.$SecurityIncidentPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one SecurityIncident.
+     * @param {SecurityIncidentUpdateArgs} args - Arguments to update one SecurityIncident.
+     * @example
+     * // Update one SecurityIncident
+     * const securityIncident = await prisma.securityIncident.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SecurityIncidentUpdateArgs>(args: SelectSubset<T, SecurityIncidentUpdateArgs<ExtArgs>>): Prisma__SecurityIncidentClient<$Result.GetResult<Prisma.$SecurityIncidentPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more SecurityIncidents.
+     * @param {SecurityIncidentDeleteManyArgs} args - Arguments to filter SecurityIncidents to delete.
+     * @example
+     * // Delete a few SecurityIncidents
+     * const { count } = await prisma.securityIncident.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SecurityIncidentDeleteManyArgs>(args?: SelectSubset<T, SecurityIncidentDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SecurityIncidents.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SecurityIncidentUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many SecurityIncidents
+     * const securityIncident = await prisma.securityIncident.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SecurityIncidentUpdateManyArgs>(args: SelectSubset<T, SecurityIncidentUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one SecurityIncident.
+     * @param {SecurityIncidentUpsertArgs} args - Arguments to update or create a SecurityIncident.
+     * @example
+     * // Update or create a SecurityIncident
+     * const securityIncident = await prisma.securityIncident.upsert({
+     *   create: {
+     *     // ... data to create a SecurityIncident
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the SecurityIncident we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SecurityIncidentUpsertArgs>(args: SelectSubset<T, SecurityIncidentUpsertArgs<ExtArgs>>): Prisma__SecurityIncidentClient<$Result.GetResult<Prisma.$SecurityIncidentPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of SecurityIncidents.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SecurityIncidentCountArgs} args - Arguments to filter SecurityIncidents to count.
+     * @example
+     * // Count the number of SecurityIncidents
+     * const count = await prisma.securityIncident.count({
+     *   where: {
+     *     // ... the filter for the SecurityIncidents we want to count
+     *   }
+     * })
+    **/
+    count<T extends SecurityIncidentCountArgs>(
+      args?: Subset<T, SecurityIncidentCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SecurityIncidentCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a SecurityIncident.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SecurityIncidentAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SecurityIncidentAggregateArgs>(args: Subset<T, SecurityIncidentAggregateArgs>): Prisma.PrismaPromise<GetSecurityIncidentAggregateType<T>>
+
+    /**
+     * Group by SecurityIncident.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SecurityIncidentGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SecurityIncidentGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SecurityIncidentGroupByArgs['orderBy'] }
+        : { orderBy?: SecurityIncidentGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SecurityIncidentGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSecurityIncidentGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the SecurityIncident model
+   */
+  readonly fields: SecurityIncidentFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for SecurityIncident.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SecurityIncidentClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    device<T extends SecurityIncident$deviceArgs<ExtArgs> = {}>(args?: Subset<T, SecurityIncident$deviceArgs<ExtArgs>>): Prisma__MonitoringDeviceClient<$Result.GetResult<Prisma.$MonitoringDevicePayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the SecurityIncident model
+   */ 
+  interface SecurityIncidentFieldRefs {
+    readonly id: FieldRef<"SecurityIncident", 'String'>
+    readonly deviceId: FieldRef<"SecurityIncident", 'String'>
+    readonly incidentType: FieldRef<"SecurityIncident", 'IncidentType'>
+    readonly severity: FieldRef<"SecurityIncident", 'IncidentSeverity'>
+    readonly title: FieldRef<"SecurityIncident", 'String'>
+    readonly description: FieldRef<"SecurityIncident", 'String'>
+    readonly affectedSystems: FieldRef<"SecurityIncident", 'Json'>
+    readonly affectedPatients: FieldRef<"SecurityIncident", 'Json'>
+    readonly detectedAt: FieldRef<"SecurityIncident", 'DateTime'>
+    readonly detectedBy: FieldRef<"SecurityIncident", 'String'>
+    readonly reportedBy: FieldRef<"SecurityIncident", 'String'>
+    readonly status: FieldRef<"SecurityIncident", 'IncidentStatus'>
+    readonly assignedTo: FieldRef<"SecurityIncident", 'String'>
+    readonly containedAt: FieldRef<"SecurityIncident", 'DateTime'>
+    readonly resolvedAt: FieldRef<"SecurityIncident", 'DateTime'>
+    readonly rootCause: FieldRef<"SecurityIncident", 'String'>
+    readonly remediationSteps: FieldRef<"SecurityIncident", 'Json'>
+    readonly lessonsLearned: FieldRef<"SecurityIncident", 'String'>
+    readonly timeline: FieldRef<"SecurityIncident", 'Json'>
+    readonly evidence: FieldRef<"SecurityIncident", 'Json'>
+    readonly notificationsSent: FieldRef<"SecurityIncident", 'Boolean'>
+    readonly regulatoryReported: FieldRef<"SecurityIncident", 'Boolean'>
+    readonly regulatoryReportDate: FieldRef<"SecurityIncident", 'DateTime'>
+    readonly createdAt: FieldRef<"SecurityIncident", 'DateTime'>
+    readonly updatedAt: FieldRef<"SecurityIncident", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * SecurityIncident findUnique
+   */
+  export type SecurityIncidentFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SecurityIncident
+     */
+    select?: SecurityIncidentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SecurityIncidentInclude<ExtArgs> | null
+    /**
+     * Filter, which SecurityIncident to fetch.
+     */
+    where: SecurityIncidentWhereUniqueInput
+  }
+
+  /**
+   * SecurityIncident findUniqueOrThrow
+   */
+  export type SecurityIncidentFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SecurityIncident
+     */
+    select?: SecurityIncidentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SecurityIncidentInclude<ExtArgs> | null
+    /**
+     * Filter, which SecurityIncident to fetch.
+     */
+    where: SecurityIncidentWhereUniqueInput
+  }
+
+  /**
+   * SecurityIncident findFirst
+   */
+  export type SecurityIncidentFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SecurityIncident
+     */
+    select?: SecurityIncidentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SecurityIncidentInclude<ExtArgs> | null
+    /**
+     * Filter, which SecurityIncident to fetch.
+     */
+    where?: SecurityIncidentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SecurityIncidents to fetch.
+     */
+    orderBy?: SecurityIncidentOrderByWithRelationInput | SecurityIncidentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SecurityIncidents.
+     */
+    cursor?: SecurityIncidentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SecurityIncidents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SecurityIncidents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SecurityIncidents.
+     */
+    distinct?: SecurityIncidentScalarFieldEnum | SecurityIncidentScalarFieldEnum[]
+  }
+
+  /**
+   * SecurityIncident findFirstOrThrow
+   */
+  export type SecurityIncidentFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SecurityIncident
+     */
+    select?: SecurityIncidentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SecurityIncidentInclude<ExtArgs> | null
+    /**
+     * Filter, which SecurityIncident to fetch.
+     */
+    where?: SecurityIncidentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SecurityIncidents to fetch.
+     */
+    orderBy?: SecurityIncidentOrderByWithRelationInput | SecurityIncidentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SecurityIncidents.
+     */
+    cursor?: SecurityIncidentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SecurityIncidents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SecurityIncidents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SecurityIncidents.
+     */
+    distinct?: SecurityIncidentScalarFieldEnum | SecurityIncidentScalarFieldEnum[]
+  }
+
+  /**
+   * SecurityIncident findMany
+   */
+  export type SecurityIncidentFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SecurityIncident
+     */
+    select?: SecurityIncidentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SecurityIncidentInclude<ExtArgs> | null
+    /**
+     * Filter, which SecurityIncidents to fetch.
+     */
+    where?: SecurityIncidentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SecurityIncidents to fetch.
+     */
+    orderBy?: SecurityIncidentOrderByWithRelationInput | SecurityIncidentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing SecurityIncidents.
+     */
+    cursor?: SecurityIncidentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SecurityIncidents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SecurityIncidents.
+     */
+    skip?: number
+    distinct?: SecurityIncidentScalarFieldEnum | SecurityIncidentScalarFieldEnum[]
+  }
+
+  /**
+   * SecurityIncident create
+   */
+  export type SecurityIncidentCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SecurityIncident
+     */
+    select?: SecurityIncidentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SecurityIncidentInclude<ExtArgs> | null
+    /**
+     * The data needed to create a SecurityIncident.
+     */
+    data: XOR<SecurityIncidentCreateInput, SecurityIncidentUncheckedCreateInput>
+  }
+
+  /**
+   * SecurityIncident createMany
+   */
+  export type SecurityIncidentCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many SecurityIncidents.
+     */
+    data: SecurityIncidentCreateManyInput | SecurityIncidentCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SecurityIncident createManyAndReturn
+   */
+  export type SecurityIncidentCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SecurityIncident
+     */
+    select?: SecurityIncidentSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many SecurityIncidents.
+     */
+    data: SecurityIncidentCreateManyInput | SecurityIncidentCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SecurityIncidentIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SecurityIncident update
+   */
+  export type SecurityIncidentUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SecurityIncident
+     */
+    select?: SecurityIncidentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SecurityIncidentInclude<ExtArgs> | null
+    /**
+     * The data needed to update a SecurityIncident.
+     */
+    data: XOR<SecurityIncidentUpdateInput, SecurityIncidentUncheckedUpdateInput>
+    /**
+     * Choose, which SecurityIncident to update.
+     */
+    where: SecurityIncidentWhereUniqueInput
+  }
+
+  /**
+   * SecurityIncident updateMany
+   */
+  export type SecurityIncidentUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update SecurityIncidents.
+     */
+    data: XOR<SecurityIncidentUpdateManyMutationInput, SecurityIncidentUncheckedUpdateManyInput>
+    /**
+     * Filter which SecurityIncidents to update
+     */
+    where?: SecurityIncidentWhereInput
+  }
+
+  /**
+   * SecurityIncident upsert
+   */
+  export type SecurityIncidentUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SecurityIncident
+     */
+    select?: SecurityIncidentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SecurityIncidentInclude<ExtArgs> | null
+    /**
+     * The filter to search for the SecurityIncident to update in case it exists.
+     */
+    where: SecurityIncidentWhereUniqueInput
+    /**
+     * In case the SecurityIncident found by the `where` argument doesn't exist, create a new SecurityIncident with this data.
+     */
+    create: XOR<SecurityIncidentCreateInput, SecurityIncidentUncheckedCreateInput>
+    /**
+     * In case the SecurityIncident was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SecurityIncidentUpdateInput, SecurityIncidentUncheckedUpdateInput>
+  }
+
+  /**
+   * SecurityIncident delete
+   */
+  export type SecurityIncidentDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SecurityIncident
+     */
+    select?: SecurityIncidentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SecurityIncidentInclude<ExtArgs> | null
+    /**
+     * Filter which SecurityIncident to delete.
+     */
+    where: SecurityIncidentWhereUniqueInput
+  }
+
+  /**
+   * SecurityIncident deleteMany
+   */
+  export type SecurityIncidentDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SecurityIncidents to delete
+     */
+    where?: SecurityIncidentWhereInput
+  }
+
+  /**
+   * SecurityIncident.device
+   */
+  export type SecurityIncident$deviceArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MonitoringDevice
+     */
+    select?: MonitoringDeviceSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MonitoringDeviceInclude<ExtArgs> | null
+    where?: MonitoringDeviceWhereInput
+  }
+
+  /**
+   * SecurityIncident without action
+   */
+  export type SecurityIncidentDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SecurityIncident
+     */
+    select?: SecurityIncidentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SecurityIncidentInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model NetworkSegment
+   */
+
+  export type AggregateNetworkSegment = {
+    _count: NetworkSegmentCountAggregateOutputType | null
+    _avg: NetworkSegmentAvgAggregateOutputType | null
+    _sum: NetworkSegmentSumAggregateOutputType | null
+    _min: NetworkSegmentMinAggregateOutputType | null
+    _max: NetworkSegmentMaxAggregateOutputType | null
+  }
+
+  export type NetworkSegmentAvgAggregateOutputType = {
+    vlanId: number | null
+  }
+
+  export type NetworkSegmentSumAggregateOutputType = {
+    vlanId: number | null
+  }
+
+  export type NetworkSegmentMinAggregateOutputType = {
+    id: string | null
+    name: string | null
+    description: string | null
+    vlanId: number | null
+    subnetCidr: string | null
+    securityLevel: $Enums.SecurityLevel | null
+    isolationLevel: $Enums.IsolationLevel | null
+    monitoringEnabled: boolean | null
+    isActive: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type NetworkSegmentMaxAggregateOutputType = {
+    id: string | null
+    name: string | null
+    description: string | null
+    vlanId: number | null
+    subnetCidr: string | null
+    securityLevel: $Enums.SecurityLevel | null
+    isolationLevel: $Enums.IsolationLevel | null
+    monitoringEnabled: boolean | null
+    isActive: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type NetworkSegmentCountAggregateOutputType = {
+    id: number
+    name: number
+    description: number
+    vlanId: number
+    subnetCidr: number
+    securityLevel: number
+    isolationLevel: number
+    allowedProtocols: number
+    firewallRules: number
+    complianceRequirements: number
+    monitoringEnabled: number
+    isActive: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type NetworkSegmentAvgAggregateInputType = {
+    vlanId?: true
+  }
+
+  export type NetworkSegmentSumAggregateInputType = {
+    vlanId?: true
+  }
+
+  export type NetworkSegmentMinAggregateInputType = {
+    id?: true
+    name?: true
+    description?: true
+    vlanId?: true
+    subnetCidr?: true
+    securityLevel?: true
+    isolationLevel?: true
+    monitoringEnabled?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type NetworkSegmentMaxAggregateInputType = {
+    id?: true
+    name?: true
+    description?: true
+    vlanId?: true
+    subnetCidr?: true
+    securityLevel?: true
+    isolationLevel?: true
+    monitoringEnabled?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type NetworkSegmentCountAggregateInputType = {
+    id?: true
+    name?: true
+    description?: true
+    vlanId?: true
+    subnetCidr?: true
+    securityLevel?: true
+    isolationLevel?: true
+    allowedProtocols?: true
+    firewallRules?: true
+    complianceRequirements?: true
+    monitoringEnabled?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type NetworkSegmentAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which NetworkSegment to aggregate.
+     */
+    where?: NetworkSegmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of NetworkSegments to fetch.
+     */
+    orderBy?: NetworkSegmentOrderByWithRelationInput | NetworkSegmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: NetworkSegmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` NetworkSegments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` NetworkSegments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned NetworkSegments
+    **/
+    _count?: true | NetworkSegmentCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: NetworkSegmentAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: NetworkSegmentSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: NetworkSegmentMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: NetworkSegmentMaxAggregateInputType
+  }
+
+  export type GetNetworkSegmentAggregateType<T extends NetworkSegmentAggregateArgs> = {
+        [P in keyof T & keyof AggregateNetworkSegment]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateNetworkSegment[P]>
+      : GetScalarType<T[P], AggregateNetworkSegment[P]>
+  }
+
+
+
+
+  export type NetworkSegmentGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: NetworkSegmentWhereInput
+    orderBy?: NetworkSegmentOrderByWithAggregationInput | NetworkSegmentOrderByWithAggregationInput[]
+    by: NetworkSegmentScalarFieldEnum[] | NetworkSegmentScalarFieldEnum
+    having?: NetworkSegmentScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: NetworkSegmentCountAggregateInputType | true
+    _avg?: NetworkSegmentAvgAggregateInputType
+    _sum?: NetworkSegmentSumAggregateInputType
+    _min?: NetworkSegmentMinAggregateInputType
+    _max?: NetworkSegmentMaxAggregateInputType
+  }
+
+  export type NetworkSegmentGroupByOutputType = {
+    id: string
+    name: string
+    description: string | null
+    vlanId: number | null
+    subnetCidr: string | null
+    securityLevel: $Enums.SecurityLevel
+    isolationLevel: $Enums.IsolationLevel
+    allowedProtocols: JsonValue | null
+    firewallRules: JsonValue | null
+    complianceRequirements: JsonValue | null
+    monitoringEnabled: boolean
+    isActive: boolean
+    createdAt: Date
+    updatedAt: Date
+    _count: NetworkSegmentCountAggregateOutputType | null
+    _avg: NetworkSegmentAvgAggregateOutputType | null
+    _sum: NetworkSegmentSumAggregateOutputType | null
+    _min: NetworkSegmentMinAggregateOutputType | null
+    _max: NetworkSegmentMaxAggregateOutputType | null
+  }
+
+  type GetNetworkSegmentGroupByPayload<T extends NetworkSegmentGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<NetworkSegmentGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof NetworkSegmentGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], NetworkSegmentGroupByOutputType[P]>
+            : GetScalarType<T[P], NetworkSegmentGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type NetworkSegmentSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    description?: boolean
+    vlanId?: boolean
+    subnetCidr?: boolean
+    securityLevel?: boolean
+    isolationLevel?: boolean
+    allowedProtocols?: boolean
+    firewallRules?: boolean
+    complianceRequirements?: boolean
+    monitoringEnabled?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    devices?: boolean | NetworkSegment$devicesArgs<ExtArgs>
+    _count?: boolean | NetworkSegmentCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["networkSegment"]>
+
+  export type NetworkSegmentSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    description?: boolean
+    vlanId?: boolean
+    subnetCidr?: boolean
+    securityLevel?: boolean
+    isolationLevel?: boolean
+    allowedProtocols?: boolean
+    firewallRules?: boolean
+    complianceRequirements?: boolean
+    monitoringEnabled?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["networkSegment"]>
+
+  export type NetworkSegmentSelectScalar = {
+    id?: boolean
+    name?: boolean
+    description?: boolean
+    vlanId?: boolean
+    subnetCidr?: boolean
+    securityLevel?: boolean
+    isolationLevel?: boolean
+    allowedProtocols?: boolean
+    firewallRules?: boolean
+    complianceRequirements?: boolean
+    monitoringEnabled?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type NetworkSegmentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    devices?: boolean | NetworkSegment$devicesArgs<ExtArgs>
+    _count?: boolean | NetworkSegmentCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type NetworkSegmentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+
+  export type $NetworkSegmentPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "NetworkSegment"
+    objects: {
+      devices: Prisma.$DeviceNetworkAssignmentPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      name: string
+      description: string | null
+      vlanId: number | null
+      subnetCidr: string | null
+      securityLevel: $Enums.SecurityLevel
+      isolationLevel: $Enums.IsolationLevel
+      allowedProtocols: Prisma.JsonValue | null
+      firewallRules: Prisma.JsonValue | null
+      complianceRequirements: Prisma.JsonValue | null
+      monitoringEnabled: boolean
+      isActive: boolean
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["networkSegment"]>
+    composites: {}
+  }
+
+  type NetworkSegmentGetPayload<S extends boolean | null | undefined | NetworkSegmentDefaultArgs> = $Result.GetResult<Prisma.$NetworkSegmentPayload, S>
+
+  type NetworkSegmentCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<NetworkSegmentFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: NetworkSegmentCountAggregateInputType | true
+    }
+
+  export interface NetworkSegmentDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['NetworkSegment'], meta: { name: 'NetworkSegment' } }
+    /**
+     * Find zero or one NetworkSegment that matches the filter.
+     * @param {NetworkSegmentFindUniqueArgs} args - Arguments to find a NetworkSegment
+     * @example
+     * // Get one NetworkSegment
+     * const networkSegment = await prisma.networkSegment.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends NetworkSegmentFindUniqueArgs>(args: SelectSubset<T, NetworkSegmentFindUniqueArgs<ExtArgs>>): Prisma__NetworkSegmentClient<$Result.GetResult<Prisma.$NetworkSegmentPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one NetworkSegment that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {NetworkSegmentFindUniqueOrThrowArgs} args - Arguments to find a NetworkSegment
+     * @example
+     * // Get one NetworkSegment
+     * const networkSegment = await prisma.networkSegment.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends NetworkSegmentFindUniqueOrThrowArgs>(args: SelectSubset<T, NetworkSegmentFindUniqueOrThrowArgs<ExtArgs>>): Prisma__NetworkSegmentClient<$Result.GetResult<Prisma.$NetworkSegmentPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first NetworkSegment that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {NetworkSegmentFindFirstArgs} args - Arguments to find a NetworkSegment
+     * @example
+     * // Get one NetworkSegment
+     * const networkSegment = await prisma.networkSegment.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends NetworkSegmentFindFirstArgs>(args?: SelectSubset<T, NetworkSegmentFindFirstArgs<ExtArgs>>): Prisma__NetworkSegmentClient<$Result.GetResult<Prisma.$NetworkSegmentPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first NetworkSegment that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {NetworkSegmentFindFirstOrThrowArgs} args - Arguments to find a NetworkSegment
+     * @example
+     * // Get one NetworkSegment
+     * const networkSegment = await prisma.networkSegment.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends NetworkSegmentFindFirstOrThrowArgs>(args?: SelectSubset<T, NetworkSegmentFindFirstOrThrowArgs<ExtArgs>>): Prisma__NetworkSegmentClient<$Result.GetResult<Prisma.$NetworkSegmentPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more NetworkSegments that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {NetworkSegmentFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all NetworkSegments
+     * const networkSegments = await prisma.networkSegment.findMany()
+     * 
+     * // Get first 10 NetworkSegments
+     * const networkSegments = await prisma.networkSegment.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const networkSegmentWithIdOnly = await prisma.networkSegment.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends NetworkSegmentFindManyArgs>(args?: SelectSubset<T, NetworkSegmentFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NetworkSegmentPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a NetworkSegment.
+     * @param {NetworkSegmentCreateArgs} args - Arguments to create a NetworkSegment.
+     * @example
+     * // Create one NetworkSegment
+     * const NetworkSegment = await prisma.networkSegment.create({
+     *   data: {
+     *     // ... data to create a NetworkSegment
+     *   }
+     * })
+     * 
+     */
+    create<T extends NetworkSegmentCreateArgs>(args: SelectSubset<T, NetworkSegmentCreateArgs<ExtArgs>>): Prisma__NetworkSegmentClient<$Result.GetResult<Prisma.$NetworkSegmentPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many NetworkSegments.
+     * @param {NetworkSegmentCreateManyArgs} args - Arguments to create many NetworkSegments.
+     * @example
+     * // Create many NetworkSegments
+     * const networkSegment = await prisma.networkSegment.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends NetworkSegmentCreateManyArgs>(args?: SelectSubset<T, NetworkSegmentCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many NetworkSegments and returns the data saved in the database.
+     * @param {NetworkSegmentCreateManyAndReturnArgs} args - Arguments to create many NetworkSegments.
+     * @example
+     * // Create many NetworkSegments
+     * const networkSegment = await prisma.networkSegment.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many NetworkSegments and only return the `id`
+     * const networkSegmentWithIdOnly = await prisma.networkSegment.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends NetworkSegmentCreateManyAndReturnArgs>(args?: SelectSubset<T, NetworkSegmentCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NetworkSegmentPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a NetworkSegment.
+     * @param {NetworkSegmentDeleteArgs} args - Arguments to delete one NetworkSegment.
+     * @example
+     * // Delete one NetworkSegment
+     * const NetworkSegment = await prisma.networkSegment.delete({
+     *   where: {
+     *     // ... filter to delete one NetworkSegment
+     *   }
+     * })
+     * 
+     */
+    delete<T extends NetworkSegmentDeleteArgs>(args: SelectSubset<T, NetworkSegmentDeleteArgs<ExtArgs>>): Prisma__NetworkSegmentClient<$Result.GetResult<Prisma.$NetworkSegmentPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one NetworkSegment.
+     * @param {NetworkSegmentUpdateArgs} args - Arguments to update one NetworkSegment.
+     * @example
+     * // Update one NetworkSegment
+     * const networkSegment = await prisma.networkSegment.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends NetworkSegmentUpdateArgs>(args: SelectSubset<T, NetworkSegmentUpdateArgs<ExtArgs>>): Prisma__NetworkSegmentClient<$Result.GetResult<Prisma.$NetworkSegmentPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more NetworkSegments.
+     * @param {NetworkSegmentDeleteManyArgs} args - Arguments to filter NetworkSegments to delete.
+     * @example
+     * // Delete a few NetworkSegments
+     * const { count } = await prisma.networkSegment.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends NetworkSegmentDeleteManyArgs>(args?: SelectSubset<T, NetworkSegmentDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more NetworkSegments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {NetworkSegmentUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many NetworkSegments
+     * const networkSegment = await prisma.networkSegment.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends NetworkSegmentUpdateManyArgs>(args: SelectSubset<T, NetworkSegmentUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one NetworkSegment.
+     * @param {NetworkSegmentUpsertArgs} args - Arguments to update or create a NetworkSegment.
+     * @example
+     * // Update or create a NetworkSegment
+     * const networkSegment = await prisma.networkSegment.upsert({
+     *   create: {
+     *     // ... data to create a NetworkSegment
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the NetworkSegment we want to update
+     *   }
+     * })
+     */
+    upsert<T extends NetworkSegmentUpsertArgs>(args: SelectSubset<T, NetworkSegmentUpsertArgs<ExtArgs>>): Prisma__NetworkSegmentClient<$Result.GetResult<Prisma.$NetworkSegmentPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of NetworkSegments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {NetworkSegmentCountArgs} args - Arguments to filter NetworkSegments to count.
+     * @example
+     * // Count the number of NetworkSegments
+     * const count = await prisma.networkSegment.count({
+     *   where: {
+     *     // ... the filter for the NetworkSegments we want to count
+     *   }
+     * })
+    **/
+    count<T extends NetworkSegmentCountArgs>(
+      args?: Subset<T, NetworkSegmentCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], NetworkSegmentCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a NetworkSegment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {NetworkSegmentAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends NetworkSegmentAggregateArgs>(args: Subset<T, NetworkSegmentAggregateArgs>): Prisma.PrismaPromise<GetNetworkSegmentAggregateType<T>>
+
+    /**
+     * Group by NetworkSegment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {NetworkSegmentGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends NetworkSegmentGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: NetworkSegmentGroupByArgs['orderBy'] }
+        : { orderBy?: NetworkSegmentGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, NetworkSegmentGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetNetworkSegmentGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the NetworkSegment model
+   */
+  readonly fields: NetworkSegmentFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for NetworkSegment.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__NetworkSegmentClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    devices<T extends NetworkSegment$devicesArgs<ExtArgs> = {}>(args?: Subset<T, NetworkSegment$devicesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DeviceNetworkAssignmentPayload<ExtArgs>, T, "findMany"> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the NetworkSegment model
+   */ 
+  interface NetworkSegmentFieldRefs {
+    readonly id: FieldRef<"NetworkSegment", 'String'>
+    readonly name: FieldRef<"NetworkSegment", 'String'>
+    readonly description: FieldRef<"NetworkSegment", 'String'>
+    readonly vlanId: FieldRef<"NetworkSegment", 'Int'>
+    readonly subnetCidr: FieldRef<"NetworkSegment", 'String'>
+    readonly securityLevel: FieldRef<"NetworkSegment", 'SecurityLevel'>
+    readonly isolationLevel: FieldRef<"NetworkSegment", 'IsolationLevel'>
+    readonly allowedProtocols: FieldRef<"NetworkSegment", 'Json'>
+    readonly firewallRules: FieldRef<"NetworkSegment", 'Json'>
+    readonly complianceRequirements: FieldRef<"NetworkSegment", 'Json'>
+    readonly monitoringEnabled: FieldRef<"NetworkSegment", 'Boolean'>
+    readonly isActive: FieldRef<"NetworkSegment", 'Boolean'>
+    readonly createdAt: FieldRef<"NetworkSegment", 'DateTime'>
+    readonly updatedAt: FieldRef<"NetworkSegment", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * NetworkSegment findUnique
+   */
+  export type NetworkSegmentFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the NetworkSegment
+     */
+    select?: NetworkSegmentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NetworkSegmentInclude<ExtArgs> | null
+    /**
+     * Filter, which NetworkSegment to fetch.
+     */
+    where: NetworkSegmentWhereUniqueInput
+  }
+
+  /**
+   * NetworkSegment findUniqueOrThrow
+   */
+  export type NetworkSegmentFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the NetworkSegment
+     */
+    select?: NetworkSegmentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NetworkSegmentInclude<ExtArgs> | null
+    /**
+     * Filter, which NetworkSegment to fetch.
+     */
+    where: NetworkSegmentWhereUniqueInput
+  }
+
+  /**
+   * NetworkSegment findFirst
+   */
+  export type NetworkSegmentFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the NetworkSegment
+     */
+    select?: NetworkSegmentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NetworkSegmentInclude<ExtArgs> | null
+    /**
+     * Filter, which NetworkSegment to fetch.
+     */
+    where?: NetworkSegmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of NetworkSegments to fetch.
+     */
+    orderBy?: NetworkSegmentOrderByWithRelationInput | NetworkSegmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for NetworkSegments.
+     */
+    cursor?: NetworkSegmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` NetworkSegments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` NetworkSegments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of NetworkSegments.
+     */
+    distinct?: NetworkSegmentScalarFieldEnum | NetworkSegmentScalarFieldEnum[]
+  }
+
+  /**
+   * NetworkSegment findFirstOrThrow
+   */
+  export type NetworkSegmentFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the NetworkSegment
+     */
+    select?: NetworkSegmentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NetworkSegmentInclude<ExtArgs> | null
+    /**
+     * Filter, which NetworkSegment to fetch.
+     */
+    where?: NetworkSegmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of NetworkSegments to fetch.
+     */
+    orderBy?: NetworkSegmentOrderByWithRelationInput | NetworkSegmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for NetworkSegments.
+     */
+    cursor?: NetworkSegmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` NetworkSegments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` NetworkSegments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of NetworkSegments.
+     */
+    distinct?: NetworkSegmentScalarFieldEnum | NetworkSegmentScalarFieldEnum[]
+  }
+
+  /**
+   * NetworkSegment findMany
+   */
+  export type NetworkSegmentFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the NetworkSegment
+     */
+    select?: NetworkSegmentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NetworkSegmentInclude<ExtArgs> | null
+    /**
+     * Filter, which NetworkSegments to fetch.
+     */
+    where?: NetworkSegmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of NetworkSegments to fetch.
+     */
+    orderBy?: NetworkSegmentOrderByWithRelationInput | NetworkSegmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing NetworkSegments.
+     */
+    cursor?: NetworkSegmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` NetworkSegments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` NetworkSegments.
+     */
+    skip?: number
+    distinct?: NetworkSegmentScalarFieldEnum | NetworkSegmentScalarFieldEnum[]
+  }
+
+  /**
+   * NetworkSegment create
+   */
+  export type NetworkSegmentCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the NetworkSegment
+     */
+    select?: NetworkSegmentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NetworkSegmentInclude<ExtArgs> | null
+    /**
+     * The data needed to create a NetworkSegment.
+     */
+    data: XOR<NetworkSegmentCreateInput, NetworkSegmentUncheckedCreateInput>
+  }
+
+  /**
+   * NetworkSegment createMany
+   */
+  export type NetworkSegmentCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many NetworkSegments.
+     */
+    data: NetworkSegmentCreateManyInput | NetworkSegmentCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * NetworkSegment createManyAndReturn
+   */
+  export type NetworkSegmentCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the NetworkSegment
+     */
+    select?: NetworkSegmentSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many NetworkSegments.
+     */
+    data: NetworkSegmentCreateManyInput | NetworkSegmentCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * NetworkSegment update
+   */
+  export type NetworkSegmentUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the NetworkSegment
+     */
+    select?: NetworkSegmentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NetworkSegmentInclude<ExtArgs> | null
+    /**
+     * The data needed to update a NetworkSegment.
+     */
+    data: XOR<NetworkSegmentUpdateInput, NetworkSegmentUncheckedUpdateInput>
+    /**
+     * Choose, which NetworkSegment to update.
+     */
+    where: NetworkSegmentWhereUniqueInput
+  }
+
+  /**
+   * NetworkSegment updateMany
+   */
+  export type NetworkSegmentUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update NetworkSegments.
+     */
+    data: XOR<NetworkSegmentUpdateManyMutationInput, NetworkSegmentUncheckedUpdateManyInput>
+    /**
+     * Filter which NetworkSegments to update
+     */
+    where?: NetworkSegmentWhereInput
+  }
+
+  /**
+   * NetworkSegment upsert
+   */
+  export type NetworkSegmentUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the NetworkSegment
+     */
+    select?: NetworkSegmentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NetworkSegmentInclude<ExtArgs> | null
+    /**
+     * The filter to search for the NetworkSegment to update in case it exists.
+     */
+    where: NetworkSegmentWhereUniqueInput
+    /**
+     * In case the NetworkSegment found by the `where` argument doesn't exist, create a new NetworkSegment with this data.
+     */
+    create: XOR<NetworkSegmentCreateInput, NetworkSegmentUncheckedCreateInput>
+    /**
+     * In case the NetworkSegment was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<NetworkSegmentUpdateInput, NetworkSegmentUncheckedUpdateInput>
+  }
+
+  /**
+   * NetworkSegment delete
+   */
+  export type NetworkSegmentDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the NetworkSegment
+     */
+    select?: NetworkSegmentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NetworkSegmentInclude<ExtArgs> | null
+    /**
+     * Filter which NetworkSegment to delete.
+     */
+    where: NetworkSegmentWhereUniqueInput
+  }
+
+  /**
+   * NetworkSegment deleteMany
+   */
+  export type NetworkSegmentDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which NetworkSegments to delete
+     */
+    where?: NetworkSegmentWhereInput
+  }
+
+  /**
+   * NetworkSegment.devices
+   */
+  export type NetworkSegment$devicesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceNetworkAssignment
+     */
+    select?: DeviceNetworkAssignmentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceNetworkAssignmentInclude<ExtArgs> | null
+    where?: DeviceNetworkAssignmentWhereInput
+    orderBy?: DeviceNetworkAssignmentOrderByWithRelationInput | DeviceNetworkAssignmentOrderByWithRelationInput[]
+    cursor?: DeviceNetworkAssignmentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DeviceNetworkAssignmentScalarFieldEnum | DeviceNetworkAssignmentScalarFieldEnum[]
+  }
+
+  /**
+   * NetworkSegment without action
+   */
+  export type NetworkSegmentDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the NetworkSegment
+     */
+    select?: NetworkSegmentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NetworkSegmentInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model DeviceNetworkAssignment
+   */
+
+  export type AggregateDeviceNetworkAssignment = {
+    _count: DeviceNetworkAssignmentCountAggregateOutputType | null
+    _min: DeviceNetworkAssignmentMinAggregateOutputType | null
+    _max: DeviceNetworkAssignmentMaxAggregateOutputType | null
+  }
+
+  export type DeviceNetworkAssignmentMinAggregateOutputType = {
+    id: string | null
+    deviceId: string | null
+    segmentId: string | null
+    ipAddress: string | null
+    macAddress: string | null
+    assignedAt: Date | null
+    assignedBy: string | null
+    status: $Enums.AssignmentStatus | null
+    complianceStatus: $Enums.ComplianceStatus | null
+    lastComplianceCheck: Date | null
+    complianceNotes: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type DeviceNetworkAssignmentMaxAggregateOutputType = {
+    id: string | null
+    deviceId: string | null
+    segmentId: string | null
+    ipAddress: string | null
+    macAddress: string | null
+    assignedAt: Date | null
+    assignedBy: string | null
+    status: $Enums.AssignmentStatus | null
+    complianceStatus: $Enums.ComplianceStatus | null
+    lastComplianceCheck: Date | null
+    complianceNotes: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type DeviceNetworkAssignmentCountAggregateOutputType = {
+    id: number
+    deviceId: number
+    segmentId: number
+    ipAddress: number
+    macAddress: number
+    assignedAt: number
+    assignedBy: number
+    status: number
+    complianceStatus: number
+    lastComplianceCheck: number
+    complianceNotes: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type DeviceNetworkAssignmentMinAggregateInputType = {
+    id?: true
+    deviceId?: true
+    segmentId?: true
+    ipAddress?: true
+    macAddress?: true
+    assignedAt?: true
+    assignedBy?: true
+    status?: true
+    complianceStatus?: true
+    lastComplianceCheck?: true
+    complianceNotes?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type DeviceNetworkAssignmentMaxAggregateInputType = {
+    id?: true
+    deviceId?: true
+    segmentId?: true
+    ipAddress?: true
+    macAddress?: true
+    assignedAt?: true
+    assignedBy?: true
+    status?: true
+    complianceStatus?: true
+    lastComplianceCheck?: true
+    complianceNotes?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type DeviceNetworkAssignmentCountAggregateInputType = {
+    id?: true
+    deviceId?: true
+    segmentId?: true
+    ipAddress?: true
+    macAddress?: true
+    assignedAt?: true
+    assignedBy?: true
+    status?: true
+    complianceStatus?: true
+    lastComplianceCheck?: true
+    complianceNotes?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type DeviceNetworkAssignmentAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DeviceNetworkAssignment to aggregate.
+     */
+    where?: DeviceNetworkAssignmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DeviceNetworkAssignments to fetch.
+     */
+    orderBy?: DeviceNetworkAssignmentOrderByWithRelationInput | DeviceNetworkAssignmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: DeviceNetworkAssignmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DeviceNetworkAssignments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DeviceNetworkAssignments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned DeviceNetworkAssignments
+    **/
+    _count?: true | DeviceNetworkAssignmentCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: DeviceNetworkAssignmentMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: DeviceNetworkAssignmentMaxAggregateInputType
+  }
+
+  export type GetDeviceNetworkAssignmentAggregateType<T extends DeviceNetworkAssignmentAggregateArgs> = {
+        [P in keyof T & keyof AggregateDeviceNetworkAssignment]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateDeviceNetworkAssignment[P]>
+      : GetScalarType<T[P], AggregateDeviceNetworkAssignment[P]>
+  }
+
+
+
+
+  export type DeviceNetworkAssignmentGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DeviceNetworkAssignmentWhereInput
+    orderBy?: DeviceNetworkAssignmentOrderByWithAggregationInput | DeviceNetworkAssignmentOrderByWithAggregationInput[]
+    by: DeviceNetworkAssignmentScalarFieldEnum[] | DeviceNetworkAssignmentScalarFieldEnum
+    having?: DeviceNetworkAssignmentScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: DeviceNetworkAssignmentCountAggregateInputType | true
+    _min?: DeviceNetworkAssignmentMinAggregateInputType
+    _max?: DeviceNetworkAssignmentMaxAggregateInputType
+  }
+
+  export type DeviceNetworkAssignmentGroupByOutputType = {
+    id: string
+    deviceId: string
+    segmentId: string
+    ipAddress: string | null
+    macAddress: string | null
+    assignedAt: Date
+    assignedBy: string
+    status: $Enums.AssignmentStatus
+    complianceStatus: $Enums.ComplianceStatus
+    lastComplianceCheck: Date | null
+    complianceNotes: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: DeviceNetworkAssignmentCountAggregateOutputType | null
+    _min: DeviceNetworkAssignmentMinAggregateOutputType | null
+    _max: DeviceNetworkAssignmentMaxAggregateOutputType | null
+  }
+
+  type GetDeviceNetworkAssignmentGroupByPayload<T extends DeviceNetworkAssignmentGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<DeviceNetworkAssignmentGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof DeviceNetworkAssignmentGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], DeviceNetworkAssignmentGroupByOutputType[P]>
+            : GetScalarType<T[P], DeviceNetworkAssignmentGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type DeviceNetworkAssignmentSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    deviceId?: boolean
+    segmentId?: boolean
+    ipAddress?: boolean
+    macAddress?: boolean
+    assignedAt?: boolean
+    assignedBy?: boolean
+    status?: boolean
+    complianceStatus?: boolean
+    lastComplianceCheck?: boolean
+    complianceNotes?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    device?: boolean | MonitoringDeviceDefaultArgs<ExtArgs>
+    segment?: boolean | NetworkSegmentDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["deviceNetworkAssignment"]>
+
+  export type DeviceNetworkAssignmentSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    deviceId?: boolean
+    segmentId?: boolean
+    ipAddress?: boolean
+    macAddress?: boolean
+    assignedAt?: boolean
+    assignedBy?: boolean
+    status?: boolean
+    complianceStatus?: boolean
+    lastComplianceCheck?: boolean
+    complianceNotes?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    device?: boolean | MonitoringDeviceDefaultArgs<ExtArgs>
+    segment?: boolean | NetworkSegmentDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["deviceNetworkAssignment"]>
+
+  export type DeviceNetworkAssignmentSelectScalar = {
+    id?: boolean
+    deviceId?: boolean
+    segmentId?: boolean
+    ipAddress?: boolean
+    macAddress?: boolean
+    assignedAt?: boolean
+    assignedBy?: boolean
+    status?: boolean
+    complianceStatus?: boolean
+    lastComplianceCheck?: boolean
+    complianceNotes?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type DeviceNetworkAssignmentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    device?: boolean | MonitoringDeviceDefaultArgs<ExtArgs>
+    segment?: boolean | NetworkSegmentDefaultArgs<ExtArgs>
+  }
+  export type DeviceNetworkAssignmentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    device?: boolean | MonitoringDeviceDefaultArgs<ExtArgs>
+    segment?: boolean | NetworkSegmentDefaultArgs<ExtArgs>
+  }
+
+  export type $DeviceNetworkAssignmentPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "DeviceNetworkAssignment"
+    objects: {
+      device: Prisma.$MonitoringDevicePayload<ExtArgs>
+      segment: Prisma.$NetworkSegmentPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      deviceId: string
+      segmentId: string
+      ipAddress: string | null
+      macAddress: string | null
+      assignedAt: Date
+      assignedBy: string
+      status: $Enums.AssignmentStatus
+      complianceStatus: $Enums.ComplianceStatus
+      lastComplianceCheck: Date | null
+      complianceNotes: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["deviceNetworkAssignment"]>
+    composites: {}
+  }
+
+  type DeviceNetworkAssignmentGetPayload<S extends boolean | null | undefined | DeviceNetworkAssignmentDefaultArgs> = $Result.GetResult<Prisma.$DeviceNetworkAssignmentPayload, S>
+
+  type DeviceNetworkAssignmentCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<DeviceNetworkAssignmentFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: DeviceNetworkAssignmentCountAggregateInputType | true
+    }
+
+  export interface DeviceNetworkAssignmentDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['DeviceNetworkAssignment'], meta: { name: 'DeviceNetworkAssignment' } }
+    /**
+     * Find zero or one DeviceNetworkAssignment that matches the filter.
+     * @param {DeviceNetworkAssignmentFindUniqueArgs} args - Arguments to find a DeviceNetworkAssignment
+     * @example
+     * // Get one DeviceNetworkAssignment
+     * const deviceNetworkAssignment = await prisma.deviceNetworkAssignment.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends DeviceNetworkAssignmentFindUniqueArgs>(args: SelectSubset<T, DeviceNetworkAssignmentFindUniqueArgs<ExtArgs>>): Prisma__DeviceNetworkAssignmentClient<$Result.GetResult<Prisma.$DeviceNetworkAssignmentPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one DeviceNetworkAssignment that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {DeviceNetworkAssignmentFindUniqueOrThrowArgs} args - Arguments to find a DeviceNetworkAssignment
+     * @example
+     * // Get one DeviceNetworkAssignment
+     * const deviceNetworkAssignment = await prisma.deviceNetworkAssignment.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends DeviceNetworkAssignmentFindUniqueOrThrowArgs>(args: SelectSubset<T, DeviceNetworkAssignmentFindUniqueOrThrowArgs<ExtArgs>>): Prisma__DeviceNetworkAssignmentClient<$Result.GetResult<Prisma.$DeviceNetworkAssignmentPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first DeviceNetworkAssignment that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeviceNetworkAssignmentFindFirstArgs} args - Arguments to find a DeviceNetworkAssignment
+     * @example
+     * // Get one DeviceNetworkAssignment
+     * const deviceNetworkAssignment = await prisma.deviceNetworkAssignment.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends DeviceNetworkAssignmentFindFirstArgs>(args?: SelectSubset<T, DeviceNetworkAssignmentFindFirstArgs<ExtArgs>>): Prisma__DeviceNetworkAssignmentClient<$Result.GetResult<Prisma.$DeviceNetworkAssignmentPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first DeviceNetworkAssignment that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeviceNetworkAssignmentFindFirstOrThrowArgs} args - Arguments to find a DeviceNetworkAssignment
+     * @example
+     * // Get one DeviceNetworkAssignment
+     * const deviceNetworkAssignment = await prisma.deviceNetworkAssignment.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends DeviceNetworkAssignmentFindFirstOrThrowArgs>(args?: SelectSubset<T, DeviceNetworkAssignmentFindFirstOrThrowArgs<ExtArgs>>): Prisma__DeviceNetworkAssignmentClient<$Result.GetResult<Prisma.$DeviceNetworkAssignmentPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more DeviceNetworkAssignments that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeviceNetworkAssignmentFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all DeviceNetworkAssignments
+     * const deviceNetworkAssignments = await prisma.deviceNetworkAssignment.findMany()
+     * 
+     * // Get first 10 DeviceNetworkAssignments
+     * const deviceNetworkAssignments = await prisma.deviceNetworkAssignment.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const deviceNetworkAssignmentWithIdOnly = await prisma.deviceNetworkAssignment.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends DeviceNetworkAssignmentFindManyArgs>(args?: SelectSubset<T, DeviceNetworkAssignmentFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DeviceNetworkAssignmentPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a DeviceNetworkAssignment.
+     * @param {DeviceNetworkAssignmentCreateArgs} args - Arguments to create a DeviceNetworkAssignment.
+     * @example
+     * // Create one DeviceNetworkAssignment
+     * const DeviceNetworkAssignment = await prisma.deviceNetworkAssignment.create({
+     *   data: {
+     *     // ... data to create a DeviceNetworkAssignment
+     *   }
+     * })
+     * 
+     */
+    create<T extends DeviceNetworkAssignmentCreateArgs>(args: SelectSubset<T, DeviceNetworkAssignmentCreateArgs<ExtArgs>>): Prisma__DeviceNetworkAssignmentClient<$Result.GetResult<Prisma.$DeviceNetworkAssignmentPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many DeviceNetworkAssignments.
+     * @param {DeviceNetworkAssignmentCreateManyArgs} args - Arguments to create many DeviceNetworkAssignments.
+     * @example
+     * // Create many DeviceNetworkAssignments
+     * const deviceNetworkAssignment = await prisma.deviceNetworkAssignment.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends DeviceNetworkAssignmentCreateManyArgs>(args?: SelectSubset<T, DeviceNetworkAssignmentCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many DeviceNetworkAssignments and returns the data saved in the database.
+     * @param {DeviceNetworkAssignmentCreateManyAndReturnArgs} args - Arguments to create many DeviceNetworkAssignments.
+     * @example
+     * // Create many DeviceNetworkAssignments
+     * const deviceNetworkAssignment = await prisma.deviceNetworkAssignment.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many DeviceNetworkAssignments and only return the `id`
+     * const deviceNetworkAssignmentWithIdOnly = await prisma.deviceNetworkAssignment.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends DeviceNetworkAssignmentCreateManyAndReturnArgs>(args?: SelectSubset<T, DeviceNetworkAssignmentCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DeviceNetworkAssignmentPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a DeviceNetworkAssignment.
+     * @param {DeviceNetworkAssignmentDeleteArgs} args - Arguments to delete one DeviceNetworkAssignment.
+     * @example
+     * // Delete one DeviceNetworkAssignment
+     * const DeviceNetworkAssignment = await prisma.deviceNetworkAssignment.delete({
+     *   where: {
+     *     // ... filter to delete one DeviceNetworkAssignment
+     *   }
+     * })
+     * 
+     */
+    delete<T extends DeviceNetworkAssignmentDeleteArgs>(args: SelectSubset<T, DeviceNetworkAssignmentDeleteArgs<ExtArgs>>): Prisma__DeviceNetworkAssignmentClient<$Result.GetResult<Prisma.$DeviceNetworkAssignmentPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one DeviceNetworkAssignment.
+     * @param {DeviceNetworkAssignmentUpdateArgs} args - Arguments to update one DeviceNetworkAssignment.
+     * @example
+     * // Update one DeviceNetworkAssignment
+     * const deviceNetworkAssignment = await prisma.deviceNetworkAssignment.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends DeviceNetworkAssignmentUpdateArgs>(args: SelectSubset<T, DeviceNetworkAssignmentUpdateArgs<ExtArgs>>): Prisma__DeviceNetworkAssignmentClient<$Result.GetResult<Prisma.$DeviceNetworkAssignmentPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more DeviceNetworkAssignments.
+     * @param {DeviceNetworkAssignmentDeleteManyArgs} args - Arguments to filter DeviceNetworkAssignments to delete.
+     * @example
+     * // Delete a few DeviceNetworkAssignments
+     * const { count } = await prisma.deviceNetworkAssignment.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends DeviceNetworkAssignmentDeleteManyArgs>(args?: SelectSubset<T, DeviceNetworkAssignmentDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DeviceNetworkAssignments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeviceNetworkAssignmentUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many DeviceNetworkAssignments
+     * const deviceNetworkAssignment = await prisma.deviceNetworkAssignment.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends DeviceNetworkAssignmentUpdateManyArgs>(args: SelectSubset<T, DeviceNetworkAssignmentUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one DeviceNetworkAssignment.
+     * @param {DeviceNetworkAssignmentUpsertArgs} args - Arguments to update or create a DeviceNetworkAssignment.
+     * @example
+     * // Update or create a DeviceNetworkAssignment
+     * const deviceNetworkAssignment = await prisma.deviceNetworkAssignment.upsert({
+     *   create: {
+     *     // ... data to create a DeviceNetworkAssignment
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the DeviceNetworkAssignment we want to update
+     *   }
+     * })
+     */
+    upsert<T extends DeviceNetworkAssignmentUpsertArgs>(args: SelectSubset<T, DeviceNetworkAssignmentUpsertArgs<ExtArgs>>): Prisma__DeviceNetworkAssignmentClient<$Result.GetResult<Prisma.$DeviceNetworkAssignmentPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of DeviceNetworkAssignments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeviceNetworkAssignmentCountArgs} args - Arguments to filter DeviceNetworkAssignments to count.
+     * @example
+     * // Count the number of DeviceNetworkAssignments
+     * const count = await prisma.deviceNetworkAssignment.count({
+     *   where: {
+     *     // ... the filter for the DeviceNetworkAssignments we want to count
+     *   }
+     * })
+    **/
+    count<T extends DeviceNetworkAssignmentCountArgs>(
+      args?: Subset<T, DeviceNetworkAssignmentCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], DeviceNetworkAssignmentCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a DeviceNetworkAssignment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeviceNetworkAssignmentAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends DeviceNetworkAssignmentAggregateArgs>(args: Subset<T, DeviceNetworkAssignmentAggregateArgs>): Prisma.PrismaPromise<GetDeviceNetworkAssignmentAggregateType<T>>
+
+    /**
+     * Group by DeviceNetworkAssignment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeviceNetworkAssignmentGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends DeviceNetworkAssignmentGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: DeviceNetworkAssignmentGroupByArgs['orderBy'] }
+        : { orderBy?: DeviceNetworkAssignmentGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, DeviceNetworkAssignmentGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetDeviceNetworkAssignmentGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the DeviceNetworkAssignment model
+   */
+  readonly fields: DeviceNetworkAssignmentFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for DeviceNetworkAssignment.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__DeviceNetworkAssignmentClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    device<T extends MonitoringDeviceDefaultArgs<ExtArgs> = {}>(args?: Subset<T, MonitoringDeviceDefaultArgs<ExtArgs>>): Prisma__MonitoringDeviceClient<$Result.GetResult<Prisma.$MonitoringDevicePayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    segment<T extends NetworkSegmentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, NetworkSegmentDefaultArgs<ExtArgs>>): Prisma__NetworkSegmentClient<$Result.GetResult<Prisma.$NetworkSegmentPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the DeviceNetworkAssignment model
+   */ 
+  interface DeviceNetworkAssignmentFieldRefs {
+    readonly id: FieldRef<"DeviceNetworkAssignment", 'String'>
+    readonly deviceId: FieldRef<"DeviceNetworkAssignment", 'String'>
+    readonly segmentId: FieldRef<"DeviceNetworkAssignment", 'String'>
+    readonly ipAddress: FieldRef<"DeviceNetworkAssignment", 'String'>
+    readonly macAddress: FieldRef<"DeviceNetworkAssignment", 'String'>
+    readonly assignedAt: FieldRef<"DeviceNetworkAssignment", 'DateTime'>
+    readonly assignedBy: FieldRef<"DeviceNetworkAssignment", 'String'>
+    readonly status: FieldRef<"DeviceNetworkAssignment", 'AssignmentStatus'>
+    readonly complianceStatus: FieldRef<"DeviceNetworkAssignment", 'ComplianceStatus'>
+    readonly lastComplianceCheck: FieldRef<"DeviceNetworkAssignment", 'DateTime'>
+    readonly complianceNotes: FieldRef<"DeviceNetworkAssignment", 'String'>
+    readonly createdAt: FieldRef<"DeviceNetworkAssignment", 'DateTime'>
+    readonly updatedAt: FieldRef<"DeviceNetworkAssignment", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * DeviceNetworkAssignment findUnique
+   */
+  export type DeviceNetworkAssignmentFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceNetworkAssignment
+     */
+    select?: DeviceNetworkAssignmentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceNetworkAssignmentInclude<ExtArgs> | null
+    /**
+     * Filter, which DeviceNetworkAssignment to fetch.
+     */
+    where: DeviceNetworkAssignmentWhereUniqueInput
+  }
+
+  /**
+   * DeviceNetworkAssignment findUniqueOrThrow
+   */
+  export type DeviceNetworkAssignmentFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceNetworkAssignment
+     */
+    select?: DeviceNetworkAssignmentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceNetworkAssignmentInclude<ExtArgs> | null
+    /**
+     * Filter, which DeviceNetworkAssignment to fetch.
+     */
+    where: DeviceNetworkAssignmentWhereUniqueInput
+  }
+
+  /**
+   * DeviceNetworkAssignment findFirst
+   */
+  export type DeviceNetworkAssignmentFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceNetworkAssignment
+     */
+    select?: DeviceNetworkAssignmentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceNetworkAssignmentInclude<ExtArgs> | null
+    /**
+     * Filter, which DeviceNetworkAssignment to fetch.
+     */
+    where?: DeviceNetworkAssignmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DeviceNetworkAssignments to fetch.
+     */
+    orderBy?: DeviceNetworkAssignmentOrderByWithRelationInput | DeviceNetworkAssignmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DeviceNetworkAssignments.
+     */
+    cursor?: DeviceNetworkAssignmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DeviceNetworkAssignments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DeviceNetworkAssignments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DeviceNetworkAssignments.
+     */
+    distinct?: DeviceNetworkAssignmentScalarFieldEnum | DeviceNetworkAssignmentScalarFieldEnum[]
+  }
+
+  /**
+   * DeviceNetworkAssignment findFirstOrThrow
+   */
+  export type DeviceNetworkAssignmentFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceNetworkAssignment
+     */
+    select?: DeviceNetworkAssignmentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceNetworkAssignmentInclude<ExtArgs> | null
+    /**
+     * Filter, which DeviceNetworkAssignment to fetch.
+     */
+    where?: DeviceNetworkAssignmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DeviceNetworkAssignments to fetch.
+     */
+    orderBy?: DeviceNetworkAssignmentOrderByWithRelationInput | DeviceNetworkAssignmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DeviceNetworkAssignments.
+     */
+    cursor?: DeviceNetworkAssignmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DeviceNetworkAssignments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DeviceNetworkAssignments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DeviceNetworkAssignments.
+     */
+    distinct?: DeviceNetworkAssignmentScalarFieldEnum | DeviceNetworkAssignmentScalarFieldEnum[]
+  }
+
+  /**
+   * DeviceNetworkAssignment findMany
+   */
+  export type DeviceNetworkAssignmentFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceNetworkAssignment
+     */
+    select?: DeviceNetworkAssignmentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceNetworkAssignmentInclude<ExtArgs> | null
+    /**
+     * Filter, which DeviceNetworkAssignments to fetch.
+     */
+    where?: DeviceNetworkAssignmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DeviceNetworkAssignments to fetch.
+     */
+    orderBy?: DeviceNetworkAssignmentOrderByWithRelationInput | DeviceNetworkAssignmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing DeviceNetworkAssignments.
+     */
+    cursor?: DeviceNetworkAssignmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DeviceNetworkAssignments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DeviceNetworkAssignments.
+     */
+    skip?: number
+    distinct?: DeviceNetworkAssignmentScalarFieldEnum | DeviceNetworkAssignmentScalarFieldEnum[]
+  }
+
+  /**
+   * DeviceNetworkAssignment create
+   */
+  export type DeviceNetworkAssignmentCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceNetworkAssignment
+     */
+    select?: DeviceNetworkAssignmentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceNetworkAssignmentInclude<ExtArgs> | null
+    /**
+     * The data needed to create a DeviceNetworkAssignment.
+     */
+    data: XOR<DeviceNetworkAssignmentCreateInput, DeviceNetworkAssignmentUncheckedCreateInput>
+  }
+
+  /**
+   * DeviceNetworkAssignment createMany
+   */
+  export type DeviceNetworkAssignmentCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many DeviceNetworkAssignments.
+     */
+    data: DeviceNetworkAssignmentCreateManyInput | DeviceNetworkAssignmentCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * DeviceNetworkAssignment createManyAndReturn
+   */
+  export type DeviceNetworkAssignmentCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceNetworkAssignment
+     */
+    select?: DeviceNetworkAssignmentSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many DeviceNetworkAssignments.
+     */
+    data: DeviceNetworkAssignmentCreateManyInput | DeviceNetworkAssignmentCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceNetworkAssignmentIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * DeviceNetworkAssignment update
+   */
+  export type DeviceNetworkAssignmentUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceNetworkAssignment
+     */
+    select?: DeviceNetworkAssignmentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceNetworkAssignmentInclude<ExtArgs> | null
+    /**
+     * The data needed to update a DeviceNetworkAssignment.
+     */
+    data: XOR<DeviceNetworkAssignmentUpdateInput, DeviceNetworkAssignmentUncheckedUpdateInput>
+    /**
+     * Choose, which DeviceNetworkAssignment to update.
+     */
+    where: DeviceNetworkAssignmentWhereUniqueInput
+  }
+
+  /**
+   * DeviceNetworkAssignment updateMany
+   */
+  export type DeviceNetworkAssignmentUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update DeviceNetworkAssignments.
+     */
+    data: XOR<DeviceNetworkAssignmentUpdateManyMutationInput, DeviceNetworkAssignmentUncheckedUpdateManyInput>
+    /**
+     * Filter which DeviceNetworkAssignments to update
+     */
+    where?: DeviceNetworkAssignmentWhereInput
+  }
+
+  /**
+   * DeviceNetworkAssignment upsert
+   */
+  export type DeviceNetworkAssignmentUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceNetworkAssignment
+     */
+    select?: DeviceNetworkAssignmentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceNetworkAssignmentInclude<ExtArgs> | null
+    /**
+     * The filter to search for the DeviceNetworkAssignment to update in case it exists.
+     */
+    where: DeviceNetworkAssignmentWhereUniqueInput
+    /**
+     * In case the DeviceNetworkAssignment found by the `where` argument doesn't exist, create a new DeviceNetworkAssignment with this data.
+     */
+    create: XOR<DeviceNetworkAssignmentCreateInput, DeviceNetworkAssignmentUncheckedCreateInput>
+    /**
+     * In case the DeviceNetworkAssignment was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<DeviceNetworkAssignmentUpdateInput, DeviceNetworkAssignmentUncheckedUpdateInput>
+  }
+
+  /**
+   * DeviceNetworkAssignment delete
+   */
+  export type DeviceNetworkAssignmentDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceNetworkAssignment
+     */
+    select?: DeviceNetworkAssignmentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceNetworkAssignmentInclude<ExtArgs> | null
+    /**
+     * Filter which DeviceNetworkAssignment to delete.
+     */
+    where: DeviceNetworkAssignmentWhereUniqueInput
+  }
+
+  /**
+   * DeviceNetworkAssignment deleteMany
+   */
+  export type DeviceNetworkAssignmentDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DeviceNetworkAssignments to delete
+     */
+    where?: DeviceNetworkAssignmentWhereInput
+  }
+
+  /**
+   * DeviceNetworkAssignment without action
+   */
+  export type DeviceNetworkAssignmentDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceNetworkAssignment
+     */
+    select?: DeviceNetworkAssignmentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceNetworkAssignmentInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model FDARecall
+   */
+
+  export type AggregateFDARecall = {
+    _count: FDARecallCountAggregateOutputType | null
+    _min: FDARecallMinAggregateOutputType | null
+    _max: FDARecallMaxAggregateOutputType | null
+  }
+
+  export type FDARecallMinAggregateOutputType = {
+    id: string | null
+    recallNumber: string | null
+    recallClass: $Enums.RecallClass | null
+    productDescription: string | null
+    manufacturer: string | null
+    reasonForRecall: string | null
+    distributionPattern: string | null
+    initiatedDate: Date | null
+    terminatedDate: Date | null
+    status: $Enums.RecallStatus | null
+    healthHazard: string | null
+    remedyDescription: string | null
+    lastCheckedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type FDARecallMaxAggregateOutputType = {
+    id: string | null
+    recallNumber: string | null
+    recallClass: $Enums.RecallClass | null
+    productDescription: string | null
+    manufacturer: string | null
+    reasonForRecall: string | null
+    distributionPattern: string | null
+    initiatedDate: Date | null
+    terminatedDate: Date | null
+    status: $Enums.RecallStatus | null
+    healthHazard: string | null
+    remedyDescription: string | null
+    lastCheckedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type FDARecallCountAggregateOutputType = {
+    id: number
+    recallNumber: number
+    recallClass: number
+    productDescription: number
+    manufacturer: number
+    reasonForRecall: number
+    distributionPattern: number
+    initiatedDate: number
+    terminatedDate: number
+    status: number
+    affectedModels: number
+    lotNumbers: number
+    healthHazard: number
+    remedyDescription: number
+    lastCheckedAt: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type FDARecallMinAggregateInputType = {
+    id?: true
+    recallNumber?: true
+    recallClass?: true
+    productDescription?: true
+    manufacturer?: true
+    reasonForRecall?: true
+    distributionPattern?: true
+    initiatedDate?: true
+    terminatedDate?: true
+    status?: true
+    healthHazard?: true
+    remedyDescription?: true
+    lastCheckedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type FDARecallMaxAggregateInputType = {
+    id?: true
+    recallNumber?: true
+    recallClass?: true
+    productDescription?: true
+    manufacturer?: true
+    reasonForRecall?: true
+    distributionPattern?: true
+    initiatedDate?: true
+    terminatedDate?: true
+    status?: true
+    healthHazard?: true
+    remedyDescription?: true
+    lastCheckedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type FDARecallCountAggregateInputType = {
+    id?: true
+    recallNumber?: true
+    recallClass?: true
+    productDescription?: true
+    manufacturer?: true
+    reasonForRecall?: true
+    distributionPattern?: true
+    initiatedDate?: true
+    terminatedDate?: true
+    status?: true
+    affectedModels?: true
+    lotNumbers?: true
+    healthHazard?: true
+    remedyDescription?: true
+    lastCheckedAt?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type FDARecallAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FDARecall to aggregate.
+     */
+    where?: FDARecallWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FDARecalls to fetch.
+     */
+    orderBy?: FDARecallOrderByWithRelationInput | FDARecallOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: FDARecallWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FDARecalls from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FDARecalls.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned FDARecalls
+    **/
+    _count?: true | FDARecallCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: FDARecallMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: FDARecallMaxAggregateInputType
+  }
+
+  export type GetFDARecallAggregateType<T extends FDARecallAggregateArgs> = {
+        [P in keyof T & keyof AggregateFDARecall]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateFDARecall[P]>
+      : GetScalarType<T[P], AggregateFDARecall[P]>
+  }
+
+
+
+
+  export type FDARecallGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FDARecallWhereInput
+    orderBy?: FDARecallOrderByWithAggregationInput | FDARecallOrderByWithAggregationInput[]
+    by: FDARecallScalarFieldEnum[] | FDARecallScalarFieldEnum
+    having?: FDARecallScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: FDARecallCountAggregateInputType | true
+    _min?: FDARecallMinAggregateInputType
+    _max?: FDARecallMaxAggregateInputType
+  }
+
+  export type FDARecallGroupByOutputType = {
+    id: string
+    recallNumber: string
+    recallClass: $Enums.RecallClass
+    productDescription: string
+    manufacturer: string
+    reasonForRecall: string
+    distributionPattern: string | null
+    initiatedDate: Date
+    terminatedDate: Date | null
+    status: $Enums.RecallStatus
+    affectedModels: JsonValue | null
+    lotNumbers: JsonValue | null
+    healthHazard: string | null
+    remedyDescription: string | null
+    lastCheckedAt: Date
+    createdAt: Date
+    updatedAt: Date
+    _count: FDARecallCountAggregateOutputType | null
+    _min: FDARecallMinAggregateOutputType | null
+    _max: FDARecallMaxAggregateOutputType | null
+  }
+
+  type GetFDARecallGroupByPayload<T extends FDARecallGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<FDARecallGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof FDARecallGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], FDARecallGroupByOutputType[P]>
+            : GetScalarType<T[P], FDARecallGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type FDARecallSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    recallNumber?: boolean
+    recallClass?: boolean
+    productDescription?: boolean
+    manufacturer?: boolean
+    reasonForRecall?: boolean
+    distributionPattern?: boolean
+    initiatedDate?: boolean
+    terminatedDate?: boolean
+    status?: boolean
+    affectedModels?: boolean
+    lotNumbers?: boolean
+    healthHazard?: boolean
+    remedyDescription?: boolean
+    lastCheckedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    affectedDevices?: boolean | FDARecall$affectedDevicesArgs<ExtArgs>
+    _count?: boolean | FDARecallCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["fDARecall"]>
+
+  export type FDARecallSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    recallNumber?: boolean
+    recallClass?: boolean
+    productDescription?: boolean
+    manufacturer?: boolean
+    reasonForRecall?: boolean
+    distributionPattern?: boolean
+    initiatedDate?: boolean
+    terminatedDate?: boolean
+    status?: boolean
+    affectedModels?: boolean
+    lotNumbers?: boolean
+    healthHazard?: boolean
+    remedyDescription?: boolean
+    lastCheckedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["fDARecall"]>
+
+  export type FDARecallSelectScalar = {
+    id?: boolean
+    recallNumber?: boolean
+    recallClass?: boolean
+    productDescription?: boolean
+    manufacturer?: boolean
+    reasonForRecall?: boolean
+    distributionPattern?: boolean
+    initiatedDate?: boolean
+    terminatedDate?: boolean
+    status?: boolean
+    affectedModels?: boolean
+    lotNumbers?: boolean
+    healthHazard?: boolean
+    remedyDescription?: boolean
+    lastCheckedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type FDARecallInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    affectedDevices?: boolean | FDARecall$affectedDevicesArgs<ExtArgs>
+    _count?: boolean | FDARecallCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type FDARecallIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+
+  export type $FDARecallPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "FDARecall"
+    objects: {
+      affectedDevices: Prisma.$DeviceRecallStatusPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      recallNumber: string
+      recallClass: $Enums.RecallClass
+      productDescription: string
+      manufacturer: string
+      reasonForRecall: string
+      distributionPattern: string | null
+      initiatedDate: Date
+      terminatedDate: Date | null
+      status: $Enums.RecallStatus
+      affectedModels: Prisma.JsonValue | null
+      lotNumbers: Prisma.JsonValue | null
+      healthHazard: string | null
+      remedyDescription: string | null
+      lastCheckedAt: Date
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["fDARecall"]>
+    composites: {}
+  }
+
+  type FDARecallGetPayload<S extends boolean | null | undefined | FDARecallDefaultArgs> = $Result.GetResult<Prisma.$FDARecallPayload, S>
+
+  type FDARecallCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<FDARecallFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: FDARecallCountAggregateInputType | true
+    }
+
+  export interface FDARecallDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['FDARecall'], meta: { name: 'FDARecall' } }
+    /**
+     * Find zero or one FDARecall that matches the filter.
+     * @param {FDARecallFindUniqueArgs} args - Arguments to find a FDARecall
+     * @example
+     * // Get one FDARecall
+     * const fDARecall = await prisma.fDARecall.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends FDARecallFindUniqueArgs>(args: SelectSubset<T, FDARecallFindUniqueArgs<ExtArgs>>): Prisma__FDARecallClient<$Result.GetResult<Prisma.$FDARecallPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one FDARecall that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {FDARecallFindUniqueOrThrowArgs} args - Arguments to find a FDARecall
+     * @example
+     * // Get one FDARecall
+     * const fDARecall = await prisma.fDARecall.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends FDARecallFindUniqueOrThrowArgs>(args: SelectSubset<T, FDARecallFindUniqueOrThrowArgs<ExtArgs>>): Prisma__FDARecallClient<$Result.GetResult<Prisma.$FDARecallPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first FDARecall that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FDARecallFindFirstArgs} args - Arguments to find a FDARecall
+     * @example
+     * // Get one FDARecall
+     * const fDARecall = await prisma.fDARecall.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends FDARecallFindFirstArgs>(args?: SelectSubset<T, FDARecallFindFirstArgs<ExtArgs>>): Prisma__FDARecallClient<$Result.GetResult<Prisma.$FDARecallPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first FDARecall that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FDARecallFindFirstOrThrowArgs} args - Arguments to find a FDARecall
+     * @example
+     * // Get one FDARecall
+     * const fDARecall = await prisma.fDARecall.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends FDARecallFindFirstOrThrowArgs>(args?: SelectSubset<T, FDARecallFindFirstOrThrowArgs<ExtArgs>>): Prisma__FDARecallClient<$Result.GetResult<Prisma.$FDARecallPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more FDARecalls that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FDARecallFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all FDARecalls
+     * const fDARecalls = await prisma.fDARecall.findMany()
+     * 
+     * // Get first 10 FDARecalls
+     * const fDARecalls = await prisma.fDARecall.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const fDARecallWithIdOnly = await prisma.fDARecall.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends FDARecallFindManyArgs>(args?: SelectSubset<T, FDARecallFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FDARecallPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a FDARecall.
+     * @param {FDARecallCreateArgs} args - Arguments to create a FDARecall.
+     * @example
+     * // Create one FDARecall
+     * const FDARecall = await prisma.fDARecall.create({
+     *   data: {
+     *     // ... data to create a FDARecall
+     *   }
+     * })
+     * 
+     */
+    create<T extends FDARecallCreateArgs>(args: SelectSubset<T, FDARecallCreateArgs<ExtArgs>>): Prisma__FDARecallClient<$Result.GetResult<Prisma.$FDARecallPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many FDARecalls.
+     * @param {FDARecallCreateManyArgs} args - Arguments to create many FDARecalls.
+     * @example
+     * // Create many FDARecalls
+     * const fDARecall = await prisma.fDARecall.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends FDARecallCreateManyArgs>(args?: SelectSubset<T, FDARecallCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many FDARecalls and returns the data saved in the database.
+     * @param {FDARecallCreateManyAndReturnArgs} args - Arguments to create many FDARecalls.
+     * @example
+     * // Create many FDARecalls
+     * const fDARecall = await prisma.fDARecall.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many FDARecalls and only return the `id`
+     * const fDARecallWithIdOnly = await prisma.fDARecall.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends FDARecallCreateManyAndReturnArgs>(args?: SelectSubset<T, FDARecallCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FDARecallPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a FDARecall.
+     * @param {FDARecallDeleteArgs} args - Arguments to delete one FDARecall.
+     * @example
+     * // Delete one FDARecall
+     * const FDARecall = await prisma.fDARecall.delete({
+     *   where: {
+     *     // ... filter to delete one FDARecall
+     *   }
+     * })
+     * 
+     */
+    delete<T extends FDARecallDeleteArgs>(args: SelectSubset<T, FDARecallDeleteArgs<ExtArgs>>): Prisma__FDARecallClient<$Result.GetResult<Prisma.$FDARecallPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one FDARecall.
+     * @param {FDARecallUpdateArgs} args - Arguments to update one FDARecall.
+     * @example
+     * // Update one FDARecall
+     * const fDARecall = await prisma.fDARecall.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends FDARecallUpdateArgs>(args: SelectSubset<T, FDARecallUpdateArgs<ExtArgs>>): Prisma__FDARecallClient<$Result.GetResult<Prisma.$FDARecallPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more FDARecalls.
+     * @param {FDARecallDeleteManyArgs} args - Arguments to filter FDARecalls to delete.
+     * @example
+     * // Delete a few FDARecalls
+     * const { count } = await prisma.fDARecall.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends FDARecallDeleteManyArgs>(args?: SelectSubset<T, FDARecallDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more FDARecalls.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FDARecallUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many FDARecalls
+     * const fDARecall = await prisma.fDARecall.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends FDARecallUpdateManyArgs>(args: SelectSubset<T, FDARecallUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one FDARecall.
+     * @param {FDARecallUpsertArgs} args - Arguments to update or create a FDARecall.
+     * @example
+     * // Update or create a FDARecall
+     * const fDARecall = await prisma.fDARecall.upsert({
+     *   create: {
+     *     // ... data to create a FDARecall
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the FDARecall we want to update
+     *   }
+     * })
+     */
+    upsert<T extends FDARecallUpsertArgs>(args: SelectSubset<T, FDARecallUpsertArgs<ExtArgs>>): Prisma__FDARecallClient<$Result.GetResult<Prisma.$FDARecallPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of FDARecalls.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FDARecallCountArgs} args - Arguments to filter FDARecalls to count.
+     * @example
+     * // Count the number of FDARecalls
+     * const count = await prisma.fDARecall.count({
+     *   where: {
+     *     // ... the filter for the FDARecalls we want to count
+     *   }
+     * })
+    **/
+    count<T extends FDARecallCountArgs>(
+      args?: Subset<T, FDARecallCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], FDARecallCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a FDARecall.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FDARecallAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends FDARecallAggregateArgs>(args: Subset<T, FDARecallAggregateArgs>): Prisma.PrismaPromise<GetFDARecallAggregateType<T>>
+
+    /**
+     * Group by FDARecall.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FDARecallGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends FDARecallGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: FDARecallGroupByArgs['orderBy'] }
+        : { orderBy?: FDARecallGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, FDARecallGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetFDARecallGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the FDARecall model
+   */
+  readonly fields: FDARecallFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for FDARecall.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__FDARecallClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    affectedDevices<T extends FDARecall$affectedDevicesArgs<ExtArgs> = {}>(args?: Subset<T, FDARecall$affectedDevicesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DeviceRecallStatusPayload<ExtArgs>, T, "findMany"> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the FDARecall model
+   */ 
+  interface FDARecallFieldRefs {
+    readonly id: FieldRef<"FDARecall", 'String'>
+    readonly recallNumber: FieldRef<"FDARecall", 'String'>
+    readonly recallClass: FieldRef<"FDARecall", 'RecallClass'>
+    readonly productDescription: FieldRef<"FDARecall", 'String'>
+    readonly manufacturer: FieldRef<"FDARecall", 'String'>
+    readonly reasonForRecall: FieldRef<"FDARecall", 'String'>
+    readonly distributionPattern: FieldRef<"FDARecall", 'String'>
+    readonly initiatedDate: FieldRef<"FDARecall", 'DateTime'>
+    readonly terminatedDate: FieldRef<"FDARecall", 'DateTime'>
+    readonly status: FieldRef<"FDARecall", 'RecallStatus'>
+    readonly affectedModels: FieldRef<"FDARecall", 'Json'>
+    readonly lotNumbers: FieldRef<"FDARecall", 'Json'>
+    readonly healthHazard: FieldRef<"FDARecall", 'String'>
+    readonly remedyDescription: FieldRef<"FDARecall", 'String'>
+    readonly lastCheckedAt: FieldRef<"FDARecall", 'DateTime'>
+    readonly createdAt: FieldRef<"FDARecall", 'DateTime'>
+    readonly updatedAt: FieldRef<"FDARecall", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * FDARecall findUnique
+   */
+  export type FDARecallFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FDARecall
+     */
+    select?: FDARecallSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FDARecallInclude<ExtArgs> | null
+    /**
+     * Filter, which FDARecall to fetch.
+     */
+    where: FDARecallWhereUniqueInput
+  }
+
+  /**
+   * FDARecall findUniqueOrThrow
+   */
+  export type FDARecallFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FDARecall
+     */
+    select?: FDARecallSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FDARecallInclude<ExtArgs> | null
+    /**
+     * Filter, which FDARecall to fetch.
+     */
+    where: FDARecallWhereUniqueInput
+  }
+
+  /**
+   * FDARecall findFirst
+   */
+  export type FDARecallFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FDARecall
+     */
+    select?: FDARecallSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FDARecallInclude<ExtArgs> | null
+    /**
+     * Filter, which FDARecall to fetch.
+     */
+    where?: FDARecallWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FDARecalls to fetch.
+     */
+    orderBy?: FDARecallOrderByWithRelationInput | FDARecallOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FDARecalls.
+     */
+    cursor?: FDARecallWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FDARecalls from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FDARecalls.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FDARecalls.
+     */
+    distinct?: FDARecallScalarFieldEnum | FDARecallScalarFieldEnum[]
+  }
+
+  /**
+   * FDARecall findFirstOrThrow
+   */
+  export type FDARecallFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FDARecall
+     */
+    select?: FDARecallSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FDARecallInclude<ExtArgs> | null
+    /**
+     * Filter, which FDARecall to fetch.
+     */
+    where?: FDARecallWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FDARecalls to fetch.
+     */
+    orderBy?: FDARecallOrderByWithRelationInput | FDARecallOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FDARecalls.
+     */
+    cursor?: FDARecallWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FDARecalls from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FDARecalls.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FDARecalls.
+     */
+    distinct?: FDARecallScalarFieldEnum | FDARecallScalarFieldEnum[]
+  }
+
+  /**
+   * FDARecall findMany
+   */
+  export type FDARecallFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FDARecall
+     */
+    select?: FDARecallSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FDARecallInclude<ExtArgs> | null
+    /**
+     * Filter, which FDARecalls to fetch.
+     */
+    where?: FDARecallWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FDARecalls to fetch.
+     */
+    orderBy?: FDARecallOrderByWithRelationInput | FDARecallOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing FDARecalls.
+     */
+    cursor?: FDARecallWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FDARecalls from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FDARecalls.
+     */
+    skip?: number
+    distinct?: FDARecallScalarFieldEnum | FDARecallScalarFieldEnum[]
+  }
+
+  /**
+   * FDARecall create
+   */
+  export type FDARecallCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FDARecall
+     */
+    select?: FDARecallSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FDARecallInclude<ExtArgs> | null
+    /**
+     * The data needed to create a FDARecall.
+     */
+    data: XOR<FDARecallCreateInput, FDARecallUncheckedCreateInput>
+  }
+
+  /**
+   * FDARecall createMany
+   */
+  export type FDARecallCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many FDARecalls.
+     */
+    data: FDARecallCreateManyInput | FDARecallCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * FDARecall createManyAndReturn
+   */
+  export type FDARecallCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FDARecall
+     */
+    select?: FDARecallSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many FDARecalls.
+     */
+    data: FDARecallCreateManyInput | FDARecallCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * FDARecall update
+   */
+  export type FDARecallUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FDARecall
+     */
+    select?: FDARecallSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FDARecallInclude<ExtArgs> | null
+    /**
+     * The data needed to update a FDARecall.
+     */
+    data: XOR<FDARecallUpdateInput, FDARecallUncheckedUpdateInput>
+    /**
+     * Choose, which FDARecall to update.
+     */
+    where: FDARecallWhereUniqueInput
+  }
+
+  /**
+   * FDARecall updateMany
+   */
+  export type FDARecallUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update FDARecalls.
+     */
+    data: XOR<FDARecallUpdateManyMutationInput, FDARecallUncheckedUpdateManyInput>
+    /**
+     * Filter which FDARecalls to update
+     */
+    where?: FDARecallWhereInput
+  }
+
+  /**
+   * FDARecall upsert
+   */
+  export type FDARecallUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FDARecall
+     */
+    select?: FDARecallSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FDARecallInclude<ExtArgs> | null
+    /**
+     * The filter to search for the FDARecall to update in case it exists.
+     */
+    where: FDARecallWhereUniqueInput
+    /**
+     * In case the FDARecall found by the `where` argument doesn't exist, create a new FDARecall with this data.
+     */
+    create: XOR<FDARecallCreateInput, FDARecallUncheckedCreateInput>
+    /**
+     * In case the FDARecall was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<FDARecallUpdateInput, FDARecallUncheckedUpdateInput>
+  }
+
+  /**
+   * FDARecall delete
+   */
+  export type FDARecallDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FDARecall
+     */
+    select?: FDARecallSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FDARecallInclude<ExtArgs> | null
+    /**
+     * Filter which FDARecall to delete.
+     */
+    where: FDARecallWhereUniqueInput
+  }
+
+  /**
+   * FDARecall deleteMany
+   */
+  export type FDARecallDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FDARecalls to delete
+     */
+    where?: FDARecallWhereInput
+  }
+
+  /**
+   * FDARecall.affectedDevices
+   */
+  export type FDARecall$affectedDevicesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceRecallStatus
+     */
+    select?: DeviceRecallStatusSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceRecallStatusInclude<ExtArgs> | null
+    where?: DeviceRecallStatusWhereInput
+    orderBy?: DeviceRecallStatusOrderByWithRelationInput | DeviceRecallStatusOrderByWithRelationInput[]
+    cursor?: DeviceRecallStatusWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DeviceRecallStatusScalarFieldEnum | DeviceRecallStatusScalarFieldEnum[]
+  }
+
+  /**
+   * FDARecall without action
+   */
+  export type FDARecallDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FDARecall
+     */
+    select?: FDARecallSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FDARecallInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model DeviceRecallStatus
+   */
+
+  export type AggregateDeviceRecallStatus = {
+    _count: DeviceRecallStatusCountAggregateOutputType | null
+    _min: DeviceRecallStatusMinAggregateOutputType | null
+    _max: DeviceRecallStatusMaxAggregateOutputType | null
+  }
+
+  export type DeviceRecallStatusMinAggregateOutputType = {
+    id: string | null
+    deviceId: string | null
+    recallId: string | null
+    status: $Enums.DeviceRecallAction | null
+    actionTaken: string | null
+    actionDate: Date | null
+    actionBy: string | null
+    notes: string | null
+    patientNotified: boolean | null
+    providerNotified: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type DeviceRecallStatusMaxAggregateOutputType = {
+    id: string | null
+    deviceId: string | null
+    recallId: string | null
+    status: $Enums.DeviceRecallAction | null
+    actionTaken: string | null
+    actionDate: Date | null
+    actionBy: string | null
+    notes: string | null
+    patientNotified: boolean | null
+    providerNotified: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type DeviceRecallStatusCountAggregateOutputType = {
+    id: number
+    deviceId: number
+    recallId: number
+    status: number
+    actionTaken: number
+    actionDate: number
+    actionBy: number
+    notes: number
+    patientNotified: number
+    providerNotified: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type DeviceRecallStatusMinAggregateInputType = {
+    id?: true
+    deviceId?: true
+    recallId?: true
+    status?: true
+    actionTaken?: true
+    actionDate?: true
+    actionBy?: true
+    notes?: true
+    patientNotified?: true
+    providerNotified?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type DeviceRecallStatusMaxAggregateInputType = {
+    id?: true
+    deviceId?: true
+    recallId?: true
+    status?: true
+    actionTaken?: true
+    actionDate?: true
+    actionBy?: true
+    notes?: true
+    patientNotified?: true
+    providerNotified?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type DeviceRecallStatusCountAggregateInputType = {
+    id?: true
+    deviceId?: true
+    recallId?: true
+    status?: true
+    actionTaken?: true
+    actionDate?: true
+    actionBy?: true
+    notes?: true
+    patientNotified?: true
+    providerNotified?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type DeviceRecallStatusAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DeviceRecallStatus to aggregate.
+     */
+    where?: DeviceRecallStatusWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DeviceRecallStatuses to fetch.
+     */
+    orderBy?: DeviceRecallStatusOrderByWithRelationInput | DeviceRecallStatusOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: DeviceRecallStatusWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DeviceRecallStatuses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DeviceRecallStatuses.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned DeviceRecallStatuses
+    **/
+    _count?: true | DeviceRecallStatusCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: DeviceRecallStatusMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: DeviceRecallStatusMaxAggregateInputType
+  }
+
+  export type GetDeviceRecallStatusAggregateType<T extends DeviceRecallStatusAggregateArgs> = {
+        [P in keyof T & keyof AggregateDeviceRecallStatus]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateDeviceRecallStatus[P]>
+      : GetScalarType<T[P], AggregateDeviceRecallStatus[P]>
+  }
+
+
+
+
+  export type DeviceRecallStatusGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DeviceRecallStatusWhereInput
+    orderBy?: DeviceRecallStatusOrderByWithAggregationInput | DeviceRecallStatusOrderByWithAggregationInput[]
+    by: DeviceRecallStatusScalarFieldEnum[] | DeviceRecallStatusScalarFieldEnum
+    having?: DeviceRecallStatusScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: DeviceRecallStatusCountAggregateInputType | true
+    _min?: DeviceRecallStatusMinAggregateInputType
+    _max?: DeviceRecallStatusMaxAggregateInputType
+  }
+
+  export type DeviceRecallStatusGroupByOutputType = {
+    id: string
+    deviceId: string
+    recallId: string
+    status: $Enums.DeviceRecallAction
+    actionTaken: string | null
+    actionDate: Date | null
+    actionBy: string | null
+    notes: string | null
+    patientNotified: boolean
+    providerNotified: boolean
+    createdAt: Date
+    updatedAt: Date
+    _count: DeviceRecallStatusCountAggregateOutputType | null
+    _min: DeviceRecallStatusMinAggregateOutputType | null
+    _max: DeviceRecallStatusMaxAggregateOutputType | null
+  }
+
+  type GetDeviceRecallStatusGroupByPayload<T extends DeviceRecallStatusGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<DeviceRecallStatusGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof DeviceRecallStatusGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], DeviceRecallStatusGroupByOutputType[P]>
+            : GetScalarType<T[P], DeviceRecallStatusGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type DeviceRecallStatusSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    deviceId?: boolean
+    recallId?: boolean
+    status?: boolean
+    actionTaken?: boolean
+    actionDate?: boolean
+    actionBy?: boolean
+    notes?: boolean
+    patientNotified?: boolean
+    providerNotified?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    device?: boolean | MonitoringDeviceDefaultArgs<ExtArgs>
+    recall?: boolean | FDARecallDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["deviceRecallStatus"]>
+
+  export type DeviceRecallStatusSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    deviceId?: boolean
+    recallId?: boolean
+    status?: boolean
+    actionTaken?: boolean
+    actionDate?: boolean
+    actionBy?: boolean
+    notes?: boolean
+    patientNotified?: boolean
+    providerNotified?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    device?: boolean | MonitoringDeviceDefaultArgs<ExtArgs>
+    recall?: boolean | FDARecallDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["deviceRecallStatus"]>
+
+  export type DeviceRecallStatusSelectScalar = {
+    id?: boolean
+    deviceId?: boolean
+    recallId?: boolean
+    status?: boolean
+    actionTaken?: boolean
+    actionDate?: boolean
+    actionBy?: boolean
+    notes?: boolean
+    patientNotified?: boolean
+    providerNotified?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type DeviceRecallStatusInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    device?: boolean | MonitoringDeviceDefaultArgs<ExtArgs>
+    recall?: boolean | FDARecallDefaultArgs<ExtArgs>
+  }
+  export type DeviceRecallStatusIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    device?: boolean | MonitoringDeviceDefaultArgs<ExtArgs>
+    recall?: boolean | FDARecallDefaultArgs<ExtArgs>
+  }
+
+  export type $DeviceRecallStatusPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "DeviceRecallStatus"
+    objects: {
+      device: Prisma.$MonitoringDevicePayload<ExtArgs>
+      recall: Prisma.$FDARecallPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      deviceId: string
+      recallId: string
+      status: $Enums.DeviceRecallAction
+      actionTaken: string | null
+      actionDate: Date | null
+      actionBy: string | null
+      notes: string | null
+      patientNotified: boolean
+      providerNotified: boolean
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["deviceRecallStatus"]>
+    composites: {}
+  }
+
+  type DeviceRecallStatusGetPayload<S extends boolean | null | undefined | DeviceRecallStatusDefaultArgs> = $Result.GetResult<Prisma.$DeviceRecallStatusPayload, S>
+
+  type DeviceRecallStatusCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<DeviceRecallStatusFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: DeviceRecallStatusCountAggregateInputType | true
+    }
+
+  export interface DeviceRecallStatusDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['DeviceRecallStatus'], meta: { name: 'DeviceRecallStatus' } }
+    /**
+     * Find zero or one DeviceRecallStatus that matches the filter.
+     * @param {DeviceRecallStatusFindUniqueArgs} args - Arguments to find a DeviceRecallStatus
+     * @example
+     * // Get one DeviceRecallStatus
+     * const deviceRecallStatus = await prisma.deviceRecallStatus.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends DeviceRecallStatusFindUniqueArgs>(args: SelectSubset<T, DeviceRecallStatusFindUniqueArgs<ExtArgs>>): Prisma__DeviceRecallStatusClient<$Result.GetResult<Prisma.$DeviceRecallStatusPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one DeviceRecallStatus that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {DeviceRecallStatusFindUniqueOrThrowArgs} args - Arguments to find a DeviceRecallStatus
+     * @example
+     * // Get one DeviceRecallStatus
+     * const deviceRecallStatus = await prisma.deviceRecallStatus.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends DeviceRecallStatusFindUniqueOrThrowArgs>(args: SelectSubset<T, DeviceRecallStatusFindUniqueOrThrowArgs<ExtArgs>>): Prisma__DeviceRecallStatusClient<$Result.GetResult<Prisma.$DeviceRecallStatusPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first DeviceRecallStatus that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeviceRecallStatusFindFirstArgs} args - Arguments to find a DeviceRecallStatus
+     * @example
+     * // Get one DeviceRecallStatus
+     * const deviceRecallStatus = await prisma.deviceRecallStatus.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends DeviceRecallStatusFindFirstArgs>(args?: SelectSubset<T, DeviceRecallStatusFindFirstArgs<ExtArgs>>): Prisma__DeviceRecallStatusClient<$Result.GetResult<Prisma.$DeviceRecallStatusPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first DeviceRecallStatus that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeviceRecallStatusFindFirstOrThrowArgs} args - Arguments to find a DeviceRecallStatus
+     * @example
+     * // Get one DeviceRecallStatus
+     * const deviceRecallStatus = await prisma.deviceRecallStatus.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends DeviceRecallStatusFindFirstOrThrowArgs>(args?: SelectSubset<T, DeviceRecallStatusFindFirstOrThrowArgs<ExtArgs>>): Prisma__DeviceRecallStatusClient<$Result.GetResult<Prisma.$DeviceRecallStatusPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more DeviceRecallStatuses that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeviceRecallStatusFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all DeviceRecallStatuses
+     * const deviceRecallStatuses = await prisma.deviceRecallStatus.findMany()
+     * 
+     * // Get first 10 DeviceRecallStatuses
+     * const deviceRecallStatuses = await prisma.deviceRecallStatus.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const deviceRecallStatusWithIdOnly = await prisma.deviceRecallStatus.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends DeviceRecallStatusFindManyArgs>(args?: SelectSubset<T, DeviceRecallStatusFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DeviceRecallStatusPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a DeviceRecallStatus.
+     * @param {DeviceRecallStatusCreateArgs} args - Arguments to create a DeviceRecallStatus.
+     * @example
+     * // Create one DeviceRecallStatus
+     * const DeviceRecallStatus = await prisma.deviceRecallStatus.create({
+     *   data: {
+     *     // ... data to create a DeviceRecallStatus
+     *   }
+     * })
+     * 
+     */
+    create<T extends DeviceRecallStatusCreateArgs>(args: SelectSubset<T, DeviceRecallStatusCreateArgs<ExtArgs>>): Prisma__DeviceRecallStatusClient<$Result.GetResult<Prisma.$DeviceRecallStatusPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many DeviceRecallStatuses.
+     * @param {DeviceRecallStatusCreateManyArgs} args - Arguments to create many DeviceRecallStatuses.
+     * @example
+     * // Create many DeviceRecallStatuses
+     * const deviceRecallStatus = await prisma.deviceRecallStatus.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends DeviceRecallStatusCreateManyArgs>(args?: SelectSubset<T, DeviceRecallStatusCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many DeviceRecallStatuses and returns the data saved in the database.
+     * @param {DeviceRecallStatusCreateManyAndReturnArgs} args - Arguments to create many DeviceRecallStatuses.
+     * @example
+     * // Create many DeviceRecallStatuses
+     * const deviceRecallStatus = await prisma.deviceRecallStatus.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many DeviceRecallStatuses and only return the `id`
+     * const deviceRecallStatusWithIdOnly = await prisma.deviceRecallStatus.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends DeviceRecallStatusCreateManyAndReturnArgs>(args?: SelectSubset<T, DeviceRecallStatusCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DeviceRecallStatusPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a DeviceRecallStatus.
+     * @param {DeviceRecallStatusDeleteArgs} args - Arguments to delete one DeviceRecallStatus.
+     * @example
+     * // Delete one DeviceRecallStatus
+     * const DeviceRecallStatus = await prisma.deviceRecallStatus.delete({
+     *   where: {
+     *     // ... filter to delete one DeviceRecallStatus
+     *   }
+     * })
+     * 
+     */
+    delete<T extends DeviceRecallStatusDeleteArgs>(args: SelectSubset<T, DeviceRecallStatusDeleteArgs<ExtArgs>>): Prisma__DeviceRecallStatusClient<$Result.GetResult<Prisma.$DeviceRecallStatusPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one DeviceRecallStatus.
+     * @param {DeviceRecallStatusUpdateArgs} args - Arguments to update one DeviceRecallStatus.
+     * @example
+     * // Update one DeviceRecallStatus
+     * const deviceRecallStatus = await prisma.deviceRecallStatus.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends DeviceRecallStatusUpdateArgs>(args: SelectSubset<T, DeviceRecallStatusUpdateArgs<ExtArgs>>): Prisma__DeviceRecallStatusClient<$Result.GetResult<Prisma.$DeviceRecallStatusPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more DeviceRecallStatuses.
+     * @param {DeviceRecallStatusDeleteManyArgs} args - Arguments to filter DeviceRecallStatuses to delete.
+     * @example
+     * // Delete a few DeviceRecallStatuses
+     * const { count } = await prisma.deviceRecallStatus.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends DeviceRecallStatusDeleteManyArgs>(args?: SelectSubset<T, DeviceRecallStatusDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DeviceRecallStatuses.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeviceRecallStatusUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many DeviceRecallStatuses
+     * const deviceRecallStatus = await prisma.deviceRecallStatus.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends DeviceRecallStatusUpdateManyArgs>(args: SelectSubset<T, DeviceRecallStatusUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one DeviceRecallStatus.
+     * @param {DeviceRecallStatusUpsertArgs} args - Arguments to update or create a DeviceRecallStatus.
+     * @example
+     * // Update or create a DeviceRecallStatus
+     * const deviceRecallStatus = await prisma.deviceRecallStatus.upsert({
+     *   create: {
+     *     // ... data to create a DeviceRecallStatus
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the DeviceRecallStatus we want to update
+     *   }
+     * })
+     */
+    upsert<T extends DeviceRecallStatusUpsertArgs>(args: SelectSubset<T, DeviceRecallStatusUpsertArgs<ExtArgs>>): Prisma__DeviceRecallStatusClient<$Result.GetResult<Prisma.$DeviceRecallStatusPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of DeviceRecallStatuses.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeviceRecallStatusCountArgs} args - Arguments to filter DeviceRecallStatuses to count.
+     * @example
+     * // Count the number of DeviceRecallStatuses
+     * const count = await prisma.deviceRecallStatus.count({
+     *   where: {
+     *     // ... the filter for the DeviceRecallStatuses we want to count
+     *   }
+     * })
+    **/
+    count<T extends DeviceRecallStatusCountArgs>(
+      args?: Subset<T, DeviceRecallStatusCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], DeviceRecallStatusCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a DeviceRecallStatus.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeviceRecallStatusAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends DeviceRecallStatusAggregateArgs>(args: Subset<T, DeviceRecallStatusAggregateArgs>): Prisma.PrismaPromise<GetDeviceRecallStatusAggregateType<T>>
+
+    /**
+     * Group by DeviceRecallStatus.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeviceRecallStatusGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends DeviceRecallStatusGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: DeviceRecallStatusGroupByArgs['orderBy'] }
+        : { orderBy?: DeviceRecallStatusGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, DeviceRecallStatusGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetDeviceRecallStatusGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the DeviceRecallStatus model
+   */
+  readonly fields: DeviceRecallStatusFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for DeviceRecallStatus.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__DeviceRecallStatusClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    device<T extends MonitoringDeviceDefaultArgs<ExtArgs> = {}>(args?: Subset<T, MonitoringDeviceDefaultArgs<ExtArgs>>): Prisma__MonitoringDeviceClient<$Result.GetResult<Prisma.$MonitoringDevicePayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    recall<T extends FDARecallDefaultArgs<ExtArgs> = {}>(args?: Subset<T, FDARecallDefaultArgs<ExtArgs>>): Prisma__FDARecallClient<$Result.GetResult<Prisma.$FDARecallPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the DeviceRecallStatus model
+   */ 
+  interface DeviceRecallStatusFieldRefs {
+    readonly id: FieldRef<"DeviceRecallStatus", 'String'>
+    readonly deviceId: FieldRef<"DeviceRecallStatus", 'String'>
+    readonly recallId: FieldRef<"DeviceRecallStatus", 'String'>
+    readonly status: FieldRef<"DeviceRecallStatus", 'DeviceRecallAction'>
+    readonly actionTaken: FieldRef<"DeviceRecallStatus", 'String'>
+    readonly actionDate: FieldRef<"DeviceRecallStatus", 'DateTime'>
+    readonly actionBy: FieldRef<"DeviceRecallStatus", 'String'>
+    readonly notes: FieldRef<"DeviceRecallStatus", 'String'>
+    readonly patientNotified: FieldRef<"DeviceRecallStatus", 'Boolean'>
+    readonly providerNotified: FieldRef<"DeviceRecallStatus", 'Boolean'>
+    readonly createdAt: FieldRef<"DeviceRecallStatus", 'DateTime'>
+    readonly updatedAt: FieldRef<"DeviceRecallStatus", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * DeviceRecallStatus findUnique
+   */
+  export type DeviceRecallStatusFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceRecallStatus
+     */
+    select?: DeviceRecallStatusSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceRecallStatusInclude<ExtArgs> | null
+    /**
+     * Filter, which DeviceRecallStatus to fetch.
+     */
+    where: DeviceRecallStatusWhereUniqueInput
+  }
+
+  /**
+   * DeviceRecallStatus findUniqueOrThrow
+   */
+  export type DeviceRecallStatusFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceRecallStatus
+     */
+    select?: DeviceRecallStatusSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceRecallStatusInclude<ExtArgs> | null
+    /**
+     * Filter, which DeviceRecallStatus to fetch.
+     */
+    where: DeviceRecallStatusWhereUniqueInput
+  }
+
+  /**
+   * DeviceRecallStatus findFirst
+   */
+  export type DeviceRecallStatusFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceRecallStatus
+     */
+    select?: DeviceRecallStatusSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceRecallStatusInclude<ExtArgs> | null
+    /**
+     * Filter, which DeviceRecallStatus to fetch.
+     */
+    where?: DeviceRecallStatusWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DeviceRecallStatuses to fetch.
+     */
+    orderBy?: DeviceRecallStatusOrderByWithRelationInput | DeviceRecallStatusOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DeviceRecallStatuses.
+     */
+    cursor?: DeviceRecallStatusWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DeviceRecallStatuses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DeviceRecallStatuses.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DeviceRecallStatuses.
+     */
+    distinct?: DeviceRecallStatusScalarFieldEnum | DeviceRecallStatusScalarFieldEnum[]
+  }
+
+  /**
+   * DeviceRecallStatus findFirstOrThrow
+   */
+  export type DeviceRecallStatusFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceRecallStatus
+     */
+    select?: DeviceRecallStatusSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceRecallStatusInclude<ExtArgs> | null
+    /**
+     * Filter, which DeviceRecallStatus to fetch.
+     */
+    where?: DeviceRecallStatusWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DeviceRecallStatuses to fetch.
+     */
+    orderBy?: DeviceRecallStatusOrderByWithRelationInput | DeviceRecallStatusOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DeviceRecallStatuses.
+     */
+    cursor?: DeviceRecallStatusWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DeviceRecallStatuses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DeviceRecallStatuses.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DeviceRecallStatuses.
+     */
+    distinct?: DeviceRecallStatusScalarFieldEnum | DeviceRecallStatusScalarFieldEnum[]
+  }
+
+  /**
+   * DeviceRecallStatus findMany
+   */
+  export type DeviceRecallStatusFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceRecallStatus
+     */
+    select?: DeviceRecallStatusSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceRecallStatusInclude<ExtArgs> | null
+    /**
+     * Filter, which DeviceRecallStatuses to fetch.
+     */
+    where?: DeviceRecallStatusWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DeviceRecallStatuses to fetch.
+     */
+    orderBy?: DeviceRecallStatusOrderByWithRelationInput | DeviceRecallStatusOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing DeviceRecallStatuses.
+     */
+    cursor?: DeviceRecallStatusWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DeviceRecallStatuses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DeviceRecallStatuses.
+     */
+    skip?: number
+    distinct?: DeviceRecallStatusScalarFieldEnum | DeviceRecallStatusScalarFieldEnum[]
+  }
+
+  /**
+   * DeviceRecallStatus create
+   */
+  export type DeviceRecallStatusCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceRecallStatus
+     */
+    select?: DeviceRecallStatusSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceRecallStatusInclude<ExtArgs> | null
+    /**
+     * The data needed to create a DeviceRecallStatus.
+     */
+    data: XOR<DeviceRecallStatusCreateInput, DeviceRecallStatusUncheckedCreateInput>
+  }
+
+  /**
+   * DeviceRecallStatus createMany
+   */
+  export type DeviceRecallStatusCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many DeviceRecallStatuses.
+     */
+    data: DeviceRecallStatusCreateManyInput | DeviceRecallStatusCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * DeviceRecallStatus createManyAndReturn
+   */
+  export type DeviceRecallStatusCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceRecallStatus
+     */
+    select?: DeviceRecallStatusSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many DeviceRecallStatuses.
+     */
+    data: DeviceRecallStatusCreateManyInput | DeviceRecallStatusCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceRecallStatusIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * DeviceRecallStatus update
+   */
+  export type DeviceRecallStatusUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceRecallStatus
+     */
+    select?: DeviceRecallStatusSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceRecallStatusInclude<ExtArgs> | null
+    /**
+     * The data needed to update a DeviceRecallStatus.
+     */
+    data: XOR<DeviceRecallStatusUpdateInput, DeviceRecallStatusUncheckedUpdateInput>
+    /**
+     * Choose, which DeviceRecallStatus to update.
+     */
+    where: DeviceRecallStatusWhereUniqueInput
+  }
+
+  /**
+   * DeviceRecallStatus updateMany
+   */
+  export type DeviceRecallStatusUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update DeviceRecallStatuses.
+     */
+    data: XOR<DeviceRecallStatusUpdateManyMutationInput, DeviceRecallStatusUncheckedUpdateManyInput>
+    /**
+     * Filter which DeviceRecallStatuses to update
+     */
+    where?: DeviceRecallStatusWhereInput
+  }
+
+  /**
+   * DeviceRecallStatus upsert
+   */
+  export type DeviceRecallStatusUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceRecallStatus
+     */
+    select?: DeviceRecallStatusSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceRecallStatusInclude<ExtArgs> | null
+    /**
+     * The filter to search for the DeviceRecallStatus to update in case it exists.
+     */
+    where: DeviceRecallStatusWhereUniqueInput
+    /**
+     * In case the DeviceRecallStatus found by the `where` argument doesn't exist, create a new DeviceRecallStatus with this data.
+     */
+    create: XOR<DeviceRecallStatusCreateInput, DeviceRecallStatusUncheckedCreateInput>
+    /**
+     * In case the DeviceRecallStatus was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<DeviceRecallStatusUpdateInput, DeviceRecallStatusUncheckedUpdateInput>
+  }
+
+  /**
+   * DeviceRecallStatus delete
+   */
+  export type DeviceRecallStatusDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceRecallStatus
+     */
+    select?: DeviceRecallStatusSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceRecallStatusInclude<ExtArgs> | null
+    /**
+     * Filter which DeviceRecallStatus to delete.
+     */
+    where: DeviceRecallStatusWhereUniqueInput
+  }
+
+  /**
+   * DeviceRecallStatus deleteMany
+   */
+  export type DeviceRecallStatusDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DeviceRecallStatuses to delete
+     */
+    where?: DeviceRecallStatusWhereInput
+  }
+
+  /**
+   * DeviceRecallStatus without action
+   */
+  export type DeviceRecallStatusDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceRecallStatus
+     */
+    select?: DeviceRecallStatusSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceRecallStatusInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model SecurityAuditLog
+   */
+
+  export type AggregateSecurityAuditLog = {
+    _count: SecurityAuditLogCountAggregateOutputType | null
+    _min: SecurityAuditLogMinAggregateOutputType | null
+    _max: SecurityAuditLogMaxAggregateOutputType | null
+  }
+
+  export type SecurityAuditLogMinAggregateOutputType = {
+    id: string | null
+    entityType: string | null
+    entityId: string | null
+    action: string | null
+    performedBy: string | null
+    performedByRole: string | null
+    ipAddress: string | null
+    userAgent: string | null
+    details: string | null
+    riskLevel: string | null
+    createdAt: Date | null
+  }
+
+  export type SecurityAuditLogMaxAggregateOutputType = {
+    id: string | null
+    entityType: string | null
+    entityId: string | null
+    action: string | null
+    performedBy: string | null
+    performedByRole: string | null
+    ipAddress: string | null
+    userAgent: string | null
+    details: string | null
+    riskLevel: string | null
+    createdAt: Date | null
+  }
+
+  export type SecurityAuditLogCountAggregateOutputType = {
+    id: number
+    entityType: number
+    entityId: number
+    action: number
+    performedBy: number
+    performedByRole: number
+    previousState: number
+    newState: number
+    ipAddress: number
+    userAgent: number
+    details: number
+    riskLevel: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type SecurityAuditLogMinAggregateInputType = {
+    id?: true
+    entityType?: true
+    entityId?: true
+    action?: true
+    performedBy?: true
+    performedByRole?: true
+    ipAddress?: true
+    userAgent?: true
+    details?: true
+    riskLevel?: true
+    createdAt?: true
+  }
+
+  export type SecurityAuditLogMaxAggregateInputType = {
+    id?: true
+    entityType?: true
+    entityId?: true
+    action?: true
+    performedBy?: true
+    performedByRole?: true
+    ipAddress?: true
+    userAgent?: true
+    details?: true
+    riskLevel?: true
+    createdAt?: true
+  }
+
+  export type SecurityAuditLogCountAggregateInputType = {
+    id?: true
+    entityType?: true
+    entityId?: true
+    action?: true
+    performedBy?: true
+    performedByRole?: true
+    previousState?: true
+    newState?: true
+    ipAddress?: true
+    userAgent?: true
+    details?: true
+    riskLevel?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type SecurityAuditLogAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SecurityAuditLog to aggregate.
+     */
+    where?: SecurityAuditLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SecurityAuditLogs to fetch.
+     */
+    orderBy?: SecurityAuditLogOrderByWithRelationInput | SecurityAuditLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SecurityAuditLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SecurityAuditLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SecurityAuditLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned SecurityAuditLogs
+    **/
+    _count?: true | SecurityAuditLogCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SecurityAuditLogMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SecurityAuditLogMaxAggregateInputType
+  }
+
+  export type GetSecurityAuditLogAggregateType<T extends SecurityAuditLogAggregateArgs> = {
+        [P in keyof T & keyof AggregateSecurityAuditLog]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSecurityAuditLog[P]>
+      : GetScalarType<T[P], AggregateSecurityAuditLog[P]>
+  }
+
+
+
+
+  export type SecurityAuditLogGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SecurityAuditLogWhereInput
+    orderBy?: SecurityAuditLogOrderByWithAggregationInput | SecurityAuditLogOrderByWithAggregationInput[]
+    by: SecurityAuditLogScalarFieldEnum[] | SecurityAuditLogScalarFieldEnum
+    having?: SecurityAuditLogScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SecurityAuditLogCountAggregateInputType | true
+    _min?: SecurityAuditLogMinAggregateInputType
+    _max?: SecurityAuditLogMaxAggregateInputType
+  }
+
+  export type SecurityAuditLogGroupByOutputType = {
+    id: string
+    entityType: string
+    entityId: string
+    action: string
+    performedBy: string
+    performedByRole: string | null
+    previousState: JsonValue | null
+    newState: JsonValue | null
+    ipAddress: string | null
+    userAgent: string | null
+    details: string | null
+    riskLevel: string | null
+    createdAt: Date
+    _count: SecurityAuditLogCountAggregateOutputType | null
+    _min: SecurityAuditLogMinAggregateOutputType | null
+    _max: SecurityAuditLogMaxAggregateOutputType | null
+  }
+
+  type GetSecurityAuditLogGroupByPayload<T extends SecurityAuditLogGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SecurityAuditLogGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SecurityAuditLogGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SecurityAuditLogGroupByOutputType[P]>
+            : GetScalarType<T[P], SecurityAuditLogGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SecurityAuditLogSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    entityType?: boolean
+    entityId?: boolean
+    action?: boolean
+    performedBy?: boolean
+    performedByRole?: boolean
+    previousState?: boolean
+    newState?: boolean
+    ipAddress?: boolean
+    userAgent?: boolean
+    details?: boolean
+    riskLevel?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["securityAuditLog"]>
+
+  export type SecurityAuditLogSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    entityType?: boolean
+    entityId?: boolean
+    action?: boolean
+    performedBy?: boolean
+    performedByRole?: boolean
+    previousState?: boolean
+    newState?: boolean
+    ipAddress?: boolean
+    userAgent?: boolean
+    details?: boolean
+    riskLevel?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["securityAuditLog"]>
+
+  export type SecurityAuditLogSelectScalar = {
+    id?: boolean
+    entityType?: boolean
+    entityId?: boolean
+    action?: boolean
+    performedBy?: boolean
+    performedByRole?: boolean
+    previousState?: boolean
+    newState?: boolean
+    ipAddress?: boolean
+    userAgent?: boolean
+    details?: boolean
+    riskLevel?: boolean
+    createdAt?: boolean
+  }
+
+
+  export type $SecurityAuditLogPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "SecurityAuditLog"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      entityType: string
+      entityId: string
+      action: string
+      performedBy: string
+      performedByRole: string | null
+      previousState: Prisma.JsonValue | null
+      newState: Prisma.JsonValue | null
+      ipAddress: string | null
+      userAgent: string | null
+      details: string | null
+      riskLevel: string | null
+      createdAt: Date
+    }, ExtArgs["result"]["securityAuditLog"]>
+    composites: {}
+  }
+
+  type SecurityAuditLogGetPayload<S extends boolean | null | undefined | SecurityAuditLogDefaultArgs> = $Result.GetResult<Prisma.$SecurityAuditLogPayload, S>
+
+  type SecurityAuditLogCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<SecurityAuditLogFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: SecurityAuditLogCountAggregateInputType | true
+    }
+
+  export interface SecurityAuditLogDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SecurityAuditLog'], meta: { name: 'SecurityAuditLog' } }
+    /**
+     * Find zero or one SecurityAuditLog that matches the filter.
+     * @param {SecurityAuditLogFindUniqueArgs} args - Arguments to find a SecurityAuditLog
+     * @example
+     * // Get one SecurityAuditLog
+     * const securityAuditLog = await prisma.securityAuditLog.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SecurityAuditLogFindUniqueArgs>(args: SelectSubset<T, SecurityAuditLogFindUniqueArgs<ExtArgs>>): Prisma__SecurityAuditLogClient<$Result.GetResult<Prisma.$SecurityAuditLogPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one SecurityAuditLog that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {SecurityAuditLogFindUniqueOrThrowArgs} args - Arguments to find a SecurityAuditLog
+     * @example
+     * // Get one SecurityAuditLog
+     * const securityAuditLog = await prisma.securityAuditLog.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SecurityAuditLogFindUniqueOrThrowArgs>(args: SelectSubset<T, SecurityAuditLogFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SecurityAuditLogClient<$Result.GetResult<Prisma.$SecurityAuditLogPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first SecurityAuditLog that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SecurityAuditLogFindFirstArgs} args - Arguments to find a SecurityAuditLog
+     * @example
+     * // Get one SecurityAuditLog
+     * const securityAuditLog = await prisma.securityAuditLog.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SecurityAuditLogFindFirstArgs>(args?: SelectSubset<T, SecurityAuditLogFindFirstArgs<ExtArgs>>): Prisma__SecurityAuditLogClient<$Result.GetResult<Prisma.$SecurityAuditLogPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first SecurityAuditLog that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SecurityAuditLogFindFirstOrThrowArgs} args - Arguments to find a SecurityAuditLog
+     * @example
+     * // Get one SecurityAuditLog
+     * const securityAuditLog = await prisma.securityAuditLog.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SecurityAuditLogFindFirstOrThrowArgs>(args?: SelectSubset<T, SecurityAuditLogFindFirstOrThrowArgs<ExtArgs>>): Prisma__SecurityAuditLogClient<$Result.GetResult<Prisma.$SecurityAuditLogPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more SecurityAuditLogs that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SecurityAuditLogFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all SecurityAuditLogs
+     * const securityAuditLogs = await prisma.securityAuditLog.findMany()
+     * 
+     * // Get first 10 SecurityAuditLogs
+     * const securityAuditLogs = await prisma.securityAuditLog.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const securityAuditLogWithIdOnly = await prisma.securityAuditLog.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SecurityAuditLogFindManyArgs>(args?: SelectSubset<T, SecurityAuditLogFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SecurityAuditLogPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a SecurityAuditLog.
+     * @param {SecurityAuditLogCreateArgs} args - Arguments to create a SecurityAuditLog.
+     * @example
+     * // Create one SecurityAuditLog
+     * const SecurityAuditLog = await prisma.securityAuditLog.create({
+     *   data: {
+     *     // ... data to create a SecurityAuditLog
+     *   }
+     * })
+     * 
+     */
+    create<T extends SecurityAuditLogCreateArgs>(args: SelectSubset<T, SecurityAuditLogCreateArgs<ExtArgs>>): Prisma__SecurityAuditLogClient<$Result.GetResult<Prisma.$SecurityAuditLogPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many SecurityAuditLogs.
+     * @param {SecurityAuditLogCreateManyArgs} args - Arguments to create many SecurityAuditLogs.
+     * @example
+     * // Create many SecurityAuditLogs
+     * const securityAuditLog = await prisma.securityAuditLog.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SecurityAuditLogCreateManyArgs>(args?: SelectSubset<T, SecurityAuditLogCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many SecurityAuditLogs and returns the data saved in the database.
+     * @param {SecurityAuditLogCreateManyAndReturnArgs} args - Arguments to create many SecurityAuditLogs.
+     * @example
+     * // Create many SecurityAuditLogs
+     * const securityAuditLog = await prisma.securityAuditLog.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many SecurityAuditLogs and only return the `id`
+     * const securityAuditLogWithIdOnly = await prisma.securityAuditLog.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SecurityAuditLogCreateManyAndReturnArgs>(args?: SelectSubset<T, SecurityAuditLogCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SecurityAuditLogPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a SecurityAuditLog.
+     * @param {SecurityAuditLogDeleteArgs} args - Arguments to delete one SecurityAuditLog.
+     * @example
+     * // Delete one SecurityAuditLog
+     * const SecurityAuditLog = await prisma.securityAuditLog.delete({
+     *   where: {
+     *     // ... filter to delete one SecurityAuditLog
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SecurityAuditLogDeleteArgs>(args: SelectSubset<T, SecurityAuditLogDeleteArgs<ExtArgs>>): Prisma__SecurityAuditLogClient<$Result.GetResult<Prisma.$SecurityAuditLogPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one SecurityAuditLog.
+     * @param {SecurityAuditLogUpdateArgs} args - Arguments to update one SecurityAuditLog.
+     * @example
+     * // Update one SecurityAuditLog
+     * const securityAuditLog = await prisma.securityAuditLog.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SecurityAuditLogUpdateArgs>(args: SelectSubset<T, SecurityAuditLogUpdateArgs<ExtArgs>>): Prisma__SecurityAuditLogClient<$Result.GetResult<Prisma.$SecurityAuditLogPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more SecurityAuditLogs.
+     * @param {SecurityAuditLogDeleteManyArgs} args - Arguments to filter SecurityAuditLogs to delete.
+     * @example
+     * // Delete a few SecurityAuditLogs
+     * const { count } = await prisma.securityAuditLog.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SecurityAuditLogDeleteManyArgs>(args?: SelectSubset<T, SecurityAuditLogDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SecurityAuditLogs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SecurityAuditLogUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many SecurityAuditLogs
+     * const securityAuditLog = await prisma.securityAuditLog.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SecurityAuditLogUpdateManyArgs>(args: SelectSubset<T, SecurityAuditLogUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one SecurityAuditLog.
+     * @param {SecurityAuditLogUpsertArgs} args - Arguments to update or create a SecurityAuditLog.
+     * @example
+     * // Update or create a SecurityAuditLog
+     * const securityAuditLog = await prisma.securityAuditLog.upsert({
+     *   create: {
+     *     // ... data to create a SecurityAuditLog
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the SecurityAuditLog we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SecurityAuditLogUpsertArgs>(args: SelectSubset<T, SecurityAuditLogUpsertArgs<ExtArgs>>): Prisma__SecurityAuditLogClient<$Result.GetResult<Prisma.$SecurityAuditLogPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of SecurityAuditLogs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SecurityAuditLogCountArgs} args - Arguments to filter SecurityAuditLogs to count.
+     * @example
+     * // Count the number of SecurityAuditLogs
+     * const count = await prisma.securityAuditLog.count({
+     *   where: {
+     *     // ... the filter for the SecurityAuditLogs we want to count
+     *   }
+     * })
+    **/
+    count<T extends SecurityAuditLogCountArgs>(
+      args?: Subset<T, SecurityAuditLogCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SecurityAuditLogCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a SecurityAuditLog.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SecurityAuditLogAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SecurityAuditLogAggregateArgs>(args: Subset<T, SecurityAuditLogAggregateArgs>): Prisma.PrismaPromise<GetSecurityAuditLogAggregateType<T>>
+
+    /**
+     * Group by SecurityAuditLog.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SecurityAuditLogGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SecurityAuditLogGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SecurityAuditLogGroupByArgs['orderBy'] }
+        : { orderBy?: SecurityAuditLogGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SecurityAuditLogGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSecurityAuditLogGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the SecurityAuditLog model
+   */
+  readonly fields: SecurityAuditLogFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for SecurityAuditLog.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SecurityAuditLogClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the SecurityAuditLog model
+   */ 
+  interface SecurityAuditLogFieldRefs {
+    readonly id: FieldRef<"SecurityAuditLog", 'String'>
+    readonly entityType: FieldRef<"SecurityAuditLog", 'String'>
+    readonly entityId: FieldRef<"SecurityAuditLog", 'String'>
+    readonly action: FieldRef<"SecurityAuditLog", 'String'>
+    readonly performedBy: FieldRef<"SecurityAuditLog", 'String'>
+    readonly performedByRole: FieldRef<"SecurityAuditLog", 'String'>
+    readonly previousState: FieldRef<"SecurityAuditLog", 'Json'>
+    readonly newState: FieldRef<"SecurityAuditLog", 'Json'>
+    readonly ipAddress: FieldRef<"SecurityAuditLog", 'String'>
+    readonly userAgent: FieldRef<"SecurityAuditLog", 'String'>
+    readonly details: FieldRef<"SecurityAuditLog", 'String'>
+    readonly riskLevel: FieldRef<"SecurityAuditLog", 'String'>
+    readonly createdAt: FieldRef<"SecurityAuditLog", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * SecurityAuditLog findUnique
+   */
+  export type SecurityAuditLogFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SecurityAuditLog
+     */
+    select?: SecurityAuditLogSelect<ExtArgs> | null
+    /**
+     * Filter, which SecurityAuditLog to fetch.
+     */
+    where: SecurityAuditLogWhereUniqueInput
+  }
+
+  /**
+   * SecurityAuditLog findUniqueOrThrow
+   */
+  export type SecurityAuditLogFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SecurityAuditLog
+     */
+    select?: SecurityAuditLogSelect<ExtArgs> | null
+    /**
+     * Filter, which SecurityAuditLog to fetch.
+     */
+    where: SecurityAuditLogWhereUniqueInput
+  }
+
+  /**
+   * SecurityAuditLog findFirst
+   */
+  export type SecurityAuditLogFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SecurityAuditLog
+     */
+    select?: SecurityAuditLogSelect<ExtArgs> | null
+    /**
+     * Filter, which SecurityAuditLog to fetch.
+     */
+    where?: SecurityAuditLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SecurityAuditLogs to fetch.
+     */
+    orderBy?: SecurityAuditLogOrderByWithRelationInput | SecurityAuditLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SecurityAuditLogs.
+     */
+    cursor?: SecurityAuditLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SecurityAuditLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SecurityAuditLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SecurityAuditLogs.
+     */
+    distinct?: SecurityAuditLogScalarFieldEnum | SecurityAuditLogScalarFieldEnum[]
+  }
+
+  /**
+   * SecurityAuditLog findFirstOrThrow
+   */
+  export type SecurityAuditLogFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SecurityAuditLog
+     */
+    select?: SecurityAuditLogSelect<ExtArgs> | null
+    /**
+     * Filter, which SecurityAuditLog to fetch.
+     */
+    where?: SecurityAuditLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SecurityAuditLogs to fetch.
+     */
+    orderBy?: SecurityAuditLogOrderByWithRelationInput | SecurityAuditLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SecurityAuditLogs.
+     */
+    cursor?: SecurityAuditLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SecurityAuditLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SecurityAuditLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SecurityAuditLogs.
+     */
+    distinct?: SecurityAuditLogScalarFieldEnum | SecurityAuditLogScalarFieldEnum[]
+  }
+
+  /**
+   * SecurityAuditLog findMany
+   */
+  export type SecurityAuditLogFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SecurityAuditLog
+     */
+    select?: SecurityAuditLogSelect<ExtArgs> | null
+    /**
+     * Filter, which SecurityAuditLogs to fetch.
+     */
+    where?: SecurityAuditLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SecurityAuditLogs to fetch.
+     */
+    orderBy?: SecurityAuditLogOrderByWithRelationInput | SecurityAuditLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing SecurityAuditLogs.
+     */
+    cursor?: SecurityAuditLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SecurityAuditLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SecurityAuditLogs.
+     */
+    skip?: number
+    distinct?: SecurityAuditLogScalarFieldEnum | SecurityAuditLogScalarFieldEnum[]
+  }
+
+  /**
+   * SecurityAuditLog create
+   */
+  export type SecurityAuditLogCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SecurityAuditLog
+     */
+    select?: SecurityAuditLogSelect<ExtArgs> | null
+    /**
+     * The data needed to create a SecurityAuditLog.
+     */
+    data: XOR<SecurityAuditLogCreateInput, SecurityAuditLogUncheckedCreateInput>
+  }
+
+  /**
+   * SecurityAuditLog createMany
+   */
+  export type SecurityAuditLogCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many SecurityAuditLogs.
+     */
+    data: SecurityAuditLogCreateManyInput | SecurityAuditLogCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SecurityAuditLog createManyAndReturn
+   */
+  export type SecurityAuditLogCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SecurityAuditLog
+     */
+    select?: SecurityAuditLogSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many SecurityAuditLogs.
+     */
+    data: SecurityAuditLogCreateManyInput | SecurityAuditLogCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SecurityAuditLog update
+   */
+  export type SecurityAuditLogUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SecurityAuditLog
+     */
+    select?: SecurityAuditLogSelect<ExtArgs> | null
+    /**
+     * The data needed to update a SecurityAuditLog.
+     */
+    data: XOR<SecurityAuditLogUpdateInput, SecurityAuditLogUncheckedUpdateInput>
+    /**
+     * Choose, which SecurityAuditLog to update.
+     */
+    where: SecurityAuditLogWhereUniqueInput
+  }
+
+  /**
+   * SecurityAuditLog updateMany
+   */
+  export type SecurityAuditLogUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update SecurityAuditLogs.
+     */
+    data: XOR<SecurityAuditLogUpdateManyMutationInput, SecurityAuditLogUncheckedUpdateManyInput>
+    /**
+     * Filter which SecurityAuditLogs to update
+     */
+    where?: SecurityAuditLogWhereInput
+  }
+
+  /**
+   * SecurityAuditLog upsert
+   */
+  export type SecurityAuditLogUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SecurityAuditLog
+     */
+    select?: SecurityAuditLogSelect<ExtArgs> | null
+    /**
+     * The filter to search for the SecurityAuditLog to update in case it exists.
+     */
+    where: SecurityAuditLogWhereUniqueInput
+    /**
+     * In case the SecurityAuditLog found by the `where` argument doesn't exist, create a new SecurityAuditLog with this data.
+     */
+    create: XOR<SecurityAuditLogCreateInput, SecurityAuditLogUncheckedCreateInput>
+    /**
+     * In case the SecurityAuditLog was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SecurityAuditLogUpdateInput, SecurityAuditLogUncheckedUpdateInput>
+  }
+
+  /**
+   * SecurityAuditLog delete
+   */
+  export type SecurityAuditLogDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SecurityAuditLog
+     */
+    select?: SecurityAuditLogSelect<ExtArgs> | null
+    /**
+     * Filter which SecurityAuditLog to delete.
+     */
+    where: SecurityAuditLogWhereUniqueInput
+  }
+
+  /**
+   * SecurityAuditLog deleteMany
+   */
+  export type SecurityAuditLogDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SecurityAuditLogs to delete
+     */
+    where?: SecurityAuditLogWhereInput
+  }
+
+  /**
+   * SecurityAuditLog without action
+   */
+  export type SecurityAuditLogDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SecurityAuditLog
+     */
+    select?: SecurityAuditLogSelect<ExtArgs> | null
+  }
+
+
+  /**
+   * Model ManufacturerAdvisory
+   */
+
+  export type AggregateManufacturerAdvisory = {
+    _count: ManufacturerAdvisoryCountAggregateOutputType | null
+    _min: ManufacturerAdvisoryMinAggregateOutputType | null
+    _max: ManufacturerAdvisoryMaxAggregateOutputType | null
+  }
+
+  export type ManufacturerAdvisoryMinAggregateOutputType = {
+    id: string | null
+    manufacturer: string | null
+    advisoryId: string | null
+    title: string | null
+    description: string | null
+    severity: $Enums.VulnerabilitySeverity | null
+    fixedVersion: string | null
+    workaround: string | null
+    publishedDate: Date | null
+    lastUpdatedDate: Date | null
+    status: $Enums.AdvisoryStatus | null
+    source: string | null
+    acknowledgedAt: Date | null
+    acknowledgedBy: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ManufacturerAdvisoryMaxAggregateOutputType = {
+    id: string | null
+    manufacturer: string | null
+    advisoryId: string | null
+    title: string | null
+    description: string | null
+    severity: $Enums.VulnerabilitySeverity | null
+    fixedVersion: string | null
+    workaround: string | null
+    publishedDate: Date | null
+    lastUpdatedDate: Date | null
+    status: $Enums.AdvisoryStatus | null
+    source: string | null
+    acknowledgedAt: Date | null
+    acknowledgedBy: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ManufacturerAdvisoryCountAggregateOutputType = {
+    id: number
+    manufacturer: number
+    advisoryId: number
+    title: number
+    description: number
+    severity: number
+    affectedProducts: number
+    affectedVersions: number
+    fixedVersion: number
+    workaround: number
+    publishedDate: number
+    lastUpdatedDate: number
+    cveReferences: number
+    status: number
+    source: number
+    acknowledgedAt: number
+    acknowledgedBy: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type ManufacturerAdvisoryMinAggregateInputType = {
+    id?: true
+    manufacturer?: true
+    advisoryId?: true
+    title?: true
+    description?: true
+    severity?: true
+    fixedVersion?: true
+    workaround?: true
+    publishedDate?: true
+    lastUpdatedDate?: true
+    status?: true
+    source?: true
+    acknowledgedAt?: true
+    acknowledgedBy?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ManufacturerAdvisoryMaxAggregateInputType = {
+    id?: true
+    manufacturer?: true
+    advisoryId?: true
+    title?: true
+    description?: true
+    severity?: true
+    fixedVersion?: true
+    workaround?: true
+    publishedDate?: true
+    lastUpdatedDate?: true
+    status?: true
+    source?: true
+    acknowledgedAt?: true
+    acknowledgedBy?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ManufacturerAdvisoryCountAggregateInputType = {
+    id?: true
+    manufacturer?: true
+    advisoryId?: true
+    title?: true
+    description?: true
+    severity?: true
+    affectedProducts?: true
+    affectedVersions?: true
+    fixedVersion?: true
+    workaround?: true
+    publishedDate?: true
+    lastUpdatedDate?: true
+    cveReferences?: true
+    status?: true
+    source?: true
+    acknowledgedAt?: true
+    acknowledgedBy?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type ManufacturerAdvisoryAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ManufacturerAdvisory to aggregate.
+     */
+    where?: ManufacturerAdvisoryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ManufacturerAdvisories to fetch.
+     */
+    orderBy?: ManufacturerAdvisoryOrderByWithRelationInput | ManufacturerAdvisoryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ManufacturerAdvisoryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ManufacturerAdvisories from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ManufacturerAdvisories.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ManufacturerAdvisories
+    **/
+    _count?: true | ManufacturerAdvisoryCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ManufacturerAdvisoryMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ManufacturerAdvisoryMaxAggregateInputType
+  }
+
+  export type GetManufacturerAdvisoryAggregateType<T extends ManufacturerAdvisoryAggregateArgs> = {
+        [P in keyof T & keyof AggregateManufacturerAdvisory]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateManufacturerAdvisory[P]>
+      : GetScalarType<T[P], AggregateManufacturerAdvisory[P]>
+  }
+
+
+
+
+  export type ManufacturerAdvisoryGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ManufacturerAdvisoryWhereInput
+    orderBy?: ManufacturerAdvisoryOrderByWithAggregationInput | ManufacturerAdvisoryOrderByWithAggregationInput[]
+    by: ManufacturerAdvisoryScalarFieldEnum[] | ManufacturerAdvisoryScalarFieldEnum
+    having?: ManufacturerAdvisoryScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ManufacturerAdvisoryCountAggregateInputType | true
+    _min?: ManufacturerAdvisoryMinAggregateInputType
+    _max?: ManufacturerAdvisoryMaxAggregateInputType
+  }
+
+  export type ManufacturerAdvisoryGroupByOutputType = {
+    id: string
+    manufacturer: string
+    advisoryId: string
+    title: string
+    description: string
+    severity: $Enums.VulnerabilitySeverity
+    affectedProducts: JsonValue
+    affectedVersions: JsonValue | null
+    fixedVersion: string | null
+    workaround: string | null
+    publishedDate: Date
+    lastUpdatedDate: Date | null
+    cveReferences: JsonValue | null
+    status: $Enums.AdvisoryStatus
+    source: string | null
+    acknowledgedAt: Date | null
+    acknowledgedBy: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: ManufacturerAdvisoryCountAggregateOutputType | null
+    _min: ManufacturerAdvisoryMinAggregateOutputType | null
+    _max: ManufacturerAdvisoryMaxAggregateOutputType | null
+  }
+
+  type GetManufacturerAdvisoryGroupByPayload<T extends ManufacturerAdvisoryGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ManufacturerAdvisoryGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ManufacturerAdvisoryGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ManufacturerAdvisoryGroupByOutputType[P]>
+            : GetScalarType<T[P], ManufacturerAdvisoryGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ManufacturerAdvisorySelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    manufacturer?: boolean
+    advisoryId?: boolean
+    title?: boolean
+    description?: boolean
+    severity?: boolean
+    affectedProducts?: boolean
+    affectedVersions?: boolean
+    fixedVersion?: boolean
+    workaround?: boolean
+    publishedDate?: boolean
+    lastUpdatedDate?: boolean
+    cveReferences?: boolean
+    status?: boolean
+    source?: boolean
+    acknowledgedAt?: boolean
+    acknowledgedBy?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["manufacturerAdvisory"]>
+
+  export type ManufacturerAdvisorySelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    manufacturer?: boolean
+    advisoryId?: boolean
+    title?: boolean
+    description?: boolean
+    severity?: boolean
+    affectedProducts?: boolean
+    affectedVersions?: boolean
+    fixedVersion?: boolean
+    workaround?: boolean
+    publishedDate?: boolean
+    lastUpdatedDate?: boolean
+    cveReferences?: boolean
+    status?: boolean
+    source?: boolean
+    acknowledgedAt?: boolean
+    acknowledgedBy?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["manufacturerAdvisory"]>
+
+  export type ManufacturerAdvisorySelectScalar = {
+    id?: boolean
+    manufacturer?: boolean
+    advisoryId?: boolean
+    title?: boolean
+    description?: boolean
+    severity?: boolean
+    affectedProducts?: boolean
+    affectedVersions?: boolean
+    fixedVersion?: boolean
+    workaround?: boolean
+    publishedDate?: boolean
+    lastUpdatedDate?: boolean
+    cveReferences?: boolean
+    status?: boolean
+    source?: boolean
+    acknowledgedAt?: boolean
+    acknowledgedBy?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+
+  export type $ManufacturerAdvisoryPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ManufacturerAdvisory"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      manufacturer: string
+      advisoryId: string
+      title: string
+      description: string
+      severity: $Enums.VulnerabilitySeverity
+      affectedProducts: Prisma.JsonValue
+      affectedVersions: Prisma.JsonValue | null
+      fixedVersion: string | null
+      workaround: string | null
+      publishedDate: Date
+      lastUpdatedDate: Date | null
+      cveReferences: Prisma.JsonValue | null
+      status: $Enums.AdvisoryStatus
+      source: string | null
+      acknowledgedAt: Date | null
+      acknowledgedBy: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["manufacturerAdvisory"]>
+    composites: {}
+  }
+
+  type ManufacturerAdvisoryGetPayload<S extends boolean | null | undefined | ManufacturerAdvisoryDefaultArgs> = $Result.GetResult<Prisma.$ManufacturerAdvisoryPayload, S>
+
+  type ManufacturerAdvisoryCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<ManufacturerAdvisoryFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: ManufacturerAdvisoryCountAggregateInputType | true
+    }
+
+  export interface ManufacturerAdvisoryDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ManufacturerAdvisory'], meta: { name: 'ManufacturerAdvisory' } }
+    /**
+     * Find zero or one ManufacturerAdvisory that matches the filter.
+     * @param {ManufacturerAdvisoryFindUniqueArgs} args - Arguments to find a ManufacturerAdvisory
+     * @example
+     * // Get one ManufacturerAdvisory
+     * const manufacturerAdvisory = await prisma.manufacturerAdvisory.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ManufacturerAdvisoryFindUniqueArgs>(args: SelectSubset<T, ManufacturerAdvisoryFindUniqueArgs<ExtArgs>>): Prisma__ManufacturerAdvisoryClient<$Result.GetResult<Prisma.$ManufacturerAdvisoryPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one ManufacturerAdvisory that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {ManufacturerAdvisoryFindUniqueOrThrowArgs} args - Arguments to find a ManufacturerAdvisory
+     * @example
+     * // Get one ManufacturerAdvisory
+     * const manufacturerAdvisory = await prisma.manufacturerAdvisory.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ManufacturerAdvisoryFindUniqueOrThrowArgs>(args: SelectSubset<T, ManufacturerAdvisoryFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ManufacturerAdvisoryClient<$Result.GetResult<Prisma.$ManufacturerAdvisoryPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first ManufacturerAdvisory that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ManufacturerAdvisoryFindFirstArgs} args - Arguments to find a ManufacturerAdvisory
+     * @example
+     * // Get one ManufacturerAdvisory
+     * const manufacturerAdvisory = await prisma.manufacturerAdvisory.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ManufacturerAdvisoryFindFirstArgs>(args?: SelectSubset<T, ManufacturerAdvisoryFindFirstArgs<ExtArgs>>): Prisma__ManufacturerAdvisoryClient<$Result.GetResult<Prisma.$ManufacturerAdvisoryPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first ManufacturerAdvisory that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ManufacturerAdvisoryFindFirstOrThrowArgs} args - Arguments to find a ManufacturerAdvisory
+     * @example
+     * // Get one ManufacturerAdvisory
+     * const manufacturerAdvisory = await prisma.manufacturerAdvisory.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ManufacturerAdvisoryFindFirstOrThrowArgs>(args?: SelectSubset<T, ManufacturerAdvisoryFindFirstOrThrowArgs<ExtArgs>>): Prisma__ManufacturerAdvisoryClient<$Result.GetResult<Prisma.$ManufacturerAdvisoryPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more ManufacturerAdvisories that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ManufacturerAdvisoryFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ManufacturerAdvisories
+     * const manufacturerAdvisories = await prisma.manufacturerAdvisory.findMany()
+     * 
+     * // Get first 10 ManufacturerAdvisories
+     * const manufacturerAdvisories = await prisma.manufacturerAdvisory.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const manufacturerAdvisoryWithIdOnly = await prisma.manufacturerAdvisory.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ManufacturerAdvisoryFindManyArgs>(args?: SelectSubset<T, ManufacturerAdvisoryFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ManufacturerAdvisoryPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a ManufacturerAdvisory.
+     * @param {ManufacturerAdvisoryCreateArgs} args - Arguments to create a ManufacturerAdvisory.
+     * @example
+     * // Create one ManufacturerAdvisory
+     * const ManufacturerAdvisory = await prisma.manufacturerAdvisory.create({
+     *   data: {
+     *     // ... data to create a ManufacturerAdvisory
+     *   }
+     * })
+     * 
+     */
+    create<T extends ManufacturerAdvisoryCreateArgs>(args: SelectSubset<T, ManufacturerAdvisoryCreateArgs<ExtArgs>>): Prisma__ManufacturerAdvisoryClient<$Result.GetResult<Prisma.$ManufacturerAdvisoryPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many ManufacturerAdvisories.
+     * @param {ManufacturerAdvisoryCreateManyArgs} args - Arguments to create many ManufacturerAdvisories.
+     * @example
+     * // Create many ManufacturerAdvisories
+     * const manufacturerAdvisory = await prisma.manufacturerAdvisory.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ManufacturerAdvisoryCreateManyArgs>(args?: SelectSubset<T, ManufacturerAdvisoryCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many ManufacturerAdvisories and returns the data saved in the database.
+     * @param {ManufacturerAdvisoryCreateManyAndReturnArgs} args - Arguments to create many ManufacturerAdvisories.
+     * @example
+     * // Create many ManufacturerAdvisories
+     * const manufacturerAdvisory = await prisma.manufacturerAdvisory.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many ManufacturerAdvisories and only return the `id`
+     * const manufacturerAdvisoryWithIdOnly = await prisma.manufacturerAdvisory.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ManufacturerAdvisoryCreateManyAndReturnArgs>(args?: SelectSubset<T, ManufacturerAdvisoryCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ManufacturerAdvisoryPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a ManufacturerAdvisory.
+     * @param {ManufacturerAdvisoryDeleteArgs} args - Arguments to delete one ManufacturerAdvisory.
+     * @example
+     * // Delete one ManufacturerAdvisory
+     * const ManufacturerAdvisory = await prisma.manufacturerAdvisory.delete({
+     *   where: {
+     *     // ... filter to delete one ManufacturerAdvisory
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ManufacturerAdvisoryDeleteArgs>(args: SelectSubset<T, ManufacturerAdvisoryDeleteArgs<ExtArgs>>): Prisma__ManufacturerAdvisoryClient<$Result.GetResult<Prisma.$ManufacturerAdvisoryPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one ManufacturerAdvisory.
+     * @param {ManufacturerAdvisoryUpdateArgs} args - Arguments to update one ManufacturerAdvisory.
+     * @example
+     * // Update one ManufacturerAdvisory
+     * const manufacturerAdvisory = await prisma.manufacturerAdvisory.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ManufacturerAdvisoryUpdateArgs>(args: SelectSubset<T, ManufacturerAdvisoryUpdateArgs<ExtArgs>>): Prisma__ManufacturerAdvisoryClient<$Result.GetResult<Prisma.$ManufacturerAdvisoryPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more ManufacturerAdvisories.
+     * @param {ManufacturerAdvisoryDeleteManyArgs} args - Arguments to filter ManufacturerAdvisories to delete.
+     * @example
+     * // Delete a few ManufacturerAdvisories
+     * const { count } = await prisma.manufacturerAdvisory.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ManufacturerAdvisoryDeleteManyArgs>(args?: SelectSubset<T, ManufacturerAdvisoryDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ManufacturerAdvisories.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ManufacturerAdvisoryUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ManufacturerAdvisories
+     * const manufacturerAdvisory = await prisma.manufacturerAdvisory.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ManufacturerAdvisoryUpdateManyArgs>(args: SelectSubset<T, ManufacturerAdvisoryUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one ManufacturerAdvisory.
+     * @param {ManufacturerAdvisoryUpsertArgs} args - Arguments to update or create a ManufacturerAdvisory.
+     * @example
+     * // Update or create a ManufacturerAdvisory
+     * const manufacturerAdvisory = await prisma.manufacturerAdvisory.upsert({
+     *   create: {
+     *     // ... data to create a ManufacturerAdvisory
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ManufacturerAdvisory we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ManufacturerAdvisoryUpsertArgs>(args: SelectSubset<T, ManufacturerAdvisoryUpsertArgs<ExtArgs>>): Prisma__ManufacturerAdvisoryClient<$Result.GetResult<Prisma.$ManufacturerAdvisoryPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of ManufacturerAdvisories.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ManufacturerAdvisoryCountArgs} args - Arguments to filter ManufacturerAdvisories to count.
+     * @example
+     * // Count the number of ManufacturerAdvisories
+     * const count = await prisma.manufacturerAdvisory.count({
+     *   where: {
+     *     // ... the filter for the ManufacturerAdvisories we want to count
+     *   }
+     * })
+    **/
+    count<T extends ManufacturerAdvisoryCountArgs>(
+      args?: Subset<T, ManufacturerAdvisoryCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ManufacturerAdvisoryCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ManufacturerAdvisory.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ManufacturerAdvisoryAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ManufacturerAdvisoryAggregateArgs>(args: Subset<T, ManufacturerAdvisoryAggregateArgs>): Prisma.PrismaPromise<GetManufacturerAdvisoryAggregateType<T>>
+
+    /**
+     * Group by ManufacturerAdvisory.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ManufacturerAdvisoryGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ManufacturerAdvisoryGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ManufacturerAdvisoryGroupByArgs['orderBy'] }
+        : { orderBy?: ManufacturerAdvisoryGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ManufacturerAdvisoryGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetManufacturerAdvisoryGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ManufacturerAdvisory model
+   */
+  readonly fields: ManufacturerAdvisoryFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ManufacturerAdvisory.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ManufacturerAdvisoryClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ManufacturerAdvisory model
+   */ 
+  interface ManufacturerAdvisoryFieldRefs {
+    readonly id: FieldRef<"ManufacturerAdvisory", 'String'>
+    readonly manufacturer: FieldRef<"ManufacturerAdvisory", 'String'>
+    readonly advisoryId: FieldRef<"ManufacturerAdvisory", 'String'>
+    readonly title: FieldRef<"ManufacturerAdvisory", 'String'>
+    readonly description: FieldRef<"ManufacturerAdvisory", 'String'>
+    readonly severity: FieldRef<"ManufacturerAdvisory", 'VulnerabilitySeverity'>
+    readonly affectedProducts: FieldRef<"ManufacturerAdvisory", 'Json'>
+    readonly affectedVersions: FieldRef<"ManufacturerAdvisory", 'Json'>
+    readonly fixedVersion: FieldRef<"ManufacturerAdvisory", 'String'>
+    readonly workaround: FieldRef<"ManufacturerAdvisory", 'String'>
+    readonly publishedDate: FieldRef<"ManufacturerAdvisory", 'DateTime'>
+    readonly lastUpdatedDate: FieldRef<"ManufacturerAdvisory", 'DateTime'>
+    readonly cveReferences: FieldRef<"ManufacturerAdvisory", 'Json'>
+    readonly status: FieldRef<"ManufacturerAdvisory", 'AdvisoryStatus'>
+    readonly source: FieldRef<"ManufacturerAdvisory", 'String'>
+    readonly acknowledgedAt: FieldRef<"ManufacturerAdvisory", 'DateTime'>
+    readonly acknowledgedBy: FieldRef<"ManufacturerAdvisory", 'String'>
+    readonly createdAt: FieldRef<"ManufacturerAdvisory", 'DateTime'>
+    readonly updatedAt: FieldRef<"ManufacturerAdvisory", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ManufacturerAdvisory findUnique
+   */
+  export type ManufacturerAdvisoryFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ManufacturerAdvisory
+     */
+    select?: ManufacturerAdvisorySelect<ExtArgs> | null
+    /**
+     * Filter, which ManufacturerAdvisory to fetch.
+     */
+    where: ManufacturerAdvisoryWhereUniqueInput
+  }
+
+  /**
+   * ManufacturerAdvisory findUniqueOrThrow
+   */
+  export type ManufacturerAdvisoryFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ManufacturerAdvisory
+     */
+    select?: ManufacturerAdvisorySelect<ExtArgs> | null
+    /**
+     * Filter, which ManufacturerAdvisory to fetch.
+     */
+    where: ManufacturerAdvisoryWhereUniqueInput
+  }
+
+  /**
+   * ManufacturerAdvisory findFirst
+   */
+  export type ManufacturerAdvisoryFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ManufacturerAdvisory
+     */
+    select?: ManufacturerAdvisorySelect<ExtArgs> | null
+    /**
+     * Filter, which ManufacturerAdvisory to fetch.
+     */
+    where?: ManufacturerAdvisoryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ManufacturerAdvisories to fetch.
+     */
+    orderBy?: ManufacturerAdvisoryOrderByWithRelationInput | ManufacturerAdvisoryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ManufacturerAdvisories.
+     */
+    cursor?: ManufacturerAdvisoryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ManufacturerAdvisories from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ManufacturerAdvisories.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ManufacturerAdvisories.
+     */
+    distinct?: ManufacturerAdvisoryScalarFieldEnum | ManufacturerAdvisoryScalarFieldEnum[]
+  }
+
+  /**
+   * ManufacturerAdvisory findFirstOrThrow
+   */
+  export type ManufacturerAdvisoryFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ManufacturerAdvisory
+     */
+    select?: ManufacturerAdvisorySelect<ExtArgs> | null
+    /**
+     * Filter, which ManufacturerAdvisory to fetch.
+     */
+    where?: ManufacturerAdvisoryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ManufacturerAdvisories to fetch.
+     */
+    orderBy?: ManufacturerAdvisoryOrderByWithRelationInput | ManufacturerAdvisoryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ManufacturerAdvisories.
+     */
+    cursor?: ManufacturerAdvisoryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ManufacturerAdvisories from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ManufacturerAdvisories.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ManufacturerAdvisories.
+     */
+    distinct?: ManufacturerAdvisoryScalarFieldEnum | ManufacturerAdvisoryScalarFieldEnum[]
+  }
+
+  /**
+   * ManufacturerAdvisory findMany
+   */
+  export type ManufacturerAdvisoryFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ManufacturerAdvisory
+     */
+    select?: ManufacturerAdvisorySelect<ExtArgs> | null
+    /**
+     * Filter, which ManufacturerAdvisories to fetch.
+     */
+    where?: ManufacturerAdvisoryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ManufacturerAdvisories to fetch.
+     */
+    orderBy?: ManufacturerAdvisoryOrderByWithRelationInput | ManufacturerAdvisoryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ManufacturerAdvisories.
+     */
+    cursor?: ManufacturerAdvisoryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ManufacturerAdvisories from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ManufacturerAdvisories.
+     */
+    skip?: number
+    distinct?: ManufacturerAdvisoryScalarFieldEnum | ManufacturerAdvisoryScalarFieldEnum[]
+  }
+
+  /**
+   * ManufacturerAdvisory create
+   */
+  export type ManufacturerAdvisoryCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ManufacturerAdvisory
+     */
+    select?: ManufacturerAdvisorySelect<ExtArgs> | null
+    /**
+     * The data needed to create a ManufacturerAdvisory.
+     */
+    data: XOR<ManufacturerAdvisoryCreateInput, ManufacturerAdvisoryUncheckedCreateInput>
+  }
+
+  /**
+   * ManufacturerAdvisory createMany
+   */
+  export type ManufacturerAdvisoryCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ManufacturerAdvisories.
+     */
+    data: ManufacturerAdvisoryCreateManyInput | ManufacturerAdvisoryCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ManufacturerAdvisory createManyAndReturn
+   */
+  export type ManufacturerAdvisoryCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ManufacturerAdvisory
+     */
+    select?: ManufacturerAdvisorySelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many ManufacturerAdvisories.
+     */
+    data: ManufacturerAdvisoryCreateManyInput | ManufacturerAdvisoryCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ManufacturerAdvisory update
+   */
+  export type ManufacturerAdvisoryUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ManufacturerAdvisory
+     */
+    select?: ManufacturerAdvisorySelect<ExtArgs> | null
+    /**
+     * The data needed to update a ManufacturerAdvisory.
+     */
+    data: XOR<ManufacturerAdvisoryUpdateInput, ManufacturerAdvisoryUncheckedUpdateInput>
+    /**
+     * Choose, which ManufacturerAdvisory to update.
+     */
+    where: ManufacturerAdvisoryWhereUniqueInput
+  }
+
+  /**
+   * ManufacturerAdvisory updateMany
+   */
+  export type ManufacturerAdvisoryUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ManufacturerAdvisories.
+     */
+    data: XOR<ManufacturerAdvisoryUpdateManyMutationInput, ManufacturerAdvisoryUncheckedUpdateManyInput>
+    /**
+     * Filter which ManufacturerAdvisories to update
+     */
+    where?: ManufacturerAdvisoryWhereInput
+  }
+
+  /**
+   * ManufacturerAdvisory upsert
+   */
+  export type ManufacturerAdvisoryUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ManufacturerAdvisory
+     */
+    select?: ManufacturerAdvisorySelect<ExtArgs> | null
+    /**
+     * The filter to search for the ManufacturerAdvisory to update in case it exists.
+     */
+    where: ManufacturerAdvisoryWhereUniqueInput
+    /**
+     * In case the ManufacturerAdvisory found by the `where` argument doesn't exist, create a new ManufacturerAdvisory with this data.
+     */
+    create: XOR<ManufacturerAdvisoryCreateInput, ManufacturerAdvisoryUncheckedCreateInput>
+    /**
+     * In case the ManufacturerAdvisory was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ManufacturerAdvisoryUpdateInput, ManufacturerAdvisoryUncheckedUpdateInput>
+  }
+
+  /**
+   * ManufacturerAdvisory delete
+   */
+  export type ManufacturerAdvisoryDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ManufacturerAdvisory
+     */
+    select?: ManufacturerAdvisorySelect<ExtArgs> | null
+    /**
+     * Filter which ManufacturerAdvisory to delete.
+     */
+    where: ManufacturerAdvisoryWhereUniqueInput
+  }
+
+  /**
+   * ManufacturerAdvisory deleteMany
+   */
+  export type ManufacturerAdvisoryDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ManufacturerAdvisories to delete
+     */
+    where?: ManufacturerAdvisoryWhereInput
+  }
+
+  /**
+   * ManufacturerAdvisory without action
+   */
+  export type ManufacturerAdvisoryDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ManufacturerAdvisory
+     */
+    select?: ManufacturerAdvisorySelect<ExtArgs> | null
+  }
+
+
+  /**
+   * Model DeviceRiskAssessment
+   */
+
+  export type AggregateDeviceRiskAssessment = {
+    _count: DeviceRiskAssessmentCountAggregateOutputType | null
+    _avg: DeviceRiskAssessmentAvgAggregateOutputType | null
+    _sum: DeviceRiskAssessmentSumAggregateOutputType | null
+    _min: DeviceRiskAssessmentMinAggregateOutputType | null
+    _max: DeviceRiskAssessmentMaxAggregateOutputType | null
+  }
+
+  export type DeviceRiskAssessmentAvgAggregateOutputType = {
+    overallRiskScore: number | null
+    vulnerabilityScore: number | null
+    patchScore: number | null
+    networkScore: number | null
+    complianceScore: number | null
+    incidentScore: number | null
+    agingScore: number | null
+  }
+
+  export type DeviceRiskAssessmentSumAggregateOutputType = {
+    overallRiskScore: number | null
+    vulnerabilityScore: number | null
+    patchScore: number | null
+    networkScore: number | null
+    complianceScore: number | null
+    incidentScore: number | null
+    agingScore: number | null
+  }
+
+  export type DeviceRiskAssessmentMinAggregateOutputType = {
+    id: string | null
+    deviceId: string | null
+    overallRiskScore: number | null
+    vulnerabilityScore: number | null
+    patchScore: number | null
+    networkScore: number | null
+    complianceScore: number | null
+    incidentScore: number | null
+    agingScore: number | null
+    riskLevel: $Enums.RiskLevel | null
+    assessedAt: Date | null
+    assessedBy: string | null
+    nextAssessmentDue: Date | null
+    notes: string | null
+    createdAt: Date | null
+  }
+
+  export type DeviceRiskAssessmentMaxAggregateOutputType = {
+    id: string | null
+    deviceId: string | null
+    overallRiskScore: number | null
+    vulnerabilityScore: number | null
+    patchScore: number | null
+    networkScore: number | null
+    complianceScore: number | null
+    incidentScore: number | null
+    agingScore: number | null
+    riskLevel: $Enums.RiskLevel | null
+    assessedAt: Date | null
+    assessedBy: string | null
+    nextAssessmentDue: Date | null
+    notes: string | null
+    createdAt: Date | null
+  }
+
+  export type DeviceRiskAssessmentCountAggregateOutputType = {
+    id: number
+    deviceId: number
+    overallRiskScore: number
+    vulnerabilityScore: number
+    patchScore: number
+    networkScore: number
+    complianceScore: number
+    incidentScore: number
+    agingScore: number
+    riskLevel: number
+    riskFactors: number
+    recommendations: number
+    assessedAt: number
+    assessedBy: number
+    nextAssessmentDue: number
+    notes: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type DeviceRiskAssessmentAvgAggregateInputType = {
+    overallRiskScore?: true
+    vulnerabilityScore?: true
+    patchScore?: true
+    networkScore?: true
+    complianceScore?: true
+    incidentScore?: true
+    agingScore?: true
+  }
+
+  export type DeviceRiskAssessmentSumAggregateInputType = {
+    overallRiskScore?: true
+    vulnerabilityScore?: true
+    patchScore?: true
+    networkScore?: true
+    complianceScore?: true
+    incidentScore?: true
+    agingScore?: true
+  }
+
+  export type DeviceRiskAssessmentMinAggregateInputType = {
+    id?: true
+    deviceId?: true
+    overallRiskScore?: true
+    vulnerabilityScore?: true
+    patchScore?: true
+    networkScore?: true
+    complianceScore?: true
+    incidentScore?: true
+    agingScore?: true
+    riskLevel?: true
+    assessedAt?: true
+    assessedBy?: true
+    nextAssessmentDue?: true
+    notes?: true
+    createdAt?: true
+  }
+
+  export type DeviceRiskAssessmentMaxAggregateInputType = {
+    id?: true
+    deviceId?: true
+    overallRiskScore?: true
+    vulnerabilityScore?: true
+    patchScore?: true
+    networkScore?: true
+    complianceScore?: true
+    incidentScore?: true
+    agingScore?: true
+    riskLevel?: true
+    assessedAt?: true
+    assessedBy?: true
+    nextAssessmentDue?: true
+    notes?: true
+    createdAt?: true
+  }
+
+  export type DeviceRiskAssessmentCountAggregateInputType = {
+    id?: true
+    deviceId?: true
+    overallRiskScore?: true
+    vulnerabilityScore?: true
+    patchScore?: true
+    networkScore?: true
+    complianceScore?: true
+    incidentScore?: true
+    agingScore?: true
+    riskLevel?: true
+    riskFactors?: true
+    recommendations?: true
+    assessedAt?: true
+    assessedBy?: true
+    nextAssessmentDue?: true
+    notes?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type DeviceRiskAssessmentAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DeviceRiskAssessment to aggregate.
+     */
+    where?: DeviceRiskAssessmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DeviceRiskAssessments to fetch.
+     */
+    orderBy?: DeviceRiskAssessmentOrderByWithRelationInput | DeviceRiskAssessmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: DeviceRiskAssessmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DeviceRiskAssessments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DeviceRiskAssessments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned DeviceRiskAssessments
+    **/
+    _count?: true | DeviceRiskAssessmentCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: DeviceRiskAssessmentAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: DeviceRiskAssessmentSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: DeviceRiskAssessmentMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: DeviceRiskAssessmentMaxAggregateInputType
+  }
+
+  export type GetDeviceRiskAssessmentAggregateType<T extends DeviceRiskAssessmentAggregateArgs> = {
+        [P in keyof T & keyof AggregateDeviceRiskAssessment]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateDeviceRiskAssessment[P]>
+      : GetScalarType<T[P], AggregateDeviceRiskAssessment[P]>
+  }
+
+
+
+
+  export type DeviceRiskAssessmentGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DeviceRiskAssessmentWhereInput
+    orderBy?: DeviceRiskAssessmentOrderByWithAggregationInput | DeviceRiskAssessmentOrderByWithAggregationInput[]
+    by: DeviceRiskAssessmentScalarFieldEnum[] | DeviceRiskAssessmentScalarFieldEnum
+    having?: DeviceRiskAssessmentScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: DeviceRiskAssessmentCountAggregateInputType | true
+    _avg?: DeviceRiskAssessmentAvgAggregateInputType
+    _sum?: DeviceRiskAssessmentSumAggregateInputType
+    _min?: DeviceRiskAssessmentMinAggregateInputType
+    _max?: DeviceRiskAssessmentMaxAggregateInputType
+  }
+
+  export type DeviceRiskAssessmentGroupByOutputType = {
+    id: string
+    deviceId: string
+    overallRiskScore: number
+    vulnerabilityScore: number
+    patchScore: number
+    networkScore: number
+    complianceScore: number
+    incidentScore: number
+    agingScore: number
+    riskLevel: $Enums.RiskLevel
+    riskFactors: JsonValue
+    recommendations: JsonValue | null
+    assessedAt: Date
+    assessedBy: string | null
+    nextAssessmentDue: Date | null
+    notes: string | null
+    createdAt: Date
+    _count: DeviceRiskAssessmentCountAggregateOutputType | null
+    _avg: DeviceRiskAssessmentAvgAggregateOutputType | null
+    _sum: DeviceRiskAssessmentSumAggregateOutputType | null
+    _min: DeviceRiskAssessmentMinAggregateOutputType | null
+    _max: DeviceRiskAssessmentMaxAggregateOutputType | null
+  }
+
+  type GetDeviceRiskAssessmentGroupByPayload<T extends DeviceRiskAssessmentGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<DeviceRiskAssessmentGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof DeviceRiskAssessmentGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], DeviceRiskAssessmentGroupByOutputType[P]>
+            : GetScalarType<T[P], DeviceRiskAssessmentGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type DeviceRiskAssessmentSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    deviceId?: boolean
+    overallRiskScore?: boolean
+    vulnerabilityScore?: boolean
+    patchScore?: boolean
+    networkScore?: boolean
+    complianceScore?: boolean
+    incidentScore?: boolean
+    agingScore?: boolean
+    riskLevel?: boolean
+    riskFactors?: boolean
+    recommendations?: boolean
+    assessedAt?: boolean
+    assessedBy?: boolean
+    nextAssessmentDue?: boolean
+    notes?: boolean
+    createdAt?: boolean
+    device?: boolean | MonitoringDeviceDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["deviceRiskAssessment"]>
+
+  export type DeviceRiskAssessmentSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    deviceId?: boolean
+    overallRiskScore?: boolean
+    vulnerabilityScore?: boolean
+    patchScore?: boolean
+    networkScore?: boolean
+    complianceScore?: boolean
+    incidentScore?: boolean
+    agingScore?: boolean
+    riskLevel?: boolean
+    riskFactors?: boolean
+    recommendations?: boolean
+    assessedAt?: boolean
+    assessedBy?: boolean
+    nextAssessmentDue?: boolean
+    notes?: boolean
+    createdAt?: boolean
+    device?: boolean | MonitoringDeviceDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["deviceRiskAssessment"]>
+
+  export type DeviceRiskAssessmentSelectScalar = {
+    id?: boolean
+    deviceId?: boolean
+    overallRiskScore?: boolean
+    vulnerabilityScore?: boolean
+    patchScore?: boolean
+    networkScore?: boolean
+    complianceScore?: boolean
+    incidentScore?: boolean
+    agingScore?: boolean
+    riskLevel?: boolean
+    riskFactors?: boolean
+    recommendations?: boolean
+    assessedAt?: boolean
+    assessedBy?: boolean
+    nextAssessmentDue?: boolean
+    notes?: boolean
+    createdAt?: boolean
+  }
+
+  export type DeviceRiskAssessmentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    device?: boolean | MonitoringDeviceDefaultArgs<ExtArgs>
+  }
+  export type DeviceRiskAssessmentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    device?: boolean | MonitoringDeviceDefaultArgs<ExtArgs>
+  }
+
+  export type $DeviceRiskAssessmentPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "DeviceRiskAssessment"
+    objects: {
+      device: Prisma.$MonitoringDevicePayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      deviceId: string
+      overallRiskScore: number
+      vulnerabilityScore: number
+      patchScore: number
+      networkScore: number
+      complianceScore: number
+      incidentScore: number
+      agingScore: number
+      riskLevel: $Enums.RiskLevel
+      riskFactors: Prisma.JsonValue
+      recommendations: Prisma.JsonValue | null
+      assessedAt: Date
+      assessedBy: string | null
+      nextAssessmentDue: Date | null
+      notes: string | null
+      createdAt: Date
+    }, ExtArgs["result"]["deviceRiskAssessment"]>
+    composites: {}
+  }
+
+  type DeviceRiskAssessmentGetPayload<S extends boolean | null | undefined | DeviceRiskAssessmentDefaultArgs> = $Result.GetResult<Prisma.$DeviceRiskAssessmentPayload, S>
+
+  type DeviceRiskAssessmentCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<DeviceRiskAssessmentFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: DeviceRiskAssessmentCountAggregateInputType | true
+    }
+
+  export interface DeviceRiskAssessmentDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['DeviceRiskAssessment'], meta: { name: 'DeviceRiskAssessment' } }
+    /**
+     * Find zero or one DeviceRiskAssessment that matches the filter.
+     * @param {DeviceRiskAssessmentFindUniqueArgs} args - Arguments to find a DeviceRiskAssessment
+     * @example
+     * // Get one DeviceRiskAssessment
+     * const deviceRiskAssessment = await prisma.deviceRiskAssessment.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends DeviceRiskAssessmentFindUniqueArgs>(args: SelectSubset<T, DeviceRiskAssessmentFindUniqueArgs<ExtArgs>>): Prisma__DeviceRiskAssessmentClient<$Result.GetResult<Prisma.$DeviceRiskAssessmentPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one DeviceRiskAssessment that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {DeviceRiskAssessmentFindUniqueOrThrowArgs} args - Arguments to find a DeviceRiskAssessment
+     * @example
+     * // Get one DeviceRiskAssessment
+     * const deviceRiskAssessment = await prisma.deviceRiskAssessment.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends DeviceRiskAssessmentFindUniqueOrThrowArgs>(args: SelectSubset<T, DeviceRiskAssessmentFindUniqueOrThrowArgs<ExtArgs>>): Prisma__DeviceRiskAssessmentClient<$Result.GetResult<Prisma.$DeviceRiskAssessmentPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first DeviceRiskAssessment that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeviceRiskAssessmentFindFirstArgs} args - Arguments to find a DeviceRiskAssessment
+     * @example
+     * // Get one DeviceRiskAssessment
+     * const deviceRiskAssessment = await prisma.deviceRiskAssessment.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends DeviceRiskAssessmentFindFirstArgs>(args?: SelectSubset<T, DeviceRiskAssessmentFindFirstArgs<ExtArgs>>): Prisma__DeviceRiskAssessmentClient<$Result.GetResult<Prisma.$DeviceRiskAssessmentPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first DeviceRiskAssessment that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeviceRiskAssessmentFindFirstOrThrowArgs} args - Arguments to find a DeviceRiskAssessment
+     * @example
+     * // Get one DeviceRiskAssessment
+     * const deviceRiskAssessment = await prisma.deviceRiskAssessment.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends DeviceRiskAssessmentFindFirstOrThrowArgs>(args?: SelectSubset<T, DeviceRiskAssessmentFindFirstOrThrowArgs<ExtArgs>>): Prisma__DeviceRiskAssessmentClient<$Result.GetResult<Prisma.$DeviceRiskAssessmentPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more DeviceRiskAssessments that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeviceRiskAssessmentFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all DeviceRiskAssessments
+     * const deviceRiskAssessments = await prisma.deviceRiskAssessment.findMany()
+     * 
+     * // Get first 10 DeviceRiskAssessments
+     * const deviceRiskAssessments = await prisma.deviceRiskAssessment.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const deviceRiskAssessmentWithIdOnly = await prisma.deviceRiskAssessment.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends DeviceRiskAssessmentFindManyArgs>(args?: SelectSubset<T, DeviceRiskAssessmentFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DeviceRiskAssessmentPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a DeviceRiskAssessment.
+     * @param {DeviceRiskAssessmentCreateArgs} args - Arguments to create a DeviceRiskAssessment.
+     * @example
+     * // Create one DeviceRiskAssessment
+     * const DeviceRiskAssessment = await prisma.deviceRiskAssessment.create({
+     *   data: {
+     *     // ... data to create a DeviceRiskAssessment
+     *   }
+     * })
+     * 
+     */
+    create<T extends DeviceRiskAssessmentCreateArgs>(args: SelectSubset<T, DeviceRiskAssessmentCreateArgs<ExtArgs>>): Prisma__DeviceRiskAssessmentClient<$Result.GetResult<Prisma.$DeviceRiskAssessmentPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many DeviceRiskAssessments.
+     * @param {DeviceRiskAssessmentCreateManyArgs} args - Arguments to create many DeviceRiskAssessments.
+     * @example
+     * // Create many DeviceRiskAssessments
+     * const deviceRiskAssessment = await prisma.deviceRiskAssessment.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends DeviceRiskAssessmentCreateManyArgs>(args?: SelectSubset<T, DeviceRiskAssessmentCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many DeviceRiskAssessments and returns the data saved in the database.
+     * @param {DeviceRiskAssessmentCreateManyAndReturnArgs} args - Arguments to create many DeviceRiskAssessments.
+     * @example
+     * // Create many DeviceRiskAssessments
+     * const deviceRiskAssessment = await prisma.deviceRiskAssessment.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many DeviceRiskAssessments and only return the `id`
+     * const deviceRiskAssessmentWithIdOnly = await prisma.deviceRiskAssessment.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends DeviceRiskAssessmentCreateManyAndReturnArgs>(args?: SelectSubset<T, DeviceRiskAssessmentCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DeviceRiskAssessmentPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a DeviceRiskAssessment.
+     * @param {DeviceRiskAssessmentDeleteArgs} args - Arguments to delete one DeviceRiskAssessment.
+     * @example
+     * // Delete one DeviceRiskAssessment
+     * const DeviceRiskAssessment = await prisma.deviceRiskAssessment.delete({
+     *   where: {
+     *     // ... filter to delete one DeviceRiskAssessment
+     *   }
+     * })
+     * 
+     */
+    delete<T extends DeviceRiskAssessmentDeleteArgs>(args: SelectSubset<T, DeviceRiskAssessmentDeleteArgs<ExtArgs>>): Prisma__DeviceRiskAssessmentClient<$Result.GetResult<Prisma.$DeviceRiskAssessmentPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one DeviceRiskAssessment.
+     * @param {DeviceRiskAssessmentUpdateArgs} args - Arguments to update one DeviceRiskAssessment.
+     * @example
+     * // Update one DeviceRiskAssessment
+     * const deviceRiskAssessment = await prisma.deviceRiskAssessment.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends DeviceRiskAssessmentUpdateArgs>(args: SelectSubset<T, DeviceRiskAssessmentUpdateArgs<ExtArgs>>): Prisma__DeviceRiskAssessmentClient<$Result.GetResult<Prisma.$DeviceRiskAssessmentPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more DeviceRiskAssessments.
+     * @param {DeviceRiskAssessmentDeleteManyArgs} args - Arguments to filter DeviceRiskAssessments to delete.
+     * @example
+     * // Delete a few DeviceRiskAssessments
+     * const { count } = await prisma.deviceRiskAssessment.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends DeviceRiskAssessmentDeleteManyArgs>(args?: SelectSubset<T, DeviceRiskAssessmentDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DeviceRiskAssessments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeviceRiskAssessmentUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many DeviceRiskAssessments
+     * const deviceRiskAssessment = await prisma.deviceRiskAssessment.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends DeviceRiskAssessmentUpdateManyArgs>(args: SelectSubset<T, DeviceRiskAssessmentUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one DeviceRiskAssessment.
+     * @param {DeviceRiskAssessmentUpsertArgs} args - Arguments to update or create a DeviceRiskAssessment.
+     * @example
+     * // Update or create a DeviceRiskAssessment
+     * const deviceRiskAssessment = await prisma.deviceRiskAssessment.upsert({
+     *   create: {
+     *     // ... data to create a DeviceRiskAssessment
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the DeviceRiskAssessment we want to update
+     *   }
+     * })
+     */
+    upsert<T extends DeviceRiskAssessmentUpsertArgs>(args: SelectSubset<T, DeviceRiskAssessmentUpsertArgs<ExtArgs>>): Prisma__DeviceRiskAssessmentClient<$Result.GetResult<Prisma.$DeviceRiskAssessmentPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of DeviceRiskAssessments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeviceRiskAssessmentCountArgs} args - Arguments to filter DeviceRiskAssessments to count.
+     * @example
+     * // Count the number of DeviceRiskAssessments
+     * const count = await prisma.deviceRiskAssessment.count({
+     *   where: {
+     *     // ... the filter for the DeviceRiskAssessments we want to count
+     *   }
+     * })
+    **/
+    count<T extends DeviceRiskAssessmentCountArgs>(
+      args?: Subset<T, DeviceRiskAssessmentCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], DeviceRiskAssessmentCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a DeviceRiskAssessment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeviceRiskAssessmentAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends DeviceRiskAssessmentAggregateArgs>(args: Subset<T, DeviceRiskAssessmentAggregateArgs>): Prisma.PrismaPromise<GetDeviceRiskAssessmentAggregateType<T>>
+
+    /**
+     * Group by DeviceRiskAssessment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeviceRiskAssessmentGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends DeviceRiskAssessmentGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: DeviceRiskAssessmentGroupByArgs['orderBy'] }
+        : { orderBy?: DeviceRiskAssessmentGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, DeviceRiskAssessmentGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetDeviceRiskAssessmentGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the DeviceRiskAssessment model
+   */
+  readonly fields: DeviceRiskAssessmentFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for DeviceRiskAssessment.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__DeviceRiskAssessmentClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    device<T extends MonitoringDeviceDefaultArgs<ExtArgs> = {}>(args?: Subset<T, MonitoringDeviceDefaultArgs<ExtArgs>>): Prisma__MonitoringDeviceClient<$Result.GetResult<Prisma.$MonitoringDevicePayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the DeviceRiskAssessment model
+   */ 
+  interface DeviceRiskAssessmentFieldRefs {
+    readonly id: FieldRef<"DeviceRiskAssessment", 'String'>
+    readonly deviceId: FieldRef<"DeviceRiskAssessment", 'String'>
+    readonly overallRiskScore: FieldRef<"DeviceRiskAssessment", 'Float'>
+    readonly vulnerabilityScore: FieldRef<"DeviceRiskAssessment", 'Float'>
+    readonly patchScore: FieldRef<"DeviceRiskAssessment", 'Float'>
+    readonly networkScore: FieldRef<"DeviceRiskAssessment", 'Float'>
+    readonly complianceScore: FieldRef<"DeviceRiskAssessment", 'Float'>
+    readonly incidentScore: FieldRef<"DeviceRiskAssessment", 'Float'>
+    readonly agingScore: FieldRef<"DeviceRiskAssessment", 'Float'>
+    readonly riskLevel: FieldRef<"DeviceRiskAssessment", 'RiskLevel'>
+    readonly riskFactors: FieldRef<"DeviceRiskAssessment", 'Json'>
+    readonly recommendations: FieldRef<"DeviceRiskAssessment", 'Json'>
+    readonly assessedAt: FieldRef<"DeviceRiskAssessment", 'DateTime'>
+    readonly assessedBy: FieldRef<"DeviceRiskAssessment", 'String'>
+    readonly nextAssessmentDue: FieldRef<"DeviceRiskAssessment", 'DateTime'>
+    readonly notes: FieldRef<"DeviceRiskAssessment", 'String'>
+    readonly createdAt: FieldRef<"DeviceRiskAssessment", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * DeviceRiskAssessment findUnique
+   */
+  export type DeviceRiskAssessmentFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceRiskAssessment
+     */
+    select?: DeviceRiskAssessmentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceRiskAssessmentInclude<ExtArgs> | null
+    /**
+     * Filter, which DeviceRiskAssessment to fetch.
+     */
+    where: DeviceRiskAssessmentWhereUniqueInput
+  }
+
+  /**
+   * DeviceRiskAssessment findUniqueOrThrow
+   */
+  export type DeviceRiskAssessmentFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceRiskAssessment
+     */
+    select?: DeviceRiskAssessmentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceRiskAssessmentInclude<ExtArgs> | null
+    /**
+     * Filter, which DeviceRiskAssessment to fetch.
+     */
+    where: DeviceRiskAssessmentWhereUniqueInput
+  }
+
+  /**
+   * DeviceRiskAssessment findFirst
+   */
+  export type DeviceRiskAssessmentFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceRiskAssessment
+     */
+    select?: DeviceRiskAssessmentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceRiskAssessmentInclude<ExtArgs> | null
+    /**
+     * Filter, which DeviceRiskAssessment to fetch.
+     */
+    where?: DeviceRiskAssessmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DeviceRiskAssessments to fetch.
+     */
+    orderBy?: DeviceRiskAssessmentOrderByWithRelationInput | DeviceRiskAssessmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DeviceRiskAssessments.
+     */
+    cursor?: DeviceRiskAssessmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DeviceRiskAssessments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DeviceRiskAssessments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DeviceRiskAssessments.
+     */
+    distinct?: DeviceRiskAssessmentScalarFieldEnum | DeviceRiskAssessmentScalarFieldEnum[]
+  }
+
+  /**
+   * DeviceRiskAssessment findFirstOrThrow
+   */
+  export type DeviceRiskAssessmentFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceRiskAssessment
+     */
+    select?: DeviceRiskAssessmentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceRiskAssessmentInclude<ExtArgs> | null
+    /**
+     * Filter, which DeviceRiskAssessment to fetch.
+     */
+    where?: DeviceRiskAssessmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DeviceRiskAssessments to fetch.
+     */
+    orderBy?: DeviceRiskAssessmentOrderByWithRelationInput | DeviceRiskAssessmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DeviceRiskAssessments.
+     */
+    cursor?: DeviceRiskAssessmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DeviceRiskAssessments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DeviceRiskAssessments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DeviceRiskAssessments.
+     */
+    distinct?: DeviceRiskAssessmentScalarFieldEnum | DeviceRiskAssessmentScalarFieldEnum[]
+  }
+
+  /**
+   * DeviceRiskAssessment findMany
+   */
+  export type DeviceRiskAssessmentFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceRiskAssessment
+     */
+    select?: DeviceRiskAssessmentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceRiskAssessmentInclude<ExtArgs> | null
+    /**
+     * Filter, which DeviceRiskAssessments to fetch.
+     */
+    where?: DeviceRiskAssessmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DeviceRiskAssessments to fetch.
+     */
+    orderBy?: DeviceRiskAssessmentOrderByWithRelationInput | DeviceRiskAssessmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing DeviceRiskAssessments.
+     */
+    cursor?: DeviceRiskAssessmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DeviceRiskAssessments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DeviceRiskAssessments.
+     */
+    skip?: number
+    distinct?: DeviceRiskAssessmentScalarFieldEnum | DeviceRiskAssessmentScalarFieldEnum[]
+  }
+
+  /**
+   * DeviceRiskAssessment create
+   */
+  export type DeviceRiskAssessmentCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceRiskAssessment
+     */
+    select?: DeviceRiskAssessmentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceRiskAssessmentInclude<ExtArgs> | null
+    /**
+     * The data needed to create a DeviceRiskAssessment.
+     */
+    data: XOR<DeviceRiskAssessmentCreateInput, DeviceRiskAssessmentUncheckedCreateInput>
+  }
+
+  /**
+   * DeviceRiskAssessment createMany
+   */
+  export type DeviceRiskAssessmentCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many DeviceRiskAssessments.
+     */
+    data: DeviceRiskAssessmentCreateManyInput | DeviceRiskAssessmentCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * DeviceRiskAssessment createManyAndReturn
+   */
+  export type DeviceRiskAssessmentCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceRiskAssessment
+     */
+    select?: DeviceRiskAssessmentSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many DeviceRiskAssessments.
+     */
+    data: DeviceRiskAssessmentCreateManyInput | DeviceRiskAssessmentCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceRiskAssessmentIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * DeviceRiskAssessment update
+   */
+  export type DeviceRiskAssessmentUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceRiskAssessment
+     */
+    select?: DeviceRiskAssessmentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceRiskAssessmentInclude<ExtArgs> | null
+    /**
+     * The data needed to update a DeviceRiskAssessment.
+     */
+    data: XOR<DeviceRiskAssessmentUpdateInput, DeviceRiskAssessmentUncheckedUpdateInput>
+    /**
+     * Choose, which DeviceRiskAssessment to update.
+     */
+    where: DeviceRiskAssessmentWhereUniqueInput
+  }
+
+  /**
+   * DeviceRiskAssessment updateMany
+   */
+  export type DeviceRiskAssessmentUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update DeviceRiskAssessments.
+     */
+    data: XOR<DeviceRiskAssessmentUpdateManyMutationInput, DeviceRiskAssessmentUncheckedUpdateManyInput>
+    /**
+     * Filter which DeviceRiskAssessments to update
+     */
+    where?: DeviceRiskAssessmentWhereInput
+  }
+
+  /**
+   * DeviceRiskAssessment upsert
+   */
+  export type DeviceRiskAssessmentUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceRiskAssessment
+     */
+    select?: DeviceRiskAssessmentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceRiskAssessmentInclude<ExtArgs> | null
+    /**
+     * The filter to search for the DeviceRiskAssessment to update in case it exists.
+     */
+    where: DeviceRiskAssessmentWhereUniqueInput
+    /**
+     * In case the DeviceRiskAssessment found by the `where` argument doesn't exist, create a new DeviceRiskAssessment with this data.
+     */
+    create: XOR<DeviceRiskAssessmentCreateInput, DeviceRiskAssessmentUncheckedCreateInput>
+    /**
+     * In case the DeviceRiskAssessment was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<DeviceRiskAssessmentUpdateInput, DeviceRiskAssessmentUncheckedUpdateInput>
+  }
+
+  /**
+   * DeviceRiskAssessment delete
+   */
+  export type DeviceRiskAssessmentDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceRiskAssessment
+     */
+    select?: DeviceRiskAssessmentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceRiskAssessmentInclude<ExtArgs> | null
+    /**
+     * Filter which DeviceRiskAssessment to delete.
+     */
+    where: DeviceRiskAssessmentWhereUniqueInput
+  }
+
+  /**
+   * DeviceRiskAssessment deleteMany
+   */
+  export type DeviceRiskAssessmentDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DeviceRiskAssessments to delete
+     */
+    where?: DeviceRiskAssessmentWhereInput
+  }
+
+  /**
+   * DeviceRiskAssessment without action
+   */
+  export type DeviceRiskAssessmentDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeviceRiskAssessment
+     */
+    select?: DeviceRiskAssessmentSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeviceRiskAssessmentInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -12313,6 +24492,10 @@ export namespace Prisma {
     status: 'status',
     lastSyncAt: 'lastSyncAt',
     batteryLevel: 'batteryLevel',
+    firmwareVersion: 'firmwareVersion',
+    softwareVersion: 'softwareVersion',
+    certificateExpiry: 'certificateExpiry',
+    lastSecurityScan: 'lastSecurityScan',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -12442,6 +24625,236 @@ export namespace Prisma {
   };
 
   export type PatientEngagementScalarFieldEnum = (typeof PatientEngagementScalarFieldEnum)[keyof typeof PatientEngagementScalarFieldEnum]
+
+
+  export const DeviceVulnerabilityScalarFieldEnum: {
+    id: 'id',
+    deviceId: 'deviceId',
+    cveId: 'cveId',
+    title: 'title',
+    description: 'description',
+    severity: 'severity',
+    cvssScore: 'cvssScore',
+    affectedVersion: 'affectedVersion',
+    fixedVersion: 'fixedVersion',
+    exploitAvailable: 'exploitAvailable',
+    status: 'status',
+    discoveredAt: 'discoveredAt',
+    resolvedAt: 'resolvedAt',
+    resolvedBy: 'resolvedBy',
+    resolutionNotes: 'resolutionNotes',
+    source: 'source',
+    references: 'references',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type DeviceVulnerabilityScalarFieldEnum = (typeof DeviceVulnerabilityScalarFieldEnum)[keyof typeof DeviceVulnerabilityScalarFieldEnum]
+
+
+  export const DevicePatchScalarFieldEnum: {
+    id: 'id',
+    deviceId: 'deviceId',
+    patchVersion: 'patchVersion',
+    currentVersion: 'currentVersion',
+    description: 'description',
+    releaseNotes: 'releaseNotes',
+    criticality: 'criticality',
+    scheduledDate: 'scheduledDate',
+    appliedDate: 'appliedDate',
+    appliedBy: 'appliedBy',
+    status: 'status',
+    rollbackVersion: 'rollbackVersion',
+    testingRequired: 'testingRequired',
+    testingCompletedAt: 'testingCompletedAt',
+    testingNotes: 'testingNotes',
+    approvedBy: 'approvedBy',
+    approvedAt: 'approvedAt',
+    failureReason: 'failureReason',
+    vulnerabilitiesFixed: 'vulnerabilitiesFixed',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type DevicePatchScalarFieldEnum = (typeof DevicePatchScalarFieldEnum)[keyof typeof DevicePatchScalarFieldEnum]
+
+
+  export const SecurityIncidentScalarFieldEnum: {
+    id: 'id',
+    deviceId: 'deviceId',
+    incidentType: 'incidentType',
+    severity: 'severity',
+    title: 'title',
+    description: 'description',
+    affectedSystems: 'affectedSystems',
+    affectedPatients: 'affectedPatients',
+    detectedAt: 'detectedAt',
+    detectedBy: 'detectedBy',
+    reportedBy: 'reportedBy',
+    status: 'status',
+    assignedTo: 'assignedTo',
+    containedAt: 'containedAt',
+    resolvedAt: 'resolvedAt',
+    rootCause: 'rootCause',
+    remediationSteps: 'remediationSteps',
+    lessonsLearned: 'lessonsLearned',
+    timeline: 'timeline',
+    evidence: 'evidence',
+    notificationsSent: 'notificationsSent',
+    regulatoryReported: 'regulatoryReported',
+    regulatoryReportDate: 'regulatoryReportDate',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type SecurityIncidentScalarFieldEnum = (typeof SecurityIncidentScalarFieldEnum)[keyof typeof SecurityIncidentScalarFieldEnum]
+
+
+  export const NetworkSegmentScalarFieldEnum: {
+    id: 'id',
+    name: 'name',
+    description: 'description',
+    vlanId: 'vlanId',
+    subnetCidr: 'subnetCidr',
+    securityLevel: 'securityLevel',
+    isolationLevel: 'isolationLevel',
+    allowedProtocols: 'allowedProtocols',
+    firewallRules: 'firewallRules',
+    complianceRequirements: 'complianceRequirements',
+    monitoringEnabled: 'monitoringEnabled',
+    isActive: 'isActive',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type NetworkSegmentScalarFieldEnum = (typeof NetworkSegmentScalarFieldEnum)[keyof typeof NetworkSegmentScalarFieldEnum]
+
+
+  export const DeviceNetworkAssignmentScalarFieldEnum: {
+    id: 'id',
+    deviceId: 'deviceId',
+    segmentId: 'segmentId',
+    ipAddress: 'ipAddress',
+    macAddress: 'macAddress',
+    assignedAt: 'assignedAt',
+    assignedBy: 'assignedBy',
+    status: 'status',
+    complianceStatus: 'complianceStatus',
+    lastComplianceCheck: 'lastComplianceCheck',
+    complianceNotes: 'complianceNotes',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type DeviceNetworkAssignmentScalarFieldEnum = (typeof DeviceNetworkAssignmentScalarFieldEnum)[keyof typeof DeviceNetworkAssignmentScalarFieldEnum]
+
+
+  export const FDARecallScalarFieldEnum: {
+    id: 'id',
+    recallNumber: 'recallNumber',
+    recallClass: 'recallClass',
+    productDescription: 'productDescription',
+    manufacturer: 'manufacturer',
+    reasonForRecall: 'reasonForRecall',
+    distributionPattern: 'distributionPattern',
+    initiatedDate: 'initiatedDate',
+    terminatedDate: 'terminatedDate',
+    status: 'status',
+    affectedModels: 'affectedModels',
+    lotNumbers: 'lotNumbers',
+    healthHazard: 'healthHazard',
+    remedyDescription: 'remedyDescription',
+    lastCheckedAt: 'lastCheckedAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type FDARecallScalarFieldEnum = (typeof FDARecallScalarFieldEnum)[keyof typeof FDARecallScalarFieldEnum]
+
+
+  export const DeviceRecallStatusScalarFieldEnum: {
+    id: 'id',
+    deviceId: 'deviceId',
+    recallId: 'recallId',
+    status: 'status',
+    actionTaken: 'actionTaken',
+    actionDate: 'actionDate',
+    actionBy: 'actionBy',
+    notes: 'notes',
+    patientNotified: 'patientNotified',
+    providerNotified: 'providerNotified',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type DeviceRecallStatusScalarFieldEnum = (typeof DeviceRecallStatusScalarFieldEnum)[keyof typeof DeviceRecallStatusScalarFieldEnum]
+
+
+  export const SecurityAuditLogScalarFieldEnum: {
+    id: 'id',
+    entityType: 'entityType',
+    entityId: 'entityId',
+    action: 'action',
+    performedBy: 'performedBy',
+    performedByRole: 'performedByRole',
+    previousState: 'previousState',
+    newState: 'newState',
+    ipAddress: 'ipAddress',
+    userAgent: 'userAgent',
+    details: 'details',
+    riskLevel: 'riskLevel',
+    createdAt: 'createdAt'
+  };
+
+  export type SecurityAuditLogScalarFieldEnum = (typeof SecurityAuditLogScalarFieldEnum)[keyof typeof SecurityAuditLogScalarFieldEnum]
+
+
+  export const ManufacturerAdvisoryScalarFieldEnum: {
+    id: 'id',
+    manufacturer: 'manufacturer',
+    advisoryId: 'advisoryId',
+    title: 'title',
+    description: 'description',
+    severity: 'severity',
+    affectedProducts: 'affectedProducts',
+    affectedVersions: 'affectedVersions',
+    fixedVersion: 'fixedVersion',
+    workaround: 'workaround',
+    publishedDate: 'publishedDate',
+    lastUpdatedDate: 'lastUpdatedDate',
+    cveReferences: 'cveReferences',
+    status: 'status',
+    source: 'source',
+    acknowledgedAt: 'acknowledgedAt',
+    acknowledgedBy: 'acknowledgedBy',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type ManufacturerAdvisoryScalarFieldEnum = (typeof ManufacturerAdvisoryScalarFieldEnum)[keyof typeof ManufacturerAdvisoryScalarFieldEnum]
+
+
+  export const DeviceRiskAssessmentScalarFieldEnum: {
+    id: 'id',
+    deviceId: 'deviceId',
+    overallRiskScore: 'overallRiskScore',
+    vulnerabilityScore: 'vulnerabilityScore',
+    patchScore: 'patchScore',
+    networkScore: 'networkScore',
+    complianceScore: 'complianceScore',
+    incidentScore: 'incidentScore',
+    agingScore: 'agingScore',
+    riskLevel: 'riskLevel',
+    riskFactors: 'riskFactors',
+    recommendations: 'recommendations',
+    assessedAt: 'assessedAt',
+    assessedBy: 'assessedBy',
+    nextAssessmentDue: 'nextAssessmentDue',
+    notes: 'notes',
+    createdAt: 'createdAt'
+  };
+
+  export type DeviceRiskAssessmentScalarFieldEnum = (typeof DeviceRiskAssessmentScalarFieldEnum)[keyof typeof DeviceRiskAssessmentScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -12733,6 +25146,230 @@ export namespace Prisma {
    */
   export type ListEnumEngagementTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EngagementType[]'>
     
+
+
+  /**
+   * Reference to a field of type 'VulnerabilitySeverity'
+   */
+  export type EnumVulnerabilitySeverityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VulnerabilitySeverity'>
+    
+
+
+  /**
+   * Reference to a field of type 'VulnerabilitySeverity[]'
+   */
+  export type ListEnumVulnerabilitySeverityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VulnerabilitySeverity[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'VulnerabilityStatus'
+   */
+  export type EnumVulnerabilityStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VulnerabilityStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'VulnerabilityStatus[]'
+   */
+  export type ListEnumVulnerabilityStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VulnerabilityStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'PatchCriticality'
+   */
+  export type EnumPatchCriticalityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PatchCriticality'>
+    
+
+
+  /**
+   * Reference to a field of type 'PatchCriticality[]'
+   */
+  export type ListEnumPatchCriticalityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PatchCriticality[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'PatchStatus'
+   */
+  export type EnumPatchStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PatchStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'PatchStatus[]'
+   */
+  export type ListEnumPatchStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PatchStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'IncidentType'
+   */
+  export type EnumIncidentTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'IncidentType'>
+    
+
+
+  /**
+   * Reference to a field of type 'IncidentType[]'
+   */
+  export type ListEnumIncidentTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'IncidentType[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'IncidentSeverity'
+   */
+  export type EnumIncidentSeverityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'IncidentSeverity'>
+    
+
+
+  /**
+   * Reference to a field of type 'IncidentSeverity[]'
+   */
+  export type ListEnumIncidentSeverityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'IncidentSeverity[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'IncidentStatus'
+   */
+  export type EnumIncidentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'IncidentStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'IncidentStatus[]'
+   */
+  export type ListEnumIncidentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'IncidentStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'SecurityLevel'
+   */
+  export type EnumSecurityLevelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SecurityLevel'>
+    
+
+
+  /**
+   * Reference to a field of type 'SecurityLevel[]'
+   */
+  export type ListEnumSecurityLevelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SecurityLevel[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'IsolationLevel'
+   */
+  export type EnumIsolationLevelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'IsolationLevel'>
+    
+
+
+  /**
+   * Reference to a field of type 'IsolationLevel[]'
+   */
+  export type ListEnumIsolationLevelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'IsolationLevel[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'AssignmentStatus'
+   */
+  export type EnumAssignmentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AssignmentStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'AssignmentStatus[]'
+   */
+  export type ListEnumAssignmentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AssignmentStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'ComplianceStatus'
+   */
+  export type EnumComplianceStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ComplianceStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'ComplianceStatus[]'
+   */
+  export type ListEnumComplianceStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ComplianceStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'RecallClass'
+   */
+  export type EnumRecallClassFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RecallClass'>
+    
+
+
+  /**
+   * Reference to a field of type 'RecallClass[]'
+   */
+  export type ListEnumRecallClassFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RecallClass[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'RecallStatus'
+   */
+  export type EnumRecallStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RecallStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'RecallStatus[]'
+   */
+  export type ListEnumRecallStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RecallStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'DeviceRecallAction'
+   */
+  export type EnumDeviceRecallActionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DeviceRecallAction'>
+    
+
+
+  /**
+   * Reference to a field of type 'DeviceRecallAction[]'
+   */
+  export type ListEnumDeviceRecallActionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DeviceRecallAction[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'AdvisoryStatus'
+   */
+  export type EnumAdvisoryStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AdvisoryStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'AdvisoryStatus[]'
+   */
+  export type ListEnumAdvisoryStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AdvisoryStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'RiskLevel'
+   */
+  export type EnumRiskLevelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RiskLevel'>
+    
+
+
+  /**
+   * Reference to a field of type 'RiskLevel[]'
+   */
+  export type ListEnumRiskLevelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RiskLevel[]'>
+    
   /**
    * Deep Input Types
    */
@@ -12942,9 +25579,19 @@ export namespace Prisma {
     status?: EnumDeviceStatusFilter<"MonitoringDevice"> | $Enums.DeviceStatus
     lastSyncAt?: DateTimeNullableFilter<"MonitoringDevice"> | Date | string | null
     batteryLevel?: IntNullableFilter<"MonitoringDevice"> | number | null
+    firmwareVersion?: StringNullableFilter<"MonitoringDevice"> | string | null
+    softwareVersion?: StringNullableFilter<"MonitoringDevice"> | string | null
+    certificateExpiry?: DateTimeNullableFilter<"MonitoringDevice"> | Date | string | null
+    lastSecurityScan?: DateTimeNullableFilter<"MonitoringDevice"> | Date | string | null
     createdAt?: DateTimeFilter<"MonitoringDevice"> | Date | string
     updatedAt?: DateTimeFilter<"MonitoringDevice"> | Date | string
     readings?: VitalReadingListRelationFilter
+    vulnerabilities?: DeviceVulnerabilityListRelationFilter
+    patches?: DevicePatchListRelationFilter
+    incidents?: SecurityIncidentListRelationFilter
+    networkAssignments?: DeviceNetworkAssignmentListRelationFilter
+    recallStatuses?: DeviceRecallStatusListRelationFilter
+    riskAssessments?: DeviceRiskAssessmentListRelationFilter
   }
 
   export type MonitoringDeviceOrderByWithRelationInput = {
@@ -12957,9 +25604,19 @@ export namespace Prisma {
     status?: SortOrder
     lastSyncAt?: SortOrderInput | SortOrder
     batteryLevel?: SortOrderInput | SortOrder
+    firmwareVersion?: SortOrderInput | SortOrder
+    softwareVersion?: SortOrderInput | SortOrder
+    certificateExpiry?: SortOrderInput | SortOrder
+    lastSecurityScan?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     readings?: VitalReadingOrderByRelationAggregateInput
+    vulnerabilities?: DeviceVulnerabilityOrderByRelationAggregateInput
+    patches?: DevicePatchOrderByRelationAggregateInput
+    incidents?: SecurityIncidentOrderByRelationAggregateInput
+    networkAssignments?: DeviceNetworkAssignmentOrderByRelationAggregateInput
+    recallStatuses?: DeviceRecallStatusOrderByRelationAggregateInput
+    riskAssessments?: DeviceRiskAssessmentOrderByRelationAggregateInput
   }
 
   export type MonitoringDeviceWhereUniqueInput = Prisma.AtLeast<{
@@ -12975,9 +25632,19 @@ export namespace Prisma {
     status?: EnumDeviceStatusFilter<"MonitoringDevice"> | $Enums.DeviceStatus
     lastSyncAt?: DateTimeNullableFilter<"MonitoringDevice"> | Date | string | null
     batteryLevel?: IntNullableFilter<"MonitoringDevice"> | number | null
+    firmwareVersion?: StringNullableFilter<"MonitoringDevice"> | string | null
+    softwareVersion?: StringNullableFilter<"MonitoringDevice"> | string | null
+    certificateExpiry?: DateTimeNullableFilter<"MonitoringDevice"> | Date | string | null
+    lastSecurityScan?: DateTimeNullableFilter<"MonitoringDevice"> | Date | string | null
     createdAt?: DateTimeFilter<"MonitoringDevice"> | Date | string
     updatedAt?: DateTimeFilter<"MonitoringDevice"> | Date | string
     readings?: VitalReadingListRelationFilter
+    vulnerabilities?: DeviceVulnerabilityListRelationFilter
+    patches?: DevicePatchListRelationFilter
+    incidents?: SecurityIncidentListRelationFilter
+    networkAssignments?: DeviceNetworkAssignmentListRelationFilter
+    recallStatuses?: DeviceRecallStatusListRelationFilter
+    riskAssessments?: DeviceRiskAssessmentListRelationFilter
   }, "id" | "serialNumber">
 
   export type MonitoringDeviceOrderByWithAggregationInput = {
@@ -12990,6 +25657,10 @@ export namespace Prisma {
     status?: SortOrder
     lastSyncAt?: SortOrderInput | SortOrder
     batteryLevel?: SortOrderInput | SortOrder
+    firmwareVersion?: SortOrderInput | SortOrder
+    softwareVersion?: SortOrderInput | SortOrder
+    certificateExpiry?: SortOrderInput | SortOrder
+    lastSecurityScan?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: MonitoringDeviceCountOrderByAggregateInput
@@ -13012,6 +25683,10 @@ export namespace Prisma {
     status?: EnumDeviceStatusWithAggregatesFilter<"MonitoringDevice"> | $Enums.DeviceStatus
     lastSyncAt?: DateTimeNullableWithAggregatesFilter<"MonitoringDevice"> | Date | string | null
     batteryLevel?: IntNullableWithAggregatesFilter<"MonitoringDevice"> | number | null
+    firmwareVersion?: StringNullableWithAggregatesFilter<"MonitoringDevice"> | string | null
+    softwareVersion?: StringNullableWithAggregatesFilter<"MonitoringDevice"> | string | null
+    certificateExpiry?: DateTimeNullableWithAggregatesFilter<"MonitoringDevice"> | Date | string | null
+    lastSecurityScan?: DateTimeNullableWithAggregatesFilter<"MonitoringDevice"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"MonitoringDevice"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"MonitoringDevice"> | Date | string
   }
@@ -13640,6 +26315,1164 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"PatientEngagement"> | Date | string
   }
 
+  export type DeviceVulnerabilityWhereInput = {
+    AND?: DeviceVulnerabilityWhereInput | DeviceVulnerabilityWhereInput[]
+    OR?: DeviceVulnerabilityWhereInput[]
+    NOT?: DeviceVulnerabilityWhereInput | DeviceVulnerabilityWhereInput[]
+    id?: StringFilter<"DeviceVulnerability"> | string
+    deviceId?: StringFilter<"DeviceVulnerability"> | string
+    cveId?: StringNullableFilter<"DeviceVulnerability"> | string | null
+    title?: StringFilter<"DeviceVulnerability"> | string
+    description?: StringFilter<"DeviceVulnerability"> | string
+    severity?: EnumVulnerabilitySeverityFilter<"DeviceVulnerability"> | $Enums.VulnerabilitySeverity
+    cvssScore?: FloatNullableFilter<"DeviceVulnerability"> | number | null
+    affectedVersion?: StringNullableFilter<"DeviceVulnerability"> | string | null
+    fixedVersion?: StringNullableFilter<"DeviceVulnerability"> | string | null
+    exploitAvailable?: BoolFilter<"DeviceVulnerability"> | boolean
+    status?: EnumVulnerabilityStatusFilter<"DeviceVulnerability"> | $Enums.VulnerabilityStatus
+    discoveredAt?: DateTimeFilter<"DeviceVulnerability"> | Date | string
+    resolvedAt?: DateTimeNullableFilter<"DeviceVulnerability"> | Date | string | null
+    resolvedBy?: StringNullableFilter<"DeviceVulnerability"> | string | null
+    resolutionNotes?: StringNullableFilter<"DeviceVulnerability"> | string | null
+    source?: StringNullableFilter<"DeviceVulnerability"> | string | null
+    references?: JsonNullableFilter<"DeviceVulnerability">
+    createdAt?: DateTimeFilter<"DeviceVulnerability"> | Date | string
+    updatedAt?: DateTimeFilter<"DeviceVulnerability"> | Date | string
+    device?: XOR<MonitoringDeviceRelationFilter, MonitoringDeviceWhereInput>
+  }
+
+  export type DeviceVulnerabilityOrderByWithRelationInput = {
+    id?: SortOrder
+    deviceId?: SortOrder
+    cveId?: SortOrderInput | SortOrder
+    title?: SortOrder
+    description?: SortOrder
+    severity?: SortOrder
+    cvssScore?: SortOrderInput | SortOrder
+    affectedVersion?: SortOrderInput | SortOrder
+    fixedVersion?: SortOrderInput | SortOrder
+    exploitAvailable?: SortOrder
+    status?: SortOrder
+    discoveredAt?: SortOrder
+    resolvedAt?: SortOrderInput | SortOrder
+    resolvedBy?: SortOrderInput | SortOrder
+    resolutionNotes?: SortOrderInput | SortOrder
+    source?: SortOrderInput | SortOrder
+    references?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    device?: MonitoringDeviceOrderByWithRelationInput
+  }
+
+  export type DeviceVulnerabilityWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: DeviceVulnerabilityWhereInput | DeviceVulnerabilityWhereInput[]
+    OR?: DeviceVulnerabilityWhereInput[]
+    NOT?: DeviceVulnerabilityWhereInput | DeviceVulnerabilityWhereInput[]
+    deviceId?: StringFilter<"DeviceVulnerability"> | string
+    cveId?: StringNullableFilter<"DeviceVulnerability"> | string | null
+    title?: StringFilter<"DeviceVulnerability"> | string
+    description?: StringFilter<"DeviceVulnerability"> | string
+    severity?: EnumVulnerabilitySeverityFilter<"DeviceVulnerability"> | $Enums.VulnerabilitySeverity
+    cvssScore?: FloatNullableFilter<"DeviceVulnerability"> | number | null
+    affectedVersion?: StringNullableFilter<"DeviceVulnerability"> | string | null
+    fixedVersion?: StringNullableFilter<"DeviceVulnerability"> | string | null
+    exploitAvailable?: BoolFilter<"DeviceVulnerability"> | boolean
+    status?: EnumVulnerabilityStatusFilter<"DeviceVulnerability"> | $Enums.VulnerabilityStatus
+    discoveredAt?: DateTimeFilter<"DeviceVulnerability"> | Date | string
+    resolvedAt?: DateTimeNullableFilter<"DeviceVulnerability"> | Date | string | null
+    resolvedBy?: StringNullableFilter<"DeviceVulnerability"> | string | null
+    resolutionNotes?: StringNullableFilter<"DeviceVulnerability"> | string | null
+    source?: StringNullableFilter<"DeviceVulnerability"> | string | null
+    references?: JsonNullableFilter<"DeviceVulnerability">
+    createdAt?: DateTimeFilter<"DeviceVulnerability"> | Date | string
+    updatedAt?: DateTimeFilter<"DeviceVulnerability"> | Date | string
+    device?: XOR<MonitoringDeviceRelationFilter, MonitoringDeviceWhereInput>
+  }, "id">
+
+  export type DeviceVulnerabilityOrderByWithAggregationInput = {
+    id?: SortOrder
+    deviceId?: SortOrder
+    cveId?: SortOrderInput | SortOrder
+    title?: SortOrder
+    description?: SortOrder
+    severity?: SortOrder
+    cvssScore?: SortOrderInput | SortOrder
+    affectedVersion?: SortOrderInput | SortOrder
+    fixedVersion?: SortOrderInput | SortOrder
+    exploitAvailable?: SortOrder
+    status?: SortOrder
+    discoveredAt?: SortOrder
+    resolvedAt?: SortOrderInput | SortOrder
+    resolvedBy?: SortOrderInput | SortOrder
+    resolutionNotes?: SortOrderInput | SortOrder
+    source?: SortOrderInput | SortOrder
+    references?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: DeviceVulnerabilityCountOrderByAggregateInput
+    _avg?: DeviceVulnerabilityAvgOrderByAggregateInput
+    _max?: DeviceVulnerabilityMaxOrderByAggregateInput
+    _min?: DeviceVulnerabilityMinOrderByAggregateInput
+    _sum?: DeviceVulnerabilitySumOrderByAggregateInput
+  }
+
+  export type DeviceVulnerabilityScalarWhereWithAggregatesInput = {
+    AND?: DeviceVulnerabilityScalarWhereWithAggregatesInput | DeviceVulnerabilityScalarWhereWithAggregatesInput[]
+    OR?: DeviceVulnerabilityScalarWhereWithAggregatesInput[]
+    NOT?: DeviceVulnerabilityScalarWhereWithAggregatesInput | DeviceVulnerabilityScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"DeviceVulnerability"> | string
+    deviceId?: StringWithAggregatesFilter<"DeviceVulnerability"> | string
+    cveId?: StringNullableWithAggregatesFilter<"DeviceVulnerability"> | string | null
+    title?: StringWithAggregatesFilter<"DeviceVulnerability"> | string
+    description?: StringWithAggregatesFilter<"DeviceVulnerability"> | string
+    severity?: EnumVulnerabilitySeverityWithAggregatesFilter<"DeviceVulnerability"> | $Enums.VulnerabilitySeverity
+    cvssScore?: FloatNullableWithAggregatesFilter<"DeviceVulnerability"> | number | null
+    affectedVersion?: StringNullableWithAggregatesFilter<"DeviceVulnerability"> | string | null
+    fixedVersion?: StringNullableWithAggregatesFilter<"DeviceVulnerability"> | string | null
+    exploitAvailable?: BoolWithAggregatesFilter<"DeviceVulnerability"> | boolean
+    status?: EnumVulnerabilityStatusWithAggregatesFilter<"DeviceVulnerability"> | $Enums.VulnerabilityStatus
+    discoveredAt?: DateTimeWithAggregatesFilter<"DeviceVulnerability"> | Date | string
+    resolvedAt?: DateTimeNullableWithAggregatesFilter<"DeviceVulnerability"> | Date | string | null
+    resolvedBy?: StringNullableWithAggregatesFilter<"DeviceVulnerability"> | string | null
+    resolutionNotes?: StringNullableWithAggregatesFilter<"DeviceVulnerability"> | string | null
+    source?: StringNullableWithAggregatesFilter<"DeviceVulnerability"> | string | null
+    references?: JsonNullableWithAggregatesFilter<"DeviceVulnerability">
+    createdAt?: DateTimeWithAggregatesFilter<"DeviceVulnerability"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"DeviceVulnerability"> | Date | string
+  }
+
+  export type DevicePatchWhereInput = {
+    AND?: DevicePatchWhereInput | DevicePatchWhereInput[]
+    OR?: DevicePatchWhereInput[]
+    NOT?: DevicePatchWhereInput | DevicePatchWhereInput[]
+    id?: StringFilter<"DevicePatch"> | string
+    deviceId?: StringFilter<"DevicePatch"> | string
+    patchVersion?: StringFilter<"DevicePatch"> | string
+    currentVersion?: StringFilter<"DevicePatch"> | string
+    description?: StringNullableFilter<"DevicePatch"> | string | null
+    releaseNotes?: StringNullableFilter<"DevicePatch"> | string | null
+    criticality?: EnumPatchCriticalityFilter<"DevicePatch"> | $Enums.PatchCriticality
+    scheduledDate?: DateTimeNullableFilter<"DevicePatch"> | Date | string | null
+    appliedDate?: DateTimeNullableFilter<"DevicePatch"> | Date | string | null
+    appliedBy?: StringNullableFilter<"DevicePatch"> | string | null
+    status?: EnumPatchStatusFilter<"DevicePatch"> | $Enums.PatchStatus
+    rollbackVersion?: StringNullableFilter<"DevicePatch"> | string | null
+    testingRequired?: BoolFilter<"DevicePatch"> | boolean
+    testingCompletedAt?: DateTimeNullableFilter<"DevicePatch"> | Date | string | null
+    testingNotes?: StringNullableFilter<"DevicePatch"> | string | null
+    approvedBy?: StringNullableFilter<"DevicePatch"> | string | null
+    approvedAt?: DateTimeNullableFilter<"DevicePatch"> | Date | string | null
+    failureReason?: StringNullableFilter<"DevicePatch"> | string | null
+    vulnerabilitiesFixed?: JsonNullableFilter<"DevicePatch">
+    createdAt?: DateTimeFilter<"DevicePatch"> | Date | string
+    updatedAt?: DateTimeFilter<"DevicePatch"> | Date | string
+    device?: XOR<MonitoringDeviceRelationFilter, MonitoringDeviceWhereInput>
+  }
+
+  export type DevicePatchOrderByWithRelationInput = {
+    id?: SortOrder
+    deviceId?: SortOrder
+    patchVersion?: SortOrder
+    currentVersion?: SortOrder
+    description?: SortOrderInput | SortOrder
+    releaseNotes?: SortOrderInput | SortOrder
+    criticality?: SortOrder
+    scheduledDate?: SortOrderInput | SortOrder
+    appliedDate?: SortOrderInput | SortOrder
+    appliedBy?: SortOrderInput | SortOrder
+    status?: SortOrder
+    rollbackVersion?: SortOrderInput | SortOrder
+    testingRequired?: SortOrder
+    testingCompletedAt?: SortOrderInput | SortOrder
+    testingNotes?: SortOrderInput | SortOrder
+    approvedBy?: SortOrderInput | SortOrder
+    approvedAt?: SortOrderInput | SortOrder
+    failureReason?: SortOrderInput | SortOrder
+    vulnerabilitiesFixed?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    device?: MonitoringDeviceOrderByWithRelationInput
+  }
+
+  export type DevicePatchWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: DevicePatchWhereInput | DevicePatchWhereInput[]
+    OR?: DevicePatchWhereInput[]
+    NOT?: DevicePatchWhereInput | DevicePatchWhereInput[]
+    deviceId?: StringFilter<"DevicePatch"> | string
+    patchVersion?: StringFilter<"DevicePatch"> | string
+    currentVersion?: StringFilter<"DevicePatch"> | string
+    description?: StringNullableFilter<"DevicePatch"> | string | null
+    releaseNotes?: StringNullableFilter<"DevicePatch"> | string | null
+    criticality?: EnumPatchCriticalityFilter<"DevicePatch"> | $Enums.PatchCriticality
+    scheduledDate?: DateTimeNullableFilter<"DevicePatch"> | Date | string | null
+    appliedDate?: DateTimeNullableFilter<"DevicePatch"> | Date | string | null
+    appliedBy?: StringNullableFilter<"DevicePatch"> | string | null
+    status?: EnumPatchStatusFilter<"DevicePatch"> | $Enums.PatchStatus
+    rollbackVersion?: StringNullableFilter<"DevicePatch"> | string | null
+    testingRequired?: BoolFilter<"DevicePatch"> | boolean
+    testingCompletedAt?: DateTimeNullableFilter<"DevicePatch"> | Date | string | null
+    testingNotes?: StringNullableFilter<"DevicePatch"> | string | null
+    approvedBy?: StringNullableFilter<"DevicePatch"> | string | null
+    approvedAt?: DateTimeNullableFilter<"DevicePatch"> | Date | string | null
+    failureReason?: StringNullableFilter<"DevicePatch"> | string | null
+    vulnerabilitiesFixed?: JsonNullableFilter<"DevicePatch">
+    createdAt?: DateTimeFilter<"DevicePatch"> | Date | string
+    updatedAt?: DateTimeFilter<"DevicePatch"> | Date | string
+    device?: XOR<MonitoringDeviceRelationFilter, MonitoringDeviceWhereInput>
+  }, "id">
+
+  export type DevicePatchOrderByWithAggregationInput = {
+    id?: SortOrder
+    deviceId?: SortOrder
+    patchVersion?: SortOrder
+    currentVersion?: SortOrder
+    description?: SortOrderInput | SortOrder
+    releaseNotes?: SortOrderInput | SortOrder
+    criticality?: SortOrder
+    scheduledDate?: SortOrderInput | SortOrder
+    appliedDate?: SortOrderInput | SortOrder
+    appliedBy?: SortOrderInput | SortOrder
+    status?: SortOrder
+    rollbackVersion?: SortOrderInput | SortOrder
+    testingRequired?: SortOrder
+    testingCompletedAt?: SortOrderInput | SortOrder
+    testingNotes?: SortOrderInput | SortOrder
+    approvedBy?: SortOrderInput | SortOrder
+    approvedAt?: SortOrderInput | SortOrder
+    failureReason?: SortOrderInput | SortOrder
+    vulnerabilitiesFixed?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: DevicePatchCountOrderByAggregateInput
+    _max?: DevicePatchMaxOrderByAggregateInput
+    _min?: DevicePatchMinOrderByAggregateInput
+  }
+
+  export type DevicePatchScalarWhereWithAggregatesInput = {
+    AND?: DevicePatchScalarWhereWithAggregatesInput | DevicePatchScalarWhereWithAggregatesInput[]
+    OR?: DevicePatchScalarWhereWithAggregatesInput[]
+    NOT?: DevicePatchScalarWhereWithAggregatesInput | DevicePatchScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"DevicePatch"> | string
+    deviceId?: StringWithAggregatesFilter<"DevicePatch"> | string
+    patchVersion?: StringWithAggregatesFilter<"DevicePatch"> | string
+    currentVersion?: StringWithAggregatesFilter<"DevicePatch"> | string
+    description?: StringNullableWithAggregatesFilter<"DevicePatch"> | string | null
+    releaseNotes?: StringNullableWithAggregatesFilter<"DevicePatch"> | string | null
+    criticality?: EnumPatchCriticalityWithAggregatesFilter<"DevicePatch"> | $Enums.PatchCriticality
+    scheduledDate?: DateTimeNullableWithAggregatesFilter<"DevicePatch"> | Date | string | null
+    appliedDate?: DateTimeNullableWithAggregatesFilter<"DevicePatch"> | Date | string | null
+    appliedBy?: StringNullableWithAggregatesFilter<"DevicePatch"> | string | null
+    status?: EnumPatchStatusWithAggregatesFilter<"DevicePatch"> | $Enums.PatchStatus
+    rollbackVersion?: StringNullableWithAggregatesFilter<"DevicePatch"> | string | null
+    testingRequired?: BoolWithAggregatesFilter<"DevicePatch"> | boolean
+    testingCompletedAt?: DateTimeNullableWithAggregatesFilter<"DevicePatch"> | Date | string | null
+    testingNotes?: StringNullableWithAggregatesFilter<"DevicePatch"> | string | null
+    approvedBy?: StringNullableWithAggregatesFilter<"DevicePatch"> | string | null
+    approvedAt?: DateTimeNullableWithAggregatesFilter<"DevicePatch"> | Date | string | null
+    failureReason?: StringNullableWithAggregatesFilter<"DevicePatch"> | string | null
+    vulnerabilitiesFixed?: JsonNullableWithAggregatesFilter<"DevicePatch">
+    createdAt?: DateTimeWithAggregatesFilter<"DevicePatch"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"DevicePatch"> | Date | string
+  }
+
+  export type SecurityIncidentWhereInput = {
+    AND?: SecurityIncidentWhereInput | SecurityIncidentWhereInput[]
+    OR?: SecurityIncidentWhereInput[]
+    NOT?: SecurityIncidentWhereInput | SecurityIncidentWhereInput[]
+    id?: StringFilter<"SecurityIncident"> | string
+    deviceId?: StringNullableFilter<"SecurityIncident"> | string | null
+    incidentType?: EnumIncidentTypeFilter<"SecurityIncident"> | $Enums.IncidentType
+    severity?: EnumIncidentSeverityFilter<"SecurityIncident"> | $Enums.IncidentSeverity
+    title?: StringFilter<"SecurityIncident"> | string
+    description?: StringFilter<"SecurityIncident"> | string
+    affectedSystems?: JsonNullableFilter<"SecurityIncident">
+    affectedPatients?: JsonNullableFilter<"SecurityIncident">
+    detectedAt?: DateTimeFilter<"SecurityIncident"> | Date | string
+    detectedBy?: StringFilter<"SecurityIncident"> | string
+    reportedBy?: StringFilter<"SecurityIncident"> | string
+    status?: EnumIncidentStatusFilter<"SecurityIncident"> | $Enums.IncidentStatus
+    assignedTo?: StringNullableFilter<"SecurityIncident"> | string | null
+    containedAt?: DateTimeNullableFilter<"SecurityIncident"> | Date | string | null
+    resolvedAt?: DateTimeNullableFilter<"SecurityIncident"> | Date | string | null
+    rootCause?: StringNullableFilter<"SecurityIncident"> | string | null
+    remediationSteps?: JsonNullableFilter<"SecurityIncident">
+    lessonsLearned?: StringNullableFilter<"SecurityIncident"> | string | null
+    timeline?: JsonNullableFilter<"SecurityIncident">
+    evidence?: JsonNullableFilter<"SecurityIncident">
+    notificationsSent?: BoolFilter<"SecurityIncident"> | boolean
+    regulatoryReported?: BoolFilter<"SecurityIncident"> | boolean
+    regulatoryReportDate?: DateTimeNullableFilter<"SecurityIncident"> | Date | string | null
+    createdAt?: DateTimeFilter<"SecurityIncident"> | Date | string
+    updatedAt?: DateTimeFilter<"SecurityIncident"> | Date | string
+    device?: XOR<MonitoringDeviceNullableRelationFilter, MonitoringDeviceWhereInput> | null
+  }
+
+  export type SecurityIncidentOrderByWithRelationInput = {
+    id?: SortOrder
+    deviceId?: SortOrderInput | SortOrder
+    incidentType?: SortOrder
+    severity?: SortOrder
+    title?: SortOrder
+    description?: SortOrder
+    affectedSystems?: SortOrderInput | SortOrder
+    affectedPatients?: SortOrderInput | SortOrder
+    detectedAt?: SortOrder
+    detectedBy?: SortOrder
+    reportedBy?: SortOrder
+    status?: SortOrder
+    assignedTo?: SortOrderInput | SortOrder
+    containedAt?: SortOrderInput | SortOrder
+    resolvedAt?: SortOrderInput | SortOrder
+    rootCause?: SortOrderInput | SortOrder
+    remediationSteps?: SortOrderInput | SortOrder
+    lessonsLearned?: SortOrderInput | SortOrder
+    timeline?: SortOrderInput | SortOrder
+    evidence?: SortOrderInput | SortOrder
+    notificationsSent?: SortOrder
+    regulatoryReported?: SortOrder
+    regulatoryReportDate?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    device?: MonitoringDeviceOrderByWithRelationInput
+  }
+
+  export type SecurityIncidentWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: SecurityIncidentWhereInput | SecurityIncidentWhereInput[]
+    OR?: SecurityIncidentWhereInput[]
+    NOT?: SecurityIncidentWhereInput | SecurityIncidentWhereInput[]
+    deviceId?: StringNullableFilter<"SecurityIncident"> | string | null
+    incidentType?: EnumIncidentTypeFilter<"SecurityIncident"> | $Enums.IncidentType
+    severity?: EnumIncidentSeverityFilter<"SecurityIncident"> | $Enums.IncidentSeverity
+    title?: StringFilter<"SecurityIncident"> | string
+    description?: StringFilter<"SecurityIncident"> | string
+    affectedSystems?: JsonNullableFilter<"SecurityIncident">
+    affectedPatients?: JsonNullableFilter<"SecurityIncident">
+    detectedAt?: DateTimeFilter<"SecurityIncident"> | Date | string
+    detectedBy?: StringFilter<"SecurityIncident"> | string
+    reportedBy?: StringFilter<"SecurityIncident"> | string
+    status?: EnumIncidentStatusFilter<"SecurityIncident"> | $Enums.IncidentStatus
+    assignedTo?: StringNullableFilter<"SecurityIncident"> | string | null
+    containedAt?: DateTimeNullableFilter<"SecurityIncident"> | Date | string | null
+    resolvedAt?: DateTimeNullableFilter<"SecurityIncident"> | Date | string | null
+    rootCause?: StringNullableFilter<"SecurityIncident"> | string | null
+    remediationSteps?: JsonNullableFilter<"SecurityIncident">
+    lessonsLearned?: StringNullableFilter<"SecurityIncident"> | string | null
+    timeline?: JsonNullableFilter<"SecurityIncident">
+    evidence?: JsonNullableFilter<"SecurityIncident">
+    notificationsSent?: BoolFilter<"SecurityIncident"> | boolean
+    regulatoryReported?: BoolFilter<"SecurityIncident"> | boolean
+    regulatoryReportDate?: DateTimeNullableFilter<"SecurityIncident"> | Date | string | null
+    createdAt?: DateTimeFilter<"SecurityIncident"> | Date | string
+    updatedAt?: DateTimeFilter<"SecurityIncident"> | Date | string
+    device?: XOR<MonitoringDeviceNullableRelationFilter, MonitoringDeviceWhereInput> | null
+  }, "id">
+
+  export type SecurityIncidentOrderByWithAggregationInput = {
+    id?: SortOrder
+    deviceId?: SortOrderInput | SortOrder
+    incidentType?: SortOrder
+    severity?: SortOrder
+    title?: SortOrder
+    description?: SortOrder
+    affectedSystems?: SortOrderInput | SortOrder
+    affectedPatients?: SortOrderInput | SortOrder
+    detectedAt?: SortOrder
+    detectedBy?: SortOrder
+    reportedBy?: SortOrder
+    status?: SortOrder
+    assignedTo?: SortOrderInput | SortOrder
+    containedAt?: SortOrderInput | SortOrder
+    resolvedAt?: SortOrderInput | SortOrder
+    rootCause?: SortOrderInput | SortOrder
+    remediationSteps?: SortOrderInput | SortOrder
+    lessonsLearned?: SortOrderInput | SortOrder
+    timeline?: SortOrderInput | SortOrder
+    evidence?: SortOrderInput | SortOrder
+    notificationsSent?: SortOrder
+    regulatoryReported?: SortOrder
+    regulatoryReportDate?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: SecurityIncidentCountOrderByAggregateInput
+    _max?: SecurityIncidentMaxOrderByAggregateInput
+    _min?: SecurityIncidentMinOrderByAggregateInput
+  }
+
+  export type SecurityIncidentScalarWhereWithAggregatesInput = {
+    AND?: SecurityIncidentScalarWhereWithAggregatesInput | SecurityIncidentScalarWhereWithAggregatesInput[]
+    OR?: SecurityIncidentScalarWhereWithAggregatesInput[]
+    NOT?: SecurityIncidentScalarWhereWithAggregatesInput | SecurityIncidentScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"SecurityIncident"> | string
+    deviceId?: StringNullableWithAggregatesFilter<"SecurityIncident"> | string | null
+    incidentType?: EnumIncidentTypeWithAggregatesFilter<"SecurityIncident"> | $Enums.IncidentType
+    severity?: EnumIncidentSeverityWithAggregatesFilter<"SecurityIncident"> | $Enums.IncidentSeverity
+    title?: StringWithAggregatesFilter<"SecurityIncident"> | string
+    description?: StringWithAggregatesFilter<"SecurityIncident"> | string
+    affectedSystems?: JsonNullableWithAggregatesFilter<"SecurityIncident">
+    affectedPatients?: JsonNullableWithAggregatesFilter<"SecurityIncident">
+    detectedAt?: DateTimeWithAggregatesFilter<"SecurityIncident"> | Date | string
+    detectedBy?: StringWithAggregatesFilter<"SecurityIncident"> | string
+    reportedBy?: StringWithAggregatesFilter<"SecurityIncident"> | string
+    status?: EnumIncidentStatusWithAggregatesFilter<"SecurityIncident"> | $Enums.IncidentStatus
+    assignedTo?: StringNullableWithAggregatesFilter<"SecurityIncident"> | string | null
+    containedAt?: DateTimeNullableWithAggregatesFilter<"SecurityIncident"> | Date | string | null
+    resolvedAt?: DateTimeNullableWithAggregatesFilter<"SecurityIncident"> | Date | string | null
+    rootCause?: StringNullableWithAggregatesFilter<"SecurityIncident"> | string | null
+    remediationSteps?: JsonNullableWithAggregatesFilter<"SecurityIncident">
+    lessonsLearned?: StringNullableWithAggregatesFilter<"SecurityIncident"> | string | null
+    timeline?: JsonNullableWithAggregatesFilter<"SecurityIncident">
+    evidence?: JsonNullableWithAggregatesFilter<"SecurityIncident">
+    notificationsSent?: BoolWithAggregatesFilter<"SecurityIncident"> | boolean
+    regulatoryReported?: BoolWithAggregatesFilter<"SecurityIncident"> | boolean
+    regulatoryReportDate?: DateTimeNullableWithAggregatesFilter<"SecurityIncident"> | Date | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"SecurityIncident"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"SecurityIncident"> | Date | string
+  }
+
+  export type NetworkSegmentWhereInput = {
+    AND?: NetworkSegmentWhereInput | NetworkSegmentWhereInput[]
+    OR?: NetworkSegmentWhereInput[]
+    NOT?: NetworkSegmentWhereInput | NetworkSegmentWhereInput[]
+    id?: StringFilter<"NetworkSegment"> | string
+    name?: StringFilter<"NetworkSegment"> | string
+    description?: StringNullableFilter<"NetworkSegment"> | string | null
+    vlanId?: IntNullableFilter<"NetworkSegment"> | number | null
+    subnetCidr?: StringNullableFilter<"NetworkSegment"> | string | null
+    securityLevel?: EnumSecurityLevelFilter<"NetworkSegment"> | $Enums.SecurityLevel
+    isolationLevel?: EnumIsolationLevelFilter<"NetworkSegment"> | $Enums.IsolationLevel
+    allowedProtocols?: JsonNullableFilter<"NetworkSegment">
+    firewallRules?: JsonNullableFilter<"NetworkSegment">
+    complianceRequirements?: JsonNullableFilter<"NetworkSegment">
+    monitoringEnabled?: BoolFilter<"NetworkSegment"> | boolean
+    isActive?: BoolFilter<"NetworkSegment"> | boolean
+    createdAt?: DateTimeFilter<"NetworkSegment"> | Date | string
+    updatedAt?: DateTimeFilter<"NetworkSegment"> | Date | string
+    devices?: DeviceNetworkAssignmentListRelationFilter
+  }
+
+  export type NetworkSegmentOrderByWithRelationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrderInput | SortOrder
+    vlanId?: SortOrderInput | SortOrder
+    subnetCidr?: SortOrderInput | SortOrder
+    securityLevel?: SortOrder
+    isolationLevel?: SortOrder
+    allowedProtocols?: SortOrderInput | SortOrder
+    firewallRules?: SortOrderInput | SortOrder
+    complianceRequirements?: SortOrderInput | SortOrder
+    monitoringEnabled?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    devices?: DeviceNetworkAssignmentOrderByRelationAggregateInput
+  }
+
+  export type NetworkSegmentWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    name?: string
+    AND?: NetworkSegmentWhereInput | NetworkSegmentWhereInput[]
+    OR?: NetworkSegmentWhereInput[]
+    NOT?: NetworkSegmentWhereInput | NetworkSegmentWhereInput[]
+    description?: StringNullableFilter<"NetworkSegment"> | string | null
+    vlanId?: IntNullableFilter<"NetworkSegment"> | number | null
+    subnetCidr?: StringNullableFilter<"NetworkSegment"> | string | null
+    securityLevel?: EnumSecurityLevelFilter<"NetworkSegment"> | $Enums.SecurityLevel
+    isolationLevel?: EnumIsolationLevelFilter<"NetworkSegment"> | $Enums.IsolationLevel
+    allowedProtocols?: JsonNullableFilter<"NetworkSegment">
+    firewallRules?: JsonNullableFilter<"NetworkSegment">
+    complianceRequirements?: JsonNullableFilter<"NetworkSegment">
+    monitoringEnabled?: BoolFilter<"NetworkSegment"> | boolean
+    isActive?: BoolFilter<"NetworkSegment"> | boolean
+    createdAt?: DateTimeFilter<"NetworkSegment"> | Date | string
+    updatedAt?: DateTimeFilter<"NetworkSegment"> | Date | string
+    devices?: DeviceNetworkAssignmentListRelationFilter
+  }, "id" | "name">
+
+  export type NetworkSegmentOrderByWithAggregationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrderInput | SortOrder
+    vlanId?: SortOrderInput | SortOrder
+    subnetCidr?: SortOrderInput | SortOrder
+    securityLevel?: SortOrder
+    isolationLevel?: SortOrder
+    allowedProtocols?: SortOrderInput | SortOrder
+    firewallRules?: SortOrderInput | SortOrder
+    complianceRequirements?: SortOrderInput | SortOrder
+    monitoringEnabled?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: NetworkSegmentCountOrderByAggregateInput
+    _avg?: NetworkSegmentAvgOrderByAggregateInput
+    _max?: NetworkSegmentMaxOrderByAggregateInput
+    _min?: NetworkSegmentMinOrderByAggregateInput
+    _sum?: NetworkSegmentSumOrderByAggregateInput
+  }
+
+  export type NetworkSegmentScalarWhereWithAggregatesInput = {
+    AND?: NetworkSegmentScalarWhereWithAggregatesInput | NetworkSegmentScalarWhereWithAggregatesInput[]
+    OR?: NetworkSegmentScalarWhereWithAggregatesInput[]
+    NOT?: NetworkSegmentScalarWhereWithAggregatesInput | NetworkSegmentScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"NetworkSegment"> | string
+    name?: StringWithAggregatesFilter<"NetworkSegment"> | string
+    description?: StringNullableWithAggregatesFilter<"NetworkSegment"> | string | null
+    vlanId?: IntNullableWithAggregatesFilter<"NetworkSegment"> | number | null
+    subnetCidr?: StringNullableWithAggregatesFilter<"NetworkSegment"> | string | null
+    securityLevel?: EnumSecurityLevelWithAggregatesFilter<"NetworkSegment"> | $Enums.SecurityLevel
+    isolationLevel?: EnumIsolationLevelWithAggregatesFilter<"NetworkSegment"> | $Enums.IsolationLevel
+    allowedProtocols?: JsonNullableWithAggregatesFilter<"NetworkSegment">
+    firewallRules?: JsonNullableWithAggregatesFilter<"NetworkSegment">
+    complianceRequirements?: JsonNullableWithAggregatesFilter<"NetworkSegment">
+    monitoringEnabled?: BoolWithAggregatesFilter<"NetworkSegment"> | boolean
+    isActive?: BoolWithAggregatesFilter<"NetworkSegment"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"NetworkSegment"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"NetworkSegment"> | Date | string
+  }
+
+  export type DeviceNetworkAssignmentWhereInput = {
+    AND?: DeviceNetworkAssignmentWhereInput | DeviceNetworkAssignmentWhereInput[]
+    OR?: DeviceNetworkAssignmentWhereInput[]
+    NOT?: DeviceNetworkAssignmentWhereInput | DeviceNetworkAssignmentWhereInput[]
+    id?: StringFilter<"DeviceNetworkAssignment"> | string
+    deviceId?: StringFilter<"DeviceNetworkAssignment"> | string
+    segmentId?: StringFilter<"DeviceNetworkAssignment"> | string
+    ipAddress?: StringNullableFilter<"DeviceNetworkAssignment"> | string | null
+    macAddress?: StringNullableFilter<"DeviceNetworkAssignment"> | string | null
+    assignedAt?: DateTimeFilter<"DeviceNetworkAssignment"> | Date | string
+    assignedBy?: StringFilter<"DeviceNetworkAssignment"> | string
+    status?: EnumAssignmentStatusFilter<"DeviceNetworkAssignment"> | $Enums.AssignmentStatus
+    complianceStatus?: EnumComplianceStatusFilter<"DeviceNetworkAssignment"> | $Enums.ComplianceStatus
+    lastComplianceCheck?: DateTimeNullableFilter<"DeviceNetworkAssignment"> | Date | string | null
+    complianceNotes?: StringNullableFilter<"DeviceNetworkAssignment"> | string | null
+    createdAt?: DateTimeFilter<"DeviceNetworkAssignment"> | Date | string
+    updatedAt?: DateTimeFilter<"DeviceNetworkAssignment"> | Date | string
+    device?: XOR<MonitoringDeviceRelationFilter, MonitoringDeviceWhereInput>
+    segment?: XOR<NetworkSegmentRelationFilter, NetworkSegmentWhereInput>
+  }
+
+  export type DeviceNetworkAssignmentOrderByWithRelationInput = {
+    id?: SortOrder
+    deviceId?: SortOrder
+    segmentId?: SortOrder
+    ipAddress?: SortOrderInput | SortOrder
+    macAddress?: SortOrderInput | SortOrder
+    assignedAt?: SortOrder
+    assignedBy?: SortOrder
+    status?: SortOrder
+    complianceStatus?: SortOrder
+    lastComplianceCheck?: SortOrderInput | SortOrder
+    complianceNotes?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    device?: MonitoringDeviceOrderByWithRelationInput
+    segment?: NetworkSegmentOrderByWithRelationInput
+  }
+
+  export type DeviceNetworkAssignmentWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    deviceId_segmentId?: DeviceNetworkAssignmentDeviceIdSegmentIdCompoundUniqueInput
+    AND?: DeviceNetworkAssignmentWhereInput | DeviceNetworkAssignmentWhereInput[]
+    OR?: DeviceNetworkAssignmentWhereInput[]
+    NOT?: DeviceNetworkAssignmentWhereInput | DeviceNetworkAssignmentWhereInput[]
+    deviceId?: StringFilter<"DeviceNetworkAssignment"> | string
+    segmentId?: StringFilter<"DeviceNetworkAssignment"> | string
+    ipAddress?: StringNullableFilter<"DeviceNetworkAssignment"> | string | null
+    macAddress?: StringNullableFilter<"DeviceNetworkAssignment"> | string | null
+    assignedAt?: DateTimeFilter<"DeviceNetworkAssignment"> | Date | string
+    assignedBy?: StringFilter<"DeviceNetworkAssignment"> | string
+    status?: EnumAssignmentStatusFilter<"DeviceNetworkAssignment"> | $Enums.AssignmentStatus
+    complianceStatus?: EnumComplianceStatusFilter<"DeviceNetworkAssignment"> | $Enums.ComplianceStatus
+    lastComplianceCheck?: DateTimeNullableFilter<"DeviceNetworkAssignment"> | Date | string | null
+    complianceNotes?: StringNullableFilter<"DeviceNetworkAssignment"> | string | null
+    createdAt?: DateTimeFilter<"DeviceNetworkAssignment"> | Date | string
+    updatedAt?: DateTimeFilter<"DeviceNetworkAssignment"> | Date | string
+    device?: XOR<MonitoringDeviceRelationFilter, MonitoringDeviceWhereInput>
+    segment?: XOR<NetworkSegmentRelationFilter, NetworkSegmentWhereInput>
+  }, "id" | "deviceId_segmentId">
+
+  export type DeviceNetworkAssignmentOrderByWithAggregationInput = {
+    id?: SortOrder
+    deviceId?: SortOrder
+    segmentId?: SortOrder
+    ipAddress?: SortOrderInput | SortOrder
+    macAddress?: SortOrderInput | SortOrder
+    assignedAt?: SortOrder
+    assignedBy?: SortOrder
+    status?: SortOrder
+    complianceStatus?: SortOrder
+    lastComplianceCheck?: SortOrderInput | SortOrder
+    complianceNotes?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: DeviceNetworkAssignmentCountOrderByAggregateInput
+    _max?: DeviceNetworkAssignmentMaxOrderByAggregateInput
+    _min?: DeviceNetworkAssignmentMinOrderByAggregateInput
+  }
+
+  export type DeviceNetworkAssignmentScalarWhereWithAggregatesInput = {
+    AND?: DeviceNetworkAssignmentScalarWhereWithAggregatesInput | DeviceNetworkAssignmentScalarWhereWithAggregatesInput[]
+    OR?: DeviceNetworkAssignmentScalarWhereWithAggregatesInput[]
+    NOT?: DeviceNetworkAssignmentScalarWhereWithAggregatesInput | DeviceNetworkAssignmentScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"DeviceNetworkAssignment"> | string
+    deviceId?: StringWithAggregatesFilter<"DeviceNetworkAssignment"> | string
+    segmentId?: StringWithAggregatesFilter<"DeviceNetworkAssignment"> | string
+    ipAddress?: StringNullableWithAggregatesFilter<"DeviceNetworkAssignment"> | string | null
+    macAddress?: StringNullableWithAggregatesFilter<"DeviceNetworkAssignment"> | string | null
+    assignedAt?: DateTimeWithAggregatesFilter<"DeviceNetworkAssignment"> | Date | string
+    assignedBy?: StringWithAggregatesFilter<"DeviceNetworkAssignment"> | string
+    status?: EnumAssignmentStatusWithAggregatesFilter<"DeviceNetworkAssignment"> | $Enums.AssignmentStatus
+    complianceStatus?: EnumComplianceStatusWithAggregatesFilter<"DeviceNetworkAssignment"> | $Enums.ComplianceStatus
+    lastComplianceCheck?: DateTimeNullableWithAggregatesFilter<"DeviceNetworkAssignment"> | Date | string | null
+    complianceNotes?: StringNullableWithAggregatesFilter<"DeviceNetworkAssignment"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"DeviceNetworkAssignment"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"DeviceNetworkAssignment"> | Date | string
+  }
+
+  export type FDARecallWhereInput = {
+    AND?: FDARecallWhereInput | FDARecallWhereInput[]
+    OR?: FDARecallWhereInput[]
+    NOT?: FDARecallWhereInput | FDARecallWhereInput[]
+    id?: StringFilter<"FDARecall"> | string
+    recallNumber?: StringFilter<"FDARecall"> | string
+    recallClass?: EnumRecallClassFilter<"FDARecall"> | $Enums.RecallClass
+    productDescription?: StringFilter<"FDARecall"> | string
+    manufacturer?: StringFilter<"FDARecall"> | string
+    reasonForRecall?: StringFilter<"FDARecall"> | string
+    distributionPattern?: StringNullableFilter<"FDARecall"> | string | null
+    initiatedDate?: DateTimeFilter<"FDARecall"> | Date | string
+    terminatedDate?: DateTimeNullableFilter<"FDARecall"> | Date | string | null
+    status?: EnumRecallStatusFilter<"FDARecall"> | $Enums.RecallStatus
+    affectedModels?: JsonNullableFilter<"FDARecall">
+    lotNumbers?: JsonNullableFilter<"FDARecall">
+    healthHazard?: StringNullableFilter<"FDARecall"> | string | null
+    remedyDescription?: StringNullableFilter<"FDARecall"> | string | null
+    lastCheckedAt?: DateTimeFilter<"FDARecall"> | Date | string
+    createdAt?: DateTimeFilter<"FDARecall"> | Date | string
+    updatedAt?: DateTimeFilter<"FDARecall"> | Date | string
+    affectedDevices?: DeviceRecallStatusListRelationFilter
+  }
+
+  export type FDARecallOrderByWithRelationInput = {
+    id?: SortOrder
+    recallNumber?: SortOrder
+    recallClass?: SortOrder
+    productDescription?: SortOrder
+    manufacturer?: SortOrder
+    reasonForRecall?: SortOrder
+    distributionPattern?: SortOrderInput | SortOrder
+    initiatedDate?: SortOrder
+    terminatedDate?: SortOrderInput | SortOrder
+    status?: SortOrder
+    affectedModels?: SortOrderInput | SortOrder
+    lotNumbers?: SortOrderInput | SortOrder
+    healthHazard?: SortOrderInput | SortOrder
+    remedyDescription?: SortOrderInput | SortOrder
+    lastCheckedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    affectedDevices?: DeviceRecallStatusOrderByRelationAggregateInput
+  }
+
+  export type FDARecallWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    recallNumber?: string
+    AND?: FDARecallWhereInput | FDARecallWhereInput[]
+    OR?: FDARecallWhereInput[]
+    NOT?: FDARecallWhereInput | FDARecallWhereInput[]
+    recallClass?: EnumRecallClassFilter<"FDARecall"> | $Enums.RecallClass
+    productDescription?: StringFilter<"FDARecall"> | string
+    manufacturer?: StringFilter<"FDARecall"> | string
+    reasonForRecall?: StringFilter<"FDARecall"> | string
+    distributionPattern?: StringNullableFilter<"FDARecall"> | string | null
+    initiatedDate?: DateTimeFilter<"FDARecall"> | Date | string
+    terminatedDate?: DateTimeNullableFilter<"FDARecall"> | Date | string | null
+    status?: EnumRecallStatusFilter<"FDARecall"> | $Enums.RecallStatus
+    affectedModels?: JsonNullableFilter<"FDARecall">
+    lotNumbers?: JsonNullableFilter<"FDARecall">
+    healthHazard?: StringNullableFilter<"FDARecall"> | string | null
+    remedyDescription?: StringNullableFilter<"FDARecall"> | string | null
+    lastCheckedAt?: DateTimeFilter<"FDARecall"> | Date | string
+    createdAt?: DateTimeFilter<"FDARecall"> | Date | string
+    updatedAt?: DateTimeFilter<"FDARecall"> | Date | string
+    affectedDevices?: DeviceRecallStatusListRelationFilter
+  }, "id" | "recallNumber">
+
+  export type FDARecallOrderByWithAggregationInput = {
+    id?: SortOrder
+    recallNumber?: SortOrder
+    recallClass?: SortOrder
+    productDescription?: SortOrder
+    manufacturer?: SortOrder
+    reasonForRecall?: SortOrder
+    distributionPattern?: SortOrderInput | SortOrder
+    initiatedDate?: SortOrder
+    terminatedDate?: SortOrderInput | SortOrder
+    status?: SortOrder
+    affectedModels?: SortOrderInput | SortOrder
+    lotNumbers?: SortOrderInput | SortOrder
+    healthHazard?: SortOrderInput | SortOrder
+    remedyDescription?: SortOrderInput | SortOrder
+    lastCheckedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: FDARecallCountOrderByAggregateInput
+    _max?: FDARecallMaxOrderByAggregateInput
+    _min?: FDARecallMinOrderByAggregateInput
+  }
+
+  export type FDARecallScalarWhereWithAggregatesInput = {
+    AND?: FDARecallScalarWhereWithAggregatesInput | FDARecallScalarWhereWithAggregatesInput[]
+    OR?: FDARecallScalarWhereWithAggregatesInput[]
+    NOT?: FDARecallScalarWhereWithAggregatesInput | FDARecallScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"FDARecall"> | string
+    recallNumber?: StringWithAggregatesFilter<"FDARecall"> | string
+    recallClass?: EnumRecallClassWithAggregatesFilter<"FDARecall"> | $Enums.RecallClass
+    productDescription?: StringWithAggregatesFilter<"FDARecall"> | string
+    manufacturer?: StringWithAggregatesFilter<"FDARecall"> | string
+    reasonForRecall?: StringWithAggregatesFilter<"FDARecall"> | string
+    distributionPattern?: StringNullableWithAggregatesFilter<"FDARecall"> | string | null
+    initiatedDate?: DateTimeWithAggregatesFilter<"FDARecall"> | Date | string
+    terminatedDate?: DateTimeNullableWithAggregatesFilter<"FDARecall"> | Date | string | null
+    status?: EnumRecallStatusWithAggregatesFilter<"FDARecall"> | $Enums.RecallStatus
+    affectedModels?: JsonNullableWithAggregatesFilter<"FDARecall">
+    lotNumbers?: JsonNullableWithAggregatesFilter<"FDARecall">
+    healthHazard?: StringNullableWithAggregatesFilter<"FDARecall"> | string | null
+    remedyDescription?: StringNullableWithAggregatesFilter<"FDARecall"> | string | null
+    lastCheckedAt?: DateTimeWithAggregatesFilter<"FDARecall"> | Date | string
+    createdAt?: DateTimeWithAggregatesFilter<"FDARecall"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"FDARecall"> | Date | string
+  }
+
+  export type DeviceRecallStatusWhereInput = {
+    AND?: DeviceRecallStatusWhereInput | DeviceRecallStatusWhereInput[]
+    OR?: DeviceRecallStatusWhereInput[]
+    NOT?: DeviceRecallStatusWhereInput | DeviceRecallStatusWhereInput[]
+    id?: StringFilter<"DeviceRecallStatus"> | string
+    deviceId?: StringFilter<"DeviceRecallStatus"> | string
+    recallId?: StringFilter<"DeviceRecallStatus"> | string
+    status?: EnumDeviceRecallActionFilter<"DeviceRecallStatus"> | $Enums.DeviceRecallAction
+    actionTaken?: StringNullableFilter<"DeviceRecallStatus"> | string | null
+    actionDate?: DateTimeNullableFilter<"DeviceRecallStatus"> | Date | string | null
+    actionBy?: StringNullableFilter<"DeviceRecallStatus"> | string | null
+    notes?: StringNullableFilter<"DeviceRecallStatus"> | string | null
+    patientNotified?: BoolFilter<"DeviceRecallStatus"> | boolean
+    providerNotified?: BoolFilter<"DeviceRecallStatus"> | boolean
+    createdAt?: DateTimeFilter<"DeviceRecallStatus"> | Date | string
+    updatedAt?: DateTimeFilter<"DeviceRecallStatus"> | Date | string
+    device?: XOR<MonitoringDeviceRelationFilter, MonitoringDeviceWhereInput>
+    recall?: XOR<FDARecallRelationFilter, FDARecallWhereInput>
+  }
+
+  export type DeviceRecallStatusOrderByWithRelationInput = {
+    id?: SortOrder
+    deviceId?: SortOrder
+    recallId?: SortOrder
+    status?: SortOrder
+    actionTaken?: SortOrderInput | SortOrder
+    actionDate?: SortOrderInput | SortOrder
+    actionBy?: SortOrderInput | SortOrder
+    notes?: SortOrderInput | SortOrder
+    patientNotified?: SortOrder
+    providerNotified?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    device?: MonitoringDeviceOrderByWithRelationInput
+    recall?: FDARecallOrderByWithRelationInput
+  }
+
+  export type DeviceRecallStatusWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    deviceId_recallId?: DeviceRecallStatusDeviceIdRecallIdCompoundUniqueInput
+    AND?: DeviceRecallStatusWhereInput | DeviceRecallStatusWhereInput[]
+    OR?: DeviceRecallStatusWhereInput[]
+    NOT?: DeviceRecallStatusWhereInput | DeviceRecallStatusWhereInput[]
+    deviceId?: StringFilter<"DeviceRecallStatus"> | string
+    recallId?: StringFilter<"DeviceRecallStatus"> | string
+    status?: EnumDeviceRecallActionFilter<"DeviceRecallStatus"> | $Enums.DeviceRecallAction
+    actionTaken?: StringNullableFilter<"DeviceRecallStatus"> | string | null
+    actionDate?: DateTimeNullableFilter<"DeviceRecallStatus"> | Date | string | null
+    actionBy?: StringNullableFilter<"DeviceRecallStatus"> | string | null
+    notes?: StringNullableFilter<"DeviceRecallStatus"> | string | null
+    patientNotified?: BoolFilter<"DeviceRecallStatus"> | boolean
+    providerNotified?: BoolFilter<"DeviceRecallStatus"> | boolean
+    createdAt?: DateTimeFilter<"DeviceRecallStatus"> | Date | string
+    updatedAt?: DateTimeFilter<"DeviceRecallStatus"> | Date | string
+    device?: XOR<MonitoringDeviceRelationFilter, MonitoringDeviceWhereInput>
+    recall?: XOR<FDARecallRelationFilter, FDARecallWhereInput>
+  }, "id" | "deviceId_recallId">
+
+  export type DeviceRecallStatusOrderByWithAggregationInput = {
+    id?: SortOrder
+    deviceId?: SortOrder
+    recallId?: SortOrder
+    status?: SortOrder
+    actionTaken?: SortOrderInput | SortOrder
+    actionDate?: SortOrderInput | SortOrder
+    actionBy?: SortOrderInput | SortOrder
+    notes?: SortOrderInput | SortOrder
+    patientNotified?: SortOrder
+    providerNotified?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: DeviceRecallStatusCountOrderByAggregateInput
+    _max?: DeviceRecallStatusMaxOrderByAggregateInput
+    _min?: DeviceRecallStatusMinOrderByAggregateInput
+  }
+
+  export type DeviceRecallStatusScalarWhereWithAggregatesInput = {
+    AND?: DeviceRecallStatusScalarWhereWithAggregatesInput | DeviceRecallStatusScalarWhereWithAggregatesInput[]
+    OR?: DeviceRecallStatusScalarWhereWithAggregatesInput[]
+    NOT?: DeviceRecallStatusScalarWhereWithAggregatesInput | DeviceRecallStatusScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"DeviceRecallStatus"> | string
+    deviceId?: StringWithAggregatesFilter<"DeviceRecallStatus"> | string
+    recallId?: StringWithAggregatesFilter<"DeviceRecallStatus"> | string
+    status?: EnumDeviceRecallActionWithAggregatesFilter<"DeviceRecallStatus"> | $Enums.DeviceRecallAction
+    actionTaken?: StringNullableWithAggregatesFilter<"DeviceRecallStatus"> | string | null
+    actionDate?: DateTimeNullableWithAggregatesFilter<"DeviceRecallStatus"> | Date | string | null
+    actionBy?: StringNullableWithAggregatesFilter<"DeviceRecallStatus"> | string | null
+    notes?: StringNullableWithAggregatesFilter<"DeviceRecallStatus"> | string | null
+    patientNotified?: BoolWithAggregatesFilter<"DeviceRecallStatus"> | boolean
+    providerNotified?: BoolWithAggregatesFilter<"DeviceRecallStatus"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"DeviceRecallStatus"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"DeviceRecallStatus"> | Date | string
+  }
+
+  export type SecurityAuditLogWhereInput = {
+    AND?: SecurityAuditLogWhereInput | SecurityAuditLogWhereInput[]
+    OR?: SecurityAuditLogWhereInput[]
+    NOT?: SecurityAuditLogWhereInput | SecurityAuditLogWhereInput[]
+    id?: StringFilter<"SecurityAuditLog"> | string
+    entityType?: StringFilter<"SecurityAuditLog"> | string
+    entityId?: StringFilter<"SecurityAuditLog"> | string
+    action?: StringFilter<"SecurityAuditLog"> | string
+    performedBy?: StringFilter<"SecurityAuditLog"> | string
+    performedByRole?: StringNullableFilter<"SecurityAuditLog"> | string | null
+    previousState?: JsonNullableFilter<"SecurityAuditLog">
+    newState?: JsonNullableFilter<"SecurityAuditLog">
+    ipAddress?: StringNullableFilter<"SecurityAuditLog"> | string | null
+    userAgent?: StringNullableFilter<"SecurityAuditLog"> | string | null
+    details?: StringNullableFilter<"SecurityAuditLog"> | string | null
+    riskLevel?: StringNullableFilter<"SecurityAuditLog"> | string | null
+    createdAt?: DateTimeFilter<"SecurityAuditLog"> | Date | string
+  }
+
+  export type SecurityAuditLogOrderByWithRelationInput = {
+    id?: SortOrder
+    entityType?: SortOrder
+    entityId?: SortOrder
+    action?: SortOrder
+    performedBy?: SortOrder
+    performedByRole?: SortOrderInput | SortOrder
+    previousState?: SortOrderInput | SortOrder
+    newState?: SortOrderInput | SortOrder
+    ipAddress?: SortOrderInput | SortOrder
+    userAgent?: SortOrderInput | SortOrder
+    details?: SortOrderInput | SortOrder
+    riskLevel?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type SecurityAuditLogWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: SecurityAuditLogWhereInput | SecurityAuditLogWhereInput[]
+    OR?: SecurityAuditLogWhereInput[]
+    NOT?: SecurityAuditLogWhereInput | SecurityAuditLogWhereInput[]
+    entityType?: StringFilter<"SecurityAuditLog"> | string
+    entityId?: StringFilter<"SecurityAuditLog"> | string
+    action?: StringFilter<"SecurityAuditLog"> | string
+    performedBy?: StringFilter<"SecurityAuditLog"> | string
+    performedByRole?: StringNullableFilter<"SecurityAuditLog"> | string | null
+    previousState?: JsonNullableFilter<"SecurityAuditLog">
+    newState?: JsonNullableFilter<"SecurityAuditLog">
+    ipAddress?: StringNullableFilter<"SecurityAuditLog"> | string | null
+    userAgent?: StringNullableFilter<"SecurityAuditLog"> | string | null
+    details?: StringNullableFilter<"SecurityAuditLog"> | string | null
+    riskLevel?: StringNullableFilter<"SecurityAuditLog"> | string | null
+    createdAt?: DateTimeFilter<"SecurityAuditLog"> | Date | string
+  }, "id">
+
+  export type SecurityAuditLogOrderByWithAggregationInput = {
+    id?: SortOrder
+    entityType?: SortOrder
+    entityId?: SortOrder
+    action?: SortOrder
+    performedBy?: SortOrder
+    performedByRole?: SortOrderInput | SortOrder
+    previousState?: SortOrderInput | SortOrder
+    newState?: SortOrderInput | SortOrder
+    ipAddress?: SortOrderInput | SortOrder
+    userAgent?: SortOrderInput | SortOrder
+    details?: SortOrderInput | SortOrder
+    riskLevel?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    _count?: SecurityAuditLogCountOrderByAggregateInput
+    _max?: SecurityAuditLogMaxOrderByAggregateInput
+    _min?: SecurityAuditLogMinOrderByAggregateInput
+  }
+
+  export type SecurityAuditLogScalarWhereWithAggregatesInput = {
+    AND?: SecurityAuditLogScalarWhereWithAggregatesInput | SecurityAuditLogScalarWhereWithAggregatesInput[]
+    OR?: SecurityAuditLogScalarWhereWithAggregatesInput[]
+    NOT?: SecurityAuditLogScalarWhereWithAggregatesInput | SecurityAuditLogScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"SecurityAuditLog"> | string
+    entityType?: StringWithAggregatesFilter<"SecurityAuditLog"> | string
+    entityId?: StringWithAggregatesFilter<"SecurityAuditLog"> | string
+    action?: StringWithAggregatesFilter<"SecurityAuditLog"> | string
+    performedBy?: StringWithAggregatesFilter<"SecurityAuditLog"> | string
+    performedByRole?: StringNullableWithAggregatesFilter<"SecurityAuditLog"> | string | null
+    previousState?: JsonNullableWithAggregatesFilter<"SecurityAuditLog">
+    newState?: JsonNullableWithAggregatesFilter<"SecurityAuditLog">
+    ipAddress?: StringNullableWithAggregatesFilter<"SecurityAuditLog"> | string | null
+    userAgent?: StringNullableWithAggregatesFilter<"SecurityAuditLog"> | string | null
+    details?: StringNullableWithAggregatesFilter<"SecurityAuditLog"> | string | null
+    riskLevel?: StringNullableWithAggregatesFilter<"SecurityAuditLog"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"SecurityAuditLog"> | Date | string
+  }
+
+  export type ManufacturerAdvisoryWhereInput = {
+    AND?: ManufacturerAdvisoryWhereInput | ManufacturerAdvisoryWhereInput[]
+    OR?: ManufacturerAdvisoryWhereInput[]
+    NOT?: ManufacturerAdvisoryWhereInput | ManufacturerAdvisoryWhereInput[]
+    id?: StringFilter<"ManufacturerAdvisory"> | string
+    manufacturer?: StringFilter<"ManufacturerAdvisory"> | string
+    advisoryId?: StringFilter<"ManufacturerAdvisory"> | string
+    title?: StringFilter<"ManufacturerAdvisory"> | string
+    description?: StringFilter<"ManufacturerAdvisory"> | string
+    severity?: EnumVulnerabilitySeverityFilter<"ManufacturerAdvisory"> | $Enums.VulnerabilitySeverity
+    affectedProducts?: JsonFilter<"ManufacturerAdvisory">
+    affectedVersions?: JsonNullableFilter<"ManufacturerAdvisory">
+    fixedVersion?: StringNullableFilter<"ManufacturerAdvisory"> | string | null
+    workaround?: StringNullableFilter<"ManufacturerAdvisory"> | string | null
+    publishedDate?: DateTimeFilter<"ManufacturerAdvisory"> | Date | string
+    lastUpdatedDate?: DateTimeNullableFilter<"ManufacturerAdvisory"> | Date | string | null
+    cveReferences?: JsonNullableFilter<"ManufacturerAdvisory">
+    status?: EnumAdvisoryStatusFilter<"ManufacturerAdvisory"> | $Enums.AdvisoryStatus
+    source?: StringNullableFilter<"ManufacturerAdvisory"> | string | null
+    acknowledgedAt?: DateTimeNullableFilter<"ManufacturerAdvisory"> | Date | string | null
+    acknowledgedBy?: StringNullableFilter<"ManufacturerAdvisory"> | string | null
+    createdAt?: DateTimeFilter<"ManufacturerAdvisory"> | Date | string
+    updatedAt?: DateTimeFilter<"ManufacturerAdvisory"> | Date | string
+  }
+
+  export type ManufacturerAdvisoryOrderByWithRelationInput = {
+    id?: SortOrder
+    manufacturer?: SortOrder
+    advisoryId?: SortOrder
+    title?: SortOrder
+    description?: SortOrder
+    severity?: SortOrder
+    affectedProducts?: SortOrder
+    affectedVersions?: SortOrderInput | SortOrder
+    fixedVersion?: SortOrderInput | SortOrder
+    workaround?: SortOrderInput | SortOrder
+    publishedDate?: SortOrder
+    lastUpdatedDate?: SortOrderInput | SortOrder
+    cveReferences?: SortOrderInput | SortOrder
+    status?: SortOrder
+    source?: SortOrderInput | SortOrder
+    acknowledgedAt?: SortOrderInput | SortOrder
+    acknowledgedBy?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ManufacturerAdvisoryWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    advisoryId?: string
+    AND?: ManufacturerAdvisoryWhereInput | ManufacturerAdvisoryWhereInput[]
+    OR?: ManufacturerAdvisoryWhereInput[]
+    NOT?: ManufacturerAdvisoryWhereInput | ManufacturerAdvisoryWhereInput[]
+    manufacturer?: StringFilter<"ManufacturerAdvisory"> | string
+    title?: StringFilter<"ManufacturerAdvisory"> | string
+    description?: StringFilter<"ManufacturerAdvisory"> | string
+    severity?: EnumVulnerabilitySeverityFilter<"ManufacturerAdvisory"> | $Enums.VulnerabilitySeverity
+    affectedProducts?: JsonFilter<"ManufacturerAdvisory">
+    affectedVersions?: JsonNullableFilter<"ManufacturerAdvisory">
+    fixedVersion?: StringNullableFilter<"ManufacturerAdvisory"> | string | null
+    workaround?: StringNullableFilter<"ManufacturerAdvisory"> | string | null
+    publishedDate?: DateTimeFilter<"ManufacturerAdvisory"> | Date | string
+    lastUpdatedDate?: DateTimeNullableFilter<"ManufacturerAdvisory"> | Date | string | null
+    cveReferences?: JsonNullableFilter<"ManufacturerAdvisory">
+    status?: EnumAdvisoryStatusFilter<"ManufacturerAdvisory"> | $Enums.AdvisoryStatus
+    source?: StringNullableFilter<"ManufacturerAdvisory"> | string | null
+    acknowledgedAt?: DateTimeNullableFilter<"ManufacturerAdvisory"> | Date | string | null
+    acknowledgedBy?: StringNullableFilter<"ManufacturerAdvisory"> | string | null
+    createdAt?: DateTimeFilter<"ManufacturerAdvisory"> | Date | string
+    updatedAt?: DateTimeFilter<"ManufacturerAdvisory"> | Date | string
+  }, "id" | "advisoryId">
+
+  export type ManufacturerAdvisoryOrderByWithAggregationInput = {
+    id?: SortOrder
+    manufacturer?: SortOrder
+    advisoryId?: SortOrder
+    title?: SortOrder
+    description?: SortOrder
+    severity?: SortOrder
+    affectedProducts?: SortOrder
+    affectedVersions?: SortOrderInput | SortOrder
+    fixedVersion?: SortOrderInput | SortOrder
+    workaround?: SortOrderInput | SortOrder
+    publishedDate?: SortOrder
+    lastUpdatedDate?: SortOrderInput | SortOrder
+    cveReferences?: SortOrderInput | SortOrder
+    status?: SortOrder
+    source?: SortOrderInput | SortOrder
+    acknowledgedAt?: SortOrderInput | SortOrder
+    acknowledgedBy?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: ManufacturerAdvisoryCountOrderByAggregateInput
+    _max?: ManufacturerAdvisoryMaxOrderByAggregateInput
+    _min?: ManufacturerAdvisoryMinOrderByAggregateInput
+  }
+
+  export type ManufacturerAdvisoryScalarWhereWithAggregatesInput = {
+    AND?: ManufacturerAdvisoryScalarWhereWithAggregatesInput | ManufacturerAdvisoryScalarWhereWithAggregatesInput[]
+    OR?: ManufacturerAdvisoryScalarWhereWithAggregatesInput[]
+    NOT?: ManufacturerAdvisoryScalarWhereWithAggregatesInput | ManufacturerAdvisoryScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"ManufacturerAdvisory"> | string
+    manufacturer?: StringWithAggregatesFilter<"ManufacturerAdvisory"> | string
+    advisoryId?: StringWithAggregatesFilter<"ManufacturerAdvisory"> | string
+    title?: StringWithAggregatesFilter<"ManufacturerAdvisory"> | string
+    description?: StringWithAggregatesFilter<"ManufacturerAdvisory"> | string
+    severity?: EnumVulnerabilitySeverityWithAggregatesFilter<"ManufacturerAdvisory"> | $Enums.VulnerabilitySeverity
+    affectedProducts?: JsonWithAggregatesFilter<"ManufacturerAdvisory">
+    affectedVersions?: JsonNullableWithAggregatesFilter<"ManufacturerAdvisory">
+    fixedVersion?: StringNullableWithAggregatesFilter<"ManufacturerAdvisory"> | string | null
+    workaround?: StringNullableWithAggregatesFilter<"ManufacturerAdvisory"> | string | null
+    publishedDate?: DateTimeWithAggregatesFilter<"ManufacturerAdvisory"> | Date | string
+    lastUpdatedDate?: DateTimeNullableWithAggregatesFilter<"ManufacturerAdvisory"> | Date | string | null
+    cveReferences?: JsonNullableWithAggregatesFilter<"ManufacturerAdvisory">
+    status?: EnumAdvisoryStatusWithAggregatesFilter<"ManufacturerAdvisory"> | $Enums.AdvisoryStatus
+    source?: StringNullableWithAggregatesFilter<"ManufacturerAdvisory"> | string | null
+    acknowledgedAt?: DateTimeNullableWithAggregatesFilter<"ManufacturerAdvisory"> | Date | string | null
+    acknowledgedBy?: StringNullableWithAggregatesFilter<"ManufacturerAdvisory"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"ManufacturerAdvisory"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"ManufacturerAdvisory"> | Date | string
+  }
+
+  export type DeviceRiskAssessmentWhereInput = {
+    AND?: DeviceRiskAssessmentWhereInput | DeviceRiskAssessmentWhereInput[]
+    OR?: DeviceRiskAssessmentWhereInput[]
+    NOT?: DeviceRiskAssessmentWhereInput | DeviceRiskAssessmentWhereInput[]
+    id?: StringFilter<"DeviceRiskAssessment"> | string
+    deviceId?: StringFilter<"DeviceRiskAssessment"> | string
+    overallRiskScore?: FloatFilter<"DeviceRiskAssessment"> | number
+    vulnerabilityScore?: FloatFilter<"DeviceRiskAssessment"> | number
+    patchScore?: FloatFilter<"DeviceRiskAssessment"> | number
+    networkScore?: FloatFilter<"DeviceRiskAssessment"> | number
+    complianceScore?: FloatFilter<"DeviceRiskAssessment"> | number
+    incidentScore?: FloatFilter<"DeviceRiskAssessment"> | number
+    agingScore?: FloatFilter<"DeviceRiskAssessment"> | number
+    riskLevel?: EnumRiskLevelFilter<"DeviceRiskAssessment"> | $Enums.RiskLevel
+    riskFactors?: JsonFilter<"DeviceRiskAssessment">
+    recommendations?: JsonNullableFilter<"DeviceRiskAssessment">
+    assessedAt?: DateTimeFilter<"DeviceRiskAssessment"> | Date | string
+    assessedBy?: StringNullableFilter<"DeviceRiskAssessment"> | string | null
+    nextAssessmentDue?: DateTimeNullableFilter<"DeviceRiskAssessment"> | Date | string | null
+    notes?: StringNullableFilter<"DeviceRiskAssessment"> | string | null
+    createdAt?: DateTimeFilter<"DeviceRiskAssessment"> | Date | string
+    device?: XOR<MonitoringDeviceRelationFilter, MonitoringDeviceWhereInput>
+  }
+
+  export type DeviceRiskAssessmentOrderByWithRelationInput = {
+    id?: SortOrder
+    deviceId?: SortOrder
+    overallRiskScore?: SortOrder
+    vulnerabilityScore?: SortOrder
+    patchScore?: SortOrder
+    networkScore?: SortOrder
+    complianceScore?: SortOrder
+    incidentScore?: SortOrder
+    agingScore?: SortOrder
+    riskLevel?: SortOrder
+    riskFactors?: SortOrder
+    recommendations?: SortOrderInput | SortOrder
+    assessedAt?: SortOrder
+    assessedBy?: SortOrderInput | SortOrder
+    nextAssessmentDue?: SortOrderInput | SortOrder
+    notes?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    device?: MonitoringDeviceOrderByWithRelationInput
+  }
+
+  export type DeviceRiskAssessmentWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: DeviceRiskAssessmentWhereInput | DeviceRiskAssessmentWhereInput[]
+    OR?: DeviceRiskAssessmentWhereInput[]
+    NOT?: DeviceRiskAssessmentWhereInput | DeviceRiskAssessmentWhereInput[]
+    deviceId?: StringFilter<"DeviceRiskAssessment"> | string
+    overallRiskScore?: FloatFilter<"DeviceRiskAssessment"> | number
+    vulnerabilityScore?: FloatFilter<"DeviceRiskAssessment"> | number
+    patchScore?: FloatFilter<"DeviceRiskAssessment"> | number
+    networkScore?: FloatFilter<"DeviceRiskAssessment"> | number
+    complianceScore?: FloatFilter<"DeviceRiskAssessment"> | number
+    incidentScore?: FloatFilter<"DeviceRiskAssessment"> | number
+    agingScore?: FloatFilter<"DeviceRiskAssessment"> | number
+    riskLevel?: EnumRiskLevelFilter<"DeviceRiskAssessment"> | $Enums.RiskLevel
+    riskFactors?: JsonFilter<"DeviceRiskAssessment">
+    recommendations?: JsonNullableFilter<"DeviceRiskAssessment">
+    assessedAt?: DateTimeFilter<"DeviceRiskAssessment"> | Date | string
+    assessedBy?: StringNullableFilter<"DeviceRiskAssessment"> | string | null
+    nextAssessmentDue?: DateTimeNullableFilter<"DeviceRiskAssessment"> | Date | string | null
+    notes?: StringNullableFilter<"DeviceRiskAssessment"> | string | null
+    createdAt?: DateTimeFilter<"DeviceRiskAssessment"> | Date | string
+    device?: XOR<MonitoringDeviceRelationFilter, MonitoringDeviceWhereInput>
+  }, "id">
+
+  export type DeviceRiskAssessmentOrderByWithAggregationInput = {
+    id?: SortOrder
+    deviceId?: SortOrder
+    overallRiskScore?: SortOrder
+    vulnerabilityScore?: SortOrder
+    patchScore?: SortOrder
+    networkScore?: SortOrder
+    complianceScore?: SortOrder
+    incidentScore?: SortOrder
+    agingScore?: SortOrder
+    riskLevel?: SortOrder
+    riskFactors?: SortOrder
+    recommendations?: SortOrderInput | SortOrder
+    assessedAt?: SortOrder
+    assessedBy?: SortOrderInput | SortOrder
+    nextAssessmentDue?: SortOrderInput | SortOrder
+    notes?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    _count?: DeviceRiskAssessmentCountOrderByAggregateInput
+    _avg?: DeviceRiskAssessmentAvgOrderByAggregateInput
+    _max?: DeviceRiskAssessmentMaxOrderByAggregateInput
+    _min?: DeviceRiskAssessmentMinOrderByAggregateInput
+    _sum?: DeviceRiskAssessmentSumOrderByAggregateInput
+  }
+
+  export type DeviceRiskAssessmentScalarWhereWithAggregatesInput = {
+    AND?: DeviceRiskAssessmentScalarWhereWithAggregatesInput | DeviceRiskAssessmentScalarWhereWithAggregatesInput[]
+    OR?: DeviceRiskAssessmentScalarWhereWithAggregatesInput[]
+    NOT?: DeviceRiskAssessmentScalarWhereWithAggregatesInput | DeviceRiskAssessmentScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"DeviceRiskAssessment"> | string
+    deviceId?: StringWithAggregatesFilter<"DeviceRiskAssessment"> | string
+    overallRiskScore?: FloatWithAggregatesFilter<"DeviceRiskAssessment"> | number
+    vulnerabilityScore?: FloatWithAggregatesFilter<"DeviceRiskAssessment"> | number
+    patchScore?: FloatWithAggregatesFilter<"DeviceRiskAssessment"> | number
+    networkScore?: FloatWithAggregatesFilter<"DeviceRiskAssessment"> | number
+    complianceScore?: FloatWithAggregatesFilter<"DeviceRiskAssessment"> | number
+    incidentScore?: FloatWithAggregatesFilter<"DeviceRiskAssessment"> | number
+    agingScore?: FloatWithAggregatesFilter<"DeviceRiskAssessment"> | number
+    riskLevel?: EnumRiskLevelWithAggregatesFilter<"DeviceRiskAssessment"> | $Enums.RiskLevel
+    riskFactors?: JsonWithAggregatesFilter<"DeviceRiskAssessment">
+    recommendations?: JsonNullableWithAggregatesFilter<"DeviceRiskAssessment">
+    assessedAt?: DateTimeWithAggregatesFilter<"DeviceRiskAssessment"> | Date | string
+    assessedBy?: StringNullableWithAggregatesFilter<"DeviceRiskAssessment"> | string | null
+    nextAssessmentDue?: DateTimeNullableWithAggregatesFilter<"DeviceRiskAssessment"> | Date | string | null
+    notes?: StringNullableWithAggregatesFilter<"DeviceRiskAssessment"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"DeviceRiskAssessment"> | Date | string
+  }
+
   export type CarePlanCreateInput = {
     id?: string
     patientId: string
@@ -13878,9 +27711,19 @@ export namespace Prisma {
     status?: $Enums.DeviceStatus
     lastSyncAt?: Date | string | null
     batteryLevel?: number | null
+    firmwareVersion?: string | null
+    softwareVersion?: string | null
+    certificateExpiry?: Date | string | null
+    lastSecurityScan?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     readings?: VitalReadingCreateNestedManyWithoutDeviceInput
+    vulnerabilities?: DeviceVulnerabilityCreateNestedManyWithoutDeviceInput
+    patches?: DevicePatchCreateNestedManyWithoutDeviceInput
+    incidents?: SecurityIncidentCreateNestedManyWithoutDeviceInput
+    networkAssignments?: DeviceNetworkAssignmentCreateNestedManyWithoutDeviceInput
+    recallStatuses?: DeviceRecallStatusCreateNestedManyWithoutDeviceInput
+    riskAssessments?: DeviceRiskAssessmentCreateNestedManyWithoutDeviceInput
   }
 
   export type MonitoringDeviceUncheckedCreateInput = {
@@ -13893,9 +27736,19 @@ export namespace Prisma {
     status?: $Enums.DeviceStatus
     lastSyncAt?: Date | string | null
     batteryLevel?: number | null
+    firmwareVersion?: string | null
+    softwareVersion?: string | null
+    certificateExpiry?: Date | string | null
+    lastSecurityScan?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     readings?: VitalReadingUncheckedCreateNestedManyWithoutDeviceInput
+    vulnerabilities?: DeviceVulnerabilityUncheckedCreateNestedManyWithoutDeviceInput
+    patches?: DevicePatchUncheckedCreateNestedManyWithoutDeviceInput
+    incidents?: SecurityIncidentUncheckedCreateNestedManyWithoutDeviceInput
+    networkAssignments?: DeviceNetworkAssignmentUncheckedCreateNestedManyWithoutDeviceInput
+    recallStatuses?: DeviceRecallStatusUncheckedCreateNestedManyWithoutDeviceInput
+    riskAssessments?: DeviceRiskAssessmentUncheckedCreateNestedManyWithoutDeviceInput
   }
 
   export type MonitoringDeviceUpdateInput = {
@@ -13908,9 +27761,19 @@ export namespace Prisma {
     status?: EnumDeviceStatusFieldUpdateOperationsInput | $Enums.DeviceStatus
     lastSyncAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     batteryLevel?: NullableIntFieldUpdateOperationsInput | number | null
+    firmwareVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    softwareVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    certificateExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSecurityScan?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     readings?: VitalReadingUpdateManyWithoutDeviceNestedInput
+    vulnerabilities?: DeviceVulnerabilityUpdateManyWithoutDeviceNestedInput
+    patches?: DevicePatchUpdateManyWithoutDeviceNestedInput
+    incidents?: SecurityIncidentUpdateManyWithoutDeviceNestedInput
+    networkAssignments?: DeviceNetworkAssignmentUpdateManyWithoutDeviceNestedInput
+    recallStatuses?: DeviceRecallStatusUpdateManyWithoutDeviceNestedInput
+    riskAssessments?: DeviceRiskAssessmentUpdateManyWithoutDeviceNestedInput
   }
 
   export type MonitoringDeviceUncheckedUpdateInput = {
@@ -13923,9 +27786,19 @@ export namespace Prisma {
     status?: EnumDeviceStatusFieldUpdateOperationsInput | $Enums.DeviceStatus
     lastSyncAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     batteryLevel?: NullableIntFieldUpdateOperationsInput | number | null
+    firmwareVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    softwareVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    certificateExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSecurityScan?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     readings?: VitalReadingUncheckedUpdateManyWithoutDeviceNestedInput
+    vulnerabilities?: DeviceVulnerabilityUncheckedUpdateManyWithoutDeviceNestedInput
+    patches?: DevicePatchUncheckedUpdateManyWithoutDeviceNestedInput
+    incidents?: SecurityIncidentUncheckedUpdateManyWithoutDeviceNestedInput
+    networkAssignments?: DeviceNetworkAssignmentUncheckedUpdateManyWithoutDeviceNestedInput
+    recallStatuses?: DeviceRecallStatusUncheckedUpdateManyWithoutDeviceNestedInput
+    riskAssessments?: DeviceRiskAssessmentUncheckedUpdateManyWithoutDeviceNestedInput
   }
 
   export type MonitoringDeviceCreateManyInput = {
@@ -13938,6 +27811,10 @@ export namespace Prisma {
     status?: $Enums.DeviceStatus
     lastSyncAt?: Date | string | null
     batteryLevel?: number | null
+    firmwareVersion?: string | null
+    softwareVersion?: string | null
+    certificateExpiry?: Date | string | null
+    lastSecurityScan?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -13952,6 +27829,10 @@ export namespace Prisma {
     status?: EnumDeviceStatusFieldUpdateOperationsInput | $Enums.DeviceStatus
     lastSyncAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     batteryLevel?: NullableIntFieldUpdateOperationsInput | number | null
+    firmwareVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    softwareVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    certificateExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSecurityScan?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -13966,6 +27847,10 @@ export namespace Prisma {
     status?: EnumDeviceStatusFieldUpdateOperationsInput | $Enums.DeviceStatus
     lastSyncAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     batteryLevel?: NullableIntFieldUpdateOperationsInput | number | null
+    firmwareVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    softwareVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    certificateExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSecurityScan?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -14691,6 +28576,1406 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type DeviceVulnerabilityCreateInput = {
+    id?: string
+    cveId?: string | null
+    title: string
+    description: string
+    severity: $Enums.VulnerabilitySeverity
+    cvssScore?: number | null
+    affectedVersion?: string | null
+    fixedVersion?: string | null
+    exploitAvailable?: boolean
+    status?: $Enums.VulnerabilityStatus
+    discoveredAt?: Date | string
+    resolvedAt?: Date | string | null
+    resolvedBy?: string | null
+    resolutionNotes?: string | null
+    source?: string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    device: MonitoringDeviceCreateNestedOneWithoutVulnerabilitiesInput
+  }
+
+  export type DeviceVulnerabilityUncheckedCreateInput = {
+    id?: string
+    deviceId: string
+    cveId?: string | null
+    title: string
+    description: string
+    severity: $Enums.VulnerabilitySeverity
+    cvssScore?: number | null
+    affectedVersion?: string | null
+    fixedVersion?: string | null
+    exploitAvailable?: boolean
+    status?: $Enums.VulnerabilityStatus
+    discoveredAt?: Date | string
+    resolvedAt?: Date | string | null
+    resolvedBy?: string | null
+    resolutionNotes?: string | null
+    source?: string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DeviceVulnerabilityUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    cveId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    severity?: EnumVulnerabilitySeverityFieldUpdateOperationsInput | $Enums.VulnerabilitySeverity
+    cvssScore?: NullableFloatFieldUpdateOperationsInput | number | null
+    affectedVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    fixedVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    exploitAvailable?: BoolFieldUpdateOperationsInput | boolean
+    status?: EnumVulnerabilityStatusFieldUpdateOperationsInput | $Enums.VulnerabilityStatus
+    discoveredAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolvedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    device?: MonitoringDeviceUpdateOneRequiredWithoutVulnerabilitiesNestedInput
+  }
+
+  export type DeviceVulnerabilityUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    deviceId?: StringFieldUpdateOperationsInput | string
+    cveId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    severity?: EnumVulnerabilitySeverityFieldUpdateOperationsInput | $Enums.VulnerabilitySeverity
+    cvssScore?: NullableFloatFieldUpdateOperationsInput | number | null
+    affectedVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    fixedVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    exploitAvailable?: BoolFieldUpdateOperationsInput | boolean
+    status?: EnumVulnerabilityStatusFieldUpdateOperationsInput | $Enums.VulnerabilityStatus
+    discoveredAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolvedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeviceVulnerabilityCreateManyInput = {
+    id?: string
+    deviceId: string
+    cveId?: string | null
+    title: string
+    description: string
+    severity: $Enums.VulnerabilitySeverity
+    cvssScore?: number | null
+    affectedVersion?: string | null
+    fixedVersion?: string | null
+    exploitAvailable?: boolean
+    status?: $Enums.VulnerabilityStatus
+    discoveredAt?: Date | string
+    resolvedAt?: Date | string | null
+    resolvedBy?: string | null
+    resolutionNotes?: string | null
+    source?: string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DeviceVulnerabilityUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    cveId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    severity?: EnumVulnerabilitySeverityFieldUpdateOperationsInput | $Enums.VulnerabilitySeverity
+    cvssScore?: NullableFloatFieldUpdateOperationsInput | number | null
+    affectedVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    fixedVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    exploitAvailable?: BoolFieldUpdateOperationsInput | boolean
+    status?: EnumVulnerabilityStatusFieldUpdateOperationsInput | $Enums.VulnerabilityStatus
+    discoveredAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolvedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeviceVulnerabilityUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    deviceId?: StringFieldUpdateOperationsInput | string
+    cveId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    severity?: EnumVulnerabilitySeverityFieldUpdateOperationsInput | $Enums.VulnerabilitySeverity
+    cvssScore?: NullableFloatFieldUpdateOperationsInput | number | null
+    affectedVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    fixedVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    exploitAvailable?: BoolFieldUpdateOperationsInput | boolean
+    status?: EnumVulnerabilityStatusFieldUpdateOperationsInput | $Enums.VulnerabilityStatus
+    discoveredAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolvedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DevicePatchCreateInput = {
+    id?: string
+    patchVersion: string
+    currentVersion: string
+    description?: string | null
+    releaseNotes?: string | null
+    criticality?: $Enums.PatchCriticality
+    scheduledDate?: Date | string | null
+    appliedDate?: Date | string | null
+    appliedBy?: string | null
+    status?: $Enums.PatchStatus
+    rollbackVersion?: string | null
+    testingRequired?: boolean
+    testingCompletedAt?: Date | string | null
+    testingNotes?: string | null
+    approvedBy?: string | null
+    approvedAt?: Date | string | null
+    failureReason?: string | null
+    vulnerabilitiesFixed?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    device: MonitoringDeviceCreateNestedOneWithoutPatchesInput
+  }
+
+  export type DevicePatchUncheckedCreateInput = {
+    id?: string
+    deviceId: string
+    patchVersion: string
+    currentVersion: string
+    description?: string | null
+    releaseNotes?: string | null
+    criticality?: $Enums.PatchCriticality
+    scheduledDate?: Date | string | null
+    appliedDate?: Date | string | null
+    appliedBy?: string | null
+    status?: $Enums.PatchStatus
+    rollbackVersion?: string | null
+    testingRequired?: boolean
+    testingCompletedAt?: Date | string | null
+    testingNotes?: string | null
+    approvedBy?: string | null
+    approvedAt?: Date | string | null
+    failureReason?: string | null
+    vulnerabilitiesFixed?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DevicePatchUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patchVersion?: StringFieldUpdateOperationsInput | string
+    currentVersion?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    releaseNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    criticality?: EnumPatchCriticalityFieldUpdateOperationsInput | $Enums.PatchCriticality
+    scheduledDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    appliedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    appliedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumPatchStatusFieldUpdateOperationsInput | $Enums.PatchStatus
+    rollbackVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    testingRequired?: BoolFieldUpdateOperationsInput | boolean
+    testingCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    testingNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    failureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    vulnerabilitiesFixed?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    device?: MonitoringDeviceUpdateOneRequiredWithoutPatchesNestedInput
+  }
+
+  export type DevicePatchUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    deviceId?: StringFieldUpdateOperationsInput | string
+    patchVersion?: StringFieldUpdateOperationsInput | string
+    currentVersion?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    releaseNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    criticality?: EnumPatchCriticalityFieldUpdateOperationsInput | $Enums.PatchCriticality
+    scheduledDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    appliedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    appliedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumPatchStatusFieldUpdateOperationsInput | $Enums.PatchStatus
+    rollbackVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    testingRequired?: BoolFieldUpdateOperationsInput | boolean
+    testingCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    testingNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    failureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    vulnerabilitiesFixed?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DevicePatchCreateManyInput = {
+    id?: string
+    deviceId: string
+    patchVersion: string
+    currentVersion: string
+    description?: string | null
+    releaseNotes?: string | null
+    criticality?: $Enums.PatchCriticality
+    scheduledDate?: Date | string | null
+    appliedDate?: Date | string | null
+    appliedBy?: string | null
+    status?: $Enums.PatchStatus
+    rollbackVersion?: string | null
+    testingRequired?: boolean
+    testingCompletedAt?: Date | string | null
+    testingNotes?: string | null
+    approvedBy?: string | null
+    approvedAt?: Date | string | null
+    failureReason?: string | null
+    vulnerabilitiesFixed?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DevicePatchUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patchVersion?: StringFieldUpdateOperationsInput | string
+    currentVersion?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    releaseNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    criticality?: EnumPatchCriticalityFieldUpdateOperationsInput | $Enums.PatchCriticality
+    scheduledDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    appliedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    appliedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumPatchStatusFieldUpdateOperationsInput | $Enums.PatchStatus
+    rollbackVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    testingRequired?: BoolFieldUpdateOperationsInput | boolean
+    testingCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    testingNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    failureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    vulnerabilitiesFixed?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DevicePatchUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    deviceId?: StringFieldUpdateOperationsInput | string
+    patchVersion?: StringFieldUpdateOperationsInput | string
+    currentVersion?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    releaseNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    criticality?: EnumPatchCriticalityFieldUpdateOperationsInput | $Enums.PatchCriticality
+    scheduledDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    appliedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    appliedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumPatchStatusFieldUpdateOperationsInput | $Enums.PatchStatus
+    rollbackVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    testingRequired?: BoolFieldUpdateOperationsInput | boolean
+    testingCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    testingNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    failureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    vulnerabilitiesFixed?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SecurityIncidentCreateInput = {
+    id?: string
+    incidentType: $Enums.IncidentType
+    severity: $Enums.IncidentSeverity
+    title: string
+    description: string
+    affectedSystems?: NullableJsonNullValueInput | InputJsonValue
+    affectedPatients?: NullableJsonNullValueInput | InputJsonValue
+    detectedAt?: Date | string
+    detectedBy: string
+    reportedBy: string
+    status?: $Enums.IncidentStatus
+    assignedTo?: string | null
+    containedAt?: Date | string | null
+    resolvedAt?: Date | string | null
+    rootCause?: string | null
+    remediationSteps?: NullableJsonNullValueInput | InputJsonValue
+    lessonsLearned?: string | null
+    timeline?: NullableJsonNullValueInput | InputJsonValue
+    evidence?: NullableJsonNullValueInput | InputJsonValue
+    notificationsSent?: boolean
+    regulatoryReported?: boolean
+    regulatoryReportDate?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    device?: MonitoringDeviceCreateNestedOneWithoutIncidentsInput
+  }
+
+  export type SecurityIncidentUncheckedCreateInput = {
+    id?: string
+    deviceId?: string | null
+    incidentType: $Enums.IncidentType
+    severity: $Enums.IncidentSeverity
+    title: string
+    description: string
+    affectedSystems?: NullableJsonNullValueInput | InputJsonValue
+    affectedPatients?: NullableJsonNullValueInput | InputJsonValue
+    detectedAt?: Date | string
+    detectedBy: string
+    reportedBy: string
+    status?: $Enums.IncidentStatus
+    assignedTo?: string | null
+    containedAt?: Date | string | null
+    resolvedAt?: Date | string | null
+    rootCause?: string | null
+    remediationSteps?: NullableJsonNullValueInput | InputJsonValue
+    lessonsLearned?: string | null
+    timeline?: NullableJsonNullValueInput | InputJsonValue
+    evidence?: NullableJsonNullValueInput | InputJsonValue
+    notificationsSent?: boolean
+    regulatoryReported?: boolean
+    regulatoryReportDate?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SecurityIncidentUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    incidentType?: EnumIncidentTypeFieldUpdateOperationsInput | $Enums.IncidentType
+    severity?: EnumIncidentSeverityFieldUpdateOperationsInput | $Enums.IncidentSeverity
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    affectedSystems?: NullableJsonNullValueInput | InputJsonValue
+    affectedPatients?: NullableJsonNullValueInput | InputJsonValue
+    detectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    detectedBy?: StringFieldUpdateOperationsInput | string
+    reportedBy?: StringFieldUpdateOperationsInput | string
+    status?: EnumIncidentStatusFieldUpdateOperationsInput | $Enums.IncidentStatus
+    assignedTo?: NullableStringFieldUpdateOperationsInput | string | null
+    containedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rootCause?: NullableStringFieldUpdateOperationsInput | string | null
+    remediationSteps?: NullableJsonNullValueInput | InputJsonValue
+    lessonsLearned?: NullableStringFieldUpdateOperationsInput | string | null
+    timeline?: NullableJsonNullValueInput | InputJsonValue
+    evidence?: NullableJsonNullValueInput | InputJsonValue
+    notificationsSent?: BoolFieldUpdateOperationsInput | boolean
+    regulatoryReported?: BoolFieldUpdateOperationsInput | boolean
+    regulatoryReportDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    device?: MonitoringDeviceUpdateOneWithoutIncidentsNestedInput
+  }
+
+  export type SecurityIncidentUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    deviceId?: NullableStringFieldUpdateOperationsInput | string | null
+    incidentType?: EnumIncidentTypeFieldUpdateOperationsInput | $Enums.IncidentType
+    severity?: EnumIncidentSeverityFieldUpdateOperationsInput | $Enums.IncidentSeverity
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    affectedSystems?: NullableJsonNullValueInput | InputJsonValue
+    affectedPatients?: NullableJsonNullValueInput | InputJsonValue
+    detectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    detectedBy?: StringFieldUpdateOperationsInput | string
+    reportedBy?: StringFieldUpdateOperationsInput | string
+    status?: EnumIncidentStatusFieldUpdateOperationsInput | $Enums.IncidentStatus
+    assignedTo?: NullableStringFieldUpdateOperationsInput | string | null
+    containedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rootCause?: NullableStringFieldUpdateOperationsInput | string | null
+    remediationSteps?: NullableJsonNullValueInput | InputJsonValue
+    lessonsLearned?: NullableStringFieldUpdateOperationsInput | string | null
+    timeline?: NullableJsonNullValueInput | InputJsonValue
+    evidence?: NullableJsonNullValueInput | InputJsonValue
+    notificationsSent?: BoolFieldUpdateOperationsInput | boolean
+    regulatoryReported?: BoolFieldUpdateOperationsInput | boolean
+    regulatoryReportDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SecurityIncidentCreateManyInput = {
+    id?: string
+    deviceId?: string | null
+    incidentType: $Enums.IncidentType
+    severity: $Enums.IncidentSeverity
+    title: string
+    description: string
+    affectedSystems?: NullableJsonNullValueInput | InputJsonValue
+    affectedPatients?: NullableJsonNullValueInput | InputJsonValue
+    detectedAt?: Date | string
+    detectedBy: string
+    reportedBy: string
+    status?: $Enums.IncidentStatus
+    assignedTo?: string | null
+    containedAt?: Date | string | null
+    resolvedAt?: Date | string | null
+    rootCause?: string | null
+    remediationSteps?: NullableJsonNullValueInput | InputJsonValue
+    lessonsLearned?: string | null
+    timeline?: NullableJsonNullValueInput | InputJsonValue
+    evidence?: NullableJsonNullValueInput | InputJsonValue
+    notificationsSent?: boolean
+    regulatoryReported?: boolean
+    regulatoryReportDate?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SecurityIncidentUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    incidentType?: EnumIncidentTypeFieldUpdateOperationsInput | $Enums.IncidentType
+    severity?: EnumIncidentSeverityFieldUpdateOperationsInput | $Enums.IncidentSeverity
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    affectedSystems?: NullableJsonNullValueInput | InputJsonValue
+    affectedPatients?: NullableJsonNullValueInput | InputJsonValue
+    detectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    detectedBy?: StringFieldUpdateOperationsInput | string
+    reportedBy?: StringFieldUpdateOperationsInput | string
+    status?: EnumIncidentStatusFieldUpdateOperationsInput | $Enums.IncidentStatus
+    assignedTo?: NullableStringFieldUpdateOperationsInput | string | null
+    containedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rootCause?: NullableStringFieldUpdateOperationsInput | string | null
+    remediationSteps?: NullableJsonNullValueInput | InputJsonValue
+    lessonsLearned?: NullableStringFieldUpdateOperationsInput | string | null
+    timeline?: NullableJsonNullValueInput | InputJsonValue
+    evidence?: NullableJsonNullValueInput | InputJsonValue
+    notificationsSent?: BoolFieldUpdateOperationsInput | boolean
+    regulatoryReported?: BoolFieldUpdateOperationsInput | boolean
+    regulatoryReportDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SecurityIncidentUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    deviceId?: NullableStringFieldUpdateOperationsInput | string | null
+    incidentType?: EnumIncidentTypeFieldUpdateOperationsInput | $Enums.IncidentType
+    severity?: EnumIncidentSeverityFieldUpdateOperationsInput | $Enums.IncidentSeverity
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    affectedSystems?: NullableJsonNullValueInput | InputJsonValue
+    affectedPatients?: NullableJsonNullValueInput | InputJsonValue
+    detectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    detectedBy?: StringFieldUpdateOperationsInput | string
+    reportedBy?: StringFieldUpdateOperationsInput | string
+    status?: EnumIncidentStatusFieldUpdateOperationsInput | $Enums.IncidentStatus
+    assignedTo?: NullableStringFieldUpdateOperationsInput | string | null
+    containedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rootCause?: NullableStringFieldUpdateOperationsInput | string | null
+    remediationSteps?: NullableJsonNullValueInput | InputJsonValue
+    lessonsLearned?: NullableStringFieldUpdateOperationsInput | string | null
+    timeline?: NullableJsonNullValueInput | InputJsonValue
+    evidence?: NullableJsonNullValueInput | InputJsonValue
+    notificationsSent?: BoolFieldUpdateOperationsInput | boolean
+    regulatoryReported?: BoolFieldUpdateOperationsInput | boolean
+    regulatoryReportDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type NetworkSegmentCreateInput = {
+    id?: string
+    name: string
+    description?: string | null
+    vlanId?: number | null
+    subnetCidr?: string | null
+    securityLevel: $Enums.SecurityLevel
+    isolationLevel?: $Enums.IsolationLevel
+    allowedProtocols?: NullableJsonNullValueInput | InputJsonValue
+    firewallRules?: NullableJsonNullValueInput | InputJsonValue
+    complianceRequirements?: NullableJsonNullValueInput | InputJsonValue
+    monitoringEnabled?: boolean
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    devices?: DeviceNetworkAssignmentCreateNestedManyWithoutSegmentInput
+  }
+
+  export type NetworkSegmentUncheckedCreateInput = {
+    id?: string
+    name: string
+    description?: string | null
+    vlanId?: number | null
+    subnetCidr?: string | null
+    securityLevel: $Enums.SecurityLevel
+    isolationLevel?: $Enums.IsolationLevel
+    allowedProtocols?: NullableJsonNullValueInput | InputJsonValue
+    firewallRules?: NullableJsonNullValueInput | InputJsonValue
+    complianceRequirements?: NullableJsonNullValueInput | InputJsonValue
+    monitoringEnabled?: boolean
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    devices?: DeviceNetworkAssignmentUncheckedCreateNestedManyWithoutSegmentInput
+  }
+
+  export type NetworkSegmentUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    vlanId?: NullableIntFieldUpdateOperationsInput | number | null
+    subnetCidr?: NullableStringFieldUpdateOperationsInput | string | null
+    securityLevel?: EnumSecurityLevelFieldUpdateOperationsInput | $Enums.SecurityLevel
+    isolationLevel?: EnumIsolationLevelFieldUpdateOperationsInput | $Enums.IsolationLevel
+    allowedProtocols?: NullableJsonNullValueInput | InputJsonValue
+    firewallRules?: NullableJsonNullValueInput | InputJsonValue
+    complianceRequirements?: NullableJsonNullValueInput | InputJsonValue
+    monitoringEnabled?: BoolFieldUpdateOperationsInput | boolean
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    devices?: DeviceNetworkAssignmentUpdateManyWithoutSegmentNestedInput
+  }
+
+  export type NetworkSegmentUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    vlanId?: NullableIntFieldUpdateOperationsInput | number | null
+    subnetCidr?: NullableStringFieldUpdateOperationsInput | string | null
+    securityLevel?: EnumSecurityLevelFieldUpdateOperationsInput | $Enums.SecurityLevel
+    isolationLevel?: EnumIsolationLevelFieldUpdateOperationsInput | $Enums.IsolationLevel
+    allowedProtocols?: NullableJsonNullValueInput | InputJsonValue
+    firewallRules?: NullableJsonNullValueInput | InputJsonValue
+    complianceRequirements?: NullableJsonNullValueInput | InputJsonValue
+    monitoringEnabled?: BoolFieldUpdateOperationsInput | boolean
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    devices?: DeviceNetworkAssignmentUncheckedUpdateManyWithoutSegmentNestedInput
+  }
+
+  export type NetworkSegmentCreateManyInput = {
+    id?: string
+    name: string
+    description?: string | null
+    vlanId?: number | null
+    subnetCidr?: string | null
+    securityLevel: $Enums.SecurityLevel
+    isolationLevel?: $Enums.IsolationLevel
+    allowedProtocols?: NullableJsonNullValueInput | InputJsonValue
+    firewallRules?: NullableJsonNullValueInput | InputJsonValue
+    complianceRequirements?: NullableJsonNullValueInput | InputJsonValue
+    monitoringEnabled?: boolean
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type NetworkSegmentUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    vlanId?: NullableIntFieldUpdateOperationsInput | number | null
+    subnetCidr?: NullableStringFieldUpdateOperationsInput | string | null
+    securityLevel?: EnumSecurityLevelFieldUpdateOperationsInput | $Enums.SecurityLevel
+    isolationLevel?: EnumIsolationLevelFieldUpdateOperationsInput | $Enums.IsolationLevel
+    allowedProtocols?: NullableJsonNullValueInput | InputJsonValue
+    firewallRules?: NullableJsonNullValueInput | InputJsonValue
+    complianceRequirements?: NullableJsonNullValueInput | InputJsonValue
+    monitoringEnabled?: BoolFieldUpdateOperationsInput | boolean
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type NetworkSegmentUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    vlanId?: NullableIntFieldUpdateOperationsInput | number | null
+    subnetCidr?: NullableStringFieldUpdateOperationsInput | string | null
+    securityLevel?: EnumSecurityLevelFieldUpdateOperationsInput | $Enums.SecurityLevel
+    isolationLevel?: EnumIsolationLevelFieldUpdateOperationsInput | $Enums.IsolationLevel
+    allowedProtocols?: NullableJsonNullValueInput | InputJsonValue
+    firewallRules?: NullableJsonNullValueInput | InputJsonValue
+    complianceRequirements?: NullableJsonNullValueInput | InputJsonValue
+    monitoringEnabled?: BoolFieldUpdateOperationsInput | boolean
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeviceNetworkAssignmentCreateInput = {
+    id?: string
+    ipAddress?: string | null
+    macAddress?: string | null
+    assignedAt?: Date | string
+    assignedBy: string
+    status?: $Enums.AssignmentStatus
+    complianceStatus?: $Enums.ComplianceStatus
+    lastComplianceCheck?: Date | string | null
+    complianceNotes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    device: MonitoringDeviceCreateNestedOneWithoutNetworkAssignmentsInput
+    segment: NetworkSegmentCreateNestedOneWithoutDevicesInput
+  }
+
+  export type DeviceNetworkAssignmentUncheckedCreateInput = {
+    id?: string
+    deviceId: string
+    segmentId: string
+    ipAddress?: string | null
+    macAddress?: string | null
+    assignedAt?: Date | string
+    assignedBy: string
+    status?: $Enums.AssignmentStatus
+    complianceStatus?: $Enums.ComplianceStatus
+    lastComplianceCheck?: Date | string | null
+    complianceNotes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DeviceNetworkAssignmentUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    macAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assignedBy?: StringFieldUpdateOperationsInput | string
+    status?: EnumAssignmentStatusFieldUpdateOperationsInput | $Enums.AssignmentStatus
+    complianceStatus?: EnumComplianceStatusFieldUpdateOperationsInput | $Enums.ComplianceStatus
+    lastComplianceCheck?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    complianceNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    device?: MonitoringDeviceUpdateOneRequiredWithoutNetworkAssignmentsNestedInput
+    segment?: NetworkSegmentUpdateOneRequiredWithoutDevicesNestedInput
+  }
+
+  export type DeviceNetworkAssignmentUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    deviceId?: StringFieldUpdateOperationsInput | string
+    segmentId?: StringFieldUpdateOperationsInput | string
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    macAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assignedBy?: StringFieldUpdateOperationsInput | string
+    status?: EnumAssignmentStatusFieldUpdateOperationsInput | $Enums.AssignmentStatus
+    complianceStatus?: EnumComplianceStatusFieldUpdateOperationsInput | $Enums.ComplianceStatus
+    lastComplianceCheck?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    complianceNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeviceNetworkAssignmentCreateManyInput = {
+    id?: string
+    deviceId: string
+    segmentId: string
+    ipAddress?: string | null
+    macAddress?: string | null
+    assignedAt?: Date | string
+    assignedBy: string
+    status?: $Enums.AssignmentStatus
+    complianceStatus?: $Enums.ComplianceStatus
+    lastComplianceCheck?: Date | string | null
+    complianceNotes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DeviceNetworkAssignmentUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    macAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assignedBy?: StringFieldUpdateOperationsInput | string
+    status?: EnumAssignmentStatusFieldUpdateOperationsInput | $Enums.AssignmentStatus
+    complianceStatus?: EnumComplianceStatusFieldUpdateOperationsInput | $Enums.ComplianceStatus
+    lastComplianceCheck?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    complianceNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeviceNetworkAssignmentUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    deviceId?: StringFieldUpdateOperationsInput | string
+    segmentId?: StringFieldUpdateOperationsInput | string
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    macAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assignedBy?: StringFieldUpdateOperationsInput | string
+    status?: EnumAssignmentStatusFieldUpdateOperationsInput | $Enums.AssignmentStatus
+    complianceStatus?: EnumComplianceStatusFieldUpdateOperationsInput | $Enums.ComplianceStatus
+    lastComplianceCheck?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    complianceNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FDARecallCreateInput = {
+    id?: string
+    recallNumber: string
+    recallClass: $Enums.RecallClass
+    productDescription: string
+    manufacturer: string
+    reasonForRecall: string
+    distributionPattern?: string | null
+    initiatedDate: Date | string
+    terminatedDate?: Date | string | null
+    status?: $Enums.RecallStatus
+    affectedModels?: NullableJsonNullValueInput | InputJsonValue
+    lotNumbers?: NullableJsonNullValueInput | InputJsonValue
+    healthHazard?: string | null
+    remedyDescription?: string | null
+    lastCheckedAt?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    affectedDevices?: DeviceRecallStatusCreateNestedManyWithoutRecallInput
+  }
+
+  export type FDARecallUncheckedCreateInput = {
+    id?: string
+    recallNumber: string
+    recallClass: $Enums.RecallClass
+    productDescription: string
+    manufacturer: string
+    reasonForRecall: string
+    distributionPattern?: string | null
+    initiatedDate: Date | string
+    terminatedDate?: Date | string | null
+    status?: $Enums.RecallStatus
+    affectedModels?: NullableJsonNullValueInput | InputJsonValue
+    lotNumbers?: NullableJsonNullValueInput | InputJsonValue
+    healthHazard?: string | null
+    remedyDescription?: string | null
+    lastCheckedAt?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    affectedDevices?: DeviceRecallStatusUncheckedCreateNestedManyWithoutRecallInput
+  }
+
+  export type FDARecallUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    recallNumber?: StringFieldUpdateOperationsInput | string
+    recallClass?: EnumRecallClassFieldUpdateOperationsInput | $Enums.RecallClass
+    productDescription?: StringFieldUpdateOperationsInput | string
+    manufacturer?: StringFieldUpdateOperationsInput | string
+    reasonForRecall?: StringFieldUpdateOperationsInput | string
+    distributionPattern?: NullableStringFieldUpdateOperationsInput | string | null
+    initiatedDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    terminatedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumRecallStatusFieldUpdateOperationsInput | $Enums.RecallStatus
+    affectedModels?: NullableJsonNullValueInput | InputJsonValue
+    lotNumbers?: NullableJsonNullValueInput | InputJsonValue
+    healthHazard?: NullableStringFieldUpdateOperationsInput | string | null
+    remedyDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    lastCheckedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    affectedDevices?: DeviceRecallStatusUpdateManyWithoutRecallNestedInput
+  }
+
+  export type FDARecallUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    recallNumber?: StringFieldUpdateOperationsInput | string
+    recallClass?: EnumRecallClassFieldUpdateOperationsInput | $Enums.RecallClass
+    productDescription?: StringFieldUpdateOperationsInput | string
+    manufacturer?: StringFieldUpdateOperationsInput | string
+    reasonForRecall?: StringFieldUpdateOperationsInput | string
+    distributionPattern?: NullableStringFieldUpdateOperationsInput | string | null
+    initiatedDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    terminatedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumRecallStatusFieldUpdateOperationsInput | $Enums.RecallStatus
+    affectedModels?: NullableJsonNullValueInput | InputJsonValue
+    lotNumbers?: NullableJsonNullValueInput | InputJsonValue
+    healthHazard?: NullableStringFieldUpdateOperationsInput | string | null
+    remedyDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    lastCheckedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    affectedDevices?: DeviceRecallStatusUncheckedUpdateManyWithoutRecallNestedInput
+  }
+
+  export type FDARecallCreateManyInput = {
+    id?: string
+    recallNumber: string
+    recallClass: $Enums.RecallClass
+    productDescription: string
+    manufacturer: string
+    reasonForRecall: string
+    distributionPattern?: string | null
+    initiatedDate: Date | string
+    terminatedDate?: Date | string | null
+    status?: $Enums.RecallStatus
+    affectedModels?: NullableJsonNullValueInput | InputJsonValue
+    lotNumbers?: NullableJsonNullValueInput | InputJsonValue
+    healthHazard?: string | null
+    remedyDescription?: string | null
+    lastCheckedAt?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FDARecallUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    recallNumber?: StringFieldUpdateOperationsInput | string
+    recallClass?: EnumRecallClassFieldUpdateOperationsInput | $Enums.RecallClass
+    productDescription?: StringFieldUpdateOperationsInput | string
+    manufacturer?: StringFieldUpdateOperationsInput | string
+    reasonForRecall?: StringFieldUpdateOperationsInput | string
+    distributionPattern?: NullableStringFieldUpdateOperationsInput | string | null
+    initiatedDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    terminatedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumRecallStatusFieldUpdateOperationsInput | $Enums.RecallStatus
+    affectedModels?: NullableJsonNullValueInput | InputJsonValue
+    lotNumbers?: NullableJsonNullValueInput | InputJsonValue
+    healthHazard?: NullableStringFieldUpdateOperationsInput | string | null
+    remedyDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    lastCheckedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FDARecallUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    recallNumber?: StringFieldUpdateOperationsInput | string
+    recallClass?: EnumRecallClassFieldUpdateOperationsInput | $Enums.RecallClass
+    productDescription?: StringFieldUpdateOperationsInput | string
+    manufacturer?: StringFieldUpdateOperationsInput | string
+    reasonForRecall?: StringFieldUpdateOperationsInput | string
+    distributionPattern?: NullableStringFieldUpdateOperationsInput | string | null
+    initiatedDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    terminatedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumRecallStatusFieldUpdateOperationsInput | $Enums.RecallStatus
+    affectedModels?: NullableJsonNullValueInput | InputJsonValue
+    lotNumbers?: NullableJsonNullValueInput | InputJsonValue
+    healthHazard?: NullableStringFieldUpdateOperationsInput | string | null
+    remedyDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    lastCheckedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeviceRecallStatusCreateInput = {
+    id?: string
+    status?: $Enums.DeviceRecallAction
+    actionTaken?: string | null
+    actionDate?: Date | string | null
+    actionBy?: string | null
+    notes?: string | null
+    patientNotified?: boolean
+    providerNotified?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    device: MonitoringDeviceCreateNestedOneWithoutRecallStatusesInput
+    recall: FDARecallCreateNestedOneWithoutAffectedDevicesInput
+  }
+
+  export type DeviceRecallStatusUncheckedCreateInput = {
+    id?: string
+    deviceId: string
+    recallId: string
+    status?: $Enums.DeviceRecallAction
+    actionTaken?: string | null
+    actionDate?: Date | string | null
+    actionBy?: string | null
+    notes?: string | null
+    patientNotified?: boolean
+    providerNotified?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DeviceRecallStatusUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumDeviceRecallActionFieldUpdateOperationsInput | $Enums.DeviceRecallAction
+    actionTaken?: NullableStringFieldUpdateOperationsInput | string | null
+    actionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    actionBy?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    patientNotified?: BoolFieldUpdateOperationsInput | boolean
+    providerNotified?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    device?: MonitoringDeviceUpdateOneRequiredWithoutRecallStatusesNestedInput
+    recall?: FDARecallUpdateOneRequiredWithoutAffectedDevicesNestedInput
+  }
+
+  export type DeviceRecallStatusUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    deviceId?: StringFieldUpdateOperationsInput | string
+    recallId?: StringFieldUpdateOperationsInput | string
+    status?: EnumDeviceRecallActionFieldUpdateOperationsInput | $Enums.DeviceRecallAction
+    actionTaken?: NullableStringFieldUpdateOperationsInput | string | null
+    actionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    actionBy?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    patientNotified?: BoolFieldUpdateOperationsInput | boolean
+    providerNotified?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeviceRecallStatusCreateManyInput = {
+    id?: string
+    deviceId: string
+    recallId: string
+    status?: $Enums.DeviceRecallAction
+    actionTaken?: string | null
+    actionDate?: Date | string | null
+    actionBy?: string | null
+    notes?: string | null
+    patientNotified?: boolean
+    providerNotified?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DeviceRecallStatusUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumDeviceRecallActionFieldUpdateOperationsInput | $Enums.DeviceRecallAction
+    actionTaken?: NullableStringFieldUpdateOperationsInput | string | null
+    actionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    actionBy?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    patientNotified?: BoolFieldUpdateOperationsInput | boolean
+    providerNotified?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeviceRecallStatusUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    deviceId?: StringFieldUpdateOperationsInput | string
+    recallId?: StringFieldUpdateOperationsInput | string
+    status?: EnumDeviceRecallActionFieldUpdateOperationsInput | $Enums.DeviceRecallAction
+    actionTaken?: NullableStringFieldUpdateOperationsInput | string | null
+    actionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    actionBy?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    patientNotified?: BoolFieldUpdateOperationsInput | boolean
+    providerNotified?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SecurityAuditLogCreateInput = {
+    id?: string
+    entityType: string
+    entityId: string
+    action: string
+    performedBy: string
+    performedByRole?: string | null
+    previousState?: NullableJsonNullValueInput | InputJsonValue
+    newState?: NullableJsonNullValueInput | InputJsonValue
+    ipAddress?: string | null
+    userAgent?: string | null
+    details?: string | null
+    riskLevel?: string | null
+    createdAt?: Date | string
+  }
+
+  export type SecurityAuditLogUncheckedCreateInput = {
+    id?: string
+    entityType: string
+    entityId: string
+    action: string
+    performedBy: string
+    performedByRole?: string | null
+    previousState?: NullableJsonNullValueInput | InputJsonValue
+    newState?: NullableJsonNullValueInput | InputJsonValue
+    ipAddress?: string | null
+    userAgent?: string | null
+    details?: string | null
+    riskLevel?: string | null
+    createdAt?: Date | string
+  }
+
+  export type SecurityAuditLogUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    entityType?: StringFieldUpdateOperationsInput | string
+    entityId?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    performedBy?: StringFieldUpdateOperationsInput | string
+    performedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    previousState?: NullableJsonNullValueInput | InputJsonValue
+    newState?: NullableJsonNullValueInput | InputJsonValue
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    userAgent?: NullableStringFieldUpdateOperationsInput | string | null
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    riskLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SecurityAuditLogUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    entityType?: StringFieldUpdateOperationsInput | string
+    entityId?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    performedBy?: StringFieldUpdateOperationsInput | string
+    performedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    previousState?: NullableJsonNullValueInput | InputJsonValue
+    newState?: NullableJsonNullValueInput | InputJsonValue
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    userAgent?: NullableStringFieldUpdateOperationsInput | string | null
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    riskLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SecurityAuditLogCreateManyInput = {
+    id?: string
+    entityType: string
+    entityId: string
+    action: string
+    performedBy: string
+    performedByRole?: string | null
+    previousState?: NullableJsonNullValueInput | InputJsonValue
+    newState?: NullableJsonNullValueInput | InputJsonValue
+    ipAddress?: string | null
+    userAgent?: string | null
+    details?: string | null
+    riskLevel?: string | null
+    createdAt?: Date | string
+  }
+
+  export type SecurityAuditLogUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    entityType?: StringFieldUpdateOperationsInput | string
+    entityId?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    performedBy?: StringFieldUpdateOperationsInput | string
+    performedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    previousState?: NullableJsonNullValueInput | InputJsonValue
+    newState?: NullableJsonNullValueInput | InputJsonValue
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    userAgent?: NullableStringFieldUpdateOperationsInput | string | null
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    riskLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SecurityAuditLogUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    entityType?: StringFieldUpdateOperationsInput | string
+    entityId?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    performedBy?: StringFieldUpdateOperationsInput | string
+    performedByRole?: NullableStringFieldUpdateOperationsInput | string | null
+    previousState?: NullableJsonNullValueInput | InputJsonValue
+    newState?: NullableJsonNullValueInput | InputJsonValue
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    userAgent?: NullableStringFieldUpdateOperationsInput | string | null
+    details?: NullableStringFieldUpdateOperationsInput | string | null
+    riskLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ManufacturerAdvisoryCreateInput = {
+    id?: string
+    manufacturer: string
+    advisoryId: string
+    title: string
+    description: string
+    severity: $Enums.VulnerabilitySeverity
+    affectedProducts: JsonNullValueInput | InputJsonValue
+    affectedVersions?: NullableJsonNullValueInput | InputJsonValue
+    fixedVersion?: string | null
+    workaround?: string | null
+    publishedDate: Date | string
+    lastUpdatedDate?: Date | string | null
+    cveReferences?: NullableJsonNullValueInput | InputJsonValue
+    status?: $Enums.AdvisoryStatus
+    source?: string | null
+    acknowledgedAt?: Date | string | null
+    acknowledgedBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ManufacturerAdvisoryUncheckedCreateInput = {
+    id?: string
+    manufacturer: string
+    advisoryId: string
+    title: string
+    description: string
+    severity: $Enums.VulnerabilitySeverity
+    affectedProducts: JsonNullValueInput | InputJsonValue
+    affectedVersions?: NullableJsonNullValueInput | InputJsonValue
+    fixedVersion?: string | null
+    workaround?: string | null
+    publishedDate: Date | string
+    lastUpdatedDate?: Date | string | null
+    cveReferences?: NullableJsonNullValueInput | InputJsonValue
+    status?: $Enums.AdvisoryStatus
+    source?: string | null
+    acknowledgedAt?: Date | string | null
+    acknowledgedBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ManufacturerAdvisoryUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    manufacturer?: StringFieldUpdateOperationsInput | string
+    advisoryId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    severity?: EnumVulnerabilitySeverityFieldUpdateOperationsInput | $Enums.VulnerabilitySeverity
+    affectedProducts?: JsonNullValueInput | InputJsonValue
+    affectedVersions?: NullableJsonNullValueInput | InputJsonValue
+    fixedVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    workaround?: NullableStringFieldUpdateOperationsInput | string | null
+    publishedDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastUpdatedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cveReferences?: NullableJsonNullValueInput | InputJsonValue
+    status?: EnumAdvisoryStatusFieldUpdateOperationsInput | $Enums.AdvisoryStatus
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    acknowledgedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    acknowledgedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ManufacturerAdvisoryUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    manufacturer?: StringFieldUpdateOperationsInput | string
+    advisoryId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    severity?: EnumVulnerabilitySeverityFieldUpdateOperationsInput | $Enums.VulnerabilitySeverity
+    affectedProducts?: JsonNullValueInput | InputJsonValue
+    affectedVersions?: NullableJsonNullValueInput | InputJsonValue
+    fixedVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    workaround?: NullableStringFieldUpdateOperationsInput | string | null
+    publishedDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastUpdatedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cveReferences?: NullableJsonNullValueInput | InputJsonValue
+    status?: EnumAdvisoryStatusFieldUpdateOperationsInput | $Enums.AdvisoryStatus
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    acknowledgedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    acknowledgedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ManufacturerAdvisoryCreateManyInput = {
+    id?: string
+    manufacturer: string
+    advisoryId: string
+    title: string
+    description: string
+    severity: $Enums.VulnerabilitySeverity
+    affectedProducts: JsonNullValueInput | InputJsonValue
+    affectedVersions?: NullableJsonNullValueInput | InputJsonValue
+    fixedVersion?: string | null
+    workaround?: string | null
+    publishedDate: Date | string
+    lastUpdatedDate?: Date | string | null
+    cveReferences?: NullableJsonNullValueInput | InputJsonValue
+    status?: $Enums.AdvisoryStatus
+    source?: string | null
+    acknowledgedAt?: Date | string | null
+    acknowledgedBy?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ManufacturerAdvisoryUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    manufacturer?: StringFieldUpdateOperationsInput | string
+    advisoryId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    severity?: EnumVulnerabilitySeverityFieldUpdateOperationsInput | $Enums.VulnerabilitySeverity
+    affectedProducts?: JsonNullValueInput | InputJsonValue
+    affectedVersions?: NullableJsonNullValueInput | InputJsonValue
+    fixedVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    workaround?: NullableStringFieldUpdateOperationsInput | string | null
+    publishedDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastUpdatedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cveReferences?: NullableJsonNullValueInput | InputJsonValue
+    status?: EnumAdvisoryStatusFieldUpdateOperationsInput | $Enums.AdvisoryStatus
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    acknowledgedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    acknowledgedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ManufacturerAdvisoryUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    manufacturer?: StringFieldUpdateOperationsInput | string
+    advisoryId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    severity?: EnumVulnerabilitySeverityFieldUpdateOperationsInput | $Enums.VulnerabilitySeverity
+    affectedProducts?: JsonNullValueInput | InputJsonValue
+    affectedVersions?: NullableJsonNullValueInput | InputJsonValue
+    fixedVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    workaround?: NullableStringFieldUpdateOperationsInput | string | null
+    publishedDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastUpdatedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cveReferences?: NullableJsonNullValueInput | InputJsonValue
+    status?: EnumAdvisoryStatusFieldUpdateOperationsInput | $Enums.AdvisoryStatus
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    acknowledgedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    acknowledgedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeviceRiskAssessmentCreateInput = {
+    id?: string
+    overallRiskScore: number
+    vulnerabilityScore?: number
+    patchScore?: number
+    networkScore?: number
+    complianceScore?: number
+    incidentScore?: number
+    agingScore?: number
+    riskLevel: $Enums.RiskLevel
+    riskFactors: JsonNullValueInput | InputJsonValue
+    recommendations?: NullableJsonNullValueInput | InputJsonValue
+    assessedAt?: Date | string
+    assessedBy?: string | null
+    nextAssessmentDue?: Date | string | null
+    notes?: string | null
+    createdAt?: Date | string
+    device: MonitoringDeviceCreateNestedOneWithoutRiskAssessmentsInput
+  }
+
+  export type DeviceRiskAssessmentUncheckedCreateInput = {
+    id?: string
+    deviceId: string
+    overallRiskScore: number
+    vulnerabilityScore?: number
+    patchScore?: number
+    networkScore?: number
+    complianceScore?: number
+    incidentScore?: number
+    agingScore?: number
+    riskLevel: $Enums.RiskLevel
+    riskFactors: JsonNullValueInput | InputJsonValue
+    recommendations?: NullableJsonNullValueInput | InputJsonValue
+    assessedAt?: Date | string
+    assessedBy?: string | null
+    nextAssessmentDue?: Date | string | null
+    notes?: string | null
+    createdAt?: Date | string
+  }
+
+  export type DeviceRiskAssessmentUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    overallRiskScore?: FloatFieldUpdateOperationsInput | number
+    vulnerabilityScore?: FloatFieldUpdateOperationsInput | number
+    patchScore?: FloatFieldUpdateOperationsInput | number
+    networkScore?: FloatFieldUpdateOperationsInput | number
+    complianceScore?: FloatFieldUpdateOperationsInput | number
+    incidentScore?: FloatFieldUpdateOperationsInput | number
+    agingScore?: FloatFieldUpdateOperationsInput | number
+    riskLevel?: EnumRiskLevelFieldUpdateOperationsInput | $Enums.RiskLevel
+    riskFactors?: JsonNullValueInput | InputJsonValue
+    recommendations?: NullableJsonNullValueInput | InputJsonValue
+    assessedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assessedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    nextAssessmentDue?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    device?: MonitoringDeviceUpdateOneRequiredWithoutRiskAssessmentsNestedInput
+  }
+
+  export type DeviceRiskAssessmentUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    deviceId?: StringFieldUpdateOperationsInput | string
+    overallRiskScore?: FloatFieldUpdateOperationsInput | number
+    vulnerabilityScore?: FloatFieldUpdateOperationsInput | number
+    patchScore?: FloatFieldUpdateOperationsInput | number
+    networkScore?: FloatFieldUpdateOperationsInput | number
+    complianceScore?: FloatFieldUpdateOperationsInput | number
+    incidentScore?: FloatFieldUpdateOperationsInput | number
+    agingScore?: FloatFieldUpdateOperationsInput | number
+    riskLevel?: EnumRiskLevelFieldUpdateOperationsInput | $Enums.RiskLevel
+    riskFactors?: JsonNullValueInput | InputJsonValue
+    recommendations?: NullableJsonNullValueInput | InputJsonValue
+    assessedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assessedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    nextAssessmentDue?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeviceRiskAssessmentCreateManyInput = {
+    id?: string
+    deviceId: string
+    overallRiskScore: number
+    vulnerabilityScore?: number
+    patchScore?: number
+    networkScore?: number
+    complianceScore?: number
+    incidentScore?: number
+    agingScore?: number
+    riskLevel: $Enums.RiskLevel
+    riskFactors: JsonNullValueInput | InputJsonValue
+    recommendations?: NullableJsonNullValueInput | InputJsonValue
+    assessedAt?: Date | string
+    assessedBy?: string | null
+    nextAssessmentDue?: Date | string | null
+    notes?: string | null
+    createdAt?: Date | string
+  }
+
+  export type DeviceRiskAssessmentUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    overallRiskScore?: FloatFieldUpdateOperationsInput | number
+    vulnerabilityScore?: FloatFieldUpdateOperationsInput | number
+    patchScore?: FloatFieldUpdateOperationsInput | number
+    networkScore?: FloatFieldUpdateOperationsInput | number
+    complianceScore?: FloatFieldUpdateOperationsInput | number
+    incidentScore?: FloatFieldUpdateOperationsInput | number
+    agingScore?: FloatFieldUpdateOperationsInput | number
+    riskLevel?: EnumRiskLevelFieldUpdateOperationsInput | $Enums.RiskLevel
+    riskFactors?: JsonNullValueInput | InputJsonValue
+    recommendations?: NullableJsonNullValueInput | InputJsonValue
+    assessedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assessedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    nextAssessmentDue?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeviceRiskAssessmentUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    deviceId?: StringFieldUpdateOperationsInput | string
+    overallRiskScore?: FloatFieldUpdateOperationsInput | number
+    vulnerabilityScore?: FloatFieldUpdateOperationsInput | number
+    patchScore?: FloatFieldUpdateOperationsInput | number
+    networkScore?: FloatFieldUpdateOperationsInput | number
+    complianceScore?: FloatFieldUpdateOperationsInput | number
+    incidentScore?: FloatFieldUpdateOperationsInput | number
+    agingScore?: FloatFieldUpdateOperationsInput | number
+    riskLevel?: EnumRiskLevelFieldUpdateOperationsInput | $Enums.RiskLevel
+    riskFactors?: JsonNullValueInput | InputJsonValue
+    recommendations?: NullableJsonNullValueInput | InputJsonValue
+    assessedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assessedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    nextAssessmentDue?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -15059,6 +30344,66 @@ export namespace Prisma {
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
+  export type DeviceVulnerabilityListRelationFilter = {
+    every?: DeviceVulnerabilityWhereInput
+    some?: DeviceVulnerabilityWhereInput
+    none?: DeviceVulnerabilityWhereInput
+  }
+
+  export type DevicePatchListRelationFilter = {
+    every?: DevicePatchWhereInput
+    some?: DevicePatchWhereInput
+    none?: DevicePatchWhereInput
+  }
+
+  export type SecurityIncidentListRelationFilter = {
+    every?: SecurityIncidentWhereInput
+    some?: SecurityIncidentWhereInput
+    none?: SecurityIncidentWhereInput
+  }
+
+  export type DeviceNetworkAssignmentListRelationFilter = {
+    every?: DeviceNetworkAssignmentWhereInput
+    some?: DeviceNetworkAssignmentWhereInput
+    none?: DeviceNetworkAssignmentWhereInput
+  }
+
+  export type DeviceRecallStatusListRelationFilter = {
+    every?: DeviceRecallStatusWhereInput
+    some?: DeviceRecallStatusWhereInput
+    none?: DeviceRecallStatusWhereInput
+  }
+
+  export type DeviceRiskAssessmentListRelationFilter = {
+    every?: DeviceRiskAssessmentWhereInput
+    some?: DeviceRiskAssessmentWhereInput
+    none?: DeviceRiskAssessmentWhereInput
+  }
+
+  export type DeviceVulnerabilityOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type DevicePatchOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type SecurityIncidentOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type DeviceNetworkAssignmentOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type DeviceRecallStatusOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type DeviceRiskAssessmentOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type MonitoringDeviceCountOrderByAggregateInput = {
     id?: SortOrder
     patientId?: SortOrder
@@ -15069,6 +30414,10 @@ export namespace Prisma {
     status?: SortOrder
     lastSyncAt?: SortOrder
     batteryLevel?: SortOrder
+    firmwareVersion?: SortOrder
+    softwareVersion?: SortOrder
+    certificateExpiry?: SortOrder
+    lastSecurityScan?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -15087,6 +30436,10 @@ export namespace Prisma {
     status?: SortOrder
     lastSyncAt?: SortOrder
     batteryLevel?: SortOrder
+    firmwareVersion?: SortOrder
+    softwareVersion?: SortOrder
+    certificateExpiry?: SortOrder
+    lastSecurityScan?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -15101,6 +30454,10 @@ export namespace Prisma {
     status?: SortOrder
     lastSyncAt?: SortOrder
     batteryLevel?: SortOrder
+    firmwareVersion?: SortOrder
+    softwareVersion?: SortOrder
+    certificateExpiry?: SortOrder
+    lastSecurityScan?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -15781,6 +31138,901 @@ export namespace Prisma {
     _max?: NestedEnumEngagementTypeFilter<$PrismaModel>
   }
 
+  export type EnumVulnerabilitySeverityFilter<$PrismaModel = never> = {
+    equals?: $Enums.VulnerabilitySeverity | EnumVulnerabilitySeverityFieldRefInput<$PrismaModel>
+    in?: $Enums.VulnerabilitySeverity[] | ListEnumVulnerabilitySeverityFieldRefInput<$PrismaModel>
+    notIn?: $Enums.VulnerabilitySeverity[] | ListEnumVulnerabilitySeverityFieldRefInput<$PrismaModel>
+    not?: NestedEnumVulnerabilitySeverityFilter<$PrismaModel> | $Enums.VulnerabilitySeverity
+  }
+
+  export type EnumVulnerabilityStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.VulnerabilityStatus | EnumVulnerabilityStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.VulnerabilityStatus[] | ListEnumVulnerabilityStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.VulnerabilityStatus[] | ListEnumVulnerabilityStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumVulnerabilityStatusFilter<$PrismaModel> | $Enums.VulnerabilityStatus
+  }
+
+  export type MonitoringDeviceRelationFilter = {
+    is?: MonitoringDeviceWhereInput
+    isNot?: MonitoringDeviceWhereInput
+  }
+
+  export type DeviceVulnerabilityCountOrderByAggregateInput = {
+    id?: SortOrder
+    deviceId?: SortOrder
+    cveId?: SortOrder
+    title?: SortOrder
+    description?: SortOrder
+    severity?: SortOrder
+    cvssScore?: SortOrder
+    affectedVersion?: SortOrder
+    fixedVersion?: SortOrder
+    exploitAvailable?: SortOrder
+    status?: SortOrder
+    discoveredAt?: SortOrder
+    resolvedAt?: SortOrder
+    resolvedBy?: SortOrder
+    resolutionNotes?: SortOrder
+    source?: SortOrder
+    references?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DeviceVulnerabilityAvgOrderByAggregateInput = {
+    cvssScore?: SortOrder
+  }
+
+  export type DeviceVulnerabilityMaxOrderByAggregateInput = {
+    id?: SortOrder
+    deviceId?: SortOrder
+    cveId?: SortOrder
+    title?: SortOrder
+    description?: SortOrder
+    severity?: SortOrder
+    cvssScore?: SortOrder
+    affectedVersion?: SortOrder
+    fixedVersion?: SortOrder
+    exploitAvailable?: SortOrder
+    status?: SortOrder
+    discoveredAt?: SortOrder
+    resolvedAt?: SortOrder
+    resolvedBy?: SortOrder
+    resolutionNotes?: SortOrder
+    source?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DeviceVulnerabilityMinOrderByAggregateInput = {
+    id?: SortOrder
+    deviceId?: SortOrder
+    cveId?: SortOrder
+    title?: SortOrder
+    description?: SortOrder
+    severity?: SortOrder
+    cvssScore?: SortOrder
+    affectedVersion?: SortOrder
+    fixedVersion?: SortOrder
+    exploitAvailable?: SortOrder
+    status?: SortOrder
+    discoveredAt?: SortOrder
+    resolvedAt?: SortOrder
+    resolvedBy?: SortOrder
+    resolutionNotes?: SortOrder
+    source?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DeviceVulnerabilitySumOrderByAggregateInput = {
+    cvssScore?: SortOrder
+  }
+
+  export type EnumVulnerabilitySeverityWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.VulnerabilitySeverity | EnumVulnerabilitySeverityFieldRefInput<$PrismaModel>
+    in?: $Enums.VulnerabilitySeverity[] | ListEnumVulnerabilitySeverityFieldRefInput<$PrismaModel>
+    notIn?: $Enums.VulnerabilitySeverity[] | ListEnumVulnerabilitySeverityFieldRefInput<$PrismaModel>
+    not?: NestedEnumVulnerabilitySeverityWithAggregatesFilter<$PrismaModel> | $Enums.VulnerabilitySeverity
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumVulnerabilitySeverityFilter<$PrismaModel>
+    _max?: NestedEnumVulnerabilitySeverityFilter<$PrismaModel>
+  }
+
+  export type EnumVulnerabilityStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.VulnerabilityStatus | EnumVulnerabilityStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.VulnerabilityStatus[] | ListEnumVulnerabilityStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.VulnerabilityStatus[] | ListEnumVulnerabilityStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumVulnerabilityStatusWithAggregatesFilter<$PrismaModel> | $Enums.VulnerabilityStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumVulnerabilityStatusFilter<$PrismaModel>
+    _max?: NestedEnumVulnerabilityStatusFilter<$PrismaModel>
+  }
+
+  export type EnumPatchCriticalityFilter<$PrismaModel = never> = {
+    equals?: $Enums.PatchCriticality | EnumPatchCriticalityFieldRefInput<$PrismaModel>
+    in?: $Enums.PatchCriticality[] | ListEnumPatchCriticalityFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PatchCriticality[] | ListEnumPatchCriticalityFieldRefInput<$PrismaModel>
+    not?: NestedEnumPatchCriticalityFilter<$PrismaModel> | $Enums.PatchCriticality
+  }
+
+  export type EnumPatchStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.PatchStatus | EnumPatchStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.PatchStatus[] | ListEnumPatchStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PatchStatus[] | ListEnumPatchStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumPatchStatusFilter<$PrismaModel> | $Enums.PatchStatus
+  }
+
+  export type DevicePatchCountOrderByAggregateInput = {
+    id?: SortOrder
+    deviceId?: SortOrder
+    patchVersion?: SortOrder
+    currentVersion?: SortOrder
+    description?: SortOrder
+    releaseNotes?: SortOrder
+    criticality?: SortOrder
+    scheduledDate?: SortOrder
+    appliedDate?: SortOrder
+    appliedBy?: SortOrder
+    status?: SortOrder
+    rollbackVersion?: SortOrder
+    testingRequired?: SortOrder
+    testingCompletedAt?: SortOrder
+    testingNotes?: SortOrder
+    approvedBy?: SortOrder
+    approvedAt?: SortOrder
+    failureReason?: SortOrder
+    vulnerabilitiesFixed?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DevicePatchMaxOrderByAggregateInput = {
+    id?: SortOrder
+    deviceId?: SortOrder
+    patchVersion?: SortOrder
+    currentVersion?: SortOrder
+    description?: SortOrder
+    releaseNotes?: SortOrder
+    criticality?: SortOrder
+    scheduledDate?: SortOrder
+    appliedDate?: SortOrder
+    appliedBy?: SortOrder
+    status?: SortOrder
+    rollbackVersion?: SortOrder
+    testingRequired?: SortOrder
+    testingCompletedAt?: SortOrder
+    testingNotes?: SortOrder
+    approvedBy?: SortOrder
+    approvedAt?: SortOrder
+    failureReason?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DevicePatchMinOrderByAggregateInput = {
+    id?: SortOrder
+    deviceId?: SortOrder
+    patchVersion?: SortOrder
+    currentVersion?: SortOrder
+    description?: SortOrder
+    releaseNotes?: SortOrder
+    criticality?: SortOrder
+    scheduledDate?: SortOrder
+    appliedDate?: SortOrder
+    appliedBy?: SortOrder
+    status?: SortOrder
+    rollbackVersion?: SortOrder
+    testingRequired?: SortOrder
+    testingCompletedAt?: SortOrder
+    testingNotes?: SortOrder
+    approvedBy?: SortOrder
+    approvedAt?: SortOrder
+    failureReason?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumPatchCriticalityWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PatchCriticality | EnumPatchCriticalityFieldRefInput<$PrismaModel>
+    in?: $Enums.PatchCriticality[] | ListEnumPatchCriticalityFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PatchCriticality[] | ListEnumPatchCriticalityFieldRefInput<$PrismaModel>
+    not?: NestedEnumPatchCriticalityWithAggregatesFilter<$PrismaModel> | $Enums.PatchCriticality
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumPatchCriticalityFilter<$PrismaModel>
+    _max?: NestedEnumPatchCriticalityFilter<$PrismaModel>
+  }
+
+  export type EnumPatchStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PatchStatus | EnumPatchStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.PatchStatus[] | ListEnumPatchStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PatchStatus[] | ListEnumPatchStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumPatchStatusWithAggregatesFilter<$PrismaModel> | $Enums.PatchStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumPatchStatusFilter<$PrismaModel>
+    _max?: NestedEnumPatchStatusFilter<$PrismaModel>
+  }
+
+  export type EnumIncidentTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.IncidentType | EnumIncidentTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.IncidentType[] | ListEnumIncidentTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.IncidentType[] | ListEnumIncidentTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumIncidentTypeFilter<$PrismaModel> | $Enums.IncidentType
+  }
+
+  export type EnumIncidentSeverityFilter<$PrismaModel = never> = {
+    equals?: $Enums.IncidentSeverity | EnumIncidentSeverityFieldRefInput<$PrismaModel>
+    in?: $Enums.IncidentSeverity[] | ListEnumIncidentSeverityFieldRefInput<$PrismaModel>
+    notIn?: $Enums.IncidentSeverity[] | ListEnumIncidentSeverityFieldRefInput<$PrismaModel>
+    not?: NestedEnumIncidentSeverityFilter<$PrismaModel> | $Enums.IncidentSeverity
+  }
+
+  export type EnumIncidentStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.IncidentStatus | EnumIncidentStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.IncidentStatus[] | ListEnumIncidentStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.IncidentStatus[] | ListEnumIncidentStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumIncidentStatusFilter<$PrismaModel> | $Enums.IncidentStatus
+  }
+
+  export type SecurityIncidentCountOrderByAggregateInput = {
+    id?: SortOrder
+    deviceId?: SortOrder
+    incidentType?: SortOrder
+    severity?: SortOrder
+    title?: SortOrder
+    description?: SortOrder
+    affectedSystems?: SortOrder
+    affectedPatients?: SortOrder
+    detectedAt?: SortOrder
+    detectedBy?: SortOrder
+    reportedBy?: SortOrder
+    status?: SortOrder
+    assignedTo?: SortOrder
+    containedAt?: SortOrder
+    resolvedAt?: SortOrder
+    rootCause?: SortOrder
+    remediationSteps?: SortOrder
+    lessonsLearned?: SortOrder
+    timeline?: SortOrder
+    evidence?: SortOrder
+    notificationsSent?: SortOrder
+    regulatoryReported?: SortOrder
+    regulatoryReportDate?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SecurityIncidentMaxOrderByAggregateInput = {
+    id?: SortOrder
+    deviceId?: SortOrder
+    incidentType?: SortOrder
+    severity?: SortOrder
+    title?: SortOrder
+    description?: SortOrder
+    detectedAt?: SortOrder
+    detectedBy?: SortOrder
+    reportedBy?: SortOrder
+    status?: SortOrder
+    assignedTo?: SortOrder
+    containedAt?: SortOrder
+    resolvedAt?: SortOrder
+    rootCause?: SortOrder
+    lessonsLearned?: SortOrder
+    notificationsSent?: SortOrder
+    regulatoryReported?: SortOrder
+    regulatoryReportDate?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SecurityIncidentMinOrderByAggregateInput = {
+    id?: SortOrder
+    deviceId?: SortOrder
+    incidentType?: SortOrder
+    severity?: SortOrder
+    title?: SortOrder
+    description?: SortOrder
+    detectedAt?: SortOrder
+    detectedBy?: SortOrder
+    reportedBy?: SortOrder
+    status?: SortOrder
+    assignedTo?: SortOrder
+    containedAt?: SortOrder
+    resolvedAt?: SortOrder
+    rootCause?: SortOrder
+    lessonsLearned?: SortOrder
+    notificationsSent?: SortOrder
+    regulatoryReported?: SortOrder
+    regulatoryReportDate?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumIncidentTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.IncidentType | EnumIncidentTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.IncidentType[] | ListEnumIncidentTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.IncidentType[] | ListEnumIncidentTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumIncidentTypeWithAggregatesFilter<$PrismaModel> | $Enums.IncidentType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumIncidentTypeFilter<$PrismaModel>
+    _max?: NestedEnumIncidentTypeFilter<$PrismaModel>
+  }
+
+  export type EnumIncidentSeverityWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.IncidentSeverity | EnumIncidentSeverityFieldRefInput<$PrismaModel>
+    in?: $Enums.IncidentSeverity[] | ListEnumIncidentSeverityFieldRefInput<$PrismaModel>
+    notIn?: $Enums.IncidentSeverity[] | ListEnumIncidentSeverityFieldRefInput<$PrismaModel>
+    not?: NestedEnumIncidentSeverityWithAggregatesFilter<$PrismaModel> | $Enums.IncidentSeverity
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumIncidentSeverityFilter<$PrismaModel>
+    _max?: NestedEnumIncidentSeverityFilter<$PrismaModel>
+  }
+
+  export type EnumIncidentStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.IncidentStatus | EnumIncidentStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.IncidentStatus[] | ListEnumIncidentStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.IncidentStatus[] | ListEnumIncidentStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumIncidentStatusWithAggregatesFilter<$PrismaModel> | $Enums.IncidentStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumIncidentStatusFilter<$PrismaModel>
+    _max?: NestedEnumIncidentStatusFilter<$PrismaModel>
+  }
+
+  export type EnumSecurityLevelFilter<$PrismaModel = never> = {
+    equals?: $Enums.SecurityLevel | EnumSecurityLevelFieldRefInput<$PrismaModel>
+    in?: $Enums.SecurityLevel[] | ListEnumSecurityLevelFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SecurityLevel[] | ListEnumSecurityLevelFieldRefInput<$PrismaModel>
+    not?: NestedEnumSecurityLevelFilter<$PrismaModel> | $Enums.SecurityLevel
+  }
+
+  export type EnumIsolationLevelFilter<$PrismaModel = never> = {
+    equals?: $Enums.IsolationLevel | EnumIsolationLevelFieldRefInput<$PrismaModel>
+    in?: $Enums.IsolationLevel[] | ListEnumIsolationLevelFieldRefInput<$PrismaModel>
+    notIn?: $Enums.IsolationLevel[] | ListEnumIsolationLevelFieldRefInput<$PrismaModel>
+    not?: NestedEnumIsolationLevelFilter<$PrismaModel> | $Enums.IsolationLevel
+  }
+
+  export type NetworkSegmentCountOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    vlanId?: SortOrder
+    subnetCidr?: SortOrder
+    securityLevel?: SortOrder
+    isolationLevel?: SortOrder
+    allowedProtocols?: SortOrder
+    firewallRules?: SortOrder
+    complianceRequirements?: SortOrder
+    monitoringEnabled?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type NetworkSegmentAvgOrderByAggregateInput = {
+    vlanId?: SortOrder
+  }
+
+  export type NetworkSegmentMaxOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    vlanId?: SortOrder
+    subnetCidr?: SortOrder
+    securityLevel?: SortOrder
+    isolationLevel?: SortOrder
+    monitoringEnabled?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type NetworkSegmentMinOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    vlanId?: SortOrder
+    subnetCidr?: SortOrder
+    securityLevel?: SortOrder
+    isolationLevel?: SortOrder
+    monitoringEnabled?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type NetworkSegmentSumOrderByAggregateInput = {
+    vlanId?: SortOrder
+  }
+
+  export type EnumSecurityLevelWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SecurityLevel | EnumSecurityLevelFieldRefInput<$PrismaModel>
+    in?: $Enums.SecurityLevel[] | ListEnumSecurityLevelFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SecurityLevel[] | ListEnumSecurityLevelFieldRefInput<$PrismaModel>
+    not?: NestedEnumSecurityLevelWithAggregatesFilter<$PrismaModel> | $Enums.SecurityLevel
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSecurityLevelFilter<$PrismaModel>
+    _max?: NestedEnumSecurityLevelFilter<$PrismaModel>
+  }
+
+  export type EnumIsolationLevelWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.IsolationLevel | EnumIsolationLevelFieldRefInput<$PrismaModel>
+    in?: $Enums.IsolationLevel[] | ListEnumIsolationLevelFieldRefInput<$PrismaModel>
+    notIn?: $Enums.IsolationLevel[] | ListEnumIsolationLevelFieldRefInput<$PrismaModel>
+    not?: NestedEnumIsolationLevelWithAggregatesFilter<$PrismaModel> | $Enums.IsolationLevel
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumIsolationLevelFilter<$PrismaModel>
+    _max?: NestedEnumIsolationLevelFilter<$PrismaModel>
+  }
+
+  export type EnumAssignmentStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.AssignmentStatus | EnumAssignmentStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.AssignmentStatus[] | ListEnumAssignmentStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AssignmentStatus[] | ListEnumAssignmentStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumAssignmentStatusFilter<$PrismaModel> | $Enums.AssignmentStatus
+  }
+
+  export type EnumComplianceStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.ComplianceStatus | EnumComplianceStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.ComplianceStatus[] | ListEnumComplianceStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ComplianceStatus[] | ListEnumComplianceStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumComplianceStatusFilter<$PrismaModel> | $Enums.ComplianceStatus
+  }
+
+  export type NetworkSegmentRelationFilter = {
+    is?: NetworkSegmentWhereInput
+    isNot?: NetworkSegmentWhereInput
+  }
+
+  export type DeviceNetworkAssignmentDeviceIdSegmentIdCompoundUniqueInput = {
+    deviceId: string
+    segmentId: string
+  }
+
+  export type DeviceNetworkAssignmentCountOrderByAggregateInput = {
+    id?: SortOrder
+    deviceId?: SortOrder
+    segmentId?: SortOrder
+    ipAddress?: SortOrder
+    macAddress?: SortOrder
+    assignedAt?: SortOrder
+    assignedBy?: SortOrder
+    status?: SortOrder
+    complianceStatus?: SortOrder
+    lastComplianceCheck?: SortOrder
+    complianceNotes?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DeviceNetworkAssignmentMaxOrderByAggregateInput = {
+    id?: SortOrder
+    deviceId?: SortOrder
+    segmentId?: SortOrder
+    ipAddress?: SortOrder
+    macAddress?: SortOrder
+    assignedAt?: SortOrder
+    assignedBy?: SortOrder
+    status?: SortOrder
+    complianceStatus?: SortOrder
+    lastComplianceCheck?: SortOrder
+    complianceNotes?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DeviceNetworkAssignmentMinOrderByAggregateInput = {
+    id?: SortOrder
+    deviceId?: SortOrder
+    segmentId?: SortOrder
+    ipAddress?: SortOrder
+    macAddress?: SortOrder
+    assignedAt?: SortOrder
+    assignedBy?: SortOrder
+    status?: SortOrder
+    complianceStatus?: SortOrder
+    lastComplianceCheck?: SortOrder
+    complianceNotes?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumAssignmentStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.AssignmentStatus | EnumAssignmentStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.AssignmentStatus[] | ListEnumAssignmentStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AssignmentStatus[] | ListEnumAssignmentStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumAssignmentStatusWithAggregatesFilter<$PrismaModel> | $Enums.AssignmentStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumAssignmentStatusFilter<$PrismaModel>
+    _max?: NestedEnumAssignmentStatusFilter<$PrismaModel>
+  }
+
+  export type EnumComplianceStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ComplianceStatus | EnumComplianceStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.ComplianceStatus[] | ListEnumComplianceStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ComplianceStatus[] | ListEnumComplianceStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumComplianceStatusWithAggregatesFilter<$PrismaModel> | $Enums.ComplianceStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumComplianceStatusFilter<$PrismaModel>
+    _max?: NestedEnumComplianceStatusFilter<$PrismaModel>
+  }
+
+  export type EnumRecallClassFilter<$PrismaModel = never> = {
+    equals?: $Enums.RecallClass | EnumRecallClassFieldRefInput<$PrismaModel>
+    in?: $Enums.RecallClass[] | ListEnumRecallClassFieldRefInput<$PrismaModel>
+    notIn?: $Enums.RecallClass[] | ListEnumRecallClassFieldRefInput<$PrismaModel>
+    not?: NestedEnumRecallClassFilter<$PrismaModel> | $Enums.RecallClass
+  }
+
+  export type EnumRecallStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.RecallStatus | EnumRecallStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.RecallStatus[] | ListEnumRecallStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.RecallStatus[] | ListEnumRecallStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumRecallStatusFilter<$PrismaModel> | $Enums.RecallStatus
+  }
+
+  export type FDARecallCountOrderByAggregateInput = {
+    id?: SortOrder
+    recallNumber?: SortOrder
+    recallClass?: SortOrder
+    productDescription?: SortOrder
+    manufacturer?: SortOrder
+    reasonForRecall?: SortOrder
+    distributionPattern?: SortOrder
+    initiatedDate?: SortOrder
+    terminatedDate?: SortOrder
+    status?: SortOrder
+    affectedModels?: SortOrder
+    lotNumbers?: SortOrder
+    healthHazard?: SortOrder
+    remedyDescription?: SortOrder
+    lastCheckedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FDARecallMaxOrderByAggregateInput = {
+    id?: SortOrder
+    recallNumber?: SortOrder
+    recallClass?: SortOrder
+    productDescription?: SortOrder
+    manufacturer?: SortOrder
+    reasonForRecall?: SortOrder
+    distributionPattern?: SortOrder
+    initiatedDate?: SortOrder
+    terminatedDate?: SortOrder
+    status?: SortOrder
+    healthHazard?: SortOrder
+    remedyDescription?: SortOrder
+    lastCheckedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FDARecallMinOrderByAggregateInput = {
+    id?: SortOrder
+    recallNumber?: SortOrder
+    recallClass?: SortOrder
+    productDescription?: SortOrder
+    manufacturer?: SortOrder
+    reasonForRecall?: SortOrder
+    distributionPattern?: SortOrder
+    initiatedDate?: SortOrder
+    terminatedDate?: SortOrder
+    status?: SortOrder
+    healthHazard?: SortOrder
+    remedyDescription?: SortOrder
+    lastCheckedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumRecallClassWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.RecallClass | EnumRecallClassFieldRefInput<$PrismaModel>
+    in?: $Enums.RecallClass[] | ListEnumRecallClassFieldRefInput<$PrismaModel>
+    notIn?: $Enums.RecallClass[] | ListEnumRecallClassFieldRefInput<$PrismaModel>
+    not?: NestedEnumRecallClassWithAggregatesFilter<$PrismaModel> | $Enums.RecallClass
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumRecallClassFilter<$PrismaModel>
+    _max?: NestedEnumRecallClassFilter<$PrismaModel>
+  }
+
+  export type EnumRecallStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.RecallStatus | EnumRecallStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.RecallStatus[] | ListEnumRecallStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.RecallStatus[] | ListEnumRecallStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumRecallStatusWithAggregatesFilter<$PrismaModel> | $Enums.RecallStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumRecallStatusFilter<$PrismaModel>
+    _max?: NestedEnumRecallStatusFilter<$PrismaModel>
+  }
+
+  export type EnumDeviceRecallActionFilter<$PrismaModel = never> = {
+    equals?: $Enums.DeviceRecallAction | EnumDeviceRecallActionFieldRefInput<$PrismaModel>
+    in?: $Enums.DeviceRecallAction[] | ListEnumDeviceRecallActionFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DeviceRecallAction[] | ListEnumDeviceRecallActionFieldRefInput<$PrismaModel>
+    not?: NestedEnumDeviceRecallActionFilter<$PrismaModel> | $Enums.DeviceRecallAction
+  }
+
+  export type FDARecallRelationFilter = {
+    is?: FDARecallWhereInput
+    isNot?: FDARecallWhereInput
+  }
+
+  export type DeviceRecallStatusDeviceIdRecallIdCompoundUniqueInput = {
+    deviceId: string
+    recallId: string
+  }
+
+  export type DeviceRecallStatusCountOrderByAggregateInput = {
+    id?: SortOrder
+    deviceId?: SortOrder
+    recallId?: SortOrder
+    status?: SortOrder
+    actionTaken?: SortOrder
+    actionDate?: SortOrder
+    actionBy?: SortOrder
+    notes?: SortOrder
+    patientNotified?: SortOrder
+    providerNotified?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DeviceRecallStatusMaxOrderByAggregateInput = {
+    id?: SortOrder
+    deviceId?: SortOrder
+    recallId?: SortOrder
+    status?: SortOrder
+    actionTaken?: SortOrder
+    actionDate?: SortOrder
+    actionBy?: SortOrder
+    notes?: SortOrder
+    patientNotified?: SortOrder
+    providerNotified?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DeviceRecallStatusMinOrderByAggregateInput = {
+    id?: SortOrder
+    deviceId?: SortOrder
+    recallId?: SortOrder
+    status?: SortOrder
+    actionTaken?: SortOrder
+    actionDate?: SortOrder
+    actionBy?: SortOrder
+    notes?: SortOrder
+    patientNotified?: SortOrder
+    providerNotified?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumDeviceRecallActionWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.DeviceRecallAction | EnumDeviceRecallActionFieldRefInput<$PrismaModel>
+    in?: $Enums.DeviceRecallAction[] | ListEnumDeviceRecallActionFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DeviceRecallAction[] | ListEnumDeviceRecallActionFieldRefInput<$PrismaModel>
+    not?: NestedEnumDeviceRecallActionWithAggregatesFilter<$PrismaModel> | $Enums.DeviceRecallAction
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumDeviceRecallActionFilter<$PrismaModel>
+    _max?: NestedEnumDeviceRecallActionFilter<$PrismaModel>
+  }
+
+  export type SecurityAuditLogCountOrderByAggregateInput = {
+    id?: SortOrder
+    entityType?: SortOrder
+    entityId?: SortOrder
+    action?: SortOrder
+    performedBy?: SortOrder
+    performedByRole?: SortOrder
+    previousState?: SortOrder
+    newState?: SortOrder
+    ipAddress?: SortOrder
+    userAgent?: SortOrder
+    details?: SortOrder
+    riskLevel?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type SecurityAuditLogMaxOrderByAggregateInput = {
+    id?: SortOrder
+    entityType?: SortOrder
+    entityId?: SortOrder
+    action?: SortOrder
+    performedBy?: SortOrder
+    performedByRole?: SortOrder
+    ipAddress?: SortOrder
+    userAgent?: SortOrder
+    details?: SortOrder
+    riskLevel?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type SecurityAuditLogMinOrderByAggregateInput = {
+    id?: SortOrder
+    entityType?: SortOrder
+    entityId?: SortOrder
+    action?: SortOrder
+    performedBy?: SortOrder
+    performedByRole?: SortOrder
+    ipAddress?: SortOrder
+    userAgent?: SortOrder
+    details?: SortOrder
+    riskLevel?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type EnumAdvisoryStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.AdvisoryStatus | EnumAdvisoryStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.AdvisoryStatus[] | ListEnumAdvisoryStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AdvisoryStatus[] | ListEnumAdvisoryStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumAdvisoryStatusFilter<$PrismaModel> | $Enums.AdvisoryStatus
+  }
+
+  export type ManufacturerAdvisoryCountOrderByAggregateInput = {
+    id?: SortOrder
+    manufacturer?: SortOrder
+    advisoryId?: SortOrder
+    title?: SortOrder
+    description?: SortOrder
+    severity?: SortOrder
+    affectedProducts?: SortOrder
+    affectedVersions?: SortOrder
+    fixedVersion?: SortOrder
+    workaround?: SortOrder
+    publishedDate?: SortOrder
+    lastUpdatedDate?: SortOrder
+    cveReferences?: SortOrder
+    status?: SortOrder
+    source?: SortOrder
+    acknowledgedAt?: SortOrder
+    acknowledgedBy?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ManufacturerAdvisoryMaxOrderByAggregateInput = {
+    id?: SortOrder
+    manufacturer?: SortOrder
+    advisoryId?: SortOrder
+    title?: SortOrder
+    description?: SortOrder
+    severity?: SortOrder
+    fixedVersion?: SortOrder
+    workaround?: SortOrder
+    publishedDate?: SortOrder
+    lastUpdatedDate?: SortOrder
+    status?: SortOrder
+    source?: SortOrder
+    acknowledgedAt?: SortOrder
+    acknowledgedBy?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ManufacturerAdvisoryMinOrderByAggregateInput = {
+    id?: SortOrder
+    manufacturer?: SortOrder
+    advisoryId?: SortOrder
+    title?: SortOrder
+    description?: SortOrder
+    severity?: SortOrder
+    fixedVersion?: SortOrder
+    workaround?: SortOrder
+    publishedDate?: SortOrder
+    lastUpdatedDate?: SortOrder
+    status?: SortOrder
+    source?: SortOrder
+    acknowledgedAt?: SortOrder
+    acknowledgedBy?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumAdvisoryStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.AdvisoryStatus | EnumAdvisoryStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.AdvisoryStatus[] | ListEnumAdvisoryStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AdvisoryStatus[] | ListEnumAdvisoryStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumAdvisoryStatusWithAggregatesFilter<$PrismaModel> | $Enums.AdvisoryStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumAdvisoryStatusFilter<$PrismaModel>
+    _max?: NestedEnumAdvisoryStatusFilter<$PrismaModel>
+  }
+
+  export type EnumRiskLevelFilter<$PrismaModel = never> = {
+    equals?: $Enums.RiskLevel | EnumRiskLevelFieldRefInput<$PrismaModel>
+    in?: $Enums.RiskLevel[] | ListEnumRiskLevelFieldRefInput<$PrismaModel>
+    notIn?: $Enums.RiskLevel[] | ListEnumRiskLevelFieldRefInput<$PrismaModel>
+    not?: NestedEnumRiskLevelFilter<$PrismaModel> | $Enums.RiskLevel
+  }
+
+  export type DeviceRiskAssessmentCountOrderByAggregateInput = {
+    id?: SortOrder
+    deviceId?: SortOrder
+    overallRiskScore?: SortOrder
+    vulnerabilityScore?: SortOrder
+    patchScore?: SortOrder
+    networkScore?: SortOrder
+    complianceScore?: SortOrder
+    incidentScore?: SortOrder
+    agingScore?: SortOrder
+    riskLevel?: SortOrder
+    riskFactors?: SortOrder
+    recommendations?: SortOrder
+    assessedAt?: SortOrder
+    assessedBy?: SortOrder
+    nextAssessmentDue?: SortOrder
+    notes?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type DeviceRiskAssessmentAvgOrderByAggregateInput = {
+    overallRiskScore?: SortOrder
+    vulnerabilityScore?: SortOrder
+    patchScore?: SortOrder
+    networkScore?: SortOrder
+    complianceScore?: SortOrder
+    incidentScore?: SortOrder
+    agingScore?: SortOrder
+  }
+
+  export type DeviceRiskAssessmentMaxOrderByAggregateInput = {
+    id?: SortOrder
+    deviceId?: SortOrder
+    overallRiskScore?: SortOrder
+    vulnerabilityScore?: SortOrder
+    patchScore?: SortOrder
+    networkScore?: SortOrder
+    complianceScore?: SortOrder
+    incidentScore?: SortOrder
+    agingScore?: SortOrder
+    riskLevel?: SortOrder
+    assessedAt?: SortOrder
+    assessedBy?: SortOrder
+    nextAssessmentDue?: SortOrder
+    notes?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type DeviceRiskAssessmentMinOrderByAggregateInput = {
+    id?: SortOrder
+    deviceId?: SortOrder
+    overallRiskScore?: SortOrder
+    vulnerabilityScore?: SortOrder
+    patchScore?: SortOrder
+    networkScore?: SortOrder
+    complianceScore?: SortOrder
+    incidentScore?: SortOrder
+    agingScore?: SortOrder
+    riskLevel?: SortOrder
+    assessedAt?: SortOrder
+    assessedBy?: SortOrder
+    nextAssessmentDue?: SortOrder
+    notes?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type DeviceRiskAssessmentSumOrderByAggregateInput = {
+    overallRiskScore?: SortOrder
+    vulnerabilityScore?: SortOrder
+    patchScore?: SortOrder
+    networkScore?: SortOrder
+    complianceScore?: SortOrder
+    incidentScore?: SortOrder
+    agingScore?: SortOrder
+  }
+
+  export type EnumRiskLevelWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.RiskLevel | EnumRiskLevelFieldRefInput<$PrismaModel>
+    in?: $Enums.RiskLevel[] | ListEnumRiskLevelFieldRefInput<$PrismaModel>
+    notIn?: $Enums.RiskLevel[] | ListEnumRiskLevelFieldRefInput<$PrismaModel>
+    not?: NestedEnumRiskLevelWithAggregatesFilter<$PrismaModel> | $Enums.RiskLevel
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumRiskLevelFilter<$PrismaModel>
+    _max?: NestedEnumRiskLevelFilter<$PrismaModel>
+  }
+
   export type CareTaskCreateNestedManyWithoutCarePlanInput = {
     create?: XOR<CareTaskCreateWithoutCarePlanInput, CareTaskUncheckedCreateWithoutCarePlanInput> | CareTaskCreateWithoutCarePlanInput[] | CareTaskUncheckedCreateWithoutCarePlanInput[]
     connectOrCreate?: CareTaskCreateOrConnectWithoutCarePlanInput | CareTaskCreateOrConnectWithoutCarePlanInput[]
@@ -15956,11 +32208,95 @@ export namespace Prisma {
     connect?: VitalReadingWhereUniqueInput | VitalReadingWhereUniqueInput[]
   }
 
+  export type DeviceVulnerabilityCreateNestedManyWithoutDeviceInput = {
+    create?: XOR<DeviceVulnerabilityCreateWithoutDeviceInput, DeviceVulnerabilityUncheckedCreateWithoutDeviceInput> | DeviceVulnerabilityCreateWithoutDeviceInput[] | DeviceVulnerabilityUncheckedCreateWithoutDeviceInput[]
+    connectOrCreate?: DeviceVulnerabilityCreateOrConnectWithoutDeviceInput | DeviceVulnerabilityCreateOrConnectWithoutDeviceInput[]
+    createMany?: DeviceVulnerabilityCreateManyDeviceInputEnvelope
+    connect?: DeviceVulnerabilityWhereUniqueInput | DeviceVulnerabilityWhereUniqueInput[]
+  }
+
+  export type DevicePatchCreateNestedManyWithoutDeviceInput = {
+    create?: XOR<DevicePatchCreateWithoutDeviceInput, DevicePatchUncheckedCreateWithoutDeviceInput> | DevicePatchCreateWithoutDeviceInput[] | DevicePatchUncheckedCreateWithoutDeviceInput[]
+    connectOrCreate?: DevicePatchCreateOrConnectWithoutDeviceInput | DevicePatchCreateOrConnectWithoutDeviceInput[]
+    createMany?: DevicePatchCreateManyDeviceInputEnvelope
+    connect?: DevicePatchWhereUniqueInput | DevicePatchWhereUniqueInput[]
+  }
+
+  export type SecurityIncidentCreateNestedManyWithoutDeviceInput = {
+    create?: XOR<SecurityIncidentCreateWithoutDeviceInput, SecurityIncidentUncheckedCreateWithoutDeviceInput> | SecurityIncidentCreateWithoutDeviceInput[] | SecurityIncidentUncheckedCreateWithoutDeviceInput[]
+    connectOrCreate?: SecurityIncidentCreateOrConnectWithoutDeviceInput | SecurityIncidentCreateOrConnectWithoutDeviceInput[]
+    createMany?: SecurityIncidentCreateManyDeviceInputEnvelope
+    connect?: SecurityIncidentWhereUniqueInput | SecurityIncidentWhereUniqueInput[]
+  }
+
+  export type DeviceNetworkAssignmentCreateNestedManyWithoutDeviceInput = {
+    create?: XOR<DeviceNetworkAssignmentCreateWithoutDeviceInput, DeviceNetworkAssignmentUncheckedCreateWithoutDeviceInput> | DeviceNetworkAssignmentCreateWithoutDeviceInput[] | DeviceNetworkAssignmentUncheckedCreateWithoutDeviceInput[]
+    connectOrCreate?: DeviceNetworkAssignmentCreateOrConnectWithoutDeviceInput | DeviceNetworkAssignmentCreateOrConnectWithoutDeviceInput[]
+    createMany?: DeviceNetworkAssignmentCreateManyDeviceInputEnvelope
+    connect?: DeviceNetworkAssignmentWhereUniqueInput | DeviceNetworkAssignmentWhereUniqueInput[]
+  }
+
+  export type DeviceRecallStatusCreateNestedManyWithoutDeviceInput = {
+    create?: XOR<DeviceRecallStatusCreateWithoutDeviceInput, DeviceRecallStatusUncheckedCreateWithoutDeviceInput> | DeviceRecallStatusCreateWithoutDeviceInput[] | DeviceRecallStatusUncheckedCreateWithoutDeviceInput[]
+    connectOrCreate?: DeviceRecallStatusCreateOrConnectWithoutDeviceInput | DeviceRecallStatusCreateOrConnectWithoutDeviceInput[]
+    createMany?: DeviceRecallStatusCreateManyDeviceInputEnvelope
+    connect?: DeviceRecallStatusWhereUniqueInput | DeviceRecallStatusWhereUniqueInput[]
+  }
+
+  export type DeviceRiskAssessmentCreateNestedManyWithoutDeviceInput = {
+    create?: XOR<DeviceRiskAssessmentCreateWithoutDeviceInput, DeviceRiskAssessmentUncheckedCreateWithoutDeviceInput> | DeviceRiskAssessmentCreateWithoutDeviceInput[] | DeviceRiskAssessmentUncheckedCreateWithoutDeviceInput[]
+    connectOrCreate?: DeviceRiskAssessmentCreateOrConnectWithoutDeviceInput | DeviceRiskAssessmentCreateOrConnectWithoutDeviceInput[]
+    createMany?: DeviceRiskAssessmentCreateManyDeviceInputEnvelope
+    connect?: DeviceRiskAssessmentWhereUniqueInput | DeviceRiskAssessmentWhereUniqueInput[]
+  }
+
   export type VitalReadingUncheckedCreateNestedManyWithoutDeviceInput = {
     create?: XOR<VitalReadingCreateWithoutDeviceInput, VitalReadingUncheckedCreateWithoutDeviceInput> | VitalReadingCreateWithoutDeviceInput[] | VitalReadingUncheckedCreateWithoutDeviceInput[]
     connectOrCreate?: VitalReadingCreateOrConnectWithoutDeviceInput | VitalReadingCreateOrConnectWithoutDeviceInput[]
     createMany?: VitalReadingCreateManyDeviceInputEnvelope
     connect?: VitalReadingWhereUniqueInput | VitalReadingWhereUniqueInput[]
+  }
+
+  export type DeviceVulnerabilityUncheckedCreateNestedManyWithoutDeviceInput = {
+    create?: XOR<DeviceVulnerabilityCreateWithoutDeviceInput, DeviceVulnerabilityUncheckedCreateWithoutDeviceInput> | DeviceVulnerabilityCreateWithoutDeviceInput[] | DeviceVulnerabilityUncheckedCreateWithoutDeviceInput[]
+    connectOrCreate?: DeviceVulnerabilityCreateOrConnectWithoutDeviceInput | DeviceVulnerabilityCreateOrConnectWithoutDeviceInput[]
+    createMany?: DeviceVulnerabilityCreateManyDeviceInputEnvelope
+    connect?: DeviceVulnerabilityWhereUniqueInput | DeviceVulnerabilityWhereUniqueInput[]
+  }
+
+  export type DevicePatchUncheckedCreateNestedManyWithoutDeviceInput = {
+    create?: XOR<DevicePatchCreateWithoutDeviceInput, DevicePatchUncheckedCreateWithoutDeviceInput> | DevicePatchCreateWithoutDeviceInput[] | DevicePatchUncheckedCreateWithoutDeviceInput[]
+    connectOrCreate?: DevicePatchCreateOrConnectWithoutDeviceInput | DevicePatchCreateOrConnectWithoutDeviceInput[]
+    createMany?: DevicePatchCreateManyDeviceInputEnvelope
+    connect?: DevicePatchWhereUniqueInput | DevicePatchWhereUniqueInput[]
+  }
+
+  export type SecurityIncidentUncheckedCreateNestedManyWithoutDeviceInput = {
+    create?: XOR<SecurityIncidentCreateWithoutDeviceInput, SecurityIncidentUncheckedCreateWithoutDeviceInput> | SecurityIncidentCreateWithoutDeviceInput[] | SecurityIncidentUncheckedCreateWithoutDeviceInput[]
+    connectOrCreate?: SecurityIncidentCreateOrConnectWithoutDeviceInput | SecurityIncidentCreateOrConnectWithoutDeviceInput[]
+    createMany?: SecurityIncidentCreateManyDeviceInputEnvelope
+    connect?: SecurityIncidentWhereUniqueInput | SecurityIncidentWhereUniqueInput[]
+  }
+
+  export type DeviceNetworkAssignmentUncheckedCreateNestedManyWithoutDeviceInput = {
+    create?: XOR<DeviceNetworkAssignmentCreateWithoutDeviceInput, DeviceNetworkAssignmentUncheckedCreateWithoutDeviceInput> | DeviceNetworkAssignmentCreateWithoutDeviceInput[] | DeviceNetworkAssignmentUncheckedCreateWithoutDeviceInput[]
+    connectOrCreate?: DeviceNetworkAssignmentCreateOrConnectWithoutDeviceInput | DeviceNetworkAssignmentCreateOrConnectWithoutDeviceInput[]
+    createMany?: DeviceNetworkAssignmentCreateManyDeviceInputEnvelope
+    connect?: DeviceNetworkAssignmentWhereUniqueInput | DeviceNetworkAssignmentWhereUniqueInput[]
+  }
+
+  export type DeviceRecallStatusUncheckedCreateNestedManyWithoutDeviceInput = {
+    create?: XOR<DeviceRecallStatusCreateWithoutDeviceInput, DeviceRecallStatusUncheckedCreateWithoutDeviceInput> | DeviceRecallStatusCreateWithoutDeviceInput[] | DeviceRecallStatusUncheckedCreateWithoutDeviceInput[]
+    connectOrCreate?: DeviceRecallStatusCreateOrConnectWithoutDeviceInput | DeviceRecallStatusCreateOrConnectWithoutDeviceInput[]
+    createMany?: DeviceRecallStatusCreateManyDeviceInputEnvelope
+    connect?: DeviceRecallStatusWhereUniqueInput | DeviceRecallStatusWhereUniqueInput[]
+  }
+
+  export type DeviceRiskAssessmentUncheckedCreateNestedManyWithoutDeviceInput = {
+    create?: XOR<DeviceRiskAssessmentCreateWithoutDeviceInput, DeviceRiskAssessmentUncheckedCreateWithoutDeviceInput> | DeviceRiskAssessmentCreateWithoutDeviceInput[] | DeviceRiskAssessmentUncheckedCreateWithoutDeviceInput[]
+    connectOrCreate?: DeviceRiskAssessmentCreateOrConnectWithoutDeviceInput | DeviceRiskAssessmentCreateOrConnectWithoutDeviceInput[]
+    createMany?: DeviceRiskAssessmentCreateManyDeviceInputEnvelope
+    connect?: DeviceRiskAssessmentWhereUniqueInput | DeviceRiskAssessmentWhereUniqueInput[]
   }
 
   export type EnumDeviceTypeFieldUpdateOperationsInput = {
@@ -15993,6 +32329,90 @@ export namespace Prisma {
     deleteMany?: VitalReadingScalarWhereInput | VitalReadingScalarWhereInput[]
   }
 
+  export type DeviceVulnerabilityUpdateManyWithoutDeviceNestedInput = {
+    create?: XOR<DeviceVulnerabilityCreateWithoutDeviceInput, DeviceVulnerabilityUncheckedCreateWithoutDeviceInput> | DeviceVulnerabilityCreateWithoutDeviceInput[] | DeviceVulnerabilityUncheckedCreateWithoutDeviceInput[]
+    connectOrCreate?: DeviceVulnerabilityCreateOrConnectWithoutDeviceInput | DeviceVulnerabilityCreateOrConnectWithoutDeviceInput[]
+    upsert?: DeviceVulnerabilityUpsertWithWhereUniqueWithoutDeviceInput | DeviceVulnerabilityUpsertWithWhereUniqueWithoutDeviceInput[]
+    createMany?: DeviceVulnerabilityCreateManyDeviceInputEnvelope
+    set?: DeviceVulnerabilityWhereUniqueInput | DeviceVulnerabilityWhereUniqueInput[]
+    disconnect?: DeviceVulnerabilityWhereUniqueInput | DeviceVulnerabilityWhereUniqueInput[]
+    delete?: DeviceVulnerabilityWhereUniqueInput | DeviceVulnerabilityWhereUniqueInput[]
+    connect?: DeviceVulnerabilityWhereUniqueInput | DeviceVulnerabilityWhereUniqueInput[]
+    update?: DeviceVulnerabilityUpdateWithWhereUniqueWithoutDeviceInput | DeviceVulnerabilityUpdateWithWhereUniqueWithoutDeviceInput[]
+    updateMany?: DeviceVulnerabilityUpdateManyWithWhereWithoutDeviceInput | DeviceVulnerabilityUpdateManyWithWhereWithoutDeviceInput[]
+    deleteMany?: DeviceVulnerabilityScalarWhereInput | DeviceVulnerabilityScalarWhereInput[]
+  }
+
+  export type DevicePatchUpdateManyWithoutDeviceNestedInput = {
+    create?: XOR<DevicePatchCreateWithoutDeviceInput, DevicePatchUncheckedCreateWithoutDeviceInput> | DevicePatchCreateWithoutDeviceInput[] | DevicePatchUncheckedCreateWithoutDeviceInput[]
+    connectOrCreate?: DevicePatchCreateOrConnectWithoutDeviceInput | DevicePatchCreateOrConnectWithoutDeviceInput[]
+    upsert?: DevicePatchUpsertWithWhereUniqueWithoutDeviceInput | DevicePatchUpsertWithWhereUniqueWithoutDeviceInput[]
+    createMany?: DevicePatchCreateManyDeviceInputEnvelope
+    set?: DevicePatchWhereUniqueInput | DevicePatchWhereUniqueInput[]
+    disconnect?: DevicePatchWhereUniqueInput | DevicePatchWhereUniqueInput[]
+    delete?: DevicePatchWhereUniqueInput | DevicePatchWhereUniqueInput[]
+    connect?: DevicePatchWhereUniqueInput | DevicePatchWhereUniqueInput[]
+    update?: DevicePatchUpdateWithWhereUniqueWithoutDeviceInput | DevicePatchUpdateWithWhereUniqueWithoutDeviceInput[]
+    updateMany?: DevicePatchUpdateManyWithWhereWithoutDeviceInput | DevicePatchUpdateManyWithWhereWithoutDeviceInput[]
+    deleteMany?: DevicePatchScalarWhereInput | DevicePatchScalarWhereInput[]
+  }
+
+  export type SecurityIncidentUpdateManyWithoutDeviceNestedInput = {
+    create?: XOR<SecurityIncidentCreateWithoutDeviceInput, SecurityIncidentUncheckedCreateWithoutDeviceInput> | SecurityIncidentCreateWithoutDeviceInput[] | SecurityIncidentUncheckedCreateWithoutDeviceInput[]
+    connectOrCreate?: SecurityIncidentCreateOrConnectWithoutDeviceInput | SecurityIncidentCreateOrConnectWithoutDeviceInput[]
+    upsert?: SecurityIncidentUpsertWithWhereUniqueWithoutDeviceInput | SecurityIncidentUpsertWithWhereUniqueWithoutDeviceInput[]
+    createMany?: SecurityIncidentCreateManyDeviceInputEnvelope
+    set?: SecurityIncidentWhereUniqueInput | SecurityIncidentWhereUniqueInput[]
+    disconnect?: SecurityIncidentWhereUniqueInput | SecurityIncidentWhereUniqueInput[]
+    delete?: SecurityIncidentWhereUniqueInput | SecurityIncidentWhereUniqueInput[]
+    connect?: SecurityIncidentWhereUniqueInput | SecurityIncidentWhereUniqueInput[]
+    update?: SecurityIncidentUpdateWithWhereUniqueWithoutDeviceInput | SecurityIncidentUpdateWithWhereUniqueWithoutDeviceInput[]
+    updateMany?: SecurityIncidentUpdateManyWithWhereWithoutDeviceInput | SecurityIncidentUpdateManyWithWhereWithoutDeviceInput[]
+    deleteMany?: SecurityIncidentScalarWhereInput | SecurityIncidentScalarWhereInput[]
+  }
+
+  export type DeviceNetworkAssignmentUpdateManyWithoutDeviceNestedInput = {
+    create?: XOR<DeviceNetworkAssignmentCreateWithoutDeviceInput, DeviceNetworkAssignmentUncheckedCreateWithoutDeviceInput> | DeviceNetworkAssignmentCreateWithoutDeviceInput[] | DeviceNetworkAssignmentUncheckedCreateWithoutDeviceInput[]
+    connectOrCreate?: DeviceNetworkAssignmentCreateOrConnectWithoutDeviceInput | DeviceNetworkAssignmentCreateOrConnectWithoutDeviceInput[]
+    upsert?: DeviceNetworkAssignmentUpsertWithWhereUniqueWithoutDeviceInput | DeviceNetworkAssignmentUpsertWithWhereUniqueWithoutDeviceInput[]
+    createMany?: DeviceNetworkAssignmentCreateManyDeviceInputEnvelope
+    set?: DeviceNetworkAssignmentWhereUniqueInput | DeviceNetworkAssignmentWhereUniqueInput[]
+    disconnect?: DeviceNetworkAssignmentWhereUniqueInput | DeviceNetworkAssignmentWhereUniqueInput[]
+    delete?: DeviceNetworkAssignmentWhereUniqueInput | DeviceNetworkAssignmentWhereUniqueInput[]
+    connect?: DeviceNetworkAssignmentWhereUniqueInput | DeviceNetworkAssignmentWhereUniqueInput[]
+    update?: DeviceNetworkAssignmentUpdateWithWhereUniqueWithoutDeviceInput | DeviceNetworkAssignmentUpdateWithWhereUniqueWithoutDeviceInput[]
+    updateMany?: DeviceNetworkAssignmentUpdateManyWithWhereWithoutDeviceInput | DeviceNetworkAssignmentUpdateManyWithWhereWithoutDeviceInput[]
+    deleteMany?: DeviceNetworkAssignmentScalarWhereInput | DeviceNetworkAssignmentScalarWhereInput[]
+  }
+
+  export type DeviceRecallStatusUpdateManyWithoutDeviceNestedInput = {
+    create?: XOR<DeviceRecallStatusCreateWithoutDeviceInput, DeviceRecallStatusUncheckedCreateWithoutDeviceInput> | DeviceRecallStatusCreateWithoutDeviceInput[] | DeviceRecallStatusUncheckedCreateWithoutDeviceInput[]
+    connectOrCreate?: DeviceRecallStatusCreateOrConnectWithoutDeviceInput | DeviceRecallStatusCreateOrConnectWithoutDeviceInput[]
+    upsert?: DeviceRecallStatusUpsertWithWhereUniqueWithoutDeviceInput | DeviceRecallStatusUpsertWithWhereUniqueWithoutDeviceInput[]
+    createMany?: DeviceRecallStatusCreateManyDeviceInputEnvelope
+    set?: DeviceRecallStatusWhereUniqueInput | DeviceRecallStatusWhereUniqueInput[]
+    disconnect?: DeviceRecallStatusWhereUniqueInput | DeviceRecallStatusWhereUniqueInput[]
+    delete?: DeviceRecallStatusWhereUniqueInput | DeviceRecallStatusWhereUniqueInput[]
+    connect?: DeviceRecallStatusWhereUniqueInput | DeviceRecallStatusWhereUniqueInput[]
+    update?: DeviceRecallStatusUpdateWithWhereUniqueWithoutDeviceInput | DeviceRecallStatusUpdateWithWhereUniqueWithoutDeviceInput[]
+    updateMany?: DeviceRecallStatusUpdateManyWithWhereWithoutDeviceInput | DeviceRecallStatusUpdateManyWithWhereWithoutDeviceInput[]
+    deleteMany?: DeviceRecallStatusScalarWhereInput | DeviceRecallStatusScalarWhereInput[]
+  }
+
+  export type DeviceRiskAssessmentUpdateManyWithoutDeviceNestedInput = {
+    create?: XOR<DeviceRiskAssessmentCreateWithoutDeviceInput, DeviceRiskAssessmentUncheckedCreateWithoutDeviceInput> | DeviceRiskAssessmentCreateWithoutDeviceInput[] | DeviceRiskAssessmentUncheckedCreateWithoutDeviceInput[]
+    connectOrCreate?: DeviceRiskAssessmentCreateOrConnectWithoutDeviceInput | DeviceRiskAssessmentCreateOrConnectWithoutDeviceInput[]
+    upsert?: DeviceRiskAssessmentUpsertWithWhereUniqueWithoutDeviceInput | DeviceRiskAssessmentUpsertWithWhereUniqueWithoutDeviceInput[]
+    createMany?: DeviceRiskAssessmentCreateManyDeviceInputEnvelope
+    set?: DeviceRiskAssessmentWhereUniqueInput | DeviceRiskAssessmentWhereUniqueInput[]
+    disconnect?: DeviceRiskAssessmentWhereUniqueInput | DeviceRiskAssessmentWhereUniqueInput[]
+    delete?: DeviceRiskAssessmentWhereUniqueInput | DeviceRiskAssessmentWhereUniqueInput[]
+    connect?: DeviceRiskAssessmentWhereUniqueInput | DeviceRiskAssessmentWhereUniqueInput[]
+    update?: DeviceRiskAssessmentUpdateWithWhereUniqueWithoutDeviceInput | DeviceRiskAssessmentUpdateWithWhereUniqueWithoutDeviceInput[]
+    updateMany?: DeviceRiskAssessmentUpdateManyWithWhereWithoutDeviceInput | DeviceRiskAssessmentUpdateManyWithWhereWithoutDeviceInput[]
+    deleteMany?: DeviceRiskAssessmentScalarWhereInput | DeviceRiskAssessmentScalarWhereInput[]
+  }
+
   export type VitalReadingUncheckedUpdateManyWithoutDeviceNestedInput = {
     create?: XOR<VitalReadingCreateWithoutDeviceInput, VitalReadingUncheckedCreateWithoutDeviceInput> | VitalReadingCreateWithoutDeviceInput[] | VitalReadingUncheckedCreateWithoutDeviceInput[]
     connectOrCreate?: VitalReadingCreateOrConnectWithoutDeviceInput | VitalReadingCreateOrConnectWithoutDeviceInput[]
@@ -16005,6 +32425,90 @@ export namespace Prisma {
     update?: VitalReadingUpdateWithWhereUniqueWithoutDeviceInput | VitalReadingUpdateWithWhereUniqueWithoutDeviceInput[]
     updateMany?: VitalReadingUpdateManyWithWhereWithoutDeviceInput | VitalReadingUpdateManyWithWhereWithoutDeviceInput[]
     deleteMany?: VitalReadingScalarWhereInput | VitalReadingScalarWhereInput[]
+  }
+
+  export type DeviceVulnerabilityUncheckedUpdateManyWithoutDeviceNestedInput = {
+    create?: XOR<DeviceVulnerabilityCreateWithoutDeviceInput, DeviceVulnerabilityUncheckedCreateWithoutDeviceInput> | DeviceVulnerabilityCreateWithoutDeviceInput[] | DeviceVulnerabilityUncheckedCreateWithoutDeviceInput[]
+    connectOrCreate?: DeviceVulnerabilityCreateOrConnectWithoutDeviceInput | DeviceVulnerabilityCreateOrConnectWithoutDeviceInput[]
+    upsert?: DeviceVulnerabilityUpsertWithWhereUniqueWithoutDeviceInput | DeviceVulnerabilityUpsertWithWhereUniqueWithoutDeviceInput[]
+    createMany?: DeviceVulnerabilityCreateManyDeviceInputEnvelope
+    set?: DeviceVulnerabilityWhereUniqueInput | DeviceVulnerabilityWhereUniqueInput[]
+    disconnect?: DeviceVulnerabilityWhereUniqueInput | DeviceVulnerabilityWhereUniqueInput[]
+    delete?: DeviceVulnerabilityWhereUniqueInput | DeviceVulnerabilityWhereUniqueInput[]
+    connect?: DeviceVulnerabilityWhereUniqueInput | DeviceVulnerabilityWhereUniqueInput[]
+    update?: DeviceVulnerabilityUpdateWithWhereUniqueWithoutDeviceInput | DeviceVulnerabilityUpdateWithWhereUniqueWithoutDeviceInput[]
+    updateMany?: DeviceVulnerabilityUpdateManyWithWhereWithoutDeviceInput | DeviceVulnerabilityUpdateManyWithWhereWithoutDeviceInput[]
+    deleteMany?: DeviceVulnerabilityScalarWhereInput | DeviceVulnerabilityScalarWhereInput[]
+  }
+
+  export type DevicePatchUncheckedUpdateManyWithoutDeviceNestedInput = {
+    create?: XOR<DevicePatchCreateWithoutDeviceInput, DevicePatchUncheckedCreateWithoutDeviceInput> | DevicePatchCreateWithoutDeviceInput[] | DevicePatchUncheckedCreateWithoutDeviceInput[]
+    connectOrCreate?: DevicePatchCreateOrConnectWithoutDeviceInput | DevicePatchCreateOrConnectWithoutDeviceInput[]
+    upsert?: DevicePatchUpsertWithWhereUniqueWithoutDeviceInput | DevicePatchUpsertWithWhereUniqueWithoutDeviceInput[]
+    createMany?: DevicePatchCreateManyDeviceInputEnvelope
+    set?: DevicePatchWhereUniqueInput | DevicePatchWhereUniqueInput[]
+    disconnect?: DevicePatchWhereUniqueInput | DevicePatchWhereUniqueInput[]
+    delete?: DevicePatchWhereUniqueInput | DevicePatchWhereUniqueInput[]
+    connect?: DevicePatchWhereUniqueInput | DevicePatchWhereUniqueInput[]
+    update?: DevicePatchUpdateWithWhereUniqueWithoutDeviceInput | DevicePatchUpdateWithWhereUniqueWithoutDeviceInput[]
+    updateMany?: DevicePatchUpdateManyWithWhereWithoutDeviceInput | DevicePatchUpdateManyWithWhereWithoutDeviceInput[]
+    deleteMany?: DevicePatchScalarWhereInput | DevicePatchScalarWhereInput[]
+  }
+
+  export type SecurityIncidentUncheckedUpdateManyWithoutDeviceNestedInput = {
+    create?: XOR<SecurityIncidentCreateWithoutDeviceInput, SecurityIncidentUncheckedCreateWithoutDeviceInput> | SecurityIncidentCreateWithoutDeviceInput[] | SecurityIncidentUncheckedCreateWithoutDeviceInput[]
+    connectOrCreate?: SecurityIncidentCreateOrConnectWithoutDeviceInput | SecurityIncidentCreateOrConnectWithoutDeviceInput[]
+    upsert?: SecurityIncidentUpsertWithWhereUniqueWithoutDeviceInput | SecurityIncidentUpsertWithWhereUniqueWithoutDeviceInput[]
+    createMany?: SecurityIncidentCreateManyDeviceInputEnvelope
+    set?: SecurityIncidentWhereUniqueInput | SecurityIncidentWhereUniqueInput[]
+    disconnect?: SecurityIncidentWhereUniqueInput | SecurityIncidentWhereUniqueInput[]
+    delete?: SecurityIncidentWhereUniqueInput | SecurityIncidentWhereUniqueInput[]
+    connect?: SecurityIncidentWhereUniqueInput | SecurityIncidentWhereUniqueInput[]
+    update?: SecurityIncidentUpdateWithWhereUniqueWithoutDeviceInput | SecurityIncidentUpdateWithWhereUniqueWithoutDeviceInput[]
+    updateMany?: SecurityIncidentUpdateManyWithWhereWithoutDeviceInput | SecurityIncidentUpdateManyWithWhereWithoutDeviceInput[]
+    deleteMany?: SecurityIncidentScalarWhereInput | SecurityIncidentScalarWhereInput[]
+  }
+
+  export type DeviceNetworkAssignmentUncheckedUpdateManyWithoutDeviceNestedInput = {
+    create?: XOR<DeviceNetworkAssignmentCreateWithoutDeviceInput, DeviceNetworkAssignmentUncheckedCreateWithoutDeviceInput> | DeviceNetworkAssignmentCreateWithoutDeviceInput[] | DeviceNetworkAssignmentUncheckedCreateWithoutDeviceInput[]
+    connectOrCreate?: DeviceNetworkAssignmentCreateOrConnectWithoutDeviceInput | DeviceNetworkAssignmentCreateOrConnectWithoutDeviceInput[]
+    upsert?: DeviceNetworkAssignmentUpsertWithWhereUniqueWithoutDeviceInput | DeviceNetworkAssignmentUpsertWithWhereUniqueWithoutDeviceInput[]
+    createMany?: DeviceNetworkAssignmentCreateManyDeviceInputEnvelope
+    set?: DeviceNetworkAssignmentWhereUniqueInput | DeviceNetworkAssignmentWhereUniqueInput[]
+    disconnect?: DeviceNetworkAssignmentWhereUniqueInput | DeviceNetworkAssignmentWhereUniqueInput[]
+    delete?: DeviceNetworkAssignmentWhereUniqueInput | DeviceNetworkAssignmentWhereUniqueInput[]
+    connect?: DeviceNetworkAssignmentWhereUniqueInput | DeviceNetworkAssignmentWhereUniqueInput[]
+    update?: DeviceNetworkAssignmentUpdateWithWhereUniqueWithoutDeviceInput | DeviceNetworkAssignmentUpdateWithWhereUniqueWithoutDeviceInput[]
+    updateMany?: DeviceNetworkAssignmentUpdateManyWithWhereWithoutDeviceInput | DeviceNetworkAssignmentUpdateManyWithWhereWithoutDeviceInput[]
+    deleteMany?: DeviceNetworkAssignmentScalarWhereInput | DeviceNetworkAssignmentScalarWhereInput[]
+  }
+
+  export type DeviceRecallStatusUncheckedUpdateManyWithoutDeviceNestedInput = {
+    create?: XOR<DeviceRecallStatusCreateWithoutDeviceInput, DeviceRecallStatusUncheckedCreateWithoutDeviceInput> | DeviceRecallStatusCreateWithoutDeviceInput[] | DeviceRecallStatusUncheckedCreateWithoutDeviceInput[]
+    connectOrCreate?: DeviceRecallStatusCreateOrConnectWithoutDeviceInput | DeviceRecallStatusCreateOrConnectWithoutDeviceInput[]
+    upsert?: DeviceRecallStatusUpsertWithWhereUniqueWithoutDeviceInput | DeviceRecallStatusUpsertWithWhereUniqueWithoutDeviceInput[]
+    createMany?: DeviceRecallStatusCreateManyDeviceInputEnvelope
+    set?: DeviceRecallStatusWhereUniqueInput | DeviceRecallStatusWhereUniqueInput[]
+    disconnect?: DeviceRecallStatusWhereUniqueInput | DeviceRecallStatusWhereUniqueInput[]
+    delete?: DeviceRecallStatusWhereUniqueInput | DeviceRecallStatusWhereUniqueInput[]
+    connect?: DeviceRecallStatusWhereUniqueInput | DeviceRecallStatusWhereUniqueInput[]
+    update?: DeviceRecallStatusUpdateWithWhereUniqueWithoutDeviceInput | DeviceRecallStatusUpdateWithWhereUniqueWithoutDeviceInput[]
+    updateMany?: DeviceRecallStatusUpdateManyWithWhereWithoutDeviceInput | DeviceRecallStatusUpdateManyWithWhereWithoutDeviceInput[]
+    deleteMany?: DeviceRecallStatusScalarWhereInput | DeviceRecallStatusScalarWhereInput[]
+  }
+
+  export type DeviceRiskAssessmentUncheckedUpdateManyWithoutDeviceNestedInput = {
+    create?: XOR<DeviceRiskAssessmentCreateWithoutDeviceInput, DeviceRiskAssessmentUncheckedCreateWithoutDeviceInput> | DeviceRiskAssessmentCreateWithoutDeviceInput[] | DeviceRiskAssessmentUncheckedCreateWithoutDeviceInput[]
+    connectOrCreate?: DeviceRiskAssessmentCreateOrConnectWithoutDeviceInput | DeviceRiskAssessmentCreateOrConnectWithoutDeviceInput[]
+    upsert?: DeviceRiskAssessmentUpsertWithWhereUniqueWithoutDeviceInput | DeviceRiskAssessmentUpsertWithWhereUniqueWithoutDeviceInput[]
+    createMany?: DeviceRiskAssessmentCreateManyDeviceInputEnvelope
+    set?: DeviceRiskAssessmentWhereUniqueInput | DeviceRiskAssessmentWhereUniqueInput[]
+    disconnect?: DeviceRiskAssessmentWhereUniqueInput | DeviceRiskAssessmentWhereUniqueInput[]
+    delete?: DeviceRiskAssessmentWhereUniqueInput | DeviceRiskAssessmentWhereUniqueInput[]
+    connect?: DeviceRiskAssessmentWhereUniqueInput | DeviceRiskAssessmentWhereUniqueInput[]
+    update?: DeviceRiskAssessmentUpdateWithWhereUniqueWithoutDeviceInput | DeviceRiskAssessmentUpdateWithWhereUniqueWithoutDeviceInput[]
+    updateMany?: DeviceRiskAssessmentUpdateManyWithWhereWithoutDeviceInput | DeviceRiskAssessmentUpdateManyWithWhereWithoutDeviceInput[]
+    deleteMany?: DeviceRiskAssessmentScalarWhereInput | DeviceRiskAssessmentScalarWhereInput[]
   }
 
   export type CarePlanCreateNestedOneWithoutVitalsInput = {
@@ -16165,6 +32669,268 @@ export namespace Prisma {
 
   export type EnumEngagementTypeFieldUpdateOperationsInput = {
     set?: $Enums.EngagementType
+  }
+
+  export type MonitoringDeviceCreateNestedOneWithoutVulnerabilitiesInput = {
+    create?: XOR<MonitoringDeviceCreateWithoutVulnerabilitiesInput, MonitoringDeviceUncheckedCreateWithoutVulnerabilitiesInput>
+    connectOrCreate?: MonitoringDeviceCreateOrConnectWithoutVulnerabilitiesInput
+    connect?: MonitoringDeviceWhereUniqueInput
+  }
+
+  export type EnumVulnerabilitySeverityFieldUpdateOperationsInput = {
+    set?: $Enums.VulnerabilitySeverity
+  }
+
+  export type EnumVulnerabilityStatusFieldUpdateOperationsInput = {
+    set?: $Enums.VulnerabilityStatus
+  }
+
+  export type MonitoringDeviceUpdateOneRequiredWithoutVulnerabilitiesNestedInput = {
+    create?: XOR<MonitoringDeviceCreateWithoutVulnerabilitiesInput, MonitoringDeviceUncheckedCreateWithoutVulnerabilitiesInput>
+    connectOrCreate?: MonitoringDeviceCreateOrConnectWithoutVulnerabilitiesInput
+    upsert?: MonitoringDeviceUpsertWithoutVulnerabilitiesInput
+    connect?: MonitoringDeviceWhereUniqueInput
+    update?: XOR<XOR<MonitoringDeviceUpdateToOneWithWhereWithoutVulnerabilitiesInput, MonitoringDeviceUpdateWithoutVulnerabilitiesInput>, MonitoringDeviceUncheckedUpdateWithoutVulnerabilitiesInput>
+  }
+
+  export type MonitoringDeviceCreateNestedOneWithoutPatchesInput = {
+    create?: XOR<MonitoringDeviceCreateWithoutPatchesInput, MonitoringDeviceUncheckedCreateWithoutPatchesInput>
+    connectOrCreate?: MonitoringDeviceCreateOrConnectWithoutPatchesInput
+    connect?: MonitoringDeviceWhereUniqueInput
+  }
+
+  export type EnumPatchCriticalityFieldUpdateOperationsInput = {
+    set?: $Enums.PatchCriticality
+  }
+
+  export type EnumPatchStatusFieldUpdateOperationsInput = {
+    set?: $Enums.PatchStatus
+  }
+
+  export type MonitoringDeviceUpdateOneRequiredWithoutPatchesNestedInput = {
+    create?: XOR<MonitoringDeviceCreateWithoutPatchesInput, MonitoringDeviceUncheckedCreateWithoutPatchesInput>
+    connectOrCreate?: MonitoringDeviceCreateOrConnectWithoutPatchesInput
+    upsert?: MonitoringDeviceUpsertWithoutPatchesInput
+    connect?: MonitoringDeviceWhereUniqueInput
+    update?: XOR<XOR<MonitoringDeviceUpdateToOneWithWhereWithoutPatchesInput, MonitoringDeviceUpdateWithoutPatchesInput>, MonitoringDeviceUncheckedUpdateWithoutPatchesInput>
+  }
+
+  export type MonitoringDeviceCreateNestedOneWithoutIncidentsInput = {
+    create?: XOR<MonitoringDeviceCreateWithoutIncidentsInput, MonitoringDeviceUncheckedCreateWithoutIncidentsInput>
+    connectOrCreate?: MonitoringDeviceCreateOrConnectWithoutIncidentsInput
+    connect?: MonitoringDeviceWhereUniqueInput
+  }
+
+  export type EnumIncidentTypeFieldUpdateOperationsInput = {
+    set?: $Enums.IncidentType
+  }
+
+  export type EnumIncidentSeverityFieldUpdateOperationsInput = {
+    set?: $Enums.IncidentSeverity
+  }
+
+  export type EnumIncidentStatusFieldUpdateOperationsInput = {
+    set?: $Enums.IncidentStatus
+  }
+
+  export type MonitoringDeviceUpdateOneWithoutIncidentsNestedInput = {
+    create?: XOR<MonitoringDeviceCreateWithoutIncidentsInput, MonitoringDeviceUncheckedCreateWithoutIncidentsInput>
+    connectOrCreate?: MonitoringDeviceCreateOrConnectWithoutIncidentsInput
+    upsert?: MonitoringDeviceUpsertWithoutIncidentsInput
+    disconnect?: MonitoringDeviceWhereInput | boolean
+    delete?: MonitoringDeviceWhereInput | boolean
+    connect?: MonitoringDeviceWhereUniqueInput
+    update?: XOR<XOR<MonitoringDeviceUpdateToOneWithWhereWithoutIncidentsInput, MonitoringDeviceUpdateWithoutIncidentsInput>, MonitoringDeviceUncheckedUpdateWithoutIncidentsInput>
+  }
+
+  export type DeviceNetworkAssignmentCreateNestedManyWithoutSegmentInput = {
+    create?: XOR<DeviceNetworkAssignmentCreateWithoutSegmentInput, DeviceNetworkAssignmentUncheckedCreateWithoutSegmentInput> | DeviceNetworkAssignmentCreateWithoutSegmentInput[] | DeviceNetworkAssignmentUncheckedCreateWithoutSegmentInput[]
+    connectOrCreate?: DeviceNetworkAssignmentCreateOrConnectWithoutSegmentInput | DeviceNetworkAssignmentCreateOrConnectWithoutSegmentInput[]
+    createMany?: DeviceNetworkAssignmentCreateManySegmentInputEnvelope
+    connect?: DeviceNetworkAssignmentWhereUniqueInput | DeviceNetworkAssignmentWhereUniqueInput[]
+  }
+
+  export type DeviceNetworkAssignmentUncheckedCreateNestedManyWithoutSegmentInput = {
+    create?: XOR<DeviceNetworkAssignmentCreateWithoutSegmentInput, DeviceNetworkAssignmentUncheckedCreateWithoutSegmentInput> | DeviceNetworkAssignmentCreateWithoutSegmentInput[] | DeviceNetworkAssignmentUncheckedCreateWithoutSegmentInput[]
+    connectOrCreate?: DeviceNetworkAssignmentCreateOrConnectWithoutSegmentInput | DeviceNetworkAssignmentCreateOrConnectWithoutSegmentInput[]
+    createMany?: DeviceNetworkAssignmentCreateManySegmentInputEnvelope
+    connect?: DeviceNetworkAssignmentWhereUniqueInput | DeviceNetworkAssignmentWhereUniqueInput[]
+  }
+
+  export type EnumSecurityLevelFieldUpdateOperationsInput = {
+    set?: $Enums.SecurityLevel
+  }
+
+  export type EnumIsolationLevelFieldUpdateOperationsInput = {
+    set?: $Enums.IsolationLevel
+  }
+
+  export type DeviceNetworkAssignmentUpdateManyWithoutSegmentNestedInput = {
+    create?: XOR<DeviceNetworkAssignmentCreateWithoutSegmentInput, DeviceNetworkAssignmentUncheckedCreateWithoutSegmentInput> | DeviceNetworkAssignmentCreateWithoutSegmentInput[] | DeviceNetworkAssignmentUncheckedCreateWithoutSegmentInput[]
+    connectOrCreate?: DeviceNetworkAssignmentCreateOrConnectWithoutSegmentInput | DeviceNetworkAssignmentCreateOrConnectWithoutSegmentInput[]
+    upsert?: DeviceNetworkAssignmentUpsertWithWhereUniqueWithoutSegmentInput | DeviceNetworkAssignmentUpsertWithWhereUniqueWithoutSegmentInput[]
+    createMany?: DeviceNetworkAssignmentCreateManySegmentInputEnvelope
+    set?: DeviceNetworkAssignmentWhereUniqueInput | DeviceNetworkAssignmentWhereUniqueInput[]
+    disconnect?: DeviceNetworkAssignmentWhereUniqueInput | DeviceNetworkAssignmentWhereUniqueInput[]
+    delete?: DeviceNetworkAssignmentWhereUniqueInput | DeviceNetworkAssignmentWhereUniqueInput[]
+    connect?: DeviceNetworkAssignmentWhereUniqueInput | DeviceNetworkAssignmentWhereUniqueInput[]
+    update?: DeviceNetworkAssignmentUpdateWithWhereUniqueWithoutSegmentInput | DeviceNetworkAssignmentUpdateWithWhereUniqueWithoutSegmentInput[]
+    updateMany?: DeviceNetworkAssignmentUpdateManyWithWhereWithoutSegmentInput | DeviceNetworkAssignmentUpdateManyWithWhereWithoutSegmentInput[]
+    deleteMany?: DeviceNetworkAssignmentScalarWhereInput | DeviceNetworkAssignmentScalarWhereInput[]
+  }
+
+  export type DeviceNetworkAssignmentUncheckedUpdateManyWithoutSegmentNestedInput = {
+    create?: XOR<DeviceNetworkAssignmentCreateWithoutSegmentInput, DeviceNetworkAssignmentUncheckedCreateWithoutSegmentInput> | DeviceNetworkAssignmentCreateWithoutSegmentInput[] | DeviceNetworkAssignmentUncheckedCreateWithoutSegmentInput[]
+    connectOrCreate?: DeviceNetworkAssignmentCreateOrConnectWithoutSegmentInput | DeviceNetworkAssignmentCreateOrConnectWithoutSegmentInput[]
+    upsert?: DeviceNetworkAssignmentUpsertWithWhereUniqueWithoutSegmentInput | DeviceNetworkAssignmentUpsertWithWhereUniqueWithoutSegmentInput[]
+    createMany?: DeviceNetworkAssignmentCreateManySegmentInputEnvelope
+    set?: DeviceNetworkAssignmentWhereUniqueInput | DeviceNetworkAssignmentWhereUniqueInput[]
+    disconnect?: DeviceNetworkAssignmentWhereUniqueInput | DeviceNetworkAssignmentWhereUniqueInput[]
+    delete?: DeviceNetworkAssignmentWhereUniqueInput | DeviceNetworkAssignmentWhereUniqueInput[]
+    connect?: DeviceNetworkAssignmentWhereUniqueInput | DeviceNetworkAssignmentWhereUniqueInput[]
+    update?: DeviceNetworkAssignmentUpdateWithWhereUniqueWithoutSegmentInput | DeviceNetworkAssignmentUpdateWithWhereUniqueWithoutSegmentInput[]
+    updateMany?: DeviceNetworkAssignmentUpdateManyWithWhereWithoutSegmentInput | DeviceNetworkAssignmentUpdateManyWithWhereWithoutSegmentInput[]
+    deleteMany?: DeviceNetworkAssignmentScalarWhereInput | DeviceNetworkAssignmentScalarWhereInput[]
+  }
+
+  export type MonitoringDeviceCreateNestedOneWithoutNetworkAssignmentsInput = {
+    create?: XOR<MonitoringDeviceCreateWithoutNetworkAssignmentsInput, MonitoringDeviceUncheckedCreateWithoutNetworkAssignmentsInput>
+    connectOrCreate?: MonitoringDeviceCreateOrConnectWithoutNetworkAssignmentsInput
+    connect?: MonitoringDeviceWhereUniqueInput
+  }
+
+  export type NetworkSegmentCreateNestedOneWithoutDevicesInput = {
+    create?: XOR<NetworkSegmentCreateWithoutDevicesInput, NetworkSegmentUncheckedCreateWithoutDevicesInput>
+    connectOrCreate?: NetworkSegmentCreateOrConnectWithoutDevicesInput
+    connect?: NetworkSegmentWhereUniqueInput
+  }
+
+  export type EnumAssignmentStatusFieldUpdateOperationsInput = {
+    set?: $Enums.AssignmentStatus
+  }
+
+  export type EnumComplianceStatusFieldUpdateOperationsInput = {
+    set?: $Enums.ComplianceStatus
+  }
+
+  export type MonitoringDeviceUpdateOneRequiredWithoutNetworkAssignmentsNestedInput = {
+    create?: XOR<MonitoringDeviceCreateWithoutNetworkAssignmentsInput, MonitoringDeviceUncheckedCreateWithoutNetworkAssignmentsInput>
+    connectOrCreate?: MonitoringDeviceCreateOrConnectWithoutNetworkAssignmentsInput
+    upsert?: MonitoringDeviceUpsertWithoutNetworkAssignmentsInput
+    connect?: MonitoringDeviceWhereUniqueInput
+    update?: XOR<XOR<MonitoringDeviceUpdateToOneWithWhereWithoutNetworkAssignmentsInput, MonitoringDeviceUpdateWithoutNetworkAssignmentsInput>, MonitoringDeviceUncheckedUpdateWithoutNetworkAssignmentsInput>
+  }
+
+  export type NetworkSegmentUpdateOneRequiredWithoutDevicesNestedInput = {
+    create?: XOR<NetworkSegmentCreateWithoutDevicesInput, NetworkSegmentUncheckedCreateWithoutDevicesInput>
+    connectOrCreate?: NetworkSegmentCreateOrConnectWithoutDevicesInput
+    upsert?: NetworkSegmentUpsertWithoutDevicesInput
+    connect?: NetworkSegmentWhereUniqueInput
+    update?: XOR<XOR<NetworkSegmentUpdateToOneWithWhereWithoutDevicesInput, NetworkSegmentUpdateWithoutDevicesInput>, NetworkSegmentUncheckedUpdateWithoutDevicesInput>
+  }
+
+  export type DeviceRecallStatusCreateNestedManyWithoutRecallInput = {
+    create?: XOR<DeviceRecallStatusCreateWithoutRecallInput, DeviceRecallStatusUncheckedCreateWithoutRecallInput> | DeviceRecallStatusCreateWithoutRecallInput[] | DeviceRecallStatusUncheckedCreateWithoutRecallInput[]
+    connectOrCreate?: DeviceRecallStatusCreateOrConnectWithoutRecallInput | DeviceRecallStatusCreateOrConnectWithoutRecallInput[]
+    createMany?: DeviceRecallStatusCreateManyRecallInputEnvelope
+    connect?: DeviceRecallStatusWhereUniqueInput | DeviceRecallStatusWhereUniqueInput[]
+  }
+
+  export type DeviceRecallStatusUncheckedCreateNestedManyWithoutRecallInput = {
+    create?: XOR<DeviceRecallStatusCreateWithoutRecallInput, DeviceRecallStatusUncheckedCreateWithoutRecallInput> | DeviceRecallStatusCreateWithoutRecallInput[] | DeviceRecallStatusUncheckedCreateWithoutRecallInput[]
+    connectOrCreate?: DeviceRecallStatusCreateOrConnectWithoutRecallInput | DeviceRecallStatusCreateOrConnectWithoutRecallInput[]
+    createMany?: DeviceRecallStatusCreateManyRecallInputEnvelope
+    connect?: DeviceRecallStatusWhereUniqueInput | DeviceRecallStatusWhereUniqueInput[]
+  }
+
+  export type EnumRecallClassFieldUpdateOperationsInput = {
+    set?: $Enums.RecallClass
+  }
+
+  export type EnumRecallStatusFieldUpdateOperationsInput = {
+    set?: $Enums.RecallStatus
+  }
+
+  export type DeviceRecallStatusUpdateManyWithoutRecallNestedInput = {
+    create?: XOR<DeviceRecallStatusCreateWithoutRecallInput, DeviceRecallStatusUncheckedCreateWithoutRecallInput> | DeviceRecallStatusCreateWithoutRecallInput[] | DeviceRecallStatusUncheckedCreateWithoutRecallInput[]
+    connectOrCreate?: DeviceRecallStatusCreateOrConnectWithoutRecallInput | DeviceRecallStatusCreateOrConnectWithoutRecallInput[]
+    upsert?: DeviceRecallStatusUpsertWithWhereUniqueWithoutRecallInput | DeviceRecallStatusUpsertWithWhereUniqueWithoutRecallInput[]
+    createMany?: DeviceRecallStatusCreateManyRecallInputEnvelope
+    set?: DeviceRecallStatusWhereUniqueInput | DeviceRecallStatusWhereUniqueInput[]
+    disconnect?: DeviceRecallStatusWhereUniqueInput | DeviceRecallStatusWhereUniqueInput[]
+    delete?: DeviceRecallStatusWhereUniqueInput | DeviceRecallStatusWhereUniqueInput[]
+    connect?: DeviceRecallStatusWhereUniqueInput | DeviceRecallStatusWhereUniqueInput[]
+    update?: DeviceRecallStatusUpdateWithWhereUniqueWithoutRecallInput | DeviceRecallStatusUpdateWithWhereUniqueWithoutRecallInput[]
+    updateMany?: DeviceRecallStatusUpdateManyWithWhereWithoutRecallInput | DeviceRecallStatusUpdateManyWithWhereWithoutRecallInput[]
+    deleteMany?: DeviceRecallStatusScalarWhereInput | DeviceRecallStatusScalarWhereInput[]
+  }
+
+  export type DeviceRecallStatusUncheckedUpdateManyWithoutRecallNestedInput = {
+    create?: XOR<DeviceRecallStatusCreateWithoutRecallInput, DeviceRecallStatusUncheckedCreateWithoutRecallInput> | DeviceRecallStatusCreateWithoutRecallInput[] | DeviceRecallStatusUncheckedCreateWithoutRecallInput[]
+    connectOrCreate?: DeviceRecallStatusCreateOrConnectWithoutRecallInput | DeviceRecallStatusCreateOrConnectWithoutRecallInput[]
+    upsert?: DeviceRecallStatusUpsertWithWhereUniqueWithoutRecallInput | DeviceRecallStatusUpsertWithWhereUniqueWithoutRecallInput[]
+    createMany?: DeviceRecallStatusCreateManyRecallInputEnvelope
+    set?: DeviceRecallStatusWhereUniqueInput | DeviceRecallStatusWhereUniqueInput[]
+    disconnect?: DeviceRecallStatusWhereUniqueInput | DeviceRecallStatusWhereUniqueInput[]
+    delete?: DeviceRecallStatusWhereUniqueInput | DeviceRecallStatusWhereUniqueInput[]
+    connect?: DeviceRecallStatusWhereUniqueInput | DeviceRecallStatusWhereUniqueInput[]
+    update?: DeviceRecallStatusUpdateWithWhereUniqueWithoutRecallInput | DeviceRecallStatusUpdateWithWhereUniqueWithoutRecallInput[]
+    updateMany?: DeviceRecallStatusUpdateManyWithWhereWithoutRecallInput | DeviceRecallStatusUpdateManyWithWhereWithoutRecallInput[]
+    deleteMany?: DeviceRecallStatusScalarWhereInput | DeviceRecallStatusScalarWhereInput[]
+  }
+
+  export type MonitoringDeviceCreateNestedOneWithoutRecallStatusesInput = {
+    create?: XOR<MonitoringDeviceCreateWithoutRecallStatusesInput, MonitoringDeviceUncheckedCreateWithoutRecallStatusesInput>
+    connectOrCreate?: MonitoringDeviceCreateOrConnectWithoutRecallStatusesInput
+    connect?: MonitoringDeviceWhereUniqueInput
+  }
+
+  export type FDARecallCreateNestedOneWithoutAffectedDevicesInput = {
+    create?: XOR<FDARecallCreateWithoutAffectedDevicesInput, FDARecallUncheckedCreateWithoutAffectedDevicesInput>
+    connectOrCreate?: FDARecallCreateOrConnectWithoutAffectedDevicesInput
+    connect?: FDARecallWhereUniqueInput
+  }
+
+  export type EnumDeviceRecallActionFieldUpdateOperationsInput = {
+    set?: $Enums.DeviceRecallAction
+  }
+
+  export type MonitoringDeviceUpdateOneRequiredWithoutRecallStatusesNestedInput = {
+    create?: XOR<MonitoringDeviceCreateWithoutRecallStatusesInput, MonitoringDeviceUncheckedCreateWithoutRecallStatusesInput>
+    connectOrCreate?: MonitoringDeviceCreateOrConnectWithoutRecallStatusesInput
+    upsert?: MonitoringDeviceUpsertWithoutRecallStatusesInput
+    connect?: MonitoringDeviceWhereUniqueInput
+    update?: XOR<XOR<MonitoringDeviceUpdateToOneWithWhereWithoutRecallStatusesInput, MonitoringDeviceUpdateWithoutRecallStatusesInput>, MonitoringDeviceUncheckedUpdateWithoutRecallStatusesInput>
+  }
+
+  export type FDARecallUpdateOneRequiredWithoutAffectedDevicesNestedInput = {
+    create?: XOR<FDARecallCreateWithoutAffectedDevicesInput, FDARecallUncheckedCreateWithoutAffectedDevicesInput>
+    connectOrCreate?: FDARecallCreateOrConnectWithoutAffectedDevicesInput
+    upsert?: FDARecallUpsertWithoutAffectedDevicesInput
+    connect?: FDARecallWhereUniqueInput
+    update?: XOR<XOR<FDARecallUpdateToOneWithWhereWithoutAffectedDevicesInput, FDARecallUpdateWithoutAffectedDevicesInput>, FDARecallUncheckedUpdateWithoutAffectedDevicesInput>
+  }
+
+  export type EnumAdvisoryStatusFieldUpdateOperationsInput = {
+    set?: $Enums.AdvisoryStatus
+  }
+
+  export type MonitoringDeviceCreateNestedOneWithoutRiskAssessmentsInput = {
+    create?: XOR<MonitoringDeviceCreateWithoutRiskAssessmentsInput, MonitoringDeviceUncheckedCreateWithoutRiskAssessmentsInput>
+    connectOrCreate?: MonitoringDeviceCreateOrConnectWithoutRiskAssessmentsInput
+    connect?: MonitoringDeviceWhereUniqueInput
+  }
+
+  export type EnumRiskLevelFieldUpdateOperationsInput = {
+    set?: $Enums.RiskLevel
+  }
+
+  export type MonitoringDeviceUpdateOneRequiredWithoutRiskAssessmentsNestedInput = {
+    create?: XOR<MonitoringDeviceCreateWithoutRiskAssessmentsInput, MonitoringDeviceUncheckedCreateWithoutRiskAssessmentsInput>
+    connectOrCreate?: MonitoringDeviceCreateOrConnectWithoutRiskAssessmentsInput
+    upsert?: MonitoringDeviceUpsertWithoutRiskAssessmentsInput
+    connect?: MonitoringDeviceWhereUniqueInput
+    update?: XOR<XOR<MonitoringDeviceUpdateToOneWithWhereWithoutRiskAssessmentsInput, MonitoringDeviceUpdateWithoutRiskAssessmentsInput>, MonitoringDeviceUncheckedUpdateWithoutRiskAssessmentsInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -16648,6 +33414,278 @@ export namespace Prisma {
     _max?: NestedEnumEngagementTypeFilter<$PrismaModel>
   }
 
+  export type NestedEnumVulnerabilitySeverityFilter<$PrismaModel = never> = {
+    equals?: $Enums.VulnerabilitySeverity | EnumVulnerabilitySeverityFieldRefInput<$PrismaModel>
+    in?: $Enums.VulnerabilitySeverity[] | ListEnumVulnerabilitySeverityFieldRefInput<$PrismaModel>
+    notIn?: $Enums.VulnerabilitySeverity[] | ListEnumVulnerabilitySeverityFieldRefInput<$PrismaModel>
+    not?: NestedEnumVulnerabilitySeverityFilter<$PrismaModel> | $Enums.VulnerabilitySeverity
+  }
+
+  export type NestedEnumVulnerabilityStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.VulnerabilityStatus | EnumVulnerabilityStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.VulnerabilityStatus[] | ListEnumVulnerabilityStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.VulnerabilityStatus[] | ListEnumVulnerabilityStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumVulnerabilityStatusFilter<$PrismaModel> | $Enums.VulnerabilityStatus
+  }
+
+  export type NestedEnumVulnerabilitySeverityWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.VulnerabilitySeverity | EnumVulnerabilitySeverityFieldRefInput<$PrismaModel>
+    in?: $Enums.VulnerabilitySeverity[] | ListEnumVulnerabilitySeverityFieldRefInput<$PrismaModel>
+    notIn?: $Enums.VulnerabilitySeverity[] | ListEnumVulnerabilitySeverityFieldRefInput<$PrismaModel>
+    not?: NestedEnumVulnerabilitySeverityWithAggregatesFilter<$PrismaModel> | $Enums.VulnerabilitySeverity
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumVulnerabilitySeverityFilter<$PrismaModel>
+    _max?: NestedEnumVulnerabilitySeverityFilter<$PrismaModel>
+  }
+
+  export type NestedEnumVulnerabilityStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.VulnerabilityStatus | EnumVulnerabilityStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.VulnerabilityStatus[] | ListEnumVulnerabilityStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.VulnerabilityStatus[] | ListEnumVulnerabilityStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumVulnerabilityStatusWithAggregatesFilter<$PrismaModel> | $Enums.VulnerabilityStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumVulnerabilityStatusFilter<$PrismaModel>
+    _max?: NestedEnumVulnerabilityStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumPatchCriticalityFilter<$PrismaModel = never> = {
+    equals?: $Enums.PatchCriticality | EnumPatchCriticalityFieldRefInput<$PrismaModel>
+    in?: $Enums.PatchCriticality[] | ListEnumPatchCriticalityFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PatchCriticality[] | ListEnumPatchCriticalityFieldRefInput<$PrismaModel>
+    not?: NestedEnumPatchCriticalityFilter<$PrismaModel> | $Enums.PatchCriticality
+  }
+
+  export type NestedEnumPatchStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.PatchStatus | EnumPatchStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.PatchStatus[] | ListEnumPatchStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PatchStatus[] | ListEnumPatchStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumPatchStatusFilter<$PrismaModel> | $Enums.PatchStatus
+  }
+
+  export type NestedEnumPatchCriticalityWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PatchCriticality | EnumPatchCriticalityFieldRefInput<$PrismaModel>
+    in?: $Enums.PatchCriticality[] | ListEnumPatchCriticalityFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PatchCriticality[] | ListEnumPatchCriticalityFieldRefInput<$PrismaModel>
+    not?: NestedEnumPatchCriticalityWithAggregatesFilter<$PrismaModel> | $Enums.PatchCriticality
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumPatchCriticalityFilter<$PrismaModel>
+    _max?: NestedEnumPatchCriticalityFilter<$PrismaModel>
+  }
+
+  export type NestedEnumPatchStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PatchStatus | EnumPatchStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.PatchStatus[] | ListEnumPatchStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PatchStatus[] | ListEnumPatchStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumPatchStatusWithAggregatesFilter<$PrismaModel> | $Enums.PatchStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumPatchStatusFilter<$PrismaModel>
+    _max?: NestedEnumPatchStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumIncidentTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.IncidentType | EnumIncidentTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.IncidentType[] | ListEnumIncidentTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.IncidentType[] | ListEnumIncidentTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumIncidentTypeFilter<$PrismaModel> | $Enums.IncidentType
+  }
+
+  export type NestedEnumIncidentSeverityFilter<$PrismaModel = never> = {
+    equals?: $Enums.IncidentSeverity | EnumIncidentSeverityFieldRefInput<$PrismaModel>
+    in?: $Enums.IncidentSeverity[] | ListEnumIncidentSeverityFieldRefInput<$PrismaModel>
+    notIn?: $Enums.IncidentSeverity[] | ListEnumIncidentSeverityFieldRefInput<$PrismaModel>
+    not?: NestedEnumIncidentSeverityFilter<$PrismaModel> | $Enums.IncidentSeverity
+  }
+
+  export type NestedEnumIncidentStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.IncidentStatus | EnumIncidentStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.IncidentStatus[] | ListEnumIncidentStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.IncidentStatus[] | ListEnumIncidentStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumIncidentStatusFilter<$PrismaModel> | $Enums.IncidentStatus
+  }
+
+  export type NestedEnumIncidentTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.IncidentType | EnumIncidentTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.IncidentType[] | ListEnumIncidentTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.IncidentType[] | ListEnumIncidentTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumIncidentTypeWithAggregatesFilter<$PrismaModel> | $Enums.IncidentType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumIncidentTypeFilter<$PrismaModel>
+    _max?: NestedEnumIncidentTypeFilter<$PrismaModel>
+  }
+
+  export type NestedEnumIncidentSeverityWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.IncidentSeverity | EnumIncidentSeverityFieldRefInput<$PrismaModel>
+    in?: $Enums.IncidentSeverity[] | ListEnumIncidentSeverityFieldRefInput<$PrismaModel>
+    notIn?: $Enums.IncidentSeverity[] | ListEnumIncidentSeverityFieldRefInput<$PrismaModel>
+    not?: NestedEnumIncidentSeverityWithAggregatesFilter<$PrismaModel> | $Enums.IncidentSeverity
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumIncidentSeverityFilter<$PrismaModel>
+    _max?: NestedEnumIncidentSeverityFilter<$PrismaModel>
+  }
+
+  export type NestedEnumIncidentStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.IncidentStatus | EnumIncidentStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.IncidentStatus[] | ListEnumIncidentStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.IncidentStatus[] | ListEnumIncidentStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumIncidentStatusWithAggregatesFilter<$PrismaModel> | $Enums.IncidentStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumIncidentStatusFilter<$PrismaModel>
+    _max?: NestedEnumIncidentStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumSecurityLevelFilter<$PrismaModel = never> = {
+    equals?: $Enums.SecurityLevel | EnumSecurityLevelFieldRefInput<$PrismaModel>
+    in?: $Enums.SecurityLevel[] | ListEnumSecurityLevelFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SecurityLevel[] | ListEnumSecurityLevelFieldRefInput<$PrismaModel>
+    not?: NestedEnumSecurityLevelFilter<$PrismaModel> | $Enums.SecurityLevel
+  }
+
+  export type NestedEnumIsolationLevelFilter<$PrismaModel = never> = {
+    equals?: $Enums.IsolationLevel | EnumIsolationLevelFieldRefInput<$PrismaModel>
+    in?: $Enums.IsolationLevel[] | ListEnumIsolationLevelFieldRefInput<$PrismaModel>
+    notIn?: $Enums.IsolationLevel[] | ListEnumIsolationLevelFieldRefInput<$PrismaModel>
+    not?: NestedEnumIsolationLevelFilter<$PrismaModel> | $Enums.IsolationLevel
+  }
+
+  export type NestedEnumSecurityLevelWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SecurityLevel | EnumSecurityLevelFieldRefInput<$PrismaModel>
+    in?: $Enums.SecurityLevel[] | ListEnumSecurityLevelFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SecurityLevel[] | ListEnumSecurityLevelFieldRefInput<$PrismaModel>
+    not?: NestedEnumSecurityLevelWithAggregatesFilter<$PrismaModel> | $Enums.SecurityLevel
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSecurityLevelFilter<$PrismaModel>
+    _max?: NestedEnumSecurityLevelFilter<$PrismaModel>
+  }
+
+  export type NestedEnumIsolationLevelWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.IsolationLevel | EnumIsolationLevelFieldRefInput<$PrismaModel>
+    in?: $Enums.IsolationLevel[] | ListEnumIsolationLevelFieldRefInput<$PrismaModel>
+    notIn?: $Enums.IsolationLevel[] | ListEnumIsolationLevelFieldRefInput<$PrismaModel>
+    not?: NestedEnumIsolationLevelWithAggregatesFilter<$PrismaModel> | $Enums.IsolationLevel
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumIsolationLevelFilter<$PrismaModel>
+    _max?: NestedEnumIsolationLevelFilter<$PrismaModel>
+  }
+
+  export type NestedEnumAssignmentStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.AssignmentStatus | EnumAssignmentStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.AssignmentStatus[] | ListEnumAssignmentStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AssignmentStatus[] | ListEnumAssignmentStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumAssignmentStatusFilter<$PrismaModel> | $Enums.AssignmentStatus
+  }
+
+  export type NestedEnumComplianceStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.ComplianceStatus | EnumComplianceStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.ComplianceStatus[] | ListEnumComplianceStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ComplianceStatus[] | ListEnumComplianceStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumComplianceStatusFilter<$PrismaModel> | $Enums.ComplianceStatus
+  }
+
+  export type NestedEnumAssignmentStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.AssignmentStatus | EnumAssignmentStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.AssignmentStatus[] | ListEnumAssignmentStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AssignmentStatus[] | ListEnumAssignmentStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumAssignmentStatusWithAggregatesFilter<$PrismaModel> | $Enums.AssignmentStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumAssignmentStatusFilter<$PrismaModel>
+    _max?: NestedEnumAssignmentStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumComplianceStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ComplianceStatus | EnumComplianceStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.ComplianceStatus[] | ListEnumComplianceStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ComplianceStatus[] | ListEnumComplianceStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumComplianceStatusWithAggregatesFilter<$PrismaModel> | $Enums.ComplianceStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumComplianceStatusFilter<$PrismaModel>
+    _max?: NestedEnumComplianceStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumRecallClassFilter<$PrismaModel = never> = {
+    equals?: $Enums.RecallClass | EnumRecallClassFieldRefInput<$PrismaModel>
+    in?: $Enums.RecallClass[] | ListEnumRecallClassFieldRefInput<$PrismaModel>
+    notIn?: $Enums.RecallClass[] | ListEnumRecallClassFieldRefInput<$PrismaModel>
+    not?: NestedEnumRecallClassFilter<$PrismaModel> | $Enums.RecallClass
+  }
+
+  export type NestedEnumRecallStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.RecallStatus | EnumRecallStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.RecallStatus[] | ListEnumRecallStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.RecallStatus[] | ListEnumRecallStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumRecallStatusFilter<$PrismaModel> | $Enums.RecallStatus
+  }
+
+  export type NestedEnumRecallClassWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.RecallClass | EnumRecallClassFieldRefInput<$PrismaModel>
+    in?: $Enums.RecallClass[] | ListEnumRecallClassFieldRefInput<$PrismaModel>
+    notIn?: $Enums.RecallClass[] | ListEnumRecallClassFieldRefInput<$PrismaModel>
+    not?: NestedEnumRecallClassWithAggregatesFilter<$PrismaModel> | $Enums.RecallClass
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumRecallClassFilter<$PrismaModel>
+    _max?: NestedEnumRecallClassFilter<$PrismaModel>
+  }
+
+  export type NestedEnumRecallStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.RecallStatus | EnumRecallStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.RecallStatus[] | ListEnumRecallStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.RecallStatus[] | ListEnumRecallStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumRecallStatusWithAggregatesFilter<$PrismaModel> | $Enums.RecallStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumRecallStatusFilter<$PrismaModel>
+    _max?: NestedEnumRecallStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumDeviceRecallActionFilter<$PrismaModel = never> = {
+    equals?: $Enums.DeviceRecallAction | EnumDeviceRecallActionFieldRefInput<$PrismaModel>
+    in?: $Enums.DeviceRecallAction[] | ListEnumDeviceRecallActionFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DeviceRecallAction[] | ListEnumDeviceRecallActionFieldRefInput<$PrismaModel>
+    not?: NestedEnumDeviceRecallActionFilter<$PrismaModel> | $Enums.DeviceRecallAction
+  }
+
+  export type NestedEnumDeviceRecallActionWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.DeviceRecallAction | EnumDeviceRecallActionFieldRefInput<$PrismaModel>
+    in?: $Enums.DeviceRecallAction[] | ListEnumDeviceRecallActionFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DeviceRecallAction[] | ListEnumDeviceRecallActionFieldRefInput<$PrismaModel>
+    not?: NestedEnumDeviceRecallActionWithAggregatesFilter<$PrismaModel> | $Enums.DeviceRecallAction
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumDeviceRecallActionFilter<$PrismaModel>
+    _max?: NestedEnumDeviceRecallActionFilter<$PrismaModel>
+  }
+
+  export type NestedEnumAdvisoryStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.AdvisoryStatus | EnumAdvisoryStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.AdvisoryStatus[] | ListEnumAdvisoryStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AdvisoryStatus[] | ListEnumAdvisoryStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumAdvisoryStatusFilter<$PrismaModel> | $Enums.AdvisoryStatus
+  }
+
+  export type NestedEnumAdvisoryStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.AdvisoryStatus | EnumAdvisoryStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.AdvisoryStatus[] | ListEnumAdvisoryStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AdvisoryStatus[] | ListEnumAdvisoryStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumAdvisoryStatusWithAggregatesFilter<$PrismaModel> | $Enums.AdvisoryStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumAdvisoryStatusFilter<$PrismaModel>
+    _max?: NestedEnumAdvisoryStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumRiskLevelFilter<$PrismaModel = never> = {
+    equals?: $Enums.RiskLevel | EnumRiskLevelFieldRefInput<$PrismaModel>
+    in?: $Enums.RiskLevel[] | ListEnumRiskLevelFieldRefInput<$PrismaModel>
+    notIn?: $Enums.RiskLevel[] | ListEnumRiskLevelFieldRefInput<$PrismaModel>
+    not?: NestedEnumRiskLevelFilter<$PrismaModel> | $Enums.RiskLevel
+  }
+
+  export type NestedEnumRiskLevelWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.RiskLevel | EnumRiskLevelFieldRefInput<$PrismaModel>
+    in?: $Enums.RiskLevel[] | ListEnumRiskLevelFieldRefInput<$PrismaModel>
+    notIn?: $Enums.RiskLevel[] | ListEnumRiskLevelFieldRefInput<$PrismaModel>
+    not?: NestedEnumRiskLevelWithAggregatesFilter<$PrismaModel> | $Enums.RiskLevel
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumRiskLevelFilter<$PrismaModel>
+    _max?: NestedEnumRiskLevelFilter<$PrismaModel>
+  }
+
   export type CareTaskCreateWithoutCarePlanInput = {
     id?: string
     title: string
@@ -16988,6 +34026,304 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type DeviceVulnerabilityCreateWithoutDeviceInput = {
+    id?: string
+    cveId?: string | null
+    title: string
+    description: string
+    severity: $Enums.VulnerabilitySeverity
+    cvssScore?: number | null
+    affectedVersion?: string | null
+    fixedVersion?: string | null
+    exploitAvailable?: boolean
+    status?: $Enums.VulnerabilityStatus
+    discoveredAt?: Date | string
+    resolvedAt?: Date | string | null
+    resolvedBy?: string | null
+    resolutionNotes?: string | null
+    source?: string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DeviceVulnerabilityUncheckedCreateWithoutDeviceInput = {
+    id?: string
+    cveId?: string | null
+    title: string
+    description: string
+    severity: $Enums.VulnerabilitySeverity
+    cvssScore?: number | null
+    affectedVersion?: string | null
+    fixedVersion?: string | null
+    exploitAvailable?: boolean
+    status?: $Enums.VulnerabilityStatus
+    discoveredAt?: Date | string
+    resolvedAt?: Date | string | null
+    resolvedBy?: string | null
+    resolutionNotes?: string | null
+    source?: string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DeviceVulnerabilityCreateOrConnectWithoutDeviceInput = {
+    where: DeviceVulnerabilityWhereUniqueInput
+    create: XOR<DeviceVulnerabilityCreateWithoutDeviceInput, DeviceVulnerabilityUncheckedCreateWithoutDeviceInput>
+  }
+
+  export type DeviceVulnerabilityCreateManyDeviceInputEnvelope = {
+    data: DeviceVulnerabilityCreateManyDeviceInput | DeviceVulnerabilityCreateManyDeviceInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type DevicePatchCreateWithoutDeviceInput = {
+    id?: string
+    patchVersion: string
+    currentVersion: string
+    description?: string | null
+    releaseNotes?: string | null
+    criticality?: $Enums.PatchCriticality
+    scheduledDate?: Date | string | null
+    appliedDate?: Date | string | null
+    appliedBy?: string | null
+    status?: $Enums.PatchStatus
+    rollbackVersion?: string | null
+    testingRequired?: boolean
+    testingCompletedAt?: Date | string | null
+    testingNotes?: string | null
+    approvedBy?: string | null
+    approvedAt?: Date | string | null
+    failureReason?: string | null
+    vulnerabilitiesFixed?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DevicePatchUncheckedCreateWithoutDeviceInput = {
+    id?: string
+    patchVersion: string
+    currentVersion: string
+    description?: string | null
+    releaseNotes?: string | null
+    criticality?: $Enums.PatchCriticality
+    scheduledDate?: Date | string | null
+    appliedDate?: Date | string | null
+    appliedBy?: string | null
+    status?: $Enums.PatchStatus
+    rollbackVersion?: string | null
+    testingRequired?: boolean
+    testingCompletedAt?: Date | string | null
+    testingNotes?: string | null
+    approvedBy?: string | null
+    approvedAt?: Date | string | null
+    failureReason?: string | null
+    vulnerabilitiesFixed?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DevicePatchCreateOrConnectWithoutDeviceInput = {
+    where: DevicePatchWhereUniqueInput
+    create: XOR<DevicePatchCreateWithoutDeviceInput, DevicePatchUncheckedCreateWithoutDeviceInput>
+  }
+
+  export type DevicePatchCreateManyDeviceInputEnvelope = {
+    data: DevicePatchCreateManyDeviceInput | DevicePatchCreateManyDeviceInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type SecurityIncidentCreateWithoutDeviceInput = {
+    id?: string
+    incidentType: $Enums.IncidentType
+    severity: $Enums.IncidentSeverity
+    title: string
+    description: string
+    affectedSystems?: NullableJsonNullValueInput | InputJsonValue
+    affectedPatients?: NullableJsonNullValueInput | InputJsonValue
+    detectedAt?: Date | string
+    detectedBy: string
+    reportedBy: string
+    status?: $Enums.IncidentStatus
+    assignedTo?: string | null
+    containedAt?: Date | string | null
+    resolvedAt?: Date | string | null
+    rootCause?: string | null
+    remediationSteps?: NullableJsonNullValueInput | InputJsonValue
+    lessonsLearned?: string | null
+    timeline?: NullableJsonNullValueInput | InputJsonValue
+    evidence?: NullableJsonNullValueInput | InputJsonValue
+    notificationsSent?: boolean
+    regulatoryReported?: boolean
+    regulatoryReportDate?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SecurityIncidentUncheckedCreateWithoutDeviceInput = {
+    id?: string
+    incidentType: $Enums.IncidentType
+    severity: $Enums.IncidentSeverity
+    title: string
+    description: string
+    affectedSystems?: NullableJsonNullValueInput | InputJsonValue
+    affectedPatients?: NullableJsonNullValueInput | InputJsonValue
+    detectedAt?: Date | string
+    detectedBy: string
+    reportedBy: string
+    status?: $Enums.IncidentStatus
+    assignedTo?: string | null
+    containedAt?: Date | string | null
+    resolvedAt?: Date | string | null
+    rootCause?: string | null
+    remediationSteps?: NullableJsonNullValueInput | InputJsonValue
+    lessonsLearned?: string | null
+    timeline?: NullableJsonNullValueInput | InputJsonValue
+    evidence?: NullableJsonNullValueInput | InputJsonValue
+    notificationsSent?: boolean
+    regulatoryReported?: boolean
+    regulatoryReportDate?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SecurityIncidentCreateOrConnectWithoutDeviceInput = {
+    where: SecurityIncidentWhereUniqueInput
+    create: XOR<SecurityIncidentCreateWithoutDeviceInput, SecurityIncidentUncheckedCreateWithoutDeviceInput>
+  }
+
+  export type SecurityIncidentCreateManyDeviceInputEnvelope = {
+    data: SecurityIncidentCreateManyDeviceInput | SecurityIncidentCreateManyDeviceInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type DeviceNetworkAssignmentCreateWithoutDeviceInput = {
+    id?: string
+    ipAddress?: string | null
+    macAddress?: string | null
+    assignedAt?: Date | string
+    assignedBy: string
+    status?: $Enums.AssignmentStatus
+    complianceStatus?: $Enums.ComplianceStatus
+    lastComplianceCheck?: Date | string | null
+    complianceNotes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    segment: NetworkSegmentCreateNestedOneWithoutDevicesInput
+  }
+
+  export type DeviceNetworkAssignmentUncheckedCreateWithoutDeviceInput = {
+    id?: string
+    segmentId: string
+    ipAddress?: string | null
+    macAddress?: string | null
+    assignedAt?: Date | string
+    assignedBy: string
+    status?: $Enums.AssignmentStatus
+    complianceStatus?: $Enums.ComplianceStatus
+    lastComplianceCheck?: Date | string | null
+    complianceNotes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DeviceNetworkAssignmentCreateOrConnectWithoutDeviceInput = {
+    where: DeviceNetworkAssignmentWhereUniqueInput
+    create: XOR<DeviceNetworkAssignmentCreateWithoutDeviceInput, DeviceNetworkAssignmentUncheckedCreateWithoutDeviceInput>
+  }
+
+  export type DeviceNetworkAssignmentCreateManyDeviceInputEnvelope = {
+    data: DeviceNetworkAssignmentCreateManyDeviceInput | DeviceNetworkAssignmentCreateManyDeviceInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type DeviceRecallStatusCreateWithoutDeviceInput = {
+    id?: string
+    status?: $Enums.DeviceRecallAction
+    actionTaken?: string | null
+    actionDate?: Date | string | null
+    actionBy?: string | null
+    notes?: string | null
+    patientNotified?: boolean
+    providerNotified?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    recall: FDARecallCreateNestedOneWithoutAffectedDevicesInput
+  }
+
+  export type DeviceRecallStatusUncheckedCreateWithoutDeviceInput = {
+    id?: string
+    recallId: string
+    status?: $Enums.DeviceRecallAction
+    actionTaken?: string | null
+    actionDate?: Date | string | null
+    actionBy?: string | null
+    notes?: string | null
+    patientNotified?: boolean
+    providerNotified?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DeviceRecallStatusCreateOrConnectWithoutDeviceInput = {
+    where: DeviceRecallStatusWhereUniqueInput
+    create: XOR<DeviceRecallStatusCreateWithoutDeviceInput, DeviceRecallStatusUncheckedCreateWithoutDeviceInput>
+  }
+
+  export type DeviceRecallStatusCreateManyDeviceInputEnvelope = {
+    data: DeviceRecallStatusCreateManyDeviceInput | DeviceRecallStatusCreateManyDeviceInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type DeviceRiskAssessmentCreateWithoutDeviceInput = {
+    id?: string
+    overallRiskScore: number
+    vulnerabilityScore?: number
+    patchScore?: number
+    networkScore?: number
+    complianceScore?: number
+    incidentScore?: number
+    agingScore?: number
+    riskLevel: $Enums.RiskLevel
+    riskFactors: JsonNullValueInput | InputJsonValue
+    recommendations?: NullableJsonNullValueInput | InputJsonValue
+    assessedAt?: Date | string
+    assessedBy?: string | null
+    nextAssessmentDue?: Date | string | null
+    notes?: string | null
+    createdAt?: Date | string
+  }
+
+  export type DeviceRiskAssessmentUncheckedCreateWithoutDeviceInput = {
+    id?: string
+    overallRiskScore: number
+    vulnerabilityScore?: number
+    patchScore?: number
+    networkScore?: number
+    complianceScore?: number
+    incidentScore?: number
+    agingScore?: number
+    riskLevel: $Enums.RiskLevel
+    riskFactors: JsonNullValueInput | InputJsonValue
+    recommendations?: NullableJsonNullValueInput | InputJsonValue
+    assessedAt?: Date | string
+    assessedBy?: string | null
+    nextAssessmentDue?: Date | string | null
+    notes?: string | null
+    createdAt?: Date | string
+  }
+
+  export type DeviceRiskAssessmentCreateOrConnectWithoutDeviceInput = {
+    where: DeviceRiskAssessmentWhereUniqueInput
+    create: XOR<DeviceRiskAssessmentCreateWithoutDeviceInput, DeviceRiskAssessmentUncheckedCreateWithoutDeviceInput>
+  }
+
+  export type DeviceRiskAssessmentCreateManyDeviceInputEnvelope = {
+    data: DeviceRiskAssessmentCreateManyDeviceInput | DeviceRiskAssessmentCreateManyDeviceInput[]
+    skipDuplicates?: boolean
+  }
+
   export type VitalReadingUpsertWithWhereUniqueWithoutDeviceInput = {
     where: VitalReadingWhereUniqueInput
     update: XOR<VitalReadingUpdateWithoutDeviceInput, VitalReadingUncheckedUpdateWithoutDeviceInput>
@@ -17002,6 +34338,245 @@ export namespace Prisma {
   export type VitalReadingUpdateManyWithWhereWithoutDeviceInput = {
     where: VitalReadingScalarWhereInput
     data: XOR<VitalReadingUpdateManyMutationInput, VitalReadingUncheckedUpdateManyWithoutDeviceInput>
+  }
+
+  export type DeviceVulnerabilityUpsertWithWhereUniqueWithoutDeviceInput = {
+    where: DeviceVulnerabilityWhereUniqueInput
+    update: XOR<DeviceVulnerabilityUpdateWithoutDeviceInput, DeviceVulnerabilityUncheckedUpdateWithoutDeviceInput>
+    create: XOR<DeviceVulnerabilityCreateWithoutDeviceInput, DeviceVulnerabilityUncheckedCreateWithoutDeviceInput>
+  }
+
+  export type DeviceVulnerabilityUpdateWithWhereUniqueWithoutDeviceInput = {
+    where: DeviceVulnerabilityWhereUniqueInput
+    data: XOR<DeviceVulnerabilityUpdateWithoutDeviceInput, DeviceVulnerabilityUncheckedUpdateWithoutDeviceInput>
+  }
+
+  export type DeviceVulnerabilityUpdateManyWithWhereWithoutDeviceInput = {
+    where: DeviceVulnerabilityScalarWhereInput
+    data: XOR<DeviceVulnerabilityUpdateManyMutationInput, DeviceVulnerabilityUncheckedUpdateManyWithoutDeviceInput>
+  }
+
+  export type DeviceVulnerabilityScalarWhereInput = {
+    AND?: DeviceVulnerabilityScalarWhereInput | DeviceVulnerabilityScalarWhereInput[]
+    OR?: DeviceVulnerabilityScalarWhereInput[]
+    NOT?: DeviceVulnerabilityScalarWhereInput | DeviceVulnerabilityScalarWhereInput[]
+    id?: StringFilter<"DeviceVulnerability"> | string
+    deviceId?: StringFilter<"DeviceVulnerability"> | string
+    cveId?: StringNullableFilter<"DeviceVulnerability"> | string | null
+    title?: StringFilter<"DeviceVulnerability"> | string
+    description?: StringFilter<"DeviceVulnerability"> | string
+    severity?: EnumVulnerabilitySeverityFilter<"DeviceVulnerability"> | $Enums.VulnerabilitySeverity
+    cvssScore?: FloatNullableFilter<"DeviceVulnerability"> | number | null
+    affectedVersion?: StringNullableFilter<"DeviceVulnerability"> | string | null
+    fixedVersion?: StringNullableFilter<"DeviceVulnerability"> | string | null
+    exploitAvailable?: BoolFilter<"DeviceVulnerability"> | boolean
+    status?: EnumVulnerabilityStatusFilter<"DeviceVulnerability"> | $Enums.VulnerabilityStatus
+    discoveredAt?: DateTimeFilter<"DeviceVulnerability"> | Date | string
+    resolvedAt?: DateTimeNullableFilter<"DeviceVulnerability"> | Date | string | null
+    resolvedBy?: StringNullableFilter<"DeviceVulnerability"> | string | null
+    resolutionNotes?: StringNullableFilter<"DeviceVulnerability"> | string | null
+    source?: StringNullableFilter<"DeviceVulnerability"> | string | null
+    references?: JsonNullableFilter<"DeviceVulnerability">
+    createdAt?: DateTimeFilter<"DeviceVulnerability"> | Date | string
+    updatedAt?: DateTimeFilter<"DeviceVulnerability"> | Date | string
+  }
+
+  export type DevicePatchUpsertWithWhereUniqueWithoutDeviceInput = {
+    where: DevicePatchWhereUniqueInput
+    update: XOR<DevicePatchUpdateWithoutDeviceInput, DevicePatchUncheckedUpdateWithoutDeviceInput>
+    create: XOR<DevicePatchCreateWithoutDeviceInput, DevicePatchUncheckedCreateWithoutDeviceInput>
+  }
+
+  export type DevicePatchUpdateWithWhereUniqueWithoutDeviceInput = {
+    where: DevicePatchWhereUniqueInput
+    data: XOR<DevicePatchUpdateWithoutDeviceInput, DevicePatchUncheckedUpdateWithoutDeviceInput>
+  }
+
+  export type DevicePatchUpdateManyWithWhereWithoutDeviceInput = {
+    where: DevicePatchScalarWhereInput
+    data: XOR<DevicePatchUpdateManyMutationInput, DevicePatchUncheckedUpdateManyWithoutDeviceInput>
+  }
+
+  export type DevicePatchScalarWhereInput = {
+    AND?: DevicePatchScalarWhereInput | DevicePatchScalarWhereInput[]
+    OR?: DevicePatchScalarWhereInput[]
+    NOT?: DevicePatchScalarWhereInput | DevicePatchScalarWhereInput[]
+    id?: StringFilter<"DevicePatch"> | string
+    deviceId?: StringFilter<"DevicePatch"> | string
+    patchVersion?: StringFilter<"DevicePatch"> | string
+    currentVersion?: StringFilter<"DevicePatch"> | string
+    description?: StringNullableFilter<"DevicePatch"> | string | null
+    releaseNotes?: StringNullableFilter<"DevicePatch"> | string | null
+    criticality?: EnumPatchCriticalityFilter<"DevicePatch"> | $Enums.PatchCriticality
+    scheduledDate?: DateTimeNullableFilter<"DevicePatch"> | Date | string | null
+    appliedDate?: DateTimeNullableFilter<"DevicePatch"> | Date | string | null
+    appliedBy?: StringNullableFilter<"DevicePatch"> | string | null
+    status?: EnumPatchStatusFilter<"DevicePatch"> | $Enums.PatchStatus
+    rollbackVersion?: StringNullableFilter<"DevicePatch"> | string | null
+    testingRequired?: BoolFilter<"DevicePatch"> | boolean
+    testingCompletedAt?: DateTimeNullableFilter<"DevicePatch"> | Date | string | null
+    testingNotes?: StringNullableFilter<"DevicePatch"> | string | null
+    approvedBy?: StringNullableFilter<"DevicePatch"> | string | null
+    approvedAt?: DateTimeNullableFilter<"DevicePatch"> | Date | string | null
+    failureReason?: StringNullableFilter<"DevicePatch"> | string | null
+    vulnerabilitiesFixed?: JsonNullableFilter<"DevicePatch">
+    createdAt?: DateTimeFilter<"DevicePatch"> | Date | string
+    updatedAt?: DateTimeFilter<"DevicePatch"> | Date | string
+  }
+
+  export type SecurityIncidentUpsertWithWhereUniqueWithoutDeviceInput = {
+    where: SecurityIncidentWhereUniqueInput
+    update: XOR<SecurityIncidentUpdateWithoutDeviceInput, SecurityIncidentUncheckedUpdateWithoutDeviceInput>
+    create: XOR<SecurityIncidentCreateWithoutDeviceInput, SecurityIncidentUncheckedCreateWithoutDeviceInput>
+  }
+
+  export type SecurityIncidentUpdateWithWhereUniqueWithoutDeviceInput = {
+    where: SecurityIncidentWhereUniqueInput
+    data: XOR<SecurityIncidentUpdateWithoutDeviceInput, SecurityIncidentUncheckedUpdateWithoutDeviceInput>
+  }
+
+  export type SecurityIncidentUpdateManyWithWhereWithoutDeviceInput = {
+    where: SecurityIncidentScalarWhereInput
+    data: XOR<SecurityIncidentUpdateManyMutationInput, SecurityIncidentUncheckedUpdateManyWithoutDeviceInput>
+  }
+
+  export type SecurityIncidentScalarWhereInput = {
+    AND?: SecurityIncidentScalarWhereInput | SecurityIncidentScalarWhereInput[]
+    OR?: SecurityIncidentScalarWhereInput[]
+    NOT?: SecurityIncidentScalarWhereInput | SecurityIncidentScalarWhereInput[]
+    id?: StringFilter<"SecurityIncident"> | string
+    deviceId?: StringNullableFilter<"SecurityIncident"> | string | null
+    incidentType?: EnumIncidentTypeFilter<"SecurityIncident"> | $Enums.IncidentType
+    severity?: EnumIncidentSeverityFilter<"SecurityIncident"> | $Enums.IncidentSeverity
+    title?: StringFilter<"SecurityIncident"> | string
+    description?: StringFilter<"SecurityIncident"> | string
+    affectedSystems?: JsonNullableFilter<"SecurityIncident">
+    affectedPatients?: JsonNullableFilter<"SecurityIncident">
+    detectedAt?: DateTimeFilter<"SecurityIncident"> | Date | string
+    detectedBy?: StringFilter<"SecurityIncident"> | string
+    reportedBy?: StringFilter<"SecurityIncident"> | string
+    status?: EnumIncidentStatusFilter<"SecurityIncident"> | $Enums.IncidentStatus
+    assignedTo?: StringNullableFilter<"SecurityIncident"> | string | null
+    containedAt?: DateTimeNullableFilter<"SecurityIncident"> | Date | string | null
+    resolvedAt?: DateTimeNullableFilter<"SecurityIncident"> | Date | string | null
+    rootCause?: StringNullableFilter<"SecurityIncident"> | string | null
+    remediationSteps?: JsonNullableFilter<"SecurityIncident">
+    lessonsLearned?: StringNullableFilter<"SecurityIncident"> | string | null
+    timeline?: JsonNullableFilter<"SecurityIncident">
+    evidence?: JsonNullableFilter<"SecurityIncident">
+    notificationsSent?: BoolFilter<"SecurityIncident"> | boolean
+    regulatoryReported?: BoolFilter<"SecurityIncident"> | boolean
+    regulatoryReportDate?: DateTimeNullableFilter<"SecurityIncident"> | Date | string | null
+    createdAt?: DateTimeFilter<"SecurityIncident"> | Date | string
+    updatedAt?: DateTimeFilter<"SecurityIncident"> | Date | string
+  }
+
+  export type DeviceNetworkAssignmentUpsertWithWhereUniqueWithoutDeviceInput = {
+    where: DeviceNetworkAssignmentWhereUniqueInput
+    update: XOR<DeviceNetworkAssignmentUpdateWithoutDeviceInput, DeviceNetworkAssignmentUncheckedUpdateWithoutDeviceInput>
+    create: XOR<DeviceNetworkAssignmentCreateWithoutDeviceInput, DeviceNetworkAssignmentUncheckedCreateWithoutDeviceInput>
+  }
+
+  export type DeviceNetworkAssignmentUpdateWithWhereUniqueWithoutDeviceInput = {
+    where: DeviceNetworkAssignmentWhereUniqueInput
+    data: XOR<DeviceNetworkAssignmentUpdateWithoutDeviceInput, DeviceNetworkAssignmentUncheckedUpdateWithoutDeviceInput>
+  }
+
+  export type DeviceNetworkAssignmentUpdateManyWithWhereWithoutDeviceInput = {
+    where: DeviceNetworkAssignmentScalarWhereInput
+    data: XOR<DeviceNetworkAssignmentUpdateManyMutationInput, DeviceNetworkAssignmentUncheckedUpdateManyWithoutDeviceInput>
+  }
+
+  export type DeviceNetworkAssignmentScalarWhereInput = {
+    AND?: DeviceNetworkAssignmentScalarWhereInput | DeviceNetworkAssignmentScalarWhereInput[]
+    OR?: DeviceNetworkAssignmentScalarWhereInput[]
+    NOT?: DeviceNetworkAssignmentScalarWhereInput | DeviceNetworkAssignmentScalarWhereInput[]
+    id?: StringFilter<"DeviceNetworkAssignment"> | string
+    deviceId?: StringFilter<"DeviceNetworkAssignment"> | string
+    segmentId?: StringFilter<"DeviceNetworkAssignment"> | string
+    ipAddress?: StringNullableFilter<"DeviceNetworkAssignment"> | string | null
+    macAddress?: StringNullableFilter<"DeviceNetworkAssignment"> | string | null
+    assignedAt?: DateTimeFilter<"DeviceNetworkAssignment"> | Date | string
+    assignedBy?: StringFilter<"DeviceNetworkAssignment"> | string
+    status?: EnumAssignmentStatusFilter<"DeviceNetworkAssignment"> | $Enums.AssignmentStatus
+    complianceStatus?: EnumComplianceStatusFilter<"DeviceNetworkAssignment"> | $Enums.ComplianceStatus
+    lastComplianceCheck?: DateTimeNullableFilter<"DeviceNetworkAssignment"> | Date | string | null
+    complianceNotes?: StringNullableFilter<"DeviceNetworkAssignment"> | string | null
+    createdAt?: DateTimeFilter<"DeviceNetworkAssignment"> | Date | string
+    updatedAt?: DateTimeFilter<"DeviceNetworkAssignment"> | Date | string
+  }
+
+  export type DeviceRecallStatusUpsertWithWhereUniqueWithoutDeviceInput = {
+    where: DeviceRecallStatusWhereUniqueInput
+    update: XOR<DeviceRecallStatusUpdateWithoutDeviceInput, DeviceRecallStatusUncheckedUpdateWithoutDeviceInput>
+    create: XOR<DeviceRecallStatusCreateWithoutDeviceInput, DeviceRecallStatusUncheckedCreateWithoutDeviceInput>
+  }
+
+  export type DeviceRecallStatusUpdateWithWhereUniqueWithoutDeviceInput = {
+    where: DeviceRecallStatusWhereUniqueInput
+    data: XOR<DeviceRecallStatusUpdateWithoutDeviceInput, DeviceRecallStatusUncheckedUpdateWithoutDeviceInput>
+  }
+
+  export type DeviceRecallStatusUpdateManyWithWhereWithoutDeviceInput = {
+    where: DeviceRecallStatusScalarWhereInput
+    data: XOR<DeviceRecallStatusUpdateManyMutationInput, DeviceRecallStatusUncheckedUpdateManyWithoutDeviceInput>
+  }
+
+  export type DeviceRecallStatusScalarWhereInput = {
+    AND?: DeviceRecallStatusScalarWhereInput | DeviceRecallStatusScalarWhereInput[]
+    OR?: DeviceRecallStatusScalarWhereInput[]
+    NOT?: DeviceRecallStatusScalarWhereInput | DeviceRecallStatusScalarWhereInput[]
+    id?: StringFilter<"DeviceRecallStatus"> | string
+    deviceId?: StringFilter<"DeviceRecallStatus"> | string
+    recallId?: StringFilter<"DeviceRecallStatus"> | string
+    status?: EnumDeviceRecallActionFilter<"DeviceRecallStatus"> | $Enums.DeviceRecallAction
+    actionTaken?: StringNullableFilter<"DeviceRecallStatus"> | string | null
+    actionDate?: DateTimeNullableFilter<"DeviceRecallStatus"> | Date | string | null
+    actionBy?: StringNullableFilter<"DeviceRecallStatus"> | string | null
+    notes?: StringNullableFilter<"DeviceRecallStatus"> | string | null
+    patientNotified?: BoolFilter<"DeviceRecallStatus"> | boolean
+    providerNotified?: BoolFilter<"DeviceRecallStatus"> | boolean
+    createdAt?: DateTimeFilter<"DeviceRecallStatus"> | Date | string
+    updatedAt?: DateTimeFilter<"DeviceRecallStatus"> | Date | string
+  }
+
+  export type DeviceRiskAssessmentUpsertWithWhereUniqueWithoutDeviceInput = {
+    where: DeviceRiskAssessmentWhereUniqueInput
+    update: XOR<DeviceRiskAssessmentUpdateWithoutDeviceInput, DeviceRiskAssessmentUncheckedUpdateWithoutDeviceInput>
+    create: XOR<DeviceRiskAssessmentCreateWithoutDeviceInput, DeviceRiskAssessmentUncheckedCreateWithoutDeviceInput>
+  }
+
+  export type DeviceRiskAssessmentUpdateWithWhereUniqueWithoutDeviceInput = {
+    where: DeviceRiskAssessmentWhereUniqueInput
+    data: XOR<DeviceRiskAssessmentUpdateWithoutDeviceInput, DeviceRiskAssessmentUncheckedUpdateWithoutDeviceInput>
+  }
+
+  export type DeviceRiskAssessmentUpdateManyWithWhereWithoutDeviceInput = {
+    where: DeviceRiskAssessmentScalarWhereInput
+    data: XOR<DeviceRiskAssessmentUpdateManyMutationInput, DeviceRiskAssessmentUncheckedUpdateManyWithoutDeviceInput>
+  }
+
+  export type DeviceRiskAssessmentScalarWhereInput = {
+    AND?: DeviceRiskAssessmentScalarWhereInput | DeviceRiskAssessmentScalarWhereInput[]
+    OR?: DeviceRiskAssessmentScalarWhereInput[]
+    NOT?: DeviceRiskAssessmentScalarWhereInput | DeviceRiskAssessmentScalarWhereInput[]
+    id?: StringFilter<"DeviceRiskAssessment"> | string
+    deviceId?: StringFilter<"DeviceRiskAssessment"> | string
+    overallRiskScore?: FloatFilter<"DeviceRiskAssessment"> | number
+    vulnerabilityScore?: FloatFilter<"DeviceRiskAssessment"> | number
+    patchScore?: FloatFilter<"DeviceRiskAssessment"> | number
+    networkScore?: FloatFilter<"DeviceRiskAssessment"> | number
+    complianceScore?: FloatFilter<"DeviceRiskAssessment"> | number
+    incidentScore?: FloatFilter<"DeviceRiskAssessment"> | number
+    agingScore?: FloatFilter<"DeviceRiskAssessment"> | number
+    riskLevel?: EnumRiskLevelFilter<"DeviceRiskAssessment"> | $Enums.RiskLevel
+    riskFactors?: JsonFilter<"DeviceRiskAssessment">
+    recommendations?: JsonNullableFilter<"DeviceRiskAssessment">
+    assessedAt?: DateTimeFilter<"DeviceRiskAssessment"> | Date | string
+    assessedBy?: StringNullableFilter<"DeviceRiskAssessment"> | string | null
+    nextAssessmentDue?: DateTimeNullableFilter<"DeviceRiskAssessment"> | Date | string | null
+    notes?: StringNullableFilter<"DeviceRiskAssessment"> | string | null
+    createdAt?: DateTimeFilter<"DeviceRiskAssessment"> | Date | string
   }
 
   export type CarePlanCreateWithoutVitalsInput = {
@@ -17055,8 +34630,18 @@ export namespace Prisma {
     status?: $Enums.DeviceStatus
     lastSyncAt?: Date | string | null
     batteryLevel?: number | null
+    firmwareVersion?: string | null
+    softwareVersion?: string | null
+    certificateExpiry?: Date | string | null
+    lastSecurityScan?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    vulnerabilities?: DeviceVulnerabilityCreateNestedManyWithoutDeviceInput
+    patches?: DevicePatchCreateNestedManyWithoutDeviceInput
+    incidents?: SecurityIncidentCreateNestedManyWithoutDeviceInput
+    networkAssignments?: DeviceNetworkAssignmentCreateNestedManyWithoutDeviceInput
+    recallStatuses?: DeviceRecallStatusCreateNestedManyWithoutDeviceInput
+    riskAssessments?: DeviceRiskAssessmentCreateNestedManyWithoutDeviceInput
   }
 
   export type MonitoringDeviceUncheckedCreateWithoutReadingsInput = {
@@ -17069,8 +34654,18 @@ export namespace Prisma {
     status?: $Enums.DeviceStatus
     lastSyncAt?: Date | string | null
     batteryLevel?: number | null
+    firmwareVersion?: string | null
+    softwareVersion?: string | null
+    certificateExpiry?: Date | string | null
+    lastSecurityScan?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    vulnerabilities?: DeviceVulnerabilityUncheckedCreateNestedManyWithoutDeviceInput
+    patches?: DevicePatchUncheckedCreateNestedManyWithoutDeviceInput
+    incidents?: SecurityIncidentUncheckedCreateNestedManyWithoutDeviceInput
+    networkAssignments?: DeviceNetworkAssignmentUncheckedCreateNestedManyWithoutDeviceInput
+    recallStatuses?: DeviceRecallStatusUncheckedCreateNestedManyWithoutDeviceInput
+    riskAssessments?: DeviceRiskAssessmentUncheckedCreateNestedManyWithoutDeviceInput
   }
 
   export type MonitoringDeviceCreateOrConnectWithoutReadingsInput = {
@@ -17146,8 +34741,18 @@ export namespace Prisma {
     status?: EnumDeviceStatusFieldUpdateOperationsInput | $Enums.DeviceStatus
     lastSyncAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     batteryLevel?: NullableIntFieldUpdateOperationsInput | number | null
+    firmwareVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    softwareVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    certificateExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSecurityScan?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    vulnerabilities?: DeviceVulnerabilityUpdateManyWithoutDeviceNestedInput
+    patches?: DevicePatchUpdateManyWithoutDeviceNestedInput
+    incidents?: SecurityIncidentUpdateManyWithoutDeviceNestedInput
+    networkAssignments?: DeviceNetworkAssignmentUpdateManyWithoutDeviceNestedInput
+    recallStatuses?: DeviceRecallStatusUpdateManyWithoutDeviceNestedInput
+    riskAssessments?: DeviceRiskAssessmentUpdateManyWithoutDeviceNestedInput
   }
 
   export type MonitoringDeviceUncheckedUpdateWithoutReadingsInput = {
@@ -17160,8 +34765,18 @@ export namespace Prisma {
     status?: EnumDeviceStatusFieldUpdateOperationsInput | $Enums.DeviceStatus
     lastSyncAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     batteryLevel?: NullableIntFieldUpdateOperationsInput | number | null
+    firmwareVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    softwareVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    certificateExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSecurityScan?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    vulnerabilities?: DeviceVulnerabilityUncheckedUpdateManyWithoutDeviceNestedInput
+    patches?: DevicePatchUncheckedUpdateManyWithoutDeviceNestedInput
+    incidents?: SecurityIncidentUncheckedUpdateManyWithoutDeviceNestedInput
+    networkAssignments?: DeviceNetworkAssignmentUncheckedUpdateManyWithoutDeviceNestedInput
+    recallStatuses?: DeviceRecallStatusUncheckedUpdateManyWithoutDeviceNestedInput
+    riskAssessments?: DeviceRiskAssessmentUncheckedUpdateManyWithoutDeviceNestedInput
   }
 
   export type CarePlanCreateWithoutAlertsInput = {
@@ -17396,6 +35011,968 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type MonitoringDeviceCreateWithoutVulnerabilitiesInput = {
+    id?: string
+    patientId: string
+    deviceType: $Enums.DeviceType
+    manufacturer?: string | null
+    model?: string | null
+    serialNumber: string
+    status?: $Enums.DeviceStatus
+    lastSyncAt?: Date | string | null
+    batteryLevel?: number | null
+    firmwareVersion?: string | null
+    softwareVersion?: string | null
+    certificateExpiry?: Date | string | null
+    lastSecurityScan?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    readings?: VitalReadingCreateNestedManyWithoutDeviceInput
+    patches?: DevicePatchCreateNestedManyWithoutDeviceInput
+    incidents?: SecurityIncidentCreateNestedManyWithoutDeviceInput
+    networkAssignments?: DeviceNetworkAssignmentCreateNestedManyWithoutDeviceInput
+    recallStatuses?: DeviceRecallStatusCreateNestedManyWithoutDeviceInput
+    riskAssessments?: DeviceRiskAssessmentCreateNestedManyWithoutDeviceInput
+  }
+
+  export type MonitoringDeviceUncheckedCreateWithoutVulnerabilitiesInput = {
+    id?: string
+    patientId: string
+    deviceType: $Enums.DeviceType
+    manufacturer?: string | null
+    model?: string | null
+    serialNumber: string
+    status?: $Enums.DeviceStatus
+    lastSyncAt?: Date | string | null
+    batteryLevel?: number | null
+    firmwareVersion?: string | null
+    softwareVersion?: string | null
+    certificateExpiry?: Date | string | null
+    lastSecurityScan?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    readings?: VitalReadingUncheckedCreateNestedManyWithoutDeviceInput
+    patches?: DevicePatchUncheckedCreateNestedManyWithoutDeviceInput
+    incidents?: SecurityIncidentUncheckedCreateNestedManyWithoutDeviceInput
+    networkAssignments?: DeviceNetworkAssignmentUncheckedCreateNestedManyWithoutDeviceInput
+    recallStatuses?: DeviceRecallStatusUncheckedCreateNestedManyWithoutDeviceInput
+    riskAssessments?: DeviceRiskAssessmentUncheckedCreateNestedManyWithoutDeviceInput
+  }
+
+  export type MonitoringDeviceCreateOrConnectWithoutVulnerabilitiesInput = {
+    where: MonitoringDeviceWhereUniqueInput
+    create: XOR<MonitoringDeviceCreateWithoutVulnerabilitiesInput, MonitoringDeviceUncheckedCreateWithoutVulnerabilitiesInput>
+  }
+
+  export type MonitoringDeviceUpsertWithoutVulnerabilitiesInput = {
+    update: XOR<MonitoringDeviceUpdateWithoutVulnerabilitiesInput, MonitoringDeviceUncheckedUpdateWithoutVulnerabilitiesInput>
+    create: XOR<MonitoringDeviceCreateWithoutVulnerabilitiesInput, MonitoringDeviceUncheckedCreateWithoutVulnerabilitiesInput>
+    where?: MonitoringDeviceWhereInput
+  }
+
+  export type MonitoringDeviceUpdateToOneWithWhereWithoutVulnerabilitiesInput = {
+    where?: MonitoringDeviceWhereInput
+    data: XOR<MonitoringDeviceUpdateWithoutVulnerabilitiesInput, MonitoringDeviceUncheckedUpdateWithoutVulnerabilitiesInput>
+  }
+
+  export type MonitoringDeviceUpdateWithoutVulnerabilitiesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    deviceType?: EnumDeviceTypeFieldUpdateOperationsInput | $Enums.DeviceType
+    manufacturer?: NullableStringFieldUpdateOperationsInput | string | null
+    model?: NullableStringFieldUpdateOperationsInput | string | null
+    serialNumber?: StringFieldUpdateOperationsInput | string
+    status?: EnumDeviceStatusFieldUpdateOperationsInput | $Enums.DeviceStatus
+    lastSyncAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    batteryLevel?: NullableIntFieldUpdateOperationsInput | number | null
+    firmwareVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    softwareVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    certificateExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSecurityScan?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    readings?: VitalReadingUpdateManyWithoutDeviceNestedInput
+    patches?: DevicePatchUpdateManyWithoutDeviceNestedInput
+    incidents?: SecurityIncidentUpdateManyWithoutDeviceNestedInput
+    networkAssignments?: DeviceNetworkAssignmentUpdateManyWithoutDeviceNestedInput
+    recallStatuses?: DeviceRecallStatusUpdateManyWithoutDeviceNestedInput
+    riskAssessments?: DeviceRiskAssessmentUpdateManyWithoutDeviceNestedInput
+  }
+
+  export type MonitoringDeviceUncheckedUpdateWithoutVulnerabilitiesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    deviceType?: EnumDeviceTypeFieldUpdateOperationsInput | $Enums.DeviceType
+    manufacturer?: NullableStringFieldUpdateOperationsInput | string | null
+    model?: NullableStringFieldUpdateOperationsInput | string | null
+    serialNumber?: StringFieldUpdateOperationsInput | string
+    status?: EnumDeviceStatusFieldUpdateOperationsInput | $Enums.DeviceStatus
+    lastSyncAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    batteryLevel?: NullableIntFieldUpdateOperationsInput | number | null
+    firmwareVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    softwareVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    certificateExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSecurityScan?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    readings?: VitalReadingUncheckedUpdateManyWithoutDeviceNestedInput
+    patches?: DevicePatchUncheckedUpdateManyWithoutDeviceNestedInput
+    incidents?: SecurityIncidentUncheckedUpdateManyWithoutDeviceNestedInput
+    networkAssignments?: DeviceNetworkAssignmentUncheckedUpdateManyWithoutDeviceNestedInput
+    recallStatuses?: DeviceRecallStatusUncheckedUpdateManyWithoutDeviceNestedInput
+    riskAssessments?: DeviceRiskAssessmentUncheckedUpdateManyWithoutDeviceNestedInput
+  }
+
+  export type MonitoringDeviceCreateWithoutPatchesInput = {
+    id?: string
+    patientId: string
+    deviceType: $Enums.DeviceType
+    manufacturer?: string | null
+    model?: string | null
+    serialNumber: string
+    status?: $Enums.DeviceStatus
+    lastSyncAt?: Date | string | null
+    batteryLevel?: number | null
+    firmwareVersion?: string | null
+    softwareVersion?: string | null
+    certificateExpiry?: Date | string | null
+    lastSecurityScan?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    readings?: VitalReadingCreateNestedManyWithoutDeviceInput
+    vulnerabilities?: DeviceVulnerabilityCreateNestedManyWithoutDeviceInput
+    incidents?: SecurityIncidentCreateNestedManyWithoutDeviceInput
+    networkAssignments?: DeviceNetworkAssignmentCreateNestedManyWithoutDeviceInput
+    recallStatuses?: DeviceRecallStatusCreateNestedManyWithoutDeviceInput
+    riskAssessments?: DeviceRiskAssessmentCreateNestedManyWithoutDeviceInput
+  }
+
+  export type MonitoringDeviceUncheckedCreateWithoutPatchesInput = {
+    id?: string
+    patientId: string
+    deviceType: $Enums.DeviceType
+    manufacturer?: string | null
+    model?: string | null
+    serialNumber: string
+    status?: $Enums.DeviceStatus
+    lastSyncAt?: Date | string | null
+    batteryLevel?: number | null
+    firmwareVersion?: string | null
+    softwareVersion?: string | null
+    certificateExpiry?: Date | string | null
+    lastSecurityScan?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    readings?: VitalReadingUncheckedCreateNestedManyWithoutDeviceInput
+    vulnerabilities?: DeviceVulnerabilityUncheckedCreateNestedManyWithoutDeviceInput
+    incidents?: SecurityIncidentUncheckedCreateNestedManyWithoutDeviceInput
+    networkAssignments?: DeviceNetworkAssignmentUncheckedCreateNestedManyWithoutDeviceInput
+    recallStatuses?: DeviceRecallStatusUncheckedCreateNestedManyWithoutDeviceInput
+    riskAssessments?: DeviceRiskAssessmentUncheckedCreateNestedManyWithoutDeviceInput
+  }
+
+  export type MonitoringDeviceCreateOrConnectWithoutPatchesInput = {
+    where: MonitoringDeviceWhereUniqueInput
+    create: XOR<MonitoringDeviceCreateWithoutPatchesInput, MonitoringDeviceUncheckedCreateWithoutPatchesInput>
+  }
+
+  export type MonitoringDeviceUpsertWithoutPatchesInput = {
+    update: XOR<MonitoringDeviceUpdateWithoutPatchesInput, MonitoringDeviceUncheckedUpdateWithoutPatchesInput>
+    create: XOR<MonitoringDeviceCreateWithoutPatchesInput, MonitoringDeviceUncheckedCreateWithoutPatchesInput>
+    where?: MonitoringDeviceWhereInput
+  }
+
+  export type MonitoringDeviceUpdateToOneWithWhereWithoutPatchesInput = {
+    where?: MonitoringDeviceWhereInput
+    data: XOR<MonitoringDeviceUpdateWithoutPatchesInput, MonitoringDeviceUncheckedUpdateWithoutPatchesInput>
+  }
+
+  export type MonitoringDeviceUpdateWithoutPatchesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    deviceType?: EnumDeviceTypeFieldUpdateOperationsInput | $Enums.DeviceType
+    manufacturer?: NullableStringFieldUpdateOperationsInput | string | null
+    model?: NullableStringFieldUpdateOperationsInput | string | null
+    serialNumber?: StringFieldUpdateOperationsInput | string
+    status?: EnumDeviceStatusFieldUpdateOperationsInput | $Enums.DeviceStatus
+    lastSyncAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    batteryLevel?: NullableIntFieldUpdateOperationsInput | number | null
+    firmwareVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    softwareVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    certificateExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSecurityScan?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    readings?: VitalReadingUpdateManyWithoutDeviceNestedInput
+    vulnerabilities?: DeviceVulnerabilityUpdateManyWithoutDeviceNestedInput
+    incidents?: SecurityIncidentUpdateManyWithoutDeviceNestedInput
+    networkAssignments?: DeviceNetworkAssignmentUpdateManyWithoutDeviceNestedInput
+    recallStatuses?: DeviceRecallStatusUpdateManyWithoutDeviceNestedInput
+    riskAssessments?: DeviceRiskAssessmentUpdateManyWithoutDeviceNestedInput
+  }
+
+  export type MonitoringDeviceUncheckedUpdateWithoutPatchesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    deviceType?: EnumDeviceTypeFieldUpdateOperationsInput | $Enums.DeviceType
+    manufacturer?: NullableStringFieldUpdateOperationsInput | string | null
+    model?: NullableStringFieldUpdateOperationsInput | string | null
+    serialNumber?: StringFieldUpdateOperationsInput | string
+    status?: EnumDeviceStatusFieldUpdateOperationsInput | $Enums.DeviceStatus
+    lastSyncAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    batteryLevel?: NullableIntFieldUpdateOperationsInput | number | null
+    firmwareVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    softwareVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    certificateExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSecurityScan?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    readings?: VitalReadingUncheckedUpdateManyWithoutDeviceNestedInput
+    vulnerabilities?: DeviceVulnerabilityUncheckedUpdateManyWithoutDeviceNestedInput
+    incidents?: SecurityIncidentUncheckedUpdateManyWithoutDeviceNestedInput
+    networkAssignments?: DeviceNetworkAssignmentUncheckedUpdateManyWithoutDeviceNestedInput
+    recallStatuses?: DeviceRecallStatusUncheckedUpdateManyWithoutDeviceNestedInput
+    riskAssessments?: DeviceRiskAssessmentUncheckedUpdateManyWithoutDeviceNestedInput
+  }
+
+  export type MonitoringDeviceCreateWithoutIncidentsInput = {
+    id?: string
+    patientId: string
+    deviceType: $Enums.DeviceType
+    manufacturer?: string | null
+    model?: string | null
+    serialNumber: string
+    status?: $Enums.DeviceStatus
+    lastSyncAt?: Date | string | null
+    batteryLevel?: number | null
+    firmwareVersion?: string | null
+    softwareVersion?: string | null
+    certificateExpiry?: Date | string | null
+    lastSecurityScan?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    readings?: VitalReadingCreateNestedManyWithoutDeviceInput
+    vulnerabilities?: DeviceVulnerabilityCreateNestedManyWithoutDeviceInput
+    patches?: DevicePatchCreateNestedManyWithoutDeviceInput
+    networkAssignments?: DeviceNetworkAssignmentCreateNestedManyWithoutDeviceInput
+    recallStatuses?: DeviceRecallStatusCreateNestedManyWithoutDeviceInput
+    riskAssessments?: DeviceRiskAssessmentCreateNestedManyWithoutDeviceInput
+  }
+
+  export type MonitoringDeviceUncheckedCreateWithoutIncidentsInput = {
+    id?: string
+    patientId: string
+    deviceType: $Enums.DeviceType
+    manufacturer?: string | null
+    model?: string | null
+    serialNumber: string
+    status?: $Enums.DeviceStatus
+    lastSyncAt?: Date | string | null
+    batteryLevel?: number | null
+    firmwareVersion?: string | null
+    softwareVersion?: string | null
+    certificateExpiry?: Date | string | null
+    lastSecurityScan?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    readings?: VitalReadingUncheckedCreateNestedManyWithoutDeviceInput
+    vulnerabilities?: DeviceVulnerabilityUncheckedCreateNestedManyWithoutDeviceInput
+    patches?: DevicePatchUncheckedCreateNestedManyWithoutDeviceInput
+    networkAssignments?: DeviceNetworkAssignmentUncheckedCreateNestedManyWithoutDeviceInput
+    recallStatuses?: DeviceRecallStatusUncheckedCreateNestedManyWithoutDeviceInput
+    riskAssessments?: DeviceRiskAssessmentUncheckedCreateNestedManyWithoutDeviceInput
+  }
+
+  export type MonitoringDeviceCreateOrConnectWithoutIncidentsInput = {
+    where: MonitoringDeviceWhereUniqueInput
+    create: XOR<MonitoringDeviceCreateWithoutIncidentsInput, MonitoringDeviceUncheckedCreateWithoutIncidentsInput>
+  }
+
+  export type MonitoringDeviceUpsertWithoutIncidentsInput = {
+    update: XOR<MonitoringDeviceUpdateWithoutIncidentsInput, MonitoringDeviceUncheckedUpdateWithoutIncidentsInput>
+    create: XOR<MonitoringDeviceCreateWithoutIncidentsInput, MonitoringDeviceUncheckedCreateWithoutIncidentsInput>
+    where?: MonitoringDeviceWhereInput
+  }
+
+  export type MonitoringDeviceUpdateToOneWithWhereWithoutIncidentsInput = {
+    where?: MonitoringDeviceWhereInput
+    data: XOR<MonitoringDeviceUpdateWithoutIncidentsInput, MonitoringDeviceUncheckedUpdateWithoutIncidentsInput>
+  }
+
+  export type MonitoringDeviceUpdateWithoutIncidentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    deviceType?: EnumDeviceTypeFieldUpdateOperationsInput | $Enums.DeviceType
+    manufacturer?: NullableStringFieldUpdateOperationsInput | string | null
+    model?: NullableStringFieldUpdateOperationsInput | string | null
+    serialNumber?: StringFieldUpdateOperationsInput | string
+    status?: EnumDeviceStatusFieldUpdateOperationsInput | $Enums.DeviceStatus
+    lastSyncAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    batteryLevel?: NullableIntFieldUpdateOperationsInput | number | null
+    firmwareVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    softwareVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    certificateExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSecurityScan?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    readings?: VitalReadingUpdateManyWithoutDeviceNestedInput
+    vulnerabilities?: DeviceVulnerabilityUpdateManyWithoutDeviceNestedInput
+    patches?: DevicePatchUpdateManyWithoutDeviceNestedInput
+    networkAssignments?: DeviceNetworkAssignmentUpdateManyWithoutDeviceNestedInput
+    recallStatuses?: DeviceRecallStatusUpdateManyWithoutDeviceNestedInput
+    riskAssessments?: DeviceRiskAssessmentUpdateManyWithoutDeviceNestedInput
+  }
+
+  export type MonitoringDeviceUncheckedUpdateWithoutIncidentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    deviceType?: EnumDeviceTypeFieldUpdateOperationsInput | $Enums.DeviceType
+    manufacturer?: NullableStringFieldUpdateOperationsInput | string | null
+    model?: NullableStringFieldUpdateOperationsInput | string | null
+    serialNumber?: StringFieldUpdateOperationsInput | string
+    status?: EnumDeviceStatusFieldUpdateOperationsInput | $Enums.DeviceStatus
+    lastSyncAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    batteryLevel?: NullableIntFieldUpdateOperationsInput | number | null
+    firmwareVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    softwareVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    certificateExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSecurityScan?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    readings?: VitalReadingUncheckedUpdateManyWithoutDeviceNestedInput
+    vulnerabilities?: DeviceVulnerabilityUncheckedUpdateManyWithoutDeviceNestedInput
+    patches?: DevicePatchUncheckedUpdateManyWithoutDeviceNestedInput
+    networkAssignments?: DeviceNetworkAssignmentUncheckedUpdateManyWithoutDeviceNestedInput
+    recallStatuses?: DeviceRecallStatusUncheckedUpdateManyWithoutDeviceNestedInput
+    riskAssessments?: DeviceRiskAssessmentUncheckedUpdateManyWithoutDeviceNestedInput
+  }
+
+  export type DeviceNetworkAssignmentCreateWithoutSegmentInput = {
+    id?: string
+    ipAddress?: string | null
+    macAddress?: string | null
+    assignedAt?: Date | string
+    assignedBy: string
+    status?: $Enums.AssignmentStatus
+    complianceStatus?: $Enums.ComplianceStatus
+    lastComplianceCheck?: Date | string | null
+    complianceNotes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    device: MonitoringDeviceCreateNestedOneWithoutNetworkAssignmentsInput
+  }
+
+  export type DeviceNetworkAssignmentUncheckedCreateWithoutSegmentInput = {
+    id?: string
+    deviceId: string
+    ipAddress?: string | null
+    macAddress?: string | null
+    assignedAt?: Date | string
+    assignedBy: string
+    status?: $Enums.AssignmentStatus
+    complianceStatus?: $Enums.ComplianceStatus
+    lastComplianceCheck?: Date | string | null
+    complianceNotes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DeviceNetworkAssignmentCreateOrConnectWithoutSegmentInput = {
+    where: DeviceNetworkAssignmentWhereUniqueInput
+    create: XOR<DeviceNetworkAssignmentCreateWithoutSegmentInput, DeviceNetworkAssignmentUncheckedCreateWithoutSegmentInput>
+  }
+
+  export type DeviceNetworkAssignmentCreateManySegmentInputEnvelope = {
+    data: DeviceNetworkAssignmentCreateManySegmentInput | DeviceNetworkAssignmentCreateManySegmentInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type DeviceNetworkAssignmentUpsertWithWhereUniqueWithoutSegmentInput = {
+    where: DeviceNetworkAssignmentWhereUniqueInput
+    update: XOR<DeviceNetworkAssignmentUpdateWithoutSegmentInput, DeviceNetworkAssignmentUncheckedUpdateWithoutSegmentInput>
+    create: XOR<DeviceNetworkAssignmentCreateWithoutSegmentInput, DeviceNetworkAssignmentUncheckedCreateWithoutSegmentInput>
+  }
+
+  export type DeviceNetworkAssignmentUpdateWithWhereUniqueWithoutSegmentInput = {
+    where: DeviceNetworkAssignmentWhereUniqueInput
+    data: XOR<DeviceNetworkAssignmentUpdateWithoutSegmentInput, DeviceNetworkAssignmentUncheckedUpdateWithoutSegmentInput>
+  }
+
+  export type DeviceNetworkAssignmentUpdateManyWithWhereWithoutSegmentInput = {
+    where: DeviceNetworkAssignmentScalarWhereInput
+    data: XOR<DeviceNetworkAssignmentUpdateManyMutationInput, DeviceNetworkAssignmentUncheckedUpdateManyWithoutSegmentInput>
+  }
+
+  export type MonitoringDeviceCreateWithoutNetworkAssignmentsInput = {
+    id?: string
+    patientId: string
+    deviceType: $Enums.DeviceType
+    manufacturer?: string | null
+    model?: string | null
+    serialNumber: string
+    status?: $Enums.DeviceStatus
+    lastSyncAt?: Date | string | null
+    batteryLevel?: number | null
+    firmwareVersion?: string | null
+    softwareVersion?: string | null
+    certificateExpiry?: Date | string | null
+    lastSecurityScan?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    readings?: VitalReadingCreateNestedManyWithoutDeviceInput
+    vulnerabilities?: DeviceVulnerabilityCreateNestedManyWithoutDeviceInput
+    patches?: DevicePatchCreateNestedManyWithoutDeviceInput
+    incidents?: SecurityIncidentCreateNestedManyWithoutDeviceInput
+    recallStatuses?: DeviceRecallStatusCreateNestedManyWithoutDeviceInput
+    riskAssessments?: DeviceRiskAssessmentCreateNestedManyWithoutDeviceInput
+  }
+
+  export type MonitoringDeviceUncheckedCreateWithoutNetworkAssignmentsInput = {
+    id?: string
+    patientId: string
+    deviceType: $Enums.DeviceType
+    manufacturer?: string | null
+    model?: string | null
+    serialNumber: string
+    status?: $Enums.DeviceStatus
+    lastSyncAt?: Date | string | null
+    batteryLevel?: number | null
+    firmwareVersion?: string | null
+    softwareVersion?: string | null
+    certificateExpiry?: Date | string | null
+    lastSecurityScan?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    readings?: VitalReadingUncheckedCreateNestedManyWithoutDeviceInput
+    vulnerabilities?: DeviceVulnerabilityUncheckedCreateNestedManyWithoutDeviceInput
+    patches?: DevicePatchUncheckedCreateNestedManyWithoutDeviceInput
+    incidents?: SecurityIncidentUncheckedCreateNestedManyWithoutDeviceInput
+    recallStatuses?: DeviceRecallStatusUncheckedCreateNestedManyWithoutDeviceInput
+    riskAssessments?: DeviceRiskAssessmentUncheckedCreateNestedManyWithoutDeviceInput
+  }
+
+  export type MonitoringDeviceCreateOrConnectWithoutNetworkAssignmentsInput = {
+    where: MonitoringDeviceWhereUniqueInput
+    create: XOR<MonitoringDeviceCreateWithoutNetworkAssignmentsInput, MonitoringDeviceUncheckedCreateWithoutNetworkAssignmentsInput>
+  }
+
+  export type NetworkSegmentCreateWithoutDevicesInput = {
+    id?: string
+    name: string
+    description?: string | null
+    vlanId?: number | null
+    subnetCidr?: string | null
+    securityLevel: $Enums.SecurityLevel
+    isolationLevel?: $Enums.IsolationLevel
+    allowedProtocols?: NullableJsonNullValueInput | InputJsonValue
+    firewallRules?: NullableJsonNullValueInput | InputJsonValue
+    complianceRequirements?: NullableJsonNullValueInput | InputJsonValue
+    monitoringEnabled?: boolean
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type NetworkSegmentUncheckedCreateWithoutDevicesInput = {
+    id?: string
+    name: string
+    description?: string | null
+    vlanId?: number | null
+    subnetCidr?: string | null
+    securityLevel: $Enums.SecurityLevel
+    isolationLevel?: $Enums.IsolationLevel
+    allowedProtocols?: NullableJsonNullValueInput | InputJsonValue
+    firewallRules?: NullableJsonNullValueInput | InputJsonValue
+    complianceRequirements?: NullableJsonNullValueInput | InputJsonValue
+    monitoringEnabled?: boolean
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type NetworkSegmentCreateOrConnectWithoutDevicesInput = {
+    where: NetworkSegmentWhereUniqueInput
+    create: XOR<NetworkSegmentCreateWithoutDevicesInput, NetworkSegmentUncheckedCreateWithoutDevicesInput>
+  }
+
+  export type MonitoringDeviceUpsertWithoutNetworkAssignmentsInput = {
+    update: XOR<MonitoringDeviceUpdateWithoutNetworkAssignmentsInput, MonitoringDeviceUncheckedUpdateWithoutNetworkAssignmentsInput>
+    create: XOR<MonitoringDeviceCreateWithoutNetworkAssignmentsInput, MonitoringDeviceUncheckedCreateWithoutNetworkAssignmentsInput>
+    where?: MonitoringDeviceWhereInput
+  }
+
+  export type MonitoringDeviceUpdateToOneWithWhereWithoutNetworkAssignmentsInput = {
+    where?: MonitoringDeviceWhereInput
+    data: XOR<MonitoringDeviceUpdateWithoutNetworkAssignmentsInput, MonitoringDeviceUncheckedUpdateWithoutNetworkAssignmentsInput>
+  }
+
+  export type MonitoringDeviceUpdateWithoutNetworkAssignmentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    deviceType?: EnumDeviceTypeFieldUpdateOperationsInput | $Enums.DeviceType
+    manufacturer?: NullableStringFieldUpdateOperationsInput | string | null
+    model?: NullableStringFieldUpdateOperationsInput | string | null
+    serialNumber?: StringFieldUpdateOperationsInput | string
+    status?: EnumDeviceStatusFieldUpdateOperationsInput | $Enums.DeviceStatus
+    lastSyncAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    batteryLevel?: NullableIntFieldUpdateOperationsInput | number | null
+    firmwareVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    softwareVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    certificateExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSecurityScan?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    readings?: VitalReadingUpdateManyWithoutDeviceNestedInput
+    vulnerabilities?: DeviceVulnerabilityUpdateManyWithoutDeviceNestedInput
+    patches?: DevicePatchUpdateManyWithoutDeviceNestedInput
+    incidents?: SecurityIncidentUpdateManyWithoutDeviceNestedInput
+    recallStatuses?: DeviceRecallStatusUpdateManyWithoutDeviceNestedInput
+    riskAssessments?: DeviceRiskAssessmentUpdateManyWithoutDeviceNestedInput
+  }
+
+  export type MonitoringDeviceUncheckedUpdateWithoutNetworkAssignmentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    deviceType?: EnumDeviceTypeFieldUpdateOperationsInput | $Enums.DeviceType
+    manufacturer?: NullableStringFieldUpdateOperationsInput | string | null
+    model?: NullableStringFieldUpdateOperationsInput | string | null
+    serialNumber?: StringFieldUpdateOperationsInput | string
+    status?: EnumDeviceStatusFieldUpdateOperationsInput | $Enums.DeviceStatus
+    lastSyncAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    batteryLevel?: NullableIntFieldUpdateOperationsInput | number | null
+    firmwareVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    softwareVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    certificateExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSecurityScan?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    readings?: VitalReadingUncheckedUpdateManyWithoutDeviceNestedInput
+    vulnerabilities?: DeviceVulnerabilityUncheckedUpdateManyWithoutDeviceNestedInput
+    patches?: DevicePatchUncheckedUpdateManyWithoutDeviceNestedInput
+    incidents?: SecurityIncidentUncheckedUpdateManyWithoutDeviceNestedInput
+    recallStatuses?: DeviceRecallStatusUncheckedUpdateManyWithoutDeviceNestedInput
+    riskAssessments?: DeviceRiskAssessmentUncheckedUpdateManyWithoutDeviceNestedInput
+  }
+
+  export type NetworkSegmentUpsertWithoutDevicesInput = {
+    update: XOR<NetworkSegmentUpdateWithoutDevicesInput, NetworkSegmentUncheckedUpdateWithoutDevicesInput>
+    create: XOR<NetworkSegmentCreateWithoutDevicesInput, NetworkSegmentUncheckedCreateWithoutDevicesInput>
+    where?: NetworkSegmentWhereInput
+  }
+
+  export type NetworkSegmentUpdateToOneWithWhereWithoutDevicesInput = {
+    where?: NetworkSegmentWhereInput
+    data: XOR<NetworkSegmentUpdateWithoutDevicesInput, NetworkSegmentUncheckedUpdateWithoutDevicesInput>
+  }
+
+  export type NetworkSegmentUpdateWithoutDevicesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    vlanId?: NullableIntFieldUpdateOperationsInput | number | null
+    subnetCidr?: NullableStringFieldUpdateOperationsInput | string | null
+    securityLevel?: EnumSecurityLevelFieldUpdateOperationsInput | $Enums.SecurityLevel
+    isolationLevel?: EnumIsolationLevelFieldUpdateOperationsInput | $Enums.IsolationLevel
+    allowedProtocols?: NullableJsonNullValueInput | InputJsonValue
+    firewallRules?: NullableJsonNullValueInput | InputJsonValue
+    complianceRequirements?: NullableJsonNullValueInput | InputJsonValue
+    monitoringEnabled?: BoolFieldUpdateOperationsInput | boolean
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type NetworkSegmentUncheckedUpdateWithoutDevicesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    vlanId?: NullableIntFieldUpdateOperationsInput | number | null
+    subnetCidr?: NullableStringFieldUpdateOperationsInput | string | null
+    securityLevel?: EnumSecurityLevelFieldUpdateOperationsInput | $Enums.SecurityLevel
+    isolationLevel?: EnumIsolationLevelFieldUpdateOperationsInput | $Enums.IsolationLevel
+    allowedProtocols?: NullableJsonNullValueInput | InputJsonValue
+    firewallRules?: NullableJsonNullValueInput | InputJsonValue
+    complianceRequirements?: NullableJsonNullValueInput | InputJsonValue
+    monitoringEnabled?: BoolFieldUpdateOperationsInput | boolean
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeviceRecallStatusCreateWithoutRecallInput = {
+    id?: string
+    status?: $Enums.DeviceRecallAction
+    actionTaken?: string | null
+    actionDate?: Date | string | null
+    actionBy?: string | null
+    notes?: string | null
+    patientNotified?: boolean
+    providerNotified?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    device: MonitoringDeviceCreateNestedOneWithoutRecallStatusesInput
+  }
+
+  export type DeviceRecallStatusUncheckedCreateWithoutRecallInput = {
+    id?: string
+    deviceId: string
+    status?: $Enums.DeviceRecallAction
+    actionTaken?: string | null
+    actionDate?: Date | string | null
+    actionBy?: string | null
+    notes?: string | null
+    patientNotified?: boolean
+    providerNotified?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DeviceRecallStatusCreateOrConnectWithoutRecallInput = {
+    where: DeviceRecallStatusWhereUniqueInput
+    create: XOR<DeviceRecallStatusCreateWithoutRecallInput, DeviceRecallStatusUncheckedCreateWithoutRecallInput>
+  }
+
+  export type DeviceRecallStatusCreateManyRecallInputEnvelope = {
+    data: DeviceRecallStatusCreateManyRecallInput | DeviceRecallStatusCreateManyRecallInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type DeviceRecallStatusUpsertWithWhereUniqueWithoutRecallInput = {
+    where: DeviceRecallStatusWhereUniqueInput
+    update: XOR<DeviceRecallStatusUpdateWithoutRecallInput, DeviceRecallStatusUncheckedUpdateWithoutRecallInput>
+    create: XOR<DeviceRecallStatusCreateWithoutRecallInput, DeviceRecallStatusUncheckedCreateWithoutRecallInput>
+  }
+
+  export type DeviceRecallStatusUpdateWithWhereUniqueWithoutRecallInput = {
+    where: DeviceRecallStatusWhereUniqueInput
+    data: XOR<DeviceRecallStatusUpdateWithoutRecallInput, DeviceRecallStatusUncheckedUpdateWithoutRecallInput>
+  }
+
+  export type DeviceRecallStatusUpdateManyWithWhereWithoutRecallInput = {
+    where: DeviceRecallStatusScalarWhereInput
+    data: XOR<DeviceRecallStatusUpdateManyMutationInput, DeviceRecallStatusUncheckedUpdateManyWithoutRecallInput>
+  }
+
+  export type MonitoringDeviceCreateWithoutRecallStatusesInput = {
+    id?: string
+    patientId: string
+    deviceType: $Enums.DeviceType
+    manufacturer?: string | null
+    model?: string | null
+    serialNumber: string
+    status?: $Enums.DeviceStatus
+    lastSyncAt?: Date | string | null
+    batteryLevel?: number | null
+    firmwareVersion?: string | null
+    softwareVersion?: string | null
+    certificateExpiry?: Date | string | null
+    lastSecurityScan?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    readings?: VitalReadingCreateNestedManyWithoutDeviceInput
+    vulnerabilities?: DeviceVulnerabilityCreateNestedManyWithoutDeviceInput
+    patches?: DevicePatchCreateNestedManyWithoutDeviceInput
+    incidents?: SecurityIncidentCreateNestedManyWithoutDeviceInput
+    networkAssignments?: DeviceNetworkAssignmentCreateNestedManyWithoutDeviceInput
+    riskAssessments?: DeviceRiskAssessmentCreateNestedManyWithoutDeviceInput
+  }
+
+  export type MonitoringDeviceUncheckedCreateWithoutRecallStatusesInput = {
+    id?: string
+    patientId: string
+    deviceType: $Enums.DeviceType
+    manufacturer?: string | null
+    model?: string | null
+    serialNumber: string
+    status?: $Enums.DeviceStatus
+    lastSyncAt?: Date | string | null
+    batteryLevel?: number | null
+    firmwareVersion?: string | null
+    softwareVersion?: string | null
+    certificateExpiry?: Date | string | null
+    lastSecurityScan?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    readings?: VitalReadingUncheckedCreateNestedManyWithoutDeviceInput
+    vulnerabilities?: DeviceVulnerabilityUncheckedCreateNestedManyWithoutDeviceInput
+    patches?: DevicePatchUncheckedCreateNestedManyWithoutDeviceInput
+    incidents?: SecurityIncidentUncheckedCreateNestedManyWithoutDeviceInput
+    networkAssignments?: DeviceNetworkAssignmentUncheckedCreateNestedManyWithoutDeviceInput
+    riskAssessments?: DeviceRiskAssessmentUncheckedCreateNestedManyWithoutDeviceInput
+  }
+
+  export type MonitoringDeviceCreateOrConnectWithoutRecallStatusesInput = {
+    where: MonitoringDeviceWhereUniqueInput
+    create: XOR<MonitoringDeviceCreateWithoutRecallStatusesInput, MonitoringDeviceUncheckedCreateWithoutRecallStatusesInput>
+  }
+
+  export type FDARecallCreateWithoutAffectedDevicesInput = {
+    id?: string
+    recallNumber: string
+    recallClass: $Enums.RecallClass
+    productDescription: string
+    manufacturer: string
+    reasonForRecall: string
+    distributionPattern?: string | null
+    initiatedDate: Date | string
+    terminatedDate?: Date | string | null
+    status?: $Enums.RecallStatus
+    affectedModels?: NullableJsonNullValueInput | InputJsonValue
+    lotNumbers?: NullableJsonNullValueInput | InputJsonValue
+    healthHazard?: string | null
+    remedyDescription?: string | null
+    lastCheckedAt?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FDARecallUncheckedCreateWithoutAffectedDevicesInput = {
+    id?: string
+    recallNumber: string
+    recallClass: $Enums.RecallClass
+    productDescription: string
+    manufacturer: string
+    reasonForRecall: string
+    distributionPattern?: string | null
+    initiatedDate: Date | string
+    terminatedDate?: Date | string | null
+    status?: $Enums.RecallStatus
+    affectedModels?: NullableJsonNullValueInput | InputJsonValue
+    lotNumbers?: NullableJsonNullValueInput | InputJsonValue
+    healthHazard?: string | null
+    remedyDescription?: string | null
+    lastCheckedAt?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FDARecallCreateOrConnectWithoutAffectedDevicesInput = {
+    where: FDARecallWhereUniqueInput
+    create: XOR<FDARecallCreateWithoutAffectedDevicesInput, FDARecallUncheckedCreateWithoutAffectedDevicesInput>
+  }
+
+  export type MonitoringDeviceUpsertWithoutRecallStatusesInput = {
+    update: XOR<MonitoringDeviceUpdateWithoutRecallStatusesInput, MonitoringDeviceUncheckedUpdateWithoutRecallStatusesInput>
+    create: XOR<MonitoringDeviceCreateWithoutRecallStatusesInput, MonitoringDeviceUncheckedCreateWithoutRecallStatusesInput>
+    where?: MonitoringDeviceWhereInput
+  }
+
+  export type MonitoringDeviceUpdateToOneWithWhereWithoutRecallStatusesInput = {
+    where?: MonitoringDeviceWhereInput
+    data: XOR<MonitoringDeviceUpdateWithoutRecallStatusesInput, MonitoringDeviceUncheckedUpdateWithoutRecallStatusesInput>
+  }
+
+  export type MonitoringDeviceUpdateWithoutRecallStatusesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    deviceType?: EnumDeviceTypeFieldUpdateOperationsInput | $Enums.DeviceType
+    manufacturer?: NullableStringFieldUpdateOperationsInput | string | null
+    model?: NullableStringFieldUpdateOperationsInput | string | null
+    serialNumber?: StringFieldUpdateOperationsInput | string
+    status?: EnumDeviceStatusFieldUpdateOperationsInput | $Enums.DeviceStatus
+    lastSyncAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    batteryLevel?: NullableIntFieldUpdateOperationsInput | number | null
+    firmwareVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    softwareVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    certificateExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSecurityScan?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    readings?: VitalReadingUpdateManyWithoutDeviceNestedInput
+    vulnerabilities?: DeviceVulnerabilityUpdateManyWithoutDeviceNestedInput
+    patches?: DevicePatchUpdateManyWithoutDeviceNestedInput
+    incidents?: SecurityIncidentUpdateManyWithoutDeviceNestedInput
+    networkAssignments?: DeviceNetworkAssignmentUpdateManyWithoutDeviceNestedInput
+    riskAssessments?: DeviceRiskAssessmentUpdateManyWithoutDeviceNestedInput
+  }
+
+  export type MonitoringDeviceUncheckedUpdateWithoutRecallStatusesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    deviceType?: EnumDeviceTypeFieldUpdateOperationsInput | $Enums.DeviceType
+    manufacturer?: NullableStringFieldUpdateOperationsInput | string | null
+    model?: NullableStringFieldUpdateOperationsInput | string | null
+    serialNumber?: StringFieldUpdateOperationsInput | string
+    status?: EnumDeviceStatusFieldUpdateOperationsInput | $Enums.DeviceStatus
+    lastSyncAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    batteryLevel?: NullableIntFieldUpdateOperationsInput | number | null
+    firmwareVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    softwareVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    certificateExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSecurityScan?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    readings?: VitalReadingUncheckedUpdateManyWithoutDeviceNestedInput
+    vulnerabilities?: DeviceVulnerabilityUncheckedUpdateManyWithoutDeviceNestedInput
+    patches?: DevicePatchUncheckedUpdateManyWithoutDeviceNestedInput
+    incidents?: SecurityIncidentUncheckedUpdateManyWithoutDeviceNestedInput
+    networkAssignments?: DeviceNetworkAssignmentUncheckedUpdateManyWithoutDeviceNestedInput
+    riskAssessments?: DeviceRiskAssessmentUncheckedUpdateManyWithoutDeviceNestedInput
+  }
+
+  export type FDARecallUpsertWithoutAffectedDevicesInput = {
+    update: XOR<FDARecallUpdateWithoutAffectedDevicesInput, FDARecallUncheckedUpdateWithoutAffectedDevicesInput>
+    create: XOR<FDARecallCreateWithoutAffectedDevicesInput, FDARecallUncheckedCreateWithoutAffectedDevicesInput>
+    where?: FDARecallWhereInput
+  }
+
+  export type FDARecallUpdateToOneWithWhereWithoutAffectedDevicesInput = {
+    where?: FDARecallWhereInput
+    data: XOR<FDARecallUpdateWithoutAffectedDevicesInput, FDARecallUncheckedUpdateWithoutAffectedDevicesInput>
+  }
+
+  export type FDARecallUpdateWithoutAffectedDevicesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    recallNumber?: StringFieldUpdateOperationsInput | string
+    recallClass?: EnumRecallClassFieldUpdateOperationsInput | $Enums.RecallClass
+    productDescription?: StringFieldUpdateOperationsInput | string
+    manufacturer?: StringFieldUpdateOperationsInput | string
+    reasonForRecall?: StringFieldUpdateOperationsInput | string
+    distributionPattern?: NullableStringFieldUpdateOperationsInput | string | null
+    initiatedDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    terminatedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumRecallStatusFieldUpdateOperationsInput | $Enums.RecallStatus
+    affectedModels?: NullableJsonNullValueInput | InputJsonValue
+    lotNumbers?: NullableJsonNullValueInput | InputJsonValue
+    healthHazard?: NullableStringFieldUpdateOperationsInput | string | null
+    remedyDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    lastCheckedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FDARecallUncheckedUpdateWithoutAffectedDevicesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    recallNumber?: StringFieldUpdateOperationsInput | string
+    recallClass?: EnumRecallClassFieldUpdateOperationsInput | $Enums.RecallClass
+    productDescription?: StringFieldUpdateOperationsInput | string
+    manufacturer?: StringFieldUpdateOperationsInput | string
+    reasonForRecall?: StringFieldUpdateOperationsInput | string
+    distributionPattern?: NullableStringFieldUpdateOperationsInput | string | null
+    initiatedDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    terminatedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumRecallStatusFieldUpdateOperationsInput | $Enums.RecallStatus
+    affectedModels?: NullableJsonNullValueInput | InputJsonValue
+    lotNumbers?: NullableJsonNullValueInput | InputJsonValue
+    healthHazard?: NullableStringFieldUpdateOperationsInput | string | null
+    remedyDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    lastCheckedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MonitoringDeviceCreateWithoutRiskAssessmentsInput = {
+    id?: string
+    patientId: string
+    deviceType: $Enums.DeviceType
+    manufacturer?: string | null
+    model?: string | null
+    serialNumber: string
+    status?: $Enums.DeviceStatus
+    lastSyncAt?: Date | string | null
+    batteryLevel?: number | null
+    firmwareVersion?: string | null
+    softwareVersion?: string | null
+    certificateExpiry?: Date | string | null
+    lastSecurityScan?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    readings?: VitalReadingCreateNestedManyWithoutDeviceInput
+    vulnerabilities?: DeviceVulnerabilityCreateNestedManyWithoutDeviceInput
+    patches?: DevicePatchCreateNestedManyWithoutDeviceInput
+    incidents?: SecurityIncidentCreateNestedManyWithoutDeviceInput
+    networkAssignments?: DeviceNetworkAssignmentCreateNestedManyWithoutDeviceInput
+    recallStatuses?: DeviceRecallStatusCreateNestedManyWithoutDeviceInput
+  }
+
+  export type MonitoringDeviceUncheckedCreateWithoutRiskAssessmentsInput = {
+    id?: string
+    patientId: string
+    deviceType: $Enums.DeviceType
+    manufacturer?: string | null
+    model?: string | null
+    serialNumber: string
+    status?: $Enums.DeviceStatus
+    lastSyncAt?: Date | string | null
+    batteryLevel?: number | null
+    firmwareVersion?: string | null
+    softwareVersion?: string | null
+    certificateExpiry?: Date | string | null
+    lastSecurityScan?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    readings?: VitalReadingUncheckedCreateNestedManyWithoutDeviceInput
+    vulnerabilities?: DeviceVulnerabilityUncheckedCreateNestedManyWithoutDeviceInput
+    patches?: DevicePatchUncheckedCreateNestedManyWithoutDeviceInput
+    incidents?: SecurityIncidentUncheckedCreateNestedManyWithoutDeviceInput
+    networkAssignments?: DeviceNetworkAssignmentUncheckedCreateNestedManyWithoutDeviceInput
+    recallStatuses?: DeviceRecallStatusUncheckedCreateNestedManyWithoutDeviceInput
+  }
+
+  export type MonitoringDeviceCreateOrConnectWithoutRiskAssessmentsInput = {
+    where: MonitoringDeviceWhereUniqueInput
+    create: XOR<MonitoringDeviceCreateWithoutRiskAssessmentsInput, MonitoringDeviceUncheckedCreateWithoutRiskAssessmentsInput>
+  }
+
+  export type MonitoringDeviceUpsertWithoutRiskAssessmentsInput = {
+    update: XOR<MonitoringDeviceUpdateWithoutRiskAssessmentsInput, MonitoringDeviceUncheckedUpdateWithoutRiskAssessmentsInput>
+    create: XOR<MonitoringDeviceCreateWithoutRiskAssessmentsInput, MonitoringDeviceUncheckedCreateWithoutRiskAssessmentsInput>
+    where?: MonitoringDeviceWhereInput
+  }
+
+  export type MonitoringDeviceUpdateToOneWithWhereWithoutRiskAssessmentsInput = {
+    where?: MonitoringDeviceWhereInput
+    data: XOR<MonitoringDeviceUpdateWithoutRiskAssessmentsInput, MonitoringDeviceUncheckedUpdateWithoutRiskAssessmentsInput>
+  }
+
+  export type MonitoringDeviceUpdateWithoutRiskAssessmentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    deviceType?: EnumDeviceTypeFieldUpdateOperationsInput | $Enums.DeviceType
+    manufacturer?: NullableStringFieldUpdateOperationsInput | string | null
+    model?: NullableStringFieldUpdateOperationsInput | string | null
+    serialNumber?: StringFieldUpdateOperationsInput | string
+    status?: EnumDeviceStatusFieldUpdateOperationsInput | $Enums.DeviceStatus
+    lastSyncAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    batteryLevel?: NullableIntFieldUpdateOperationsInput | number | null
+    firmwareVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    softwareVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    certificateExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSecurityScan?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    readings?: VitalReadingUpdateManyWithoutDeviceNestedInput
+    vulnerabilities?: DeviceVulnerabilityUpdateManyWithoutDeviceNestedInput
+    patches?: DevicePatchUpdateManyWithoutDeviceNestedInput
+    incidents?: SecurityIncidentUpdateManyWithoutDeviceNestedInput
+    networkAssignments?: DeviceNetworkAssignmentUpdateManyWithoutDeviceNestedInput
+    recallStatuses?: DeviceRecallStatusUpdateManyWithoutDeviceNestedInput
+  }
+
+  export type MonitoringDeviceUncheckedUpdateWithoutRiskAssessmentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patientId?: StringFieldUpdateOperationsInput | string
+    deviceType?: EnumDeviceTypeFieldUpdateOperationsInput | $Enums.DeviceType
+    manufacturer?: NullableStringFieldUpdateOperationsInput | string | null
+    model?: NullableStringFieldUpdateOperationsInput | string | null
+    serialNumber?: StringFieldUpdateOperationsInput | string
+    status?: EnumDeviceStatusFieldUpdateOperationsInput | $Enums.DeviceStatus
+    lastSyncAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    batteryLevel?: NullableIntFieldUpdateOperationsInput | number | null
+    firmwareVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    softwareVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    certificateExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSecurityScan?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    readings?: VitalReadingUncheckedUpdateManyWithoutDeviceNestedInput
+    vulnerabilities?: DeviceVulnerabilityUncheckedUpdateManyWithoutDeviceNestedInput
+    patches?: DevicePatchUncheckedUpdateManyWithoutDeviceNestedInput
+    incidents?: SecurityIncidentUncheckedUpdateManyWithoutDeviceNestedInput
+    networkAssignments?: DeviceNetworkAssignmentUncheckedUpdateManyWithoutDeviceNestedInput
+    recallStatuses?: DeviceRecallStatusUncheckedUpdateManyWithoutDeviceNestedInput
+  }
+
   export type CareTaskCreateManyCarePlanInput = {
     id?: string
     title: string
@@ -17577,6 +36154,125 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
+  export type DeviceVulnerabilityCreateManyDeviceInput = {
+    id?: string
+    cveId?: string | null
+    title: string
+    description: string
+    severity: $Enums.VulnerabilitySeverity
+    cvssScore?: number | null
+    affectedVersion?: string | null
+    fixedVersion?: string | null
+    exploitAvailable?: boolean
+    status?: $Enums.VulnerabilityStatus
+    discoveredAt?: Date | string
+    resolvedAt?: Date | string | null
+    resolvedBy?: string | null
+    resolutionNotes?: string | null
+    source?: string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DevicePatchCreateManyDeviceInput = {
+    id?: string
+    patchVersion: string
+    currentVersion: string
+    description?: string | null
+    releaseNotes?: string | null
+    criticality?: $Enums.PatchCriticality
+    scheduledDate?: Date | string | null
+    appliedDate?: Date | string | null
+    appliedBy?: string | null
+    status?: $Enums.PatchStatus
+    rollbackVersion?: string | null
+    testingRequired?: boolean
+    testingCompletedAt?: Date | string | null
+    testingNotes?: string | null
+    approvedBy?: string | null
+    approvedAt?: Date | string | null
+    failureReason?: string | null
+    vulnerabilitiesFixed?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SecurityIncidentCreateManyDeviceInput = {
+    id?: string
+    incidentType: $Enums.IncidentType
+    severity: $Enums.IncidentSeverity
+    title: string
+    description: string
+    affectedSystems?: NullableJsonNullValueInput | InputJsonValue
+    affectedPatients?: NullableJsonNullValueInput | InputJsonValue
+    detectedAt?: Date | string
+    detectedBy: string
+    reportedBy: string
+    status?: $Enums.IncidentStatus
+    assignedTo?: string | null
+    containedAt?: Date | string | null
+    resolvedAt?: Date | string | null
+    rootCause?: string | null
+    remediationSteps?: NullableJsonNullValueInput | InputJsonValue
+    lessonsLearned?: string | null
+    timeline?: NullableJsonNullValueInput | InputJsonValue
+    evidence?: NullableJsonNullValueInput | InputJsonValue
+    notificationsSent?: boolean
+    regulatoryReported?: boolean
+    regulatoryReportDate?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DeviceNetworkAssignmentCreateManyDeviceInput = {
+    id?: string
+    segmentId: string
+    ipAddress?: string | null
+    macAddress?: string | null
+    assignedAt?: Date | string
+    assignedBy: string
+    status?: $Enums.AssignmentStatus
+    complianceStatus?: $Enums.ComplianceStatus
+    lastComplianceCheck?: Date | string | null
+    complianceNotes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DeviceRecallStatusCreateManyDeviceInput = {
+    id?: string
+    recallId: string
+    status?: $Enums.DeviceRecallAction
+    actionTaken?: string | null
+    actionDate?: Date | string | null
+    actionBy?: string | null
+    notes?: string | null
+    patientNotified?: boolean
+    providerNotified?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DeviceRiskAssessmentCreateManyDeviceInput = {
+    id?: string
+    overallRiskScore: number
+    vulnerabilityScore?: number
+    patchScore?: number
+    networkScore?: number
+    complianceScore?: number
+    incidentScore?: number
+    agingScore?: number
+    riskLevel: $Enums.RiskLevel
+    riskFactors: JsonNullValueInput | InputJsonValue
+    recommendations?: NullableJsonNullValueInput | InputJsonValue
+    assessedAt?: Date | string
+    assessedBy?: string | null
+    nextAssessmentDue?: Date | string | null
+    notes?: string | null
+    createdAt?: Date | string
+  }
+
   export type VitalReadingUpdateWithoutDeviceInput = {
     id?: StringFieldUpdateOperationsInput | string
     patientId?: StringFieldUpdateOperationsInput | string
@@ -17613,6 +36309,363 @@ export namespace Prisma {
     isAbnormal?: BoolFieldUpdateOperationsInput | boolean
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     recordedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeviceVulnerabilityUpdateWithoutDeviceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    cveId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    severity?: EnumVulnerabilitySeverityFieldUpdateOperationsInput | $Enums.VulnerabilitySeverity
+    cvssScore?: NullableFloatFieldUpdateOperationsInput | number | null
+    affectedVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    fixedVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    exploitAvailable?: BoolFieldUpdateOperationsInput | boolean
+    status?: EnumVulnerabilityStatusFieldUpdateOperationsInput | $Enums.VulnerabilityStatus
+    discoveredAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolvedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeviceVulnerabilityUncheckedUpdateWithoutDeviceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    cveId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    severity?: EnumVulnerabilitySeverityFieldUpdateOperationsInput | $Enums.VulnerabilitySeverity
+    cvssScore?: NullableFloatFieldUpdateOperationsInput | number | null
+    affectedVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    fixedVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    exploitAvailable?: BoolFieldUpdateOperationsInput | boolean
+    status?: EnumVulnerabilityStatusFieldUpdateOperationsInput | $Enums.VulnerabilityStatus
+    discoveredAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolvedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeviceVulnerabilityUncheckedUpdateManyWithoutDeviceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    cveId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    severity?: EnumVulnerabilitySeverityFieldUpdateOperationsInput | $Enums.VulnerabilitySeverity
+    cvssScore?: NullableFloatFieldUpdateOperationsInput | number | null
+    affectedVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    fixedVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    exploitAvailable?: BoolFieldUpdateOperationsInput | boolean
+    status?: EnumVulnerabilityStatusFieldUpdateOperationsInput | $Enums.VulnerabilityStatus
+    discoveredAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolvedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    source?: NullableStringFieldUpdateOperationsInput | string | null
+    references?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DevicePatchUpdateWithoutDeviceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patchVersion?: StringFieldUpdateOperationsInput | string
+    currentVersion?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    releaseNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    criticality?: EnumPatchCriticalityFieldUpdateOperationsInput | $Enums.PatchCriticality
+    scheduledDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    appliedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    appliedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumPatchStatusFieldUpdateOperationsInput | $Enums.PatchStatus
+    rollbackVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    testingRequired?: BoolFieldUpdateOperationsInput | boolean
+    testingCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    testingNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    failureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    vulnerabilitiesFixed?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DevicePatchUncheckedUpdateWithoutDeviceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patchVersion?: StringFieldUpdateOperationsInput | string
+    currentVersion?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    releaseNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    criticality?: EnumPatchCriticalityFieldUpdateOperationsInput | $Enums.PatchCriticality
+    scheduledDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    appliedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    appliedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumPatchStatusFieldUpdateOperationsInput | $Enums.PatchStatus
+    rollbackVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    testingRequired?: BoolFieldUpdateOperationsInput | boolean
+    testingCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    testingNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    failureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    vulnerabilitiesFixed?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DevicePatchUncheckedUpdateManyWithoutDeviceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    patchVersion?: StringFieldUpdateOperationsInput | string
+    currentVersion?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    releaseNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    criticality?: EnumPatchCriticalityFieldUpdateOperationsInput | $Enums.PatchCriticality
+    scheduledDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    appliedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    appliedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumPatchStatusFieldUpdateOperationsInput | $Enums.PatchStatus
+    rollbackVersion?: NullableStringFieldUpdateOperationsInput | string | null
+    testingRequired?: BoolFieldUpdateOperationsInput | boolean
+    testingCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    testingNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    failureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    vulnerabilitiesFixed?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SecurityIncidentUpdateWithoutDeviceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    incidentType?: EnumIncidentTypeFieldUpdateOperationsInput | $Enums.IncidentType
+    severity?: EnumIncidentSeverityFieldUpdateOperationsInput | $Enums.IncidentSeverity
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    affectedSystems?: NullableJsonNullValueInput | InputJsonValue
+    affectedPatients?: NullableJsonNullValueInput | InputJsonValue
+    detectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    detectedBy?: StringFieldUpdateOperationsInput | string
+    reportedBy?: StringFieldUpdateOperationsInput | string
+    status?: EnumIncidentStatusFieldUpdateOperationsInput | $Enums.IncidentStatus
+    assignedTo?: NullableStringFieldUpdateOperationsInput | string | null
+    containedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rootCause?: NullableStringFieldUpdateOperationsInput | string | null
+    remediationSteps?: NullableJsonNullValueInput | InputJsonValue
+    lessonsLearned?: NullableStringFieldUpdateOperationsInput | string | null
+    timeline?: NullableJsonNullValueInput | InputJsonValue
+    evidence?: NullableJsonNullValueInput | InputJsonValue
+    notificationsSent?: BoolFieldUpdateOperationsInput | boolean
+    regulatoryReported?: BoolFieldUpdateOperationsInput | boolean
+    regulatoryReportDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SecurityIncidentUncheckedUpdateWithoutDeviceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    incidentType?: EnumIncidentTypeFieldUpdateOperationsInput | $Enums.IncidentType
+    severity?: EnumIncidentSeverityFieldUpdateOperationsInput | $Enums.IncidentSeverity
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    affectedSystems?: NullableJsonNullValueInput | InputJsonValue
+    affectedPatients?: NullableJsonNullValueInput | InputJsonValue
+    detectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    detectedBy?: StringFieldUpdateOperationsInput | string
+    reportedBy?: StringFieldUpdateOperationsInput | string
+    status?: EnumIncidentStatusFieldUpdateOperationsInput | $Enums.IncidentStatus
+    assignedTo?: NullableStringFieldUpdateOperationsInput | string | null
+    containedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rootCause?: NullableStringFieldUpdateOperationsInput | string | null
+    remediationSteps?: NullableJsonNullValueInput | InputJsonValue
+    lessonsLearned?: NullableStringFieldUpdateOperationsInput | string | null
+    timeline?: NullableJsonNullValueInput | InputJsonValue
+    evidence?: NullableJsonNullValueInput | InputJsonValue
+    notificationsSent?: BoolFieldUpdateOperationsInput | boolean
+    regulatoryReported?: BoolFieldUpdateOperationsInput | boolean
+    regulatoryReportDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SecurityIncidentUncheckedUpdateManyWithoutDeviceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    incidentType?: EnumIncidentTypeFieldUpdateOperationsInput | $Enums.IncidentType
+    severity?: EnumIncidentSeverityFieldUpdateOperationsInput | $Enums.IncidentSeverity
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    affectedSystems?: NullableJsonNullValueInput | InputJsonValue
+    affectedPatients?: NullableJsonNullValueInput | InputJsonValue
+    detectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    detectedBy?: StringFieldUpdateOperationsInput | string
+    reportedBy?: StringFieldUpdateOperationsInput | string
+    status?: EnumIncidentStatusFieldUpdateOperationsInput | $Enums.IncidentStatus
+    assignedTo?: NullableStringFieldUpdateOperationsInput | string | null
+    containedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rootCause?: NullableStringFieldUpdateOperationsInput | string | null
+    remediationSteps?: NullableJsonNullValueInput | InputJsonValue
+    lessonsLearned?: NullableStringFieldUpdateOperationsInput | string | null
+    timeline?: NullableJsonNullValueInput | InputJsonValue
+    evidence?: NullableJsonNullValueInput | InputJsonValue
+    notificationsSent?: BoolFieldUpdateOperationsInput | boolean
+    regulatoryReported?: BoolFieldUpdateOperationsInput | boolean
+    regulatoryReportDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeviceNetworkAssignmentUpdateWithoutDeviceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    macAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assignedBy?: StringFieldUpdateOperationsInput | string
+    status?: EnumAssignmentStatusFieldUpdateOperationsInput | $Enums.AssignmentStatus
+    complianceStatus?: EnumComplianceStatusFieldUpdateOperationsInput | $Enums.ComplianceStatus
+    lastComplianceCheck?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    complianceNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    segment?: NetworkSegmentUpdateOneRequiredWithoutDevicesNestedInput
+  }
+
+  export type DeviceNetworkAssignmentUncheckedUpdateWithoutDeviceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    segmentId?: StringFieldUpdateOperationsInput | string
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    macAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assignedBy?: StringFieldUpdateOperationsInput | string
+    status?: EnumAssignmentStatusFieldUpdateOperationsInput | $Enums.AssignmentStatus
+    complianceStatus?: EnumComplianceStatusFieldUpdateOperationsInput | $Enums.ComplianceStatus
+    lastComplianceCheck?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    complianceNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeviceNetworkAssignmentUncheckedUpdateManyWithoutDeviceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    segmentId?: StringFieldUpdateOperationsInput | string
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    macAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assignedBy?: StringFieldUpdateOperationsInput | string
+    status?: EnumAssignmentStatusFieldUpdateOperationsInput | $Enums.AssignmentStatus
+    complianceStatus?: EnumComplianceStatusFieldUpdateOperationsInput | $Enums.ComplianceStatus
+    lastComplianceCheck?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    complianceNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeviceRecallStatusUpdateWithoutDeviceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumDeviceRecallActionFieldUpdateOperationsInput | $Enums.DeviceRecallAction
+    actionTaken?: NullableStringFieldUpdateOperationsInput | string | null
+    actionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    actionBy?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    patientNotified?: BoolFieldUpdateOperationsInput | boolean
+    providerNotified?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    recall?: FDARecallUpdateOneRequiredWithoutAffectedDevicesNestedInput
+  }
+
+  export type DeviceRecallStatusUncheckedUpdateWithoutDeviceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    recallId?: StringFieldUpdateOperationsInput | string
+    status?: EnumDeviceRecallActionFieldUpdateOperationsInput | $Enums.DeviceRecallAction
+    actionTaken?: NullableStringFieldUpdateOperationsInput | string | null
+    actionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    actionBy?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    patientNotified?: BoolFieldUpdateOperationsInput | boolean
+    providerNotified?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeviceRecallStatusUncheckedUpdateManyWithoutDeviceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    recallId?: StringFieldUpdateOperationsInput | string
+    status?: EnumDeviceRecallActionFieldUpdateOperationsInput | $Enums.DeviceRecallAction
+    actionTaken?: NullableStringFieldUpdateOperationsInput | string | null
+    actionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    actionBy?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    patientNotified?: BoolFieldUpdateOperationsInput | boolean
+    providerNotified?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeviceRiskAssessmentUpdateWithoutDeviceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    overallRiskScore?: FloatFieldUpdateOperationsInput | number
+    vulnerabilityScore?: FloatFieldUpdateOperationsInput | number
+    patchScore?: FloatFieldUpdateOperationsInput | number
+    networkScore?: FloatFieldUpdateOperationsInput | number
+    complianceScore?: FloatFieldUpdateOperationsInput | number
+    incidentScore?: FloatFieldUpdateOperationsInput | number
+    agingScore?: FloatFieldUpdateOperationsInput | number
+    riskLevel?: EnumRiskLevelFieldUpdateOperationsInput | $Enums.RiskLevel
+    riskFactors?: JsonNullValueInput | InputJsonValue
+    recommendations?: NullableJsonNullValueInput | InputJsonValue
+    assessedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assessedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    nextAssessmentDue?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeviceRiskAssessmentUncheckedUpdateWithoutDeviceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    overallRiskScore?: FloatFieldUpdateOperationsInput | number
+    vulnerabilityScore?: FloatFieldUpdateOperationsInput | number
+    patchScore?: FloatFieldUpdateOperationsInput | number
+    networkScore?: FloatFieldUpdateOperationsInput | number
+    complianceScore?: FloatFieldUpdateOperationsInput | number
+    incidentScore?: FloatFieldUpdateOperationsInput | number
+    agingScore?: FloatFieldUpdateOperationsInput | number
+    riskLevel?: EnumRiskLevelFieldUpdateOperationsInput | $Enums.RiskLevel
+    riskFactors?: JsonNullValueInput | InputJsonValue
+    recommendations?: NullableJsonNullValueInput | InputJsonValue
+    assessedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assessedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    nextAssessmentDue?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeviceRiskAssessmentUncheckedUpdateManyWithoutDeviceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    overallRiskScore?: FloatFieldUpdateOperationsInput | number
+    vulnerabilityScore?: FloatFieldUpdateOperationsInput | number
+    patchScore?: FloatFieldUpdateOperationsInput | number
+    networkScore?: FloatFieldUpdateOperationsInput | number
+    complianceScore?: FloatFieldUpdateOperationsInput | number
+    incidentScore?: FloatFieldUpdateOperationsInput | number
+    agingScore?: FloatFieldUpdateOperationsInput | number
+    riskLevel?: EnumRiskLevelFieldUpdateOperationsInput | $Enums.RiskLevel
+    riskFactors?: JsonNullValueInput | InputJsonValue
+    recommendations?: NullableJsonNullValueInput | InputJsonValue
+    assessedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assessedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    nextAssessmentDue?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -17656,6 +36709,122 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type DeviceNetworkAssignmentCreateManySegmentInput = {
+    id?: string
+    deviceId: string
+    ipAddress?: string | null
+    macAddress?: string | null
+    assignedAt?: Date | string
+    assignedBy: string
+    status?: $Enums.AssignmentStatus
+    complianceStatus?: $Enums.ComplianceStatus
+    lastComplianceCheck?: Date | string | null
+    complianceNotes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DeviceNetworkAssignmentUpdateWithoutSegmentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    macAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assignedBy?: StringFieldUpdateOperationsInput | string
+    status?: EnumAssignmentStatusFieldUpdateOperationsInput | $Enums.AssignmentStatus
+    complianceStatus?: EnumComplianceStatusFieldUpdateOperationsInput | $Enums.ComplianceStatus
+    lastComplianceCheck?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    complianceNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    device?: MonitoringDeviceUpdateOneRequiredWithoutNetworkAssignmentsNestedInput
+  }
+
+  export type DeviceNetworkAssignmentUncheckedUpdateWithoutSegmentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    deviceId?: StringFieldUpdateOperationsInput | string
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    macAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assignedBy?: StringFieldUpdateOperationsInput | string
+    status?: EnumAssignmentStatusFieldUpdateOperationsInput | $Enums.AssignmentStatus
+    complianceStatus?: EnumComplianceStatusFieldUpdateOperationsInput | $Enums.ComplianceStatus
+    lastComplianceCheck?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    complianceNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeviceNetworkAssignmentUncheckedUpdateManyWithoutSegmentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    deviceId?: StringFieldUpdateOperationsInput | string
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    macAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assignedBy?: StringFieldUpdateOperationsInput | string
+    status?: EnumAssignmentStatusFieldUpdateOperationsInput | $Enums.AssignmentStatus
+    complianceStatus?: EnumComplianceStatusFieldUpdateOperationsInput | $Enums.ComplianceStatus
+    lastComplianceCheck?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    complianceNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeviceRecallStatusCreateManyRecallInput = {
+    id?: string
+    deviceId: string
+    status?: $Enums.DeviceRecallAction
+    actionTaken?: string | null
+    actionDate?: Date | string | null
+    actionBy?: string | null
+    notes?: string | null
+    patientNotified?: boolean
+    providerNotified?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DeviceRecallStatusUpdateWithoutRecallInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumDeviceRecallActionFieldUpdateOperationsInput | $Enums.DeviceRecallAction
+    actionTaken?: NullableStringFieldUpdateOperationsInput | string | null
+    actionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    actionBy?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    patientNotified?: BoolFieldUpdateOperationsInput | boolean
+    providerNotified?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    device?: MonitoringDeviceUpdateOneRequiredWithoutRecallStatusesNestedInput
+  }
+
+  export type DeviceRecallStatusUncheckedUpdateWithoutRecallInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    deviceId?: StringFieldUpdateOperationsInput | string
+    status?: EnumDeviceRecallActionFieldUpdateOperationsInput | $Enums.DeviceRecallAction
+    actionTaken?: NullableStringFieldUpdateOperationsInput | string | null
+    actionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    actionBy?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    patientNotified?: BoolFieldUpdateOperationsInput | boolean
+    providerNotified?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeviceRecallStatusUncheckedUpdateManyWithoutRecallInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    deviceId?: StringFieldUpdateOperationsInput | string
+    status?: EnumDeviceRecallActionFieldUpdateOperationsInput | $Enums.DeviceRecallAction
+    actionTaken?: NullableStringFieldUpdateOperationsInput | string | null
+    actionDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    actionBy?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    patientNotified?: BoolFieldUpdateOperationsInput | boolean
+    providerNotified?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
 
 
   /**
@@ -17673,6 +36842,14 @@ export namespace Prisma {
      * @deprecated Use GoalCountOutputTypeDefaultArgs instead
      */
     export type GoalCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = GoalCountOutputTypeDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use NetworkSegmentCountOutputTypeDefaultArgs instead
+     */
+    export type NetworkSegmentCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = NetworkSegmentCountOutputTypeDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use FDARecallCountOutputTypeDefaultArgs instead
+     */
+    export type FDARecallCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = FDARecallCountOutputTypeDefaultArgs<ExtArgs>
     /**
      * @deprecated Use CarePlanDefaultArgs instead
      */
@@ -17713,6 +36890,46 @@ export namespace Prisma {
      * @deprecated Use PatientEngagementDefaultArgs instead
      */
     export type PatientEngagementArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = PatientEngagementDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use DeviceVulnerabilityDefaultArgs instead
+     */
+    export type DeviceVulnerabilityArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = DeviceVulnerabilityDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use DevicePatchDefaultArgs instead
+     */
+    export type DevicePatchArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = DevicePatchDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use SecurityIncidentDefaultArgs instead
+     */
+    export type SecurityIncidentArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = SecurityIncidentDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use NetworkSegmentDefaultArgs instead
+     */
+    export type NetworkSegmentArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = NetworkSegmentDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use DeviceNetworkAssignmentDefaultArgs instead
+     */
+    export type DeviceNetworkAssignmentArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = DeviceNetworkAssignmentDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use FDARecallDefaultArgs instead
+     */
+    export type FDARecallArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = FDARecallDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use DeviceRecallStatusDefaultArgs instead
+     */
+    export type DeviceRecallStatusArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = DeviceRecallStatusDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use SecurityAuditLogDefaultArgs instead
+     */
+    export type SecurityAuditLogArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = SecurityAuditLogDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use ManufacturerAdvisoryDefaultArgs instead
+     */
+    export type ManufacturerAdvisoryArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = ManufacturerAdvisoryDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use DeviceRiskAssessmentDefaultArgs instead
+     */
+    export type DeviceRiskAssessmentArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = DeviceRiskAssessmentDefaultArgs<ExtArgs>
 
   /**
    * Batch Payload for updateMany & deleteMany & createMany

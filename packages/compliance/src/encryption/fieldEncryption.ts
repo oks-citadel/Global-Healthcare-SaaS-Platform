@@ -4,9 +4,10 @@
  */
 
 import * as crypto from 'crypto';
+import type { CipherGCM, DecipherGCM } from 'crypto';
 
 export class FieldEncryption {
-  private algorithm = 'aes-256-gcm';
+  private algorithm: 'aes-256-gcm' = 'aes-256-gcm';
   private keyLength = 32; // 256 bits
   private ivLength = 16; // 128 bits
   private tagLength = 16;
@@ -34,7 +35,7 @@ export class FieldEncryption {
       'sha512'
     );
 
-    const cipher = crypto.createCipheriv(this.algorithm, key, iv);
+    const cipher = crypto.createCipheriv(this.algorithm, key, iv) as CipherGCM;
 
     // Add authenticated data if context provided
     if (context) {
@@ -81,7 +82,7 @@ export class FieldEncryption {
       'sha512'
     );
 
-    const decipher = crypto.createDecipheriv(this.algorithm, key, iv);
+    const decipher = crypto.createDecipheriv(this.algorithm, key, iv) as DecipherGCM;
     decipher.setAuthTag(authTag);
 
     if (context) {

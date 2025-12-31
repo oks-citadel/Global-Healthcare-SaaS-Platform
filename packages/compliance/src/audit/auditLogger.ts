@@ -372,10 +372,17 @@ export class AuditLogger extends EventEmitter {
    * Verify audit log integrity
    */
   verifyIntegrity(entry: AuditEntry, previousHash: string): boolean {
-    const expectedHash = this.calculateHash({
-      ...entry,
-      hash: previousHash
-    });
+    // Store original previousHash, set to provided one for verification
+    const originalPreviousHash = this.previousHash;
+    this.previousHash = previousHash;
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { hash: _, ...entryWithoutHash } = entry;
+    const expectedHash = this.calculateHash(entryWithoutHash);
+
+    // Restore original previousHash
+    this.previousHash = originalPreviousHash;
+
     return entry.hash === expectedHash;
   }
 

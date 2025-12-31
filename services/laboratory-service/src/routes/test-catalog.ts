@@ -21,7 +21,7 @@ router.get('/', async (req: Request, res: Response): Promise<void> => {
       offset: req.query.offset ? Number(req.query.offset) : 0,
     };
 
-    const result = await testCatalogService.getAllTests(filters);
+    const result = await testCatalogService.getAllTests(filters as any);
 
     res.json({
       data: result.tests,
@@ -117,7 +117,7 @@ router.post('/', requireUser, async (req: UserRequest, res: Response): Promise<v
 
     const validatedData = createTestCatalogSchema.parse(req.body);
 
-    const test = await testCatalogService.createTest(validatedData);
+    const test = await testCatalogService.createTest(validatedData as any);
 
     logger.info('Test catalog entry created', {
       testId: test.id,
@@ -257,7 +257,7 @@ router.post('/:id/reference-ranges', requireUser, async (req: UserRequest, res: 
 
     const validatedData = createReferenceRangeSchema.parse(req.body);
 
-    const range = await testCatalogService.addReferenceRange(id, validatedData);
+    const range = await testCatalogService.addReferenceRange(id, validatedData as any);
 
     res.status(201).json({
       data: range,

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { PrismaClient } from '../generated/client';
+import { PrismaClient, Prisma } from '../generated/client';
 import { z } from 'zod';
 import { UserRequest, requireUser, requireRole } from '../middleware/extractUser';
 import denialPredictionService from '../services/denial-prediction.service';
@@ -197,7 +197,7 @@ router.post('/', requireUser, async (req: UserRequest, res) => {
         ...validatedData,
         serviceDate: new Date(validatedData.serviceDate),
         claimStatus: 'denied',
-      },
+      } as Prisma.DenialCreateInput,
     });
 
     res.status(201).json({
@@ -261,7 +261,7 @@ router.post('/predict-risk', requireUser, async (req: UserRequest, res) => {
       serviceDate: validatedData.serviceDate
         ? new Date(validatedData.serviceDate)
         : undefined,
-    });
+    } as any);
 
     res.json({
       data: prediction,
@@ -309,7 +309,7 @@ router.post('/predict-risk/bulk', requireUser, async (req: UserRequest, res) => 
       validatedClaims.map(c => ({
         ...c,
         serviceDate: c.serviceDate ? new Date(c.serviceDate) : undefined,
-      }))
+      })) as any[]
     );
 
     res.json({
@@ -384,7 +384,7 @@ router.post('/import/x12-835', requireUser, requireRole('admin', 'billing'), asy
             ...validated,
             serviceDate: new Date(validated.serviceDate),
             claimStatus: 'denied',
-          },
+          } as Prisma.DenialCreateInput,
         });
         created.push(denial);
       } catch (err) {

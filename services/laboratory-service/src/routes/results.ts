@@ -71,7 +71,7 @@ router.post('/', requireUser, async (req: UserRequest, res: Response): Promise<v
     const validatedData = createResultSchema.parse(req.body);
 
     const result = await prisma.labResult.create({
-      data: validatedData,
+      data: validatedData as any,
     });
 
     // Update test status

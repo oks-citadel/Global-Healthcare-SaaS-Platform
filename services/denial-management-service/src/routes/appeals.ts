@@ -159,7 +159,7 @@ router.post('/generate', requireUser, async (req: UserRequest, res) => {
   try {
     const validatedData = generateAppealSchema.parse(req.body);
 
-    const response = await appealGenerationService.generateAppealLetter(validatedData);
+    const response = await appealGenerationService.generateAppealLetter(validatedData as any);
 
     // Update staff productivity
     if (req.user) {

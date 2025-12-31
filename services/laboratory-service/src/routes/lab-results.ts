@@ -181,7 +181,7 @@ router.post('/', requireUser, async (req: UserRequest, res: Response): Promise<v
 
     const validatedData = createResultSchema.parse(req.body);
 
-    const result = await resultsService.createResult(validatedData, userId);
+    const result = await resultsService.createResult(validatedData as any, userId);
 
     // Check if this is a critical value and create alert
     if (result.isCritical) {
@@ -235,7 +235,7 @@ router.post('/bulk', requireUser, async (req: UserRequest, res: Response): Promi
 
     const results = await resultsService.createBulkResults(
       validatedData.testId,
-      validatedData.results,
+      validatedData.results as any,
       userId
     );
 

@@ -200,6 +200,7 @@ export const NigeriaConfig: CountryConfig = {
   isolation: {
     enabled: false,
     dedicatedDatabase: false,
+    dedicatedSecretsManager: false,
     dedicatedKeyVault: false,
     customerManagedKeys: false,
     dedicatedNamespace: false,

@@ -1,4 +1,4 @@
-import express, { Application } from 'express';
+import express, { Application, RequestHandler } from 'express';
 import { createServer } from 'http';
 import { Server as SocketServer } from 'socket.io';
 import cors from 'cors';
@@ -24,14 +24,14 @@ const io = new SocketServer(httpServer, {
 const PORT = process.env.PORT || 3001;
 
 // Rate limiting configuration
-const limiter = rateLimit({
+const limiter: RequestHandler = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Limit each IP to 100 requests per windowMs
   message: { error: 'Too Many Requests', message: 'Rate limit exceeded. Please try again later.' },
   standardHeaders: true,
   legacyHeaders: false,
   skip: (req) => req.path === '/health' || req.path === '/stats', // Skip health checks
-});
+}) as unknown as RequestHandler;
 
 // Middleware
 app.use(helmet());

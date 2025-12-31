@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { UserRequest, requireUser, requireRole } from '../middleware/extractUser';
-import populationService from '../services/population.service';
+import populationService, { CreatePopulationInput } from '../services/population.service';
 
 const router: ReturnType<typeof Router> = Router();
 
@@ -50,7 +50,7 @@ router.post('/', requireUser, requireRole('admin', 'analyst', 'provider'), async
       ...validated,
       organizationId: req.user!.organizationId || req.body.organizationId,
       createdBy: req.user!.id,
-    });
+    } as CreatePopulationInput);
 
     res.status(201).json({ data: population, message: 'Population created successfully' });
   } catch (error) {

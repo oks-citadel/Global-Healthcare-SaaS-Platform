@@ -2319,8 +2319,18 @@ export namespace Prisma {
 
   export type AggregateVisit = {
     _count: VisitCountAggregateOutputType | null
+    _avg: VisitAvgAggregateOutputType | null
+    _sum: VisitSumAggregateOutputType | null
     _min: VisitMinAggregateOutputType | null
     _max: VisitMaxAggregateOutputType | null
+  }
+
+  export type VisitAvgAggregateOutputType = {
+    durationMinutes: number | null
+  }
+
+  export type VisitSumAggregateOutputType = {
+    durationMinutes: number | null
   }
 
   export type VisitMinAggregateOutputType = {
@@ -2330,6 +2340,7 @@ export namespace Prisma {
     status: $Enums.VisitStatus | null
     startedAt: Date | null
     endedAt: Date | null
+    durationMinutes: number | null
     roomId: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -2342,6 +2353,7 @@ export namespace Prisma {
     status: $Enums.VisitStatus | null
     startedAt: Date | null
     endedAt: Date | null
+    durationMinutes: number | null
     roomId: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -2354,6 +2366,7 @@ export namespace Prisma {
     status: number
     startedAt: number
     endedAt: number
+    durationMinutes: number
     roomId: number
     iceServers: number
     createdAt: number
@@ -2362,6 +2375,14 @@ export namespace Prisma {
   }
 
 
+  export type VisitAvgAggregateInputType = {
+    durationMinutes?: true
+  }
+
+  export type VisitSumAggregateInputType = {
+    durationMinutes?: true
+  }
+
   export type VisitMinAggregateInputType = {
     id?: true
     appointmentId?: true
@@ -2369,6 +2390,7 @@ export namespace Prisma {
     status?: true
     startedAt?: true
     endedAt?: true
+    durationMinutes?: true
     roomId?: true
     createdAt?: true
     updatedAt?: true
@@ -2381,6 +2403,7 @@ export namespace Prisma {
     status?: true
     startedAt?: true
     endedAt?: true
+    durationMinutes?: true
     roomId?: true
     createdAt?: true
     updatedAt?: true
@@ -2393,6 +2416,7 @@ export namespace Prisma {
     status?: true
     startedAt?: true
     endedAt?: true
+    durationMinutes?: true
     roomId?: true
     iceServers?: true
     createdAt?: true
@@ -2438,6 +2462,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: VisitAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: VisitSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: VisitMinAggregateInputType
@@ -2468,6 +2504,8 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: VisitCountAggregateInputType | true
+    _avg?: VisitAvgAggregateInputType
+    _sum?: VisitSumAggregateInputType
     _min?: VisitMinAggregateInputType
     _max?: VisitMaxAggregateInputType
   }
@@ -2479,11 +2517,14 @@ export namespace Prisma {
     status: $Enums.VisitStatus
     startedAt: Date | null
     endedAt: Date | null
+    durationMinutes: number | null
     roomId: string
     iceServers: JsonValue | null
     createdAt: Date
     updatedAt: Date
     _count: VisitCountAggregateOutputType | null
+    _avg: VisitAvgAggregateOutputType | null
+    _sum: VisitSumAggregateOutputType | null
     _min: VisitMinAggregateOutputType | null
     _max: VisitMaxAggregateOutputType | null
   }
@@ -2509,6 +2550,7 @@ export namespace Prisma {
     status?: boolean
     startedAt?: boolean
     endedAt?: boolean
+    durationMinutes?: boolean
     roomId?: boolean
     iceServers?: boolean
     createdAt?: boolean
@@ -2525,6 +2567,7 @@ export namespace Prisma {
     status?: boolean
     startedAt?: boolean
     endedAt?: boolean
+    durationMinutes?: boolean
     roomId?: boolean
     iceServers?: boolean
     createdAt?: boolean
@@ -2539,6 +2582,7 @@ export namespace Prisma {
     status?: boolean
     startedAt?: boolean
     endedAt?: boolean
+    durationMinutes?: boolean
     roomId?: boolean
     iceServers?: boolean
     createdAt?: boolean
@@ -2567,6 +2611,7 @@ export namespace Prisma {
       status: $Enums.VisitStatus
       startedAt: Date | null
       endedAt: Date | null
+      durationMinutes: number | null
       roomId: string
       iceServers: Prisma.JsonValue | null
       createdAt: Date
@@ -2972,6 +3017,7 @@ export namespace Prisma {
     readonly status: FieldRef<"Visit", 'VisitStatus'>
     readonly startedAt: FieldRef<"Visit", 'DateTime'>
     readonly endedAt: FieldRef<"Visit", 'DateTime'>
+    readonly durationMinutes: FieldRef<"Visit", 'Int'>
     readonly roomId: FieldRef<"Visit", 'String'>
     readonly iceServers: FieldRef<"Visit", 'Json'>
     readonly createdAt: FieldRef<"Visit", 'DateTime'>
@@ -6157,6 +6203,7 @@ export namespace Prisma {
     status: 'status',
     startedAt: 'startedAt',
     endedAt: 'endedAt',
+    durationMinutes: 'durationMinutes',
     roomId: 'roomId',
     iceServers: 'iceServers',
     createdAt: 'createdAt',
@@ -6463,6 +6510,7 @@ export namespace Prisma {
     status?: EnumVisitStatusFilter<"Visit"> | $Enums.VisitStatus
     startedAt?: DateTimeNullableFilter<"Visit"> | Date | string | null
     endedAt?: DateTimeNullableFilter<"Visit"> | Date | string | null
+    durationMinutes?: IntNullableFilter<"Visit"> | number | null
     roomId?: StringFilter<"Visit"> | string
     iceServers?: JsonNullableFilter<"Visit">
     createdAt?: DateTimeFilter<"Visit"> | Date | string
@@ -6478,6 +6526,7 @@ export namespace Prisma {
     status?: SortOrder
     startedAt?: SortOrderInput | SortOrder
     endedAt?: SortOrderInput | SortOrder
+    durationMinutes?: SortOrderInput | SortOrder
     roomId?: SortOrder
     iceServers?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -6497,6 +6546,7 @@ export namespace Prisma {
     status?: EnumVisitStatusFilter<"Visit"> | $Enums.VisitStatus
     startedAt?: DateTimeNullableFilter<"Visit"> | Date | string | null
     endedAt?: DateTimeNullableFilter<"Visit"> | Date | string | null
+    durationMinutes?: IntNullableFilter<"Visit"> | number | null
     iceServers?: JsonNullableFilter<"Visit">
     createdAt?: DateTimeFilter<"Visit"> | Date | string
     updatedAt?: DateTimeFilter<"Visit"> | Date | string
@@ -6511,13 +6561,16 @@ export namespace Prisma {
     status?: SortOrder
     startedAt?: SortOrderInput | SortOrder
     endedAt?: SortOrderInput | SortOrder
+    durationMinutes?: SortOrderInput | SortOrder
     roomId?: SortOrder
     iceServers?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: VisitCountOrderByAggregateInput
+    _avg?: VisitAvgOrderByAggregateInput
     _max?: VisitMaxOrderByAggregateInput
     _min?: VisitMinOrderByAggregateInput
+    _sum?: VisitSumOrderByAggregateInput
   }
 
   export type VisitScalarWhereWithAggregatesInput = {
@@ -6530,6 +6583,7 @@ export namespace Prisma {
     status?: EnumVisitStatusWithAggregatesFilter<"Visit"> | $Enums.VisitStatus
     startedAt?: DateTimeNullableWithAggregatesFilter<"Visit"> | Date | string | null
     endedAt?: DateTimeNullableWithAggregatesFilter<"Visit"> | Date | string | null
+    durationMinutes?: IntNullableWithAggregatesFilter<"Visit"> | number | null
     roomId?: StringWithAggregatesFilter<"Visit"> | string
     iceServers?: JsonNullableWithAggregatesFilter<"Visit">
     createdAt?: DateTimeWithAggregatesFilter<"Visit"> | Date | string
@@ -6835,6 +6889,7 @@ export namespace Prisma {
     status?: $Enums.VisitStatus
     startedAt?: Date | string | null
     endedAt?: Date | string | null
+    durationMinutes?: number | null
     roomId: string
     iceServers?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
@@ -6850,6 +6905,7 @@ export namespace Prisma {
     status?: $Enums.VisitStatus
     startedAt?: Date | string | null
     endedAt?: Date | string | null
+    durationMinutes?: number | null
     roomId: string
     iceServers?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
@@ -6863,6 +6919,7 @@ export namespace Prisma {
     status?: EnumVisitStatusFieldUpdateOperationsInput | $Enums.VisitStatus
     startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    durationMinutes?: NullableIntFieldUpdateOperationsInput | number | null
     roomId?: StringFieldUpdateOperationsInput | string
     iceServers?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -6878,6 +6935,7 @@ export namespace Prisma {
     status?: EnumVisitStatusFieldUpdateOperationsInput | $Enums.VisitStatus
     startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    durationMinutes?: NullableIntFieldUpdateOperationsInput | number | null
     roomId?: StringFieldUpdateOperationsInput | string
     iceServers?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -6892,6 +6950,7 @@ export namespace Prisma {
     status?: $Enums.VisitStatus
     startedAt?: Date | string | null
     endedAt?: Date | string | null
+    durationMinutes?: number | null
     roomId: string
     iceServers?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
@@ -6904,6 +6963,7 @@ export namespace Prisma {
     status?: EnumVisitStatusFieldUpdateOperationsInput | $Enums.VisitStatus
     startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    durationMinutes?: NullableIntFieldUpdateOperationsInput | number | null
     roomId?: StringFieldUpdateOperationsInput | string
     iceServers?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -6917,6 +6977,7 @@ export namespace Prisma {
     status?: EnumVisitStatusFieldUpdateOperationsInput | $Enums.VisitStatus
     startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    durationMinutes?: NullableIntFieldUpdateOperationsInput | number | null
     roomId?: StringFieldUpdateOperationsInput | string
     iceServers?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -7361,6 +7422,17 @@ export namespace Prisma {
     gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
+
+  export type IntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
   export type JsonNullableFilter<$PrismaModel = never> = 
     | PatchUndefined<
         Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
@@ -7406,10 +7478,15 @@ export namespace Prisma {
     status?: SortOrder
     startedAt?: SortOrder
     endedAt?: SortOrder
+    durationMinutes?: SortOrder
     roomId?: SortOrder
     iceServers?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type VisitAvgOrderByAggregateInput = {
+    durationMinutes?: SortOrder
   }
 
   export type VisitMaxOrderByAggregateInput = {
@@ -7419,6 +7496,7 @@ export namespace Prisma {
     status?: SortOrder
     startedAt?: SortOrder
     endedAt?: SortOrder
+    durationMinutes?: SortOrder
     roomId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -7431,9 +7509,14 @@ export namespace Prisma {
     status?: SortOrder
     startedAt?: SortOrder
     endedAt?: SortOrder
+    durationMinutes?: SortOrder
     roomId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type VisitSumOrderByAggregateInput = {
+    durationMinutes?: SortOrder
   }
 
   export type EnumVisitStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -7458,6 +7541,22 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedDateTimeNullableFilter<$PrismaModel>
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
+  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
   }
   export type JsonNullableWithAggregatesFilter<$PrismaModel = never> = 
     | PatchUndefined<
@@ -7693,6 +7792,14 @@ export namespace Prisma {
 
   export type NullableDateTimeFieldUpdateOperationsInput = {
     set?: Date | string | null
+  }
+
+  export type NullableIntFieldUpdateOperationsInput = {
+    set?: number | null
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
   }
 
   export type AppointmentUpdateOneRequiredWithoutVisitNestedInput = {
@@ -7969,6 +8076,33 @@ export namespace Prisma {
     _min?: NestedDateTimeNullableFilter<$PrismaModel>
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
+
+  export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
+  export type NestedFloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
   export type NestedJsonNullableFilter<$PrismaModel = never> = 
     | PatchUndefined<
         Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
@@ -8011,6 +8145,7 @@ export namespace Prisma {
     status?: $Enums.VisitStatus
     startedAt?: Date | string | null
     endedAt?: Date | string | null
+    durationMinutes?: number | null
     roomId: string
     iceServers?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
@@ -8024,6 +8159,7 @@ export namespace Prisma {
     status?: $Enums.VisitStatus
     startedAt?: Date | string | null
     endedAt?: Date | string | null
+    durationMinutes?: number | null
     roomId: string
     iceServers?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
@@ -8053,6 +8189,7 @@ export namespace Prisma {
     status?: EnumVisitStatusFieldUpdateOperationsInput | $Enums.VisitStatus
     startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    durationMinutes?: NullableIntFieldUpdateOperationsInput | number | null
     roomId?: StringFieldUpdateOperationsInput | string
     iceServers?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -8066,6 +8203,7 @@ export namespace Prisma {
     status?: EnumVisitStatusFieldUpdateOperationsInput | $Enums.VisitStatus
     startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    durationMinutes?: NullableIntFieldUpdateOperationsInput | number | null
     roomId?: StringFieldUpdateOperationsInput | string
     iceServers?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -8208,6 +8346,7 @@ export namespace Prisma {
     status?: $Enums.VisitStatus
     startedAt?: Date | string | null
     endedAt?: Date | string | null
+    durationMinutes?: number | null
     roomId: string
     iceServers?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
@@ -8222,6 +8361,7 @@ export namespace Prisma {
     status?: $Enums.VisitStatus
     startedAt?: Date | string | null
     endedAt?: Date | string | null
+    durationMinutes?: number | null
     roomId: string
     iceServers?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
@@ -8250,6 +8390,7 @@ export namespace Prisma {
     status?: EnumVisitStatusFieldUpdateOperationsInput | $Enums.VisitStatus
     startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    durationMinutes?: NullableIntFieldUpdateOperationsInput | number | null
     roomId?: StringFieldUpdateOperationsInput | string
     iceServers?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -8264,6 +8405,7 @@ export namespace Prisma {
     status?: EnumVisitStatusFieldUpdateOperationsInput | $Enums.VisitStatus
     startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    durationMinutes?: NullableIntFieldUpdateOperationsInput | number | null
     roomId?: StringFieldUpdateOperationsInput | string
     iceServers?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string

@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { z } from "zod";
-import { PrismaClient, NotificationChannel } from "../generated/client/index.js";
+import { PrismaClient, NotificationChannel, Prisma } from "../generated/client/index.js";
 import { NotificationError } from "../middleware/error.middleware.js";
 import { authenticate, requireOwnership } from "../middleware/auth.middleware.js";
 import { logger } from "../utils/logger.js";
@@ -104,11 +104,11 @@ router.put(
               userId,
               channel: pref.channel as NotificationChannel,
               enabled: pref.enabled,
-              settings: pref.settings,
+              settings: pref.settings as Prisma.InputJsonValue | undefined,
             },
             update: {
               enabled: pref.enabled,
-              settings: pref.settings,
+              settings: pref.settings as Prisma.InputJsonValue | undefined,
             },
           })
         )

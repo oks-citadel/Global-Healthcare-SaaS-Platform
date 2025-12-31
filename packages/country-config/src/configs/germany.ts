@@ -177,6 +177,7 @@ export const GermanyConfig: CountryConfig = {
   isolation: {
     enabled: true,
     dedicatedDatabase: true,
+    dedicatedSecretsManager: true,
     dedicatedKeyVault: true,
     customerManagedKeys: true,
     dedicatedNamespace: true,

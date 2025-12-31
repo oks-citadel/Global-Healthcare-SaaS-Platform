@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { RequestHandler } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
@@ -16,32 +16,32 @@ const app: express.Application = express();
 const PORT = process.env.PORT || 3010;
 
 // Rate limiting configuration
-const standardLimiter = rateLimit({
+const standardLimiter: RequestHandler = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Limit each IP to 100 requests per windowMs
   message: { error: 'Too Many Requests', message: 'Rate limit exceeded. Please try again later.' },
   standardHeaders: true,
   legacyHeaders: false,
   skip: (req) => req.path === '/health', // Skip health checks
-});
+}) as unknown as RequestHandler;
 
 // Stricter rate limiting for MRF generation (resource-intensive)
-const mrfLimiter = rateLimit({
+const mrfLimiter: RequestHandler = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
   max: 10, // Limit each IP to 10 MRF generations per hour
   message: { error: 'Too Many Requests', message: 'MRF generation rate limit exceeded. Please try again later.' },
   standardHeaders: true,
   legacyHeaders: false,
-});
+}) as unknown as RequestHandler;
 
 // Stricter rate limiting for compliance checks
-const complianceLimiter = rateLimit({
+const complianceLimiter: RequestHandler = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
   max: 20, // Limit each IP to 20 compliance checks per hour
   message: { error: 'Too Many Requests', message: 'Compliance check rate limit exceeded. Please try again later.' },
   standardHeaders: true,
   legacyHeaders: false,
-});
+}) as unknown as RequestHandler;
 
 // Security middleware
 app.use(helmet({

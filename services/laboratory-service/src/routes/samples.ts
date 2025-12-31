@@ -145,7 +145,7 @@ router.post('/', requireUser, async (req: UserRequest, res: Response): Promise<v
 
     const validatedData = createSampleSchema.parse(req.body);
 
-    const sample = await sampleService.createSample(validatedData, userId);
+    const sample = await sampleService.createSample(validatedData as any, userId);
 
     logger.info('Sample created', {
       sampleId: sample.id,

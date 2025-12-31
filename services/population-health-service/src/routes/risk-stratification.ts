@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { UserRequest, requireUser, requireRole } from '../middleware/extractUser';
-import riskStratificationService from '../services/risk-stratification.service';
+import riskStratificationService, { RiskScoreInput } from '../services/risk-stratification.service';
 
 const router: ReturnType<typeof Router> = Router();
 
@@ -61,7 +61,7 @@ router.post('/', requireUser, requireRole('admin', 'analyst', 'provider'), async
   try {
     const validated = createRiskScoreSchema.parse(req.body);
 
-    const riskScore = await riskStratificationService.createRiskScore(validated);
+    const riskScore = await riskStratificationService.createRiskScore(validated as RiskScoreInput);
     res.status(201).json({ data: riskScore, message: 'Risk score created successfully' });
   } catch (error) {
     if (error instanceof z.ZodError) {

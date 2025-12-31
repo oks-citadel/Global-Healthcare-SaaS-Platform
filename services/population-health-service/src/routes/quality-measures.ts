@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { UserRequest, requireUser, requireRole } from '../middleware/extractUser';
-import qualityMeasuresService from '../services/quality-measures.service';
+import qualityMeasuresService, { QualityMeasureInput } from '../services/quality-measures.service';
 
 const router: ReturnType<typeof Router> = Router();
 
@@ -60,7 +60,7 @@ router.post('/', requireUser, requireRole('admin', 'analyst'), async (req: UserR
   try {
     const validated = createMeasureSchema.parse(req.body);
 
-    const measure = await qualityMeasuresService.createQualityMeasure(validated);
+    const measure = await qualityMeasuresService.createQualityMeasure(validated as QualityMeasureInput);
     res.status(201).json({ data: measure, message: 'Quality measure created successfully' });
   } catch (error) {
     if (error instanceof z.ZodError) {

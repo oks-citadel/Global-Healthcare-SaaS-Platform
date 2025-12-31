@@ -1,4 +1,5 @@
-import rateLimit from 'express-rate-limit';
+import rateLimit, { RateLimitRequestHandler } from 'express-rate-limit';
+import { RequestHandler } from 'express';
 import Redis from 'ioredis';
 
 const redisClient = new Redis({
@@ -49,7 +50,7 @@ class RedisStore {
 }
 
 // General rate limiter - 100 requests per minute
-export const generalLimiter = rateLimit({
+export const generalLimiter: RequestHandler = rateLimit({
   windowMs: 60 * 1000, // 1 minute
   max: 100,
   message: {
@@ -62,10 +63,10 @@ export const generalLimiter = rateLimit({
     // Skip rate limiting for health checks
     return req.path === '/health';
   },
-});
+}) as unknown as RequestHandler;
 
 // Strict limiter for authentication endpoints - 5 requests per minute
-export const authLimiter = rateLimit({
+export const authLimiter: RequestHandler = rateLimit({
   windowMs: 60 * 1000,
   max: 5,
   message: {
@@ -74,10 +75,10 @@ export const authLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-});
+}) as unknown as RequestHandler;
 
 // API limiter with Redis store for distributed systems
-export const apiLimiter = rateLimit({
+export const apiLimiter: RequestHandler = rateLimit({
   windowMs: 60 * 1000,
   max: async (req) => {
     // Different limits based on user role
@@ -92,6 +93,6 @@ export const apiLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-});
+}) as unknown as RequestHandler;
 
 export { redisClient };

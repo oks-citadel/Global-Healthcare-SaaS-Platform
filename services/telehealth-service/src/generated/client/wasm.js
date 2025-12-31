@@ -143,6 +143,7 @@ exports.Prisma.VisitScalarFieldEnum = {
   status: 'status',
   startedAt: 'startedAt',
   endedAt: 'endedAt',
+  durationMinutes: 'durationMinutes',
   roomId: 'roomId',
   iceServers: 'iceServers',
   createdAt: 'createdAt',

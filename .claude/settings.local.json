@@ -12,7 +12,13 @@
       "Bash(xargs cat:*)",
       "Bash(git fetch:*)",
       "Bash(git merge:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(ls:*)",
+      "Bash(pnpm install)",
+      "Bash(pnpm typecheck:*)",
+      "Bash(npx prisma generate:*)",
+      "Bash(grep:*)",
+      "Bash(pnpm turbo run typecheck:*)"
     ]
   }
 }

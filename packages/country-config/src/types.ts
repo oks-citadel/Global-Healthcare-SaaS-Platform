@@ -185,6 +185,8 @@ export interface CountryIsolation {
   dedicatedNamespace: boolean;
   /** Dedicated storage account */
   dedicatedStorage: boolean;
+  /** Dedicated Key Vault (Azure) */
+  dedicatedKeyVault: boolean;
 }
 
 /**

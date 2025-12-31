@@ -54,13 +54,14 @@ enum AppointmentStatus {
 }
 
 model Visit {
-  id            String      @id @default(uuid())
-  appointmentId String      @unique
-  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
-  sessionToken  String      @unique
-  status        VisitStatus @default(waiting)
-  startedAt     DateTime?
-  endedAt       DateTime?
+  id              String      @id @default(uuid())
+  appointmentId   String      @unique
+  appointment     Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  sessionToken    String      @unique
+  status          VisitStatus @default(waiting)
+  startedAt       DateTime?
+  endedAt         DateTime?
+  durationMinutes Int? // Calculated duration in minutes
 
   // WebRTC connection info
   roomId     String @unique

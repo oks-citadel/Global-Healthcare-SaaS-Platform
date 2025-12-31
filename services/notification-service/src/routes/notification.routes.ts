@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { z } from "zod";
-import { PrismaClient, NotificationChannel, NotificationStatus, NotificationPriority } from "../generated/client/index.js";
+import { PrismaClient, NotificationChannel, NotificationStatus, NotificationPriority, Prisma } from "../generated/client/index.js";
 import { NotificationError } from "../middleware/error.middleware.js";
 import { authenticate, requireAdmin, requireOwnership, ForbiddenError } from "../middleware/auth.middleware.js";
 import { logger } from "../utils/logger.js";
@@ -57,7 +57,7 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
         message: validatedData.message,
         channel: validatedData.channel as NotificationChannel,
         priority: validatedData.priority as NotificationPriority,
-        metadata: validatedData.metadata,
+        metadata: validatedData.metadata as Prisma.InputJsonValue | undefined,
         scheduledAt: validatedData.scheduledAt ? new Date(validatedData.scheduledAt) : null,
         templateId: validatedData.templateId,
         status: validatedData.scheduledAt ? "queued" as NotificationStatus : "pending" as NotificationStatus,
@@ -250,7 +250,7 @@ router.post(
               message: notif.message,
               channel: notif.channel as NotificationChannel,
               priority: notif.priority as NotificationPriority,
-              metadata: { ...notif.metadata, batchId },
+              metadata: { ...notif.metadata, batchId } as Prisma.InputJsonValue,
               scheduledAt: notif.scheduledAt ? new Date(notif.scheduledAt) : null,
               templateId: notif.templateId,
               status: "queued" as NotificationStatus,

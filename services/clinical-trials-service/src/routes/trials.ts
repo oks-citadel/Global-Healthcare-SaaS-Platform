@@ -299,8 +299,8 @@ router.post('/sync', requireUser, requireRole('admin', 'coordinator'), async (re
     // Upsert trial
     const trial = await prisma.clinicalTrial.upsert({
       where: { nctId: trialData.nctId },
-      update: trialData,
-      create: trialData,
+      update: trialData as any,
+      create: trialData as any,
     });
 
     // Sync sites
@@ -315,8 +315,8 @@ router.post('/sync', requireUser, requireRole('admin', 'coordinator'), async (re
             city: siteData.city,
           },
         },
-        update: siteData,
-        create: siteData,
+        update: siteData as any,
+        create: siteData as any,
       });
     }
 
@@ -352,7 +352,7 @@ router.post('/', requireUser, requireRole('admin', 'coordinator'), async (req: U
       data: {
         ...validatedData,
         conditions: validatedData.conditions || [],
-      },
+      } as any,
     });
 
     await prisma.$disconnect();

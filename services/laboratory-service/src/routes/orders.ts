@@ -94,7 +94,7 @@ router.post('/', requireUser, async (req: UserRequest, res: Response) => {
         orderNumber,
         priority: validatedData.priority,
         clinicalInfo: validatedData.clinicalInfo,
-        tests: { create: validatedData.tests },
+        tests: { create: validatedData.tests as any },
       },
       include: { tests: true },
     });

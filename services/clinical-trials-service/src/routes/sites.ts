@@ -287,7 +287,7 @@ router.post('/', requireUser, requireRole('admin', 'coordinator'), async (req: U
     }
 
     const site = await prisma.trialSite.create({
-      data: validatedData,
+      data: validatedData as any,
       include: {
         trial: {
           select: { nctId: true, title: true },
@@ -487,7 +487,7 @@ router.post('/investigators', requireUser, requireRole('admin'), async (req: Use
         ...validatedData,
         certifications: validatedData.certifications || [],
         trainingRecords: [],
-      },
+      } as any,
     });
 
     await prisma.$disconnect();

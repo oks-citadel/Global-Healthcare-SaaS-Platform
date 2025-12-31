@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { RequestHandler } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
@@ -16,7 +16,7 @@ const PORT = process.env.PORT || 3010;
 const prisma = new PrismaClient();
 
 // Rate limiting configuration
-const limiter = rateLimit({
+const limiter: RequestHandler = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 200, // Limit each IP to 200 requests per windowMs
   message: {
@@ -26,10 +26,10 @@ const limiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   skip: (req) => req.path === '/health' || req.path === '/ready',
-});
+}) as unknown as RequestHandler;
 
 // Stricter rate limit for AI-intensive endpoints
-const aiLimiter = rateLimit({
+const aiLimiter: RequestHandler = rateLimit({
   windowMs: 60 * 1000, // 1 minute
   max: 10, // 10 requests per minute for AI endpoints
   message: {
@@ -38,7 +38,7 @@ const aiLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-});
+}) as unknown as RequestHandler;
 
 // Middleware
 app.use(helmet());

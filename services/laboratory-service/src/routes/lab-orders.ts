@@ -34,7 +34,7 @@ router.get('/', requireUser, async (req: UserRequest, res: Response): Promise<vo
       filters.providerId = userId;
     }
 
-    const result = await orderService.getOrders(filters);
+    const result = await orderService.getOrders(filters as any);
 
     res.json({
       data: result.orders,
@@ -116,7 +116,7 @@ router.post('/', requireUser, async (req: UserRequest, res: Response): Promise<v
 
     const validatedData = createOrderSchema.parse(req.body);
 
-    const order = await orderService.createOrder(validatedData, userId);
+    const order = await orderService.createOrder(validatedData as any, userId);
 
     logger.info('Lab order created', {
       orderId: order.id,
@@ -151,7 +151,7 @@ router.patch('/:id', requireUser, async (req: UserRequest, res: Response): Promi
 
     const validatedData = updateOrderSchema.parse(req.body);
 
-    const order = await orderService.updateOrder(id, validatedData);
+    const order = await orderService.updateOrder(id, validatedData as any);
 
     res.json({
       data: order,

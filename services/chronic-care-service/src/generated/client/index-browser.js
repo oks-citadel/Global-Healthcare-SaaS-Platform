@@ -163,6 +163,10 @@ exports.Prisma.MonitoringDeviceScalarFieldEnum = {
   status: 'status',
   lastSyncAt: 'lastSyncAt',
   batteryLevel: 'batteryLevel',
+  firmwareVersion: 'firmwareVersion',
+  softwareVersion: 'softwareVersion',
+  certificateExpiry: 'certificateExpiry',
+  lastSecurityScan: 'lastSecurityScan',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -267,6 +271,206 @@ exports.Prisma.PatientEngagementScalarFieldEnum = {
   description: 'description',
   metadata: 'metadata',
   recordedAt: 'recordedAt',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.DeviceVulnerabilityScalarFieldEnum = {
+  id: 'id',
+  deviceId: 'deviceId',
+  cveId: 'cveId',
+  title: 'title',
+  description: 'description',
+  severity: 'severity',
+  cvssScore: 'cvssScore',
+  affectedVersion: 'affectedVersion',
+  fixedVersion: 'fixedVersion',
+  exploitAvailable: 'exploitAvailable',
+  status: 'status',
+  discoveredAt: 'discoveredAt',
+  resolvedAt: 'resolvedAt',
+  resolvedBy: 'resolvedBy',
+  resolutionNotes: 'resolutionNotes',
+  source: 'source',
+  references: 'references',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.DevicePatchScalarFieldEnum = {
+  id: 'id',
+  deviceId: 'deviceId',
+  patchVersion: 'patchVersion',
+  currentVersion: 'currentVersion',
+  description: 'description',
+  releaseNotes: 'releaseNotes',
+  criticality: 'criticality',
+  scheduledDate: 'scheduledDate',
+  appliedDate: 'appliedDate',
+  appliedBy: 'appliedBy',
+  status: 'status',
+  rollbackVersion: 'rollbackVersion',
+  testingRequired: 'testingRequired',
+  testingCompletedAt: 'testingCompletedAt',
+  testingNotes: 'testingNotes',
+  approvedBy: 'approvedBy',
+  approvedAt: 'approvedAt',
+  failureReason: 'failureReason',
+  vulnerabilitiesFixed: 'vulnerabilitiesFixed',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SecurityIncidentScalarFieldEnum = {
+  id: 'id',
+  deviceId: 'deviceId',
+  incidentType: 'incidentType',
+  severity: 'severity',
+  title: 'title',
+  description: 'description',
+  affectedSystems: 'affectedSystems',
+  affectedPatients: 'affectedPatients',
+  detectedAt: 'detectedAt',
+  detectedBy: 'detectedBy',
+  reportedBy: 'reportedBy',
+  status: 'status',
+  assignedTo: 'assignedTo',
+  containedAt: 'containedAt',
+  resolvedAt: 'resolvedAt',
+  rootCause: 'rootCause',
+  remediationSteps: 'remediationSteps',
+  lessonsLearned: 'lessonsLearned',
+  timeline: 'timeline',
+  evidence: 'evidence',
+  notificationsSent: 'notificationsSent',
+  regulatoryReported: 'regulatoryReported',
+  regulatoryReportDate: 'regulatoryReportDate',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.NetworkSegmentScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  vlanId: 'vlanId',
+  subnetCidr: 'subnetCidr',
+  securityLevel: 'securityLevel',
+  isolationLevel: 'isolationLevel',
+  allowedProtocols: 'allowedProtocols',
+  firewallRules: 'firewallRules',
+  complianceRequirements: 'complianceRequirements',
+  monitoringEnabled: 'monitoringEnabled',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.DeviceNetworkAssignmentScalarFieldEnum = {
+  id: 'id',
+  deviceId: 'deviceId',
+  segmentId: 'segmentId',
+  ipAddress: 'ipAddress',
+  macAddress: 'macAddress',
+  assignedAt: 'assignedAt',
+  assignedBy: 'assignedBy',
+  status: 'status',
+  complianceStatus: 'complianceStatus',
+  lastComplianceCheck: 'lastComplianceCheck',
+  complianceNotes: 'complianceNotes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.FDARecallScalarFieldEnum = {
+  id: 'id',
+  recallNumber: 'recallNumber',
+  recallClass: 'recallClass',
+  productDescription: 'productDescription',
+  manufacturer: 'manufacturer',
+  reasonForRecall: 'reasonForRecall',
+  distributionPattern: 'distributionPattern',
+  initiatedDate: 'initiatedDate',
+  terminatedDate: 'terminatedDate',
+  status: 'status',
+  affectedModels: 'affectedModels',
+  lotNumbers: 'lotNumbers',
+  healthHazard: 'healthHazard',
+  remedyDescription: 'remedyDescription',
+  lastCheckedAt: 'lastCheckedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.DeviceRecallStatusScalarFieldEnum = {
+  id: 'id',
+  deviceId: 'deviceId',
+  recallId: 'recallId',
+  status: 'status',
+  actionTaken: 'actionTaken',
+  actionDate: 'actionDate',
+  actionBy: 'actionBy',
+  notes: 'notes',
+  patientNotified: 'patientNotified',
+  providerNotified: 'providerNotified',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SecurityAuditLogScalarFieldEnum = {
+  id: 'id',
+  entityType: 'entityType',
+  entityId: 'entityId',
+  action: 'action',
+  performedBy: 'performedBy',
+  performedByRole: 'performedByRole',
+  previousState: 'previousState',
+  newState: 'newState',
+  ipAddress: 'ipAddress',
+  userAgent: 'userAgent',
+  details: 'details',
+  riskLevel: 'riskLevel',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.ManufacturerAdvisoryScalarFieldEnum = {
+  id: 'id',
+  manufacturer: 'manufacturer',
+  advisoryId: 'advisoryId',
+  title: 'title',
+  description: 'description',
+  severity: 'severity',
+  affectedProducts: 'affectedProducts',
+  affectedVersions: 'affectedVersions',
+  fixedVersion: 'fixedVersion',
+  workaround: 'workaround',
+  publishedDate: 'publishedDate',
+  lastUpdatedDate: 'lastUpdatedDate',
+  cveReferences: 'cveReferences',
+  status: 'status',
+  source: 'source',
+  acknowledgedAt: 'acknowledgedAt',
+  acknowledgedBy: 'acknowledgedBy',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.DeviceRiskAssessmentScalarFieldEnum = {
+  id: 'id',
+  deviceId: 'deviceId',
+  overallRiskScore: 'overallRiskScore',
+  vulnerabilityScore: 'vulnerabilityScore',
+  patchScore: 'patchScore',
+  networkScore: 'networkScore',
+  complianceScore: 'complianceScore',
+  incidentScore: 'incidentScore',
+  agingScore: 'agingScore',
+  riskLevel: 'riskLevel',
+  riskFactors: 'riskFactors',
+  recommendations: 'recommendations',
+  assessedAt: 'assessedAt',
+  assessedBy: 'assessedBy',
+  nextAssessmentDue: 'nextAssessmentDue',
+  notes: 'notes',
   createdAt: 'createdAt'
 };
 
@@ -410,6 +614,138 @@ exports.EngagementType = exports.$Enums.EngagementType = {
   other: 'other'
 };
 
+exports.VulnerabilitySeverity = exports.$Enums.VulnerabilitySeverity = {
+  critical: 'critical',
+  high: 'high',
+  medium: 'medium',
+  low: 'low',
+  informational: 'informational'
+};
+
+exports.VulnerabilityStatus = exports.$Enums.VulnerabilityStatus = {
+  open: 'open',
+  in_progress: 'in_progress',
+  mitigated: 'mitigated',
+  resolved: 'resolved',
+  accepted_risk: 'accepted_risk',
+  false_positive: 'false_positive'
+};
+
+exports.PatchCriticality = exports.$Enums.PatchCriticality = {
+  critical: 'critical',
+  security: 'security',
+  recommended: 'recommended',
+  optional: 'optional'
+};
+
+exports.PatchStatus = exports.$Enums.PatchStatus = {
+  pending: 'pending',
+  approved: 'approved',
+  scheduled: 'scheduled',
+  in_progress: 'in_progress',
+  completed: 'completed',
+  failed: 'failed',
+  rolled_back: 'rolled_back',
+  cancelled: 'cancelled'
+};
+
+exports.IncidentType = exports.$Enums.IncidentType = {
+  unauthorized_access: 'unauthorized_access',
+  data_breach: 'data_breach',
+  malware: 'malware',
+  ransomware: 'ransomware',
+  firmware_tampering: 'firmware_tampering',
+  network_intrusion: 'network_intrusion',
+  denial_of_service: 'denial_of_service',
+  physical_tampering: 'physical_tampering',
+  configuration_change: 'configuration_change',
+  anomalous_behavior: 'anomalous_behavior',
+  credential_compromise: 'credential_compromise',
+  other: 'other'
+};
+
+exports.IncidentSeverity = exports.$Enums.IncidentSeverity = {
+  critical: 'critical',
+  high: 'high',
+  medium: 'medium',
+  low: 'low'
+};
+
+exports.IncidentStatus = exports.$Enums.IncidentStatus = {
+  detected: 'detected',
+  investigating: 'investigating',
+  contained: 'contained',
+  eradicating: 'eradicating',
+  recovering: 'recovering',
+  resolved: 'resolved',
+  closed: 'closed'
+};
+
+exports.SecurityLevel = exports.$Enums.SecurityLevel = {
+  critical: 'critical',
+  high: 'high',
+  medium: 'medium',
+  low: 'low',
+  public: 'public'
+};
+
+exports.IsolationLevel = exports.$Enums.IsolationLevel = {
+  air_gapped: 'air_gapped',
+  strict: 'strict',
+  standard: 'standard',
+  relaxed: 'relaxed'
+};
+
+exports.AssignmentStatus = exports.$Enums.AssignmentStatus = {
+  active: 'active',
+  suspended: 'suspended',
+  removed: 'removed'
+};
+
+exports.ComplianceStatus = exports.$Enums.ComplianceStatus = {
+  compliant: 'compliant',
+  non_compliant: 'non_compliant',
+  pending: 'pending',
+  exempt: 'exempt'
+};
+
+exports.RecallClass = exports.$Enums.RecallClass = {
+  class_I: 'class_I',
+  class_II: 'class_II',
+  class_III: 'class_III'
+};
+
+exports.RecallStatus = exports.$Enums.RecallStatus = {
+  ongoing: 'ongoing',
+  completed: 'completed',
+  terminated: 'terminated'
+};
+
+exports.DeviceRecallAction = exports.$Enums.DeviceRecallAction = {
+  pending: 'pending',
+  under_review: 'under_review',
+  device_replaced: 'device_replaced',
+  device_repaired: 'device_repaired',
+  device_removed: 'device_removed',
+  no_action_required: 'no_action_required',
+  patient_contacted: 'patient_contacted'
+};
+
+exports.AdvisoryStatus = exports.$Enums.AdvisoryStatus = {
+  active: 'active',
+  superseded: 'superseded',
+  resolved: 'resolved',
+  archived: 'archived'
+};
+
+exports.RiskLevel = exports.$Enums.RiskLevel = {
+  critical: 'critical',
+  high: 'high',
+  medium: 'medium',
+  low: 'low',
+  minimal: 'minimal'
+};
+
 exports.Prisma.ModelName = {
   CarePlan: 'CarePlan',
   CareTask: 'CareTask',
@@ -420,7 +756,17 @@ exports.Prisma.ModelName = {
   GoalProgress: 'GoalProgress',
   AlertThreshold: 'AlertThreshold',
   CarePlanTemplate: 'CarePlanTemplate',
-  PatientEngagement: 'PatientEngagement'
+  PatientEngagement: 'PatientEngagement',
+  DeviceVulnerability: 'DeviceVulnerability',
+  DevicePatch: 'DevicePatch',
+  SecurityIncident: 'SecurityIncident',
+  NetworkSegment: 'NetworkSegment',
+  DeviceNetworkAssignment: 'DeviceNetworkAssignment',
+  FDARecall: 'FDARecall',
+  DeviceRecallStatus: 'DeviceRecallStatus',
+  SecurityAuditLog: 'SecurityAuditLog',
+  ManufacturerAdvisory: 'ManufacturerAdvisory',
+  DeviceRiskAssessment: 'DeviceRiskAssessment'
 };
 
 /**

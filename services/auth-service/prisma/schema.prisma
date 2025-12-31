@@ -131,3 +131,24 @@ model EmailVerificationToken {
   @@index([token])
   @@index([expiresAt])
 }
+
+// ==========================================
+// MFA Session Tokens
+// ==========================================
+
+model MfaToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+
+  // Metadata
+  ipAddress String?
+  userAgent String?
+
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+}

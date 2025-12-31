@@ -497,7 +497,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\kogun\\OneDrive\\Documents\\Global Healthcare\\Global-Healthcare-SaaS-Platform\\services\\mental-health-service\\src\\generated\\client",
+      "value": "C:\\Users\\citad\\OneDrive\\Documents\\Global-Healthcare-SaaS-Platform\\services\\mental-health-service\\src\\generated\\client",
       "fromEnvVar": null
     },
     "config": {
@@ -511,7 +511,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\kogun\\OneDrive\\Documents\\Global Healthcare\\Global-Healthcare-SaaS-Platform\\services\\mental-health-service\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\Users\\citad\\OneDrive\\Documents\\Global-Healthcare-SaaS-Platform\\services\\mental-health-service\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -543,8 +543,8 @@ const fs = require('fs')
 config.dirname = __dirname
 if (!fs.existsSync(path.join(__dirname, 'schema.prisma'))) {
   const alternativePaths = [
-    "../src/generated/client",
     "src/generated/client",
+    "generated/client",
   ]
   
   const alternativePath = alternativePaths.find((altPath) => {
@@ -573,7 +573,7 @@ Object.assign(exports, Prisma)
 
 // file annotations for bundling tools to include these files
 path.join(__dirname, "query_engine-windows.dll.node");
-path.join(process.cwd(), "../src/generated/client/query_engine-windows.dll.node")
+path.join(process.cwd(), "src/generated/client/query_engine-windows.dll.node")
 // file annotations for bundling tools to include these files
 path.join(__dirname, "schema.prisma");
-path.join(process.cwd(), "../src/generated/client/schema.prisma")
+path.join(process.cwd(), "src/generated/client/schema.prisma")

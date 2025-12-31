@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { RequestHandler } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
@@ -15,23 +15,23 @@ const app: express.Application = express();
 const PORT = process.env.PORT || 3012;
 
 // Rate limiting configuration
-const limiter = rateLimit({
+const limiter: RequestHandler = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Limit each IP to 100 requests per windowMs
   message: { error: 'Too Many Requests', message: 'Rate limit exceeded. Please try again later.' },
   standardHeaders: true,
   legacyHeaders: false,
   skip: (req) => req.path === '/health', // Skip health checks
-});
+}) as unknown as RequestHandler;
 
 // Stricter rate limit for AI matching endpoints
-const matchingLimiter = rateLimit({
+const matchingLimiter: RequestHandler = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 30, // Limit to 30 matching requests per 15 minutes
   message: { error: 'Too Many Requests', message: 'Matching rate limit exceeded. Please try again later.' },
   standardHeaders: true,
   legacyHeaders: false,
-});
+}) as unknown as RequestHandler;
 
 // Security middleware
 app.use(helmet());
