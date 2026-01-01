@@ -36,26 +36,24 @@ phases:
       - echo "Building Docker image for $SERVICE_NAME..."
       - cd $CODEBUILD_SRC_DIR
 
-      # Check if service has its own Dockerfile
+      # Select Dockerfile based on path (apps vs services)
       - |
-        if [ -f "$SERVICE_PATH/Dockerfile" ]; then
-          echo "Using service-specific Dockerfile"
-          cd $SERVICE_PATH
-          docker build -t $IMAGE_URI \
-            --build-arg NODE_ENV=production \
-            --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
-            --build-arg VCS_REF=$COMMIT_HASH \
-            .
+        if [[ "$SERVICE_PATH" == apps/* ]]; then
+          DOCKERFILE="docker/Dockerfile.app"
+          echo "Building Next.js app with $DOCKERFILE"
         else
-          echo "Using root Dockerfile with build context"
-          docker build -t $IMAGE_URI \
-            --build-arg SERVICE_PATH=$SERVICE_PATH \
-            --build-arg NODE_ENV=production \
-            --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
-            --build-arg VCS_REF=$COMMIT_HASH \
-            -f docker/Dockerfile.service \
-            .
+          DOCKERFILE="docker/Dockerfile.service"
+          echo "Building service with $DOCKERFILE"
         fi
+
+        docker build -t $IMAGE_URI \
+          --build-arg SERVICE_PATH=$SERVICE_PATH \
+          --build-arg SERVICE_NAME=$SERVICE_NAME \
+          --build-arg NODE_ENV=production \
+          --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+          --build-arg VCS_REF=$COMMIT_HASH \
+          -f $DOCKERFILE \
+          .
 
   post_build:
     commands:
