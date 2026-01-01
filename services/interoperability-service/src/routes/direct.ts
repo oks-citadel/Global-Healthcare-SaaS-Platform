@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, RequestHandler } from 'express';
 import { z } from 'zod';
 import DirectMessagingService from '../services/DirectMessagingService';
 import { UserRequest, requireUser } from '../middleware/extractUser';
@@ -8,7 +8,7 @@ import { logger } from '../utils/logger';
 const router: ReturnType<typeof Router> = Router();
 
 // Apply Direct messaging-specific rate limiting
-router.use(directMessagingLimiter);
+router.use(directMessagingLimiter as unknown as RequestHandler);
 
 // Schema for sending a Direct message
 const sendMessageSchema = z.object({
@@ -50,7 +50,7 @@ router.post('/send', requireUser, async (req: UserRequest, res) => {
       subject: validatedData.subject,
       body: validatedData.body,
       attachments: validatedData.attachments,
-      mdn: validatedData.mdn,
+      mdn: { requested: validatedData.mdn?.requested || false },
       encrypted: true,
       signed: true,
     });
@@ -137,7 +137,7 @@ router.post('/addresses', requireUser, async (req: UserRequest, res) => {
   try {
     const validatedData = registerAddressSchema.parse(req.body);
 
-    const result = await DirectMessagingService.registerAddress(validatedData);
+    const result = await DirectMessagingService.registerAddress(validatedData as any);
 
     res.status(201).json({
       success: true,

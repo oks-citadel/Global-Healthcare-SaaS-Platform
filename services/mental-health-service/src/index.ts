@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { RequestHandler } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
@@ -29,7 +29,7 @@ app.use(cors({
   origin: process.env.CORS_ORIGIN || '*',
   credentials: true,
 }));
-app.use(limiter);
+app.use(limiter as unknown as RequestHandler);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

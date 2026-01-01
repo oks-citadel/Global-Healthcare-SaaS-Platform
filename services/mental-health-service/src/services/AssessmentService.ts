@@ -412,11 +412,16 @@ export class AssessmentService {
     type: AssessmentType,
     responses: Record<string, number | boolean>
   ): AssessmentResult {
+    // Filter out boolean values and cast to number-only record
+    const numericResponses = Object.fromEntries(
+      Object.entries(responses).filter(([, v]) => typeof v === 'number')
+    ) as Record<string, number>;
+
     switch (type) {
       case 'PHQ9':
-        return this.scorePHQ9(responses);
+        return this.scorePHQ9(numericResponses);
       case 'GAD7':
-        return this.scoreGAD7(responses);
+        return this.scoreGAD7(numericResponses);
       default:
         return {
           totalScore: 0,

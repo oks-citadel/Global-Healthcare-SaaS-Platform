@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { RequestHandler } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
@@ -51,7 +51,7 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Request-ID', 'X-Correlation-ID'],
 }));
 
-app.use(limiter);
+app.use(limiter as unknown as RequestHandler);
 app.use(express.json({ limit: '50mb' })); // Larger payload for document exchange
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(express.text({ type: ['application/xml', 'text/xml', 'application/edi-x12'], limit: '50mb' }));

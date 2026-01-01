@@ -66,7 +66,7 @@ router.get('/', requireUser, async (req: UserRequest, res: Response): Promise<vo
 
     // Filter by assessment type
     if (assessmentType && typeof assessmentType === 'string') {
-      where.assessmentType = assessmentType;
+      where.assessmentType = assessmentType as any;
     }
 
     const assessments = await prisma.mentalHealthAssessment.findMany({
@@ -153,7 +153,7 @@ router.post('/', requireUser, async (req: UserRequest, res: Response): Promise<v
         assessedBy: userId,
         assessmentType: validatedData.assessmentType,
         score: validatedData.score,
-        severity: validatedData.severity,
+        severity: validatedData.severity as any,
         results: validatedData.results,
         notes: validatedData.notes,
         followUpRequired: validatedData.followUpRequired || false,

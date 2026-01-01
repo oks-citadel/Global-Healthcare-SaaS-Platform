@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, RequestHandler } from 'express';
 import { z } from 'zod';
 import TEFCAService from '../services/TEFCAService';
 import { UserRequest, requireUser } from '../middleware/extractUser';
@@ -8,7 +8,7 @@ import { logger } from '../utils/logger';
 const router: ReturnType<typeof Router> = Router();
 
 // Apply network query-specific rate limiting
-router.use(networkQueryLimiter);
+router.use(networkQueryLimiter as unknown as RequestHandler);
 
 // Schema for TEFCA query
 const tefcaQuerySchema = z.object({
@@ -69,7 +69,7 @@ router.post('/query', requireUser, async (req: UserRequest, res) => {
   try {
     const validatedData = tefcaQuerySchema.parse(req.body);
 
-    const result = await TEFCAService.query(validatedData);
+    const result = await TEFCAService.query(validatedData as any);
 
     if (!result.success) {
       res.status(400).json({
@@ -277,7 +277,7 @@ router.post('/participants', requireUser, async (req: UserRequest, res) => {
   try {
     const validatedData = registerParticipantSchema.parse(req.body);
 
-    const participant = await TEFCAService.registerParticipant(validatedData);
+    const participant = await TEFCAService.registerParticipant(validatedData as any);
 
     res.status(201).json({
       success: true,

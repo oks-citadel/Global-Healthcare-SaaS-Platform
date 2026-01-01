@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, RequestHandler } from 'express';
 import { z } from 'zod';
 import CommonWellService from '../services/CommonWellService';
 import { UserRequest, requireUser } from '../middleware/extractUser';
@@ -8,7 +8,7 @@ import { logger } from '../utils/logger';
 const router: ReturnType<typeof Router> = Router();
 
 // Apply network query-specific rate limiting
-router.use(networkQueryLimiter);
+router.use(networkQueryLimiter as unknown as RequestHandler);
 
 // Schema for patient search
 const patientSearchSchema = z.object({

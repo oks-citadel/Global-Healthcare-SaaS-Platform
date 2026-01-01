@@ -40,9 +40,7 @@ export class ConsentService {
         patientId,
         consentType,
         status: 'active',
-        grantedTo: {
-          has: providerId,
-        },
+        grantedTo: providerId,
         OR: [
           { expiresAt: null },
           { expiresAt: { gt: new Date() } },
@@ -66,9 +64,7 @@ export class ConsentService {
         patientId,
         status: 'active',
         substanceUseDisclosure: true,
-        grantedTo: {
-          has: providerId,
-        },
+        grantedTo: providerId,
         OR: [
           { expiresAt: null },
           { expiresAt: { gt: new Date() } },
@@ -86,13 +82,14 @@ export class ConsentService {
     return await prisma.consentRecord.create({
       data: {
         patientId: data.patientId,
+        providerId: data.providerId,
         consentType: data.consentType,
         purpose: data.purpose,
-        grantedTo: [data.providerId],
+        grantedTo: data.providerId,
+        grantedAt: new Date(),
         expiresAt: data.expiresAt,
         substanceUseDisclosure: data.substanceUseDisclosure || false,
-        disclosureScope: data.disclosureScope,
-        redisclosure: data.redisclosure || false,
+        disclosureScope: data.disclosureScope ? [data.disclosureScope] : [],
         status: 'active',
       },
     });
@@ -162,9 +159,7 @@ export class ConsentService {
       where: {
         patientId,
         status: 'active',
-        grantedTo: {
-          has: providerId,
-        },
+        grantedTo: providerId,
         OR: [
           { expiresAt: null },
           { expiresAt: { gt: new Date() } },
@@ -179,10 +174,9 @@ export class ConsentService {
       };
     }
 
-    // Check if resource type is within scope
-    if (consent.disclosureScope) {
-      const allowedScopes = consent.disclosureScope.split(',').map(s => s.trim());
-      if (!allowedScopes.includes(resourceType) && !allowedScopes.includes('*')) {
+    // Check if resource type is within scope (disclosureScope is already string[])
+    if (consent.disclosureScope && consent.disclosureScope.length > 0) {
+      if (!consent.disclosureScope.includes(resourceType) && !consent.disclosureScope.includes('*')) {
         return {
           allowed: false,
           reason: 'Resource type not within consent scope',
@@ -212,13 +206,14 @@ export class ConsentService {
     return await prisma.consentRecord.create({
       data: {
         patientId,
+        providerId,
         consentType: 'emergency_contact',
         purpose: `Emergency: ${emergencyReason}`,
-        grantedTo: [providerId],
+        grantedTo: providerId,
+        grantedAt: new Date(),
         expiresAt,
         status: 'active',
         substanceUseDisclosure: false,
-        redisclosure: false,
       },
     });
   }

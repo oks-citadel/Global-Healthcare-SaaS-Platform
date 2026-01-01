@@ -115,7 +115,7 @@ export class X12TransactionService {
       const processedData = await this.processTransaction(parsed);
 
       // Update status to completed
-      await prisma.x12Transaction.update({
+      await prisma.x12Transaction.updateMany({
         where: { transactionSetId: transactionId },
         data: { status: 'completed', processedAt: new Date() },
       });

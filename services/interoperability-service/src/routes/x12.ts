@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, RequestHandler } from 'express';
 import { z } from 'zod';
 import X12TransactionService from '../services/X12TransactionService';
 import { UserRequest, requireUser } from '../middleware/extractUser';
@@ -8,7 +8,7 @@ import { logger } from '../utils/logger';
 const router: ReturnType<typeof Router> = Router();
 
 // Apply X12-specific rate limiting
-router.use(x12Limiter);
+router.use(x12Limiter as unknown as RequestHandler);
 
 // Schema for X12 transaction generation
 const x12GenerateSchema = z.object({

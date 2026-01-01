@@ -68,7 +68,7 @@ router.get('/patient/:patientId', requireUser, async (req: UserRequest, res: Res
     const where: PsychMedicationWhereInput = { patientId };
 
     if (status && typeof status === 'string') {
-      where.status = status;
+      where.status = status as any;
     }
 
     const medications = await prisma.psychMedication.findMany({
@@ -153,14 +153,14 @@ router.post('/', requireUser, async (req: UserRequest, res: Response): Promise<v
       data: {
         patientId: validatedData.patientId,
         prescriberId: userId,
+        name: validatedData.medicationName,
         medicationName: validatedData.medicationName,
         medicationClass: validatedData.medicationClass,
         dosage: validatedData.dosage,
         frequency: validatedData.frequency,
-        route: validatedData.route,
         startDate: new Date(validatedData.startDate),
         endDate: validatedData.endDate ? new Date(validatedData.endDate) : null,
-        indication: validatedData.indication,
+        reason: validatedData.indication,
         sideEffects: validatedData.sideEffects || [],
         interactions: validatedData.interactions || [],
         status: 'active',

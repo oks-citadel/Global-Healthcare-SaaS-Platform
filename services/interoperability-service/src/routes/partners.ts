@@ -156,7 +156,7 @@ router.post('/', requireUser, requireRole('admin'), async (req: UserRequest, res
       data: {
         ...validatedData,
         status: 'pending',
-      },
+      } as any,
     });
 
     logger.info('Trading partner created', {

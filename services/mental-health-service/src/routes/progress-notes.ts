@@ -84,30 +84,28 @@ router.post('/', requireUser, async (req: UserRequest, res: Response): Promise<v
       }
     }
 
+    // Build content from SOAP/DAP fields
+    const contentParts: string[] = [];
+    if (validatedData.subjective) contentParts.push(`Subjective: ${validatedData.subjective}`);
+    if (validatedData.objective) contentParts.push(`Objective: ${validatedData.objective}`);
+    if (validatedData.assessment) contentParts.push(`Assessment: ${validatedData.assessment}`);
+    if (validatedData.data) contentParts.push(`Data: ${validatedData.data}`);
+    if (validatedData.assessmentDAP) contentParts.push(`Assessment (DAP): ${validatedData.assessmentDAP}`);
+    if (validatedData.riskAssessment) contentParts.push(`Risk Assessment: ${validatedData.riskAssessment}`);
+    if (validatedData.progress) contentParts.push(`Progress: ${validatedData.progress}`);
+    if (validatedData.homework) contentParts.push(`Homework: ${validatedData.homework}`);
+    if (validatedData.nextSteps) contentParts.push(`Next Steps: ${validatedData.nextSteps}`);
+
     const note = await prisma.progressNote.create({
       data: {
         sessionId: validatedData.sessionId,
         patientId: validatedData.patientId,
         providerId: userId,
         noteType: validatedData.noteType,
-
-        subjective: validatedData.subjective,
-        objective: validatedData.objective,
-        assessment: validatedData.assessment,
-        plan: validatedData.plan,
-
-        data: validatedData.data,
-        assessmentDAP: validatedData.assessmentDAP,
-        planDAP: validatedData.planDAP,
-
-        riskAssessment: validatedData.riskAssessment,
+        content: contentParts.join('\n\n') || 'No content provided',
+        diagnosis: [],
         interventions: validatedData.interventions || [],
-        progress: validatedData.progress,
-        homework: validatedData.homework,
-        nextSteps: validatedData.nextSteps,
-
-        isConfidential: validatedData.isConfidential,
-        consentSigned: validatedData.consentSigned,
+        plan: validatedData.plan || validatedData.planDAP,
       },
     });
 
@@ -398,30 +396,28 @@ router.post('/sessions/:sessionId/notes', requireUser, async (req: UserRequest, 
     const noteData = { ...req.body, sessionId, patientId: session.patientId };
     const validatedData = createProgressNoteSchema.parse(noteData);
 
+    // Build content from SOAP/DAP fields
+    const noteContentParts: string[] = [];
+    if (validatedData.subjective) noteContentParts.push(`Subjective: ${validatedData.subjective}`);
+    if (validatedData.objective) noteContentParts.push(`Objective: ${validatedData.objective}`);
+    if (validatedData.assessment) noteContentParts.push(`Assessment: ${validatedData.assessment}`);
+    if (validatedData.data) noteContentParts.push(`Data: ${validatedData.data}`);
+    if (validatedData.assessmentDAP) noteContentParts.push(`Assessment (DAP): ${validatedData.assessmentDAP}`);
+    if (validatedData.riskAssessment) noteContentParts.push(`Risk Assessment: ${validatedData.riskAssessment}`);
+    if (validatedData.progress) noteContentParts.push(`Progress: ${validatedData.progress}`);
+    if (validatedData.homework) noteContentParts.push(`Homework: ${validatedData.homework}`);
+    if (validatedData.nextSteps) noteContentParts.push(`Next Steps: ${validatedData.nextSteps}`);
+
     const note = await prisma.progressNote.create({
       data: {
         sessionId: validatedData.sessionId,
         patientId: validatedData.patientId,
         providerId: userId,
         noteType: validatedData.noteType,
-
-        subjective: validatedData.subjective,
-        objective: validatedData.objective,
-        assessment: validatedData.assessment,
-        plan: validatedData.plan,
-
-        data: validatedData.data,
-        assessmentDAP: validatedData.assessmentDAP,
-        planDAP: validatedData.planDAP,
-
-        riskAssessment: validatedData.riskAssessment,
+        content: noteContentParts.join('\n\n') || 'No content provided',
+        diagnosis: [],
         interventions: validatedData.interventions || [],
-        progress: validatedData.progress,
-        homework: validatedData.homework,
-        nextSteps: validatedData.nextSteps,
-
-        isConfidential: validatedData.isConfidential,
-        consentSigned: validatedData.consentSigned,
+        plan: validatedData.plan || validatedData.planDAP,
       },
     });
 

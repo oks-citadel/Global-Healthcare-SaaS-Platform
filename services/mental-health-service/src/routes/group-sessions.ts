@@ -80,14 +80,16 @@ router.post('/', requireUser, async (req: UserRequest, res: Response): Promise<v
 
     const session = await prisma.groupSession.create({
       data: {
+        name: validatedData.topic || 'Group Session',
         groupId: validatedData.groupId,
         facilitatorId: userId,
+        scheduledAt: new Date(validatedData.sessionDate),
         sessionDate: new Date(validatedData.sessionDate),
         duration: validatedData.duration,
         topic: validatedData.topic,
         description: validatedData.description,
         objectives: validatedData.objectives,
-        materials: validatedData.materials,
+        materials: validatedData.materials as any,
         status: 'scheduled',
       },
     });
@@ -134,7 +136,7 @@ router.get('/', requireUser, async (req: UserRequest, res: Response): Promise<vo
 
     // Filter by status
     if (status && typeof status === 'string') {
-      where.status = status;
+      where.status = status as any;
     }
 
     // Filter by date range

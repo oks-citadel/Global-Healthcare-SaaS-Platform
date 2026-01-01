@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, RequestHandler } from 'express';
 import { z } from 'zod';
 import FhirProxyService from '../services/FhirProxyService';
 import { UserRequest, requireUser } from '../middleware/extractUser';
@@ -8,7 +8,7 @@ import { logger } from '../utils/logger';
 const router: ReturnType<typeof Router> = Router();
 
 // Apply FHIR-specific rate limiting
-router.use(fhirLimiter);
+router.use(fhirLimiter as unknown as RequestHandler);
 
 // Schema for endpoint registration
 const registerEndpointSchema = z.object({
@@ -68,7 +68,7 @@ router.post('/endpoints', requireUser, async (req: UserRequest, res) => {
   try {
     const validatedData = registerEndpointSchema.parse(req.body);
 
-    const result = await FhirProxyService.registerEndpoint(validatedData);
+    const result = await FhirProxyService.registerEndpoint(validatedData as any);
 
     if (!result.success) {
       res.status(result.statusCode).json({

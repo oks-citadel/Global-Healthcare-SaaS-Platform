@@ -76,10 +76,11 @@ router.post('/', requireUser, async (req: UserRequest, res) => {
       startDate: new Date(validatedData.startDate),
       reviewDate: new Date(validatedData.reviewDate),
       goals: validatedData.goals.map((goal) => ({
+        title: goal.description,
         description: goal.description,
         targetDate: goal.targetDate ? new Date(goal.targetDate) : undefined,
         strategies: goal.strategies,
-        measurements: goal.measurements,
+        measurements: goal.measurements ? Object.keys(goal.measurements) : [],
       })),
     });
 
@@ -295,10 +296,11 @@ router.post('/:id/goals', requireUser, async (req: UserRequest, res) => {
 
     const goal = await TreatmentPlanService.addGoal({
       treatmentPlanId: id,
+      title: validatedData.description,
       description: validatedData.description,
       targetDate: validatedData.targetDate ? new Date(validatedData.targetDate) : undefined,
       strategies: validatedData.strategies,
-      measurements: validatedData.measurements,
+      measurements: validatedData.measurements ? Object.keys(validatedData.measurements) : [],
     });
 
     res.status(201).json({

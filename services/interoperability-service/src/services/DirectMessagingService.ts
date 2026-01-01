@@ -481,7 +481,7 @@ export class DirectMessagingService {
         },
         {
           type: forge.pki.oids.signingTime,
-          value: new Date(),
+          value: new Date().toISOString(),
         },
       ],
     });
@@ -706,7 +706,7 @@ export class DirectMessagingService {
       { name: 'subjectAltName', altNames: [{ type: 1, value: address }] },
     ]);
 
-    cert.sign(keypair.privateKey, forge.md.sha256.create());
+    cert.sign(keypair.privateKey as forge.pki.rsa.PrivateKey, forge.md.sha256.create());
 
     return cert;
   }

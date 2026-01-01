@@ -46,7 +46,7 @@ router.get('/', requireUser, async (req: UserRequest, res: Response): Promise<vo
 
     // Filter by status
     if (status && typeof status === 'string') {
-      where.status = status;
+      where.status = status as any;
     }
 
     // Filter by date range

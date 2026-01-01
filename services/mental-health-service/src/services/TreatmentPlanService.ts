@@ -4,10 +4,11 @@ const prisma = new PrismaClient();
 
 // Type definitions for treatment plan data
 interface TreatmentPlanGoalInput {
-  description: string;
+  title: string;
+  description?: string;
   targetDate?: Date;
   strategies: string[];
-  measurements?: Record<string, unknown>;
+  measurements?: string[];
 }
 
 interface CreateTreatmentPlanInput {
@@ -33,10 +34,11 @@ interface UpdateTreatmentPlanInput {
 
 interface AddGoalInput {
   treatmentPlanId: string;
-  description: string;
+  title: string;
+  description?: string;
   targetDate?: Date;
   strategies: string[];
-  measurements?: Record<string, unknown>;
+  measurements?: string[];
 }
 
 interface UpdateGoalProgressInput {
@@ -67,9 +69,9 @@ export class TreatmentPlanService {
         patientId: data.patientId,
         providerId: data.providerId,
         diagnosis: data.diagnosis,
-        goals: data.goals,
-        interventions: data.interventions,
-        medications: data.medications,
+        goals: data.goals as any,
+        interventions: data.interventions as any,
+        medications: data.medications as any,
         frequency: data.frequency,
         startDate: data.startDate,
         reviewDate: data.reviewDate,
@@ -84,13 +86,13 @@ export class TreatmentPlanService {
           prisma.treatmentGoal.create({
             data: {
               treatmentPlanId: plan.id,
+              title: goal.title,
               description: goal.description,
               targetDate: goal.targetDate,
               strategies: goal.strategies,
-              measurements: goal.measurements,
+              measurements: goal.measurements || [],
               status: 'in_progress',
               progress: 0,
-              barriers: [],
             },
           })
         )
@@ -159,7 +161,7 @@ export class TreatmentPlanService {
   ): Promise<TreatmentPlan> {
     return await prisma.treatmentPlan.update({
       where: { id: planId },
-      data,
+      data: data as any,
     });
   }
 
@@ -170,13 +172,13 @@ export class TreatmentPlanService {
     return await prisma.treatmentGoal.create({
       data: {
         treatmentPlanId: data.treatmentPlanId,
+        title: data.title,
         description: data.description,
         targetDate: data.targetDate,
         strategies: data.strategies,
-        measurements: data.measurements,
+        measurements: data.measurements || [],
         status: 'in_progress',
         progress: 0,
-        barriers: [],
       },
     });
   }
