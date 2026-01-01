@@ -61,9 +61,9 @@ phases:
       - echo "Pushing Docker image to ECR..."
       - docker push $IMAGE_URI
 
-      # Also tag as latest for the branch
+      # Also tag as latest for the branch (may fail with immutable tags - non-blocking)
       - docker tag $IMAGE_URI $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:latest
-      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:latest
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:latest || echo "Latest tag push skipped (immutable or already exists)"
 
       # Generate imagedefinitions.json for ECS/EKS deployment
       - echo "Generating image definitions..."

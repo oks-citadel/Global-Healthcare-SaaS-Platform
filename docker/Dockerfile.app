@@ -56,7 +56,15 @@ ENV HOSTNAME="0.0.0.0"
 # Copy standalone build
 COPY --from=builder --chown=nextjs:nodejs /app/${SERVICE_PATH}/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/${SERVICE_PATH}/.next/static ./${SERVICE_PATH}/.next/static
-COPY --from=builder --chown=nextjs:nodejs /app/${SERVICE_PATH}/public ./${SERVICE_PATH}/public
+
+# Copy public folder if it exists
+RUN --mount=from=builder,source=/app,target=/builder \
+    if [ -d "/builder/${SERVICE_PATH}/public" ]; then \
+      mkdir -p ./${SERVICE_PATH}/public && \
+      cp -r /builder/${SERVICE_PATH}/public/* ./${SERVICE_PATH}/public/; \
+    fi
+
+RUN chown -R nextjs:nodejs /app
 
 USER nextjs
 EXPOSE 3000
