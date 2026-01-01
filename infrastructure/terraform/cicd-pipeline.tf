@@ -92,6 +92,17 @@ resource "aws_iam_role_policy" "codebuild" {
           "eks:DescribeCluster"
         ]
         Resource = aws_eks_cluster.main.arn
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "kms:Decrypt",
+          "kms:DescribeKey",
+          "kms:Encrypt",
+          "kms:GenerateDataKey",
+          "kms:GenerateDataKeyWithoutPlaintext"
+        ]
+        Resource = aws_kms_key.secrets.arn
       }
     ]
   })
@@ -300,6 +311,17 @@ resource "aws_iam_role_policy" "codepipeline" {
           "eks:DescribeCluster"
         ]
         Resource = aws_eks_cluster.main.arn
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "kms:Decrypt",
+          "kms:DescribeKey",
+          "kms:Encrypt",
+          "kms:GenerateDataKey",
+          "kms:GenerateDataKeyWithoutPlaintext"
+        ]
+        Resource = aws_kms_key.secrets.arn
       }
     ]
   })

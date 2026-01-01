@@ -1011,7 +1011,7 @@ resource "aws_rds_cluster" "main" {
   cluster_identifier = "${local.name_prefix}-aurora"
   engine             = "aurora-postgresql"
   engine_mode        = "provisioned"
-  engine_version     = "15.4"
+  engine_version     = "15.6"  # Valid Aurora PostgreSQL Serverless v2 version
   database_name      = "unified_health"
   master_username    = var.postgresql_admin_username
   master_password    = random_password.postgresql_admin.result
@@ -1477,7 +1477,7 @@ resource "aws_cloudwatch_metric_alarm" "redis_memory" {
 # ============================================
 
 resource "aws_xray_sampling_rule" "main" {
-  rule_name      = "${local.name_prefix}-sampling-rule"
+  rule_name      = "${local.name_prefix}-xray"  # Max 32 chars
   priority       = 1000
   version        = 1
   reservoir_size = 5

@@ -76,7 +76,7 @@ variable "vpc_cidr" {
 variable "allowed_cidr_blocks" {
   description = "CIDR blocks allowed to access resources (e.g., EKS API)"
   type        = list(string)
-  default     = []
+  default     = ["0.0.0.0/0"]  # Default to allow all for public access
 }
 
 # ============================================
