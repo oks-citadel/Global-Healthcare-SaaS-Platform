@@ -244,10 +244,10 @@ router.post('/', requireUser, requireRole('admin', 'compliance_officer', 'vendor
     const contract = await prisma.contract.create({
       data: {
         ...validatedData,
-        effectiveDate: validatedData.effectiveDate ? new Date(validatedData.effectiveDate) : undefined,
-        expirationDate: validatedData.expirationDate ? new Date(validatedData.expirationDate) : undefined,
+        effectiveDate: validatedData.effectiveDate ? new Date(validatedData.effectiveDate) : new Date(),
+        expirationDate: validatedData.expirationDate ? new Date(validatedData.expirationDate) : new Date(),
         createdBy: req.user!.id,
-      },
+      } as any,
     });
 
     await createAuditLog(req, {

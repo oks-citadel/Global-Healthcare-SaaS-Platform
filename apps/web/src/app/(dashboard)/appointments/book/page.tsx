@@ -61,10 +61,11 @@ export default function BookAppointmentPage() {
       const dateTime = `${selectedDate}T${selectedTime}:00`;
 
       await bookAppointment.mutateAsync({
-        providerId: selectedProvider,
+        doctorId: selectedProvider,
         dateTime,
-        type: appointmentType as any,
-        reason: reason || undefined,
+        duration: 30,
+        type: appointmentType as 'in-person' | 'video' | 'phone',
+        reason: reason || '',
       });
 
       toast.success('Appointment booked successfully!');

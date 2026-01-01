@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   View,
-  StyleSheet,
   ViewStyle,
   TouchableOpacity,
   TouchableOpacityProps,
@@ -64,7 +63,3 @@ export const Card: React.FC<CardProps> = ({
 
   return <View style={[getCardStyle(), style]}>{children}</View>;
 };
-
-const styles = StyleSheet.create({
-  // Placeholder for any additional styles if needed
-});

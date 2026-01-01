@@ -73,7 +73,7 @@ router.post('/search', requireUser, async (req: UserRequest, res) => {
   try {
     const validatedData = patientSearchSchema.parse(req.body);
 
-    const result = await CommonWellService.searchPerson(validatedData);
+    const result = await CommonWellService.searchPerson(validatedData as any);
 
     if (!result.success) {
       res.status(400).json({
@@ -114,7 +114,7 @@ router.post('/register', requireUser, async (req: UserRequest, res) => {
   try {
     const validatedData = patientSearchSchema.parse(req.body);
 
-    const result = await CommonWellService.registerPerson(validatedData);
+    const result = await CommonWellService.registerPerson(validatedData as any);
 
     if (!result.success) {
       res.status(400).json({
@@ -155,7 +155,7 @@ router.post('/link', requireUser, async (req: UserRequest, res) => {
   try {
     const validatedData = linkPatientSchema.parse(req.body);
 
-    const result = await CommonWellService.linkPatient(validatedData);
+    const result = await CommonWellService.linkPatient(validatedData as any);
 
     if (!result.success) {
       res.status(400).json({
@@ -334,7 +334,7 @@ router.put('/person/:personId/consent', requireUser, async (req: UserRequest, re
     const { personId } = req.params;
     const validatedData = consentSchema.parse(req.body);
 
-    const result = await CommonWellService.updateConsent(personId, validatedData);
+    const result = await CommonWellService.updateConsent(personId, validatedData as any);
 
     if (!result.success) {
       res.status(400).json({
@@ -408,7 +408,7 @@ router.post('/organizations', requireUser, async (req: UserRequest, res) => {
   try {
     const validatedData = registerOrganizationSchema.parse(req.body);
 
-    const result = await CommonWellService.registerOrganization(validatedData);
+    const result = await CommonWellService.registerOrganization(validatedData as any);
 
     if (!result.success) {
       res.status(400).json({

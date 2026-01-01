@@ -144,7 +144,7 @@ Announcer.displayName = 'Announcer';
 export const useAnnouncer = () => {
   const [message, setMessage] = useState('');
   const [politeness, setPoliteness] = useState<AriaPoliteness>('polite');
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const announce = (
     newMessage: string,

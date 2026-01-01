@@ -49,7 +49,7 @@ router.post('/send', requireUser, async (req: UserRequest, res) => {
       to: validatedData.to,
       subject: validatedData.subject,
       body: validatedData.body,
-      attachments: validatedData.attachments,
+      attachments: validatedData.attachments as any,
       mdn: { requested: validatedData.mdn?.requested || false },
       encrypted: true,
       signed: true,

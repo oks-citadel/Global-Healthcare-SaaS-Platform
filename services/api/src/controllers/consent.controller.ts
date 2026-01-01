@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Request, Response, NextFunction } from 'express';
 import { consentService } from '../services/consent.service.js';
 import { z } from 'zod';

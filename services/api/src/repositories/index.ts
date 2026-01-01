@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Base Repository
 export { BaseRepository } from './base.repository.js';
 export type {

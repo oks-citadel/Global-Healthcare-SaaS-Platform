@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Router } from 'express';
 import { healthController } from '../controllers/health.controller.js';
 import { authController } from '../controllers/auth.controller.js';

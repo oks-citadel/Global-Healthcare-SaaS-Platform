@@ -427,6 +427,7 @@ export interface X12_270_Subscriber {
   gender?: 'M' | 'F' | 'U';
   groupNumber?: string;
   address?: X12Address;
+  relationshipCode?: string;
 }
 
 export interface X12_270_Dependent {

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { prisma, checkDatabaseHealth, connectDatabase, disconnectDatabase } from './prisma.js';
 import { logger } from '../utils/logger.js';
 

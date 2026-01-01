@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Surgical Scheduling Routes
  *

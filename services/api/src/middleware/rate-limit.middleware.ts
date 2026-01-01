@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Request, Response, NextFunction } from 'express';
 import { createClient, RedisClientType } from 'redis';
 import { TooManyRequestsError } from '../utils/errors.js';

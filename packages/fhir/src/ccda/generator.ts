@@ -183,7 +183,7 @@ export class CCDAGenerator {
 
     // Language code
     content += this.generateElement('languageCode', {
-      code: document.languageCode?.code || this.options.defaultLanguage,
+      code: document.languageCode?.code || this.options.defaultLanguage || 'en-US',
     });
 
     // Set ID and version (if present)
@@ -398,7 +398,7 @@ export class CCDAGenerator {
       for (const lang of patient.languageCommunication) {
         let langContent = '';
         if (lang.languageCode) {
-          langContent += this.generateElement('languageCode', { code: lang.languageCode.code });
+          langContent += this.generateElement('languageCode', { code: lang.languageCode.code || 'en-US' });
         }
         if (lang.preferenceInd !== undefined) {
           langContent += this.generateElement('preferenceInd', { value: lang.preferenceInd.toString() });
@@ -848,7 +848,7 @@ export class CCDAGenerator {
 
     // Effective time
     if (activity.effectiveTime) {
-      saContent += this.generateIVL_TS('effectiveTime', activity.effectiveTime);
+      saContent += this.generateIVL_TS('effectiveTime', activity.effectiveTime as IVL_TS);
     }
 
     // Route code

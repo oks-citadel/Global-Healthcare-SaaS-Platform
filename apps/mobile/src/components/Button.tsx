@@ -3,7 +3,6 @@ import {
   TouchableOpacity,
   Text,
   ActivityIndicator,
-  StyleSheet,
   ViewStyle,
   TextStyle,
   TouchableOpacityProps,
@@ -143,7 +142,7 @@ export const Button: React.FC<ButtonProps> = ({
       ) : (
         <>
           {icon && <>{icon}</>}
-          <Text style={[getTextStyle(), icon && { marginLeft: spacing.xs }]}>
+          <Text style={[getTextStyle(), icon ? { marginLeft: spacing.xs } : undefined]}>
             {title}
           </Text>
         </>
@@ -151,7 +150,3 @@ export const Button: React.FC<ButtonProps> = ({
     </TouchableOpacity>
   );
 };
-
-const styles = StyleSheet.create({
-  // Placeholder for any additional styles if needed
-});

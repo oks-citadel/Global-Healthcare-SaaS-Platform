@@ -19,7 +19,7 @@ import {
 } from 'react-native-webrtc';
 import io, { Socket } from 'socket.io-client';
 
-const { width, height } = Dimensions.get('window');
+const { width: _width, height: _height } = Dimensions.get('window');
 
 interface VideoCallScreenProps {
   visitId: string;
@@ -77,7 +77,7 @@ export default function VideoCallScreen({
       initializeCall();
     });
 
-    socket.on('connect_error', (err) => {
+    socket.on('connect_error', (_err) => {
       setError('Failed to connect to server');
     });
 
@@ -162,14 +162,14 @@ export default function VideoCallScreen({
       });
 
       // Handle remote stream
-      peerConnection.ontrack = (event) => {
+      (peerConnection as any).ontrack = (event: any) => {
         if (event.streams && event.streams[0]) {
           setRemoteStream(event.streams[0]);
         }
       };
 
       // Handle ICE candidates
-      peerConnection.onicecandidate = (event) => {
+      (peerConnection as any).onicecandidate = (event: any) => {
         if (event.candidate) {
           socketRef.current?.emit('ice-candidate', {
             to: remoteSocketId,
@@ -179,7 +179,7 @@ export default function VideoCallScreen({
       };
 
       // Handle connection state changes
-      peerConnection.onconnectionstatechange = () => {
+      (peerConnection as any).onconnectionstatechange = () => {
         if (peerConnection.connectionState === 'connected') {
           setIsConnected(true);
         } else if (peerConnection.connectionState === 'disconnected') {
@@ -214,13 +214,13 @@ export default function VideoCallScreen({
         peerConnection.addTrack(track, localStream);
       });
 
-      peerConnection.ontrack = (event) => {
+      (peerConnection as any).ontrack = (event: any) => {
         if (event.streams && event.streams[0]) {
           setRemoteStream(event.streams[0]);
         }
       };
 
-      peerConnection.onicecandidate = (event) => {
+      (peerConnection as any).onicecandidate = (event: any) => {
         if (event.candidate) {
           socketRef.current?.emit('ice-candidate', {
             to: from,

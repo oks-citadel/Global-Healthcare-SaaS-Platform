@@ -61,12 +61,12 @@ export default function SettingsPage() {
 
   // Forms
   const profileForm = useForm<ProfileFormData>({
-    resolver: zodResolver(profileSchema),
+    resolver: zodResolver(profileSchema as any),
     defaultValues: profileData,
   });
 
   const passwordForm = useForm<PasswordFormData>({
-    resolver: zodResolver(passwordSchema),
+    resolver: zodResolver(passwordSchema as any),
   });
 
   // Update form when data loads

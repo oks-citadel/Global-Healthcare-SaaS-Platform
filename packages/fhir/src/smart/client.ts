@@ -16,7 +16,7 @@ import {
   SMARTStorage,
 } from './types';
 import { parseScopes, checkAccess } from './scopes';
-import { extractOAuthURIs } from './capability';
+import { extractOAuthURIs, CapabilityStatement } from './capability';
 
 /**
  * Default in-memory storage implementation
@@ -123,7 +123,7 @@ export class SMARTClient implements ISMARTClient {
       });
 
       if (response.ok) {
-        this.smartConfig = await response.json();
+        this.smartConfig = await response.json() as SMARTConfiguration;
         await this.storage.set(
           STORAGE_KEYS.CONFIGURATION,
           JSON.stringify(this.smartConfig)
@@ -148,7 +148,7 @@ export class SMARTClient implements ISMARTClient {
       );
     }
 
-    const capabilityStatement = await metadataResponse.json();
+    const capabilityStatement = await metadataResponse.json() as CapabilityStatement;
     const oauthUris = extractOAuthURIs(capabilityStatement);
 
     if (!oauthUris.authorization_endpoint || !oauthUris.token_endpoint) {
@@ -334,7 +334,7 @@ export class SMARTClient implements ISMARTClient {
         headers['Authorization'] = `Basic ${credentials}`;
       } else if (this.config.tokenEndpointAuthMethod === 'client_secret_post') {
         tokenRequest.client_id = this.config.clientId;
-        (tokenRequest as Record<string, string>).client_secret =
+        (tokenRequest as unknown as Record<string, string>).client_secret =
           this.config.clientSecret;
       }
     } else if (this.config.privateKey) {
@@ -414,7 +414,7 @@ export class SMARTClient implements ISMARTClient {
         headers['Authorization'] = `Basic ${credentials}`;
       } else if (this.config.tokenEndpointAuthMethod === 'client_secret_post') {
         tokenRequest.client_id = this.config.clientId;
-        (tokenRequest as Record<string, string>).client_secret =
+        (tokenRequest as unknown as Record<string, string>).client_secret =
           this.config.clientSecret;
       }
     } else if (this.config.privateKey) {
@@ -704,7 +704,7 @@ export class SMARTClient implements ISMARTClient {
       );
     }
 
-    return response.json();
+    return response.json() as Promise<T>;
   }
 
   /**

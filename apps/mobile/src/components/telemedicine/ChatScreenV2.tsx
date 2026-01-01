@@ -28,7 +28,7 @@ interface ChatScreenV2Props {
 export default function ChatScreenV2({
   roomId,
   userId,
-  userRole,
+  userRole: _userRole,
 }: ChatScreenV2Props) {
   const [inputMessage, setInputMessage] = React.useState('');
   const flatListRef = useRef<FlatList>(null);
@@ -228,7 +228,7 @@ export default function ChatScreenV2({
         {/* Messages list */}
         <FlatList
           ref={flatListRef}
-          data={messages}
+          data={messages as any}
           renderItem={renderMessage}
           keyExtractor={(item, index) => item.id || `msg-${index}`}
           contentContainerStyle={styles.messagesList}

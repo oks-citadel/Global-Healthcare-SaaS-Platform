@@ -84,7 +84,7 @@ export function I18nProvider({ children, initialLanguage }: I18nProviderProps) {
     );
   }
 
-  return <I18nextProvider i18n={i18n}>{children}</I18nextProvider>;
+  return <I18nextProvider i18n={i18n}>{children as any}</I18nextProvider>;
 }
 
 /**

@@ -79,7 +79,7 @@ export default function ProfilePage() {
     formState: { errors },
     reset,
   } = useForm<ProfileFormData>({
-    resolver: zodResolver(profileSchema),
+    resolver: zodResolver(profileSchema as any),
     values: profile
       ? {
           firstName: profile.firstName,

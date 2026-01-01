@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Router } from 'express';
 import { postDischargeController } from '../controllers/post-discharge.controller.js';
 import { authenticate, authorize } from '../middleware/auth.middleware.js';

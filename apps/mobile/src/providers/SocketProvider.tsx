@@ -37,7 +37,7 @@ export function SocketProvider({ children }: SocketProviderProps) {
         .then(() => {
           setInitialized(true);
         })
-        .catch((error) => {
+        .catch((_error) => {
           // Socket initialization failed
         });
     } else {

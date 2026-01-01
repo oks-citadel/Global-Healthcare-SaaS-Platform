@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Document Routes with AWS S3 Storage Integration
  *

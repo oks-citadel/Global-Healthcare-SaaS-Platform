@@ -82,7 +82,7 @@ export class VendorService {
         primaryContactName: data.primaryContactName,
         primaryContactEmail: data.primaryContactEmail,
         primaryContactPhone: data.primaryContactPhone,
-        address: data.address,
+        address: data.address as any,
         dataAccessLevel: data.dataAccessLevel || DataAccessLevel.NONE,
         phiAccess: data.phiAccess || false,
         piiAccess: data.piiAccess || false,

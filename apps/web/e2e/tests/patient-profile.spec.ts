@@ -137,7 +137,7 @@ test.describe('Patient Profile', () => {
         // Contact name may or may not be visible depending on implementation
         const hasContactInfo =
           (await contactName.isVisible().catch(() => false)) ||
-          (await emergencyContact.textContent()).length > 0;
+          ((await emergencyContact.textContent()) || '').length > 0;
 
         expect(hasContactInfo).toBe(true);
       }

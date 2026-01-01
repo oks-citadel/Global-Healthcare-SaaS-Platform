@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, RequestHandler } from 'express';
 import { z } from 'zod';
 import CCDAExchangeService from '../services/CCDAExchangeService';
 import { UserRequest, requireUser } from '../middleware/extractUser';
@@ -8,7 +8,7 @@ import { logger } from '../utils/logger';
 const router: ReturnType<typeof Router> = Router();
 
 // Apply document-specific rate limiting
-router.use(documentLimiter);
+router.use(documentLimiter as unknown as RequestHandler);
 
 // Schema for C-CDA document generation
 const generateDocumentSchema = z.object({
@@ -141,7 +141,7 @@ router.post('/generate', requireUser, async (req: UserRequest, res) => {
   try {
     const validatedData = generateDocumentSchema.parse(req.body);
 
-    const xmlContent = CCDAExchangeService.generate(validatedData);
+    const xmlContent = CCDAExchangeService.generate(validatedData as any);
 
     res.set('Content-Type', 'application/xml');
     res.send(xmlContent);

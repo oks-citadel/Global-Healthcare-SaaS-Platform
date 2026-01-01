@@ -43,7 +43,7 @@ export const toast = {
     },
     options?: ExternalToast
   ) => {
-    return sonnerToast.promise(promise, messages, { ...defaultOptions, ...options });
+    return sonnerToast.promise(promise, { ...messages, ...defaultOptions, ...options });
   },
 
   custom: (message: string | React.ReactNode, options?: ExternalToast) => {

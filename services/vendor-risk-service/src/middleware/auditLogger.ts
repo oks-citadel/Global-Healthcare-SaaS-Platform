@@ -30,9 +30,9 @@ export const createAuditLog = async (
         userRole: req.user?.role,
         ipAddress: req.ip || req.headers['x-forwarded-for'] as string,
         userAgent: req.headers['user-agent'],
-        oldValues: entry.oldValues,
-        newValues: entry.newValues,
-        metadata: entry.metadata,
+        oldValues: entry.oldValues as any,
+        newValues: entry.newValues as any,
+        metadata: entry.metadata as any,
       },
     });
   } catch (error) {
@@ -111,9 +111,9 @@ export class AuditLogger {
           userId,
           userEmail,
           userRole,
-          oldValues: entry.oldValues,
-          newValues: entry.newValues,
-          metadata: entry.metadata,
+          oldValues: entry.oldValues as any,
+          newValues: entry.newValues as any,
+          metadata: entry.metadata as any,
         },
       });
     } catch (error) {

@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { RequestHandler } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
@@ -79,7 +79,7 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'X-User-Id', 'X-User-Role', 'X-User-Email', 'X-Request-Id'],
 }));
 
-app.use(limiter);
+app.use(limiter as unknown as RequestHandler);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(extractUser);
@@ -87,7 +87,7 @@ app.use(extractUser);
 // Apply stricter rate limit to write operations
 app.use((req, res, next) => {
   if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method) && req.path !== '/health') {
-    return writeOperationsLimiter(req, res, next);
+    return (writeOperationsLimiter as unknown as RequestHandler)(req, res, next);
   }
   next();
 });

@@ -11,6 +11,11 @@
       "require": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
+    "./hooks/useTranslation": {
+      "import": "./src/hooks/useTranslation.ts",
+      "require": "./src/hooks/useTranslation.ts",
+      "types": "./src/hooks/useTranslation.ts"
+    },
     "./locales/*": "./src/locales/*"
   },
   "scripts": {

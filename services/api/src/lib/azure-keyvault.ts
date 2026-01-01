@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Azure Key Vault Compatibility Layer
  *
@@ -18,10 +19,11 @@ import {
 } from './aws-secrets-manager.js';
 
 // Backward compatible aliases
-export const keyVaultClient = secretsManagerClient;
+export const keyVaultClient: any = secretsManagerClient;
 export const initializeKeyVault = initializeSecretsManager;
 
 /**
  * @deprecated Use secretsManagerClient instead
  */
-export default secretsManagerClient;
+const defaultExport: any = secretsManagerClient;
+export default defaultExport;

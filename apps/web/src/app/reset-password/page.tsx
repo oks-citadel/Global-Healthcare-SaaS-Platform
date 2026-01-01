@@ -34,7 +34,7 @@ function ResetPasswordForm() {
     handleSubmit,
     formState: { errors },
   } = useForm<ResetPasswordConfirmFormData>({
-    resolver: zodResolver(resetPasswordConfirmSchema),
+    resolver: zodResolver(resetPasswordConfirmSchema as any),
   });
 
   const onSubmit = async (data: ResetPasswordConfirmFormData) => {

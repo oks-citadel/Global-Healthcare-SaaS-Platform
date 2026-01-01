@@ -1,5 +1,4 @@
 import rateLimit from 'express-rate-limit';
-import { Request, Response } from 'express';
 import { logger } from '../utils/logger';
 
 /**
@@ -15,8 +14,8 @@ export const standardLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-  skip: (req) => req.path === '/health',
-  handler: (req: Request, res: Response) => {
+  skip: (req: any) => req.path === '/health',
+  handler: (req: any, res: any) => {
     logger.warn('Rate limit exceeded', {
       ip: req.ip,
       path: req.path,
@@ -43,7 +42,7 @@ export const fhirLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator: (req: Request) => {
+  keyGenerator: (req: any) => {
     // Rate limit by organization or IP
     return (req.headers['x-organization-id'] as string) || req.ip || 'unknown';
   },
@@ -63,7 +62,7 @@ export const x12Limiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator: (req: Request) => {
+  keyGenerator: (req: any) => {
     return (req.headers['x-organization-id'] as string) || req.ip || 'unknown';
   },
 });
@@ -113,7 +112,7 @@ export const networkQueryLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator: (req: Request) => {
+  keyGenerator: (req: any) => {
     return (req.headers['x-organization-id'] as string) || req.ip || 'unknown';
   },
 });

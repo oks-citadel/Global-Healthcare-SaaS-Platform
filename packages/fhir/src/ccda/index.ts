@@ -330,7 +330,7 @@ export function ccdaXmlToFhirBundle(
  */
 export function fhirBundleToCcdaXml(
   bundle: import('./fhir-mapping').Bundle,
-  documentType: CCDADocumentTypeCode = 'CCD',
+  documentType: import('./types').CCDADocumentTypeCode = 'CCD',
   generatorOptions?: import('./generator').CCDAGeneratorOptions
 ): string {
   const { fhirBundleToCCDA } = require('./fhir-mapping');

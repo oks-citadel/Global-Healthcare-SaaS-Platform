@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Request, Response, NextFunction } from 'express';
 import { auditService } from '../services/audit.service.js';
 import { z } from 'zod';

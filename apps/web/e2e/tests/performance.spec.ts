@@ -521,7 +521,7 @@ test.describe('Performance Tests', () => {
           apiCalls.push({
             url,
             status: response.status(),
-            timing: response.timing(),
+            timing: response.headers()['server-timing'] || null,
           });
         }
       });

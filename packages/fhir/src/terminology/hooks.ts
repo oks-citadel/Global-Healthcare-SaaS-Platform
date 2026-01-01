@@ -22,15 +22,15 @@ import type { CodeableConcept, Coding } from '../types/base';
 // Re-export production terminology services
 export {
   getSnomedService,
-  SNOMEDService as ProductionSNOMEDService
+  SnomedService as ProductionSNOMEDService
 } from './services/snomed.service';
 export {
   getLoincService,
-  LOINCService as ProductionLOINCService
+  LoincService as ProductionLOINCService
 } from './services/loinc.service';
 export {
   getIcdService,
-  ICDService as ProductionICDService
+  IcdService as ProductionICDService
 } from './services/icd.service';
 export {
   getRxNormService,
@@ -38,7 +38,7 @@ export {
 } from './services/rxnorm.service';
 export {
   getCvxService,
-  CVXService as ProductionCVXService
+  CvxService as ProductionCVXService
 } from './services/cvx.service';
 export * from './services/cache';
 

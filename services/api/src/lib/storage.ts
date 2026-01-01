@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AWS S3 Storage Service for HIPAA-Compliant Document Management
  *

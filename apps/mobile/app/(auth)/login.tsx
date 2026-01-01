@@ -17,12 +17,12 @@ import { colors, spacing, typography } from '../../src/theme';
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, _setShowPassword] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>(
     {}
   );
 
-  const { login, isLoading, error, clearError } = useAuth();
+  const { login, isLoading, error: _error, clearError } = useAuth();
   const router = useRouter();
 
   const validateForm = (): boolean => {

@@ -890,7 +890,7 @@ export class DICOMwebClient {
    * GET {baseUrl}/workitems
    */
   async queryWorkitems(query: UPSQueryParams = {}): Promise<UPSWorkitem[]> {
-    const path = `${this.config.upsPath}/workitems${this.buildQueryString(query)}`;
+    const path = `${this.config.upsPath}/workitems${this.buildQueryString(query as Record<string, unknown>)}`;
 
     const response = await this.request<DICOMJSONObject[]>('GET', path, {
       accept: MediaTypes.DICOM_JSON,

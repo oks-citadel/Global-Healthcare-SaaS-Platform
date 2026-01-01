@@ -70,7 +70,7 @@ router.post('/query', requireUser, async (req: UserRequest, res) => {
   try {
     const validatedData = carequalityQuerySchema.parse(req.body);
 
-    const result = await CarequalityService.query(validatedData);
+    const result = await CarequalityService.query(validatedData as any);
 
     if (!result.success) {
       res.status(400).json({
@@ -284,7 +284,7 @@ router.post('/organizations', requireUser, async (req: UserRequest, res) => {
   try {
     const validatedData = registerOrganizationSchema.parse(req.body);
 
-    const organization = await CarequalityService.registerOrganization(validatedData);
+    const organization = await CarequalityService.registerOrganization(validatedData as any);
 
     res.status(201).json({
       success: true,

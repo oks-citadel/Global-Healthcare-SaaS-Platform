@@ -150,7 +150,7 @@ export class AssessmentService {
       where: { id },
       data: {
         status: AssessmentStatus.UNDER_REVIEW,
-        findings,
+        findings: findings as any,
       },
     });
   }
@@ -266,7 +266,7 @@ export class AssessmentService {
     return prisma.questionnaireResponse.update({
       where: { id },
       data: {
-        responses: mergedResponses,
+        responses: mergedResponses as any,
         percentComplete: data.percentComplete,
         status: data.percentComplete === 100 ? QuestionnaireStatus.SUBMITTED : QuestionnaireStatus.IN_PROGRESS,
         submittedAt: data.percentComplete === 100 ? new Date() : undefined,

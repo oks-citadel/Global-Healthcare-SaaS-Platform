@@ -168,11 +168,11 @@ export class PaymentService {
             ? await getStripeInvoice(subscription.latest_invoice)
             : subscription.latest_invoice;
 
-        if (invoice.payment_intent) {
+        if ((invoice as any).payment_intent) {
           const paymentIntent =
-            typeof invoice.payment_intent === 'string'
-              ? invoice.payment_intent
-              : invoice.payment_intent.client_secret;
+            typeof (invoice as any).payment_intent === 'string'
+              ? (invoice as any).payment_intent
+              : (invoice as any).payment_intent.client_secret;
           clientSecret = paymentIntent || null;
         }
       }

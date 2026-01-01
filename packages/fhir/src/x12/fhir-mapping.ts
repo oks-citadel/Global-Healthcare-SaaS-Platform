@@ -341,7 +341,7 @@ export function x12_837P_to_FHIRClaim(x12: X12_837P): FHIRClaim {
     ],
     total: {
       value: x12.claimInformation.totalChargeAmount,
-      currency: 'USD',
+      code: 'USD',
     },
   };
 
@@ -437,11 +437,11 @@ export function x12_837P_to_FHIRClaim(x12: X12_837P): FHIRClaim {
     },
     unitPrice: {
       value: line.chargeAmount,
-      currency: 'USD',
+      code: 'USD',
     },
     net: {
       value: line.chargeAmount * line.units,
-      currency: 'USD',
+      code: 'USD',
     },
   }));
 
@@ -499,7 +499,7 @@ export function x12_837I_to_FHIRClaim(x12: X12_837I): FHIRClaim {
     ],
     total: {
       value: x12.claimInformation.totalChargeAmount,
-      currency: 'USD',
+      code: 'USD',
     },
   };
 
@@ -598,7 +598,7 @@ export function x12_837I_to_FHIRClaim(x12: X12_837I): FHIRClaim {
     },
     unitPrice: {
       value: line.chargeAmount,
-      currency: 'USD',
+      code: 'USD',
     },
   }));
 
@@ -670,7 +670,7 @@ export function x12_835_to_FHIRExplanationOfBenefit(x12: X12_835): FHIRExplanati
             },
             amount: {
               value: line.chargeAmount,
-              currency: 'USD',
+              code: 'USD',
             },
           },
           {
@@ -684,7 +684,7 @@ export function x12_835_to_FHIRExplanationOfBenefit(x12: X12_835): FHIRExplanati
             },
             amount: {
               value: line.paidAmount,
-              currency: 'USD',
+              code: 'USD',
             },
           },
           ...(line.allowedAmount !== undefined
@@ -700,7 +700,7 @@ export function x12_835_to_FHIRExplanationOfBenefit(x12: X12_835): FHIRExplanati
                   },
                   amount: {
                     value: line.allowedAmount,
-                    currency: 'USD',
+                    code: 'USD',
                   },
                 },
               ]
@@ -719,7 +719,7 @@ export function x12_835_to_FHIRExplanationOfBenefit(x12: X12_835): FHIRExplanati
           },
           amount: {
             value: claimPayment.totalClaimChargeAmount,
-            currency: 'USD',
+            code: 'USD',
           },
         },
         {
@@ -733,7 +733,7 @@ export function x12_835_to_FHIRExplanationOfBenefit(x12: X12_835): FHIRExplanati
           },
           amount: {
             value: claimPayment.totalClaimPaymentAmount,
-            currency: 'USD',
+            code: 'USD',
           },
         },
       ],
@@ -749,7 +749,7 @@ export function x12_835_to_FHIRExplanationOfBenefit(x12: X12_835): FHIRExplanati
         date: formatX12DateToFHIR(x12.paymentDate),
         amount: {
           value: claimPayment.totalClaimPaymentAmount,
-          currency: 'USD',
+          code: 'USD',
         },
         identifier: x12.checkOrEFTNumber
           ? {
@@ -857,7 +857,7 @@ export function x12_271_to_FHIRCoverage(x12: X12_271): FHIRCoverage {
       valueMoney: benefit.monetaryAmount !== undefined
         ? {
             value: benefit.monetaryAmount,
-            currency: 'USD',
+            code: 'USD',
           }
         : undefined,
     }));

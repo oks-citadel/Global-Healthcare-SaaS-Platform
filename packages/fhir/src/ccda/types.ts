@@ -407,7 +407,8 @@ export interface CCDASection {
   text?: CCDANarrativeBlock;
   confidentialityCode?: CE;
   languageCode?: CS;
-  entries?: CCDAEntry[];
+  // Using any[] for entries to allow specialized section types to override with specific entry types
+  entries?: any[];
 }
 
 /**

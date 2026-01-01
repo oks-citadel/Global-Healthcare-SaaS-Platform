@@ -405,11 +405,11 @@ export const surgicalSchedulingService = {
       blockId: input.blockId,
       laterality: input.laterality,
       specialEquipment: input.specialEquipment,
-      staffRequirements: input.staffRequirements,
+      staffRequirements: input.staffRequirements as any,
       assistingSurgeonIds: input.assistingSurgeonIds,
       preOpDiagnosis: input.preOpDiagnosis,
       notes: input.notes,
-      patientPreferences: input.patientPreferences,
+      patientPreferences: input.patientPreferences as any,
       createdAt: now,
       updatedAt: now,
     };

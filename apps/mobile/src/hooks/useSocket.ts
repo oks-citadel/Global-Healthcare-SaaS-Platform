@@ -6,7 +6,6 @@ import {
   ChatMessagePayload,
   TypingPayload,
   NotificationPayload,
-  PushNotificationPayload,
 } from '../services/socket';
 import { useAuthStore } from '../store/authStore';
 import { offlineService } from '../services/offline';
@@ -39,7 +38,7 @@ export interface UseSocketReturn {
  * Hook for managing Socket.io connection and real-time features
  */
 export function useSocket(options: UseSocketOptions = {}): UseSocketReturn {
-  const { autoConnect = true, reconnectOnAuth = true } = options;
+  const { autoConnect = true, reconnectOnAuth: _reconnectOnAuth = true } = options;
 
   const [isConnected, setIsConnected] = useState(false);
   const [connectionState, setConnectionState] = useState<ConnectionState>('disconnected');
@@ -48,7 +47,7 @@ export function useSocket(options: UseSocketOptions = {}): UseSocketReturn {
 
   const { isAuthenticated } = useAuthStore();
   const isInitialized = useRef(false);
-  const reconnectTimeout = useRef<NodeJS.Timeout>();
+  const reconnectTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
 
   /**
    * Initialize socket connection
@@ -276,7 +275,7 @@ export function useChatMessages(roomId: string) {
   const [messages, setMessages] = useState<ChatMessagePayload[]>([]);
   const [typingUsers, setTypingUsers] = useState<TypingPayload[]>([]);
   const { sendMessage, sendTyping, joinRoom, leaveRoom, on } = useSocket();
-  const typingTimeoutRef = useRef<NodeJS.Timeout>();
+  const typingTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   /**
    * Send a message

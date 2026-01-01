@@ -716,7 +716,7 @@ export function getSectionTypeFromTemplateId(templateId: string): string | null 
  * Validate that a template ID is a known C-CDA template
  */
 export function isValidTemplateId(templateId: string): boolean {
-  const allTemplates = [
+  const allTemplates: string[] = [
     ...Object.values(DocumentTemplateIds),
     ...Object.values(SectionTemplateIds),
     ...Object.values(EntryTemplateIds),

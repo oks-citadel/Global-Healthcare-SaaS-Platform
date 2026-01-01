@@ -307,7 +307,7 @@ export class X12Parser {
 
       const loopId = this.detectLoop(segment, transactionType);
 
-      if (loopId && loopId !== currentLoop?.loopId) {
+      if (loopId && loopId !== (currentLoop as X12Loop | null)?.loopId) {
         // Start new loop
         if (currentLoop) {
           // Close current loop
@@ -406,21 +406,21 @@ export class X12Parser {
 
     switch (transactionType) {
       case '837P':
-        return this.build837P(baseTransaction, segments);
+        return this.build837P(baseTransaction as Partial<X12_837P>, segments);
       case '837I':
-        return this.build837I(baseTransaction, segments);
+        return this.build837I(baseTransaction as Partial<X12_837I>, segments);
       case '835':
-        return this.build835(baseTransaction, segments);
+        return this.build835(baseTransaction as Partial<X12_835>, segments);
       case '270':
-        return this.build270(baseTransaction, segments);
+        return this.build270(baseTransaction as Partial<X12_270>, segments);
       case '271':
-        return this.build271(baseTransaction, segments);
+        return this.build271(baseTransaction as Partial<X12_271>, segments);
       case '276':
-        return this.build276(baseTransaction, segments);
+        return this.build276(baseTransaction as Partial<X12_276>, segments);
       case '277':
-        return this.build277(baseTransaction, segments);
+        return this.build277(baseTransaction as Partial<X12_277>, segments);
       case '278':
-        return this.build278(baseTransaction, segments);
+        return this.build278(baseTransaction as Partial<X12_278>, segments);
       default:
         return baseTransaction as X12Transaction;
     }

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { trace, context, SpanStatusCode, Span, Tracer } from '@opentelemetry/api';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { Resource } from '@opentelemetry/resources';

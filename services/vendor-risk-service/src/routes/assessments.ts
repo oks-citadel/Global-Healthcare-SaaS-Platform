@@ -126,9 +126,9 @@ router.post('/', requireUser, requireRole('admin', 'compliance_officer', 'vendor
 
     const assessment = await assessmentService.createAssessment({
       ...validatedData,
-      dueDate: validatedData.dueDate ? new Date(validatedData.dueDate) : undefined,
+      dueDate: validatedData.dueDate ? new Date(validatedData.dueDate) : new Date(),
       createdBy: req.user!.id,
-    });
+    } as any);
 
     await createAuditLog(req, {
       vendorId: validatedData.vendorId,
@@ -304,7 +304,7 @@ router.put('/questionnaires/:id/responses', requireUser, async (req: UserRequest
       return;
     }
 
-    const questionnaire = await assessmentService.updateQuestionnaireResponse(id, validatedData);
+    const questionnaire = await assessmentService.updateQuestionnaireResponse(id, validatedData as any);
 
     await createAuditLog(req, {
       vendorId: existingQuestionnaire.vendorId,

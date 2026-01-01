@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 
 /**
  * useFocusManagement Hook
@@ -187,7 +187,7 @@ export const useAriaLive = () => {
   const [politeness, setPoliteness] = useState<'polite' | 'assertive'>(
     'polite'
   );
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const announce = useCallback(
     (newMessage: string, newPoliteness: 'polite' | 'assertive' = 'polite') => {

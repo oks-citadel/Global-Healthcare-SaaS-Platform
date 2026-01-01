@@ -88,7 +88,6 @@ export type SocketEventCallback<T extends keyof SocketEvents> = SocketEvents[T];
 
 class SocketService {
   private socket: Socket | null = null;
-  private reconnectAttempts: number = 0;
   private maxReconnectAttempts: number = 10;
   private reconnectDelay: number = 1000;
   private connectionState: ConnectionState = 'disconnected';
@@ -164,7 +163,6 @@ class SocketService {
 
     // Connection events
     this.socket.on('connect', () => {
-      this.reconnectAttempts = 0;
       this.setConnectionState('connected');
       this.startKeepAlive();
       this.emit('connect');
@@ -193,7 +191,6 @@ class SocketService {
     });
 
     this.socket.on('reconnect_attempt', (attemptNumber: number) => {
-      this.reconnectAttempts = attemptNumber;
       this.emit('reconnect_attempt', attemptNumber);
     });
 
@@ -207,7 +204,7 @@ class SocketService {
     });
 
     // Authentication error handling
-    this.socket.on('unauthorized', async (error: any) => {
+    this.socket.on('unauthorized', async (_error: any) => {
       await this.refreshTokenAndReconnect();
     });
   }
@@ -283,9 +280,9 @@ class SocketService {
       this.listeners.set(event, new Set());
 
       // Setup socket listener
-      this.socket?.on(event, (...args: any[]) => {
+      (this.socket as any)?.on(event, (...args: any[]) => {
         const callbacks = this.listeners.get(event);
-        callbacks?.forEach((cb) => cb(...args));
+        callbacks?.forEach((cb) => (cb as Function)(...args));
       });
     }
 
@@ -310,7 +307,7 @@ class SocketService {
   ): void {
     const unsubscribe = this.on(event, ((...args: any[]) => {
       unsubscribe();
-      callback(...(args as any));
+      (callback as Function)(...args);
     }) as SocketEventCallback<T>);
   }
 
@@ -480,7 +477,7 @@ class SocketService {
   destroy(): void {
     this.disconnect();
     this.listeners.clear();
-    AppState.removeEventListener('change', this.handleAppStateChange);
+    // Note: AppState.removeEventListener is deprecated, use subscription pattern instead
   }
 }
 

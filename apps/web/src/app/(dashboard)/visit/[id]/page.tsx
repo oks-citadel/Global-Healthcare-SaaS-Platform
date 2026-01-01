@@ -23,7 +23,7 @@ interface VisitData {
 export default function VirtualVisitPage() {
   const params = useParams();
   const router = useRouter();
-  const visitId = params.id as string;
+  const visitId = params?.id as string;
 
   const [visitData, setVisitData] = useState<VisitData | null>(null);
   const [userRole, setUserRole] = useState<'doctor' | 'patient'>('patient');

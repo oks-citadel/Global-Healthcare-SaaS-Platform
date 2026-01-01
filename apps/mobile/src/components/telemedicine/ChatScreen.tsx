@@ -37,7 +37,7 @@ interface ChatScreenProps {
 export default function ChatScreen({
   roomId,
   userId,
-  userRole,
+  userRole: _userRole,
   token,
   apiUrl,
 }: ChatScreenProps) {
@@ -114,7 +114,7 @@ export default function ChatScreen({
         message: inputMessage.trim(),
         timestamp,
       },
-      (response: any) => {
+      (_response: any) => {
         // Message sent or failed silently
       }
     );
@@ -424,13 +424,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#9ca3af',
   },
   typingDot1: {
-    animationDelay: '0s',
+    // Note: animationDelay not supported in RN - use Animated API
   },
   typingDot2: {
-    animationDelay: '0.2s',
+    // Note: animationDelay not supported in RN - use Animated API
   },
   typingDot3: {
-    animationDelay: '0.4s',
+    // Note: animationDelay not supported in RN - use Animated API
   },
   inputContainer: {
     flexDirection: 'row',

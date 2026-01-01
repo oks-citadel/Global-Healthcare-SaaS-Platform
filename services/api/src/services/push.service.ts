@@ -539,14 +539,14 @@ export async function getUserNotifications(userId: string, filters: Notification
 
     if (filters.startDate) {
       where.createdAt = {
-        ...where.createdAt,
+        ...(where.createdAt as object || {}),
         gte: new Date(filters.startDate),
       };
     }
 
     if (filters.endDate) {
       where.createdAt = {
-        ...where.createdAt,
+        ...(where.createdAt as object || {}),
         lte: new Date(filters.endDate),
       };
     }

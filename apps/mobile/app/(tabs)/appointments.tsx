@@ -20,7 +20,7 @@ type TabType = 'upcoming' | 'past' | 'cancelled';
 
 export default function AppointmentsScreen() {
   const [activeTab, setActiveTab] = useState<TabType>('upcoming');
-  const [page, setPage] = useState(1);
+  const [page, _setPage] = useState(1);
 
   const {
     data: appointmentsData,

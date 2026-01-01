@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { NetInfo } from '@react-native-community/netinfo';
+import NetInfo, { NetInfoState } from '@react-native-community/netinfo';
 import apiClient from '../api/client';
 import { socketService } from './socket';
 
@@ -60,7 +60,7 @@ class OfflineService {
    */
   async initialize(): Promise<void> {
     // Subscribe to network state changes
-    this.unsubscribeNetInfo = NetInfo.addEventListener((state) => {
+    this.unsubscribeNetInfo = NetInfo.addEventListener((state: NetInfoState) => {
       const wasOnline = this.isOnline;
       this.isOnline = state.isConnected ?? false;
 

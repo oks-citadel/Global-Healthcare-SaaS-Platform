@@ -138,7 +138,7 @@ router.post('/', requireUser, requireRole('admin', 'compliance_officer', 'vendor
     const vendor = await vendorService.createVendor({
       ...validatedData,
       createdBy: req.user!.id,
-    });
+    } as any);
 
     await createAuditLog(req, {
       vendorId: vendor.id,

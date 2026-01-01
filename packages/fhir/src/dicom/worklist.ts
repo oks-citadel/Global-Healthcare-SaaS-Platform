@@ -796,7 +796,7 @@ function buildPerformedSeriesItem(series: PerformedSeries): DICOMJSONObject {
       Value: series.referencedImageSequence.map((img) => ({
         '00081150': { vr: 'UI', Value: [img.referencedSOPClassUID] },
         '00081155': { vr: 'UI', Value: [img.referencedSOPInstanceUID] },
-      })),
+      })) as any[],
     };
   }
 
@@ -807,7 +807,7 @@ function buildPerformedSeriesItem(series: PerformedSeries): DICOMJSONObject {
       Value: series.referencedNonImageCompositeSequence.map((ref) => ({
         '00081150': { vr: 'UI', Value: [ref.referencedSOPClassUID] },
         '00081155': { vr: 'UI', Value: [ref.referencedSOPInstanceUID] },
-      })),
+      })) as any[],
     };
   }
 

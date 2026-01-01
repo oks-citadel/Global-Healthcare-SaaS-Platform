@@ -161,7 +161,7 @@ export async function createClientAssertionJWT(
  * Backend Services Client for system-to-system authorization
  */
 export class BackendServicesClient {
-  private config: BackendServicesConfig;
+  protected config: BackendServicesConfig;
   private smartConfig: SMARTConfiguration | null = null;
   private currentToken: SMARTToken | null = null;
   private tokenObtainedAt: number = 0;
@@ -196,7 +196,7 @@ export class BackendServicesClient {
       );
     }
 
-    this.smartConfig = await response.json();
+    this.smartConfig = await response.json() as SMARTConfiguration;
     return this.smartConfig!;
   }
 
@@ -298,7 +298,7 @@ export class BackendServicesClient {
       throw new Error(errorMessage);
     }
 
-    this.currentToken = await response.json();
+    this.currentToken = await response.json() as SMARTToken;
     this.tokenObtainedAt = Date.now();
 
     return this.currentToken!;
@@ -345,7 +345,7 @@ export class BackendServicesClient {
       );
     }
 
-    return response.json();
+    return response.json() as Promise<T>;
   }
 
   /**
@@ -532,7 +532,7 @@ export class BulkDataClient extends BackendServicesClient {
 
     if (response.status === 200) {
       // Complete
-      const status = await response.json();
+      const status = await response.json() as BulkDataExportStatus;
       return {
         complete: true,
         status,
