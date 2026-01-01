@@ -1,7 +1,7 @@
 # ============================================
 # Stage 1: Dependencies
 # ============================================
-FROM node:20.18-alpine AS deps
+FROM node:25.2-alpine AS deps
 
 # Install security updates, dumb-init, and openssl for Prisma
 RUN apk add --no-cache \
@@ -22,7 +22,7 @@ RUN npm install --legacy-peer-deps
 # ============================================
 # Stage 2: Builder
 # ============================================
-FROM node:20.18-alpine AS builder
+FROM node:25.2-alpine AS builder
 
 # Install openssl for Prisma
 RUN apk add --no-cache openssl
@@ -50,7 +50,7 @@ RUN npm prune --production --legacy-peer-deps
 # ============================================
 # Stage 3: Production Runtime
 # ============================================
-FROM node:20.18-alpine AS production
+FROM node:25.2-alpine AS production
 
 # Add image metadata
 LABEL maintainer="UnifiedHealth Platform Team"
