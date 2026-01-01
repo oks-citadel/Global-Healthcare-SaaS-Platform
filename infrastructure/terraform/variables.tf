@@ -6,6 +6,22 @@
 # ============================================
 
 # ============================================
+# AWS Account Configuration
+# ============================================
+
+variable "aws_account_id" {
+  description = "AWS Account ID for deployment"
+  type        = string
+  default     = "992382449461"
+}
+
+variable "organizational_unit_id" {
+  description = "AWS Organizations OU ID"
+  type        = string
+  default     = "ou-2kqs-qw6vym5t"
+}
+
+# ============================================
 # Core Configuration
 # ============================================
 

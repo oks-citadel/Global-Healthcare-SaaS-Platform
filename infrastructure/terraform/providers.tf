@@ -31,6 +31,9 @@ terraform {
 provider "aws" {
   region = var.aws_region
 
+  # Ensure deployment only to authorized account
+  allowed_account_ids = [var.aws_account_id]
+
   # Cross-account access via assume role (optional)
   dynamic "assume_role" {
     for_each = var.assume_role_arn != "" ? [1] : []
@@ -43,11 +46,12 @@ provider "aws" {
 
   default_tags {
     tags = {
-      Project       = "UnifiedHealth"
-      Environment   = var.environment
-      ManagedBy     = "Terraform"
-      CostCenter    = "Healthcare-Platform"
-      DataResidency = var.aws_region
+      Project              = "UnifiedHealth"
+      Environment          = var.environment
+      ManagedBy            = "Terraform"
+      CostCenter           = "Healthcare-Platform"
+      DataResidency        = var.aws_region
+      OrganizationalUnitId = var.organizational_unit_id
     }
   }
 }

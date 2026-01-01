@@ -17,12 +17,10 @@
 
 terraform {
   backend "s3" {
-    # Backend configuration is provided via -backend-config flag during init
-    # This allows different state files per environment while keeping code DRY
-
-    # Placeholder values - override via backend config files
-    bucket         = "unified-health-terraform-state-placeholder"
-    key            = "global/terraform.tfstate"
+    # AWS Account: 992382449461
+    # Organizational Unit: ou-2kqs-qw6vym5t
+    bucket         = "unified-health-terraform-state-992382449461"
+    key            = "unified-health/prod/terraform.tfstate"
     region         = "us-east-1"
     encrypt        = true
 

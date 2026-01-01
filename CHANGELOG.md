@@ -5,11 +5,49 @@ All notable changes to the UnifiedHealth Global Platform will be documented in t
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-01-01
+
+### Added
+
+#### AWS Account Configuration
+
+- **AWS Account ID**: 992382449461 configured for deployment
+- **Organizational Unit**: ou-2kqs-qw6vym5t for AWS Organizations
+- **Terraform Backend**: S3 state storage with DynamoDB locking
+- **Deployment Script**: Automated infrastructure deployment with bootstrap
+
+#### Healthcare Platform Dashboard
+
+- Comprehensive React dashboard component with 21 healthcare modules
+- Four navigation tabs: Overview, Modules, EHR Telehealth, Integrations
+- Support for FHIR R4, HL7v2, C-CDA, DICOM, X12 EDI, NCPDP standards
+- Compliance display for HIPAA, GDPR, POPIA, SOC 2, HITRUST
+
+#### Test Infrastructure
+
+- Added vitest configuration for population-health-service
+- Added vitest configuration for clinical-trials-service
+- Added test files for laboratory-service
+
+### Changed
+
+#### Infrastructure Configuration
+
+- Updated `variables.tf` with AWS account ID and OU variables
+- Updated `providers.tf` with allowed_account_ids validation
+- Updated `backend.tf` with production S3 bucket configuration
+- Updated `buildspec.yml` with default account configuration
+- Created `terraform.tfvars` for production deployment
+- Created `deploy.sh` script for infrastructure automation
+
+---
+
 ## [1.1.0] - 2024-12-31
 
 ### Added
 
 #### AWS CI/CD Pipeline
+
 - **AWS CodePipeline** - Complete CI/CD orchestration from GitHub to ECR
 - **AWS CodeBuild** - Docker image builds for all 13 microservices
 - **Amazon ECR** - Container registry with image scanning and lifecycle policies
@@ -17,6 +55,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **CloudWatch Events** - Pipeline state change notifications to SNS
 
 #### Infrastructure as Code
+
 - `cicd-pipeline.tf` - Complete CI/CD pipeline Terraform configuration
 - `buildspec.yml` - CodeBuild specification for Docker builds
 - Service-level build configurations for:
@@ -37,6 +76,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 #### TypeScript Errors Resolution (29/29 Packages Passing)
+
 - **Mobile App** (`@unified-health/mobile`)
   - Fixed unused variables with underscore prefix pattern
   - Fixed style conditional expressions using ternary operators
@@ -74,11 +114,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 #### Naming Conventions
+
 - Standardized AWS resource naming with `unified-health-{environment}` prefix
 - Updated ECR repository naming to `{prefix}/{service-name}` format
 - Aligned Terraform resource tags with AWS best practices
 
 #### Documentation
+
 - Updated README.md with production status and CI/CD information
 - Added AWS deployment architecture documentation
 - Updated infrastructure documentation for AWS services
@@ -124,19 +166,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Migration Notes
 
 ### Azure to AWS Migration (Completed)
+
 The platform has been fully migrated from Azure to AWS:
 
-| Azure Service | AWS Equivalent |
-|---------------|----------------|
-| AKS | Amazon EKS |
-| Azure PostgreSQL | Aurora PostgreSQL |
-| Azure Redis | ElastiCache Redis |
-| Azure Key Vault | AWS Secrets Manager |
-| Azure Container Registry | Amazon ECR |
-| Azure Storage | Amazon S3 |
-| Azure Monitor | CloudWatch |
-| Azure Front Door | CloudFront |
-| Azure DNS | Route 53 |
+| Azure Service            | AWS Equivalent      |
+| ------------------------ | ------------------- |
+| AKS                      | Amazon EKS          |
+| Azure PostgreSQL         | Aurora PostgreSQL   |
+| Azure Redis              | ElastiCache Redis   |
+| Azure Key Vault          | AWS Secrets Manager |
+| Azure Container Registry | Amazon ECR          |
+| Azure Storage            | Amazon S3           |
+| Azure Monitor            | CloudWatch          |
+| Azure Front Door         | CloudFront          |
+| Azure DNS                | Route 53            |
 
 ### Deployment
 

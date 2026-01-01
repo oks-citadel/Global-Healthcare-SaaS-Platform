@@ -4,11 +4,15 @@ version: 0.2
 # UnifiedHealth Platform - AWS CodeBuild Spec
 # ============================================
 # Builds Docker images and pushes to Amazon ECR
+# AWS Account: 992382449461
+# Region: us-east-1
 # ============================================
 
 env:
   variables:
     DOCKER_BUILDKIT: "1"
+    DEFAULT_AWS_ACCOUNT_ID: "992382449461"
+    DEFAULT_AWS_REGION: "us-east-1"
   exported-variables:
     - IMAGE_TAG
     - IMAGE_URI
@@ -98,6 +102,6 @@ artifacts:
 
 cache:
   paths:
-    - '/root/.npm/**/*'
-    - '/root/.pnpm-store/**/*'
-    - 'node_modules/**/*'
+    - "/root/.npm/**/*"
+    - "/root/.pnpm-store/**/*"
+    - "node_modules/**/*"
