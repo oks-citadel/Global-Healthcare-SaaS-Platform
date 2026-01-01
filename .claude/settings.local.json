@@ -20,7 +20,8 @@
       "Bash(grep:*)",
       "Bash(pnpm turbo run typecheck:*)",
       "Bash(xargs:*)",
-      "Bash(pnpm install:*)"
+      "Bash(pnpm install:*)",
+      "Bash(gh pr list:*)"
     ]
   }
 }

@@ -33,7 +33,7 @@
 - [Subscription Model](#subscription-model)
 - [User Research & Personas](#user-research--personas)
 - [Quick Start](#quick-start)
-- [Deployment](#deployment)
+- [CI/CD Pipeline](#cicd-pipeline)
 - [Security & Compliance](#security--compliance)
 - [API Documentation](#api-documentation)
 - [Contributing](#contributing)
@@ -42,7 +42,7 @@
 
 ## Production Status
 
-> **Last Updated:** December 30, 2024
+> **Last Updated:** December 31, 2024
 
 ### Platform Readiness Overview
 
@@ -1592,6 +1592,82 @@ pnpm dev
 | Admin Dashboard | http://localhost:3001      |
 | Provider Portal | http://localhost:3002      |
 | API Docs        | http://localhost:8080/docs |
+
+---
+
+## CI/CD Pipeline
+
+### AWS CodePipeline Architecture
+
+```
+GitHub Repository
+       │
+       ▼
+┌──────────────────┐
+│   CodePipeline   │ ◄── Orchestrates the entire pipeline
+└────────┬─────────┘
+         │
+         ▼
+┌──────────────────┐
+│    CodeBuild     │ ◄── Builds Docker images
+└────────┬─────────┘
+         │
+         ▼
+┌──────────────────┐
+│   Amazon ECR     │ ◄── Stores container images
+└────────┬─────────┘
+         │
+         ▼
+┌──────────────────┐
+│   Amazon EKS     │ ◄── Runs containerized services
+└──────────────────┘
+```
+
+### Pipeline Stages
+
+| Stage | Action | Description |
+|-------|--------|-------------|
+| **Source** | GitHub | Triggered on push to main branch |
+| **Build** | CodeBuild | Builds Docker images for all services |
+| **Push** | ECR | Pushes images to container registry |
+| **Deploy** | EKS | Updates Kubernetes deployments |
+
+### Services Built
+
+| Service | ECR Repository | Port |
+|---------|----------------|------|
+| API Gateway | `unified-health-prod/api-gateway` | 3000 |
+| Auth Service | `unified-health-prod/auth-service` | 3001 |
+| Core API | `unified-health-prod/api` | 8080 |
+| Telehealth Service | `unified-health-prod/telehealth-service` | 3001 |
+| Mental Health Service | `unified-health-prod/mental-health-service` | 3002 |
+| Chronic Care Service | `unified-health-prod/chronic-care-service` | 3003 |
+| Pharmacy Service | `unified-health-prod/pharmacy-service` | 3004 |
+| Laboratory Service | `unified-health-prod/laboratory-service` | 3005 |
+| Imaging Service | `unified-health-prod/imaging-service` | 3006 |
+| Notification Service | `unified-health-prod/notification-service` | 3007 |
+| Web App | `unified-health-prod/web-app` | 3000 |
+| Provider Portal | `unified-health-prod/provider-portal` | 3002 |
+| Admin Portal | `unified-health-prod/admin-portal` | 3001 |
+
+### Deployment Commands
+
+```bash
+# Deploy infrastructure with Terraform
+cd infrastructure/terraform
+terraform init
+terraform plan -var="environment=prod"
+terraform apply -var="environment=prod"
+
+# Verify pipeline status
+aws codepipeline get-pipeline-state --name unified-health-prod-pipeline
+
+# Check ECR repositories
+aws ecr describe-repositories --repository-names unified-health-prod/api-gateway
+
+# Update kubeconfig for EKS
+aws eks update-kubeconfig --name unified-health-prod-eks --region us-east-1
+```
 
 ---
 

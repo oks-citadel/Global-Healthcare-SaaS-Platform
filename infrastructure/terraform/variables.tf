@@ -307,3 +307,25 @@ variable "monthly_budget_usd" {
   type        = number
   default     = 50000
 }
+
+# ============================================
+# CI/CD Pipeline Configuration
+# ============================================
+
+variable "github_repository" {
+  description = "GitHub repository in format 'owner/repo'"
+  type        = string
+  default     = "oks-citadel/Global-Healthcare-SaaS-Platform"
+}
+
+variable "github_branch" {
+  description = "GitHub branch to trigger pipeline"
+  type        = string
+  default     = "main"
+}
+
+variable "enable_cicd_pipeline" {
+  description = "Enable CI/CD pipeline resources"
+  type        = bool
+  default     = true
+}
