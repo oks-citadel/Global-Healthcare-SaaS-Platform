@@ -1,7 +1,8 @@
 # ============================================
 # UnifiedHealth Platform - Monorepo Service Dockerfile
 # ============================================
-FROM node:20.18-alpine AS base
+# Using ECR Public Gallery to avoid Docker Hub rate limits
+FROM public.ecr.aws/docker/library/node:20-alpine AS base
 RUN apk add --no-cache dumb-init curl libc6-compat openssl
 RUN corepack enable && corepack prepare pnpm@9.0.0 --activate
 WORKDIR /app
@@ -40,7 +41,7 @@ RUN cd ${SERVICE_PATH} && pnpm build
 # ============================================
 # Stage 4: Production
 # ============================================
-FROM node:20.18-alpine AS production
+FROM public.ecr.aws/docker/library/node:20-alpine AS production
 ARG SERVICE_PATH
 
 RUN apk add --no-cache dumb-init curl openssl
