@@ -1,4 +1,4 @@
-FROM node:20.18-alpine AS base
+FROM public.ecr.aws/docker/library/node:20-alpine AS base
 RUN apk add --no-cache dumb-init curl
 
 # Install dependencies only when needed

@@ -1,7 +1,7 @@
 # ============================================
 # Stage 1: Dependencies
 # ============================================
-FROM node:20.18-alpine AS deps
+FROM public.ecr.aws/docker/library/node:20-alpine AS deps
 
 RUN apk add --no-cache libc6-compat \
     && rm -rf /var/cache/apk/*
@@ -17,7 +17,7 @@ RUN pnpm install --frozen-lockfile
 # ============================================
 # Stage 2: Builder
 # ============================================
-FROM node:20.18-alpine AS builder
+FROM public.ecr.aws/docker/library/node:20-alpine AS builder
 
 WORKDIR /app
 
@@ -37,7 +37,7 @@ RUN pnpm build
 # ============================================
 # Stage 3: Production Runtime
 # ============================================
-FROM node:20.18-alpine AS production
+FROM public.ecr.aws/docker/library/node:20-alpine AS production
 
 LABEL maintainer="UnifiedHealth Platform Team"
 LABEL version="1.0.0"
