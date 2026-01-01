@@ -1,0 +1,36 @@
+# ServiceMonitor for Telehealth Service
+# Video consultation and virtual care service metrics
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: telehealth-service
+  namespace: unified-health
+  labels:
+    app: telehealth-service
+    component: monitoring
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: telehealth-service
+  namespaceSelector:
+    matchNames:
+      - unified-health
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s
+      scrapeTimeout: 10s
+      scheme: http
+      honorLabels: true
+      relabelings:
+        - sourceLabels: [__meta_kubernetes_pod_name]
+          targetLabel: pod
+        - sourceLabels: [__meta_kubernetes_namespace]
+          targetLabel: namespace
+        - sourceLabels: [__meta_kubernetes_pod_label_version]
+          targetLabel: version
+      metricRelabelings:
+        - sourceLabels: [__name__]
+          regex: 'http_.*|video_.*|consultation_.*|websocket_.*'
+          action: keep

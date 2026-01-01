@@ -335,6 +335,107 @@ jobs:
           if-no-files-found: ignore
 
   # ==========================================
+  # Unit Tests - Web App
+  # ==========================================
+  unit-tests-web:
+    name: Unit Tests - Web
+    runs-on: ubuntu-latest
+    needs: setup
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+      - name: Restore pnpm cache
+        uses: actions/cache@v5
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run unit tests with coverage
+        run: cd apps/web && pnpm test:coverage
+        env:
+          NODE_ENV: test
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: coverage-web
+          path: apps/web/coverage/
+          if-no-files-found: ignore
+
+  # ==========================================
+  # Unit Tests - Packages
+  # ==========================================
+  unit-tests-packages:
+    name: Unit Tests - Packages
+    runs-on: ubuntu-latest
+    needs: setup
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+      - name: Restore pnpm cache
+        uses: actions/cache@v5
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run SDK tests
+        run: cd packages/sdk && pnpm test
+        continue-on-error: true
+
+      - name: Run compliance tests
+        run: cd packages/compliance && pnpm test
+        continue-on-error: true
+
+      - name: Run i18n tests
+        run: cd packages/i18n && pnpm test
+        continue-on-error: true
+
+  # ==========================================
   # TypeScript Type Checking
   # ==========================================
   typecheck:
@@ -388,6 +489,8 @@ jobs:
     needs:
       - unit-tests-api
       - unit-tests-notification
+      - unit-tests-web
+      - unit-tests-packages
       - payment-tests
       - webhook-tests
       - security-tests
@@ -446,6 +549,8 @@ jobs:
             const results = {
               'Unit Tests - API': '${{ needs.unit-tests-api.result }}',
               'Unit Tests - Notification': '${{ needs.unit-tests-notification.result }}',
+              'Unit Tests - Web': '${{ needs.unit-tests-web.result }}',
+              'Unit Tests - Packages': '${{ needs.unit-tests-packages.result }}',
               'Payment Tests': '${{ needs.payment-tests.result }}',
               'Webhook Tests': '${{ needs.webhook-tests.result }}',
               'Security Tests': '${{ needs.security-tests.result }}',

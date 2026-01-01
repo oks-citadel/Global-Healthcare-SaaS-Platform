@@ -1,0 +1,19 @@
+# Kustomization for ServiceMonitor resources
+# Used by Prometheus Operator to auto-discover services to scrape
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: unified-health
+
+resources:
+  - api-gateway-servicemonitor.yaml
+  - unified-health-api-servicemonitor.yaml
+  - telehealth-service-servicemonitor.yaml
+  - chronic-care-service-servicemonitor.yaml
+  - mental-health-service-servicemonitor.yaml
+  - pharmacy-service-servicemonitor.yaml
+  - laboratory-service-servicemonitor.yaml
+
+commonLabels:
+  team: platform-sre
+  environment: production

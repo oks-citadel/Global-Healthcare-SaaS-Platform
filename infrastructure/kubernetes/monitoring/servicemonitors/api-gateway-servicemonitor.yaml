@@ -1,0 +1,36 @@
+# ServiceMonitor for API Gateway Service
+# Configures Prometheus Operator to scrape metrics from the API Gateway
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: api-gateway
+  namespace: unified-health
+  labels:
+    app: api-gateway
+    component: monitoring
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: api-gateway
+  namespaceSelector:
+    matchNames:
+      - unified-health
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s
+      scrapeTimeout: 10s
+      scheme: http
+      honorLabels: true
+      relabelings:
+        - sourceLabels: [__meta_kubernetes_pod_name]
+          targetLabel: pod
+        - sourceLabels: [__meta_kubernetes_namespace]
+          targetLabel: namespace
+        - sourceLabels: [__meta_kubernetes_pod_label_version]
+          targetLabel: version
+      metricRelabelings:
+        - sourceLabels: [__name__]
+          regex: 'go_.*'
+          action: drop

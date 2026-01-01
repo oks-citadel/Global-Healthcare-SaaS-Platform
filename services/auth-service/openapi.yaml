@@ -1,0 +1,805 @@
+openapi: 3.0.3
+info:
+  title: UnifiedHealth Authentication Service
+  version: 1.0.0
+  description: |
+    The Authentication Service for the UnifiedHealth Global Platform. This service handles
+    all authentication and authorization concerns including user registration, login,
+    token management, and multi-factor authentication (MFA).
+
+    ## Features
+    - **User Registration**: Create new user accounts with role-based access
+    - **Authentication**: Email/password login with JWT token issuance
+    - **Token Management**: Access token refresh and logout functionality
+    - **Password Management**: Forgot password and reset password flows
+    - **Email Verification**: Email verification for new accounts
+    - **Multi-Factor Authentication**: TOTP-based MFA with backup codes
+
+    ## Security
+    - Passwords are hashed using bcrypt with adaptive cost factor
+    - JWT tokens use RS256 signing algorithm
+    - Access tokens expire in 15 minutes, refresh tokens in 7 days
+    - Rate limiting applied to authentication endpoints
+    - Account lockout after failed login attempts
+
+  contact:
+    name: API Support
+    email: support@unifiedhealth.io
+  license:
+    name: Proprietary
+    url: https://unifiedhealthcare.com/terms
+
+servers:
+  - url: http://localhost:3002
+    description: Local development server
+  - url: https://auth-dev.unifiedhealthcare.com
+    description: Development environment
+  - url: https://auth.unifiedhealthcare.com
+    description: Production environment
+
+tags:
+  - name: Health
+    description: Health check and monitoring endpoints
+  - name: Authentication
+    description: User authentication endpoints
+  - name: Password
+    description: Password management endpoints
+  - name: Email Verification
+    description: Email verification endpoints
+  - name: MFA
+    description: Multi-factor authentication endpoints
+
+paths:
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Health check
+      description: Simple health check endpoint for monitoring
+      operationId: getHealth
+      security: []
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register new user
+      description: |
+        Create a new user account. A verification email will be sent to the
+        provided email address. Rate limited to prevent abuse.
+      operationId: register
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: User already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Login user
+      description: |
+        Authenticate user with email and password. Returns JWT access and refresh tokens.
+        If MFA is enabled, returns a partial response requiring MFA verification.
+      operationId: login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh access token
+      description: Get a new access token using a valid refresh token
+      operationId: refreshToken
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+      responses:
+        '200':
+          description: Token refreshed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Invalid or expired refresh token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Logout user
+      description: Invalidate user tokens and end the session
+      operationId: logout
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Logged out successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /auth/me:
+    get:
+      tags:
+        - Authentication
+      summary: Get current user
+      description: Get authenticated user information
+      operationId: getCurrentUser
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Current user information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /auth/forgot-password:
+    post:
+      tags:
+        - Password
+      summary: Request password reset
+      description: |
+        Send a password reset email to the user. Always returns success to prevent
+        email enumeration attacks.
+      operationId: forgotPassword
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordRequest'
+      responses:
+        '200':
+          description: Password reset email sent (if account exists)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: If an account exists, a password reset email has been sent
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/reset-password:
+    post:
+      tags:
+        - Password
+      summary: Reset password
+      description: Reset password using the token from the password reset email
+      operationId: resetPassword
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+      responses:
+        '200':
+          description: Password reset successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Password reset successfully
+        '400':
+          description: Invalid or expired token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/verify-email:
+    post:
+      tags:
+        - Email Verification
+      summary: Verify email address
+      description: Verify email address using the token from the verification email
+      operationId: verifyEmail
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyEmailRequest'
+      responses:
+        '200':
+          description: Email verified successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Email verified successfully
+        '400':
+          description: Invalid or expired token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/resend-verification:
+    post:
+      tags:
+        - Email Verification
+      summary: Resend verification email
+      description: Resend the email verification link
+      operationId: resendVerification
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResendVerificationRequest'
+      responses:
+        '200':
+          description: Verification email sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Verification email sent
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /mfa/status:
+    get:
+      tags:
+        - MFA
+      summary: Get MFA status
+      description: Check if MFA is enabled for the authenticated user
+      operationId: getMfaStatus
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: MFA status retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MfaStatusResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /mfa/enable:
+    post:
+      tags:
+        - MFA
+      summary: Enable MFA
+      description: |
+        Generate MFA setup data including TOTP secret and QR code.
+        User must verify with /mfa/verify-setup to complete enrollment.
+      operationId: enableMfa
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: MFA setup data generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MfaSetupResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '409':
+          description: MFA already enabled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /mfa/verify-setup:
+    post:
+      tags:
+        - MFA
+      summary: Verify MFA setup
+      description: Complete MFA enrollment by verifying a TOTP code
+      operationId: verifyMfaSetup
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MfaVerifyRequest'
+      responses:
+        '200':
+          description: MFA enabled successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MfaEnabledResponse'
+        '400':
+          description: Invalid TOTP code
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /mfa/disable:
+    post:
+      tags:
+        - MFA
+      summary: Disable MFA
+      description: Disable MFA for the authenticated user
+      operationId: disableMfa
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MfaVerifyRequest'
+      responses:
+        '200':
+          description: MFA disabled successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: MFA disabled successfully
+        '400':
+          description: Invalid TOTP code
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /mfa/backup-codes/regenerate:
+    post:
+      tags:
+        - MFA
+      summary: Regenerate backup codes
+      description: Generate new backup codes, invalidating all existing ones
+      operationId: regenerateBackupCodes
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MfaVerifyRequest'
+      responses:
+        '200':
+          description: Backup codes regenerated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BackupCodesResponse'
+        '400':
+          description: Invalid TOTP code
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /mfa/verify-login:
+    post:
+      tags:
+        - MFA
+      summary: Verify MFA during login
+      description: Complete login by verifying MFA code or backup code
+      operationId: verifyMfaLogin
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MfaLoginVerifyRequest'
+      responses:
+        '200':
+          description: MFA verified, login complete
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Invalid MFA code
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT access token from login or token refresh
+
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [healthy, unhealthy]
+          example: healthy
+        timestamp:
+          type: string
+          format: date-time
+        version:
+          type: string
+          example: "1.0.0"
+        service:
+          type: string
+          example: "auth-service"
+
+    RegisterRequest:
+      type: object
+      required:
+        - email
+        - password
+        - firstName
+        - lastName
+      properties:
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        password:
+          type: string
+          format: password
+          minLength: 12
+          description: Must contain uppercase, lowercase, number, and special character
+          example: StrongPassword123!
+        firstName:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: John
+        lastName:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: Doe
+        phone:
+          type: string
+          example: "+1234567890"
+        dateOfBirth:
+          type: string
+          format: date
+          example: "1990-01-01"
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        password:
+          type: string
+          format: password
+          example: StrongPassword123!
+
+    RefreshTokenRequest:
+      type: object
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
+          description: Valid refresh token
+
+    ForgotPasswordRequest:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          format: email
+          example: user@example.com
+
+    ResetPasswordRequest:
+      type: object
+      required:
+        - token
+        - password
+      properties:
+        token:
+          type: string
+          description: Password reset token from email
+        password:
+          type: string
+          format: password
+          minLength: 12
+          description: New password
+
+    VerifyEmailRequest:
+      type: object
+      required:
+        - token
+      properties:
+        token:
+          type: string
+          description: Email verification token
+
+    ResendVerificationRequest:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          format: email
+
+    MfaVerifyRequest:
+      type: object
+      required:
+        - code
+      properties:
+        code:
+          type: string
+          pattern: '^\d{6}$'
+          description: 6-digit TOTP code
+          example: "123456"
+
+    MfaLoginVerifyRequest:
+      type: object
+      required:
+        - mfaToken
+        - code
+      properties:
+        mfaToken:
+          type: string
+          description: Temporary MFA token from login response
+        code:
+          type: string
+          description: 6-digit TOTP code or backup code
+          example: "123456"
+
+    AuthResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          description: JWT access token (expires in 15 minutes)
+        refreshToken:
+          type: string
+          description: JWT refresh token (expires in 7 days)
+        expiresIn:
+          type: integer
+          description: Token expiration time in seconds
+          example: 900
+        tokenType:
+          type: string
+          example: Bearer
+        user:
+          $ref: '#/components/schemas/UserResponse'
+        mfaRequired:
+          type: boolean
+          description: Indicates if MFA verification is required
+        mfaToken:
+          type: string
+          description: Temporary token for MFA verification (only if mfaRequired is true)
+
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        firstName:
+          type: string
+        lastName:
+          type: string
+        role:
+          type: string
+          enum: [patient, provider, admin]
+        emailVerified:
+          type: boolean
+        mfaEnabled:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    MfaStatusResponse:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        backupCodesRemaining:
+          type: integer
+          description: Number of unused backup codes
+
+    MfaSetupResponse:
+      type: object
+      properties:
+        secret:
+          type: string
+          description: TOTP secret key
+        qrCode:
+          type: string
+          description: Base64 encoded QR code image
+        manualEntryKey:
+          type: string
+          description: Human-readable key for manual entry
+
+    MfaEnabledResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: MFA enabled successfully
+        backupCodes:
+          type: array
+          items:
+            type: string
+          description: One-time backup codes (store securely)
+
+    BackupCodesResponse:
+      type: object
+      properties:
+        backupCodes:
+          type: array
+          items:
+            type: string
+          description: New one-time backup codes
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Bad Request"
+        message:
+          type: string
+          example: "Invalid input data"
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+        timestamp:
+          type: string
+          format: date-time
+
+  responses:
+    UnauthorizedError:
+      description: Unauthorized - Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "Unauthorized"
+            message: "Authentication token is missing or invalid"
+            timestamp: "2025-12-31T00:00:00Z"

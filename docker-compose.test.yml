@@ -1,0 +1,292 @@
+# ============================================
+# UnifiedHealth Platform - Integration Test Environment
+# Docker Compose configuration for running integration tests
+# ============================================
+
+version: '3.8'
+
+services:
+  # ==========================================
+  # PostgreSQL Test Database
+  # ==========================================
+  postgres-test:
+    image: postgres:15-alpine
+    container_name: unifiedhealth-postgres-test
+    environment:
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_password
+      POSTGRES_DB: unified_health_test
+      POSTGRES_MULTIPLE_DATABASES: "auth_test,notification_test,pharmacy_test,imaging_test"
+    ports:
+      - "5433:5432"
+    networks:
+      - test-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test_user -d unified_health_test"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    tmpfs:
+      - /var/lib/postgresql/data
+    volumes:
+      - ./scripts/init-test-databases.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+  # ==========================================
+  # Redis Test Instance
+  # ==========================================
+  redis-test:
+    image: redis:7-alpine
+    container_name: unifiedhealth-redis-test
+    ports:
+      - "6380:6379"
+    networks:
+      - test-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    tmpfs:
+      - /data
+    command: redis-server --appendonly no --save ""
+
+  # ==========================================
+  # MinIO (S3-compatible storage for tests)
+  # ==========================================
+  minio-test:
+    image: minio/minio:latest
+    container_name: unifiedhealth-minio-test
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9100:9000"
+      - "9101:9001"
+    networks:
+      - test-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    command: server /data --console-address ":9001"
+    tmpfs:
+      - /data
+
+  # ==========================================
+  # MailHog (Email testing)
+  # ==========================================
+  mailhog-test:
+    image: mailhog/mailhog:latest
+    container_name: unifiedhealth-mailhog-test
+    ports:
+      - "1025:1025"  # SMTP
+      - "8025:8025"  # Web UI
+    networks:
+      - test-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8025"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  # ==========================================
+  # API Service Test Container
+  # ==========================================
+  api-test:
+    build:
+      context: ./services/api
+      dockerfile: Dockerfile
+      target: builder
+    container_name: unifiedhealth-api-test
+    environment:
+      NODE_ENV: test
+      PORT: 8080
+      DATABASE_URL: postgresql://test_user:test_password@postgres-test:5432/unified_health_test
+      REDIS_HOST: redis-test
+      REDIS_PORT: 6379
+      JWT_SECRET: test-jwt-secret-for-integration-tests-only
+      JWT_EXPIRES_IN: 1h
+      SENDGRID_API_KEY: SG.test
+      SMTP_HOST: mailhog-test
+      SMTP_PORT: 1025
+      AWS_ACCESS_KEY_ID: minioadmin
+      AWS_SECRET_ACCESS_KEY: minioadmin
+      AWS_ENDPOINT: http://minio-test:9000
+      AWS_S3_BUCKET: test-bucket
+      LOG_LEVEL: error
+    ports:
+      - "8081:8080"
+    networks:
+      - test-network
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    command: ["sh", "-c", "pnpm db:generate && pnpm db:migrate:prod && pnpm start"]
+
+  # ==========================================
+  # Auth Service Test Container
+  # ==========================================
+  auth-service-test:
+    build:
+      context: ./services/auth-service
+      dockerfile: Dockerfile
+      target: builder
+    container_name: unifiedhealth-auth-test
+    environment:
+      NODE_ENV: test
+      PORT: 3001
+      DATABASE_URL: postgresql://test_user:test_password@postgres-test:5432/auth_test
+      REDIS_HOST: redis-test
+      REDIS_PORT: 6379
+      JWT_SECRET: test-jwt-secret-for-integration-tests-only
+      JWT_EXPIRES_IN: 1h
+      LOG_LEVEL: error
+    ports:
+      - "3011:3001"
+    networks:
+      - test-network
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3001/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # ==========================================
+  # Notification Service Test Container
+  # ==========================================
+  notification-service-test:
+    build:
+      context: ./services/notification-service
+      dockerfile: Dockerfile
+      target: builder
+    container_name: unifiedhealth-notification-test
+    environment:
+      NODE_ENV: test
+      PORT: 3006
+      DATABASE_URL: postgresql://test_user:test_password@postgres-test:5432/notification_test
+      REDIS_HOST: redis-test
+      REDIS_PORT: 6379
+      SMTP_HOST: mailhog-test
+      SMTP_PORT: 1025
+      SENDGRID_API_KEY: SG.test
+      LOG_LEVEL: error
+    ports:
+      - "3016:3006"
+    networks:
+      - test-network
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_healthy
+      mailhog-test:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3006/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # ==========================================
+  # Integration Test Runner
+  # ==========================================
+  test-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    container_name: unifiedhealth-test-runner
+    environment:
+      NODE_ENV: test
+      DATABASE_URL: postgresql://test_user:test_password@postgres-test:5432/unified_health_test
+      REDIS_HOST: redis-test
+      REDIS_PORT: 6379
+      API_URL: http://api-test:8080
+      AUTH_SERVICE_URL: http://auth-service-test:3001
+      NOTIFICATION_SERVICE_URL: http://notification-service-test:3006
+      JWT_SECRET: test-jwt-secret-for-integration-tests-only
+    networks:
+      - test-network
+    depends_on:
+      api-test:
+        condition: service_healthy
+    volumes:
+      - ./coverage:/app/coverage
+      - ./test-results:/app/test-results
+    command: ["pnpm", "test:integration"]
+
+  # ==========================================
+  # Web E2E Test Container (Playwright)
+  # ==========================================
+  e2e-test:
+    image: mcr.microsoft.com/playwright:v1.40.1-jammy
+    container_name: unifiedhealth-e2e-test
+    working_dir: /app
+    environment:
+      PLAYWRIGHT_BASE_URL: http://web-test:3000
+      API_URL: http://api-test:8080
+      CI: "true"
+    networks:
+      - test-network
+    depends_on:
+      web-test:
+        condition: service_healthy
+      api-test:
+        condition: service_healthy
+    volumes:
+      - ./apps/web:/app
+      - ./apps/web/e2e/test-results:/app/e2e/test-results
+    command: ["npx", "playwright", "test", "--reporter=json,html"]
+
+  # ==========================================
+  # Web Application Test Container
+  # ==========================================
+  web-test:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+      target: builder
+    container_name: unifiedhealth-web-test
+    environment:
+      NODE_ENV: test
+      NEXT_PUBLIC_API_URL: http://api-test:8080
+      PORT: 3000
+    ports:
+      - "3010:3000"
+    networks:
+      - test-network
+    depends_on:
+      api-test:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
+networks:
+  test-network:
+    driver: bridge
+    name: unifiedhealth-test-network
+
+# No persistent volumes - all test data is ephemeral

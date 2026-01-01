@@ -4,10 +4,14 @@
 # ============================================
 # This workflow runs on every PR and blocks merge if security checks fail.
 # It performs:
-# 1. Dependency audit
-# 2. SAST (Static Application Security Testing)
-# 3. Business logic abuse tests
-# 4. Security agent scan
+# 1. Dependency audit (pnpm audit)
+# 2. SAST - Static Application Security Testing (Semgrep, CodeQL)
+# 3. Secret scanning (Gitleaks)
+# 4. Container security scanning (Trivy)
+# 5. Infrastructure as Code scanning (Trivy, Checkov)
+# 6. DAST - Dynamic Application Security Testing (OWASP ZAP - on-demand)
+# 7. Business logic abuse tests
+# 8. Security agent scan
 # ============================================
 
 name: Security Check
@@ -252,6 +256,241 @@ jobs:
           exit 1
 
   # ==========================================
+  # Container Security Scanning (Trivy)
+  # ==========================================
+  container-scan:
+    name: Container Security Scan
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        service:
+          - api
+          - auth-service
+          - api-gateway
+          - telehealth-service
+          - pharmacy-service
+          - laboratory-service
+          - imaging-service
+          - mental-health-service
+          - chronic-care-service
+          - notification-service
+          - interoperability-service
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image for scanning
+        uses: docker/build-push-action@v6
+        with:
+          context: ./services/${{ matrix.service }}
+          push: false
+          load: true
+          tags: ${{ matrix.service }}:scan
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+        continue-on-error: true
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: '${{ matrix.service }}:scan'
+          format: 'sarif'
+          output: 'trivy-results-${{ matrix.service }}.sarif'
+          severity: 'CRITICAL,HIGH'
+          vuln-type: 'os,library'
+          ignore-unfixed: true
+        continue-on-error: true
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v4
+        if: always()
+        with:
+          sarif_file: 'trivy-results-${{ matrix.service }}.sarif'
+          category: 'trivy-${{ matrix.service }}'
+        continue-on-error: true
+
+      - name: Run Trivy for JSON report
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: '${{ matrix.service }}:scan'
+          format: 'json'
+          output: 'trivy-results-${{ matrix.service }}.json'
+          severity: 'CRITICAL,HIGH,MEDIUM'
+          vuln-type: 'os,library'
+        continue-on-error: true
+
+      - name: Upload Trivy JSON results
+        uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: trivy-results-${{ matrix.service }}
+          path: 'trivy-results-${{ matrix.service }}.json'
+          if-no-files-found: ignore
+
+  # ==========================================
+  # Infrastructure as Code Scanning
+  # ==========================================
+  iac-scan:
+    name: IaC Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Run Trivy IaC scanner on Terraform
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'config'
+          scan-ref: './infrastructure/terraform'
+          format: 'sarif'
+          output: 'trivy-iac-terraform.sarif'
+          severity: 'CRITICAL,HIGH,MEDIUM'
+        continue-on-error: true
+
+      - name: Run Trivy IaC scanner on Kubernetes
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'config'
+          scan-ref: './infrastructure/kubernetes'
+          format: 'sarif'
+          output: 'trivy-iac-k8s.sarif'
+          severity: 'CRITICAL,HIGH,MEDIUM'
+        continue-on-error: true
+
+      - name: Upload Terraform IaC results
+        uses: github/codeql-action/upload-sarif@v4
+        if: always()
+        with:
+          sarif_file: 'trivy-iac-terraform.sarif'
+          category: 'trivy-iac-terraform'
+        continue-on-error: true
+
+      - name: Upload Kubernetes IaC results
+        uses: github/codeql-action/upload-sarif@v4
+        if: always()
+        with:
+          sarif_file: 'trivy-iac-k8s.sarif'
+          category: 'trivy-iac-k8s'
+        continue-on-error: true
+
+      - name: Run Checkov for additional IaC checks
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: infrastructure/
+          framework: terraform,kubernetes
+          output_format: sarif
+          output_file_path: checkov-results.sarif
+          soft_fail: true
+        continue-on-error: true
+
+      - name: Upload Checkov results
+        uses: github/codeql-action/upload-sarif@v4
+        if: always()
+        with:
+          sarif_file: 'checkov-results.sarif'
+          category: 'checkov-iac'
+        continue-on-error: true
+
+  # ==========================================
+  # DAST - Dynamic Application Security Testing
+  # ==========================================
+  dast-scan:
+    name: DAST Scan (OWASP ZAP)
+    runs-on: ubuntu-latest
+    # Only run on manual trigger or scheduled builds, not on every PR
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+
+    services:
+      api:
+        image: node:20-alpine
+        ports:
+          - 8080:8080
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build and start API in background
+        run: |
+          cd services/api
+          pnpm build
+          DEMO_MODE=true node dist/index.js &
+          sleep 10
+        continue-on-error: true
+
+      - name: OWASP ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.14.0
+        with:
+          target: 'http://localhost:8080'
+          rules_file_name: '.zap/rules.tsv'
+          cmd_options: '-a -j'
+          allow_issue_writing: false
+        continue-on-error: true
+
+      - name: Upload ZAP Report
+        uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: zap-report
+          path: report_html.html
+          if-no-files-found: ignore
+
+      - name: Create ZAP Summary
+        if: always()
+        run: |
+          echo "## OWASP ZAP DAST Scan Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "DAST scanning completed. Review the uploaded artifact for detailed findings." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Note:** DAST scans are only run on manual triggers or scheduled builds." >> $GITHUB_STEP_SUMMARY
+
+  # ==========================================
+  # CodeQL Analysis
+  # ==========================================
+  codeql:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: javascript-typescript
+          queries: security-extended,security-and-quality
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v4
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "codeql-javascript"
+
+  # ==========================================
   # Type Check and Lint
   # ==========================================
   code-quality:
@@ -294,6 +533,9 @@ jobs:
       - security-agent
       - abuse-tests
       - code-quality
+      - container-scan
+      - iac-scan
+      - codeql
     if: always()
 
     steps:
@@ -305,6 +547,9 @@ jobs:
           echo "Security Agent: ${{ needs.security-agent.result }}"
           echo "Abuse Tests: ${{ needs.abuse-tests.result }}"
           echo "Code Quality: ${{ needs.code-quality.result }}"
+          echo "Container Scan: ${{ needs.container-scan.result }}"
+          echo "IaC Scan: ${{ needs.iac-scan.result }}"
+          echo "CodeQL: ${{ needs.codeql.result }}"
 
           # Critical checks that must pass
           if [ "${{ needs.security-agent.result }}" == "failure" ]; then
@@ -322,7 +567,12 @@ jobs:
             exit 1
           fi
 
-          echo "✅ All security checks passed!"
+          if [ "${{ needs.codeql.result }}" == "failure" ]; then
+            echo "::error::CodeQL analysis found security issues. Merge blocked."
+            exit 1
+          fi
+
+          echo "All security checks passed!"
 
       - name: Post summary to PR
         if: github.event_name == 'pull_request'
@@ -331,11 +581,14 @@ jobs:
           script: |
             const results = {
               'Dependency Audit': '${{ needs.dependency-audit.result }}',
-              'SAST Analysis': '${{ needs.sast.result }}',
-              'Secret Scanning': '${{ needs.secret-scan.result }}',
+              'SAST Analysis (Semgrep)': '${{ needs.sast.result }}',
+              'Secret Scanning (Gitleaks)': '${{ needs.secret-scan.result }}',
               'Security Agent': '${{ needs.security-agent.result }}',
               'Abuse Tests': '${{ needs.abuse-tests.result }}',
-              'Code Quality': '${{ needs.code-quality.result }}'
+              'Code Quality': '${{ needs.code-quality.result }}',
+              'Container Scanning (Trivy)': '${{ needs.container-scan.result }}',
+              'IaC Scanning': '${{ needs.iac-scan.result }}',
+              'CodeQL Analysis': '${{ needs.codeql.result }}'
             };
 
             let table = '| Check | Status |\n|-------|--------|\n';
@@ -350,5 +603,5 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: `## 🔐 Security Gate Results\n\n${table}\n\n${allPassed ? '✅ All checks passed!' : '⚠️ Some checks need attention.'}`
+              body: `## Security Gate Results\n\n${table}\n\n${allPassed ? 'All checks passed!' : 'Some checks need attention.'}`
             });

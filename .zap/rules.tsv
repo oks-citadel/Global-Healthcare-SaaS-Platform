@@ -1,0 +1,93 @@
+# OWASP ZAP Baseline Scan Rules Configuration
+# Format: <rule_id>	<action>	<rule_name>
+# Actions: IGNORE, WARN, FAIL
+
+# Informational rules - lower to WARN for baseline
+10015	WARN	Incomplete or No Cache-control and Pragma HTTP Header Set
+10017	WARN	Cross-Domain JavaScript Source File Inclusion
+10019	WARN	Content-Type Header Missing
+10020	WARN	X-Frame-Options Header Not Set
+10021	WARN	X-Content-Type-Options Header Missing
+10027	WARN	Information Disclosure - Suspicious Comments
+10028	WARN	Open Redirect
+10029	WARN	Cookie Poisoning
+10030	WARN	User Controllable Charset
+10031	WARN	User Controllable HTML Element Attribute (Potential XSS)
+10032	WARN	Viewstate Scanner
+10033	WARN	Directory Browsing
+10034	WARN	Heartbleed OpenSSL Vulnerability
+10035	WARN	Strict-Transport-Security Header Not Set
+10036	WARN	Server Leaks Version Information via "Server" HTTP Response Header Field
+10037	WARN	Server Leaks Information via "X-Powered-By" HTTP Response Header Field(s)
+10038	WARN	Content Security Policy (CSP) Header Not Set
+10039	WARN	X-Backend-Server Header Information Leak
+10040	WARN	Secure Pages Include Mixed Content
+10049	WARN	Storable and Cacheable Content
+10050	WARN	Retrieved from Cache
+10052	WARN	X-ChromeLogger-Data (XCOLD) Header Information Leak
+10054	WARN	Cookie without SameSite Attribute
+10055	WARN	CSP: Wildcard Directive
+10056	WARN	CSP: script-src unsafe-inline
+10057	WARN	Username Hash Found
+10061	WARN	X-AspNet-Version Response Header Scanner
+10062	WARN	PII Disclosure
+10063	WARN	Permissions Policy Header Not Set
+10096	WARN	Timestamp Disclosure
+10097	WARN	Hash Disclosure
+10098	WARN	Cross-Domain Misconfiguration
+10105	WARN	Weak Authentication Method
+10106	WARN	HTTP Only Site
+10107	WARN	Httpoxy - Proxy Header Misuse
+10108	WARN	Reverse Tabnabbing
+10109	WARN	Modern Web Application
+10110	WARN	Dangerous JS Functions
+10202	WARN	Absence of Anti-CSRF Tokens
+
+# Critical security issues - keep as FAIL
+40012	FAIL	Cross Site Scripting (Reflected)
+40013	FAIL	Session ID in URL Rewrite
+40014	FAIL	Cross Site Scripting (Persistent)
+40016	FAIL	Cross Site Scripting (Persistent) - Prime
+40017	FAIL	Cross Site Scripting (Persistent) - Spider
+40018	FAIL	SQL Injection
+40019	FAIL	SQL Injection - MySQL
+40020	FAIL	SQL Injection - Hypersonic SQL
+40021	FAIL	SQL Injection - Oracle
+40022	FAIL	SQL Injection - PostgreSQL
+40023	FAIL	Possible Username Enumeration
+40024	FAIL	SQL Injection - SQLite
+40025	FAIL	Proxy Disclosure
+40026	FAIL	Cross Site Scripting (DOM Based)
+40027	FAIL	SQL Injection - MsSQL
+40028	FAIL	ELMAH Information Leak
+40029	FAIL	Trace.axd Information Leak
+40032	FAIL	.htaccess Information Leak
+40034	FAIL	.env Information Leak
+40035	FAIL	Hidden File Finder
+40038	FAIL	Bypassing 403
+40039	FAIL	Web Cache Deception
+40040	FAIL	CORS Header
+40041	FAIL	File Upload
+40042	FAIL	Spring Actuator Information Leak
+40043	FAIL	Log4Shell
+90017	FAIL	XSLT Injection
+90018	FAIL	SQL Injection - Hypersonic SQL - Time Based
+90019	FAIL	SQL Injection - MsSQL - Time Based
+90020	FAIL	SQL Injection - MySQL - Time Based
+90021	FAIL	SQL Injection - Oracle - Time Based
+90022	FAIL	Application Error Disclosure
+90023	FAIL	XML External Entity Attack
+90024	FAIL	Generic Padding Oracle
+90025	FAIL	Expression Language Injection
+90026	FAIL	SOAP Action Spoofing
+90027	FAIL	Cookie Slack Detector
+90028	FAIL	Insecure HTTP Method
+90029	FAIL	SOAP XML Injection
+90030	FAIL	WSDL File Detection
+90033	FAIL	Loosely Scoped Cookie
+90034	FAIL	Cloud Metadata Potentially Exposed
+
+# Healthcare-specific considerations
+# These are especially important for HIPAA compliance
+10062	FAIL	PII Disclosure
+10202	FAIL	Absence of Anti-CSRF Tokens

@@ -1,0 +1,146 @@
+# Prometheus Alerting Rules - Latency
+# Global Healthcare SaaS Platform
+# Focus: High latency monitoring (P99 > 2s)
+
+groups:
+  # ==========================================
+  # Latency Alerts
+  # ==========================================
+  - name: latency
+    interval: 30s
+    rules:
+      # Warning: P95 latency exceeds 1 second
+      - alert: HighP95Latency
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(http_request_duration_seconds_bucket{namespace="unified-health"}[5m])) by (le, job)
+          ) > 1.0
+        for: 10m
+        labels:
+          severity: warning
+          category: latency
+          team: platform-sre
+        annotations:
+          summary: "High P95 latency on {{ $labels.job }}: {{ $value | printf \"%.2f\" }}s"
+          description: |
+            Service {{ $labels.job }} has P95 latency of {{ $value | printf "%.2f" }}s.
+            This exceeds the 1 second threshold and may impact user experience.
+          runbook_url: "https://runbooks.unifiedhealth.io/high-latency"
+          dashboard_url: "https://grafana.unifiedhealth.io/d/healthcare-platform-overview"
+
+      # Critical: P99 latency exceeds 2 seconds
+      - alert: CriticalP99Latency
+        expr: |
+          histogram_quantile(0.99,
+            sum(rate(http_request_duration_seconds_bucket{namespace="unified-health"}[5m])) by (le, job)
+          ) > 2.0
+        for: 5m
+        labels:
+          severity: critical
+          category: latency
+          team: platform-sre
+        annotations:
+          summary: "CRITICAL P99 latency on {{ $labels.job }}: {{ $value | printf \"%.2f\" }}s"
+          description: |
+            Service {{ $labels.job }} has P99 latency of {{ $value | printf "%.2f" }}s.
+            This exceeds the 2 second critical threshold and requires immediate attention.
+          runbook_url: "https://runbooks.unifiedhealth.io/critical-latency"
+
+      # Critical: P99 latency exceeds 5 seconds (severe)
+      - alert: SevereLatency
+        expr: |
+          histogram_quantile(0.99,
+            sum(rate(http_request_duration_seconds_bucket{namespace="unified-health"}[5m])) by (le, job)
+          ) > 5.0
+        for: 2m
+        labels:
+          severity: critical
+          category: latency
+          team: platform-sre
+          escalation: urgent
+        annotations:
+          summary: "SEVERE latency on {{ $labels.job }}: {{ $value | printf \"%.2f\" }}s"
+          description: |
+            Service {{ $labels.job }} has P99 latency of {{ $value | printf "%.2f" }}s.
+            This severe latency indicates a major performance issue.
+          runbook_url: "https://runbooks.unifiedhealth.io/severe-latency"
+
+      # Warning: Latency increasing trend
+      - alert: LatencyIncreasingTrend
+        expr: |
+          (
+            histogram_quantile(0.95,
+              sum(rate(http_request_duration_seconds_bucket{namespace="unified-health"}[5m])) by (le, job))
+            -
+            histogram_quantile(0.95,
+              sum(rate(http_request_duration_seconds_bucket{namespace="unified-health"}[30m] offset 30m)) by (le, job))
+          )
+          /
+          histogram_quantile(0.95,
+            sum(rate(http_request_duration_seconds_bucket{namespace="unified-health"}[30m] offset 30m)) by (le, job))
+          > 0.5
+        for: 15m
+        labels:
+          severity: warning
+          category: latency
+          team: platform-sre
+        annotations:
+          summary: "Latency increasing trend detected on {{ $labels.job }}"
+          description: |
+            Service {{ $labels.job }} shows a {{ $value | humanizePercentage }} increase in P95 latency
+            compared to 30 minutes ago. Investigate potential performance degradation.
+          runbook_url: "https://runbooks.unifiedhealth.io/latency-trend"
+
+      # Warning: Slow database queries
+      - alert: SlowDatabaseQueries
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(db_query_duration_seconds_bucket[5m])) by (le, operation)
+          ) > 0.5
+        for: 10m
+        labels:
+          severity: warning
+          category: database
+          team: platform-sre
+        annotations:
+          summary: "Slow database queries detected: {{ $labels.operation }}"
+          description: |
+            Database operation {{ $labels.operation }} has P95 latency of {{ $value | printf "%.2f" }}s.
+            This exceeds the 500ms threshold.
+          runbook_url: "https://runbooks.unifiedhealth.io/slow-queries"
+
+      # Critical: Very slow database queries
+      - alert: CriticalDatabaseLatency
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(db_query_duration_seconds_bucket[5m])) by (le, operation)
+          ) > 2.0
+        for: 5m
+        labels:
+          severity: critical
+          category: database
+          team: platform-sre
+        annotations:
+          summary: "Critical database latency: {{ $labels.operation }}"
+          description: |
+            Database operation {{ $labels.operation }} has P95 latency of {{ $value | printf "%.2f" }}s.
+            This may cause request timeouts.
+          runbook_url: "https://runbooks.unifiedhealth.io/critical-db-latency"
+
+      # Warning: External service latency
+      - alert: ExternalServiceLatency
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(external_service_duration_seconds_bucket[5m])) by (le, service)
+          ) > 5.0
+        for: 5m
+        labels:
+          severity: warning
+          category: external_services
+          team: platform-sre
+        annotations:
+          summary: "High external service latency: {{ $labels.service }}"
+          description: |
+            External service {{ $labels.service }} has P95 latency of {{ $value | printf "%.2f" }}s.
+            Consider implementing fallbacks or circuit breakers.
+          runbook_url: "https://runbooks.unifiedhealth.io/external-service-latency"

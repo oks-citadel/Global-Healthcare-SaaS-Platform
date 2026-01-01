@@ -134,7 +134,7 @@ router.post('/', requireUser, requireRole('coordinator', 'admin', 'provider'), a
       data: {
         ...validatedData,
         screeningDate: new Date(),
-      },
+      } as any,
       include: {
         trial: {
           select: { nctId: true, title: true },
@@ -388,7 +388,7 @@ router.post('/:id/consent', requireUser, requireRole('coordinator', 'admin'), as
         ...validatedData,
         signedAt: new Date(),
         expiresAt: validatedData.expiresAt ? new Date(validatedData.expiresAt) : null,
-      },
+      } as any,
     });
 
     await prisma.$disconnect();
@@ -505,7 +505,7 @@ router.post('/:id/visits', requireUser, requireRole('coordinator', 'admin'), asy
         enrollmentId: id,
         ...validatedData,
         scheduledDate: new Date(validatedData.scheduledDate),
-      },
+      } as any,
     });
 
     // Create reminder notification

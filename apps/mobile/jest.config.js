@@ -21,4 +21,15 @@ module.exports = {
   globals: {
     localStorage: {},
   },
+  collectCoverage: true,
+  coverageDirectory: "coverage",
+  coverageReporters: ["text", "lcov", "json", "html"],
+  coverageThreshold: {
+    global: {
+      statements: 60,
+      branches: 50,
+      functions: 60,
+      lines: 60,
+    },
+  },
 };

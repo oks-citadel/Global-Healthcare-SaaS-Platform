@@ -18,7 +18,8 @@
       "Bash(pnpm typecheck:*)",
       "Bash(npx prisma generate:*)",
       "Bash(grep:*)",
-      "Bash(pnpm turbo run typecheck:*)"
+      "Bash(pnpm turbo run typecheck:*)",
+      "Bash(xargs:*)"
     ]
   }
 }

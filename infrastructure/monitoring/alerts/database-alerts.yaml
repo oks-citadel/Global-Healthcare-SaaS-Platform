@@ -1,0 +1,227 @@
+# Prometheus Alerting Rules - Database
+# Global Healthcare SaaS Platform
+# Focus: Database connection issues and health
+
+groups:
+  # ==========================================
+  # Database Health Alerts
+  # ==========================================
+  - name: database_health
+    interval: 30s
+    rules:
+      # Critical: Database is down
+      - alert: DatabaseDown
+        expr: up{job="postgres-exporter"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          category: database
+          team: platform-sre
+          escalation: urgent
+        annotations:
+          summary: "PostgreSQL database is DOWN"
+          description: |
+            PostgreSQL database is not responding.
+            This is a critical issue affecting all services.
+          runbook_url: "https://runbooks.unifiedhealth.io/database-down"
+
+      # Warning: Connection pool under pressure
+      - alert: DatabaseConnectionPoolPressure
+        expr: db_connection_pool_waiting > 5
+        for: 5m
+        labels:
+          severity: warning
+          category: database
+          team: platform-sre
+        annotations:
+          summary: "Database connection pool under pressure"
+          description: |
+            {{ $value }} requests are waiting for database connections.
+            Consider increasing pool size or optimizing queries.
+          runbook_url: "https://runbooks.unifiedhealth.io/connection-pool-pressure"
+
+      # Critical: Connection pool exhausted
+      - alert: DatabaseConnectionPoolExhausted
+        expr: db_connection_pool_waiting > 10
+        for: 2m
+        labels:
+          severity: critical
+          category: database
+          team: platform-sre
+        annotations:
+          summary: "Database connection pool EXHAUSTED"
+          description: |
+            {{ $value }} requests waiting for connections.
+            Connection pool is exhausted. Immediate action required.
+          runbook_url: "https://runbooks.unifiedhealth.io/connection-pool-exhausted"
+
+      # Warning: High database connection count
+      - alert: HighDatabaseConnections
+        expr: |
+          pg_stat_database_numbackends{datname="unified_health"} > 80
+        for: 10m
+        labels:
+          severity: warning
+          category: database
+          team: platform-sre
+        annotations:
+          summary: "High number of database connections"
+          description: |
+            Database has {{ $value }} active connections.
+            This is approaching the connection limit.
+          runbook_url: "https://runbooks.unifiedhealth.io/high-db-connections"
+
+      # Critical: Database connections near limit
+      - alert: DatabaseConnectionsNearLimit
+        expr: |
+          pg_stat_database_numbackends{datname="unified_health"} > 95
+        for: 5m
+        labels:
+          severity: critical
+          category: database
+          team: platform-sre
+        annotations:
+          summary: "Database connections near limit"
+          description: |
+            Database has {{ $value }} active connections.
+            Connection limit is nearly reached.
+          runbook_url: "https://runbooks.unifiedhealth.io/db-connection-limit"
+
+      # Warning: Database connection errors
+      - alert: DatabaseConnectionErrors
+        expr: |
+          increase(db_connection_errors_total[5m]) > 5
+        for: 5m
+        labels:
+          severity: warning
+          category: database
+          team: platform-sre
+        annotations:
+          summary: "Database connection errors detected"
+          description: |
+            {{ $value }} database connection errors in the last 5 minutes.
+            Check database health and network connectivity.
+          runbook_url: "https://runbooks.unifiedhealth.io/db-connection-errors"
+
+      # Warning: High database query error rate
+      - alert: HighDatabaseErrorRate
+        expr: |
+          (
+            sum(rate(db_query_duration_seconds_count{status="error"}[5m]))
+            /
+            sum(rate(db_query_duration_seconds_count[5m]))
+          ) * 100 > 1
+        for: 5m
+        labels:
+          severity: warning
+          category: database
+          team: platform-sre
+        annotations:
+          summary: "High database query error rate"
+          description: |
+            Database query error rate is {{ $value | printf "%.2f" }}%.
+            Check for query issues or database problems.
+          runbook_url: "https://runbooks.unifiedhealth.io/db-query-errors"
+
+      # Warning: Low database cache hit ratio
+      - alert: LowDatabaseCacheHitRatio
+        expr: |
+          (
+            rate(pg_stat_database_blks_hit{datname="unified_health"}[5m])
+            /
+            (rate(pg_stat_database_blks_hit{datname="unified_health"}[5m]) + rate(pg_stat_database_blks_read{datname="unified_health"}[5m]))
+          ) < 0.9
+        for: 15m
+        labels:
+          severity: warning
+          category: database
+          team: platform-sre
+        annotations:
+          summary: "Low database cache hit ratio"
+          description: |
+            Database cache hit ratio is {{ $value | humanizePercentage }}.
+            This may indicate insufficient shared buffers.
+          runbook_url: "https://runbooks.unifiedhealth.io/low-cache-hit"
+
+      # Warning: Database disk space
+      - alert: DatabaseDiskSpaceWarning
+        expr: |
+          (pg_database_size_bytes{datname="unified_health"} / 1024 / 1024 / 1024) > 40
+        for: 5m
+        labels:
+          severity: warning
+          category: database
+          team: platform-sre
+        annotations:
+          summary: "Database disk space warning"
+          description: |
+            Database size is {{ $value | printf "%.1f" }} GB.
+            Consider archiving old data or expanding storage.
+          runbook_url: "https://runbooks.unifiedhealth.io/db-disk-space"
+
+      # Critical: Database disk space critical
+      - alert: DatabaseDiskSpaceCritical
+        expr: |
+          (pg_database_size_bytes{datname="unified_health"} / 1024 / 1024 / 1024) > 45
+        for: 5m
+        labels:
+          severity: critical
+          category: database
+          team: platform-sre
+        annotations:
+          summary: "Database disk space CRITICAL"
+          description: |
+            Database size is {{ $value | printf "%.1f" }} GB.
+            Immediate action required to prevent outage.
+          runbook_url: "https://runbooks.unifiedhealth.io/db-disk-critical"
+
+      # Warning: Database replication lag
+      - alert: DatabaseReplicationLag
+        expr: |
+          pg_replication_lag > 30
+        for: 5m
+        labels:
+          severity: warning
+          category: database
+          team: platform-sre
+        annotations:
+          summary: "Database replication lag detected"
+          description: |
+            Replication lag is {{ $value }} seconds.
+            Standby database may have stale data.
+          runbook_url: "https://runbooks.unifiedhealth.io/replication-lag"
+
+      # Warning: Redis is down
+      - alert: RedisDown
+        expr: up{job="redis-exporter"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          category: cache
+          team: platform-sre
+        annotations:
+          summary: "Redis cache is DOWN"
+          description: |
+            Redis is not responding. This will impact application performance
+            and may cause session management issues.
+          runbook_url: "https://runbooks.unifiedhealth.io/redis-down"
+
+      # Warning: Low cache hit rate
+      - alert: LowCacheHitRate
+        expr: |
+          (
+            sum(rate(cache_hits_total[5m]))
+            /
+            (sum(rate(cache_hits_total[5m])) + sum(rate(cache_misses_total[5m])))
+          ) * 100 < 70
+        for: 15m
+        labels:
+          severity: warning
+          category: cache
+          team: platform-sre
+        annotations:
+          summary: "Low cache hit rate"
+          description: |
+            Cache hit rate is {{ $value | printf "%.1f" }}%.
+            This may indicate cache invalidation issues or cold cache.
+          runbook_url: "https://runbooks.unifiedhealth.io/low-cache-hit-rate"

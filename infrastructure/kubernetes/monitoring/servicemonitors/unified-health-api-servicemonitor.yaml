@@ -1,0 +1,37 @@
+# ServiceMonitor for Unified Health API Service
+# Main backend API service metrics collection
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: unified-health-api
+  namespace: unified-health
+  labels:
+    app: unified-health-api
+    component: monitoring
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: unified-health-api
+  namespaceSelector:
+    matchNames:
+      - unified-health
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s
+      scrapeTimeout: 10s
+      scheme: http
+      honorLabels: true
+      relabelings:
+        - sourceLabels: [__meta_kubernetes_pod_name]
+          targetLabel: pod
+        - sourceLabels: [__meta_kubernetes_namespace]
+          targetLabel: namespace
+        - sourceLabels: [__meta_kubernetes_pod_label_version]
+          targetLabel: version
+      metricRelabelings:
+        # Keep important application metrics
+        - sourceLabels: [__name__]
+          regex: 'http_.*|db_.*|cache_.*|appointments_.*|patients_.*|consultations_.*'
+          action: keep

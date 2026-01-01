@@ -13,7 +13,7 @@ export default defineConfig({
     ],
     coverage: {
       provider: "v8",
-      reporter: ["text", "json", "html"],
+      reporter: ["text", "json", "html", "lcov"],
       exclude: [
         "node_modules/",
         "e2e/",
@@ -21,6 +21,12 @@ export default defineConfig({
         "**/*.config.*",
         "**/*.spec.*",
       ],
+      thresholds: {
+        statements: 60,
+        branches: 50,
+        functions: 60,
+        lines: 60,
+      },
     },
   },
 });

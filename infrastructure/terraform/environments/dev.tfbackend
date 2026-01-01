@@ -1,15 +1,26 @@
 # ============================================
 # Development Environment Backend Configuration
 # ============================================
-# Azure Storage backend for Terraform state management
-# Enables state locking, versioning, and team collaboration
+# AWS S3 backend for Terraform state management
+# Enables state locking via DynamoDB, versioning, and team collaboration
+#
+# Usage: terraform init -backend-config=environments/dev.tfbackend
 
-# Storage Account Configuration
-# Replace these values with your actual Azure Storage account details
-resource_group_name  = "unified-health-tfstate-rg"
-storage_account_name = "unifiedhealthtfstatedev"
-container_name       = "tfstate-dev"
-key                  = "dev/terraform.tfstate"
+# S3 Bucket Configuration
+# Replace these values with your actual S3 bucket details
+bucket         = "unified-health-terraform-state-dev-placeholder"
+key            = "env/dev/terraform.tfstate"
+region         = "us-east-1"
 
-# State Locking
-# Uses Azure Storage blob leases for state locking to prevent concurrent modifications
+# Encryption
+encrypt        = true
+
+# DynamoDB table for state locking
+# Prevents concurrent modifications to the state
+dynamodb_table = "unified-health-terraform-locks-dev"
+
+# Optional: Use KMS key for additional encryption
+# kms_key_id   = "alias/unified-health-terraform-dev"
+
+# Optional: Enable assume role for cross-account access
+# role_arn     = "arn:aws:iam::ACCOUNT_ID:role/TerraformStateAccess"

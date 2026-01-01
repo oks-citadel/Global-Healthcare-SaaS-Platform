@@ -1,15 +1,25 @@
 # ============================================
 # Staging Environment Backend Configuration
 # ============================================
-# Azure Storage backend for Terraform state management
-# Separate state from dev/prod for environment isolation
+# AWS S3 backend for Terraform state management
+# Staging uses similar security controls as production
+#
+# Usage: terraform init -backend-config=environments/staging.tfbackend
 
-# Storage Account Configuration
-# Replace these values with your actual Azure Storage account details
-resource_group_name  = "unified-health-tfstate-rg"
-storage_account_name = "unifiedhealthtfstatestg"
-container_name       = "tfstate-staging"
-key                  = "staging/terraform.tfstate"
+# S3 Bucket Configuration
+# Replace these values with your actual S3 bucket details
+bucket         = "unified-health-terraform-state-staging-placeholder"
+key            = "env/staging/terraform.tfstate"
+region         = "us-east-1"
 
-# State Locking
-# Uses Azure Storage blob leases for state locking to prevent concurrent modifications
+# Encryption
+encrypt        = true
+
+# DynamoDB table for state locking
+dynamodb_table = "unified-health-terraform-locks-staging"
+
+# Optional: Use KMS key for additional encryption
+# kms_key_id   = "alias/unified-health-terraform-staging"
+
+# Optional: Enable assume role for cross-account access
+# role_arn     = "arn:aws:iam::ACCOUNT_ID:role/TerraformStateAccess"

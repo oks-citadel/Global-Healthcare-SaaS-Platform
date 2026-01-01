@@ -1,0 +1,36 @@
+# ServiceMonitor for Chronic Care Service
+# Chronic disease management service metrics
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: chronic-care-service
+  namespace: unified-health
+  labels:
+    app: chronic-care-service
+    component: monitoring
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: chronic-care-service
+  namespaceSelector:
+    matchNames:
+      - unified-health
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s
+      scrapeTimeout: 10s
+      scheme: http
+      honorLabels: true
+      relabelings:
+        - sourceLabels: [__meta_kubernetes_pod_name]
+          targetLabel: pod
+        - sourceLabels: [__meta_kubernetes_namespace]
+          targetLabel: namespace
+        - sourceLabels: [__meta_kubernetes_pod_label_version]
+          targetLabel: version
+      metricRelabelings:
+        - sourceLabels: [__name__]
+          regex: 'http_.*|care_plan_.*|health_monitoring_.*|patient_.*'
+          action: keep

@@ -1,0 +1,36 @@
+# ServiceMonitor for Mental Health Service
+# Mental health and wellness service metrics
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: mental-health-service
+  namespace: unified-health
+  labels:
+    app: mental-health-service
+    component: monitoring
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: mental-health-service
+  namespaceSelector:
+    matchNames:
+      - unified-health
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s
+      scrapeTimeout: 10s
+      scheme: http
+      honorLabels: true
+      relabelings:
+        - sourceLabels: [__meta_kubernetes_pod_name]
+          targetLabel: pod
+        - sourceLabels: [__meta_kubernetes_namespace]
+          targetLabel: namespace
+        - sourceLabels: [__meta_kubernetes_pod_label_version]
+          targetLabel: version
+      metricRelabelings:
+        - sourceLabels: [__name__]
+          regex: 'http_.*|therapy_.*|assessment_.*|session_.*'
+          action: keep

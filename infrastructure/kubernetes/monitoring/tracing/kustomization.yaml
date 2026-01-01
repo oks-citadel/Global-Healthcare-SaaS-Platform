@@ -1,0 +1,15 @@
+# Kustomization for Distributed Tracing components
+# Includes Jaeger and OpenTelemetry Collector
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: tracing
+
+resources:
+  - jaeger-deployment.yaml
+  - opentelemetry-collector.yaml
+
+commonLabels:
+  team: platform-sre
+  environment: production
+  app.kubernetes.io/part-of: unified-health

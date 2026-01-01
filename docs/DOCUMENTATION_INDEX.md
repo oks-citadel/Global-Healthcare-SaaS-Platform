@@ -33,7 +33,14 @@ This comprehensive documentation covers all aspects of the UnifiedHealth Global 
 
 ### Integration & Setup
 - **[API Setup Guide](../API_SETUP.md)** - API service configuration and setup
+- **[API Versioning Strategy](./API_VERSIONING.md)** - API versioning guidelines and lifecycle
 - **[OpenAPI Specification](../services/api/openapi.yaml)** - Complete OpenAPI 3.0 spec
+
+### Service-Level OpenAPI Specs
+- **[API Gateway OpenAPI](../services/api-gateway/openapi.yaml)** - Gateway routing and proxy documentation
+- **[Auth Service OpenAPI](../services/auth-service/openapi.yaml)** - Authentication and MFA endpoints
+- **[Notification Service OpenAPI](../services/notification-service/openapi.yaml)** - Notification and template management
+- **[Telehealth Service OpenAPI](../services/telehealth-service/openapi.yaml)** - Appointments and virtual visits
 
 ### Specialized Features
 - **[Stripe Integration](../STRIPE_INTEGRATION.md)** - Payment processing setup
@@ -54,6 +61,12 @@ This comprehensive documentation covers all aspects of the UnifiedHealth Global 
 - **[Service Dependencies](./architecture/SERVICE_DEPENDENCIES.md)** - Service dependency map and integration points
 - **[Data Models](./architecture/DATA_MODELS.md)** - Database schemas and data architecture
 - **[System Design](./architecture/SYSTEM_DESIGN.md)** - Detailed design decisions and patterns
+
+### Architecture Decision Records (ADRs)
+- **[ADR Index](./adr/README.md)** - Index of all architecture decisions
+- **[ADR-001: Microservices Architecture](./adr/ADR-001-microservices-architecture.md)** - Microservices adoption rationale
+- **[ADR-002: Authentication Strategy](./adr/ADR-002-authentication-strategy.md)** - JWT-based authentication design
+- **[ADR-003: Database per Service](./adr/ADR-003-database-per-service.md)** - Data isolation patterns
 
 ---
 
@@ -112,6 +125,11 @@ This comprehensive documentation covers all aspects of the UnifiedHealth Global 
 ### Advanced Operations
 - **[Monitoring Implementation](../MONITORING_IMPLEMENTATION_SUMMARY.md)** - Monitoring stack setup
 - **[Database Administration](../services/api/DATABASE_ADMIN_SUMMARY.md)** - Database management procedures
+
+### Operational Runbooks
+- **[Incident Response Runbook](../infrastructure/runbooks/INCIDENT_RESPONSE.md)** - Incident management procedures
+- **[Service Restart Runbook](../infrastructure/runbooks/SERVICE_RESTART.md)** - Safe service restart procedures
+- **[Database Backup & Restore](../infrastructure/runbooks/DATABASE_BACKUP_RESTORE.md)** - Backup and recovery procedures
 
 ---
 
@@ -244,9 +262,9 @@ This comprehensive documentation covers all aspects of the UnifiedHealth Global 
 
 ## Documentation Statistics
 
-**Total Documents:** 50+
-**Categories:** 9
-**Last Updated:** 2025-12-17
+**Total Documents:** 60+
+**Categories:** 10
+**Last Updated:** 2025-12-31
 **Platform Version:** 1.0.0
 
 ---
