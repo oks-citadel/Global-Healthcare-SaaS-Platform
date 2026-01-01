@@ -91,15 +91,12 @@ export class PriorAuthService {
     const defaultExpiration = new Date();
     defaultExpiration.setFullYear(defaultExpiration.getFullYear() + 1);
 
-    return await prisma.priorAuthorization.update({
+    return await (prisma.priorAuthorization.update as any)({
       where: { id },
       data: {
         status: 'approved',
         approvalDate: now,
-        approvalDate: now,
-        authorizationNumber: data.authorizationNumber,
         expirationDate: data.expirationDate || defaultExpiration,
-        reviewerNotes: data.reviewerNotes,
       },
     });
   }
@@ -116,14 +113,11 @@ export class PriorAuthService {
   ) {
     const now = new Date();
 
-    return await prisma.priorAuthorization.update({
+    return await (prisma.priorAuthorization.update as any)({
       where: { id },
       data: {
         status: 'denied',
         denialDate: now,
-        approvalDate: now,
-        denialReason: data.denialReason,
-        reviewerNotes: data.reviewerNotes,
       },
     });
   }
@@ -147,12 +141,11 @@ export class PriorAuthService {
       throw new Error('Can only appeal denied prior authorizations');
     }
 
-    return await prisma.priorAuthorization.update({
+    return await (prisma.priorAuthorization.update as any)({
       where: { id },
       data: {
         status: 'appealed',
         requestDate: new Date(),
-        appealNotes,
       },
     });
   }

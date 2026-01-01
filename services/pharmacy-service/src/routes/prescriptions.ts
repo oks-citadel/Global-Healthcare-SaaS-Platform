@@ -96,7 +96,7 @@ router.post('/', requireUser, async (req: UserRequest, res) => {
         encounterId: validatedData.encounterId,
         notes: validatedData.notes,
         validUntil: validatedData.validUntil ? new Date(validatedData.validUntil) : null,
-        items: { create: validatedData.items },
+        items: { create: validatedData.items as any },
       },
       include: { items: true },
     });

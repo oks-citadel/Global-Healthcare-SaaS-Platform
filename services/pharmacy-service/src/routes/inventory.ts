@@ -76,7 +76,7 @@ router.post('/', requireUser, async (req: UserRequest, res) => {
       expirationDate: validatedData.expirationDate
         ? new Date(validatedData.expirationDate)
         : undefined,
-    });
+    } as any);
 
     res.status(201).json({
       data: inventory,

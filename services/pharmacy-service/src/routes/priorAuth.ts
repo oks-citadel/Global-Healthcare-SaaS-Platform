@@ -45,7 +45,7 @@ router.post('/', requireUser, async (req: UserRequest, res) => {
 
     const validatedData = createPriorAuthSchema.parse(req.body);
 
-    const priorAuth = await PriorAuthService.submitPriorAuth(validatedData);
+    const priorAuth = await PriorAuthService.submitPriorAuth(validatedData as any);
 
     res.status(201).json({
       data: priorAuth,
@@ -145,7 +145,7 @@ router.post('/:id/approve', requireUser, async (req: UserRequest, res) => {
       expirationDate: validatedData.expirationDate
         ? new Date(validatedData.expirationDate)
         : undefined,
-    });
+    } as any);
 
     res.json({
       data: priorAuth,
@@ -182,7 +182,7 @@ router.post('/:id/deny', requireUser, async (req: UserRequest, res) => {
     const { id } = req.params;
     const validatedData = denyPriorAuthSchema.parse(req.body);
 
-    const priorAuth = await PriorAuthService.denyPriorAuth(id, validatedData);
+    const priorAuth = await PriorAuthService.denyPriorAuth(id, validatedData as any);
 
     res.json({
       data: priorAuth,

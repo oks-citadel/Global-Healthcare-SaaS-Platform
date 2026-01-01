@@ -50,7 +50,7 @@ router.post('/clock-in', requireUser, requireCaregiver, async (req: UserRequest,
       caregiverId: caregiver.id,
       verificationMethod: validatedData.verificationMethod || 'gps',
       ipAddress: req.ip,
-    });
+    } as any);
 
     res.json({
       data: result,
@@ -86,7 +86,7 @@ router.post('/clock-out', requireUser, requireCaregiver, async (req: UserRequest
       caregiverId: caregiver.id,
       verificationMethod: validatedData.verificationMethod || 'gps',
       ipAddress: req.ip,
-    });
+    } as any);
 
     res.json({
       data: result,
@@ -109,7 +109,7 @@ router.post('/location-update', requireUser, requireCaregiver, async (req: UserR
 
     const validatedLocation = locationSchema.parse(location);
 
-    const record = await evvService.recordLocationUpdate(visitId, validatedLocation, deviceId);
+    const record = await evvService.recordLocationUpdate(visitId, validatedLocation as any, deviceId);
 
     res.json({ data: record, message: 'Location recorded' });
   } catch (error) {
@@ -127,7 +127,7 @@ router.post('/signature/:visitId', requireUser, requireCaregiver, async (req: Us
   try {
     const validatedData = signatureSchema.parse(req.body);
 
-    const record = await evvService.captureSignature(req.params.visitId, validatedData);
+    const record = await evvService.captureSignature(req.params.visitId, validatedData as any);
 
     res.json({ data: record, message: 'Signature captured successfully' });
   } catch (error) {
@@ -145,7 +145,7 @@ router.post('/verify-location/:visitId', requireUser, async (req: UserRequest, r
   try {
     const validatedLocation = locationSchema.parse(req.body);
 
-    const verification = await evvService.verifyLocation(req.params.visitId, validatedLocation);
+    const verification = await evvService.verifyLocation(req.params.visitId, validatedLocation as any);
 
     res.json({ data: verification });
   } catch (error) {

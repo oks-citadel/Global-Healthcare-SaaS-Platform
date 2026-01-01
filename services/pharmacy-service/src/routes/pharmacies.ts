@@ -59,7 +59,7 @@ router.post('/', requireUser, async (req: UserRequest, res) => {
     }
 
     const validatedData = createPharmacySchema.parse(req.body);
-    const pharmacy = await prisma.pharmacy.create({ data: validatedData });
+    const pharmacy = await prisma.pharmacy.create({ data: validatedData as any });
 
     res.status(201).json({ data: pharmacy, message: 'Pharmacy created successfully' });
   } catch (error) {

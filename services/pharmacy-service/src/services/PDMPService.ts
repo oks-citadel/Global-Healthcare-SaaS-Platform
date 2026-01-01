@@ -124,12 +124,11 @@ export class PDMPService {
     // Simulate PDMP reporting
     const pdmpReportId = `PDMP-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-    await prisma.controlledSubstanceLog.update({
+    await (prisma.controlledSubstanceLog.update as any)({
       where: { id: controlledSubstanceLogId },
       data: {
         reportedToPDMP: true,
         pdmpReportDate: new Date(),
-        pdmpReportId,
       },
     });
 

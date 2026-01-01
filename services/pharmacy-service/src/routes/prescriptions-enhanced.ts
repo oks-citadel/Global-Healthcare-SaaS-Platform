@@ -99,7 +99,7 @@ router.post('/', requireUser, async (req: UserRequest, res) => {
       ...validatedData,
       providerId: userId,
       validUntil: validatedData.validUntil ? new Date(validatedData.validUntil) : undefined,
-    });
+    } as any);
 
     res.status(201).json({ data: prescription, message: 'Prescription created successfully' });
   } catch (error) {

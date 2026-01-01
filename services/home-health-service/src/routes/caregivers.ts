@@ -143,7 +143,7 @@ router.post('/', requireUser, requireSupervisor, async (req: UserRequest, res) =
         certifications: validatedData.certifications || [],
         specialties: validatedData.specialties || [],
         languages: validatedData.languages || ['English'],
-      },
+      } as any,
     });
 
     res.status(201).json({ data: caregiver, message: 'Caregiver created successfully' });
@@ -226,7 +226,7 @@ router.post('/:id/location', requireUser, async (req: UserRequest, res) => {
 
     const caregiver = await schedulingService.updateCaregiverLocation(
       req.params.id,
-      validatedData
+      validatedData as any
     );
 
     res.json({

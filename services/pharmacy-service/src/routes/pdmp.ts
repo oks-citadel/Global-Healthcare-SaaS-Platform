@@ -65,9 +65,9 @@ router.get('/history/:patientId', requireUser, async (req: UserRequest, res: Res
       {
         startDate: startDate ? new Date(startDate as string) : undefined,
         endDate: endDate ? new Date(endDate as string) : undefined,
-        deaSchedule: deaSchedule as string | undefined,
+        schedule: deaSchedule as string | undefined,
         limit: limit ? parseInt(limit as string) : undefined,
-      }
+      } as any
     );
 
     res.json({

@@ -62,11 +62,11 @@ router.get('/', requireUser, async (req: UserRequest, res: Response) => {
     }
 
     if (therapeuticClass) {
-      where.therapeuticClass = therapeuticClass;
+      (where as any).therapeuticClass = therapeuticClass;
     }
 
     if (isFormulary !== undefined) {
-      where.isFormulary = isFormulary === 'true';
+      (where as any).isFormulary = isFormulary === 'true';
     }
 
     if (isControlled !== undefined) {
@@ -74,7 +74,7 @@ router.get('/', requireUser, async (req: UserRequest, res: Response) => {
     }
 
     if (deaSchedule) {
-      where.deaSchedule = deaSchedule;
+      (where as any).deaSchedule = deaSchedule;
     }
 
     if (requiresPriorAuth !== undefined) {
@@ -157,7 +157,7 @@ router.post('/', requireUser, async (req: UserRequest, res: Response) => {
     const validatedData = addMedicationSchema.parse(req.body);
 
     const medication = await prisma.medication.create({
-      data: validatedData,
+      data: validatedData as any,
     });
 
     res.status(201).json({
@@ -291,11 +291,11 @@ router.get('/controlled-substances', requireUser, async (req: UserRequest, res: 
     };
 
     if (deaSchedule) {
-      where.deaSchedule = deaSchedule;
+      (where as any).deaSchedule = deaSchedule;
     }
 
     const medications = await prisma.medication.findMany({
-      where,
+      where: where as any,
       orderBy: { name: 'asc' },
     });
 
@@ -318,15 +318,15 @@ router.get('/controlled-substances', requireUser, async (req: UserRequest, res: 
  */
 router.get('/therapeutic-classes', requireUser, async (req: UserRequest, res: Response) => {
   try {
-    const medications = await prisma.medication.findMany({
+    const medications = await (prisma.medication.findMany as any)({
       where: { isActive: true },
       select: { therapeuticClass: true },
       distinct: ['therapeuticClass'],
     });
 
     const classes = medications
-      .map((m) => m.therapeuticClass)
-      .filter((c): c is string => !!c)
+      .map((m: any) => m.therapeuticClass)
+      .filter((c: any): c is string => !!c)
       .sort();
 
     res.json({

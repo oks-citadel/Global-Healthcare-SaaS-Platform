@@ -160,7 +160,7 @@ router.post('/', requireUser, async (req: UserRequest, res) => {
     const visit = await visitService.createVisit({
       ...validatedData,
       scheduledDate: new Date(validatedData.scheduledDate),
-    });
+    } as any);
 
     res.status(201).json({ data: visit, message: 'Visit created successfully' });
   } catch (error) {
@@ -199,7 +199,7 @@ router.patch('/:id', requireUser, async (req: UserRequest, res) => {
 router.post('/:id/start', requireUser, requireCaregiver, async (req: UserRequest, res) => {
   try {
     const validatedData = locationSchema.parse(req.body);
-    const visit = await visitService.startVisit(req.params.id, validatedData);
+    const visit = await visitService.startVisit(req.params.id, validatedData as any);
     res.json({ data: visit, message: 'Visit started successfully' });
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -215,7 +215,7 @@ router.post('/:id/start', requireUser, requireCaregiver, async (req: UserRequest
 router.post('/:id/complete', requireUser, requireCaregiver, async (req: UserRequest, res) => {
   try {
     const validatedData = completeVisitSchema.parse(req.body);
-    const visit = await visitService.completeVisit(req.params.id, validatedData);
+    const visit = await visitService.completeVisit(req.params.id, validatedData as any);
     res.json({ data: visit, message: 'Visit completed successfully' });
   } catch (error) {
     if (error instanceof z.ZodError) {

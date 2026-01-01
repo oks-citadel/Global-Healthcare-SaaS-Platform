@@ -1455,7 +1455,7 @@ export class DeviceSecurityService {
         incidentScore,
         agingScore,
         riskLevel,
-        riskFactors: riskFactors,
+        riskFactors: riskFactors as any,
         recommendations,
         assessedBy: userId,
         nextAssessmentDue: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days

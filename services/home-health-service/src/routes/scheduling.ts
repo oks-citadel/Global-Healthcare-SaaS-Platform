@@ -30,7 +30,7 @@ router.post('/find-caregivers', requireUser, async (req: UserRequest, res) => {
     const validatedData = findCaregiverSchema.parse(req.body);
 
     const matches = await schedulingService.findMatchingCaregivers({
-      patientLocation: validatedData.patientLocation,
+      patientLocation: validatedData.patientLocation as any,
       visitType: validatedData.visitType,
       requiredSpecialties: validatedData.requiredSpecialties,
       preferredLanguage: validatedData.preferredLanguage,

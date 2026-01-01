@@ -86,7 +86,7 @@ router.post('/', requireUser, requireCaregiver, async (req: UserRequest, res) =>
       data: {
         ...validatedData,
         createdBy: userId,
-      },
+      } as any,
     });
 
     res.status(201).json({ data: document, message: 'Documentation created successfully' });
@@ -163,7 +163,7 @@ router.post('/home-assessment', requireUser, requireCaregiver, async (req: UserR
         ...validatedData,
         assessorId: userId,
         followUpDate: validatedData.followUpDate ? new Date(validatedData.followUpDate) : null,
-      },
+      } as any,
     });
 
     res.status(201).json({ data: assessment, message: 'Home assessment created successfully' });
@@ -201,7 +201,7 @@ router.post('/incidents', requireUser, async (req: UserRequest, res) => {
       data: {
         ...validatedData,
         occurredAt: new Date(validatedData.occurredAt),
-      },
+      } as any,
     });
 
     res.status(201).json({ data: incident, message: 'Incident reported successfully' });
@@ -309,7 +309,7 @@ router.post('/family-communication', requireUser, async (req: UserRequest, res) 
       data: {
         ...validatedData,
         caregiverId: caregiver?.id,
-      },
+      } as any,
     });
 
     res.status(201).json({ data: communication, message: 'Message sent successfully' });

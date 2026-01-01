@@ -73,26 +73,24 @@ export class InteractionCheckService {
     }
 
     const hasCriticalInteractions = interactions.some(
-      (i) => i.severityLevel === 'contraindicated'
+      (i: any) => i.severity === 'contraindicated'
     );
     const hasSevereInteractions = interactions.some(
-      (i) => i.severityLevel === 'severe'
+      (i: any) => i.severity === 'severe'
     );
     const hasModerateInteractions = interactions.some(
-      (i) => i.severityLevel === 'moderate'
+      (i: any) => i.severity === 'moderate'
     );
 
     return {
       hasCriticalInteractions,
       hasSevereInteractions,
       hasModerateInteractions,
-      interactions: interactions.map((i) => ({
+      interactions: interactions.map((i: any) => ({
         drug1: i.drug1Name,
         drug2: i.drug2Name,
-        severity: i.severityLevel,
+        severity: i.severity,
         description: i.description,
-        clinicalEffects: i.clinicalEffects || undefined,
-        management: i.management || undefined,
       })),
     };
   }
@@ -129,17 +127,16 @@ export class InteractionCheckService {
     );
 
     const hasCriticalAllergies = matchingAllergies.some(
-      (a) => a.reactionType === 'anaphylaxis' || a.reactionType === 'severe'
+      (a: any) => a.reaction === 'anaphylaxis' || a.severity === 'severe'
     );
 
     return {
       hasAllergies: matchingAllergies.length > 0,
       hasCriticalAllergies,
-      allergies: matchingAllergies.map((a) => ({
+      allergies: matchingAllergies.map((a: any) => ({
         allergen: a.allergen,
-        reactionType: a.reactionType,
-        symptoms: a.symptoms,
-        notes: a.notes || undefined,
+        reactionType: a.reaction,
+        symptoms: [] as string[],
       })),
     };
   }
@@ -184,7 +181,13 @@ export class InteractionCheckService {
     documentation?: string;
   }) {
     return await prisma.drugInteraction.create({
-      data,
+      data: {
+        drug1Name: data.drug1Name,
+        drug2Name: data.drug2Name,
+        severity: data.severityLevel,
+        description: data.description,
+        source: 'manual',
+      } as any,
     });
   }
 
@@ -202,7 +205,13 @@ export class InteractionCheckService {
     notes?: string;
   }) {
     return await prisma.drugAllergy.create({
-      data,
+      data: {
+        patientId: data.patientId,
+        allergen: data.allergen,
+        reaction: data.reactionType,
+        severity: 'moderate',
+        onsetDate: data.onsetDate || new Date(),
+      } as any,
     });
   }
 

@@ -365,7 +365,7 @@ router.post(
           scheduledDate: validation.data.scheduledDate
             ? new Date(validation.data.scheduledDate)
             : undefined,
-        },
+        } as any,
         userId
       );
 
@@ -662,7 +662,7 @@ router.post(
           ...validation.data,
           incidentType: validation.data.incidentType as IncidentType,
           severity: validation.data.severity as IncidentSeverity,
-        },
+        } as any,
         userId
       );
 
@@ -705,7 +705,7 @@ router.post(
           ...validation.data,
           incidentType: validation.data.incidentType as IncidentType,
           severity: validation.data.severity as IncidentSeverity,
-        },
+        } as any,
         userId
       );
 

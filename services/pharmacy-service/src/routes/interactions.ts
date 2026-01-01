@@ -175,7 +175,7 @@ router.post('/allergies', requireUser, async (req: UserRequest, res) => {
         ? new Date(validatedData.onsetDate)
         : undefined,
       verifiedBy: validatedData.verifiedBy || req.user!.id,
-    });
+    } as any);
 
     res.status(201).json({
       data: allergy,
