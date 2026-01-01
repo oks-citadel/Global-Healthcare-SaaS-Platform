@@ -1,120 +1,66 @@
 # ============================================
 # UnifiedHealth Platform - Monorepo Service Dockerfile
 # ============================================
-# Build services from monorepo root with pnpm
 # Usage: docker build --build-arg SERVICE_PATH=services/api-gateway -f docker/Dockerfile.service .
 # ============================================
 
-ARG NODE_VERSION=20.18
-
-# ============================================
-# Stage 1: Base with pnpm
-# ============================================
-FROM node:${NODE_VERSION}-alpine AS base
-
-RUN apk add --no-cache dumb-init curl libc6-compat \
-    && rm -rf /var/cache/apk/*
-
+FROM node:20.18-alpine AS base
+RUN apk add --no-cache dumb-init curl libc6-compat
 RUN corepack enable && corepack prepare pnpm@9.0.0 --activate
-
 WORKDIR /app
 
 # ============================================
-# Stage 2: Dependencies
+# Stage 2: Install dependencies
 # ============================================
 FROM base AS deps
-
-# Copy workspace configuration
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
-
-# Copy all package.json files for workspace resolution
-COPY packages/adapters/package.json ./packages/adapters/
-COPY packages/ai-workflows/package.json ./packages/ai-workflows/
-COPY packages/compliance/package.json ./packages/compliance/
-COPY packages/country-config/package.json ./packages/country-config/
-COPY packages/entitlements/package.json ./packages/entitlements/
-COPY packages/fhir/package.json ./packages/fhir/
-COPY packages/i18n/package.json ./packages/i18n/
-COPY packages/policy/package.json ./packages/policy/
-COPY packages/sdk/package.json ./packages/sdk/
-COPY packages/ui/package.json ./packages/ui/
-
-# Copy service package.json
 ARG SERVICE_PATH
-COPY ${SERVICE_PATH}/package.json ./${SERVICE_PATH}/
 
-# Install all dependencies
-RUN pnpm install --frozen-lockfile
-
-# ============================================
-# Stage 3: Builder
-# ============================================
-FROM base AS builder
-
-ARG SERVICE_PATH
-ARG SERVICE_NAME
-
-WORKDIR /app
-
-# Copy dependencies from deps stage
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/packages/*/node_modules ./packages/
-COPY --from=deps /app/${SERVICE_PATH}/node_modules ./${SERVICE_PATH}/
-
-# Copy workspace files
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
-
-# Copy shared packages source
+# Copy everything needed for install
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages/ ./packages/
-
-# Copy service source
 COPY ${SERVICE_PATH}/ ./${SERVICE_PATH}/
 
-# Build shared packages first
-RUN pnpm --filter "@global-health/*" --filter "@healthcare/*" --filter "@unifiedhealth/*" build 2>/dev/null || true
+# Install all workspace dependencies
+RUN pnpm install --frozen-lockfile --ignore-scripts
+
+# ============================================
+# Stage 3: Build
+# ============================================
+FROM base AS builder
+ARG SERVICE_PATH
+
+COPY --from=deps /app ./
+
+# Build shared packages first (ignore errors for packages that don't have build)
+RUN pnpm -r --filter "./packages/*" build || true
 
 # Build the service
-WORKDIR /app/${SERVICE_PATH}
-RUN pnpm build
+RUN pnpm --filter "./${SERVICE_PATH}" build
 
 # ============================================
 # Stage 4: Production
 # ============================================
-FROM node:${NODE_VERSION}-alpine AS production
-
+FROM node:20.18-alpine AS production
 ARG SERVICE_PATH
-ARG SERVICE_NAME
-ARG BUILD_DATE
-ARG VCS_REF
 
-LABEL maintainer="UnifiedHealth Platform Team"
-LABEL version="1.0.0"
-LABEL build-date="${BUILD_DATE}"
-LABEL vcs-ref="${VCS_REF}"
-
-RUN apk add --no-cache dumb-init curl \
-    && rm -rf /var/cache/apk/*
-
+RUN apk add --no-cache dumb-init curl
 WORKDIR /app
 
-# Create non-root user
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S appuser -u 1001 -G nodejs
+RUN addgroup -g 1001 -S nodejs && adduser -S appuser -u 1001 -G nodejs
 
 ENV NODE_ENV=production
 ENV PORT=3000
 
-# Copy built artifacts
+# Copy only what's needed for production
 COPY --from=builder --chown=appuser:nodejs /app/${SERVICE_PATH}/dist ./dist
 COPY --from=builder --chown=appuser:nodejs /app/${SERVICE_PATH}/package.json ./
-COPY --from=builder --chown=appuser:nodejs /app/${SERVICE_PATH}/node_modules ./node_modules
+COPY --from=builder --chown=appuser:nodejs /app/node_modules ./node_modules
 
 USER appuser
-
 EXPOSE 3000
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=20s --retries=3 \
-  CMD curl -f http://localhost:${PORT}/health || exit 1
+  CMD curl -f http://localhost:3000/health || exit 1
 
 ENTRYPOINT ["dumb-init", "--"]
 CMD ["node", "dist/index.js"]
