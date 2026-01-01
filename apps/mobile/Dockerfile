@@ -38,7 +38,7 @@ COPY package.json pnpm-lock.yaml* ./
 
 # Install dependencies with cache mount for faster builds
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
-    pnpm install --frozen-lockfile
+    pnpm install
 
 # ============================================
 # Stage 2: Builder
@@ -81,7 +81,7 @@ WORKDIR /app
 
 # Install dependencies
 COPY package.json pnpm-lock.yaml* ./
-RUN pnpm install --frozen-lockfile
+RUN pnpm install
 
 # Copy source code
 COPY . .
