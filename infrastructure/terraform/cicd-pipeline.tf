@@ -176,11 +176,10 @@ locals {
     "price-transparency-service"  = { path = "services/price-transparency-service", port = 3013 }
     "vendor-risk-service"         = { path = "services/vendor-risk-service", port = 3014 }
 
-    # Frontend Applications
+    # Frontend Applications (Web only - mobile uses Expo EAS Build)
     "web-app"              = { path = "apps/web", port = 3000 }
     "provider-portal"      = { path = "apps/provider-portal", port = 3002 }
     "admin-portal"         = { path = "apps/admin", port = 3001 }
-    "mobile"               = { path = "apps/mobile", port = 3015 }
   }
 }
 
