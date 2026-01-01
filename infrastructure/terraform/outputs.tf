@@ -226,10 +226,7 @@ output "kms_eks_key_arn" {
   value       = aws_kms_key.eks.arn
 }
 
-output "kms_global_key_arn" {
-  description = "Global KMS key ARN"
-  value       = aws_kms_key.global.arn
-}
+# kms_global_key_arn moved to backup/global.tf
 
 # ============================================
 # CloudWatch / Monitoring Outputs
@@ -250,71 +247,8 @@ output "sns_alerts_topic_arn" {
   value       = aws_sns_topic.alerts.arn
 }
 
-output "sns_global_alerts_topic_arn" {
-  description = "Global SNS topic ARN for alerts"
-  value       = aws_sns_topic.global_alerts.arn
-}
-
-# ============================================
-# CloudFront / CDN Outputs (Replaces Azure Front Door)
-# ============================================
-
-output "cloudfront_distribution_id" {
-  description = "CloudFront distribution ID"
-  value       = aws_cloudfront_distribution.global.id
-}
-
-output "cloudfront_distribution_arn" {
-  description = "CloudFront distribution ARN"
-  value       = aws_cloudfront_distribution.global.arn
-}
-
-output "cloudfront_domain_name" {
-  description = "CloudFront distribution domain name"
-  value       = aws_cloudfront_distribution.global.domain_name
-}
-
-output "cloudfront_hosted_zone_id" {
-  description = "CloudFront hosted zone ID (for Route 53 alias records)"
-  value       = aws_cloudfront_distribution.global.hosted_zone_id
-}
-
-# ============================================
-# WAF Outputs
-# ============================================
-
-output "waf_web_acl_arn" {
-  description = "WAF Web ACL ARN"
-  value       = aws_wafv2_web_acl.global.arn
-}
-
-output "waf_web_acl_id" {
-  description = "WAF Web ACL ID"
-  value       = aws_wafv2_web_acl.global.id
-}
-
-# ============================================
-# Global ECR Outputs
-# ============================================
-
-output "global_ecr_repository_urls" {
-  description = "Global ECR repository URLs"
-  value       = { for k, v in aws_ecr_repository.global : k => v.repository_url }
-}
-
-# ============================================
-# Route 53 Outputs (Replaces Azure DNS / Traffic Manager)
-# ============================================
-
-output "route53_zone_id" {
-  description = "Route 53 hosted zone ID"
-  value       = var.manage_dns ? aws_route53_zone.global[0].zone_id : null
-}
-
-output "route53_zone_name_servers" {
-  description = "Route 53 hosted zone name servers"
-  value       = var.manage_dns ? aws_route53_zone.global[0].name_servers : null
-}
+# Note: Global resources (CloudFront, WAF, Route53) are in backup/global.tf
+# Enable them after core infrastructure is deployed
 
 # ============================================
 # IAM Role Outputs
@@ -373,7 +307,6 @@ output "deployment_summary" {
     eks_cluster_name      = aws_eks_cluster.main.name
     rds_endpoint          = aws_rds_cluster.main.endpoint
     redis_endpoint        = aws_elasticache_replication_group.main.primary_endpoint_address
-    cloudfront_domain     = aws_cloudfront_distribution.global.domain_name
     s3_bucket             = aws_s3_bucket.main.id
     ecr_registry          = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.aws_region}.amazonaws.com"
   }
