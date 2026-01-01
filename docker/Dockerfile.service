@@ -1,9 +1,6 @@
 # ============================================
 # UnifiedHealth Platform - Monorepo Service Dockerfile
 # ============================================
-# Usage: docker build --build-arg SERVICE_PATH=services/api-gateway -f docker/Dockerfile.service .
-# ============================================
-
 FROM node:20.18-alpine AS base
 RUN apk add --no-cache dumb-init curl libc6-compat openssl
 RUN corepack enable && corepack prepare pnpm@9.0.0 --activate
@@ -15,12 +12,10 @@ WORKDIR /app
 FROM base AS deps
 ARG SERVICE_PATH
 
-# Copy workspace configuration
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages/ ./packages/
 COPY ${SERVICE_PATH}/ ./${SERVICE_PATH}/
 
-# Install all dependencies (including devDependencies for build)
 RUN pnpm install --frozen-lockfile
 
 # ============================================
@@ -31,12 +26,11 @@ ARG SERVICE_PATH
 
 COPY --from=deps /app ./
 
-# Build shared packages first
+# Build shared packages
 RUN pnpm -r --filter "./packages/*" build 2>/dev/null || true
 
-# Generate Prisma client if prisma directory exists
+# Generate Prisma client if needed
 RUN if [ -d "${SERVICE_PATH}/prisma" ]; then \
-      echo "Generating Prisma client..." && \
       cd ${SERVICE_PATH} && pnpm exec prisma generate; \
     fi
 
@@ -57,15 +51,16 @@ RUN addgroup -g 1001 -S nodejs && adduser -S appuser -u 1001 -G nodejs
 ENV NODE_ENV=production
 ENV PORT=3000
 
-# Copy built artifacts and production dependencies
+# Copy built artifacts
 COPY --from=builder --chown=appuser:nodejs /app/${SERVICE_PATH}/dist ./dist
 COPY --from=builder --chown=appuser:nodejs /app/${SERVICE_PATH}/package.json ./
-
-# Copy node_modules (we need the full monorepo node_modules for workspace deps)
 COPY --from=builder --chown=appuser:nodejs /app/node_modules ./node_modules
 
-# Copy Prisma client if it exists
-COPY --from=builder --chown=appuser:nodejs /app/${SERVICE_PATH}/node_modules/.prisma ./node_modules/.prisma 2>/dev/null || true
+# Copy Prisma client using RUN to handle missing directory gracefully
+RUN --mount=from=builder,source=/app,target=/builder \
+    if [ -d "/builder/${SERVICE_PATH}/node_modules/.prisma" ]; then \
+      cp -r /builder/${SERVICE_PATH}/node_modules/.prisma ./node_modules/; \
+    fi
 
 USER appuser
 EXPOSE 3000
