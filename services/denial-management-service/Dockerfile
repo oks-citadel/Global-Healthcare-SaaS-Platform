@@ -1,4 +1,4 @@
-FROM node:20.18-slim AS base
+FROM public.ecr.aws/docker/library/node:20-slim AS base
 RUN apt-get update && apt-get install -y openssl dumb-init curl && rm -rf /var/lib/apt/lists/*
 
 FROM base AS deps

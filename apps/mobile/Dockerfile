@@ -3,7 +3,7 @@
 # For Expo Application Services (EAS) and CI builds
 # ============================================
 
-FROM node:20-alpine AS base
+FROM public.ecr.aws/docker/library/node:20-alpine AS base
 
 # Add image metadata
 LABEL maintainer="UnifiedHealth Platform Team"

@@ -153,9 +153,12 @@ resource "aws_s3_bucket_public_access_block" "codepipeline" {
 
 locals {
   services = {
+    # Core Services
     "api-gateway"          = { path = "services/api-gateway", port = 3000 }
     "auth-service"         = { path = "services/auth-service", port = 3001 }
     "api"                  = { path = "services/api", port = 8080 }
+
+    # Clinical Services
     "telehealth-service"   = { path = "services/telehealth-service", port = 3001 }
     "mental-health-service" = { path = "services/mental-health-service", port = 3002 }
     "chronic-care-service" = { path = "services/chronic-care-service", port = 3003 }
@@ -163,9 +166,21 @@ locals {
     "laboratory-service"   = { path = "services/laboratory-service", port = 3005 }
     "imaging-service"      = { path = "services/imaging-service", port = 3006 }
     "notification-service" = { path = "services/notification-service", port = 3007 }
+
+    # Additional Healthcare Services
+    "clinical-trials-service"     = { path = "services/clinical-trials-service", port = 3008 }
+    "denial-management-service"   = { path = "services/denial-management-service", port = 3009 }
+    "home-health-service"         = { path = "services/home-health-service", port = 3010 }
+    "interoperability-service"    = { path = "services/interoperability-service", port = 3011 }
+    "population-health-service"   = { path = "services/population-health-service", port = 3012 }
+    "price-transparency-service"  = { path = "services/price-transparency-service", port = 3013 }
+    "vendor-risk-service"         = { path = "services/vendor-risk-service", port = 3014 }
+
+    # Frontend Applications
     "web-app"              = { path = "apps/web", port = 3000 }
     "provider-portal"      = { path = "apps/provider-portal", port = 3002 }
     "admin-portal"         = { path = "apps/admin", port = 3001 }
+    "mobile"               = { path = "apps/mobile", port = 3015 }
   }
 }
 
