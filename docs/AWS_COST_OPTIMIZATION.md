@@ -10,12 +10,12 @@
 
 ---
 
-## Current Resource Status
+## Current Resource Status (Updated Jan 2, 2026)
 
 ### EKS Clusters (4 total)
 | Cluster | Environment | Status | Est. Monthly Cost |
 |---------|-------------|--------|-------------------|
-| `unified-health-prod-eks` | PRODUCTION | Running (3 nodes) | $432 + $72 = $504 |
+| `unified-health-prod-eks` | PRODUCTION | Running (2 app + 2 system nodes) | $360 + $72 = $432 |
 | `flamoral-prod-eks` | PRODUCTION | Running | ~$422 |
 | `broxiva-prod-eks` | PRODUCTION | Running | ~$350 |
 | `applyforus-dev` | DEV | **Scaled to 0** | $72 (control plane only) |
@@ -23,7 +23,7 @@
 ### RDS Aurora Clusters (3 total)
 | Cluster | Environment | Status | Est. Monthly Cost |
 |---------|-------------|--------|-------------------|
-| `unified-health-prod-aurora` | PRODUCTION | Available | ~$280 (Serverless v2) |
+| `unified-health-prod-aurora` | PRODUCTION | Available | ~$180-$280 (Serverless v2, min 0.5 ACU) |
 | `flamoral-prod-aurora` | PRODUCTION | Available | ~$120 (Serverless v2) |
 | `flamoral-staging-aurora` | STAGING | **STOPPED** | $0 |
 
@@ -42,6 +42,16 @@
 1. **flamoral-staging-aurora** - STOPPED (saves ~$100/mo)
 2. **applyforus-dev EKS nodes** - Scaled to 0 (saves ~$200/mo)
 3. **Dev budgets** - Already configured with alerts
+4. **flamoral-staging-redis** - DELETED with snapshot (saves ~$50/mo)
+5. **dev-applyforus Redis** - DELETED with snapshot (saves ~$15/mo)
+
+## Optimizations Implemented (Jan 2, 2026)
+
+1. **unified-health-prod-eks application nodes** - Reduced from 3 to 2 (saves ~$140/mo)
+2. **unified-health-prod-aurora** - Reduced min ACU from 2.0 to 0.5 (saves ~$50-100/mo during low traffic)
+3. **ElastiCache Redis** - Kept at 2x r6g.large for HIPAA compliance (no change)
+
+**Total estimated monthly savings: ~$205-255/mo**
 
 ---
 
