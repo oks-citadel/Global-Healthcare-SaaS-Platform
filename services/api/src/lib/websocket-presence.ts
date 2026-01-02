@@ -78,16 +78,15 @@ class PresenceManager {
    * Initialize Redis connection for presence tracking
    */
   private initializeRedis(): void {
-    if (config.redis.host) {
+    const redisUrl = process.env.REDIS_URL;
+    if (redisUrl) {
       try {
-        this.redis = new Redis({
-          host: config.redis.host,
-          port: config.redis.port,
-          password: config.redis.password,
+        this.redis = new Redis(redisUrl, {
           retryStrategy: (times: number) => {
             const delay = Math.min(times * 50, 2000);
             return delay;
           },
+          tls: redisUrl.startsWith('rediss://') ? { rejectUnauthorized: false } : undefined,
         });
 
         this.redis.on('error', (error) => {
