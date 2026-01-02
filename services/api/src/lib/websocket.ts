@@ -107,7 +107,7 @@ export async function initializeWebSocket(
   });
 
   // Setup Redis adapter for horizontal scaling
-  if (useRedisAdapter && config.redis.host) {
+  if (useRedisAdapter && process.env.REDIS_URL) {
     try {
       await setupRedisAdapter();
       logger.info('Redis adapter enabled for Socket.io horizontal scaling');
@@ -136,22 +136,22 @@ export async function initializeWebSocket(
  * Setup Redis adapter for Socket.io horizontal scaling
  */
 async function setupRedisAdapter(): Promise<void> {
-  if (!config.redis.host) {
+  const redisUrl = process.env.REDIS_URL;
+  if (!redisUrl) {
     throw new Error('Redis configuration not found');
   }
 
-  // Create Redis clients for pub/sub
-  redisPubClient = new Redis({
-    host: config.redis.host,
-    port: config.redis.port,
-    password: config.redis.password,
+  // Create Redis clients for pub/sub using REDIS_URL for TLS support
+  const redisOptions = {
     retryStrategy: (times: number) => {
       const delay = Math.min(times * 50, 2000);
       return delay;
     },
-  });
+    tls: redisUrl.startsWith('rediss://') ? { rejectUnauthorized: false } : undefined,
+  };
 
-  redisSubClient = redisPubClient.duplicate();
+  redisPubClient = new Redis(redisUrl, redisOptions);
+  redisSubClient = new Redis(redisUrl, redisOptions);
 
   // Wait for Redis connections
   await Promise.all([
