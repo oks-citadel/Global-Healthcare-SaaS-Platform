@@ -38,13 +38,12 @@ phases:
       - cd $CODEBUILD_SRC_DIR
 
       # Select Dockerfile: prefer service-specific, fallback to monorepo Dockerfiles
-      # Force ARM64 platform for EKS Graviton nodes
+      # ARM64 builds run natively on ARM CodeBuild - no --platform needed
       - |
         # Check if service has its own Dockerfile
         if [[ -f "${SERVICE_PATH}/Dockerfile" ]]; then
           echo "Using service-specific Dockerfile: ${SERVICE_PATH}/Dockerfile"
           docker build -t $IMAGE_URI \
-            --platform linux/arm64 \
             --no-cache \
             --build-arg NODE_ENV=production \
             --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
@@ -56,7 +55,6 @@ phases:
           DOCKERFILE="Dockerfile.web.pnpm"
           echo "Building Next.js web app with $DOCKERFILE"
           docker build -t $IMAGE_URI \
-            --platform linux/arm64 \
             --no-cache \
             --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
             --build-arg VERSION=${IMAGE_TAG} \
@@ -67,7 +65,6 @@ phases:
           DOCKERFILE="docker/Dockerfile.app"
           echo "Building Next.js app with monorepo $DOCKERFILE"
           docker build -t $IMAGE_URI \
-            --platform linux/arm64 \
             --no-cache \
             --build-arg SERVICE_PATH=$SERVICE_PATH \
             --build-arg SERVICE_NAME=$SERVICE_NAME \
@@ -80,7 +77,6 @@ phases:
           DOCKERFILE="docker/Dockerfile.service"
           echo "Building service with monorepo $DOCKERFILE"
           docker build -t $IMAGE_URI \
-            --platform linux/arm64 \
             --no-cache \
             --build-arg SERVICE_PATH=$SERVICE_PATH \
             --build-arg SERVICE_NAME=$SERVICE_NAME \
