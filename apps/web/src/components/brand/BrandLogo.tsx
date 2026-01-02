@@ -140,7 +140,7 @@ export function BrandLogo({
       {!iconOnly && (
         <div className="flex flex-col">
           <span className={`${config.text} font-semibold tracking-tight ${colors.text}`}>
-            Unified Health
+            The Unified Health
           </span>
           {showTagline && (
             <span className={`${config.tagline} italic ${colors.tagline} -mt-0.5`}>
