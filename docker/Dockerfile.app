@@ -71,4 +71,5 @@ USER nextjs
 EXPOSE 3000
 
 ENTRYPOINT ["dumb-init", "--"]
-CMD ["node", "server.js"]
+# For monorepo standalone builds, server.js is at SERVICE_PATH/server.js
+CMD node apps/web/server.js
