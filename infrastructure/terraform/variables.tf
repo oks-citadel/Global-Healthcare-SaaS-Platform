@@ -345,3 +345,15 @@ variable "enable_cicd_pipeline" {
   type        = bool
   default     = true
 }
+
+variable "enable_scheduled_deployment" {
+  description = "Enable scheduled daily deployment at 9 PM (builds continue throughout day)"
+  type        = bool
+  default     = true
+}
+
+variable "eks_cluster_name" {
+  description = "EKS cluster name for scheduled deployments"
+  type        = string
+  default     = "unified-health-prod-eks"
+}
