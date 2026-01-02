@@ -77,8 +77,8 @@ COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nodejs:nodejs /app/package.json ./package.json
 COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
 COPY --from=builder --chown=nodejs:nodejs /app/prisma ./prisma
-# Copy generated Prisma client
-COPY --from=builder --chown=nodejs:nodejs /app/src/generated ./generated
+# Copy generated Prisma client to correct path (dist/generated/client is imported from dist/lib/prisma.js)
+COPY --from=builder --chown=nodejs:nodejs /app/src/generated ./dist/generated
 
 # Switch to non-root user
 USER nodejs
