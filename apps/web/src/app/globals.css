@@ -74,9 +74,9 @@
   --uh-shadow-glow-cyan: 0 0 30px rgba(6, 182, 212, 0.3);
 
   /* -------- Typography -------- */
-  --uh-font-body: 0.625rem;
-  --uh-font-body-sm: 0.5625rem;
-  --uh-font-caption: 0.5rem;
+  --uh-font-body: 1rem;
+  --uh-font-body-sm: 0.875rem;
+  --uh-font-caption: 0.75rem;
   --uh-font-h1: 2.25rem;
   --uh-font-h2: 1.875rem;
   --uh-font-h3: 1.5rem;
@@ -206,7 +206,7 @@
     background-color: var(--uh-bg-bright);
     color: var(--uh-text-on-bright);
     font-size: var(--uh-font-body);
-    font-style: italic;
+    font-style: normal;
     line-height: 1.6;
   }
 
@@ -227,19 +227,19 @@
 @layer components {
   .uh-text-body {
     font-size: var(--uh-font-body);
-    font-style: italic;
+    font-style: normal;
     line-height: 1.6;
   }
 
   .uh-text-body-sm {
     font-size: var(--uh-font-body-sm);
-    font-style: italic;
+    font-style: normal;
     line-height: 1.6;
   }
 
   .uh-text-caption {
     font-size: var(--uh-font-caption);
-    font-style: italic;
+    font-style: normal;
     line-height: 1.5;
   }
 
@@ -358,7 +358,7 @@
     background: linear-gradient(135deg, #00D4AA 0%, #4F46E5 50%, #06B6D4 100%);
     color: white;
     font-weight: 600;
-    font-style: italic;
+    font-style: normal;
     padding: var(--uh-space-4) var(--uh-space-8);
     border-radius: var(--uh-radius-full);
     box-shadow: var(--uh-shadow-glow-teal);
@@ -375,7 +375,7 @@
     border: 1px solid var(--uh-border-dark);
     color: var(--uh-text-on-dark);
     font-weight: 500;
-    font-style: italic;
+    font-style: normal;
     padding: var(--uh-space-4) var(--uh-space-8);
     border-radius: var(--uh-radius-full);
     transition: all var(--uh-duration-base) var(--uh-ease);
