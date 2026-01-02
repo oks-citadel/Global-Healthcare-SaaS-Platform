@@ -2,42 +2,463 @@
 @tailwind components;
 @tailwind utilities;
 
+/* =================================
+   THE UNIFIED HEALTH - CSS VARIABLES
+   Premium Healthcare Design System
+   ================================= */
+
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  /* -------- Base Backgrounds -------- */
+  --uh-bg-dark: #0A0A0F;
+  --uh-bg-dark-elevated: #121218;
+  --uh-bg-dark-surface: #1A1A24;
+
+  --uh-bg-bright: #FFFFFF;
+  --uh-bg-bright-soft: #F8FAFC;
+  --uh-bg-bright-muted: #F1F5F9;
+  --uh-bg-bright-elevated: #E2E8F0;
+
+  /* -------- Text Colors -------- */
+  --uh-text-on-dark: #FFFFFF;
+  --uh-text-on-dark-muted: #94A3B8;
+  --uh-text-on-dark-subtle: #64748B;
+
+  --uh-text-on-bright: #0F172A;
+  --uh-text-on-bright-muted: #475569;
+  --uh-text-on-bright-subtle: #94A3B8;
+
+  /* -------- Brand Colors (Healing Aurora) -------- */
+  --uh-teal: #00D4AA;
+  --uh-teal-light: #5EEAD4;
+  --uh-teal-dark: #0D9488;
+
+  --uh-indigo: #4F46E5;
+  --uh-indigo-light: #818CF8;
+  --uh-indigo-dark: #3730A3;
+
+  --uh-cyan: #06B6D4;
+  --uh-cyan-light: #67E8F9;
+  --uh-cyan-dark: #0891B2;
+
+  --uh-emerald: #10B981;
+  --uh-emerald-light: #6EE7B7;
+  --uh-emerald-dark: #059669;
+
+  --uh-gold: #D4AF37;
+  --uh-gold-light: #F5DEB3;
+  --uh-gold-dark: #C9A227;
+
+  --uh-blue: #3B82F6;
+  --uh-blue-light: #60A5FA;
+  --uh-blue-dark: #2563EB;
+
+  /* -------- Semantic Colors -------- */
+  --uh-success: #10B981;
+  --uh-warning: #F59E0B;
+  --uh-danger: #EF4444;
+  --uh-info: #3B82F6;
+
+  /* -------- Borders -------- */
+  --uh-border-dark: rgba(255, 255, 255, 0.1);
+  --uh-border-bright: #E2E8F0;
+  --uh-border-bright-strong: #CBD5E1;
+
+  /* -------- Shadows -------- */
+  --uh-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --uh-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --uh-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --uh-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  --uh-shadow-glow-teal: 0 0 30px rgba(0, 212, 170, 0.3);
+  --uh-shadow-glow-indigo: 0 0 30px rgba(79, 70, 229, 0.3);
+  --uh-shadow-glow-gold: 0 0 30px rgba(212, 175, 55, 0.3);
+  --uh-shadow-glow-cyan: 0 0 30px rgba(6, 182, 212, 0.3);
+
+  /* -------- Typography -------- */
+  --uh-font-body: 0.625rem;
+  --uh-font-body-sm: 0.5625rem;
+  --uh-font-caption: 0.5rem;
+  --uh-font-h1: 2.25rem;
+  --uh-font-h2: 1.875rem;
+  --uh-font-h3: 1.5rem;
+  --uh-font-h4: 1.25rem;
+  --uh-font-h5: 1rem;
+  --uh-font-h6: 0.875rem;
+
+  /* -------- Spacing -------- */
+  --uh-space-1: 4px;
+  --uh-space-2: 8px;
+  --uh-space-3: 12px;
+  --uh-space-4: 16px;
+  --uh-space-5: 20px;
+  --uh-space-6: 24px;
+  --uh-space-8: 32px;
+  --uh-space-10: 40px;
+  --uh-space-12: 48px;
+  --uh-space-16: 64px;
+
+  /* -------- Border Radius -------- */
+  --uh-radius-sm: 6px;
+  --uh-radius-md: 8px;
+  --uh-radius-lg: 12px;
+  --uh-radius-xl: 16px;
+  --uh-radius-2xl: 20px;
+  --uh-radius-full: 9999px;
+  --radius: 0.5rem;
+
+  /* -------- Motion -------- */
+  --uh-duration-fast: 150ms;
+  --uh-duration-base: 250ms;
+  --uh-duration-slow: 450ms;
+  --uh-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --uh-ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* -------- Legacy Compatibility -------- */
+  --foreground-rgb: 15, 23, 42;
+  --background-start-rgb: 255, 255, 255;
+  --background-end-rgb: 248, 250, 252;
+
+  /* -------- HSL Variables (shadcn compatibility) -------- */
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 174 100% 42%;
+  --primary: 174 100% 42%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 240 4.8% 95.9%;
+  --secondary-foreground: 240 5.9% 10%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+  --muted: 240 4.8% 95.9%;
+  --muted-foreground: 240 3.8% 46.1%;
+  --accent: 240 4.8% 95.9%;
+  --accent-foreground: 240 5.9% 10%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
 }
 
+/* -------- Dark Mode Variables -------- */
 @media (prefers-color-scheme: dark) {
   :root {
     --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+    --background-start-rgb: 10, 10, 15;
+    --background-end-rgb: 18, 18, 24;
+    --background: 240 10% 4%;
+    --foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
   }
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+.dark {
+  --background: 240 10% 4%;
+  --foreground: 0 0% 98%;
+  --border: 240 3.7% 15.9%;
+  --input: 240 3.7% 15.9%;
+  --ring: 174 100% 42%;
+  --primary: 174 100% 42%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 240 3.7% 15.9%;
+  --secondary-foreground: 0 0% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --muted: 240 3.7% 15.9%;
+  --muted-foreground: 240 5% 64.9%;
+  --accent: 240 3.7% 15.9%;
+  --accent-foreground: 0 0% 98%;
+  --popover: 240 10% 4%;
+  --popover-foreground: 0 0% 98%;
+  --card: 240 10% 4%;
+  --card-foreground: 0 0% 98%;
 }
 
+/* -------- Reduced Motion -------- */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --uh-duration-fast: 0ms;
+    --uh-duration-base: 0ms;
+    --uh-duration-slow: 0ms;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* -------- Base Styles -------- */
 @layer base {
   * {
-    border-color: hsl(var(--border, 214.3 31.8% 91.4%));
+    border-color: hsl(var(--border));
   }
+
+  html {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
   body {
-    background-color: hsl(var(--background, 0 0% 100%));
-    color: hsl(var(--foreground, 222.2 84% 4.9%));
+    background-color: var(--uh-bg-bright);
+    color: var(--uh-text-on-bright);
+    font-size: var(--uh-font-body);
+    font-style: italic;
+    line-height: 1.6;
+  }
+
+  /* Interior pages default to bright */
+  body.uh-interior {
+    background-color: var(--uh-bg-bright-soft);
+    color: var(--uh-text-on-bright);
+  }
+
+  /* Landing/marketing pages use dark */
+  body.uh-landing {
+    background-color: var(--uh-bg-dark);
+    color: var(--uh-text-on-dark);
   }
 }
 
+/* -------- Typography Classes -------- */
+@layer components {
+  .uh-text-body {
+    font-size: var(--uh-font-body);
+    font-style: italic;
+    line-height: 1.6;
+  }
+
+  .uh-text-body-sm {
+    font-size: var(--uh-font-body-sm);
+    font-style: italic;
+    line-height: 1.6;
+  }
+
+  .uh-text-caption {
+    font-size: var(--uh-font-caption);
+    font-style: italic;
+    line-height: 1.5;
+  }
+
+  .uh-h1 {
+    font-size: var(--uh-font-h1);
+    font-weight: 700;
+    line-height: 1.2;
+    font-style: normal;
+  }
+
+  .uh-h2 {
+    font-size: var(--uh-font-h2);
+    font-weight: 600;
+    line-height: 1.25;
+    font-style: normal;
+  }
+
+  .uh-h3 {
+    font-size: var(--uh-font-h3);
+    font-weight: 600;
+    line-height: 1.3;
+    font-style: normal;
+  }
+
+  .uh-h4 {
+    font-size: var(--uh-font-h4);
+    font-weight: 600;
+    line-height: 1.4;
+    font-style: normal;
+  }
+
+  .uh-h5 {
+    font-size: var(--uh-font-h5);
+    font-weight: 500;
+    line-height: 1.5;
+    font-style: normal;
+  }
+
+  .uh-h6 {
+    font-size: var(--uh-font-h6);
+    font-weight: 500;
+    line-height: 1.5;
+    font-style: normal;
+  }
+
+  /* -------- Gradient Backgrounds -------- */
+  .uh-bg-landing {
+    background:
+      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 212, 170, 0.15), transparent),
+      radial-gradient(ellipse 60% 40% at 80% 100%, rgba(79, 70, 229, 0.12), transparent),
+      radial-gradient(ellipse 50% 30% at 20% 80%, rgba(6, 182, 212, 0.1), transparent),
+      linear-gradient(180deg, #0A0A0F 0%, #121218 50%, #0A0A0F 100%);
+  }
+
+  .uh-bg-hero {
+    background:
+      radial-gradient(ellipse 100% 80% at 50% 0%, rgba(0, 212, 170, 0.25), transparent 60%),
+      radial-gradient(ellipse 80% 60% at 80% 20%, rgba(79, 70, 229, 0.2), transparent 50%),
+      radial-gradient(ellipse 60% 40% at 20% 80%, rgba(6, 182, 212, 0.15), transparent 40%),
+      linear-gradient(180deg, #0A0A0F 0%, #0F0F15 100%);
+  }
+
+  .uh-gradient-healing {
+    background: linear-gradient(135deg, #00D4AA 0%, #4F46E5 50%, #06B6D4 100%);
+  }
+
+  .uh-gradient-trust {
+    background: linear-gradient(135deg, #3B82F6 0%, #06B6D4 50%, #10B981 100%);
+  }
+
+  .uh-gradient-wellness {
+    background: linear-gradient(135deg, #10B981 0%, #34D399 50%, #6EE7B7 100%);
+  }
+
+  .uh-gradient-premium {
+    background: linear-gradient(135deg, #D4AF37 0%, #F5DEB3 50%, #C9A227 100%);
+  }
+
+  .uh-gradient-text {
+    background: linear-gradient(135deg, #00D4AA 0%, #4F46E5 50%, #06B6D4 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* -------- Glass Effects -------- */
+  .uh-glass-dark {
+    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .uh-glass-bright {
+    background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  /* -------- Card Styles -------- */
+  .uh-card-dark {
+    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+    border: 1px solid var(--uh-border-dark);
+    border-radius: var(--uh-radius-xl);
+    backdrop-filter: blur(12px);
+  }
+
+  .uh-card-bright {
+    background: var(--uh-bg-bright);
+    border: 1px solid var(--uh-border-bright);
+    border-radius: var(--uh-radius-xl);
+    box-shadow: var(--uh-shadow-md);
+  }
+
+  /* -------- Button Styles -------- */
+  .uh-btn-primary {
+    background: linear-gradient(135deg, #00D4AA 0%, #4F46E5 50%, #06B6D4 100%);
+    color: white;
+    font-weight: 600;
+    font-style: italic;
+    padding: var(--uh-space-4) var(--uh-space-8);
+    border-radius: var(--uh-radius-full);
+    box-shadow: var(--uh-shadow-glow-teal);
+    transition: all var(--uh-duration-base) var(--uh-ease);
+  }
+
+  .uh-btn-primary:hover {
+    transform: scale(1.02);
+    box-shadow: var(--uh-shadow-glow-teal), var(--uh-shadow-lg);
+  }
+
+  .uh-btn-secondary {
+    background: transparent;
+    border: 1px solid var(--uh-border-dark);
+    color: var(--uh-text-on-dark);
+    font-weight: 500;
+    font-style: italic;
+    padding: var(--uh-space-4) var(--uh-space-8);
+    border-radius: var(--uh-radius-full);
+    transition: all var(--uh-duration-base) var(--uh-ease);
+  }
+
+  .uh-btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--uh-teal);
+  }
+
+  /* -------- Focus States -------- */
+  .uh-focus-ring:focus-visible {
+    outline: 2px solid var(--uh-teal);
+    outline-offset: 2px;
+  }
+
+  /* -------- Glow Effects -------- */
+  .uh-glow-teal {
+    box-shadow: var(--uh-shadow-glow-teal);
+  }
+
+  .uh-glow-indigo {
+    box-shadow: var(--uh-shadow-glow-indigo);
+  }
+
+  .uh-glow-gold {
+    box-shadow: var(--uh-shadow-glow-gold);
+  }
+
+  .uh-glow-cyan {
+    box-shadow: var(--uh-shadow-glow-cyan);
+  }
+}
+
+/* -------- Utility Classes -------- */
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
+
+  .animation-delay-2000 {
+    animation-delay: 2000ms;
+  }
+
+  .animation-delay-4000 {
+    animation-delay: 4000ms;
+  }
+}
+
+/* -------- Animations -------- */
+@keyframes uh-glow {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+@keyframes uh-float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes uh-pulse-soft {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+@keyframes uh-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-uh-glow {
+  animation: uh-glow 8s ease-in-out infinite;
+}
+
+.animate-uh-float {
+  animation: uh-float 6s ease-in-out infinite;
+}
+
+.animate-uh-pulse-soft {
+  animation: uh-pulse-soft 3s ease-in-out infinite;
+}
+
+.animate-uh-shimmer {
+  animation: uh-shimmer 2s linear infinite;
+  background-size: 200% 100%;
 }
