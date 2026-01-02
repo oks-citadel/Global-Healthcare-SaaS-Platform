@@ -1,6 +1,6 @@
 ---
 # ============================================
-# UnifiedHealth API - Kubernetes Deployment
+# The Unified Health API - Kubernetes Deployment
 # ============================================
 apiVersion: apps/v1
 kind: Deployment

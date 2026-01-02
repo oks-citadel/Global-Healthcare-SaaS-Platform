@@ -1,9 +1,10 @@
 version: 0.2
 
 # ============================================
-# UnifiedHealth Platform - AWS CodeBuild Spec
+# The Unified Health Platform - AWS CodeBuild Spec
 # ============================================
 # Builds Docker images and pushes to Amazon ECR
+# Domain: theunifiedhealth.com
 # AWS Account: 992382449461
 # Region: us-east-1
 # ============================================

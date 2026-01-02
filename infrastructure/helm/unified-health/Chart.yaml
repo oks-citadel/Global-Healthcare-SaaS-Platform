@@ -1,6 +1,6 @@
 apiVersion: v2
 name: unified-health
-description: UnifiedHealth Global Platform - Multi-Currency, Multi-Region Healthcare SaaS
+description: The Unified Health Global Platform - Multi-Currency, Multi-Region Healthcare SaaS
 type: application
 version: 1.0.0
 appVersion: "1.0.0"
@@ -16,7 +16,7 @@ sources:
   - https://github.com/your-org/unified-health-platform
 
 maintainers:
-  - name: UnifiedHealth Team
+  - name: The Unified Health Team
     email: devops@unifiedhealth.com
 
 dependencies: []

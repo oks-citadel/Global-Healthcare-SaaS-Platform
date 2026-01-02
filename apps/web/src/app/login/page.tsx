@@ -56,7 +56,7 @@ export default function LoginPage() {
             </div>
           </div>
           <h2 className="text-3xl font-bold text-gray-900">
-            Welcome to UnifiedHealth
+            Welcome to Unified Health
           </h2>
           <p className="mt-2 text-sm text-gray-600">
             Sign in to access your healthcare portal
@@ -196,7 +196,7 @@ export default function LoginPage() {
               </div>
               <div className="relative flex justify-center text-sm">
                 <span className="px-2 bg-white text-gray-500">
-                  New to UnifiedHealth?
+                  New to Unified Health?
                 </span>
               </div>
             </div>

@@ -1,6 +1,6 @@
 ---
 # ============================================
-# UnifiedHealth - Development Overlay
+# The Unified Health - Development Overlay
 # Dev-specific configurations for unifiedhealth-dev namespace
 # ============================================
 apiVersion: kustomize.config.k8s.io/v1beta1

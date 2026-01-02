@@ -1,8 +1,9 @@
 {
   "app": {
-    "name": "Unified Healthcare Platform",
+    "name": "The Unified Health",
+    "shortName": "Unified Health",
     "tagline": "Your Complete Healthcare Solution",
-    "welcome": "Welcome to Unified Healthcare",
+    "welcome": "Welcome to The Unified Health",
     "loading": "Loading...",
     "saving": "Saving...",
     "saved": "Saved successfully",

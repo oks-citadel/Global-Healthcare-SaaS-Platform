@@ -1,5 +1,5 @@
 # ============================================
-# UnifiedHealth Platform - Dev Environment
+# The Unified Health Platform - Dev Environment
 # ============================================
 # AWS-ONLY Configuration (Azure Removed)
 # ============================================

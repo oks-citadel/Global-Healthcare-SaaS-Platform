@@ -1,9 +1,9 @@
 openapi: 3.0.3
 info:
-  title: Unified Healthcare Platform API
+  title: The Unified Health Platform API
   version: 1.0.0
   description: |
-    Comprehensive API for the Global Healthcare SaaS Platform providing telemedicine,
+    Comprehensive API for The Unified Health Global Platform providing telemedicine,
     patient management, appointments, clinical documentation, and billing services.
 
     ## Authentication
@@ -14,10 +14,10 @@ info:
 
   contact:
     name: API Support
-    email: support@unifiedhealthcare.com
+    email: support@theunifiedhealth.com
   license:
     name: Proprietary
-    url: https://unifiedhealthcare.com/terms
+    url: https://theunifiedhealth.com/terms
 
 servers:
   - url: http://localhost:8080/api/v1

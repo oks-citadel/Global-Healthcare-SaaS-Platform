@@ -1,9 +1,9 @@
 openapi: 3.0.3
 info:
-  title: UnifiedHealth API Gateway
+  title: The Unified Health API Gateway
   version: 1.0.0
   description: |
-    The API Gateway service for the UnifiedHealth Global Platform. This service acts as the
+    The API Gateway service for The Unified Health Global Platform. This service acts as the
     single entry point for all client requests, providing authentication, rate limiting,
     request routing, and load balancing across backend microservices.
 
@@ -25,10 +25,10 @@ info:
 
   contact:
     name: API Support
-    email: support@unifiedhealth.io
+    email: support@theunifiedhealth.com
   license:
     name: Proprietary
-    url: https://unifiedhealthcare.com/terms
+    url: https://theunifiedhealth.com/terms
 
 servers:
   - url: http://localhost:8000

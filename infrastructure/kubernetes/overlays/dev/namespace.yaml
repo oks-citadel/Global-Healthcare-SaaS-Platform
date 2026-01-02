@@ -1,6 +1,6 @@
 ---
 # ============================================
-# UnifiedHealth - Development Namespace
+# The Unified Health - Development Namespace
 # ============================================
 apiVersion: v1
 kind: Namespace
@@ -12,4 +12,4 @@ metadata:
     app.kubernetes.io/part-of: unifiedhealth
     app.kubernetes.io/managed-by: kustomize
   annotations:
-    description: "UnifiedHealth Platform - Development Environment"
+    description: "The Unified Health Platform - Development Environment"

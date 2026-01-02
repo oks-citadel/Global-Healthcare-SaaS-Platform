@@ -8,7 +8,7 @@
 
 ## Agreement to Terms
 
-These Terms of Service ("Terms," "Terms of Service") constitute a legally binding agreement between you ("User," "you," or "your") and Unified Healthcare Platform ("Company," "we," "us," or "our"), concerning your access to and use of the Unified Healthcare Platform website, mobile application, and related services (collectively, the "Service").
+These Terms of Service ("Terms," "Terms of Service") constitute a legally binding agreement between you ("User," "you," or "your") and The Unified Health, Inc. ("Company," "we," "us," or "our"), concerning your access to and use of The Unified Health website, mobile application, and related services (collectively, the "Service").
 
 **BY ACCESSING OR USING THE SERVICE, YOU AGREE TO BE BOUND BY THESE TERMS. IF YOU DO NOT AGREE TO THESE TERMS, DO NOT ACCESS OR USE THE SERVICE.**
 
@@ -271,7 +271,7 @@ You agree NOT to:
 
 ### 8.1 Our Intellectual Property
 
-The Service, including all content, features, and functionality, is owned by Unified Healthcare Platform and is protected by copyright, trademark, patent, trade secret, and other intellectual property laws.
+The Service, including all content, features, and functionality, is owned by The Unified Health, Inc. and is protected by copyright, trademark, patent, trade secret, and other intellectual property laws.
 
 **Our IP includes:**
 - Website and app design
@@ -286,7 +286,7 @@ Your license to use the Service does not grant you any ownership rights to our i
 
 ### 8.3 Trademarks
 
-"Unified Healthcare Platform" and our logos are our trademarks. You may not use our trademarks without our prior written permission.
+"The Unified Health" and our logos are our trademarks. You may not use our trademarks without our prior written permission.
 
 ### 8.4 User Content
 
@@ -460,7 +460,7 @@ We are not liable for damages resulting from your failure to seek emergency medi
 
 ## 14. Indemnification
 
-You agree to indemnify, defend, and hold harmless Unified Healthcare Platform, its affiliates, officers, directors, employees, and agents from and against any claims, liabilities, damages, losses, costs, or expenses (including reasonable attorneys' fees) arising out of or related to:
+You agree to indemnify, defend, and hold harmless The Unified Health, Inc., its affiliates, officers, directors, employees, and agents from and against any claims, liabilities, damages, losses, costs, or expenses (including reasonable attorneys' fees) arising out of or related to:
 
 - Your use of the Service
 - Your violation of these Terms
@@ -582,8 +582,8 @@ We are not liable for any delay or failure to perform due to causes beyond our r
 
 Notices to you will be sent to the email address associated with your account. Notices to us should be sent to:
 
-**Unified Healthcare Platform**
-Email: legal@unifiedhealthcare.com
+**The Unified Health, Inc.**
+Email: legal@theunifiedhealth.com
 Mail: [Company Address]
 
 ### 18.7 No Agency
@@ -601,15 +601,15 @@ Provisions that by their nature should survive termination will survive, includi
 If you have questions about these Terms, please contact us:
 
 **Customer Support:**
-Email: support@unifiedhealthcare.com
+Email: support@theunifiedhealth.com
 Phone: +1 (555) 123-4567
 Hours: Monday-Friday, 9:00 AM - 5:00 PM (EST)
 
 **Legal Department:**
-Email: legal@unifiedhealthcare.com
+Email: legal@theunifiedhealth.com
 
 **Mailing Address:**
-Unified Healthcare Platform
+The Unified Health, Inc.
 [Street Address]
 [City, State ZIP]
 
@@ -628,4 +628,4 @@ Unified Healthcare Platform
 **Last Updated:** January 15, 2025
 **Version:** 1.0
 
-© 2025 Unified Healthcare Platform. All rights reserved.
+© 2025 The Unified Health, Inc. All rights reserved.

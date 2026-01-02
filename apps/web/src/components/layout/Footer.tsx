@@ -24,7 +24,7 @@ interface FooterProps {
  *     <FooterLink href="/about">About</FooterLink>
  *     <FooterLink href="/privacy">Privacy</FooterLink>
  *   </FooterNav>
- *   <FooterCopyright>© 2024 Unified Healthcare</FooterCopyright>
+ *   <FooterCopyright>© 2024 The Unified Health</FooterCopyright>
  * </Footer>
  * ```
  */

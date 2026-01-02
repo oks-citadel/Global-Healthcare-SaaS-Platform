@@ -1,9 +1,9 @@
 openapi: 3.0.3
 info:
-  title: UnifiedHealth Authentication Service
+  title: The Unified Health Authentication Service
   version: 1.0.0
   description: |
-    The Authentication Service for the UnifiedHealth Global Platform. This service handles
+    The Authentication Service for The Unified Health Global Platform. This service handles
     all authentication and authorization concerns including user registration, login,
     token management, and multi-factor authentication (MFA).
 
@@ -24,10 +24,10 @@ info:
 
   contact:
     name: API Support
-    email: support@unifiedhealth.io
+    email: support@theunifiedhealth.com
   license:
     name: Proprietary
-    url: https://unifiedhealthcare.com/terms
+    url: https://theunifiedhealth.com/terms
 
 servers:
   - url: http://localhost:3002

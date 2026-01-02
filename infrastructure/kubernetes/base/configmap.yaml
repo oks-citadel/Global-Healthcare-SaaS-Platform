@@ -1,6 +1,6 @@
 ---
 # ============================================
-# UnifiedHealth API - ConfigMap
+# The Unified Health API - ConfigMap
 # Non-sensitive configuration values
 # ============================================
 apiVersion: v1

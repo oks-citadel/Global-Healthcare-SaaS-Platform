@@ -150,7 +150,7 @@ class EmailService {
             <p>For security, this link can only be used once.</p>
           </div>
           <div class="footer">
-            <p>&copy; ${new Date().getFullYear()} Unified Healthcare. All rights reserved.</p>
+            <p>&copy; ${new Date().getFullYear()} The Unified Health. All rights reserved.</p>
             <p>If you're having trouble clicking the button, copy and paste this URL:<br>${resetUrl}</p>
           </div>
         </div>
@@ -160,7 +160,7 @@ class EmailService {
 
     return this.send({
       to: email,
-      subject: "Reset Your Password - Unified Healthcare",
+      subject: "Reset Your Password - The Unified Health",
       html,
     });
   }
@@ -189,14 +189,14 @@ class EmailService {
           </div>
           <div class="content">
             <p>Hi ${firstName || "there"},</p>
-            <p>Welcome to Unified Healthcare! Please verify your email address by clicking the button below:</p>
+            <p>Welcome to The Unified Health! Please verify your email address by clicking the button below:</p>
             <p style="text-align: center;">
               <a href="${verifyUrl}" class="button">Verify Email</a>
             </p>
             <p>This link will expire in ${config.security.emailVerificationExpiry} hours.</p>
           </div>
           <div class="footer">
-            <p>&copy; ${new Date().getFullYear()} Unified Healthcare. All rights reserved.</p>
+            <p>&copy; ${new Date().getFullYear()} The Unified Health. All rights reserved.</p>
             <p>If you're having trouble clicking the button, copy and paste this URL:<br>${verifyUrl}</p>
           </div>
         </div>
@@ -206,7 +206,7 @@ class EmailService {
 
     return this.send({
       to: email,
-      subject: "Verify Your Email - Unified Healthcare",
+      subject: "Verify Your Email - The Unified Health",
       html,
     });
   }
@@ -229,11 +229,11 @@ class EmailService {
       <body>
         <div class="container">
           <div class="header">
-            <h1>Welcome to Unified Healthcare!</h1>
+            <h1>Welcome to The Unified Health!</h1>
           </div>
           <div class="content">
             <p>Hi ${firstName || "there"},</p>
-            <p>Thank you for joining Unified Healthcare. We're excited to have you on board!</p>
+            <p>Thank you for joining The Unified Health. We're excited to have you on board!</p>
             <p>With your account, you can:</p>
             <ul>
               <li>Book appointments with healthcare providers</li>
@@ -246,7 +246,7 @@ class EmailService {
             </p>
           </div>
           <div class="footer">
-            <p>&copy; ${new Date().getFullYear()} Unified Healthcare. All rights reserved.</p>
+            <p>&copy; ${new Date().getFullYear()} The Unified Health. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -255,7 +255,7 @@ class EmailService {
 
     return this.send({
       to: email,
-      subject: "Welcome to Unified Healthcare!",
+      subject: "Welcome to The Unified Health!",
       html,
     });
   }

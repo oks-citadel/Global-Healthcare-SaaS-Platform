@@ -1,6 +1,6 @@
 ---
 # ============================================
-# UnifiedHealth Platform - Kubernetes Namespace
+# The Unified Health Platform - Kubernetes Namespace
 # ============================================
 apiVersion: v1
 kind: Namespace

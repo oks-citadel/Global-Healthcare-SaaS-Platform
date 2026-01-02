@@ -686,7 +686,7 @@ export const AFRICA_REGION: RegionConfig = {
  * Global platform configuration
  */
 export const GLOBAL_CONFIG: GlobalConfig = {
-  platformName: 'UnifiedHealth Platform',
+  platformName: 'The Unified Health',
   globalFeatures: {
     multiRegion: true,
     globalRouting: true,

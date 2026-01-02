@@ -6,8 +6,8 @@ import Providers from './providers';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'UnifiedHealth - Healthcare Portal',
-  description: 'Unified Healthcare Platform - Patient Portal for accessing healthcare services',
+  title: 'Unified Health - Healthcare Portal',
+  description: 'The Unified Health - Patient Portal for accessing healthcare services',
   keywords: ['healthcare', 'telemedicine', 'appointments', 'medical records'],
 };
 

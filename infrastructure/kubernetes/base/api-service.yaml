@@ -1,6 +1,6 @@
 ---
 # ============================================
-# UnifiedHealth API - Service
+# The Unified Health API - Service
 # ClusterIP service for internal communication
 # ============================================
 apiVersion: v1
@@ -50,7 +50,7 @@ spec:
 
 ---
 # ============================================
-# UnifiedHealth API - Headless Service
+# The Unified Health API - Headless Service
 # For StatefulSet or direct pod discovery
 # ============================================
 apiVersion: v1

@@ -8,7 +8,7 @@
 
 ## Introduction
 
-Welcome to Unified Healthcare Platform ("we," "us," or "our"). We are committed to protecting your privacy and the security of your Protected Health Information (PHI). This Privacy Policy explains how we collect, use, disclose, and safeguard your health information in compliance with the Health Insurance Portability and Accountability Act (HIPAA), the General Data Protection Regulation (GDPR), and other applicable privacy laws.
+Welcome to The Unified Health ("we," "us," or "our"). We are committed to protecting your privacy and the security of your Protected Health Information (PHI). This Privacy Policy explains how we collect, use, disclose, and safeguard your health information in compliance with the Health Insurance Portability and Accountability Act (HIPAA), the General Data Protection Regulation (GDPR), and other applicable privacy laws.
 
 **Please read this Privacy Policy carefully.** If you do not agree with the terms of this Privacy Policy, please do not access or use our platform.
 
@@ -421,9 +421,9 @@ You have the right to lodge a complaint with a supervisory authority if you beli
 To exercise any of these rights, please contact:
 
 **Privacy Officer**
-Email: privacy@unifiedhealthcare.com
+Email: privacy@theunifiedhealth.com
 Phone: +1 (555) 123-4567
-Mail: Unified Healthcare Platform, Attn: Privacy Officer, [Address]
+Mail: The Unified Health, Inc., Attn: Privacy Officer, [Address]
 
 **Required Information:**
 - Your full name
@@ -577,8 +577,8 @@ We maintain a complete version history of this Privacy Policy, available upon re
 For questions, concerns, or requests regarding this Privacy Policy or your privacy rights:
 
 **Privacy Officer**
-Unified Healthcare Platform
-Email: privacy@unifiedhealthcare.com
+The Unified Health, Inc.
+Email: privacy@theunifiedhealth.com
 Phone: +1 (555) 123-4567
 Address: [Company Address]
 
@@ -589,7 +589,7 @@ Address: [Company Address]
 For HIPAA-related concerns or complaints:
 
 **Compliance Officer**
-Email: compliance@unifiedhealthcare.com
+Email: compliance@theunifiedhealth.com
 Phone: +1 (555) 123-4568
 
 ### Data Protection Officer (for GDPR)
@@ -597,7 +597,7 @@ Phone: +1 (555) 123-4568
 For GDPR-related inquiries (EU residents):
 
 **Data Protection Officer**
-Email: dpo@unifiedhealthcare.com
+Email: dpo@theunifiedhealth.com
 
 ### File a Complaint
 
@@ -642,7 +642,7 @@ This Privacy Policy serves as our Notice of Privacy Practices as required by HIP
 
 **I acknowledge that:**
 
-1. I have received and read the Unified Healthcare Platform Privacy Policy
+1. I have received and read The Unified Health Privacy Policy
 2. I understand how my Protected Health Information will be used and disclosed
 3. I have been informed of my privacy rights under HIPAA and GDPR (if applicable)
 4. I have been given the opportunity to ask questions about this Privacy Policy
@@ -659,4 +659,4 @@ This Privacy Policy serves as our Notice of Privacy Practices as required by HIP
 **Effective Date:** January 15, 2025
 **Next Review Date:** January 15, 2026
 
-© 2025 Unified Healthcare Platform. All rights reserved.
+© 2025 The Unified Health, Inc. All rights reserved.

@@ -1,9 +1,9 @@
 openapi: 3.0.3
 info:
-  title: UnifiedHealth Telehealth Service
+  title: The Unified Health Telehealth Service
   version: 1.0.0
   description: |
-    The Telehealth Service for the UnifiedHealth Global Platform. This service manages
+    The Telehealth Service for The Unified Health Global Platform. This service manages
     virtual healthcare appointments, video/audio visits, real-time messaging, and
     WebRTC session coordination.
 
@@ -30,10 +30,10 @@ info:
 
   contact:
     name: API Support
-    email: support@unifiedhealth.io
+    email: support@theunifiedhealth.com
   license:
     name: Proprietary
-    url: https://unifiedhealthcare.com/terms
+    url: https://theunifiedhealth.com/terms
 
 servers:
   - url: http://localhost:3003

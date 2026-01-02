@@ -27,7 +27,7 @@
       }
     ]
   },
-  "description": "Global Healthcare SaaS Platform - Comprehensive Overview Dashboard",
+  "description": "Unified Health Platform - Comprehensive Overview Dashboard",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
@@ -1301,7 +1301,7 @@
     "time_options": ["5m", "15m", "1h", "6h", "12h", "24h", "2d", "7d", "30d"]
   },
   "timezone": "browser",
-  "title": "Global Healthcare Platform Overview",
+  "title": "Unified Health Platform Overview",
   "uid": "healthcare-platform-overview",
   "version": 1,
   "weekStart": ""

@@ -1,5 +1,5 @@
 # ============================================
-# UnifiedHealth Platform - AWS Main Configuration
+# The Unified Health Platform - AWS Main Configuration
 # ============================================
 # AZURE MIGRATION COMPLETE - AWS ONLY
 # All Azure resources have been translated to AWS equivalents
@@ -7,7 +7,7 @@
 
 locals {
   common_tags = {
-    Project     = "UnifiedHealth"
+    Project     = "The Unified Health"
     Environment = var.environment
     ManagedBy   = "terraform"
     Owner       = "citadel-cloud-management"
@@ -423,4 +423,101 @@ module "elasticache_africa" {
   tags = merge(local.common_tags, {
     Region = "Africa"
   })
+}
+
+# ============================================
+# Route53 DNS (theunifiedhealth.com)
+# ============================================
+
+module "route53" {
+  source = "./modules/route53"
+  count  = var.enable_route53 ? 1 : 0
+
+  project_name = var.project_name
+  environment  = var.environment
+  domain_name  = var.domain_name
+
+  # DNS Records
+  records = [
+    {
+      name            = ""
+      type            = "A"
+      ttl             = 300
+      values          = []
+      alias_target    = var.deploy_americas && length(module.eks_americas) > 0 ? {
+        dns_name               = module.eks_americas[0].cluster_endpoint
+        zone_id                = "Z35SXDOTRQ7X7K"  # us-east-1 ALB zone
+        evaluate_target_health = true
+      } : null
+      weight          = null
+      set_identifier  = null
+      geolocation     = null
+      latency_region  = null
+      health_check_name     = null
+      failover_enabled      = false
+      failover_type         = null
+    },
+    {
+      name            = "www"
+      type            = "CNAME"
+      ttl             = 300
+      values          = [var.domain_name]
+      alias_target    = null
+      weight          = null
+      set_identifier  = null
+      geolocation     = null
+      latency_region  = null
+      health_check_name     = null
+      failover_enabled      = false
+      failover_type         = null
+    },
+    {
+      name            = "api"
+      type            = "CNAME"
+      ttl             = 300
+      values          = ["api.${var.domain_name}"]
+      alias_target    = null
+      weight          = null
+      set_identifier  = null
+      geolocation     = null
+      latency_region  = null
+      health_check_name     = null
+      failover_enabled      = false
+      failover_type         = null
+    }
+  ]
+
+  health_check_configs = {}
+  enable_caa_records     = true
+  caa_email              = "security@${var.domain_name}"
+  enable_query_logging   = true
+  query_log_retention_days = 90
+  kms_key_arn            = null
+  enable_dnssec          = false
+  dnssec_kms_key_arn     = null
+
+  tags = local.common_tags
+}
+
+# ============================================
+# CodePipeline CI/CD
+# ============================================
+
+module "codepipeline" {
+  source = "./modules/codepipeline"
+  count  = var.enable_codepipeline && var.github_connection_arn != "" ? 1 : 0
+
+  project_name = var.project_name
+  environment  = var.environment
+
+  aws_account_id = data.aws_caller_identity.current.account_id
+  aws_region     = var.aws_region
+
+  github_connection_arn = var.github_connection_arn
+  github_repository     = var.github_repository
+  github_branch         = var.github_branch
+
+  eks_cluster_name = var.deploy_americas ? module.eks_americas[0].cluster_name : ""
+
+  tags = local.common_tags
 }

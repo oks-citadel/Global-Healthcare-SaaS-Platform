@@ -1,5 +1,5 @@
 # ============================================
-# UnifiedHealth API - AWS EKS Overlay
+# The Unified Health API - AWS EKS Overlay
 # AWS-specific configurations for EKS deployment
 # ============================================
 apiVersion: kustomize.config.k8s.io/v1beta1

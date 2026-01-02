@@ -1,5 +1,5 @@
 ========================================
-UnifiedHealth Platform Deployed Successfully!
+The Unified Health Platform Deployed Successfully!
 ========================================
 
 Release Name: {{ .Release.Name }}

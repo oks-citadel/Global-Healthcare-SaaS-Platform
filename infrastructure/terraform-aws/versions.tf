@@ -1,5 +1,5 @@
 # ============================================
-# UnifiedHealth Platform - AWS Terraform
+# The Unified Health Platform - AWS Terraform
 # ============================================
 # AZURE IS FORBIDDEN - AWS ONLY
 # This configuration replaces all Azure infrastructure

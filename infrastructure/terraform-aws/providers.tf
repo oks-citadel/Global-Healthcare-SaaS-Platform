@@ -19,7 +19,7 @@ provider "aws" {
 
   default_tags {
     tags = {
-      Project        = "UnifiedHealth"
+      Project        = "The Unified Health"
       Environment    = var.environment
       ManagedBy      = "terraform"
       Owner          = "citadel-cloud-management"
@@ -50,7 +50,7 @@ provider "aws" {
 
   default_tags {
     tags = {
-      Project     = "UnifiedHealth"
+      Project     = "The Unified Health"
       Environment = var.environment
       ManagedBy   = "terraform"
       Region      = "Americas"
@@ -74,7 +74,7 @@ provider "aws" {
 
   default_tags {
     tags = {
-      Project     = "UnifiedHealth"
+      Project     = "The Unified Health"
       Environment = var.environment
       ManagedBy   = "terraform"
       Region      = "Europe"
@@ -84,9 +84,14 @@ provider "aws" {
 }
 
 # Africa Region (POPIA)
+# Note: af-south-1 requires opt-in. Skip validation when not deploying to Africa.
 provider "aws" {
   alias  = "africa"
   region = "af-south-1"
+
+  # Skip credential validation for Africa region when not deployed
+  skip_credentials_validation = true
+  skip_requesting_account_id  = true
 
   dynamic "assume_role" {
     for_each = var.assume_role_arn != "" ? [1] : []
@@ -99,7 +104,7 @@ provider "aws" {
 
   default_tags {
     tags = {
-      Project     = "UnifiedHealth"
+      Project     = "The Unified Health"
       Environment = var.environment
       ManagedBy   = "terraform"
       Region      = "Africa"

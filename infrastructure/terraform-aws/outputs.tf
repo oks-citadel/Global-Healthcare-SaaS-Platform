@@ -1,5 +1,5 @@
 # ============================================
-# UnifiedHealth Platform - AWS Outputs
+# The Unified Health Platform - AWS Outputs
 # ============================================
 
 # ============================================
@@ -96,4 +96,52 @@ output "africa_rds_endpoint" {
 output "africa_redis_endpoint" {
   description = "Africa ElastiCache endpoint"
   value       = try(module.elasticache_africa[0].primary_endpoint, null)
+}
+
+# ============================================
+# Route53 DNS Outputs
+# ============================================
+
+output "route53_zone_id" {
+  description = "Route53 hosted zone ID for theunifiedhealth.com"
+  value       = try(module.route53[0].zone_id, null)
+}
+
+output "route53_nameservers" {
+  description = "Route53 nameservers - Configure these in GoDaddy"
+  value       = try(module.route53[0].nameservers, null)
+}
+
+output "route53_domain_name" {
+  description = "Domain name for the hosted zone"
+  value       = try(module.route53[0].domain_name, null)
+}
+
+# ============================================
+# CodePipeline CI/CD Outputs
+# ============================================
+
+output "codepipeline_name" {
+  description = "Name of the CodePipeline"
+  value       = try(module.codepipeline[0].pipeline_name, null)
+}
+
+output "codepipeline_arn" {
+  description = "ARN of the CodePipeline"
+  value       = try(module.codepipeline[0].pipeline_arn, null)
+}
+
+output "codebuild_web_app_project" {
+  description = "CodeBuild project for web app"
+  value       = try(module.codepipeline[0].codebuild_web_app_name, null)
+}
+
+output "codebuild_api_service_project" {
+  description = "CodeBuild project for API service"
+  value       = try(module.codepipeline[0].codebuild_api_service_name, null)
+}
+
+output "pipeline_artifacts_bucket" {
+  description = "S3 bucket for pipeline artifacts"
+  value       = try(module.codepipeline[0].artifacts_bucket_name, null)
 }

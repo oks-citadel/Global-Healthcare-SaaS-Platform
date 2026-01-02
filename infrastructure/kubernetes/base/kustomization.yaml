@@ -1,6 +1,6 @@
 ---
 # ============================================
-# UnifiedHealth API - Base Kustomization
+# The Unified Health API - Base Kustomization
 # Base configuration for all environments
 # ============================================
 apiVersion: kustomize.config.k8s.io/v1beta1

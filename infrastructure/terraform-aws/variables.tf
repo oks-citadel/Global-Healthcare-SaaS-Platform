@@ -1,5 +1,5 @@
 # ============================================
-# UnifiedHealth Platform - AWS Variables
+# The Unified Health Platform - AWS Variables
 # ============================================
 # All variables for AWS deployment
 # NO AZURE VARIABLES ALLOWED
@@ -306,4 +306,48 @@ variable "monthly_budget_usd" {
   description = "Monthly budget in USD"
   type        = number
   default     = 50000
+}
+
+# ============================================
+# Domain Configuration
+# ============================================
+
+variable "domain_name" {
+  description = "Primary domain name"
+  type        = string
+  default     = "theunifiedhealth.com"
+}
+
+variable "enable_route53" {
+  description = "Enable Route53 hosted zone"
+  type        = bool
+  default     = true
+}
+
+# ============================================
+# CI/CD Configuration
+# ============================================
+
+variable "enable_codepipeline" {
+  description = "Enable CodePipeline CI/CD"
+  type        = bool
+  default     = true
+}
+
+variable "github_connection_arn" {
+  description = "ARN of CodeStar connection to GitHub"
+  type        = string
+  default     = ""
+}
+
+variable "github_repository" {
+  description = "GitHub repository (owner/repo format)"
+  type        = string
+  default     = ""
+}
+
+variable "github_branch" {
+  description = "GitHub branch to deploy"
+  type        = string
+  default     = "main"
 }

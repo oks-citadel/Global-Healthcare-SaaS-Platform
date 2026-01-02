@@ -1,5 +1,5 @@
 # ============================================
-# UnifiedHealth Platform - Staging Environment
+# The Unified Health Platform - Staging Environment
 # ============================================
 # AWS-ONLY Configuration (Azure Removed)
 # ============================================

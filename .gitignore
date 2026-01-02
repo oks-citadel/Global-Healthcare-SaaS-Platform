@@ -47,6 +47,15 @@ infrastructure/terraform/.terraform.lock.hcl
 infrastructure/terraform/*.tfplan
 infrastructure/terraform/crash.log
 
+# Terraform AWS
+infrastructure/terraform-aws/.terraform/
+infrastructure/terraform-aws/*.tfstate
+infrastructure/terraform-aws/*.tfstate.*
+infrastructure/terraform-aws/.terraform.lock.hcl
+infrastructure/terraform-aws/tfplan
+infrastructure/terraform-aws/crash.log
+# Note: terraform.tfvars is committed for reference but sensitive values should use environment variables
+
 # Docker
 docker-compose.override.yml
 

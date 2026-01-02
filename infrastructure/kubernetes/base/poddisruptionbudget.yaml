@@ -1,6 +1,6 @@
 ---
 # ============================================
-# UnifiedHealth API - Pod Disruption Budget
+# The Unified Health API - Pod Disruption Budget
 # Ensures high availability during voluntary disruptions
 # ============================================
 apiVersion: policy/v1

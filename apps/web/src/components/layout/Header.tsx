@@ -36,7 +36,7 @@ export default function Header() {
                   <span className="text-white font-bold text-lg">U</span>
                 </div>
                 <span className="text-xl font-bold text-gray-900">
-                  UnifiedHealth
+                  Unified Health
                 </span>
               </div>
             </Link>

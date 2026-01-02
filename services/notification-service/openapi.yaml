@@ -1,9 +1,9 @@
 openapi: 3.0.3
 info:
-  title: UnifiedHealth Notification Service
+  title: The Unified Health Notification Service
   version: 1.0.0
   description: |
-    The Notification Service for the UnifiedHealth Global Platform. This service manages
+    The Notification Service for The Unified Health Global Platform. This service manages
     all notification delivery across multiple channels including email, SMS, push
     notifications, and in-app messages.
 
@@ -29,10 +29,10 @@ info:
 
   contact:
     name: API Support
-    email: support@unifiedhealth.io
+    email: support@theunifiedhealth.com
   license:
     name: Proprietary
-    url: https://unifiedhealthcare.com/terms
+    url: https://theunifiedhealth.com/terms
 
 servers:
   - url: http://localhost:3005

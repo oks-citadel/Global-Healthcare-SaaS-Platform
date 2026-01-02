@@ -1,5 +1,5 @@
 # ============================================
-# UnifiedHealth Platform - CI Test Pipeline
+# The Unified Health Platform - CI Test Pipeline
 # Runs unit tests, integration tests, and security tests on PR/Push
 # ============================================
 
@@ -73,6 +73,71 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+  # ==========================================
+  # Branding Consistency Check
+  # ==========================================
+  branding-check:
+    name: Branding Consistency
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Check for disallowed branding variants
+        run: |
+          echo "Checking for disallowed branding patterns..."
+
+          # Define patterns to search for (disallowed variants)
+          # Using word boundaries to avoid false positives
+          DISALLOWED_PATTERNS=(
+            "UnifiedHealth[^c]"
+            "Unified Healthcare"
+            "unified-health\.com"
+            "unifiedhealth\.com"
+          )
+
+          # Files to exclude from check (internal identifiers, package names, etc.)
+          EXCLUDE_PATTERNS="--exclude-dir=node_modules --exclude-dir=.git --exclude-dir=dist --exclude-dir=.pnpm --exclude=*.lock --exclude=pnpm-lock.yaml --exclude=package-lock.json --exclude=*.min.js --exclude=*.map"
+
+          # Whitelist file patterns (internal identifiers that are allowed)
+          # These contain technical identifiers that must remain as-is
+          WHITELIST_FILES="app.json|package.json|\.env|Dockerfile|docker-compose|kustomization|\.tf$|Chart\.yaml"
+
+          FOUND_ISSUES=false
+
+          for pattern in "${DISALLOWED_PATTERNS[@]}"; do
+            echo "Checking pattern: $pattern"
+
+            # Search in user-facing files
+            MATCHES=$(grep -rniE "$pattern" \
+              --include="*.html" \
+              --include="*.tsx" \
+              --include="*.ts" \
+              --include="*.md" \
+              --include="*.yaml" \
+              --include="*.yml" \
+              $EXCLUDE_PATTERNS \
+              apps/ services/ docs/ packages/i18n/ \
+              2>/dev/null | grep -vE "$WHITELIST_FILES" || true)
+
+            if [ -n "$MATCHES" ]; then
+              echo "::warning::Found disallowed branding pattern '$pattern':"
+              echo "$MATCHES" | head -20
+              FOUND_ISSUES=true
+            fi
+          done
+
+          if [ "$FOUND_ISSUES" = true ]; then
+            echo ""
+            echo "::error::Branding consistency check found issues."
+            echo "Allowed variants: 'The Unified Health' (canonical), 'Unified Health' (UI shorthand)"
+            echo "Domain: theunifiedhealth.com"
+            exit 1
+          fi
+
+          echo "Branding consistency check passed!"
 
   # ==========================================
   # Unit Tests - API Service
@@ -487,6 +552,7 @@ jobs:
     name: CI Gate
     runs-on: ubuntu-latest
     needs:
+      - branding-check
       - unit-tests-api
       - unit-tests-notification
       - unit-tests-web

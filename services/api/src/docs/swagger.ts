@@ -8,7 +8,7 @@ const swaggerOptions: swaggerJSDoc.Options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'Unified Healthcare Platform API',
+      title: 'The Unified Health Platform API',
       version: '1.0.0',
       description: `
         Comprehensive healthcare API for managing patients, appointments, encounters, documents, and more.
@@ -24,12 +24,12 @@ const swaggerOptions: swaggerJSDoc.Options = {
       `,
       contact: {
         name: 'API Support',
-        email: 'api-support@unifiedhealth.com',
-        url: 'https://docs.unifiedhealth.com',
+        email: 'api-support@theunifiedhealth.com',
+        url: 'https://docs.theunifiedhealth.com',
       },
       license: {
         name: 'Proprietary',
-        url: 'https://unifiedhealth.com/license',
+        url: 'https://theunifiedhealth.com/license',
       },
     },
     servers: [
@@ -505,7 +505,7 @@ export function setupSwagger(app: Express): void {
     swaggerUi.serve,
     swaggerUi.setup(swaggerSpec, {
       customCss: '.swagger-ui .topbar { display: none }',
-      customSiteTitle: 'Unified Healthcare API Documentation',
+      customSiteTitle: 'The Unified Health API Documentation',
       customfavIcon: '/favicon.ico',
       swaggerOptions: {
         persistAuthorization: true,

@@ -1,6 +1,6 @@
 ---
 # ============================================
-# UnifiedHealth API - Ingress
+# The Unified Health API - Ingress
 # NGINX Ingress with TLS and rate limiting
 # ============================================
 apiVersion: networking.k8s.io/v1
@@ -122,7 +122,7 @@ spec:
 
 ---
 # ============================================
-# UnifiedHealth API - TLS Certificate
+# The Unified Health API - TLS Certificate
 # Certificate managed by cert-manager
 # ============================================
 apiVersion: cert-manager.io/v1

@@ -3,6 +3,9 @@
  * Country-specific configuration for healthcare compliance
  */
 
+// Export branding (single source of truth)
+export * from './branding';
+
 // Export types
 export * from './types';
 

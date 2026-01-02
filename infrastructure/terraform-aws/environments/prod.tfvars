@@ -1,5 +1,5 @@
 # ============================================
-# UnifiedHealth Platform - Production Environment
+# The Unified Health Platform - Production Environment
 # ============================================
 # AWS-ONLY Configuration (Azure Removed)
 # Multi-Region Deployment
