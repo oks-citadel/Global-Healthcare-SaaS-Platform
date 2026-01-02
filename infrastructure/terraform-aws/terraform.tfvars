@@ -33,10 +33,10 @@ rds_backup_retention_days = 30
 elasticache_node_type          = "cache.r6g.large"
 elasticache_num_cache_clusters = 2
 
-# CI/CD Configuration - Will be enabled after GitHub connection
-enable_codepipeline   = false
-github_connection_arn = ""
-github_repository     = ""
+# CI/CD Configuration
+enable_codepipeline   = true
+github_connection_arn = "arn:aws:codestar-connections:us-east-1:992382449461:connection/0cc565b7-bc2a-4e6b-b40f-c47ccc053e45"
+github_repository     = "oks-citadel/Global-Healthcare-SaaS-Platform"
 github_branch         = "main"
 
 # Monitoring

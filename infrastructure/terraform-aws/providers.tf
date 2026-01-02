@@ -24,7 +24,7 @@ provider "aws" {
       ManagedBy      = "terraform"
       Owner          = "citadel-cloud-management"
       CostCenter     = "healthcare-platform"
-      Compliance     = join(",", var.compliance_standards)
+      Compliance     = join("-", var.compliance_standards)
       DataResidency  = var.aws_region
     }
   }
