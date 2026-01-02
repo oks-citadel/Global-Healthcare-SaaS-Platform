@@ -38,20 +38,37 @@ phases:
       - cd $CODEBUILD_SRC_DIR
 
       # Select Dockerfile: prefer service-specific, fallback to monorepo Dockerfiles
+      # Force ARM64 platform for EKS Graviton nodes
       - |
         # Check if service has its own Dockerfile
         if [[ -f "${SERVICE_PATH}/Dockerfile" ]]; then
           echo "Using service-specific Dockerfile: ${SERVICE_PATH}/Dockerfile"
           docker build -t $IMAGE_URI \
+            --platform linux/arm64 \
+            --no-cache \
             --build-arg NODE_ENV=production \
             --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
             --build-arg VCS_REF=$COMMIT_HASH \
             -f ${SERVICE_PATH}/Dockerfile \
             ${SERVICE_PATH}
+        elif [[ "$SERVICE_PATH" == "apps/web" ]]; then
+          # Use pnpm-based Dockerfile for web app (optimized for monorepo)
+          DOCKERFILE="Dockerfile.web.pnpm"
+          echo "Building Next.js web app with $DOCKERFILE"
+          docker build -t $IMAGE_URI \
+            --platform linux/arm64 \
+            --no-cache \
+            --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+            --build-arg VERSION=${IMAGE_TAG} \
+            --build-arg GIT_SHA=$COMMIT_HASH \
+            -f $DOCKERFILE \
+            .
         elif [[ "$SERVICE_PATH" == apps/* ]]; then
           DOCKERFILE="docker/Dockerfile.app"
           echo "Building Next.js app with monorepo $DOCKERFILE"
           docker build -t $IMAGE_URI \
+            --platform linux/arm64 \
+            --no-cache \
             --build-arg SERVICE_PATH=$SERVICE_PATH \
             --build-arg SERVICE_NAME=$SERVICE_NAME \
             --build-arg NODE_ENV=production \
@@ -63,6 +80,8 @@ phases:
           DOCKERFILE="docker/Dockerfile.service"
           echo "Building service with monorepo $DOCKERFILE"
           docker build -t $IMAGE_URI \
+            --platform linux/arm64 \
+            --no-cache \
             --build-arg SERVICE_PATH=$SERVICE_PATH \
             --build-arg SERVICE_NAME=$SERVICE_NAME \
             --build-arg NODE_ENV=production \
