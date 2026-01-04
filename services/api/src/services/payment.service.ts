@@ -1,5 +1,6 @@
 import Stripe from 'stripe';
 import { PrismaClient } from '../generated/client';
+import { v4 as uuidv4 } from 'uuid';
 import {
   stripe,
   createStripeCustomer,
@@ -22,6 +23,7 @@ import {
   listCustomerCharges,
 } from '../lib/stripe.js';
 import { logger } from '../utils/logger.js';
+import { auditService } from './audit.service.js';
 import {
   CreateSubscriptionDto,
   UpdatePaymentMethodDto,
@@ -32,6 +34,95 @@ import {
 } from '../dtos/payment.dto.js';
 
 const prisma = new PrismaClient();
+
+/**
+ * Payment Error Types for proper error categorization
+ */
+export class PaymentError extends Error {
+  public readonly code: string;
+  public readonly isRetryable: boolean;
+  public readonly statusCode: number;
+
+  constructor(message: string, code: string, isRetryable: boolean = false, statusCode: number = 500) {
+    super(message);
+    this.name = 'PaymentError';
+    this.code = code;
+    this.isRetryable = isRetryable;
+    this.statusCode = statusCode;
+  }
+}
+
+export class PaymentValidationError extends PaymentError {
+  constructor(message: string) {
+    super(message, 'VALIDATION_ERROR', false, 400);
+    this.name = 'PaymentValidationError';
+  }
+}
+
+export class PaymentNotFoundError extends PaymentError {
+  constructor(message: string) {
+    super(message, 'NOT_FOUND', false, 404);
+    this.name = 'PaymentNotFoundError';
+  }
+}
+
+export class PaymentProcessingError extends PaymentError {
+  constructor(message: string, isRetryable: boolean = true) {
+    super(message, 'PROCESSING_ERROR', isRetryable, 502);
+    this.name = 'PaymentProcessingError';
+  }
+}
+
+/**
+ * Generate idempotency key for Stripe operations
+ */
+function generateIdempotencyKey(prefix: string, ...parts: string[]): string {
+  return `${prefix}_${parts.join('_')}_${Date.now()}`;
+}
+
+/**
+ * Retry configuration for database operations
+ */
+const RETRY_CONFIG = {
+  maxRetries: 3,
+  baseDelayMs: 500,
+  maxDelayMs: 5000,
+};
+
+/**
+ * Retry a database operation with exponential backoff
+ */
+async function retryOperation<T>(
+  operation: () => Promise<T>,
+  operationName: string,
+  maxRetries: number = RETRY_CONFIG.maxRetries
+): Promise<T> {
+  let lastError: Error | null = null;
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await operation();
+    } catch (error) {
+      lastError = error as Error;
+      if (attempt < maxRetries) {
+        const delay = Math.min(
+          Math.pow(2, attempt) * RETRY_CONFIG.baseDelayMs,
+          RETRY_CONFIG.maxDelayMs
+        );
+        logger.warn(`${operationName} failed, retrying...`, {
+          attempt: attempt + 1,
+          maxRetries,
+          delayMs: delay,
+          error: lastError.message,
+        });
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
+    }
+  }
+
+  logger.error(`${operationName} failed after all retries`, { error: lastError });
+  throw lastError || new Error(`${operationName} failed`);
+}
 
 interface CustomerMetadata {
   userId: string;
@@ -93,22 +184,26 @@ export class PaymentService {
   }
 
   /**
-   * Create a subscription for a user
+   * Create a subscription for a user with idempotency and audit logging
    */
   async createSubscription(
     userId: string,
-    data: CreateSubscriptionDto
+    data: CreateSubscriptionDto,
+    requestContext?: { ipAddress?: string; userAgent?: string }
   ): Promise<{
     subscription: Stripe.Subscription;
     clientSecret: string | null;
   }> {
+    const operationId = uuidv4();
+    const startTime = Date.now();
+
     try {
       const user = await prisma.user.findUnique({
         where: { id: userId },
       });
 
       if (!user) {
-        throw new Error('User not found');
+        throw new PaymentNotFoundError('User not found');
       }
 
       // Get or create Stripe customer
@@ -118,22 +213,42 @@ export class PaymentService {
         name: `${user.firstName} ${user.lastName}`,
       });
 
-      // If payment method is provided, attach it to customer
+      // If payment method is provided, attach it to customer with idempotency
       if (data.paymentMethodId) {
-        await attachPaymentMethod(data.paymentMethodId, customer.id);
+        const attachIdempotencyKey = generateIdempotencyKey('attach_pm', userId, data.paymentMethodId);
+        await stripe.paymentMethods.attach(
+          data.paymentMethodId,
+          { customer: customer.id },
+          { idempotencyKey: attachIdempotencyKey }
+        );
         await setDefaultPaymentMethod(customer.id, data.paymentMethodId);
       }
 
-      // Create subscription
-      const subscription = await createStripeSubscription({
-        customerId: customer.id,
-        priceId: data.priceId,
-        trialPeriodDays: data.trialPeriodDays,
-        metadata: {
-          userId,
-          ...data.metadata,
+      // Generate idempotency key for subscription creation
+      const subscriptionIdempotencyKey = generateIdempotencyKey('subscription', userId, data.priceId);
+
+      // Create subscription with idempotency key
+      const subscription = await stripe.subscriptions.create(
+        {
+          customer: customer.id,
+          items: [{ price: data.priceId }],
+          metadata: {
+            userId,
+            operationId,
+            ...data.metadata,
+          },
+          trial_period_days: data.trialPeriodDays,
+          payment_behavior: 'default_incomplete',
+          payment_settings: {
+            payment_method_types: ['card'],
+            save_default_payment_method: 'on_subscription',
+          },
+          expand: ['latest_invoice.payment_intent', 'customer'],
         },
-      });
+        {
+          idempotencyKey: subscriptionIdempotencyKey,
+        }
+      );
 
       // Get the plan details
       const plan = await prisma.plan.findUnique({
@@ -141,24 +256,27 @@ export class PaymentService {
       });
 
       if (!plan) {
-        throw new Error('Plan not found');
+        throw new PaymentNotFoundError('Plan not found');
       }
 
-      // Save subscription to database
-      await prisma.subscription.create({
-        data: {
-          userId,
-          planId: plan.id,
-          stripeSubscriptionId: subscription.id,
-          status:
-            subscription.status === 'active' || subscription.status === 'trialing'
-              ? 'active'
-              : 'past_due',
-          currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
-          currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
-          cancelAtPeriodEnd: subscription.cancel_at_period_end,
-        },
-      });
+      // Save subscription to database with retry logic
+      const dbSubscription = await retryOperation(
+        async () => prisma.subscription.create({
+          data: {
+            userId,
+            planId: plan.id,
+            stripeSubscriptionId: subscription.id,
+            status:
+              subscription.status === 'active' || subscription.status === 'trialing'
+                ? 'active'
+                : 'past_due',
+            currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
+            currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
+            cancelAtPeriodEnd: subscription.cancel_at_period_end,
+          },
+        }),
+        'Create subscription record'
+      );
 
       // Extract client secret for payment confirmation
       let clientSecret: string | null = null;
@@ -177,25 +295,81 @@ export class PaymentService {
         }
       }
 
-      logger.info(`Created subscription ${subscription.id} for user ${userId}`);
+      // Log audit event for subscription creation
+      await auditService.logEvent({
+        userId,
+        action: 'SUBSCRIPTION_CREATED',
+        resource: 'subscription',
+        resourceId: dbSubscription.id,
+        details: {
+          operationId,
+          stripeSubscriptionId: subscription.id,
+          planId: plan.id,
+          planName: plan.name,
+          status: subscription.status,
+          trialPeriodDays: data.trialPeriodDays,
+          processingTimeMs: Date.now() - startTime,
+        },
+        ipAddress: requestContext?.ipAddress,
+        userAgent: requestContext?.userAgent,
+      });
+
+      logger.info(`Created subscription ${subscription.id} for user ${userId}`, {
+        operationId,
+        idempotencyKey: subscriptionIdempotencyKey,
+        processingTimeMs: Date.now() - startTime,
+      });
 
       return {
         subscription,
         clientSecret,
       };
-    } catch (error) {
-      logger.error('Error creating subscription:', error);
-      throw error;
+    } catch (error: any) {
+      // Log failed subscription creation for audit
+      await auditService.logEvent({
+        userId,
+        action: 'SUBSCRIPTION_CREATION_FAILED',
+        resource: 'subscription',
+        details: {
+          operationId,
+          priceId: data.priceId,
+          error: error.message,
+          errorCode: error.code,
+          processingTimeMs: Date.now() - startTime,
+        },
+        ipAddress: requestContext?.ipAddress,
+        userAgent: requestContext?.userAgent,
+      }).catch((auditError) => {
+        logger.error('Failed to log audit event for failed subscription creation', { auditError });
+      });
+
+      logger.error('Error creating subscription:', { error, operationId });
+
+      // Categorize and rethrow with proper error type
+      if (error instanceof PaymentError) {
+        throw error;
+      }
+      if (error.type === 'StripeCardError') {
+        throw new PaymentProcessingError(error.message, false);
+      }
+      if (error.type === 'StripeInvalidRequestError') {
+        throw new PaymentValidationError(error.message);
+      }
+      throw new PaymentProcessingError(error.message, true);
     }
   }
 
   /**
-   * Cancel a subscription
+   * Cancel a subscription with audit logging
    */
   async cancelSubscription(
     userId: string,
-    data: CancelSubscriptionDto
+    data: CancelSubscriptionDto,
+    requestContext?: { ipAddress?: string; userAgent?: string }
   ): Promise<Stripe.Subscription> {
+    const operationId = uuidv4();
+    const startTime = Date.now();
+
     try {
       // Verify subscription belongs to user
       const dbSubscription = await prisma.subscription.findFirst({
@@ -206,7 +380,7 @@ export class PaymentService {
       });
 
       if (!dbSubscription) {
-        throw new Error('Subscription not found or does not belong to user');
+        throw new PaymentNotFoundError('Subscription not found or does not belong to user');
       }
 
       // Cancel in Stripe
@@ -215,22 +389,71 @@ export class PaymentService {
         data.cancelAtPeriodEnd
       );
 
-      // Update database
-      await prisma.subscription.update({
-        where: { id: dbSubscription.id },
-        data: {
-          status: data.cancelAtPeriodEnd ? 'active' : 'cancelled',
+      // Update database with retry logic
+      await retryOperation(
+        async () => prisma.subscription.update({
+          where: { id: dbSubscription.id },
+          data: {
+            status: data.cancelAtPeriodEnd ? 'active' : 'cancelled',
+            cancelAtPeriodEnd: data.cancelAtPeriodEnd,
+            updatedAt: new Date(),
+          },
+        }),
+        'Update subscription for cancellation'
+      );
+
+      // Log audit event for subscription cancellation
+      await auditService.logEvent({
+        userId,
+        action: data.cancelAtPeriodEnd ? 'SUBSCRIPTION_CANCEL_SCHEDULED' : 'SUBSCRIPTION_CANCELLED',
+        resource: 'subscription',
+        resourceId: dbSubscription.id,
+        details: {
+          operationId,
+          stripeSubscriptionId: data.subscriptionId,
           cancelAtPeriodEnd: data.cancelAtPeriodEnd,
-          updatedAt: new Date(),
+          effectiveDate: data.cancelAtPeriodEnd
+            ? new Date((subscription as any).current_period_end * 1000).toISOString()
+            : new Date().toISOString(),
+          processingTimeMs: Date.now() - startTime,
         },
+        ipAddress: requestContext?.ipAddress,
+        userAgent: requestContext?.userAgent,
       });
 
-      logger.info(`Cancelled subscription ${data.subscriptionId} for user ${userId}`);
+      logger.info(`Cancelled subscription ${data.subscriptionId} for user ${userId}`, {
+        operationId,
+        cancelAtPeriodEnd: data.cancelAtPeriodEnd,
+        processingTimeMs: Date.now() - startTime,
+      });
 
       return subscription;
-    } catch (error) {
-      logger.error('Error cancelling subscription:', error);
-      throw error;
+    } catch (error: any) {
+      // Log failed cancellation for audit
+      await auditService.logEvent({
+        userId,
+        action: 'SUBSCRIPTION_CANCELLATION_FAILED',
+        resource: 'subscription',
+        details: {
+          operationId,
+          stripeSubscriptionId: data.subscriptionId,
+          cancelAtPeriodEnd: data.cancelAtPeriodEnd,
+          error: error.message,
+          errorCode: error.code,
+          processingTimeMs: Date.now() - startTime,
+        },
+        ipAddress: requestContext?.ipAddress,
+        userAgent: requestContext?.userAgent,
+      }).catch((auditError) => {
+        logger.error('Failed to log audit event for failed cancellation', { auditError });
+      });
+
+      logger.error('Error cancelling subscription:', { error, operationId });
+
+      if (error instanceof PaymentError) {
+        throw error;
+      }
+      throw new PaymentProcessingError(error.message, true);
     }
   }
 
@@ -654,22 +877,26 @@ export class PaymentService {
   }
 
   /**
-   * Create a one-time charge
+   * Create a one-time charge with idempotency and audit logging
    */
   async createCharge(
     userId: string,
-    data: CreateChargeDto
+    data: CreateChargeDto,
+    requestContext?: { ipAddress?: string; userAgent?: string }
   ): Promise<{
     payment: any;
     clientSecret: string | null;
   }> {
+    const operationId = uuidv4();
+    const startTime = Date.now();
+
     try {
       const user = await prisma.user.findUnique({
         where: { id: userId },
       });
 
       if (!user) {
-        throw new Error('User not found');
+        throw new PaymentNotFoundError('User not found');
       }
 
       // Get or create Stripe customer
@@ -679,42 +906,110 @@ export class PaymentService {
         name: `${user.firstName} ${user.lastName}`,
       });
 
-      // Create payment intent
-      const paymentIntent = await createPaymentIntent({
-        amount: data.amount,
-        currency: data.currency,
-        customerId: customer.id,
-        paymentMethodId: data.paymentMethodId,
-        description: data.description,
-        metadata: {
-          userId,
-          ...data.metadata,
-        },
-        confirmImmediately: data.confirmImmediately,
-      });
+      // Generate idempotency key for this charge operation
+      const idempotencyKey = generateIdempotencyKey('charge', userId, data.amount.toString(), data.currency);
 
-      // Save payment to database
-      const payment = await prisma.payment.create({
-        data: {
-          userId,
-          stripePaymentIntentId: paymentIntent.id,
-          amount: data.amount / 100, // Convert from cents to dollars
-          currency: data.currency.toUpperCase(),
-          status: this.mapStripePaymentStatus(paymentIntent.status),
+      // Create payment intent with idempotency key
+      const paymentIntent = await stripe.paymentIntents.create(
+        {
+          amount: data.amount,
+          currency: data.currency,
+          customer: customer.id,
+          payment_method: data.paymentMethodId,
           description: data.description,
-          metadata: data.metadata as any,
+          metadata: {
+            userId,
+            operationId,
+            ...data.metadata,
+          },
+          automatic_payment_methods: {
+            enabled: true,
+            allow_redirects: 'never',
+          },
+          confirm: data.confirmImmediately && data.paymentMethodId ? true : undefined,
         },
+        {
+          idempotencyKey,
+        }
+      );
+
+      // Save payment to database with retry logic
+      const payment = await retryOperation(
+        async () => prisma.payment.create({
+          data: {
+            userId,
+            stripePaymentIntentId: paymentIntent.id,
+            amount: data.amount / 100, // Convert from cents to dollars
+            currency: data.currency.toUpperCase(),
+            status: this.mapStripePaymentStatus(paymentIntent.status),
+            description: data.description,
+            metadata: { ...data.metadata, operationId, idempotencyKey } as any,
+          },
+        }),
+        'Create payment record'
+      );
+
+      // Log audit event for the charge
+      await auditService.logEvent({
+        userId,
+        action: 'PAYMENT_CHARGE_CREATED',
+        resource: 'payment',
+        resourceId: payment.id,
+        details: {
+          operationId,
+          stripePaymentIntentId: paymentIntent.id,
+          amount: data.amount / 100,
+          currency: data.currency.toUpperCase(),
+          status: payment.status,
+          processingTimeMs: Date.now() - startTime,
+        },
+        ipAddress: requestContext?.ipAddress,
+        userAgent: requestContext?.userAgent,
       });
 
-      logger.info(`Created charge ${paymentIntent.id} for user ${userId}`);
+      logger.info(`Created charge ${paymentIntent.id} for user ${userId}`, {
+        operationId,
+        idempotencyKey,
+        processingTimeMs: Date.now() - startTime,
+      });
 
       return {
         payment,
         clientSecret: paymentIntent.client_secret,
       };
-    } catch (error) {
-      logger.error('Error creating charge:', error);
-      throw error;
+    } catch (error: any) {
+      // Log failed charge attempt for audit
+      await auditService.logEvent({
+        userId,
+        action: 'PAYMENT_CHARGE_FAILED',
+        resource: 'payment',
+        details: {
+          operationId,
+          amount: data.amount / 100,
+          currency: data.currency,
+          error: error.message,
+          errorCode: error.code,
+          processingTimeMs: Date.now() - startTime,
+        },
+        ipAddress: requestContext?.ipAddress,
+        userAgent: requestContext?.userAgent,
+      }).catch((auditError) => {
+        logger.error('Failed to log audit event for failed charge', { auditError });
+      });
+
+      logger.error('Error creating charge:', { error, operationId });
+
+      // Categorize and rethrow with proper error type
+      if (error instanceof PaymentError) {
+        throw error;
+      }
+      if (error.type === 'StripeCardError') {
+        throw new PaymentProcessingError(error.message, false);
+      }
+      if (error.type === 'StripeInvalidRequestError') {
+        throw new PaymentValidationError(error.message);
+      }
+      throw new PaymentProcessingError(error.message, true);
     }
   }
 
@@ -817,68 +1112,141 @@ export class PaymentService {
   }
 
   /**
-   * Refund a payment
+   * Refund a payment with idempotency and audit logging
    */
   async refundPayment(
     userId: string,
     paymentId: string,
-    data: CreateRefundDto
+    data: CreateRefundDto,
+    requestContext?: { ipAddress?: string; userAgent?: string }
   ): Promise<any> {
+    const operationId = uuidv4();
+    const startTime = Date.now();
+
     try {
       const payment = await prisma.payment.findUnique({
         where: { id: paymentId },
       });
 
       if (!payment) {
-        throw new Error('Payment not found');
+        throw new PaymentNotFoundError('Payment not found');
       }
 
       // Verify payment belongs to user
       if (payment.userId !== userId) {
-        throw new Error('Payment not found or does not belong to user');
+        throw new PaymentNotFoundError('Payment not found or does not belong to user');
       }
 
       // Verify payment can be refunded
       if (payment.status !== 'succeeded') {
-        throw new Error('Only succeeded payments can be refunded');
+        throw new PaymentValidationError('Only succeeded payments can be refunded');
       }
 
       if (!payment.stripePaymentIntentId) {
-        throw new Error('Payment does not have a Stripe payment intent');
+        throw new PaymentValidationError('Payment does not have a Stripe payment intent');
       }
 
-      // Create refund in Stripe
-      const refund = await createRefund({
-        paymentIntentId: payment.stripePaymentIntentId,
-        amount: data.amount,
-        reason: data.reason,
-        metadata: {
-          userId,
-          paymentId,
-          ...data.metadata,
-        },
-      });
+      // Generate idempotency key for refund operation
+      const idempotencyKey = generateIdempotencyKey(
+        'refund',
+        paymentId,
+        (data.amount || 'full').toString()
+      );
 
-      // Update payment in database
+      // Create refund in Stripe with idempotency key
+      const refund = await stripe.refunds.create(
+        {
+          payment_intent: payment.stripePaymentIntentId,
+          amount: data.amount,
+          reason: data.reason,
+          metadata: {
+            userId,
+            paymentId,
+            operationId,
+            ...data.metadata,
+          },
+        },
+        {
+          idempotencyKey,
+        }
+      );
+
+      // Update payment in database with retry logic
       const isFullRefund = !data.amount || data.amount === Number(payment.amount) * 100;
-      const updatedPayment = await prisma.payment.update({
-        where: { id: paymentId },
-        data: {
-          status: isFullRefund ? 'refunded' : 'partially_refunded',
-          refundedAmount: refund.amount / 100,
-          refundedAt: new Date(),
+      const updatedPayment = await retryOperation(
+        async () => prisma.payment.update({
+          where: { id: paymentId },
+          data: {
+            status: isFullRefund ? 'refunded' : 'partially_refunded',
+            refundedAmount: refund.amount / 100,
+            refundedAt: new Date(),
+          },
+        }),
+        'Update payment for refund'
+      );
+
+      // Log audit event for the refund
+      await auditService.logEvent({
+        userId,
+        action: 'PAYMENT_REFUND_CREATED',
+        resource: 'payment',
+        resourceId: paymentId,
+        details: {
+          operationId,
+          stripeRefundId: refund.id,
+          stripePaymentIntentId: payment.stripePaymentIntentId,
+          originalAmount: Number(payment.amount),
+          refundAmount: refund.amount / 100,
+          isFullRefund,
+          reason: data.reason,
+          processingTimeMs: Date.now() - startTime,
         },
+        ipAddress: requestContext?.ipAddress,
+        userAgent: requestContext?.userAgent,
       });
 
-      logger.info(`Refunded payment ${paymentId} for user ${userId}`);
+      logger.info(`Refunded payment ${paymentId} for user ${userId}`, {
+        operationId,
+        idempotencyKey,
+        refundId: refund.id,
+        processingTimeMs: Date.now() - startTime,
+      });
 
       return {
         payment: updatedPayment,
         refund,
       };
-    } catch (error) {
-      logger.error('Error refunding payment:', error);
-      throw error;
+    } catch (error: any) {
+      // Log failed refund attempt for audit
+      await auditService.logEvent({
+        userId,
+        action: 'PAYMENT_REFUND_FAILED',
+        resource: 'payment',
+        resourceId: paymentId,
+        details: {
+          operationId,
+          amount: data.amount,
+          reason: data.reason,
+          error: error.message,
+          errorCode: error.code,
+          processingTimeMs: Date.now() - startTime,
+        },
+        ipAddress: requestContext?.ipAddress,
+        userAgent: requestContext?.userAgent,
+      }).catch((auditError) => {
+        logger.error('Failed to log audit event for failed refund', { auditError });
+      });
+
+      logger.error('Error refunding payment:', { error, operationId });
+
+      // Categorize and rethrow with proper error type
+      if (error instanceof PaymentError) {
+        throw error;
+      }
+      if (error.type === 'StripeInvalidRequestError') {
+        throw new PaymentValidationError(error.message);
+      }
+      throw new PaymentProcessingError(error.message, true);
     }
   }
 

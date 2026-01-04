@@ -334,7 +334,7 @@ export class OAuthService {
             email: profile.email,
             displayName: profile.displayName,
             avatarUrl: profile.avatarUrl,
-            profileData: profile.rawProfile,
+            profileData: profile.rawProfile as object,
             lastUsedAt: new Date(),
           },
         });
@@ -406,7 +406,7 @@ export class OAuthService {
             email: profile.email,
             displayName: profile.displayName,
             avatarUrl: profile.avatarUrl,
-            profileData: profile.rawProfile,
+            profileData: profile.rawProfile as object,
             lastUsedAt: new Date(),
           },
         },
@@ -475,7 +475,7 @@ export class OAuthService {
         email: profile.email,
         displayName: profile.displayName,
         avatarUrl: profile.avatarUrl,
-        profileData: profile.rawProfile,
+        profileData: profile.rawProfile as object,
         lastUsedAt: new Date(),
       },
     });

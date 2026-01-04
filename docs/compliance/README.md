@@ -1,7 +1,7 @@
 # HIPAA Compliance Documentation
 
-**Last Updated:** January 15, 2025
-**Version:** 1.0
+**Last Updated:** January 2025
+**Version:** 1.1
 
 ---
 
@@ -262,6 +262,8 @@ All quality gates must be met for ongoing HIPAA compliance:
 7. PHI Data Flow Documentation - All flows mapped
 8. Data Retention Policy - Automated processes implemented
 9. Incident Response Procedures - IRT trained and tested
+10. Audit Evidence Guide - Centralized evidence collection
+11. Data Classification Policy - Classification framework documented
 
 ### In Progress 🔄
 - Annual HIPAA compliance audit (scheduled Q1 2025)
@@ -272,6 +274,40 @@ All quality gates must be met for ongoing HIPAA compliance:
 - Q2 2025: Quarterly compliance review
 - Q3 2025: HITRUST CSF certification (in progress)
 - Q4 2025: SOC 2 Type II audit
+
+---
+
+### 10. Audit Evidence Guide
+**File:** `AUDIT-EVIDENCE.md`
+**Purpose:** Centralized evidence collection guide for HIPAA, GDPR, and SOC2 audits
+**Review Schedule:** Quarterly or before audits
+**Owner:** Compliance Team
+
+**Contents:**
+- HIPAA compliance checklist with evidence locations
+- GDPR compliance checklist with evidence locations
+- SOC2 Trust Service Criteria control mappings
+- Data flow documentation cross-references
+- Audit preparation checklist
+
+**Use Case:** Audit preparation and evidence collection
+
+---
+
+### 11. Data Classification Policy
+**File:** `DATA-CLASSIFICATION.md`
+**Purpose:** Define data types, handling requirements, and encryption standards
+**Review Schedule:** Annual
+**Owner:** Security & Compliance Teams
+
+**Contents:**
+- PII data types and handling procedures
+- PHI data types and handling procedures
+- Data retention policies by classification
+- Encryption requirements by classification level
+- Access control requirements by classification
+
+**Use Case:** Data handling guidance for developers and operations
 
 ---
 

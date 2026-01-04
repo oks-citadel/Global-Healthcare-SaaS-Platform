@@ -128,14 +128,14 @@ export class AppleStrategy extends OAuthBaseStrategy {
         throw new Error(`Token exchange failed: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as Record<string, unknown>;
 
       return {
-        accessToken: data.access_token,
-        refreshToken: data.refresh_token || null,
-        expiresIn: data.expires_in || null,
-        tokenType: data.token_type || 'Bearer',
-        idToken: data.id_token,
+        accessToken: data.access_token as string,
+        refreshToken: (data.refresh_token as string) || null,
+        expiresIn: (data.expires_in as number) || null,
+        tokenType: (data.token_type as string) || 'Bearer',
+        idToken: data.id_token as string | undefined,
       };
     } catch (error) {
       logger.error('Apple token exchange error', {
@@ -222,7 +222,7 @@ export class AppleStrategy extends OAuthBaseStrategy {
         throw new Error('Failed to fetch Apple public keys');
       }
 
-      const { keys } = await response.json();
+      const { keys } = await response.json() as { keys: Array<{ kid: string }> };
 
       // Decode token header to get key ID
       const header = jwt.decode(idToken, { complete: true })?.header;
@@ -296,14 +296,14 @@ export class AppleStrategy extends OAuthBaseStrategy {
         throw new Error(`Token refresh failed: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as Record<string, unknown>;
 
       return {
-        accessToken: data.access_token,
+        accessToken: data.access_token as string,
         refreshToken: refreshToken, // Apple doesn't return new refresh token
-        expiresIn: data.expires_in || null,
-        tokenType: data.token_type || 'Bearer',
-        idToken: data.id_token,
+        expiresIn: (data.expires_in as number) || null,
+        tokenType: (data.token_type as string) || 'Bearer',
+        idToken: data.id_token as string | undefined,
       };
     } catch (error) {
       logger.error('Apple token refresh error', {

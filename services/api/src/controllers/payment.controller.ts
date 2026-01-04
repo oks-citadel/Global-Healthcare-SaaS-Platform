@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { Request, Response } from 'express';
-import { paymentService } from '../services/payment.service.js';
+import { paymentService, PaymentError, PaymentValidationError, PaymentNotFoundError, PaymentProcessingError } from '../services/payment.service.js';
 import {
   CreateSubscriptionSchema,
   UpdatePaymentMethodSchema,
@@ -20,6 +20,67 @@ interface AuthRequest extends Request {
     email: string;
     role: string;
   };
+}
+
+/**
+ * Extract request context for audit logging
+ */
+function getRequestContext(req: Request): { ipAddress?: string; userAgent?: string } {
+  return {
+    ipAddress: req.ip || req.socket?.remoteAddress,
+    userAgent: req.get('user-agent'),
+  };
+}
+
+/**
+ * Handle payment errors with proper HTTP status codes
+ */
+function handlePaymentError(error: any, res: Response, defaultMessage: string): void {
+  if (error instanceof PaymentValidationError) {
+    res.status(400).json({
+      error: 'Validation Error',
+      code: error.code,
+      message: error.message,
+      isRetryable: false,
+    });
+    return;
+  }
+
+  if (error instanceof PaymentNotFoundError) {
+    res.status(404).json({
+      error: 'Not Found',
+      code: error.code,
+      message: error.message,
+      isRetryable: false,
+    });
+    return;
+  }
+
+  if (error instanceof PaymentProcessingError) {
+    res.status(error.statusCode).json({
+      error: 'Processing Error',
+      code: error.code,
+      message: error.message,
+      isRetryable: error.isRetryable,
+    });
+    return;
+  }
+
+  if (error instanceof PaymentError) {
+    res.status(error.statusCode).json({
+      error: 'Payment Error',
+      code: error.code,
+      message: error.message,
+      isRetryable: error.isRetryable,
+    });
+    return;
+  }
+
+  // Default error handling
+  res.status(500).json({
+    error: defaultMessage,
+    message: error.message,
+  });
 }
 
 class PaymentController {
@@ -55,7 +116,7 @@ class PaymentController {
 
   /**
    * POST /payments/subscription
-   * Create a new subscription
+   * Create a new subscription with proper error handling and audit logging
    */
   async createSubscription(req: AuthRequest, res: Response): Promise<void> {
     try {
@@ -65,9 +126,12 @@ class PaymentController {
       }
 
       const validatedData = CreateSubscriptionSchema.parse(req.body);
+      const requestContext = getRequestContext(req);
+
       const result = await paymentService.createSubscription(
         req.user.id,
-        validatedData
+        validatedData,
+        requestContext
       );
 
       res.status(201).json({
@@ -84,16 +148,13 @@ class PaymentController {
       });
     } catch (error: any) {
       logger.error('Error creating subscription:', error);
-      res.status(500).json({
-        error: 'Failed to create subscription',
-        message: error.message,
-      });
+      handlePaymentError(error, res, 'Failed to create subscription');
     }
   }
 
   /**
    * DELETE /payments/subscription
-   * Cancel a subscription
+   * Cancel a subscription with proper error handling and audit logging
    */
   async cancelSubscription(req: AuthRequest, res: Response): Promise<void> {
     try {
@@ -103,9 +164,12 @@ class PaymentController {
       }
 
       const validatedData = CancelSubscriptionSchema.parse(req.body);
+      const requestContext = getRequestContext(req);
+
       const subscription = await paymentService.cancelSubscription(
         req.user.id,
-        validatedData
+        validatedData,
+        requestContext
       );
 
       res.status(200).json({
@@ -122,10 +186,7 @@ class PaymentController {
       });
     } catch (error: any) {
       logger.error('Error canceling subscription:', error);
-      res.status(500).json({
-        error: 'Failed to cancel subscription',
-        message: error.message,
-      });
+      handlePaymentError(error, res, 'Failed to cancel subscription');
     }
   }
 
@@ -367,7 +428,7 @@ class PaymentController {
 
   /**
    * POST /payments/charge
-   * Create a one-time charge
+   * Create a one-time charge with proper error handling and audit logging
    */
   async createCharge(req: AuthRequest, res: Response): Promise<void> {
     try {
@@ -377,7 +438,13 @@ class PaymentController {
       }
 
       const validatedData = CreateChargeSchema.parse(req.body);
-      const result = await paymentService.createCharge(req.user.id, validatedData);
+      const requestContext = getRequestContext(req);
+
+      const result = await paymentService.createCharge(
+        req.user.id,
+        validatedData,
+        requestContext
+      );
 
       res.status(201).json({
         payment: {
@@ -392,10 +459,7 @@ class PaymentController {
       });
     } catch (error: any) {
       logger.error('Error creating charge:', error);
-      res.status(500).json({
-        error: 'Failed to create charge',
-        message: error.message,
-      });
+      handlePaymentError(error, res, 'Failed to create charge');
     }
   }
 
@@ -496,7 +560,7 @@ class PaymentController {
 
   /**
    * POST /payments/:id/refund
-   * Refund a payment
+   * Refund a payment with proper error handling and audit logging
    */
   async refundPayment(req: AuthRequest, res: Response): Promise<void> {
     try {
@@ -511,10 +575,13 @@ class PaymentController {
         paymentId: id,
       });
 
+      const requestContext = getRequestContext(req);
+
       const result = await paymentService.refundPayment(
         req.user.id,
         id,
-        validatedData
+        validatedData,
+        requestContext
       );
 
       res.status(200).json({
@@ -537,11 +604,7 @@ class PaymentController {
       });
     } catch (error: any) {
       logger.error('Error refunding payment:', error);
-      const statusCode = error.message.includes('not found') ? 404 : 500;
-      res.status(statusCode).json({
-        error: 'Failed to refund payment',
-        message: error.message,
-      });
+      handlePaymentError(error, res, 'Failed to refund payment');
     }
   }
 

@@ -8,14 +8,43 @@ import rateLimit from 'express-rate-limit';
 import { config } from './config/index.js';
 import { logger } from './utils/logger.js';
 import { errorHandler } from './middleware/error.middleware.js';
+import { correlationMiddleware } from './middleware/correlation.middleware.js';
+import { tracingMiddleware, getXRayOpenSegmentMiddleware, getXRayCloseSegmentMiddleware } from './middleware/tracing.middleware.js';
 import { routes } from './routes/index.js';
 import { connectDatabase, disconnectDatabase, checkDatabaseHealth } from './lib/prisma.js';
 import { setupSwagger } from './docs/swagger.js';
 import { initializeWebSocket, shutdownWebSocket } from './lib/websocket.js';
 import { isDemoMode, demoCredentials } from './lib/demo-store.js';
+import { initTracing, shutdownTracing } from './lib/tracing.js';
 
 const app = express();
 const httpServer = createServer(app);
+
+// Initialize OpenTelemetry tracing (must be done before other middleware)
+if (process.env.TRACING_ENABLED !== 'false') {
+  try {
+    initTracing();
+    logger.info('OpenTelemetry tracing initialized');
+  } catch (error) {
+    logger.warn('Failed to initialize tracing', { error: error instanceof Error ? error.message : 'Unknown error' });
+  }
+}
+
+// AWS X-Ray middleware (if enabled)
+if (process.env.AWS_XRAY_ENABLED === 'true') {
+  app.use(getXRayOpenSegmentMiddleware());
+}
+
+// Correlation ID middleware - must be early in the chain
+app.use(correlationMiddleware);
+
+// Distributed tracing middleware
+app.use(tracingMiddleware({
+  serviceName: 'unified-health-api',
+  serviceVersion: config.version,
+  environment: config.env,
+  excludePaths: ['/health', '/ready', '/metrics', '/favicon.ico'],
+}));
 
 // Security middleware
 app.use(helmet());
@@ -100,6 +129,11 @@ app.get('/ready', async (req, res) => {
   }
 });
 
+// AWS X-Ray close segment (if enabled)
+if (process.env.AWS_XRAY_ENABLED === 'true') {
+  app.use(getXRayCloseSegmentMiddleware());
+}
+
 // Error handling
 app.use(errorHandler);
 
@@ -167,6 +201,11 @@ async function startServer() {
           // Then disconnect database
           await disconnectDatabase();
           logger.info('Database connection closed');
+
+          // Shutdown tracing
+          await shutdownTracing();
+          logger.info('Tracing shut down');
+
           process.exit(0);
         } catch (error) {
           logger.error('Error during shutdown', { error });

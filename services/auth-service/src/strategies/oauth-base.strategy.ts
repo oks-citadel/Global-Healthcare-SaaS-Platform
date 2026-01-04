@@ -72,15 +72,15 @@ export abstract class OAuthBaseStrategy {
         throw new Error(`Token exchange failed: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as Record<string, unknown>;
 
       return {
-        accessToken: data.access_token,
-        refreshToken: data.refresh_token || null,
-        expiresIn: data.expires_in || null,
-        tokenType: data.token_type || 'Bearer',
-        idToken: data.id_token,
-        scope: data.scope,
+        accessToken: data.access_token as string,
+        refreshToken: (data.refresh_token as string) || null,
+        expiresIn: (data.expires_in as number) || null,
+        tokenType: (data.token_type as string) || 'Bearer',
+        idToken: data.id_token as string | undefined,
+        scope: data.scope as string | undefined,
       };
     } catch (error) {
       logger.error('OAuth token exchange error', {
@@ -126,15 +126,15 @@ export abstract class OAuthBaseStrategy {
         throw new Error(`Token refresh failed: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as Record<string, unknown>;
 
       return {
-        accessToken: data.access_token,
-        refreshToken: data.refresh_token || refreshToken, // Some providers return new refresh token
-        expiresIn: data.expires_in || null,
-        tokenType: data.token_type || 'Bearer',
-        idToken: data.id_token,
-        scope: data.scope,
+        accessToken: data.access_token as string,
+        refreshToken: (data.refresh_token as string) || refreshToken, // Some providers return new refresh token
+        expiresIn: (data.expires_in as number) || null,
+        tokenType: (data.token_type as string) || 'Bearer',
+        idToken: data.id_token as string | undefined,
+        scope: data.scope as string | undefined,
       };
     } catch (error) {
       logger.error('OAuth token refresh error', {

@@ -2,6 +2,7 @@
 import { Router, Request, Response } from 'express';
 import { logger } from '../../utils/logger.js';
 import { stripeWebhookService } from '../../services/stripe-webhook.service.js';
+import { stripeWebhookIdempotency } from '../../middleware/idempotency.middleware.js';
 
 const router = Router();
 
@@ -35,7 +36,7 @@ const router = Router();
  * Endpoint URL: https://your-domain.com/webhooks/stripe
  * Events to send: Select all payment-related events
  */
-router.post('/', async (req: Request, res: Response): Promise<void> => {
+router.post('/', stripeWebhookIdempotency(), async (req: Request, res: Response): Promise<void> => {
   const startTime = Date.now();
 
   try {
@@ -68,23 +69,35 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
+    // Get idempotency info from middleware (if available)
+    const idempotencyInfo = req.webhookIdempotency;
+
     logger.info('Received Stripe webhook request', {
       signature: signature.substring(0, 20) + '...',
       bodyLength: Buffer.isBuffer(payload) ? payload.length : JSON.stringify(payload).length,
       contentType: req.headers['content-type'],
       ip: req.ip,
+      eventId: idempotencyInfo?.eventId,
+      eventType: idempotencyInfo?.eventType,
     });
 
-    // Process webhook with retry mechanism and idempotency
+    // Process webhook with retry mechanism
     await stripeWebhookService.processWebhookWithRetry(
       payload,
       signature as string
     );
 
+    // Mark event as processed after successful handling
+    if (idempotencyInfo?.markAsProcessed) {
+      await idempotencyInfo.markAsProcessed();
+    }
+
     const processingTime = Date.now() - startTime;
 
     logger.info('Stripe webhook processed successfully', {
       processingTimeMs: processingTime,
+      eventId: idempotencyInfo?.eventId,
+      eventType: idempotencyInfo?.eventType,
     });
 
     // Return 200 immediately to Stripe to acknowledge receipt
@@ -95,11 +108,14 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
 
   } catch (error: any) {
     const processingTime = Date.now() - startTime;
+    const idempotencyInfo = req.webhookIdempotency;
 
     logger.error('Error processing Stripe webhook', {
       error: error.message,
       stack: error.stack,
       processingTimeMs: processingTime,
+      eventId: idempotencyInfo?.eventId,
+      eventType: idempotencyInfo?.eventType,
     });
 
     // Determine appropriate status code
@@ -117,6 +133,7 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
       errorMessage = 'Event already processed';
       logger.info('Webhook event already processed (idempotency)', {
         processingTimeMs: processingTime,
+        eventId: idempotencyInfo?.eventId,
       });
     }
 

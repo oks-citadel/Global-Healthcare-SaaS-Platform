@@ -153,6 +153,11 @@ export type NotificationPreference = $Result.DefaultSelection<Prisma.$Notificati
  * 
  */
 export type WebhookEventLog = $Result.DefaultSelection<Prisma.$WebhookEventLogPayload>
+/**
+ * Model BillingTransactionLog
+ * 
+ */
+export type BillingTransactionLog = $Result.DefaultSelection<Prisma.$BillingTransactionLogPayload>
 
 /**
  * Enums
@@ -416,6 +421,31 @@ export const WebhookEventStatus: {
 
 export type WebhookEventStatus = (typeof WebhookEventStatus)[keyof typeof WebhookEventStatus]
 
+
+export const BillingTransactionType: {
+  CHARGE: 'CHARGE',
+  REFUND: 'REFUND',
+  SUBSCRIPTION_CREATE: 'SUBSCRIPTION_CREATE',
+  SUBSCRIPTION_UPDATE: 'SUBSCRIPTION_UPDATE',
+  SUBSCRIPTION_CANCEL: 'SUBSCRIPTION_CANCEL',
+  PAYMENT_METHOD_ADD: 'PAYMENT_METHOD_ADD',
+  PAYMENT_METHOD_REMOVE: 'PAYMENT_METHOD_REMOVE',
+  INVOICE_PAID: 'INVOICE_PAID',
+  INVOICE_FAILED: 'INVOICE_FAILED'
+};
+
+export type BillingTransactionType = (typeof BillingTransactionType)[keyof typeof BillingTransactionType]
+
+
+export const BillingTransactionStatus: {
+  pending: 'pending',
+  processing: 'processing',
+  succeeded: 'succeeded',
+  failed: 'failed'
+};
+
+export type BillingTransactionStatus = (typeof BillingTransactionStatus)[keyof typeof BillingTransactionStatus]
+
 }
 
 export type Role = $Enums.Role
@@ -513,6 +543,14 @@ export const NotificationStatus: typeof $Enums.NotificationStatus
 export type WebhookEventStatus = $Enums.WebhookEventStatus
 
 export const WebhookEventStatus: typeof $Enums.WebhookEventStatus
+
+export type BillingTransactionType = $Enums.BillingTransactionType
+
+export const BillingTransactionType: typeof $Enums.BillingTransactionType
+
+export type BillingTransactionStatus = $Enums.BillingTransactionStatus
+
+export const BillingTransactionStatus: typeof $Enums.BillingTransactionStatus
 
 /**
  * ##  Prisma Client ʲˢ
@@ -927,6 +965,16 @@ export class PrismaClient<
     * ```
     */
   get webhookEventLog(): Prisma.WebhookEventLogDelegate<ExtArgs>;
+
+  /**
+   * `prisma.billingTransactionLog`: Exposes CRUD operations for the **BillingTransactionLog** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more BillingTransactionLogs
+    * const billingTransactionLogs = await prisma.billingTransactionLog.findMany()
+    * ```
+    */
+  get billingTransactionLog(): Prisma.BillingTransactionLogDelegate<ExtArgs>;
 }
 
 export namespace Prisma {
@@ -1395,7 +1443,8 @@ export namespace Prisma {
     DeviceToken: 'DeviceToken',
     PushNotification: 'PushNotification',
     NotificationPreference: 'NotificationPreference',
-    WebhookEventLog: 'WebhookEventLog'
+    WebhookEventLog: 'WebhookEventLog',
+    BillingTransactionLog: 'BillingTransactionLog'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1411,7 +1460,7 @@ export namespace Prisma {
 
   export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> = {
     meta: {
-      modelProps: "user" | "refreshToken" | "patient" | "provider" | "appointment" | "visit" | "chatMessage" | "encounter" | "clinicalNote" | "document" | "plan" | "subscription" | "paymentMethod" | "payment" | "invoice" | "invoiceItem" | "healthPackage" | "healthPackageBooking" | "diagnosticTest" | "labResult" | "prescription" | "prescriptionItem" | "consent" | "auditEvent" | "deviceToken" | "pushNotification" | "notificationPreference" | "webhookEventLog"
+      modelProps: "user" | "refreshToken" | "patient" | "provider" | "appointment" | "visit" | "chatMessage" | "encounter" | "clinicalNote" | "document" | "plan" | "subscription" | "paymentMethod" | "payment" | "invoice" | "invoiceItem" | "healthPackage" | "healthPackageBooking" | "diagnosticTest" | "labResult" | "prescription" | "prescriptionItem" | "consent" | "auditEvent" | "deviceToken" | "pushNotification" | "notificationPreference" | "webhookEventLog" | "billingTransactionLog"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -3372,6 +3421,76 @@ export namespace Prisma {
           count: {
             args: Prisma.WebhookEventLogCountArgs<ExtArgs>
             result: $Utils.Optional<WebhookEventLogCountAggregateOutputType> | number
+          }
+        }
+      }
+      BillingTransactionLog: {
+        payload: Prisma.$BillingTransactionLogPayload<ExtArgs>
+        fields: Prisma.BillingTransactionLogFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.BillingTransactionLogFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BillingTransactionLogPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.BillingTransactionLogFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BillingTransactionLogPayload>
+          }
+          findFirst: {
+            args: Prisma.BillingTransactionLogFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BillingTransactionLogPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.BillingTransactionLogFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BillingTransactionLogPayload>
+          }
+          findMany: {
+            args: Prisma.BillingTransactionLogFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BillingTransactionLogPayload>[]
+          }
+          create: {
+            args: Prisma.BillingTransactionLogCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BillingTransactionLogPayload>
+          }
+          createMany: {
+            args: Prisma.BillingTransactionLogCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.BillingTransactionLogCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BillingTransactionLogPayload>[]
+          }
+          delete: {
+            args: Prisma.BillingTransactionLogDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BillingTransactionLogPayload>
+          }
+          update: {
+            args: Prisma.BillingTransactionLogUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BillingTransactionLogPayload>
+          }
+          deleteMany: {
+            args: Prisma.BillingTransactionLogDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.BillingTransactionLogUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.BillingTransactionLogUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BillingTransactionLogPayload>
+          }
+          aggregate: {
+            args: Prisma.BillingTransactionLogAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateBillingTransactionLog>
+          }
+          groupBy: {
+            args: Prisma.BillingTransactionLogGroupByArgs<ExtArgs>
+            result: $Utils.Optional<BillingTransactionLogGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.BillingTransactionLogCountArgs<ExtArgs>
+            result: $Utils.Optional<BillingTransactionLogCountAggregateOutputType> | number
           }
         }
       }
@@ -32535,6 +32654,1014 @@ export namespace Prisma {
 
 
   /**
+   * Model BillingTransactionLog
+   */
+
+  export type AggregateBillingTransactionLog = {
+    _count: BillingTransactionLogCountAggregateOutputType | null
+    _avg: BillingTransactionLogAvgAggregateOutputType | null
+    _sum: BillingTransactionLogSumAggregateOutputType | null
+    _min: BillingTransactionLogMinAggregateOutputType | null
+    _max: BillingTransactionLogMaxAggregateOutputType | null
+  }
+
+  export type BillingTransactionLogAvgAggregateOutputType = {
+    amount: Decimal | null
+    processingTimeMs: number | null
+  }
+
+  export type BillingTransactionLogSumAggregateOutputType = {
+    amount: Decimal | null
+    processingTimeMs: number | null
+  }
+
+  export type BillingTransactionLogMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    transactionType: $Enums.BillingTransactionType | null
+    stripeId: string | null
+    amount: Decimal | null
+    currency: string | null
+    status: $Enums.BillingTransactionStatus | null
+    idempotencyKey: string | null
+    error: string | null
+    processingTimeMs: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type BillingTransactionLogMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    transactionType: $Enums.BillingTransactionType | null
+    stripeId: string | null
+    amount: Decimal | null
+    currency: string | null
+    status: $Enums.BillingTransactionStatus | null
+    idempotencyKey: string | null
+    error: string | null
+    processingTimeMs: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type BillingTransactionLogCountAggregateOutputType = {
+    id: number
+    userId: number
+    transactionType: number
+    stripeId: number
+    amount: number
+    currency: number
+    status: number
+    idempotencyKey: number
+    metadata: number
+    error: number
+    processingTimeMs: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type BillingTransactionLogAvgAggregateInputType = {
+    amount?: true
+    processingTimeMs?: true
+  }
+
+  export type BillingTransactionLogSumAggregateInputType = {
+    amount?: true
+    processingTimeMs?: true
+  }
+
+  export type BillingTransactionLogMinAggregateInputType = {
+    id?: true
+    userId?: true
+    transactionType?: true
+    stripeId?: true
+    amount?: true
+    currency?: true
+    status?: true
+    idempotencyKey?: true
+    error?: true
+    processingTimeMs?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type BillingTransactionLogMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    transactionType?: true
+    stripeId?: true
+    amount?: true
+    currency?: true
+    status?: true
+    idempotencyKey?: true
+    error?: true
+    processingTimeMs?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type BillingTransactionLogCountAggregateInputType = {
+    id?: true
+    userId?: true
+    transactionType?: true
+    stripeId?: true
+    amount?: true
+    currency?: true
+    status?: true
+    idempotencyKey?: true
+    metadata?: true
+    error?: true
+    processingTimeMs?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type BillingTransactionLogAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which BillingTransactionLog to aggregate.
+     */
+    where?: BillingTransactionLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BillingTransactionLogs to fetch.
+     */
+    orderBy?: BillingTransactionLogOrderByWithRelationInput | BillingTransactionLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: BillingTransactionLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BillingTransactionLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BillingTransactionLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned BillingTransactionLogs
+    **/
+    _count?: true | BillingTransactionLogCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: BillingTransactionLogAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: BillingTransactionLogSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: BillingTransactionLogMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: BillingTransactionLogMaxAggregateInputType
+  }
+
+  export type GetBillingTransactionLogAggregateType<T extends BillingTransactionLogAggregateArgs> = {
+        [P in keyof T & keyof AggregateBillingTransactionLog]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateBillingTransactionLog[P]>
+      : GetScalarType<T[P], AggregateBillingTransactionLog[P]>
+  }
+
+
+
+
+  export type BillingTransactionLogGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: BillingTransactionLogWhereInput
+    orderBy?: BillingTransactionLogOrderByWithAggregationInput | BillingTransactionLogOrderByWithAggregationInput[]
+    by: BillingTransactionLogScalarFieldEnum[] | BillingTransactionLogScalarFieldEnum
+    having?: BillingTransactionLogScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: BillingTransactionLogCountAggregateInputType | true
+    _avg?: BillingTransactionLogAvgAggregateInputType
+    _sum?: BillingTransactionLogSumAggregateInputType
+    _min?: BillingTransactionLogMinAggregateInputType
+    _max?: BillingTransactionLogMaxAggregateInputType
+  }
+
+  export type BillingTransactionLogGroupByOutputType = {
+    id: string
+    userId: string
+    transactionType: $Enums.BillingTransactionType
+    stripeId: string | null
+    amount: Decimal | null
+    currency: string | null
+    status: $Enums.BillingTransactionStatus
+    idempotencyKey: string | null
+    metadata: JsonValue | null
+    error: string | null
+    processingTimeMs: number | null
+    createdAt: Date
+    updatedAt: Date
+    _count: BillingTransactionLogCountAggregateOutputType | null
+    _avg: BillingTransactionLogAvgAggregateOutputType | null
+    _sum: BillingTransactionLogSumAggregateOutputType | null
+    _min: BillingTransactionLogMinAggregateOutputType | null
+    _max: BillingTransactionLogMaxAggregateOutputType | null
+  }
+
+  type GetBillingTransactionLogGroupByPayload<T extends BillingTransactionLogGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<BillingTransactionLogGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof BillingTransactionLogGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], BillingTransactionLogGroupByOutputType[P]>
+            : GetScalarType<T[P], BillingTransactionLogGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type BillingTransactionLogSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    transactionType?: boolean
+    stripeId?: boolean
+    amount?: boolean
+    currency?: boolean
+    status?: boolean
+    idempotencyKey?: boolean
+    metadata?: boolean
+    error?: boolean
+    processingTimeMs?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["billingTransactionLog"]>
+
+  export type BillingTransactionLogSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    transactionType?: boolean
+    stripeId?: boolean
+    amount?: boolean
+    currency?: boolean
+    status?: boolean
+    idempotencyKey?: boolean
+    metadata?: boolean
+    error?: boolean
+    processingTimeMs?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["billingTransactionLog"]>
+
+  export type BillingTransactionLogSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    transactionType?: boolean
+    stripeId?: boolean
+    amount?: boolean
+    currency?: boolean
+    status?: boolean
+    idempotencyKey?: boolean
+    metadata?: boolean
+    error?: boolean
+    processingTimeMs?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+
+  export type $BillingTransactionLogPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "BillingTransactionLog"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      transactionType: $Enums.BillingTransactionType
+      stripeId: string | null
+      amount: Prisma.Decimal | null
+      currency: string | null
+      status: $Enums.BillingTransactionStatus
+      idempotencyKey: string | null
+      metadata: Prisma.JsonValue | null
+      error: string | null
+      processingTimeMs: number | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["billingTransactionLog"]>
+    composites: {}
+  }
+
+  type BillingTransactionLogGetPayload<S extends boolean | null | undefined | BillingTransactionLogDefaultArgs> = $Result.GetResult<Prisma.$BillingTransactionLogPayload, S>
+
+  type BillingTransactionLogCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<BillingTransactionLogFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: BillingTransactionLogCountAggregateInputType | true
+    }
+
+  export interface BillingTransactionLogDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['BillingTransactionLog'], meta: { name: 'BillingTransactionLog' } }
+    /**
+     * Find zero or one BillingTransactionLog that matches the filter.
+     * @param {BillingTransactionLogFindUniqueArgs} args - Arguments to find a BillingTransactionLog
+     * @example
+     * // Get one BillingTransactionLog
+     * const billingTransactionLog = await prisma.billingTransactionLog.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends BillingTransactionLogFindUniqueArgs>(args: SelectSubset<T, BillingTransactionLogFindUniqueArgs<ExtArgs>>): Prisma__BillingTransactionLogClient<$Result.GetResult<Prisma.$BillingTransactionLogPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one BillingTransactionLog that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {BillingTransactionLogFindUniqueOrThrowArgs} args - Arguments to find a BillingTransactionLog
+     * @example
+     * // Get one BillingTransactionLog
+     * const billingTransactionLog = await prisma.billingTransactionLog.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends BillingTransactionLogFindUniqueOrThrowArgs>(args: SelectSubset<T, BillingTransactionLogFindUniqueOrThrowArgs<ExtArgs>>): Prisma__BillingTransactionLogClient<$Result.GetResult<Prisma.$BillingTransactionLogPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first BillingTransactionLog that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BillingTransactionLogFindFirstArgs} args - Arguments to find a BillingTransactionLog
+     * @example
+     * // Get one BillingTransactionLog
+     * const billingTransactionLog = await prisma.billingTransactionLog.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends BillingTransactionLogFindFirstArgs>(args?: SelectSubset<T, BillingTransactionLogFindFirstArgs<ExtArgs>>): Prisma__BillingTransactionLogClient<$Result.GetResult<Prisma.$BillingTransactionLogPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first BillingTransactionLog that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BillingTransactionLogFindFirstOrThrowArgs} args - Arguments to find a BillingTransactionLog
+     * @example
+     * // Get one BillingTransactionLog
+     * const billingTransactionLog = await prisma.billingTransactionLog.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends BillingTransactionLogFindFirstOrThrowArgs>(args?: SelectSubset<T, BillingTransactionLogFindFirstOrThrowArgs<ExtArgs>>): Prisma__BillingTransactionLogClient<$Result.GetResult<Prisma.$BillingTransactionLogPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more BillingTransactionLogs that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BillingTransactionLogFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all BillingTransactionLogs
+     * const billingTransactionLogs = await prisma.billingTransactionLog.findMany()
+     * 
+     * // Get first 10 BillingTransactionLogs
+     * const billingTransactionLogs = await prisma.billingTransactionLog.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const billingTransactionLogWithIdOnly = await prisma.billingTransactionLog.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends BillingTransactionLogFindManyArgs>(args?: SelectSubset<T, BillingTransactionLogFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BillingTransactionLogPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a BillingTransactionLog.
+     * @param {BillingTransactionLogCreateArgs} args - Arguments to create a BillingTransactionLog.
+     * @example
+     * // Create one BillingTransactionLog
+     * const BillingTransactionLog = await prisma.billingTransactionLog.create({
+     *   data: {
+     *     // ... data to create a BillingTransactionLog
+     *   }
+     * })
+     * 
+     */
+    create<T extends BillingTransactionLogCreateArgs>(args: SelectSubset<T, BillingTransactionLogCreateArgs<ExtArgs>>): Prisma__BillingTransactionLogClient<$Result.GetResult<Prisma.$BillingTransactionLogPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many BillingTransactionLogs.
+     * @param {BillingTransactionLogCreateManyArgs} args - Arguments to create many BillingTransactionLogs.
+     * @example
+     * // Create many BillingTransactionLogs
+     * const billingTransactionLog = await prisma.billingTransactionLog.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends BillingTransactionLogCreateManyArgs>(args?: SelectSubset<T, BillingTransactionLogCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many BillingTransactionLogs and returns the data saved in the database.
+     * @param {BillingTransactionLogCreateManyAndReturnArgs} args - Arguments to create many BillingTransactionLogs.
+     * @example
+     * // Create many BillingTransactionLogs
+     * const billingTransactionLog = await prisma.billingTransactionLog.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many BillingTransactionLogs and only return the `id`
+     * const billingTransactionLogWithIdOnly = await prisma.billingTransactionLog.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends BillingTransactionLogCreateManyAndReturnArgs>(args?: SelectSubset<T, BillingTransactionLogCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BillingTransactionLogPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a BillingTransactionLog.
+     * @param {BillingTransactionLogDeleteArgs} args - Arguments to delete one BillingTransactionLog.
+     * @example
+     * // Delete one BillingTransactionLog
+     * const BillingTransactionLog = await prisma.billingTransactionLog.delete({
+     *   where: {
+     *     // ... filter to delete one BillingTransactionLog
+     *   }
+     * })
+     * 
+     */
+    delete<T extends BillingTransactionLogDeleteArgs>(args: SelectSubset<T, BillingTransactionLogDeleteArgs<ExtArgs>>): Prisma__BillingTransactionLogClient<$Result.GetResult<Prisma.$BillingTransactionLogPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one BillingTransactionLog.
+     * @param {BillingTransactionLogUpdateArgs} args - Arguments to update one BillingTransactionLog.
+     * @example
+     * // Update one BillingTransactionLog
+     * const billingTransactionLog = await prisma.billingTransactionLog.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends BillingTransactionLogUpdateArgs>(args: SelectSubset<T, BillingTransactionLogUpdateArgs<ExtArgs>>): Prisma__BillingTransactionLogClient<$Result.GetResult<Prisma.$BillingTransactionLogPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more BillingTransactionLogs.
+     * @param {BillingTransactionLogDeleteManyArgs} args - Arguments to filter BillingTransactionLogs to delete.
+     * @example
+     * // Delete a few BillingTransactionLogs
+     * const { count } = await prisma.billingTransactionLog.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends BillingTransactionLogDeleteManyArgs>(args?: SelectSubset<T, BillingTransactionLogDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more BillingTransactionLogs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BillingTransactionLogUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many BillingTransactionLogs
+     * const billingTransactionLog = await prisma.billingTransactionLog.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends BillingTransactionLogUpdateManyArgs>(args: SelectSubset<T, BillingTransactionLogUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one BillingTransactionLog.
+     * @param {BillingTransactionLogUpsertArgs} args - Arguments to update or create a BillingTransactionLog.
+     * @example
+     * // Update or create a BillingTransactionLog
+     * const billingTransactionLog = await prisma.billingTransactionLog.upsert({
+     *   create: {
+     *     // ... data to create a BillingTransactionLog
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the BillingTransactionLog we want to update
+     *   }
+     * })
+     */
+    upsert<T extends BillingTransactionLogUpsertArgs>(args: SelectSubset<T, BillingTransactionLogUpsertArgs<ExtArgs>>): Prisma__BillingTransactionLogClient<$Result.GetResult<Prisma.$BillingTransactionLogPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of BillingTransactionLogs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BillingTransactionLogCountArgs} args - Arguments to filter BillingTransactionLogs to count.
+     * @example
+     * // Count the number of BillingTransactionLogs
+     * const count = await prisma.billingTransactionLog.count({
+     *   where: {
+     *     // ... the filter for the BillingTransactionLogs we want to count
+     *   }
+     * })
+    **/
+    count<T extends BillingTransactionLogCountArgs>(
+      args?: Subset<T, BillingTransactionLogCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], BillingTransactionLogCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a BillingTransactionLog.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BillingTransactionLogAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends BillingTransactionLogAggregateArgs>(args: Subset<T, BillingTransactionLogAggregateArgs>): Prisma.PrismaPromise<GetBillingTransactionLogAggregateType<T>>
+
+    /**
+     * Group by BillingTransactionLog.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BillingTransactionLogGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends BillingTransactionLogGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: BillingTransactionLogGroupByArgs['orderBy'] }
+        : { orderBy?: BillingTransactionLogGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, BillingTransactionLogGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetBillingTransactionLogGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the BillingTransactionLog model
+   */
+  readonly fields: BillingTransactionLogFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for BillingTransactionLog.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__BillingTransactionLogClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the BillingTransactionLog model
+   */ 
+  interface BillingTransactionLogFieldRefs {
+    readonly id: FieldRef<"BillingTransactionLog", 'String'>
+    readonly userId: FieldRef<"BillingTransactionLog", 'String'>
+    readonly transactionType: FieldRef<"BillingTransactionLog", 'BillingTransactionType'>
+    readonly stripeId: FieldRef<"BillingTransactionLog", 'String'>
+    readonly amount: FieldRef<"BillingTransactionLog", 'Decimal'>
+    readonly currency: FieldRef<"BillingTransactionLog", 'String'>
+    readonly status: FieldRef<"BillingTransactionLog", 'BillingTransactionStatus'>
+    readonly idempotencyKey: FieldRef<"BillingTransactionLog", 'String'>
+    readonly metadata: FieldRef<"BillingTransactionLog", 'Json'>
+    readonly error: FieldRef<"BillingTransactionLog", 'String'>
+    readonly processingTimeMs: FieldRef<"BillingTransactionLog", 'Int'>
+    readonly createdAt: FieldRef<"BillingTransactionLog", 'DateTime'>
+    readonly updatedAt: FieldRef<"BillingTransactionLog", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * BillingTransactionLog findUnique
+   */
+  export type BillingTransactionLogFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BillingTransactionLog
+     */
+    select?: BillingTransactionLogSelect<ExtArgs> | null
+    /**
+     * Filter, which BillingTransactionLog to fetch.
+     */
+    where: BillingTransactionLogWhereUniqueInput
+  }
+
+  /**
+   * BillingTransactionLog findUniqueOrThrow
+   */
+  export type BillingTransactionLogFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BillingTransactionLog
+     */
+    select?: BillingTransactionLogSelect<ExtArgs> | null
+    /**
+     * Filter, which BillingTransactionLog to fetch.
+     */
+    where: BillingTransactionLogWhereUniqueInput
+  }
+
+  /**
+   * BillingTransactionLog findFirst
+   */
+  export type BillingTransactionLogFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BillingTransactionLog
+     */
+    select?: BillingTransactionLogSelect<ExtArgs> | null
+    /**
+     * Filter, which BillingTransactionLog to fetch.
+     */
+    where?: BillingTransactionLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BillingTransactionLogs to fetch.
+     */
+    orderBy?: BillingTransactionLogOrderByWithRelationInput | BillingTransactionLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for BillingTransactionLogs.
+     */
+    cursor?: BillingTransactionLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BillingTransactionLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BillingTransactionLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BillingTransactionLogs.
+     */
+    distinct?: BillingTransactionLogScalarFieldEnum | BillingTransactionLogScalarFieldEnum[]
+  }
+
+  /**
+   * BillingTransactionLog findFirstOrThrow
+   */
+  export type BillingTransactionLogFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BillingTransactionLog
+     */
+    select?: BillingTransactionLogSelect<ExtArgs> | null
+    /**
+     * Filter, which BillingTransactionLog to fetch.
+     */
+    where?: BillingTransactionLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BillingTransactionLogs to fetch.
+     */
+    orderBy?: BillingTransactionLogOrderByWithRelationInput | BillingTransactionLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for BillingTransactionLogs.
+     */
+    cursor?: BillingTransactionLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BillingTransactionLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BillingTransactionLogs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BillingTransactionLogs.
+     */
+    distinct?: BillingTransactionLogScalarFieldEnum | BillingTransactionLogScalarFieldEnum[]
+  }
+
+  /**
+   * BillingTransactionLog findMany
+   */
+  export type BillingTransactionLogFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BillingTransactionLog
+     */
+    select?: BillingTransactionLogSelect<ExtArgs> | null
+    /**
+     * Filter, which BillingTransactionLogs to fetch.
+     */
+    where?: BillingTransactionLogWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BillingTransactionLogs to fetch.
+     */
+    orderBy?: BillingTransactionLogOrderByWithRelationInput | BillingTransactionLogOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing BillingTransactionLogs.
+     */
+    cursor?: BillingTransactionLogWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BillingTransactionLogs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BillingTransactionLogs.
+     */
+    skip?: number
+    distinct?: BillingTransactionLogScalarFieldEnum | BillingTransactionLogScalarFieldEnum[]
+  }
+
+  /**
+   * BillingTransactionLog create
+   */
+  export type BillingTransactionLogCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BillingTransactionLog
+     */
+    select?: BillingTransactionLogSelect<ExtArgs> | null
+    /**
+     * The data needed to create a BillingTransactionLog.
+     */
+    data: XOR<BillingTransactionLogCreateInput, BillingTransactionLogUncheckedCreateInput>
+  }
+
+  /**
+   * BillingTransactionLog createMany
+   */
+  export type BillingTransactionLogCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many BillingTransactionLogs.
+     */
+    data: BillingTransactionLogCreateManyInput | BillingTransactionLogCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * BillingTransactionLog createManyAndReturn
+   */
+  export type BillingTransactionLogCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BillingTransactionLog
+     */
+    select?: BillingTransactionLogSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many BillingTransactionLogs.
+     */
+    data: BillingTransactionLogCreateManyInput | BillingTransactionLogCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * BillingTransactionLog update
+   */
+  export type BillingTransactionLogUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BillingTransactionLog
+     */
+    select?: BillingTransactionLogSelect<ExtArgs> | null
+    /**
+     * The data needed to update a BillingTransactionLog.
+     */
+    data: XOR<BillingTransactionLogUpdateInput, BillingTransactionLogUncheckedUpdateInput>
+    /**
+     * Choose, which BillingTransactionLog to update.
+     */
+    where: BillingTransactionLogWhereUniqueInput
+  }
+
+  /**
+   * BillingTransactionLog updateMany
+   */
+  export type BillingTransactionLogUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update BillingTransactionLogs.
+     */
+    data: XOR<BillingTransactionLogUpdateManyMutationInput, BillingTransactionLogUncheckedUpdateManyInput>
+    /**
+     * Filter which BillingTransactionLogs to update
+     */
+    where?: BillingTransactionLogWhereInput
+  }
+
+  /**
+   * BillingTransactionLog upsert
+   */
+  export type BillingTransactionLogUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BillingTransactionLog
+     */
+    select?: BillingTransactionLogSelect<ExtArgs> | null
+    /**
+     * The filter to search for the BillingTransactionLog to update in case it exists.
+     */
+    where: BillingTransactionLogWhereUniqueInput
+    /**
+     * In case the BillingTransactionLog found by the `where` argument doesn't exist, create a new BillingTransactionLog with this data.
+     */
+    create: XOR<BillingTransactionLogCreateInput, BillingTransactionLogUncheckedCreateInput>
+    /**
+     * In case the BillingTransactionLog was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<BillingTransactionLogUpdateInput, BillingTransactionLogUncheckedUpdateInput>
+  }
+
+  /**
+   * BillingTransactionLog delete
+   */
+  export type BillingTransactionLogDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BillingTransactionLog
+     */
+    select?: BillingTransactionLogSelect<ExtArgs> | null
+    /**
+     * Filter which BillingTransactionLog to delete.
+     */
+    where: BillingTransactionLogWhereUniqueInput
+  }
+
+  /**
+   * BillingTransactionLog deleteMany
+   */
+  export type BillingTransactionLogDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which BillingTransactionLogs to delete
+     */
+    where?: BillingTransactionLogWhereInput
+  }
+
+  /**
+   * BillingTransactionLog without action
+   */
+  export type BillingTransactionLogDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BillingTransactionLog
+     */
+    select?: BillingTransactionLogSelect<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -33021,6 +34148,25 @@ export namespace Prisma {
   export type WebhookEventLogScalarFieldEnum = (typeof WebhookEventLogScalarFieldEnum)[keyof typeof WebhookEventLogScalarFieldEnum]
 
 
+  export const BillingTransactionLogScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    transactionType: 'transactionType',
+    stripeId: 'stripeId',
+    amount: 'amount',
+    currency: 'currency',
+    status: 'status',
+    idempotencyKey: 'idempotencyKey',
+    metadata: 'metadata',
+    error: 'error',
+    processingTimeMs: 'processingTimeMs',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type BillingTransactionLogScalarFieldEnum = (typeof BillingTransactionLogScalarFieldEnum)[keyof typeof BillingTransactionLogScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
@@ -33477,6 +34623,34 @@ export namespace Prisma {
    * Reference to a field of type 'WebhookEventStatus[]'
    */
   export type ListEnumWebhookEventStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'WebhookEventStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'BillingTransactionType'
+   */
+  export type EnumBillingTransactionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BillingTransactionType'>
+    
+
+
+  /**
+   * Reference to a field of type 'BillingTransactionType[]'
+   */
+  export type ListEnumBillingTransactionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BillingTransactionType[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'BillingTransactionStatus'
+   */
+  export type EnumBillingTransactionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BillingTransactionStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'BillingTransactionStatus[]'
+   */
+  export type ListEnumBillingTransactionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BillingTransactionStatus[]'>
     
 
 
@@ -35918,6 +37092,100 @@ export namespace Prisma {
     processingTimeMs?: IntNullableWithAggregatesFilter<"WebhookEventLog"> | number | null
     createdAt?: DateTimeWithAggregatesFilter<"WebhookEventLog"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"WebhookEventLog"> | Date | string
+  }
+
+  export type BillingTransactionLogWhereInput = {
+    AND?: BillingTransactionLogWhereInput | BillingTransactionLogWhereInput[]
+    OR?: BillingTransactionLogWhereInput[]
+    NOT?: BillingTransactionLogWhereInput | BillingTransactionLogWhereInput[]
+    id?: StringFilter<"BillingTransactionLog"> | string
+    userId?: StringFilter<"BillingTransactionLog"> | string
+    transactionType?: EnumBillingTransactionTypeFilter<"BillingTransactionLog"> | $Enums.BillingTransactionType
+    stripeId?: StringNullableFilter<"BillingTransactionLog"> | string | null
+    amount?: DecimalNullableFilter<"BillingTransactionLog"> | Decimal | DecimalJsLike | number | string | null
+    currency?: StringNullableFilter<"BillingTransactionLog"> | string | null
+    status?: EnumBillingTransactionStatusFilter<"BillingTransactionLog"> | $Enums.BillingTransactionStatus
+    idempotencyKey?: StringNullableFilter<"BillingTransactionLog"> | string | null
+    metadata?: JsonNullableFilter<"BillingTransactionLog">
+    error?: StringNullableFilter<"BillingTransactionLog"> | string | null
+    processingTimeMs?: IntNullableFilter<"BillingTransactionLog"> | number | null
+    createdAt?: DateTimeFilter<"BillingTransactionLog"> | Date | string
+    updatedAt?: DateTimeFilter<"BillingTransactionLog"> | Date | string
+  }
+
+  export type BillingTransactionLogOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    transactionType?: SortOrder
+    stripeId?: SortOrderInput | SortOrder
+    amount?: SortOrderInput | SortOrder
+    currency?: SortOrderInput | SortOrder
+    status?: SortOrder
+    idempotencyKey?: SortOrderInput | SortOrder
+    metadata?: SortOrderInput | SortOrder
+    error?: SortOrderInput | SortOrder
+    processingTimeMs?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type BillingTransactionLogWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    idempotencyKey?: string
+    AND?: BillingTransactionLogWhereInput | BillingTransactionLogWhereInput[]
+    OR?: BillingTransactionLogWhereInput[]
+    NOT?: BillingTransactionLogWhereInput | BillingTransactionLogWhereInput[]
+    userId?: StringFilter<"BillingTransactionLog"> | string
+    transactionType?: EnumBillingTransactionTypeFilter<"BillingTransactionLog"> | $Enums.BillingTransactionType
+    stripeId?: StringNullableFilter<"BillingTransactionLog"> | string | null
+    amount?: DecimalNullableFilter<"BillingTransactionLog"> | Decimal | DecimalJsLike | number | string | null
+    currency?: StringNullableFilter<"BillingTransactionLog"> | string | null
+    status?: EnumBillingTransactionStatusFilter<"BillingTransactionLog"> | $Enums.BillingTransactionStatus
+    metadata?: JsonNullableFilter<"BillingTransactionLog">
+    error?: StringNullableFilter<"BillingTransactionLog"> | string | null
+    processingTimeMs?: IntNullableFilter<"BillingTransactionLog"> | number | null
+    createdAt?: DateTimeFilter<"BillingTransactionLog"> | Date | string
+    updatedAt?: DateTimeFilter<"BillingTransactionLog"> | Date | string
+  }, "id" | "idempotencyKey">
+
+  export type BillingTransactionLogOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    transactionType?: SortOrder
+    stripeId?: SortOrderInput | SortOrder
+    amount?: SortOrderInput | SortOrder
+    currency?: SortOrderInput | SortOrder
+    status?: SortOrder
+    idempotencyKey?: SortOrderInput | SortOrder
+    metadata?: SortOrderInput | SortOrder
+    error?: SortOrderInput | SortOrder
+    processingTimeMs?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: BillingTransactionLogCountOrderByAggregateInput
+    _avg?: BillingTransactionLogAvgOrderByAggregateInput
+    _max?: BillingTransactionLogMaxOrderByAggregateInput
+    _min?: BillingTransactionLogMinOrderByAggregateInput
+    _sum?: BillingTransactionLogSumOrderByAggregateInput
+  }
+
+  export type BillingTransactionLogScalarWhereWithAggregatesInput = {
+    AND?: BillingTransactionLogScalarWhereWithAggregatesInput | BillingTransactionLogScalarWhereWithAggregatesInput[]
+    OR?: BillingTransactionLogScalarWhereWithAggregatesInput[]
+    NOT?: BillingTransactionLogScalarWhereWithAggregatesInput | BillingTransactionLogScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"BillingTransactionLog"> | string
+    userId?: StringWithAggregatesFilter<"BillingTransactionLog"> | string
+    transactionType?: EnumBillingTransactionTypeWithAggregatesFilter<"BillingTransactionLog"> | $Enums.BillingTransactionType
+    stripeId?: StringNullableWithAggregatesFilter<"BillingTransactionLog"> | string | null
+    amount?: DecimalNullableWithAggregatesFilter<"BillingTransactionLog"> | Decimal | DecimalJsLike | number | string | null
+    currency?: StringNullableWithAggregatesFilter<"BillingTransactionLog"> | string | null
+    status?: EnumBillingTransactionStatusWithAggregatesFilter<"BillingTransactionLog"> | $Enums.BillingTransactionStatus
+    idempotencyKey?: StringNullableWithAggregatesFilter<"BillingTransactionLog"> | string | null
+    metadata?: JsonNullableWithAggregatesFilter<"BillingTransactionLog">
+    error?: StringNullableWithAggregatesFilter<"BillingTransactionLog"> | string | null
+    processingTimeMs?: IntNullableWithAggregatesFilter<"BillingTransactionLog"> | number | null
+    createdAt?: DateTimeWithAggregatesFilter<"BillingTransactionLog"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"BillingTransactionLog"> | Date | string
   }
 
   export type UserCreateInput = {
@@ -38703,6 +39971,118 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type BillingTransactionLogCreateInput = {
+    id?: string
+    userId: string
+    transactionType: $Enums.BillingTransactionType
+    stripeId?: string | null
+    amount?: Decimal | DecimalJsLike | number | string | null
+    currency?: string | null
+    status?: $Enums.BillingTransactionStatus
+    idempotencyKey?: string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    error?: string | null
+    processingTimeMs?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BillingTransactionLogUncheckedCreateInput = {
+    id?: string
+    userId: string
+    transactionType: $Enums.BillingTransactionType
+    stripeId?: string | null
+    amount?: Decimal | DecimalJsLike | number | string | null
+    currency?: string | null
+    status?: $Enums.BillingTransactionStatus
+    idempotencyKey?: string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    error?: string | null
+    processingTimeMs?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BillingTransactionLogUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    transactionType?: EnumBillingTransactionTypeFieldUpdateOperationsInput | $Enums.BillingTransactionType
+    stripeId?: NullableStringFieldUpdateOperationsInput | string | null
+    amount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    currency?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumBillingTransactionStatusFieldUpdateOperationsInput | $Enums.BillingTransactionStatus
+    idempotencyKey?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    error?: NullableStringFieldUpdateOperationsInput | string | null
+    processingTimeMs?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BillingTransactionLogUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    transactionType?: EnumBillingTransactionTypeFieldUpdateOperationsInput | $Enums.BillingTransactionType
+    stripeId?: NullableStringFieldUpdateOperationsInput | string | null
+    amount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    currency?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumBillingTransactionStatusFieldUpdateOperationsInput | $Enums.BillingTransactionStatus
+    idempotencyKey?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    error?: NullableStringFieldUpdateOperationsInput | string | null
+    processingTimeMs?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BillingTransactionLogCreateManyInput = {
+    id?: string
+    userId: string
+    transactionType: $Enums.BillingTransactionType
+    stripeId?: string | null
+    amount?: Decimal | DecimalJsLike | number | string | null
+    currency?: string | null
+    status?: $Enums.BillingTransactionStatus
+    idempotencyKey?: string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    error?: string | null
+    processingTimeMs?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BillingTransactionLogUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    transactionType?: EnumBillingTransactionTypeFieldUpdateOperationsInput | $Enums.BillingTransactionType
+    stripeId?: NullableStringFieldUpdateOperationsInput | string | null
+    amount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    currency?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumBillingTransactionStatusFieldUpdateOperationsInput | $Enums.BillingTransactionStatus
+    idempotencyKey?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    error?: NullableStringFieldUpdateOperationsInput | string | null
+    processingTimeMs?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BillingTransactionLogUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    transactionType?: EnumBillingTransactionTypeFieldUpdateOperationsInput | $Enums.BillingTransactionType
+    stripeId?: NullableStringFieldUpdateOperationsInput | string | null
+    amount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    currency?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumBillingTransactionStatusFieldUpdateOperationsInput | $Enums.BillingTransactionStatus
+    idempotencyKey?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    error?: NullableStringFieldUpdateOperationsInput | string | null
+    processingTimeMs?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -40927,6 +42307,96 @@ export namespace Prisma {
     _max?: NestedJsonFilter<$PrismaModel>
   }
 
+  export type EnumBillingTransactionTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.BillingTransactionType | EnumBillingTransactionTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.BillingTransactionType[] | ListEnumBillingTransactionTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.BillingTransactionType[] | ListEnumBillingTransactionTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumBillingTransactionTypeFilter<$PrismaModel> | $Enums.BillingTransactionType
+  }
+
+  export type EnumBillingTransactionStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.BillingTransactionStatus | EnumBillingTransactionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.BillingTransactionStatus[] | ListEnumBillingTransactionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.BillingTransactionStatus[] | ListEnumBillingTransactionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumBillingTransactionStatusFilter<$PrismaModel> | $Enums.BillingTransactionStatus
+  }
+
+  export type BillingTransactionLogCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    transactionType?: SortOrder
+    stripeId?: SortOrder
+    amount?: SortOrder
+    currency?: SortOrder
+    status?: SortOrder
+    idempotencyKey?: SortOrder
+    metadata?: SortOrder
+    error?: SortOrder
+    processingTimeMs?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type BillingTransactionLogAvgOrderByAggregateInput = {
+    amount?: SortOrder
+    processingTimeMs?: SortOrder
+  }
+
+  export type BillingTransactionLogMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    transactionType?: SortOrder
+    stripeId?: SortOrder
+    amount?: SortOrder
+    currency?: SortOrder
+    status?: SortOrder
+    idempotencyKey?: SortOrder
+    error?: SortOrder
+    processingTimeMs?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type BillingTransactionLogMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    transactionType?: SortOrder
+    stripeId?: SortOrder
+    amount?: SortOrder
+    currency?: SortOrder
+    status?: SortOrder
+    idempotencyKey?: SortOrder
+    error?: SortOrder
+    processingTimeMs?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type BillingTransactionLogSumOrderByAggregateInput = {
+    amount?: SortOrder
+    processingTimeMs?: SortOrder
+  }
+
+  export type EnumBillingTransactionTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.BillingTransactionType | EnumBillingTransactionTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.BillingTransactionType[] | ListEnumBillingTransactionTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.BillingTransactionType[] | ListEnumBillingTransactionTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumBillingTransactionTypeWithAggregatesFilter<$PrismaModel> | $Enums.BillingTransactionType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumBillingTransactionTypeFilter<$PrismaModel>
+    _max?: NestedEnumBillingTransactionTypeFilter<$PrismaModel>
+  }
+
+  export type EnumBillingTransactionStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.BillingTransactionStatus | EnumBillingTransactionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.BillingTransactionStatus[] | ListEnumBillingTransactionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.BillingTransactionStatus[] | ListEnumBillingTransactionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumBillingTransactionStatusWithAggregatesFilter<$PrismaModel> | $Enums.BillingTransactionStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumBillingTransactionStatusFilter<$PrismaModel>
+    _max?: NestedEnumBillingTransactionStatusFilter<$PrismaModel>
+  }
+
   export type PatientCreateNestedOneWithoutUserInput = {
     create?: XOR<PatientCreateWithoutUserInput, PatientUncheckedCreateWithoutUserInput>
     connectOrCreate?: PatientCreateOrConnectWithoutUserInput
@@ -42206,6 +43676,14 @@ export namespace Prisma {
     set?: $Enums.WebhookEventStatus
   }
 
+  export type EnumBillingTransactionTypeFieldUpdateOperationsInput = {
+    set?: $Enums.BillingTransactionType
+  }
+
+  export type EnumBillingTransactionStatusFieldUpdateOperationsInput = {
+    set?: $Enums.BillingTransactionStatus
+  }
+
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -42911,6 +44389,40 @@ export namespace Prisma {
     gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type NestedEnumBillingTransactionTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.BillingTransactionType | EnumBillingTransactionTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.BillingTransactionType[] | ListEnumBillingTransactionTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.BillingTransactionType[] | ListEnumBillingTransactionTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumBillingTransactionTypeFilter<$PrismaModel> | $Enums.BillingTransactionType
+  }
+
+  export type NestedEnumBillingTransactionStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.BillingTransactionStatus | EnumBillingTransactionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.BillingTransactionStatus[] | ListEnumBillingTransactionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.BillingTransactionStatus[] | ListEnumBillingTransactionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumBillingTransactionStatusFilter<$PrismaModel> | $Enums.BillingTransactionStatus
+  }
+
+  export type NestedEnumBillingTransactionTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.BillingTransactionType | EnumBillingTransactionTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.BillingTransactionType[] | ListEnumBillingTransactionTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.BillingTransactionType[] | ListEnumBillingTransactionTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumBillingTransactionTypeWithAggregatesFilter<$PrismaModel> | $Enums.BillingTransactionType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumBillingTransactionTypeFilter<$PrismaModel>
+    _max?: NestedEnumBillingTransactionTypeFilter<$PrismaModel>
+  }
+
+  export type NestedEnumBillingTransactionStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.BillingTransactionStatus | EnumBillingTransactionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.BillingTransactionStatus[] | ListEnumBillingTransactionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.BillingTransactionStatus[] | ListEnumBillingTransactionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumBillingTransactionStatusWithAggregatesFilter<$PrismaModel> | $Enums.BillingTransactionStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumBillingTransactionStatusFilter<$PrismaModel>
+    _max?: NestedEnumBillingTransactionStatusFilter<$PrismaModel>
   }
 
   export type PatientCreateWithoutUserInput = {
@@ -46696,6 +48208,10 @@ export namespace Prisma {
      * @deprecated Use WebhookEventLogDefaultArgs instead
      */
     export type WebhookEventLogArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = WebhookEventLogDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use BillingTransactionLogDefaultArgs instead
+     */
+    export type BillingTransactionLogArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = BillingTransactionLogDefaultArgs<ExtArgs>
 
   /**
    * Batch Payload for updateMany & deleteMany & createMany

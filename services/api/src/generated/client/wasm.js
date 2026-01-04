@@ -511,6 +511,22 @@ exports.Prisma.WebhookEventLogScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.BillingTransactionLogScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  transactionType: 'transactionType',
+  stripeId: 'stripeId',
+  amount: 'amount',
+  currency: 'currency',
+  status: 'status',
+  idempotencyKey: 'idempotencyKey',
+  metadata: 'metadata',
+  error: 'error',
+  processingTimeMs: 'processingTimeMs',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -727,6 +743,25 @@ exports.WebhookEventStatus = exports.$Enums.WebhookEventStatus = {
   failed: 'failed'
 };
 
+exports.BillingTransactionType = exports.$Enums.BillingTransactionType = {
+  CHARGE: 'CHARGE',
+  REFUND: 'REFUND',
+  SUBSCRIPTION_CREATE: 'SUBSCRIPTION_CREATE',
+  SUBSCRIPTION_UPDATE: 'SUBSCRIPTION_UPDATE',
+  SUBSCRIPTION_CANCEL: 'SUBSCRIPTION_CANCEL',
+  PAYMENT_METHOD_ADD: 'PAYMENT_METHOD_ADD',
+  PAYMENT_METHOD_REMOVE: 'PAYMENT_METHOD_REMOVE',
+  INVOICE_PAID: 'INVOICE_PAID',
+  INVOICE_FAILED: 'INVOICE_FAILED'
+};
+
+exports.BillingTransactionStatus = exports.$Enums.BillingTransactionStatus = {
+  pending: 'pending',
+  processing: 'processing',
+  succeeded: 'succeeded',
+  failed: 'failed'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
   RefreshToken: 'RefreshToken',
@@ -755,7 +790,8 @@ exports.Prisma.ModelName = {
   DeviceToken: 'DeviceToken',
   PushNotification: 'PushNotification',
   NotificationPreference: 'NotificationPreference',
-  WebhookEventLog: 'WebhookEventLog'
+  WebhookEventLog: 'WebhookEventLog',
+  BillingTransactionLog: 'BillingTransactionLog'
 };
 
 /**

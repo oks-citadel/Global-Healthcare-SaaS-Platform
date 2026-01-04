@@ -185,9 +185,58 @@ exports.Prisma.MfaTokenScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.SocialAccountScalarFieldEnum = {
+  id: 'id',
+  provider: 'provider',
+  providerId: 'providerId',
+  userId: 'userId',
+  accessToken: 'accessToken',
+  refreshToken: 'refreshToken',
+  tokenExpiry: 'tokenExpiry',
+  email: 'email',
+  displayName: 'displayName',
+  avatarUrl: 'avatarUrl',
+  profileData: 'profileData',
+  linkedAt: 'linkedAt',
+  lastUsedAt: 'lastUsedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.OAuthStateScalarFieldEnum = {
+  id: 'id',
+  state: 'state',
+  provider: 'provider',
+  userId: 'userId',
+  redirectUrl: 'redirectUrl',
+  metadata: 'metadata',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.AuditLogScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  action: 'action',
+  resource: 'resource',
+  resourceId: 'resourceId',
+  ipAddress: 'ipAddress',
+  userAgent: 'userAgent',
+  sessionId: 'sessionId',
+  success: 'success',
+  failureReason: 'failureReason',
+  metadata: 'metadata',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
+};
+
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull
 };
 
 exports.Prisma.QueryMode = {
@@ -198,6 +247,12 @@ exports.Prisma.QueryMode = {
 exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
+};
+
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
 };
 exports.Role = exports.$Enums.Role = {
   patient: 'patient',
@@ -217,7 +272,10 @@ exports.Prisma.ModelName = {
   RefreshToken: 'RefreshToken',
   PasswordResetToken: 'PasswordResetToken',
   EmailVerificationToken: 'EmailVerificationToken',
-  MfaToken: 'MfaToken'
+  MfaToken: 'MfaToken',
+  SocialAccount: 'SocialAccount',
+  OAuthState: 'OAuthState',
+  AuditLog: 'AuditLog'
 };
 
 /**

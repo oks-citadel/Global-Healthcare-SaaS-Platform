@@ -17,6 +17,7 @@ import { paymentController } from '../controllers/payment.controller.js';
 import { pushController } from '../controllers/push.controller.js';
 import { dashboardController } from '../controllers/dashboard.controller.js';
 import { authenticate, authorize, requireSubscription, requireEmailVerified } from '../middleware/auth.middleware.js';
+import { stripeWebhookIdempotency, webhookIdempotency } from '../middleware/idempotency.middleware.js';
 import stripeWebhookRouter from './webhooks/stripe.js';
 import { premiumRoutes } from './premium.routes.js';
 import { postDischargeRoutes } from './post-discharge.routes.js';
@@ -134,7 +135,7 @@ router.delete('/subscriptions/:id', authenticate, subscriptionController.cancelS
 // ==========================================
 // Billing Webhook (Stripe) - Legacy
 // ==========================================
-router.post('/billing/webhook', subscriptionController.handleWebhook);
+router.post('/billing/webhook', stripeWebhookIdempotency(), subscriptionController.handleWebhook);
 
 // ==========================================
 // Stripe Webhooks (Dedicated Route)
@@ -148,7 +149,16 @@ router.use('/webhooks/stripe', stripeWebhookRouter);
 // Internal Billing Endpoints (Service-to-Service)
 // ==========================================
 // Telehealth service billing webhook - receives billing events from telehealth service
-router.post('/billing/telehealth-visit', async (req, res) => {
+// Uses idempotency based on visitId header to prevent duplicate billing
+router.post(
+  '/billing/telehealth-visit',
+  webhookIdempotency({
+    source: 'telehealth',
+    getEventId: (req) => req.body?.visitId || req.headers['x-visit-id'] as string || null,
+    getEventType: () => 'telehealth-billing',
+    markProcessedImmediately: false,
+  }),
+  async (req, res) => {
   try {
     const serviceKey = req.headers['x-service-key'];
     const expectedKey = process.env.SERVICE_API_KEY;
@@ -195,6 +205,11 @@ router.post('/billing/telehealth-visit', async (req, res) => {
       }
     );
 
+    // Mark event as processed after successful billing
+    if (req.webhookIdempotency?.markAsProcessed) {
+      await req.webhookIdempotency.markAsProcessed();
+    }
+
     logger.info('Telehealth billing completed', {
       visitId,
       appointmentId,
@@ -233,7 +248,7 @@ router.get('/payments/history', authenticate, paymentController.getPaymentHistor
 router.get('/payments/:id', authenticate, paymentController.getPayment);
 router.post('/payments/:id/refund', authenticate, paymentController.refundPayment);
 router.get('/payments/invoices', authenticate, paymentController.getInvoices);
-router.post('/payments/webhook', paymentController.handleWebhook);
+router.post('/payments/webhook', stripeWebhookIdempotency(), paymentController.handleWebhook);
 
 // ==========================================
 // Notification Endpoints

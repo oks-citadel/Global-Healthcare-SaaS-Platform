@@ -57,7 +57,7 @@ export class GoogleStrategy extends OAuthBaseStrategy {
         throw new Error(`Failed to fetch Google profile: ${response.status}`);
       }
 
-      const data: GoogleUserInfo = await response.json();
+      const data = await response.json() as GoogleUserInfo;
 
       logger.info('Google profile fetched successfully', {
         providerId: data.sub,

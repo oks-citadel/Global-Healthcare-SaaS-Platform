@@ -63,7 +63,7 @@ export class FacebookStrategy extends OAuthBaseStrategy {
         throw new Error(`Failed to fetch Facebook profile: ${response.status}`);
       }
 
-      const data: FacebookUserInfo = await response.json();
+      const data = await response.json() as FacebookUserInfo;
 
       logger.info('Facebook profile fetched successfully', {
         providerId: data.id,
@@ -127,13 +127,13 @@ export class FacebookStrategy extends OAuthBaseStrategy {
         throw new Error(`Long-lived token exchange failed: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as Record<string, unknown>;
 
       return {
-        accessToken: data.access_token,
+        accessToken: data.access_token as string,
         refreshToken: null, // Facebook doesn't use refresh tokens
-        expiresIn: data.expires_in,
-        tokenType: data.token_type || 'Bearer',
+        expiresIn: data.expires_in as number,
+        tokenType: (data.token_type as string) || 'Bearer',
       };
     } catch (error) {
       logger.error('Facebook long-lived token exchange error', {
@@ -166,7 +166,7 @@ export class FacebookStrategy extends OAuthBaseStrategy {
         return { isValid: false };
       }
 
-      const data = await response.json();
+      const data = await response.json() as { data?: { is_valid?: boolean; user_id?: string; scopes?: string[]; expires_at?: number } };
 
       return {
         isValid: data.data?.is_valid || false,

@@ -887,3 +887,51 @@ enum WebhookEventStatus {
   succeeded
   failed
 }
+
+// ==========================================
+// Billing Transaction Logging (Audit Trail)
+// ==========================================
+
+model BillingTransactionLog {
+  id               String                   @id @default(uuid())
+  userId           String
+  transactionType  BillingTransactionType
+  stripeId         String? // Stripe payment intent, refund, or subscription ID
+  amount           Decimal?                 @db.Decimal(10, 2)
+  currency         String?
+  status           BillingTransactionStatus @default(pending)
+  idempotencyKey   String?                  @unique
+  metadata         Json?
+  error            String?
+  processingTimeMs Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([transactionType])
+  @@index([status])
+  @@index([createdAt])
+  @@index([userId, transactionType])
+  @@index([stripeId])
+  @@index([idempotencyKey])
+}
+
+enum BillingTransactionType {
+  CHARGE
+  REFUND
+  SUBSCRIPTION_CREATE
+  SUBSCRIPTION_UPDATE
+  SUBSCRIPTION_CANCEL
+  PAYMENT_METHOD_ADD
+  PAYMENT_METHOD_REMOVE
+  INVOICE_PAID
+  INVOICE_FAILED
+}
+
+enum BillingTransactionStatus {
+  pending
+  processing
+  succeeded
+  failed
+}

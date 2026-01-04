@@ -300,15 +300,15 @@ export function createRateLimitMiddleware(type: RateLimitEndpointType): RequestH
 /**
  * Pre-configured rate limiters
  */
-export const generalRateLimit = createRateLimitMiddleware('general');
-export const authRateLimit = createRateLimitMiddleware('auth');
-export const uploadRateLimit = createRateLimitMiddleware('upload');
-export const searchRateLimit = createRateLimitMiddleware('search');
+export const generalRateLimit: RequestHandler = createRateLimitMiddleware('general');
+export const authRateLimit: RequestHandler = createRateLimitMiddleware('auth');
+export const uploadRateLimit: RequestHandler = createRateLimitMiddleware('upload');
+export const searchRateLimit: RequestHandler = createRateLimitMiddleware('search');
 
 /**
  * Combined rate limiter that applies general limits to all routes
  */
-export const rateLimiter = {
+export const rateLimiter: Record<RateLimitEndpointType, RequestHandler> = {
   general: generalRateLimit,
   auth: authRateLimit,
   upload: uploadRateLimit,
