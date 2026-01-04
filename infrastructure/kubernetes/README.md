@@ -740,5 +740,19 @@ For issues or questions:
 
 ---
 
-**Last Updated**: 2025-12-29
-**Version**: 2.0.0 (AWS)
+## Important Notes
+
+### Archived Stub Configurations (2026-01-03)
+
+The stub deployment configurations in `infrastructure/kubernetes/production/` have been archived. These files (deployments.yaml, configmaps.yaml, services.yaml) were development/testing configurations that were not suitable for production use. They have been moved to `infrastructure/kubernetes/production/archived/` with the `.archived` extension.
+
+**For production deployments, always use**:
+1. `scripts/deploy-production.sh` - Primary deployment script with blue-green deployments
+2. Base configurations in `infrastructure/kubernetes/base/services/*/deployment.yaml`
+
+See `infrastructure/kubernetes/production/README.md` for complete details.
+
+---
+
+**Last Updated**: 2026-01-03
+**Version**: 2.0.1 (AWS)

@@ -439,13 +439,35 @@ export class ConnectionPoolManager {
 export class IndexOptimization {
   /**
    * Analyze query for missing indexes
+   * SECURITY: This method is restricted to internal use only.
+   * The query parameter must be a pre-validated, static SQL string.
+   * Never pass user input directly to this method.
    */
   static async analyzeQuery(
     prisma: PrismaClient,
     query: string
   ): Promise<any> {
     try {
-      // PostgreSQL specific EXPLAIN
+      // SECURITY: Validate query is a simple SELECT statement only
+      const normalizedQuery = query.trim().toUpperCase();
+      if (!normalizedQuery.startsWith('SELECT') ||
+          normalizedQuery.includes('INSERT') ||
+          normalizedQuery.includes('UPDATE') ||
+          normalizedQuery.includes('DELETE') ||
+          normalizedQuery.includes('DROP') ||
+          normalizedQuery.includes('ALTER') ||
+          normalizedQuery.includes('TRUNCATE') ||
+          normalizedQuery.includes('GRANT') ||
+          normalizedQuery.includes('REVOKE') ||
+          normalizedQuery.includes('CREATE') ||
+          normalizedQuery.includes('EXEC') ||
+          normalizedQuery.includes(';')) {
+        logger.error('analyzeQuery: Invalid query - only simple SELECT statements allowed');
+        return null;
+      }
+
+      // PostgreSQL specific EXPLAIN - only for admin/debugging purposes
+      // WARNING: This still uses raw query - ensure caller validates input
       const result = await prisma.$queryRawUnsafe(`EXPLAIN ${query}`);
       return result;
     } catch (error) {

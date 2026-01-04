@@ -82,6 +82,10 @@ model Study {
   @@index([studyDate])
   @@index([modality])
   @@index([status])
+  @@index([studyInstanceUID])
+  @@index([accessionNumber])
+  @@index([patientId, studyDate])
+  @@index([modality, studyDate])
 }
 
 model Image {
@@ -255,4 +259,275 @@ enum Severity {
   HIGH
   MODERATE
   LOW
+}
+
+// ==========================================
+// PACS Integration Tables
+// ==========================================
+
+model PACSNode {
+  id              String   @id @default(uuid())
+  name            String   @unique
+  description     String?
+  aeTitle         String   @unique // Application Entity Title
+  hostname        String
+  port            Int      @default(104)
+
+  // Node type and capabilities
+  nodeType        PACSNodeType @default(SCP)
+  isActive        Boolean  @default(true)
+
+  // TLS/Security
+  tlsEnabled      Boolean  @default(false)
+  tlsCertPath     String?
+
+  // Connection settings
+  maxAssociations Int      @default(10)
+  timeout         Int      @default(30) // seconds
+
+  // Supported transfer syntaxes
+  transferSyntaxes String[]
+
+  // Supported SOP Classes
+  sopClasses      String[]
+
+  // Metadata
+  lastConnectedAt DateTime?
+  lastErrorAt     DateTime?
+  lastError       String?
+
+  // Relations
+  dicomTransfers  DicomTransfer[]
+  worklistItems   WorklistItem[]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([aeTitle])
+  @@index([isActive])
+  @@index([nodeType])
+  @@index([hostname, port])
+}
+
+model DicomTransfer {
+  id              String   @id @default(uuid())
+
+  // Source and destination
+  sourceNodeId    String?
+  sourceNode      PACSNode? @relation(fields: [sourceNodeId], references: [id], onDelete: SetNull)
+  destinationAE   String
+
+  // DICOM references
+  studyInstanceUID    String
+  seriesInstanceUID   String?
+  sopInstanceUID      String?
+
+  // Transfer details
+  transferType    TransferType
+  direction       TransferDirection
+  status          TransferStatus @default(PENDING)
+
+  // Progress tracking
+  totalInstances  Int      @default(0)
+  completedInstances Int   @default(0)
+  failedInstances Int      @default(0)
+
+  // Timing
+  scheduledAt     DateTime?
+  startedAt       DateTime?
+  completedAt     DateTime?
+
+  // Error handling
+  retryCount      Int      @default(0)
+  maxRetries      Int      @default(3)
+  lastError       String?
+  errorDetails    Json?
+
+  // Metadata
+  priority        Int      @default(5) // 1-10, lower is higher priority
+  initiatedBy     String?
+  notes           String?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([sourceNodeId])
+  @@index([studyInstanceUID])
+  @@index([status])
+  @@index([transferType])
+  @@index([scheduledAt])
+  @@index([priority])
+  @@index([status, priority])
+}
+
+model WorklistItem {
+  id                  String   @id @default(uuid())
+
+  // Associated PACS node
+  pacsNodeId          String?
+  pacsNode            PACSNode? @relation(fields: [pacsNodeId], references: [id], onDelete: SetNull)
+
+  // Scheduled Procedure Step
+  scheduledProcedureStepId String @unique
+  scheduledStartDate  DateTime
+  scheduledStartTime  String?
+  modality            Modality
+  scheduledStation    String?
+  scheduledPerformingPhysician String?
+
+  // Requested Procedure
+  requestedProcedureId String
+  requestedProcedureDescription String
+  accessionNumber     String   @unique
+
+  // Patient Information (for worklist query)
+  patientId           String
+  patientName         String
+  patientDOB          DateTime?
+  patientSex          String?
+
+  // Referring Physician
+  referringPhysician  String?
+  referringPhysicianId String?
+
+  // Order Information
+  orderId             String?
+  orderPriority       Priority @default(ROUTINE)
+
+  // Status
+  status              WorklistStatus @default(SCHEDULED)
+
+  // Timing
+  arrivedAt           DateTime?
+  startedAt           DateTime?
+  completedAt         DateTime?
+
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@index([pacsNodeId])
+  @@index([scheduledStartDate])
+  @@index([modality])
+  @@index([patientId])
+  @@index([accessionNumber])
+  @@index([status])
+  @@index([orderId])
+  @@index([scheduledStartDate, modality])
+}
+
+model StorageLocation {
+  id              String   @id @default(uuid())
+  name            String   @unique
+  description     String?
+
+  // Storage type
+  storageType     StorageType
+
+  // Configuration
+  basePath        String?  // For local/NAS storage
+  bucketName      String?  // For S3/GCS/Azure
+  region          String?
+  endpoint        String?  // Custom S3-compatible endpoint
+
+  // Credentials (encrypted)
+  accessKeyId     String?
+  secretAccessKey String?
+
+  // Storage settings
+  isDefault       Boolean  @default(false)
+  isActive        Boolean  @default(true)
+  maxSizeGB       BigInt?
+  usedSizeGB      BigInt   @default(0)
+
+  // Retention policy
+  retentionDays   Int?     // null = infinite
+  archiveAfterDays Int?
+
+  // Health check
+  lastHealthCheck DateTime?
+  isHealthy       Boolean  @default(true)
+  healthCheckError String?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([storageType])
+  @@index([isActive])
+  @@index([isDefault])
+}
+
+model DicomTag {
+  id              String   @id @default(uuid())
+  tag             String   @unique // Format: (0008,0050) - human readable
+  tagHex          String   @unique // Format: 00080050 - hex
+  name            String
+  keyword         String   @unique
+  vr              String   // Value Representation (CS, LO, PN, etc.)
+  vm              String   // Value Multiplicity
+  description     String?
+
+  // Categorization
+  category        String?  // Patient, Study, Series, Instance, etc.
+  isRequired      Boolean  @default(false)
+  isSearchable    Boolean  @default(false)
+  isPHI           Boolean  @default(false) // Protected Health Information
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([category])
+  @@index([isSearchable])
+  @@index([isPHI])
+}
+
+// ==========================================
+// PACS Enums
+// ==========================================
+
+enum PACSNodeType {
+  SCP     // Storage Class Provider (receiver)
+  SCU     // Storage Class User (sender)
+  BOTH    // Both SCP and SCU
+  QUERY   // Query/Retrieve only
+  PRINT   // Print server
+}
+
+enum TransferType {
+  STORE       // C-STORE
+  QUERY       // C-FIND
+  RETRIEVE    // C-MOVE or C-GET
+  ECHO        // C-ECHO (verification)
+}
+
+enum TransferDirection {
+  INBOUND
+  OUTBOUND
+}
+
+enum TransferStatus {
+  PENDING
+  QUEUED
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+  CANCELLED
+  RETRY_SCHEDULED
+}
+
+enum WorklistStatus {
+  SCHEDULED
+  ARRIVED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum StorageType {
+  LOCAL
+  NAS
+  S3
+  GCS
+  AZURE_BLOB
+  CUSTOM
 }

@@ -1,3 +1,26 @@
+# ============================================
+# ARCHIVED FILE - DO NOT USE FOR PRODUCTION
+# ============================================
+# Archive Date: 2026-01-03
+# Archived By: Infrastructure Cleanup
+# Reason: This file contains STUB code ConfigMaps that embed application code
+#         directly in Kubernetes manifests. This is an anti-pattern for production.
+#
+# Issues with this configuration:
+# 1. Application code should not be stored in ConfigMaps
+# 2. Code should be built into container images and stored in ECR
+# 3. These simple HTTP servers are not production-ready microservices
+# 4. No proper error handling, logging, or observability
+# 5. Hard-coded mock data instead of database connections
+#
+# AUTHORITATIVE DEPLOYMENT CONFIGURATIONS:
+# - Container images should be built and pushed to ECR
+# - Use scripts/deploy-production.sh for production deployments
+# - See infrastructure/kubernetes/base/services/*/deployment.yaml for proper configs
+#
+# See: infrastructure/kubernetes/production/README.md for deployment guidance
+# ============================================
+
 # API Gateway Code - v1.0.0
 apiVersion: v1
 kind: ConfigMap

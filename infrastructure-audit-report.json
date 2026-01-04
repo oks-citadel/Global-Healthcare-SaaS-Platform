@@ -73,15 +73,23 @@
       ]
     },
     "stubDeployments": {
-      "status": "NOT_FOR_PRODUCTION",
-      "path": "infrastructure/kubernetes/production/deployments.yaml",
-      "description": "This file contains simplified stub deployments for testing only. Actual production uses deploy-production.sh which deploys the properly configured base deployments",
-      "issues": [
+      "status": "ARCHIVED",
+      "archivedDate": "2026-01-03",
+      "archivedPath": "infrastructure/kubernetes/production/archived/",
+      "archivedFiles": [
+        "deployments.yaml.archived",
+        "configmaps.yaml.archived",
+        "services.yaml.archived"
+      ],
+      "description": "Stub deployments have been ARCHIVED and should not be used. Production uses deploy-production.sh which deploys the properly configured base deployments from infrastructure/kubernetes/base/services/",
+      "originalIssues": [
         "Uses generic node:20-alpine image instead of ECR images",
         "Missing security context",
         "Low resource limits (50m CPU, 64Mi memory)",
-        "Single replica"
-      ]
+        "Single replica",
+        "Code embedded in ConfigMaps (anti-pattern)"
+      ],
+      "resolution": "Files archived to production/archived/ folder with .archived extension. See infrastructure/kubernetes/production/README.md for authoritative deployment guidance."
     },
     "securityFeatures": [
       "Pod Security Context (runAsNonRoot, runAsUser: 1000, fsGroup: 1000)",

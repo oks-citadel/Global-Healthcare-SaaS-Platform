@@ -3,8 +3,25 @@
 # ============================================
 # UnifiedHealth Platform - Deployment Script (AWS)
 # ============================================
-# This script deploys the application to AWS EKS
+# AUTHORITATIVE ENVIRONMENT DEPLOYMENT SCRIPT
+#
+# This script deploys the application to AWS EKS for all environments (dev, staging, production).
+# It uses Kustomize overlays from infrastructure/kubernetes/overlays/<environment>/
+#
+# For production deployments, prefer using scripts/deploy-production.sh which provides:
+#   - Blue-green deployment
+#   - Automatic rollback
+#   - Database backup and migration
+#
+# DO NOT use the archived stub files in infrastructure/kubernetes/production/archived/
+# Those were development/testing configurations and are NOT production-ready.
+#
+# Authoritative deployment configurations:
+#   - Base configs: infrastructure/kubernetes/base/services/*/deployment.yaml
+#   - Overlays: infrastructure/kubernetes/overlays/<environment>/
+#
 # Usage: ./infrastructure/kubernetes/deploy.sh <environment> [action]
+# ============================================
 
 set -euo pipefail
 

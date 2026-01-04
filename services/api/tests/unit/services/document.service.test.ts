@@ -6,7 +6,7 @@ import {
   ForbiddenError,
 } from "../../../src/utils/errors.js";
 
-describe.skip("DocumentService", () => {
+describe("DocumentService", () => {
   const validDocumentInput = {
     patientId: `patient-${Date.now()}`,
     type: "lab_result" as const,

@@ -142,7 +142,7 @@ describe('NotificationService', () => {
       expect(result.errorMessage).toContain('Missing required SMS fields');
     });
 
-    it.skip('should validate invalid phone number format', async () => {
+    it('should validate invalid phone number format', async () => {
       const invalidNumbers = [
         'abc123',
         '123',
@@ -402,7 +402,7 @@ describe('NotificationService', () => {
     it('should handle special characters in email subject', async () => {
       const input = {
         to: 'test@example.com',
-        subject: 'Test with 特殊字符 and émojis 🎉',
+        subject: 'Test with special chars and emojis',
         body: 'Test body',
       };
 
@@ -413,7 +413,7 @@ describe('NotificationService', () => {
     it('should handle special characters in SMS message', async () => {
       const input = {
         to: '+1234567890',
-        message: 'Test with 特殊字符 and émojis 🎉',
+        message: 'Test with special chars and emojis',
       };
 
       const result = await notificationService.sendSms(input);

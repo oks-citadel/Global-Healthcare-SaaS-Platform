@@ -96,7 +96,7 @@ resource "aws_kms_alias" "messaging" {
 resource "aws_sns_topic" "topics" {
   for_each = var.topic_configs
 
-  name         = "${local.name}-${each.key}"
+  name         = each.value.fifo_topic ? "${local.name}-${each.key}.fifo" : "${local.name}-${each.key}"
   display_name = each.value.display_name
 
   # HIPAA: Server-side encryption

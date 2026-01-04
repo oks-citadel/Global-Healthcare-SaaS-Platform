@@ -2,10 +2,10 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import request from 'supertest';
 import { createTestApp, createTestUser, getAuthHeader } from './helpers/testApp.js';
 
-describe.skip('Auth API Integration Tests', () => {
+describe('Auth API Integration Tests', () => {
   const app = createTestApp();
 
-  describe.skip('POST /api/v1/auth/register', () => {
+  describe('POST /api/v1/auth/register', () => {
     it('should register a new user', async () => {
       const response = await request(app)
         .post('/api/v1/auth/register')
@@ -79,7 +79,7 @@ describe.skip('Auth API Integration Tests', () => {
     });
   });
 
-  describe.skip('POST /api/v1/auth/login', () => {
+  describe('POST /api/v1/auth/login', () => {
     it('should login with valid credentials', async () => {
       const email = `login-${Date.now()}@example.com`;
       const password = 'SecurePass123!';
@@ -135,7 +135,7 @@ describe.skip('Auth API Integration Tests', () => {
     });
   });
 
-  describe.skip('POST /api/v1/auth/refresh', () => {
+  describe('POST /api/v1/auth/refresh', () => {
     it('should refresh access token', async () => {
       const { refreshToken } = await createTestUser();
 
@@ -157,7 +157,7 @@ describe.skip('Auth API Integration Tests', () => {
     });
   });
 
-  describe.skip('GET /api/v1/auth/me', () => {
+  describe('GET /api/v1/auth/me', () => {
     it('should return current user info', async () => {
       const { accessToken, user } = await createTestUser();
 
@@ -187,7 +187,7 @@ describe.skip('Auth API Integration Tests', () => {
     });
   });
 
-  describe.skip('POST /api/v1/auth/logout', () => {
+  describe('POST /api/v1/auth/logout', () => {
     it('should logout successfully', async () => {
       const { accessToken } = await createTestUser();
 
@@ -200,7 +200,7 @@ describe.skip('Auth API Integration Tests', () => {
     });
   });
 
-  describe.skip('GET /api/v1/roles', () => {
+  describe('GET /api/v1/roles', () => {
     it('should return roles for admin', async () => {
       const { accessToken } = await createTestUser('admin');
 

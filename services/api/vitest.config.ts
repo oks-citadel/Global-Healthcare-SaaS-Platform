@@ -8,8 +8,6 @@ export default defineConfig({
     exclude: [
       'node_modules',
       'dist',
-      // Exclude integration tests that require database
-      'tests/integration/**',
       'tests/security/**',
       'tests/webhooks/**',
     ],

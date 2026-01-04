@@ -351,3 +351,109 @@ variable "github_branch" {
   type        = string
   default     = "main"
 }
+
+# ============================================
+# SES Configuration (Email - Replaces SendGrid)
+# ============================================
+
+variable "enable_ses" {
+  description = "Enable AWS SES for email delivery (replaces SendGrid)"
+  type        = bool
+  default     = true
+}
+
+# ============================================
+# SNS/SQS Configuration (Messaging - Replaces Twilio)
+# ============================================
+
+variable "enable_sns_sqs" {
+  description = "Enable AWS SNS/SQS for messaging (replaces Twilio)"
+  type        = bool
+  default     = true
+}
+
+# ============================================
+# AWS Budgets Configuration
+# ============================================
+
+variable "enable_budgets" {
+  description = "Enable AWS Budgets for cost monitoring and alerts"
+  type        = bool
+  default     = true
+}
+
+variable "budget_amount" {
+  description = "Monthly budget amount in USD"
+  type        = number
+  default     = 50000
+}
+
+variable "budget_alert_thresholds" {
+  description = "List of threshold percentages to trigger budget alerts"
+  type        = list(number)
+  default     = [50, 80, 100, 120]
+}
+
+variable "budget_alert_emails" {
+  description = "List of email addresses to receive budget alerts"
+  type        = list(string)
+  default     = []
+}
+
+# ============================================
+# AWS Backup Configuration
+# ============================================
+
+variable "enable_backup" {
+  description = "Enable AWS Backup for centralized backup management"
+  type        = bool
+  default     = true
+}
+
+variable "backup_retention_days" {
+  description = "Number of days to retain daily backups"
+  type        = number
+  default     = 35
+}
+
+variable "backup_enable_weekly" {
+  description = "Enable weekly backup rule"
+  type        = bool
+  default     = true
+}
+
+variable "backup_weekly_retention_days" {
+  description = "Number of days to retain weekly backups"
+  type        = number
+  default     = 90
+}
+
+variable "backup_enable_monthly" {
+  description = "Enable monthly backup rule"
+  type        = bool
+  default     = true
+}
+
+variable "backup_monthly_retention_days" {
+  description = "Number of days to retain monthly backups"
+  type        = number
+  default     = 365
+}
+
+variable "backup_enable_vault_lock" {
+  description = "Enable vault lock for immutable backups (compliance mode)"
+  type        = bool
+  default     = false
+}
+
+variable "backup_enable_cross_region_copy" {
+  description = "Enable cross-region backup copy for disaster recovery"
+  type        = bool
+  default     = false
+}
+
+variable "backup_notification_emails" {
+  description = "List of email addresses for backup notifications"
+  type        = list(string)
+  default     = []
+}

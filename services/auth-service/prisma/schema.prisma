@@ -41,6 +41,7 @@ model User {
   refreshTokens       RefreshToken[]
   passwordResetTokens PasswordResetToken[]
   emailVerificationTokens EmailVerificationToken[]
+  socialAccounts      SocialAccount[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -151,4 +152,97 @@ model MfaToken {
   @@index([userId])
   @@index([token])
   @@index([expiresAt])
+}
+
+// ==========================================
+// Social Accounts (OAuth2 Integration)
+// ==========================================
+
+model SocialAccount {
+  id          String   @id @default(uuid())
+  provider    String   // OAuth provider name (google, facebook, apple, microsoft, etc.)
+  providerId  String   // Unique ID from the OAuth provider
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // OAuth tokens (encrypted)
+  accessToken  String?
+  refreshToken String?
+  tokenExpiry  DateTime?
+
+  // Profile data from provider
+  email        String?
+  displayName  String?
+  avatarUrl    String?
+  profileData  Json?    // Additional provider-specific profile data
+
+  linkedAt    DateTime @default(now())
+  lastUsedAt  DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Unique constraint: one provider account per user
+  @@unique([provider, providerId])
+  @@unique([provider, userId])
+  @@index([userId])
+  @@index([provider])
+  @@index([providerId])
+  @@index([linkedAt])
+}
+
+// ==========================================
+// OAuth State (CSRF Protection)
+// ==========================================
+
+model OAuthState {
+  id          String   @id @default(uuid())
+  state       String   @unique   // Random state parameter for CSRF protection
+  provider    String              // OAuth provider (google, facebook, apple)
+
+  // For account linking (optional - set when linking to existing user)
+  userId      String?
+
+  // Return URL after OAuth callback
+  redirectUrl String?
+
+  // Additional data to pass through the OAuth flow
+  metadata    Json?
+
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+
+  @@index([state])
+  @@index([expiresAt])
+}
+
+// ==========================================
+// Audit Log (Security Events)
+// ==========================================
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  userId      String?
+  action      String   // login, logout, password_change, mfa_enable, social_link, etc.
+  resource    String?  // The resource being accessed/modified
+  resourceId  String?
+
+  // Request metadata
+  ipAddress   String?
+  userAgent   String?
+  sessionId   String?
+
+  // Result
+  success     Boolean  @default(true)
+  failureReason String?
+
+  // Additional context
+  metadata    Json?
+
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+  @@index([success])
+  @@index([userId, action])
 }

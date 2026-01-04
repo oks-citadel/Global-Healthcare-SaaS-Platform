@@ -321,7 +321,7 @@ describe('Error Middleware', () => {
       expect(next).toHaveBeenCalledWith(error);
     });
 
-    it.skip('should catch rejected promises', async () => {
+    it('should catch rejected promises', async () => {
       const error = new Error('Promise rejection');
       const handler = asyncHandler(async () => {
         return Promise.reject(error);

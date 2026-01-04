@@ -6,7 +6,7 @@ import {
   NotFoundError,
 } from "../../../src/utils/errors.js";
 
-describe.skip("AuthService", () => {
+describe("AuthService", () => {
   const validRegisterInput = {
     email: "test@example.com",
     password: "SecurePass123!",

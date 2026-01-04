@@ -49,8 +49,8 @@ export function Sidebar() {
               className={cn(
                 'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
                 isActive
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                  ? 'sidebar-active text-white shadow-md'
+                  : 'text-muted-foreground hover:bg-trust-blue-50 hover:text-trust-blue-700'
               )}
             >
               <item.icon className="h-5 w-5" />
@@ -62,7 +62,7 @@ export function Sidebar() {
       <div className="border-t p-4">
         <button
           onClick={handleLogout}
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-trust-blue-50 hover:text-trust-blue-700"
         >
           <LogOut className="h-5 w-5" />
           Logout

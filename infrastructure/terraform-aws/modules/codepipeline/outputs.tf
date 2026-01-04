@@ -26,3 +26,23 @@ output "codebuild_api_service_name" {
   description = "Name of the API service CodeBuild project"
   value       = aws_codebuild_project.api_service.name
 }
+
+output "nightly_build_rule_arn" {
+  description = "ARN of the EventBridge rule for nightly builds"
+  value       = var.enable_nightly_builds ? aws_cloudwatch_event_rule.nightly_build[0].arn : null
+}
+
+output "nightly_build_schedule" {
+  description = "Schedule expression for nightly builds (9:00 PM daily)"
+  value       = var.enable_nightly_builds ? aws_cloudwatch_event_rule.nightly_build[0].schedule_expression : null
+}
+
+output "codebuild_deploy_name" {
+  description = "Name of the EKS deploy CodeBuild project"
+  value       = aws_codebuild_project.deploy.name
+}
+
+output "codebuild_role_arn" {
+  description = "ARN of the CodeBuild IAM role"
+  value       = aws_iam_role.codebuild.arn
+}

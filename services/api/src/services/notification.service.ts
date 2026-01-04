@@ -7,8 +7,8 @@ import {
 } from '../dtos/notification.dto.js';
 import { logger } from '../utils/logger.js';
 import { BadRequestError, NotFoundError } from '../utils/errors.js';
-import { sendEmail as sendEmailLib } from '../lib/email.js';
-import { sendSms as sendSmsLib, getSmsStatus } from '../lib/sms.js';
+import { sendEmail as sendEmailLib } from '../lib/aws-email.js';
+import { sendSms as sendSmsLib } from '../lib/aws-sms.js';
 import { getNotificationQueues } from '../lib/queue.js';
 
 /**
@@ -18,8 +18,8 @@ import { getNotificationQueues } from '../lib/queue.js';
  * with queue-based delivery for reliability and scalability.
  *
  * Integrations:
- * - SendGrid for email (https://sendgrid.com)
- * - Twilio for SMS (https://twilio.com)
+ * - AWS SES for email
+ * - AWS SNS for SMS
  * - Bull queues for async processing
  */
 
@@ -389,7 +389,7 @@ export const notificationService = {
   /**
    * Get SMS delivery status
    *
-   * @param messageId - Twilio message SID
+   * @param messageId - AWS SNS message ID
    * @returns SMS status information
    */
   async getSmsStatus(messageId: string): Promise<SmsStatusResponse> {
@@ -400,13 +400,13 @@ export const notificationService = {
 
       logger.info('Fetching SMS status', { messageId });
 
-      const status = await getSmsStatus(messageId);
+      // AWS SNS does not provide a direct API for message status lookup
 
       return {
         messageId,
-        status: status.status,
-        errorCode: status.errorCode,
-        errorMessage: status.errorMessage,
+        status: 'unknown',
+        
+        errorMessage: 'AWS SNS does not provide real-time delivery status. Check CloudWatch Logs for delivery information.',
       };
     } catch (error) {
       logger.error('Failed to fetch SMS status', {

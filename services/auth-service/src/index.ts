@@ -2,16 +2,19 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
+import cookieParser from "cookie-parser";
 import { config } from "./config/index.js";
 import { logger } from "./utils/logger.js";
 import { prisma } from "./utils/prisma.js";
 import authRoutes from "./routes/auth.routes.js";
 import mfaRoutes from "./routes/mfa.routes.js";
+import oauthRoutes from "./routes/oauth.routes.js";
 import { generalLimiter } from "./middleware/rate-limit.middleware.js";
 import {
   errorHandler,
   notFoundHandler,
 } from "./middleware/error.middleware.js";
+import { logEnabledProviders } from "./strategies/index.js";
 
 const app: express.Application = express();
 
@@ -40,6 +43,9 @@ app.use(
 // Body parsing
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+
+// Cookie parsing (for OAuth state cookies)
+app.use(cookieParser());
 
 // Rate limiting
 app.use(generalLimiter);
@@ -95,6 +101,9 @@ app.use("/auth", authRoutes);
 // MFA routes
 app.use("/auth/mfa", mfaRoutes);
 
+// OAuth routes
+app.use("/auth/oauth", oauthRoutes);
+
 // ==================== Error Handling ====================
 
 // 404 handler
@@ -110,6 +119,9 @@ const startServer = async () => {
     // Test database connection
     await prisma.$connect();
     logger.info("Database connected successfully");
+
+    // Log enabled OAuth providers
+    logEnabledProviders();
 
     // Start Express server
     app.listen(config.port, () => {
@@ -129,7 +141,15 @@ const startServer = async () => {
       console.log(`  POST /auth/forgot-password`);
       console.log(`  POST /auth/reset-password`);
       console.log(`  POST /auth/verify-email`);
-      console.log(`  POST /auth/resend-verification\n`);
+      console.log(`  POST /auth/resend-verification`);
+      console.log(`\nOAuth endpoints:`);
+      console.log(`  GET  /auth/oauth/providers`);
+      console.log(`  GET  /auth/oauth/:provider`);
+      console.log(`  GET  /auth/oauth/:provider/callback`);
+      console.log(`  POST /auth/oauth/:provider/token`);
+      console.log(`  POST /auth/oauth/link/:provider (protected)`);
+      console.log(`  DELETE /auth/oauth/unlink/:provider (protected)`);
+      console.log(`  GET  /auth/oauth/accounts (protected)\n`);
     });
   } catch (error) {
     logger.error("Failed to start server", { error });

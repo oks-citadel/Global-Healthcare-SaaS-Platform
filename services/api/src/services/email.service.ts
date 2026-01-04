@@ -1,4 +1,4 @@
-import { sendEmail } from '../lib/email.js';
+import { sendEmail } from '../lib/aws-email.js';
 import { logger } from '../utils/logger.js';
 
 /**

@@ -3,15 +3,14 @@
  *
  * Comprehensive test suite for:
  * - Stripe Integration
- * - SendGrid Integration
- * - Twilio Integration
+ * - AWS SES Integration
+ * - AWS SNS Integration
  * - Firebase Cloud Messaging Integration
  */
 
 import { stripe, createStripeCustomer, createSetupIntent } from '../lib/stripe.js';
-import { sendEmail } from '../lib/email.js';
-import { sendSms } from '../lib/sms.js';
-import { twilioEnhancedService } from '../lib/twilio-enhanced.js';
+import { sendEmail } from '../lib/aws-email.js';
+import { sendSms } from '../lib/aws-sms.js';
 import { fcmEnhancedService } from '../lib/fcm-enhanced.js';
 import { processWebhookWithRetry } from '../lib/stripe-webhook-handler.js';
 import { emailTemplatesService } from '../services/email-templates.service.js';
@@ -63,11 +62,11 @@ class IntegrationTestRunner {
     // Run Stripe tests
     await this.runStripeTests();
 
-    // Run SendGrid tests
-    await this.runSendGridTests();
+    // Run AWS SES tests
+    await this.runSesTests();
 
-    // Run Twilio tests
-    await this.runTwilioTests();
+    // Run AWS SNS tests
+    await this.runSnsTests();
 
     // Run FCM tests
     await this.runFcmTests();
@@ -190,10 +189,10 @@ class IntegrationTestRunner {
   }
 
   /**
-   * SendGrid Integration Tests
+   * AWS SES Integration Tests
    */
-  private async runSendGridTests(): Promise<void> {
-    console.log('\nSendGrid Integration Tests');
+  private async runSesTests(): Promise<void> {
+    console.log('\nAWS SES Integration Tests');
     console.log('-'.repeat(80));
 
     if (TEST_CONFIG.skipLiveTests) {
@@ -202,7 +201,7 @@ class IntegrationTestRunner {
     }
 
     // Test 1: Send Simple Email
-    await this.runTest('SendGrid', 'Send Simple Email', async () => {
+    await this.runTest('AWS SES', 'Send Simple Email', async () => {
       const result = await sendEmail({
         to: TEST_CONFIG.testEmail,
         subject: 'Integration Test - Simple Email',
@@ -217,7 +216,7 @@ class IntegrationTestRunner {
     });
 
     // Test 2: Send Templated Email
-    await this.runTest('SendGrid', 'Send Templated Email', async () => {
+    await this.runTest('AWS SES', 'Send Templated Email', async () => {
       const result = await emailTemplatesService.sendWelcomeEmail({
         email: TEST_CONFIG.testEmail,
         firstName: 'Test',
@@ -231,7 +230,7 @@ class IntegrationTestRunner {
     });
 
     // Test 3: Send Email with Attachments
-    await this.runTest('SendGrid', 'Send Email with Attachments', async () => {
+    await this.runTest('AWS SES', 'Send Email with Attachments', async () => {
       const result = await sendEmail({
         to: TEST_CONFIG.testEmail,
         subject: 'Integration Test - Email with Attachment',
@@ -254,10 +253,10 @@ class IntegrationTestRunner {
   }
 
   /**
-   * Twilio Integration Tests
+   * AWS SNS Integration Tests
    */
-  private async runTwilioTests(): Promise<void> {
-    console.log('\nTwilio Integration Tests');
+  private async runSnsTests(): Promise<void> {
+    console.log('\nAWS SNS Integration Tests');
     console.log('-'.repeat(80));
 
     if (TEST_CONFIG.skipLiveTests) {
@@ -266,7 +265,7 @@ class IntegrationTestRunner {
     }
 
     // Test 1: Send SMS
-    await this.runTest('Twilio', 'Send SMS', async () => {
+    await this.runTest('AWS SNS', 'Send SMS', async () => {
       const result = await sendSms({
         to: TEST_CONFIG.testPhone,
         message: 'Integration Test - This is a test SMS from the integration test suite.',
@@ -280,21 +279,8 @@ class IntegrationTestRunner {
       };
     });
 
-    // Test 2: Send SMS with Retry
-    await this.runTest('Twilio', 'Send SMS with Retry', async () => {
-      const result = await twilioEnhancedService.sendSmsWithRetry({
-        to: TEST_CONFIG.testPhone,
-        message: 'Integration Test - SMS with retry logic',
-      });
-
-      return {
-        success: result.success,
-        messageId: result.messageId,
-      };
-    });
-
-    // Test 3: Send Templated SMS
-    await this.runTest('Twilio', 'Send Templated SMS', async () => {
+    // Test 2: Send Templated SMS
+    await this.runTest('AWS SNS', 'Send Templated SMS', async () => {
       const result = await smsTemplatesService.sendVerificationCode(
         {
           phoneNumber: TEST_CONFIG.testPhone,
@@ -307,18 +293,6 @@ class IntegrationTestRunner {
       return {
         success: result.success,
         messageId: result.messageId,
-      };
-    });
-
-    // Test 4: Phone Number Validation
-    await this.runTest('Twilio', 'Phone Number Validation', async () => {
-      const result = await twilioEnhancedService.validatePhoneNumber(TEST_CONFIG.testPhone);
-
-      return {
-        valid: result.valid,
-        formatted: result.formatted,
-        carrier: result.carrier,
-        type: result.type,
       };
     });
   }

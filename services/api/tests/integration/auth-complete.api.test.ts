@@ -6,11 +6,11 @@ import { createTestApp, createTestUser, getAuthHeader } from './helpers/testApp.
  * Comprehensive Authentication API Test Suite
  * Tests all authentication endpoints with multiple scenarios
  */
-describe.skip('Authentication API - Complete Test Suite', () => {
+describe('Authentication API - Complete Test Suite', () => {
   const app = createTestApp();
 
-  describe.skip('POST /api/v1/auth/register', () => {
-    describe.skip('Success Cases', () => {
+  describe('POST /api/v1/auth/register', () => {
+    describe('Success Cases', () => {
       it('should register a new patient user', async () => {
         const response = await request(app)
           .post('/api/v1/auth/register')
@@ -94,7 +94,7 @@ describe.skip('Authentication API - Complete Test Suite', () => {
       });
     });
 
-    describe.skip('Validation Errors', () => {
+    describe('Validation Errors', () => {
       it('should reject registration with invalid email format', async () => {
         const response = await request(app)
           .post('/api/v1/auth/register')
@@ -193,7 +193,7 @@ describe.skip('Authentication API - Complete Test Suite', () => {
       });
     });
 
-    describe.skip('Duplicate Email Handling', () => {
+    describe('Duplicate Email Handling', () => {
       it('should reject duplicate email registration', async () => {
         const email = `duplicate-${Date.now()}@example.com`;
 
@@ -241,8 +241,8 @@ describe.skip('Authentication API - Complete Test Suite', () => {
     });
   });
 
-  describe.skip('POST /api/v1/auth/login', () => {
-    describe.skip('Success Cases', () => {
+  describe('POST /api/v1/auth/login', () => {
+    describe('Success Cases', () => {
       it('should login with valid credentials', async () => {
         const email = `login-success-${Date.now()}@example.com`;
         const password = 'SecurePass123!@#';
@@ -284,7 +284,7 @@ describe.skip('Authentication API - Complete Test Suite', () => {
       });
     });
 
-    describe.skip('Authentication Errors', () => {
+    describe('Authentication Errors', () => {
       it('should reject login with incorrect password', async () => {
         const email = `wrong-pass-${Date.now()}@example.com`;
 
@@ -345,7 +345,7 @@ describe.skip('Authentication API - Complete Test Suite', () => {
       });
     });
 
-    describe.skip('Security Features', () => {
+    describe('Security Features', () => {
       it('should not expose password in login response', async () => {
         const { email, password } = await createTestUser();
 
@@ -374,7 +374,7 @@ describe.skip('Authentication API - Complete Test Suite', () => {
     });
   });
 
-  describe.skip('POST /api/v1/auth/refresh', () => {
+  describe('POST /api/v1/auth/refresh', () => {
     it('should refresh access token with valid refresh token', async () => {
       const { refreshToken } = await createTestUser();
 
@@ -414,7 +414,7 @@ describe.skip('Authentication API - Complete Test Suite', () => {
     });
   });
 
-  describe.skip('GET /api/v1/auth/me', () => {
+  describe('GET /api/v1/auth/me', () => {
     it('should return current user profile', async () => {
       const { accessToken, user } = await createTestUser();
 
@@ -461,7 +461,7 @@ describe.skip('Authentication API - Complete Test Suite', () => {
     });
   });
 
-  describe.skip('POST /api/v1/auth/logout', () => {
+  describe('POST /api/v1/auth/logout', () => {
     it('should logout successfully with valid token', async () => {
       const { accessToken } = await createTestUser();
 
@@ -488,7 +488,7 @@ describe.skip('Authentication API - Complete Test Suite', () => {
     });
   });
 
-  describe.skip('GET /api/v1/roles', () => {
+  describe('GET /api/v1/roles', () => {
     it('should return all roles for admin user', async () => {
       const { accessToken } = await createTestUser('admin');
 

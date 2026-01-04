@@ -94,7 +94,8 @@ resource "aws_iam_role_policy" "codepipeline" {
       {
         Effect = "Allow"
         Action = [
-          "eks:DescribeCluster"
+          "eks:DescribeCluster",
+          "eks:ListClusters"
         ]
         Resource = "*"
       }
@@ -169,7 +170,8 @@ resource "aws_iam_role_policy" "codebuild" {
       {
         Effect = "Allow"
         Action = [
-          "eks:DescribeCluster"
+          "eks:DescribeCluster",
+          "eks:ListClusters"
         ]
         Resource = "*"
       },
@@ -214,6 +216,11 @@ resource "aws_codebuild_project" "web_app" {
     environment_variable {
       name  = "AWS_REGION"
       value = var.aws_region
+    }
+
+    environment_variable {
+      name  = "AWS_ACCOUNT_ID"
+      value = var.aws_account_id
     }
 
     environment_variable {
@@ -266,6 +273,11 @@ resource "aws_codebuild_project" "api_service" {
     environment_variable {
       name  = "AWS_REGION"
       value = var.aws_region
+    }
+
+    environment_variable {
+      name  = "AWS_ACCOUNT_ID"
+      value = var.aws_account_id
     }
 
     environment_variable {
@@ -381,6 +393,68 @@ resource "aws_codepipeline" "main" {
   tags = var.tags
 }
 
+# ============================================
+# EventBridge Rule for Nightly Builds (9:00 PM)
+# ============================================
+
+resource "aws_cloudwatch_event_rule" "nightly_build" {
+  count = var.enable_nightly_builds ? 1 : 0
+
+  name                = "${var.project_name}-${var.environment}-nightly-build"
+  description         = "Trigger CodePipeline at 9:00 PM daily for nightly builds"
+  schedule_expression = "cron(0 21 * * ? *)"
+
+  tags = var.tags
+}
+
+resource "aws_cloudwatch_event_target" "nightly_build" {
+  count = var.enable_nightly_builds ? 1 : 0
+
+  rule      = aws_cloudwatch_event_rule.nightly_build[0].name
+  target_id = "CodePipeline"
+  arn       = aws_codepipeline.main.arn
+  role_arn  = aws_iam_role.eventbridge[0].arn
+}
+
+resource "aws_iam_role" "eventbridge" {
+  count = var.enable_nightly_builds ? 1 : 0
+
+  name = "${var.project_name}-${var.environment}-eventbridge-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "events.amazonaws.com"
+        }
+      }
+    ]
+  })
+
+  tags = var.tags
+}
+
+resource "aws_iam_role_policy" "eventbridge" {
+  count = var.enable_nightly_builds ? 1 : 0
+
+  name = "${var.project_name}-${var.environment}-eventbridge-policy"
+  role = aws_iam_role.eventbridge[0].id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = "codepipeline:StartPipelineExecution"
+        Resource = aws_codepipeline.main.arn
+      }
+    ]
+  })
+}
+
 # Deploy Project (kubectl apply)
 resource "aws_codebuild_project" "deploy" {
   name          = "${var.project_name}-${var.environment}-deploy"
@@ -409,6 +483,11 @@ resource "aws_codebuild_project" "deploy" {
     }
 
     environment_variable {
+      name  = "AWS_ACCOUNT_ID"
+      value = var.aws_account_id
+    }
+
+    environment_variable {
       name  = "NAMESPACE"
       value = "unified-health"
     }
@@ -416,28 +495,7 @@ resource "aws_codebuild_project" "deploy" {
 
   source {
     type      = "CODEPIPELINE"
-    buildspec = <<-EOF
-      version: 0.2
-      phases:
-        install:
-          commands:
-            - curl -LO "https://dl.k8s.io/release/v1.28.0/bin/linux/amd64/kubectl"
-            - chmod +x kubectl
-            - mv kubectl /usr/local/bin/
-        pre_build:
-          commands:
-            - echo "Configuring kubectl for EKS..."
-            - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
-        build:
-          commands:
-            - echo "Deploying to EKS cluster..."
-            - kubectl apply -f k8s-patch.yaml -n $NAMESPACE
-            - kubectl rollout status deployment/web-app -n $NAMESPACE --timeout=300s
-            - kubectl rollout status deployment/api -n $NAMESPACE --timeout=300s
-        post_build:
-          commands:
-            - echo "Deployment completed successfully!"
-    EOF
+    buildspec = file("${path.module}/deployspec.yml")
   }
 
   tags = var.tags

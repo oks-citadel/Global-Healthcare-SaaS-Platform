@@ -1,3 +1,24 @@
+# ============================================
+# ARCHIVED FILE - DO NOT USE FOR PRODUCTION
+# ============================================
+# Archive Date: 2026-01-03
+# Archived By: Infrastructure Cleanup
+# Reason: This file contains STUB service definitions for stub deployments.
+#         These were part of the development/testing setup and are not needed
+#         for production deployments using the proper base/services/* configurations.
+#
+# Issues with this configuration:
+# 1. References stub deployments that use node:20-alpine images
+# 2. Port mappings (3000-3005) do not match production configs (8080)
+# 3. Missing labels required for proper service mesh integration
+#
+# AUTHORITATIVE SERVICE CONFIGURATIONS:
+# - infrastructure/kubernetes/base/services/*/service.yaml
+# - Use scripts/deploy-production.sh for production deployments
+#
+# See: infrastructure/kubernetes/production/README.md for deployment guidance
+# ============================================
+
 # API Gateway Service
 apiVersion: v1
 kind: Service

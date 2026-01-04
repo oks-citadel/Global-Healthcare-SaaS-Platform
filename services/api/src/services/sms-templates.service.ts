@@ -1,4 +1,4 @@
-import { sendSms, sendBatchSms, SmsResponse } from '../lib/sms.js';
+import { sendSms, sendBatchSms, SmsResponse } from '../lib/aws-sms.js';
 import { logger } from '../utils/logger.js';
 
 /**

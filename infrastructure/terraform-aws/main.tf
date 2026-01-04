@@ -107,7 +107,7 @@ module "vpc_americas" {
 
   tags = merge(local.common_tags, {
     Region     = "Americas"
-    Compliance = join(",", local.regions.americas.compliance)
+    Compliance = join("-", local.regions.americas.compliance)
   })
 }
 
@@ -223,7 +223,7 @@ module "vpc_europe" {
 
   tags = merge(local.common_tags, {
     Region     = "Europe"
-    Compliance = join(",", local.regions.europe.compliance)
+    Compliance = join("-", local.regions.europe.compliance)
   })
 }
 
@@ -339,7 +339,7 @@ module "vpc_africa" {
 
   tags = merge(local.common_tags, {
     Region     = "Africa"
-    Compliance = join(",", local.regions.africa.compliance)
+    Compliance = join("-", local.regions.africa.compliance)
   })
 }
 
@@ -520,4 +520,366 @@ module "codepipeline" {
   eks_cluster_name = var.deploy_americas ? module.eks_americas[0].cluster_name : ""
 
   tags = local.common_tags
+}
+
+# ============================================
+# AWS SES (Email Delivery - Replaces SendGrid)
+# ============================================
+
+module "ses" {
+  source = "./modules/ses"
+  count  = var.enable_ses ? 1 : 0
+
+  project_name = var.project_name
+  environment  = var.environment
+  domain_name  = var.domain_name
+
+  route53_zone_id       = var.enable_route53 ? module.route53[0].zone_id : null
+  wait_for_verification = false
+
+  enable_dmarc     = true
+  dmarc_policy     = "quarantine"
+  dmarc_rua_email  = "dmarc-reports@${var.domain_name}"
+  dmarc_ruf_email  = "dmarc-forensic@${var.domain_name}"
+
+  create_notification_topics = true
+  enable_alarms              = true
+  alarm_actions              = []
+
+  allowed_from_addresses = [
+    "*@${var.domain_name}",
+    "noreply@${var.domain_name}",
+    "support@${var.domain_name}",
+    "billing@${var.domain_name}",
+    "security@${var.domain_name}"
+  ]
+
+  tags = local.common_tags
+}
+
+# ============================================
+# AWS SNS/SQS (Messaging - Replaces Twilio)
+# ============================================
+
+module "sns_sqs_americas" {
+  source = "./modules/sns-sqs"
+  count  = var.deploy_americas && var.enable_sns_sqs ? 1 : 0
+
+  providers = {
+    aws = aws.americas
+  }
+
+  project_name = var.project_name
+  environment  = var.environment
+
+  create_kms_key = true
+
+  # SNS Topics for Healthcare Events
+  topic_configs = {
+    # User Notifications
+    user-notifications = {
+      display_name = "User Notifications"
+      purpose      = "User-facing-notifications"
+      fifo_topic   = false
+    }
+
+    # System Alerts
+    system-alerts = {
+      display_name    = "System Alerts"
+      purpose         = "Infrastructure-and-application-alerts"
+      fifo_topic      = false
+      email_subscriptions = [var.alert_email]
+    }
+
+    # Appointment Events
+    appointment-events = {
+      display_name = "Appointment Events"
+      purpose      = "Appointment-lifecycle-events"
+      fifo_topic   = false
+    }
+
+    # Patient Events
+    patient-events = {
+      display_name = "Patient Events"
+      purpose      = "Patient-registration-and-profile-updates"
+      fifo_topic   = false
+    }
+
+    # Billing Events
+    billing-events = {
+      display_name = "Billing Events"
+      purpose      = "Payment-and-subscription-events"
+      fifo_topic   = false
+    }
+
+    # Clinical Events
+    clinical-events = {
+      display_name                = "Clinical Events"
+      purpose                     = "HIPAA-sensitive-clinical-data"
+      fifo_topic                  = true
+      content_based_deduplication = true
+    }
+
+    # Telehealth Events
+    telehealth-events = {
+      display_name = "Telehealth Events"
+      purpose      = "Video-session-events"
+      fifo_topic   = false
+    }
+  }
+
+  # SQS Queues for Processing
+  queue_configs = {
+    # Email Processing Queue
+    email-processing = {
+      purpose                    = "Email-sending-queue"
+      visibility_timeout_seconds = 60
+      message_retention_seconds  = 1209600
+      enable_dlq                 = true
+      max_receive_count          = 3
+      subscribe_to_topics        = ["user-notifications", "billing-events"]
+      enable_age_alarm           = true
+      age_alarm_threshold        = 3600
+    }
+
+    # SMS Processing Queue
+    sms-processing = {
+      purpose                    = "SMS-push-notification-queue"
+      visibility_timeout_seconds = 30
+      message_retention_seconds  = 1209600
+      enable_dlq                 = true
+      max_receive_count          = 3
+      subscribe_to_topics        = ["user-notifications", "appointment-events"]
+      enable_age_alarm           = true
+      age_alarm_threshold        = 1800
+    }
+
+    # Appointment Processing Queue
+    appointment-processing = {
+      purpose                    = "Appointment-scheduling-queue"
+      visibility_timeout_seconds = 120
+      message_retention_seconds  = 1209600
+      enable_dlq                 = true
+      max_receive_count          = 5
+      subscribe_to_topics        = ["appointment-events"]
+      enable_age_alarm           = true
+      age_alarm_threshold        = 7200
+    }
+
+    # Billing Processing Queue
+    billing-processing = {
+      purpose                    = "Payment-and-invoice-processing"
+      visibility_timeout_seconds = 300
+      message_retention_seconds  = 1209600
+      enable_dlq                 = true
+      max_receive_count          = 5
+      subscribe_to_topics        = ["billing-events"]
+      enable_age_alarm           = true
+      age_alarm_threshold        = 3600
+    }
+
+    # Clinical Events Queue (FIFO for ordering)
+    clinical-processing = {
+      purpose                     = "HIPAA-clinical-data-processing"
+      fifo_queue                  = true
+      content_based_deduplication = true
+      visibility_timeout_seconds  = 300
+      message_retention_seconds   = 1209600
+      enable_dlq                  = true
+      max_receive_count           = 3
+      subscribe_to_topics         = ["clinical-events"]
+      enable_age_alarm            = true
+      age_alarm_threshold         = 1800
+    }
+
+    # Analytics Queue
+    analytics-processing = {
+      purpose                    = "Analytics-and-metrics-processing"
+      visibility_timeout_seconds = 60
+      message_retention_seconds  = 604800
+      enable_dlq                 = true
+      max_receive_count          = 3
+      subscribe_to_topics        = ["patient-events", "appointment-events", "telehealth-events"]
+    }
+
+    # Webhook Processing Queue
+    webhook-processing = {
+      purpose                    = "External-webhook-ingestion"
+      visibility_timeout_seconds = 120
+      message_retention_seconds  = 1209600
+      enable_dlq                 = true
+      max_receive_count          = 5
+      enable_age_alarm           = true
+      age_alarm_threshold        = 3600
+    }
+  }
+
+  enable_dlq_alarms   = true
+  dlq_alarm_threshold = 1
+  alarm_actions       = []
+
+  tags = merge(local.common_tags, {
+    Region = "Americas"
+  })
+}
+
+# ============================================
+# AWS Budgets (Cost Monitoring)
+# ============================================
+
+module "budgets" {
+  source = "./modules/budgets"
+  count  = var.enable_budgets ? 1 : 0
+
+  project_name = var.project_name
+  environment  = var.environment
+
+  budget_amount    = var.budget_amount
+  alert_thresholds = var.budget_alert_thresholds
+  alert_emails     = length(var.budget_alert_emails) > 0 ? var.budget_alert_emails : [var.alert_email]
+
+  # Cost filters for healthcare platform
+  cost_filter_tag_key    = "Project"
+  cost_filter_tag_values = [var.project_name]
+
+  tags = local.common_tags
+}
+
+# ============================================
+# AWS Backup - Americas Region
+# ============================================
+
+module "backup_americas" {
+  source = "./modules/backup"
+  count  = var.deploy_americas && var.enable_backup ? 1 : 0
+
+  providers = {
+    aws = aws.americas
+  }
+
+  project_name = var.project_name
+  environment  = var.environment
+  region_name  = "americas"
+
+  # Backup schedule configuration
+  daily_backup_retention_days  = var.backup_retention_days
+  enable_weekly_backup         = var.backup_enable_weekly
+  weekly_backup_retention_days = var.backup_weekly_retention_days
+  enable_monthly_backup        = var.backup_enable_monthly
+  monthly_backup_retention_days = var.backup_monthly_retention_days
+
+  # Compliance configuration
+  enable_vault_lock = var.backup_enable_vault_lock
+
+  # Cross-region copy for disaster recovery
+  enable_cross_region_copy   = var.backup_enable_cross_region_copy && var.deploy_europe
+  copy_destination_vault_arn = var.backup_enable_cross_region_copy && var.deploy_europe ? module.backup_europe[0].vault_arn : ""
+
+  # Notifications
+  enable_notifications  = true
+  notification_emails   = length(var.backup_notification_emails) > 0 ? var.backup_notification_emails : [var.alert_email]
+
+  # Tag-based resource selection
+  selection_tags = {
+    Backup      = "true"
+    Environment = var.environment
+  }
+
+  tags = merge(local.common_tags, {
+    Region = "Americas"
+  })
+}
+
+# ============================================
+# AWS Backup - Europe Region
+# ============================================
+
+module "backup_europe" {
+  source = "./modules/backup"
+  count  = var.deploy_europe && var.enable_backup ? 1 : 0
+
+  providers = {
+    aws = aws.europe
+  }
+
+  project_name = var.project_name
+  environment  = var.environment
+  region_name  = "europe"
+
+  # Backup schedule configuration
+  daily_backup_retention_days  = var.backup_retention_days
+  enable_weekly_backup         = var.backup_enable_weekly
+  weekly_backup_retention_days = var.backup_weekly_retention_days
+  enable_monthly_backup        = var.backup_enable_monthly
+  monthly_backup_retention_days = var.backup_monthly_retention_days
+
+  # Compliance configuration - GDPR requires stricter controls
+  enable_vault_lock             = var.backup_enable_vault_lock
+  vault_lock_min_retention_days = 30  # GDPR data retention
+
+  # Cross-region copy for disaster recovery
+  enable_cross_region_copy   = var.backup_enable_cross_region_copy && var.deploy_americas
+  copy_destination_vault_arn = var.backup_enable_cross_region_copy && var.deploy_americas ? module.backup_americas[0].vault_arn : ""
+
+  # Notifications
+  enable_notifications  = true
+  notification_emails   = length(var.backup_notification_emails) > 0 ? var.backup_notification_emails : [var.alert_email]
+
+  # Tag-based resource selection
+  selection_tags = {
+    Backup      = "true"
+    Environment = var.environment
+  }
+
+  tags = merge(local.common_tags, {
+    Region     = "Europe"
+    Compliance = "GDPR"
+  })
+}
+
+# ============================================
+# AWS Backup - Africa Region
+# ============================================
+
+module "backup_africa" {
+  source = "./modules/backup"
+  count  = var.deploy_africa && var.enable_backup ? 1 : 0
+
+  providers = {
+    aws = aws.africa
+  }
+
+  project_name = var.project_name
+  environment  = var.environment
+  region_name  = "africa"
+
+  # Backup schedule configuration
+  daily_backup_retention_days  = var.backup_retention_days
+  enable_weekly_backup         = var.backup_enable_weekly
+  weekly_backup_retention_days = var.backup_weekly_retention_days
+  enable_monthly_backup        = var.backup_enable_monthly
+  monthly_backup_retention_days = var.backup_monthly_retention_days
+
+  # Compliance configuration - POPIA requirements
+  enable_vault_lock             = var.backup_enable_vault_lock
+  vault_lock_min_retention_days = 7
+
+  # Cross-region copy for disaster recovery
+  enable_cross_region_copy   = var.backup_enable_cross_region_copy && var.deploy_europe
+  copy_destination_vault_arn = var.backup_enable_cross_region_copy && var.deploy_europe ? module.backup_europe[0].vault_arn : ""
+
+  # Notifications
+  enable_notifications  = true
+  notification_emails   = length(var.backup_notification_emails) > 0 ? var.backup_notification_emails : [var.alert_email]
+
+  # Tag-based resource selection
+  selection_tags = {
+    Backup      = "true"
+    Environment = var.environment
+  }
+
+  tags = merge(local.common_tags, {
+    Region     = "Africa"
+    Compliance = "POPIA"
+  })
 }

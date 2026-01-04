@@ -1,3 +1,27 @@
+# ============================================
+# ARCHIVED FILE - DO NOT USE FOR PRODUCTION
+# ============================================
+# Archive Date: 2026-01-03
+# Archived By: Infrastructure Cleanup
+# Reason: This file contains STUB deployments that are not production-ready.
+#
+# Issues with this configuration:
+# 1. Uses generic node:20-alpine images instead of ECR container images
+# 2. Single replica (replicas: 1) - no high availability
+# 3. Minimal resource limits (50m CPU, 64Mi memory) - not suitable for production load
+# 4. No security contexts (runAsNonRoot, readOnlyRootFilesystem, etc.)
+# 5. Code mounted via ConfigMaps instead of proper container images
+# 6. No service account configuration
+# 7. No pod anti-affinity for HA distribution
+#
+# AUTHORITATIVE DEPLOYMENT CONFIGURATIONS:
+# - infrastructure/kubernetes/base/services/*/deployment.yaml (base configs)
+# - Use scripts/deploy-production.sh for production deployments
+# - Use infrastructure/kubernetes/deploy.sh for environment-specific deployments
+#
+# See: infrastructure/kubernetes/production/README.md for deployment guidance
+# ============================================
+
 # API Gateway Deployment - v1.0.0 (FIXED VERSION - NO AUTO-UPDATE)
 apiVersion: apps/v1
 kind: Deployment

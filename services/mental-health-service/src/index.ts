@@ -1,47 +1,45 @@
-import express, { RequestHandler } from 'express';
+import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import rateLimit from 'express-rate-limit';
-import dotenv from 'dotenv';
 import sessionsRouter from './routes/sessions';
 import assessmentsRouter from './routes/assessments';
 import crisisRouter from './routes/crisis';
 import { extractUser } from './middleware/extractUser';
+import { config, logConfig } from './config';
+import {
+  generalRateLimit,
+  getRateLimitStatus,
+  closeRateLimitConnection,
+} from './middleware/rate-limit.middleware';
 
-dotenv.config();
+// Log validated configuration at startup
+logConfig(config);
 
 const app: express.Application = express();
-const PORT = process.env.PORT || 3002;
-
-// Rate limiting configuration
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
-  message: { error: 'Too Many Requests', message: 'Rate limit exceeded. Please try again later.' },
-  standardHeaders: true,
-  legacyHeaders: false,
-  skip: (req) => req.path === '/health', // Skip health checks
-});
+const PORT = config.port;
 
 // Middleware
 app.use(helmet());
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || '*',
-  credentials: true,
+  origin: config.cors.origin,
+  credentials: config.cors.credentials,
 }));
-app.use(limiter as unknown as RequestHandler);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Extract user from gateway headers
 app.use(extractUser);
 
+// Apply distributed rate limiting with Redis support
+app.use(generalRateLimit);
+
 // Health check
 app.get('/health', (req, res) => {
   res.json({
     status: 'healthy',
-    service: 'mental-health-service',
+    service: config.serviceName,
     timestamp: new Date().toISOString(),
+    rateLimit: getRateLimitStatus(),
   });
 });
 
@@ -69,9 +67,29 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 });
 
 // Start server
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Mental Health Service running on port ${PORT}`);
   console.log(`Health check available at http://localhost:${PORT}/health`);
+  console.log(`Rate limit status:`, getRateLimitStatus());
 });
+
+// Graceful shutdown
+const gracefulShutdown = async (signal: string) => {
+  console.log(`${signal} received, shutting down gracefully...`);
+
+  server.close(async () => {
+    console.log('HTTP server closed');
+    await closeRateLimitConnection();
+    process.exit(0);
+  });
+
+  setTimeout(() => {
+    console.error('Forced shutdown after timeout');
+    process.exit(1);
+  }, 10000);
+};
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
 export default app;

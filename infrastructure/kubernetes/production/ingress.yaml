@@ -1,4 +1,19 @@
-# Production Ingress - v1.0.0 (FIXED VERSION)
+# ============================================
+# Production Ingress - Simplified Configuration
+# ============================================
+# NOTE: For production with full security features, prefer using:
+#   infrastructure/kubernetes/base/ingress/ingress.yaml
+#
+# The base ingress includes:
+#   - TLS with cert-manager
+#   - Rate limiting
+#   - Security headers (X-Frame-Options, CSP, etc.)
+#   - CORS configuration
+#   - WAF with ModSecurity
+#   - WebSocket support
+#
+# This simplified ingress is provided for basic routing only.
+# ============================================
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:

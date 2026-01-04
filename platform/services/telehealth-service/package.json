@@ -23,7 +23,6 @@
     "ioredis": "^5.3.2",
     "pino": "^8.17.2",
     "mediasoup": "^3.13.12",
-    "twilio": "^4.19.3"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",

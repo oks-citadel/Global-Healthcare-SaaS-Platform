@@ -2,10 +2,10 @@ import { describe, it, expect } from 'vitest';
 import request from 'supertest';
 import { createTestApp, createTestUser, getAuthHeader } from './helpers/testApp.js';
 
-describe.skip('Patient API Integration Tests', () => {
+describe('Patient API Integration Tests', () => {
   const app = createTestApp();
 
-  describe.skip('POST /api/v1/patients', () => {
+  describe('POST /api/v1/patients', () => {
     it('should create a patient record', async () => {
       const { accessToken, user } = await createTestUser('patient');
 
@@ -94,7 +94,7 @@ describe.skip('Patient API Integration Tests', () => {
     });
   });
 
-  describe.skip('GET /api/v1/patients/:id', () => {
+  describe('GET /api/v1/patients/:id', () => {
     it('should get patient by ID', async () => {
       const { accessToken, user } = await createTestUser('patient');
 
@@ -178,7 +178,7 @@ describe.skip('Patient API Integration Tests', () => {
     });
   });
 
-  describe.skip('PATCH /api/v1/patients/:id', () => {
+  describe('PATCH /api/v1/patients/:id', () => {
     it('should update patient record', async () => {
       const { accessToken, user } = await createTestUser('patient');
 

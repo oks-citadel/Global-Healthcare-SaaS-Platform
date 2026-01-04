@@ -238,17 +238,23 @@ export abstract class BaseRepository<
   }
 
   /**
-   * Execute raw query
+   * Execute raw query using parameterized queries (SQL Injection Safe)
+   * SECURITY: Uses Prisma.sql tagged template for parameterized queries
+   * @deprecated Prefer using Prisma's type-safe query methods instead of raw SQL
    */
-  async executeRaw(query: string, ...values: any[]): Promise<any> {
-    return this.prisma.$executeRawUnsafe(query, ...values);
+  async executeRaw(query: Prisma.Sql): Promise<any> {
+    // Only allow Prisma.Sql tagged template literals for safety
+    return this.prisma.$executeRaw(query);
   }
 
   /**
-   * Query raw
+   * Query raw using parameterized queries (SQL Injection Safe)
+   * SECURITY: Uses Prisma.sql tagged template for parameterized queries
+   * @deprecated Prefer using Prisma's type-safe query methods instead of raw SQL
    */
-  async queryRaw<R = any>(query: string, ...values: any[]): Promise<R> {
-    return this.prisma.$queryRawUnsafe(query, ...values);
+  async queryRaw<R = any>(query: Prisma.Sql): Promise<R> {
+    // Only allow Prisma.Sql tagged template literals for safety
+    return this.prisma.$queryRaw(query);
   }
 
   /**

@@ -45,6 +45,12 @@ variable "eks_cluster_name" {
   type        = string
 }
 
+variable "enable_nightly_builds" {
+  description = "Enable nightly 9:00 PM build trigger via EventBridge"
+  type        = bool
+  default     = true
+}
+
 variable "tags" {
   description = "Tags to apply to resources"
   type        = map(string)

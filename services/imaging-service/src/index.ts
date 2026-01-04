@@ -1,6 +1,7 @@
 import app from './app';
 import logger from './utils/logger';
 import { PrismaClient } from './generated/client';
+import { closeRateLimitConnection, getRateLimitStatus } from './middleware/rate-limit.middleware';
 
 const prisma = new PrismaClient();
 const PORT = process.env.PORT || 3006;
@@ -25,6 +26,7 @@ async function startServer() {
       logger.info(`Imaging Service running on port ${PORT}`);
       logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
       logger.info(`Health check: http://localhost:${PORT}/health`);
+      logger.info(`Rate limit status: ${JSON.stringify(getRateLimitStatus())}`);
     });
 
     // Graceful shutdown
@@ -33,6 +35,9 @@ async function startServer() {
 
       server.close(async () => {
         logger.info('HTTP server closed');
+
+        await closeRateLimitConnection();
+        logger.info('Rate limit Redis connection closed');
 
         await prisma.$disconnect();
         logger.info('Database connection closed');

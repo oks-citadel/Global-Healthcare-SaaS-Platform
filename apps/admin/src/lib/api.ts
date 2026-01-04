@@ -89,4 +89,13 @@ export const reportsApi = {
   getProviderStats: (params?: any) => api.get('/admin/reports/providers', { params }),
   getRevenueReport: (params?: any) => api.get('/admin/reports/revenue', { params }),
   getAppointmentStats: (params?: any) => api.get('/admin/reports/appointments', { params }),
+  // Export endpoints for large datasets with pagination
+  exportUserStats: (params?: { period?: string; page?: number; pageSize?: number }) =>
+    api.get('/admin/reports/users/export', { params }),
+  exportProviderStats: (params?: { period?: string; page?: number; pageSize?: number }) =>
+    api.get('/admin/reports/providers/export', { params }),
+  exportRevenueReport: (params?: { period?: string; page?: number; pageSize?: number }) =>
+    api.get('/admin/reports/revenue/export', { params }),
+  exportAppointmentStats: (params?: { period?: string; page?: number; pageSize?: number }) =>
+    api.get('/admin/reports/appointments/export', { params }),
 }

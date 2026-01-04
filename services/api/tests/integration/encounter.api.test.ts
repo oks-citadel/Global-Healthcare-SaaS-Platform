@@ -2,10 +2,10 @@ import { describe, it, expect } from 'vitest';
 import request from 'supertest';
 import { createTestApp, createTestUser, getAuthHeader } from './helpers/testApp.js';
 
-describe.skip('Encounter API Integration Tests', () => {
+describe('Encounter API Integration Tests', () => {
   const app = createTestApp();
 
-  describe.skip('POST /api/v1/encounters', () => {
+  describe('POST /api/v1/encounters', () => {
     it('should create an encounter (provider)', async () => {
       const { accessToken, user } = await createTestUser('provider');
 
@@ -71,7 +71,7 @@ describe.skip('Encounter API Integration Tests', () => {
     });
   });
 
-  describe.skip('GET /api/v1/encounters/:id', () => {
+  describe('GET /api/v1/encounters/:id', () => {
     it('should get encounter by ID', async () => {
       const { accessToken } = await createTestUser('provider');
 
@@ -106,7 +106,7 @@ describe.skip('Encounter API Integration Tests', () => {
     });
   });
 
-  describe.skip('PATCH /api/v1/encounters/:id', () => {
+  describe('PATCH /api/v1/encounters/:id', () => {
     it('should update encounter status', async () => {
       const { accessToken } = await createTestUser('provider');
 
@@ -180,7 +180,7 @@ describe.skip('Encounter API Integration Tests', () => {
     });
   });
 
-  describe.skip('POST /api/v1/encounters/:id/notes', () => {
+  describe('POST /api/v1/encounters/:id/notes', () => {
     it('should add clinical note to encounter', async () => {
       const { accessToken } = await createTestUser('provider');
 
@@ -236,7 +236,7 @@ describe.skip('Encounter API Integration Tests', () => {
     });
   });
 
-  describe.skip('GET /api/v1/encounters/:id/notes', () => {
+  describe('GET /api/v1/encounters/:id/notes', () => {
     it('should get clinical notes for encounter', async () => {
       const { accessToken } = await createTestUser('provider');
 
@@ -270,7 +270,7 @@ describe.skip('Encounter API Integration Tests', () => {
     });
   });
 
-  describe.skip('POST /api/v1/encounters/:id/start', () => {
+  describe('POST /api/v1/encounters/:id/start', () => {
     it('should start an encounter', async () => {
       const { accessToken } = await createTestUser('provider');
 
@@ -295,7 +295,7 @@ describe.skip('Encounter API Integration Tests', () => {
     });
   });
 
-  describe.skip('POST /api/v1/encounters/:id/end', () => {
+  describe('POST /api/v1/encounters/:id/end', () => {
     it('should end an encounter', async () => {
       const { accessToken } = await createTestUser('provider');
 

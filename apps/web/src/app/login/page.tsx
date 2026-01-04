@@ -47,7 +47,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex bg-uh-dark relative overflow-hidden">
+    <div className="min-h-screen flex">
       {/* Background Aurora Effects */}
       <div className="absolute inset-0 pointer-events-none">
         <div

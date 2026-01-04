@@ -123,6 +123,13 @@ export function validateConfig(): {
     );
   }
 
+  // Check SES configuration for production
+  if (isProduction && process.env.EMAIL_PROVIDER === "ses") {
+    if (!process.env.AWS_SES_REGION) {
+      warnings.push("AWS_SES_REGION not set - using default us-east-1");
+    }
+  }
+
   return {
     valid: errors.length === 0,
     errors,
@@ -216,13 +223,30 @@ export const config = {
   },
 
   email: {
-    provider: getOptionalEnv("EMAIL_PROVIDER", "sendgrid"),
-    sendgridApiKey: getOptionalEnv("SENDGRID_API_KEY", ""),
-    sesRegion: getOptionalEnv("AWS_SES_REGION", "us-east-1"),
+    // Provider configuration
+    provider: getOptionalEnv("EMAIL_PROVIDER", "ses") as "ses" | "sendgrid",
+    enabled: getOptionalEnv("EMAIL_ENABLED", isDevelopment ? "false" : "true") === "true",
+
+    // From address configuration
     fromAddress: getOptionalEnv("EMAIL_FROM_ADDRESS", "noreply@unified-health.com"),
     fromName: getOptionalEnv("EMAIL_FROM_NAME", "The Unified Health"),
+    supportEmail: getOptionalEnv("EMAIL_SUPPORT_ADDRESS", "support@unified-health.com"),
+
+    // Application URLs
     appUrl: getOptionalEnv("APP_URL", "http://localhost:3000"),
-    enabled: getOptionalEnv("EMAIL_ENABLED", isDevelopment ? "false" : "true") === "true",
+
+    // AWS SES Configuration
+    sesRegion: getOptionalEnv("AWS_SES_REGION", "us-east-1"),
+    sesAccessKeyId: getOptionalEnv("AWS_SES_ACCESS_KEY_ID", ""),
+    sesSecretAccessKey: getOptionalEnv("AWS_SES_SECRET_ACCESS_KEY", ""),
+    sesConfigurationSet: getOptionalEnv("AWS_SES_CONFIGURATION_SET", ""),
+    sesSandboxMode: getOptionalEnv("AWS_SES_SANDBOX_MODE", isDevelopment ? "true" : "false") === "true",
+    sesMaxRetries: parseInt(getOptionalEnv("AWS_SES_MAX_RETRIES", "3"), 10),
+    sesRetryDelay: parseInt(getOptionalEnv("AWS_SES_RETRY_DELAY", "1000"), 10),
+    sesRateLimitPerSecond: parseInt(getOptionalEnv("AWS_SES_RATE_LIMIT_PER_SECOND", "14"), 10),
+
+    // SendGrid Configuration (legacy support)
+    sendgridApiKey: getOptionalEnv("SENDGRID_API_KEY", ""),
   },
 } as const;
 

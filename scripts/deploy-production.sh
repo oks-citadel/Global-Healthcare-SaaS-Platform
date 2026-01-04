@@ -2,8 +2,20 @@
 # ============================================
 # UnifiedHealth Platform - Production Deployment
 # ============================================
-# This script deploys the application to production using blue-green deployment on AWS
+# AUTHORITATIVE PRODUCTION DEPLOYMENT SCRIPT
+#
+# This is the PRIMARY and AUTHORITATIVE method for deploying to production.
+# This script deploys the application to production using blue-green deployment on AWS.
+#
+# DO NOT use the stub files in infrastructure/kubernetes/production/ for deployments.
+# Those files have been archived to infrastructure/kubernetes/production/archived/
+#
+# Authoritative deployment configurations are in:
+#   - infrastructure/kubernetes/base/services/*/deployment.yaml
+#   - This script generates production deployments with proper ECR images
+#
 # Usage: ./scripts/deploy-production.sh
+# ============================================
 
 set -euo pipefail
 

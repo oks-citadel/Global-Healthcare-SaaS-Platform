@@ -17,7 +17,7 @@ vi.mock('../../../src/utils/logger.js', () => ({
 // Mock global fetch
 global.fetch = vi.fn();
 
-describe.skip('PushNotificationService', () => {
+describe('PushNotificationService', () => {
   let service: PushNotificationService;
 
   beforeEach(() => {

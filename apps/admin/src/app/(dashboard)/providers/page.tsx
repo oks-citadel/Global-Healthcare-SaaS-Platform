@@ -109,7 +109,7 @@ export default function ProvidersPage() {
                   size="sm"
                   onClick={() => handleApprove(provider.id)}
                 >
-                  <CheckCircle className="h-4 w-4 text-green-600" />
+                  <CheckCircle className="h-4 w-4 text-health-green" />
                 </Button>
                 <Button
                   variant="ghost"

@@ -2,10 +2,15 @@
 import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import { errorHandler } from './utils/errorHandler';
 import logger from './utils/logger';
+import {
+  generalRateLimit,
+  uploadRateLimit,
+  searchRateLimit,
+  getRateLimitStatus,
+} from './middleware/rate-limit.middleware';
 
 // Import routes
 import orderRoutes from './routes/orderRoutes';
@@ -20,16 +25,6 @@ dotenv.config();
 
 const app: Application = express();
 
-// Rate limiting configuration
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
-  message: { error: 'Too Many Requests', message: 'Rate limit exceeded. Please try again later.' },
-  standardHeaders: true,
-  legacyHeaders: false,
-  skip: (req) => req.path === '/health', // Skip health checks
-});
-
 // Security middleware
 app.use(helmet());
 
@@ -39,12 +34,12 @@ app.use(cors({
   credentials: true,
 }));
 
-// Apply rate limiting
-app.use(limiter);
-
 // Body parser middleware
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+// Apply distributed rate limiting with Redis support
+app.use(generalRateLimit);
 
 // Request logging middleware
 app.use((req: Request, res: Response, next: NextFunction) => {
@@ -62,15 +57,17 @@ app.get('/health', (req: Request, res: Response) => {
     service: 'imaging-service',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
+    rateLimit: getRateLimitStatus(),
   });
 });
 
-// API Routes
+// API Routes with appropriate rate limits
+// Image uploads need stricter rate limiting
 app.use('/api/imaging-orders', orderRoutes);
 app.use('/api/studies', studyRoutes);
-app.use('/api/studies', studyImageRoutes);
-app.use('/api/images', imageRoutes);
-app.use('/api/reports', reportRoutes);
+app.use('/api/studies', uploadRateLimit, studyImageRoutes);
+app.use('/api/images', uploadRateLimit, imageRoutes);
+app.use('/api/reports', searchRateLimit, reportRoutes);
 app.use('/api/critical-findings', criticalFindingRoutes);
 
 // Root endpoint

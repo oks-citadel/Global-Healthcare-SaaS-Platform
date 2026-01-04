@@ -1,7 +1,7 @@
 import Bull, { Queue, Job, JobOptions } from 'bull';
 import { logger } from '../utils/logger.js';
-import { sendEmail } from './email.js';
-import { sendSms } from './sms.js';
+import { sendEmail } from './aws-email.js';
+import { sendSms } from './aws-sms.js';
 
 /**
  * Queue Library

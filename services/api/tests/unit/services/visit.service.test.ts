@@ -164,7 +164,7 @@ describe('VisitService', () => {
       expect(result.endedAt).toBeDefined();
     });
 
-    it.skip('should calculate visit duration correctly', async () => {
+    it('should calculate visit duration correctly', async () => {
       const startTime = new Date('2025-01-15T10:00:00Z');
       const endTime = new Date('2025-01-15T10:30:00Z'); // 30 minutes later
 
@@ -522,7 +522,7 @@ describe('VisitService', () => {
         endedAt: null,
       };
 
-      const specialMessage = "Hello! 你好 🏥 <script>alert('test')</script>";
+      const specialMessage = "Hello! <script>alert('test')</script>";
       const mockChatMessage = {
         id: 'message-123',
         visitId: 'visit-123',

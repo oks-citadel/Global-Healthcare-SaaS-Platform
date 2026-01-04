@@ -1,0 +1,88 @@
+version: 0.2
+
+# ============================================
+# The Unified Health Platform - Deploy Spec
+# ============================================
+# Deploy to EKS using kubectl
+# ============================================
+
+env:
+  variables:
+    KUBECTL_VERSION: "v1.28.0"
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.11
+    commands:
+      - echo "Installing kubectl..."
+      - curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
+      - chmod +x kubectl
+      - mv kubectl /usr/local/bin/
+      - kubectl version --client
+
+  pre_build:
+    commands:
+      - echo "Configuring kubectl for EKS cluster ${EKS_CLUSTER_NAME}..."
+      - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
+      - echo "Verifying cluster connectivity..."
+      - kubectl cluster-info
+      - kubectl get nodes
+      - echo "Ensuring namespace exists..."
+      - kubectl get namespace $NAMESPACE || kubectl create namespace $NAMESPACE
+
+  build:
+    commands:
+      - echo "Deploying to EKS cluster ${EKS_CLUSTER_NAME}..."
+      - echo "Listing available artifacts..."
+      - ls -la
+
+      # Check if k8s-patch.yaml exists and apply it
+      - |
+        if [ -f "k8s-patch.yaml" ]; then
+          echo "Applying k8s-patch.yaml..."
+          kubectl apply -f k8s-patch.yaml -n $NAMESPACE
+        else
+          echo "k8s-patch.yaml not found, using kubectl set image..."
+
+          # Get the image tags from build artifacts
+          if [ -f "web-app-image.txt" ]; then
+            WEB_APP_IMAGE=$(cat web-app-image.txt)
+            echo "Updating web-app deployment with image: ${WEB_APP_IMAGE}"
+            kubectl set image deployment/web-app web-app=${WEB_APP_IMAGE} -n $NAMESPACE
+          fi
+
+          if [ -f "api-image.txt" ]; then
+            API_IMAGE=$(cat api-image.txt)
+            echo "Updating api deployment with image: ${API_IMAGE}"
+            kubectl set image deployment/api api=${API_IMAGE} -n $NAMESPACE
+          fi
+        fi
+
+      # Verify deployments are rolling out
+      - echo "Waiting for web-app deployment rollout..."
+      - kubectl rollout status deployment/web-app -n $NAMESPACE --timeout=300s || echo "web-app deployment not found or rollout timeout"
+
+      - echo "Waiting for api deployment rollout..."
+      - kubectl rollout status deployment/api -n $NAMESPACE --timeout=300s || echo "api deployment not found or rollout timeout"
+
+  post_build:
+    commands:
+      - echo "Deployment completed at $(date)"
+      - echo "Verifying deployment status..."
+      - kubectl get deployments -n $NAMESPACE
+      - kubectl get pods -n $NAMESPACE
+      - kubectl get services -n $NAMESPACE
+
+      # Output deployment details
+      - echo "Web App Deployment:"
+      - kubectl describe deployment/web-app -n $NAMESPACE 2>/dev/null || echo "web-app deployment not found"
+
+      - echo "API Deployment:"
+      - kubectl describe deployment/api -n $NAMESPACE 2>/dev/null || echo "api deployment not found"
+
+      - echo "Deployment completed successfully!"
+
+cache:
+  paths:
+    - /root/.kube/**/*

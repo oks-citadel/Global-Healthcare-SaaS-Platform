@@ -145,3 +145,59 @@ output "pipeline_artifacts_bucket" {
   description = "S3 bucket for pipeline artifacts"
   value       = try(module.codepipeline[0].artifacts_bucket_name, null)
 }
+
+# ============================================
+# AWS Budgets Outputs
+# ============================================
+
+output "budget_arn" {
+  description = "ARN of the monthly budget"
+  value       = try(module.budgets[0].budget_arn, null)
+}
+
+output "budget_alerts_sns_topic_arn" {
+  description = "SNS topic ARN for budget alerts"
+  value       = try(module.budgets[0].sns_topic_arn, null)
+}
+
+# ============================================
+# AWS Backup Outputs - Americas
+# ============================================
+
+output "americas_backup_vault_arn" {
+  description = "Americas backup vault ARN"
+  value       = try(module.backup_americas[0].vault_arn, null)
+}
+
+output "americas_backup_plan_arn" {
+  description = "Americas backup plan ARN"
+  value       = try(module.backup_americas[0].plan_arn, null)
+}
+
+# ============================================
+# AWS Backup Outputs - Europe
+# ============================================
+
+output "europe_backup_vault_arn" {
+  description = "Europe backup vault ARN"
+  value       = try(module.backup_europe[0].vault_arn, null)
+}
+
+output "europe_backup_plan_arn" {
+  description = "Europe backup plan ARN"
+  value       = try(module.backup_europe[0].plan_arn, null)
+}
+
+# ============================================
+# AWS Backup Outputs - Africa
+# ============================================
+
+output "africa_backup_vault_arn" {
+  description = "Africa backup vault ARN"
+  value       = try(module.backup_africa[0].vault_arn, null)
+}
+
+output "africa_backup_plan_arn" {
+  description = "Africa backup plan ARN"
+  value       = try(module.backup_africa[0].plan_arn, null)
+}

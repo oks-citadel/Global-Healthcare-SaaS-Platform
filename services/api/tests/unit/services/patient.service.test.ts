@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { patientService } from "../../../src/services/patient.service.js";
 import { NotFoundError, ConflictError } from "../../../src/utils/errors.js";
 
-describe.skip("PatientService", () => {
+describe("PatientService", () => {
   const validPatientInput = {
     userId: `user-${Date.now()}`,
     dateOfBirth: "1990-01-15",

@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { encounterService } from "../../../src/services/encounter.service.js";
 import { NotFoundError, BadRequestError } from "../../../src/utils/errors.js";
 
-describe.skip("EncounterService", () => {
+describe("EncounterService", () => {
   const validEncounterInput = {
     patientId: `patient-${Date.now()}`,
     providerId: `provider-${Date.now()}`,

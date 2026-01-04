@@ -202,11 +202,11 @@ export function mockLogger() {
 }
 
 /**
- * Mock SendGrid Client
+ * Mock AWS SES Client
  */
-export function mockSendGridClient() {
+export function mockAwsSesClient() {
   return {
-    send: vi.fn().mockResolvedValue([{ statusCode: 202 }]),
+    send: vi.fn().mockResolvedValue({ MessageId: 'mock-ses-message-id' }),
   };
 }
 
@@ -252,14 +252,14 @@ export function mockStripeClient() {
 }
 
 /**
- * Mock Twilio Client
+ * Mock AWS SNS Client
  */
-export function mockTwilioClient() {
+export function mockAwsSnsClient() {
   return {
     messages: {
       create: vi.fn().mockResolvedValue({
-        sid: 'SM123',
-        status: 'sent',
+        MessageId: 'mock-sns-message-id',
+        success: true,
       }),
     },
   };
