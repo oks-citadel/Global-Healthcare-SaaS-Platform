@@ -6,8 +6,8 @@
  */
 
 // Tracing exports
+export type { TracingConfig } from './tracing/index.js';
 export {
-  TracingConfig,
   initializeTracing,
   shutdownTracing,
   getTracer,
@@ -21,18 +21,16 @@ export {
 } from './tracing/index.js';
 
 // Logging exports
+export type { LoggingConfig, LogLevel, LogContext } from './logging/index.js';
 export {
-  LoggingConfig,
   createLogger,
   createStructuredLogger,
-  LogLevel,
-  LogContext,
   correlationFormat,
 } from './logging/index.js';
 
 // Metrics exports
+export type { MetricsConfig } from './metrics/index.js';
 export {
-  MetricsConfig,
   initializeMetrics,
   getMetricsRegistry,
   createCounter,
@@ -45,4 +43,5 @@ export {
 } from './metrics/index.js';
 
 // Configuration
-export { ObservabilityConfig, createObservabilityConfig } from './config.js';
+export type { ObservabilityConfig } from './config.js';
+export { createObservabilityConfig } from './config.js';

@@ -13,7 +13,8 @@ const nextConfig = {
   transpilePackages: ['@unified-health/sdk'],
 
   // Optimize for kiosk deployment
-  // output: 'standalone', // Disabled for Windows symlink issues
+  // // output: 'standalone', // Disabled locally. Enable in CI.
+  ...(process.env.CI === 'true' ? { output: 'standalone' } : {}), // Disabled for Windows symlink issues
 
   experimental: {
     optimizePackageImports: ['lucide-react'],

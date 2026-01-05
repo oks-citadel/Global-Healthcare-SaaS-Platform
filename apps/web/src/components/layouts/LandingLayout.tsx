@@ -96,7 +96,7 @@ function NavLink({
       href={href}
       className="text-white/70 hover:text-white text-sm font-medium transition-colors focus-ring rounded-lg px-2 py-1"
     >
-      {children}
+      <>{children}</>
     </Link>
   );
 }
@@ -173,7 +173,7 @@ function FooterLink({
         href={href}
         className="text-white/50 hover:text-uh-teal text-sm transition-colors focus-ring rounded"
       >
-        {children}
+        <>{children}</>
       </Link>
     </li>
   );

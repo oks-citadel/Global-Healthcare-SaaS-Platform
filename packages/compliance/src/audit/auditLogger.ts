@@ -425,8 +425,8 @@ export class AuditLogger extends EventEmitter {
           },
           body: JSON.stringify({
             ...entry,
-            metadata: {
-              ...entry.metadata,
+            details: {
+              ...entry.details,
               sentAt: new Date().toISOString(),
             },
           }),
@@ -500,11 +500,11 @@ export class AuditLogger extends EventEmitter {
       const logDate = new Date(log.timestamp);
       if (logDate < startDate || logDate > endDate) return false;
 
-      if (filters?.userId && log.actor.userId !== filters.userId) return false;
+      if (filters?.userId && log.context.userId !== filters.userId) return false;
       if (filters?.eventTypes && !filters.eventTypes.includes(log.eventType))
         return false;
       if (filters?.regulations) {
-        const logRegulations = log.compliance?.regulations || [];
+        const logRegulations = log.regulation || [];
         if (!filters.regulations.some((r) => logRegulations.includes(r)))
           return false;
       }

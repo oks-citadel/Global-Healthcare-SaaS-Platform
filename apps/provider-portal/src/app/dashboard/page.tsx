@@ -190,7 +190,7 @@ export default function DashboardPage() {
           {/* Upcoming Appointments */}
           <Card>
             <CardHeader>
-              <CardTitle>Today's Appointments</CardTitle>
+              <CardTitle>Today&apos;s Appointments</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">

@@ -75,10 +75,10 @@ export const REPORT_METADATA: Record<ReportType, { title: string; description: s
 }
 
 // Generate filename with timestamp
-export function generateFilename(reportType: ReportType, format: ExportFormat): string {
+export function generateFilename(reportType: ReportType, exportFormat: ExportFormat): string {
   const timestamp = format(new Date(), 'yyyy-MM-dd_HH-mm-ss')
   const reportName = reportType.replace(/-/g, '_')
-  return `${reportName}_${timestamp}.${format === 'excel' ? 'xlsx' : format}`
+  return `${reportName}_${timestamp}.${exportFormat === 'excel' ? 'xlsx' : exportFormat}`
 }
 
 // Convert data to CSV format

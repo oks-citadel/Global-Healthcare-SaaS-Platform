@@ -2,7 +2,8 @@
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
-  output: 'standalone',
+  // output: 'standalone', // Disabled locally. Enable in CI.
+  ...(process.env.CI === 'true' ? { output: 'standalone' } : {}),
   typescript: {
     ignoreBuildErrors: false,
   },

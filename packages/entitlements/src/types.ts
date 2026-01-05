@@ -266,6 +266,9 @@ export interface PlanDefinition {
   /** Available add-ons for this plan */
   availableAddOns: AddOn[];
 
+  /** Overage rates per usage event type (in minor currency units) */
+  overageRates?: Partial<Record<UsageEventType, number>>;
+
   /** Whether plan is active */
   active: boolean;
 
@@ -331,6 +334,13 @@ export enum UsageEventType {
   STORAGE_GB = 'storage_gb',
   PATIENT_REGISTERED = 'patient_registered',
   PROVIDER_REGISTERED = 'provider_registered',
+  VIDEO_CALL = 'video_call',
+  SMS_SENT = 'sms_sent',
+  EMAIL_SENT = 'email_sent',
+  DOCUMENT_GENERATED = 'document_generated',
+  REPORT_GENERATED = 'report_generated',
+  LAB_RESULT_PROCESSED = 'lab_result_processed',
+  PRESCRIPTION_FILLED = 'prescription_filled',
 }
 
 /**

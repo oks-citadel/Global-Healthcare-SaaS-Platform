@@ -248,7 +248,7 @@ export default function ConsultationsPage() {
               <Card>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-600">Today's Sessions</p>
+                    <p className="text-sm text-gray-600">Today&apos;s Sessions</p>
                     <p className="text-3xl font-bold text-gray-900 mt-1">
                       {stats.todayCount}
                     </p>

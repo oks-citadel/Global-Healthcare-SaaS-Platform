@@ -2,7 +2,8 @@
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
-  output: 'standalone',
+  // Standalone output enabled only in CI/CD (avoids Windows symlink issues locally)
+  ...(process.env.CI === 'true' ? { output: 'standalone' } : {}),
   typescript: {
     ignoreBuildErrors: false,
   },

@@ -360,6 +360,13 @@ export class EntitlementsService implements IEntitlementsService {
         [UsageEventType.STORAGE_GB]: "storage",
         [UsageEventType.PATIENT_REGISTERED]: "patients",
         [UsageEventType.PROVIDER_REGISTERED]: "providers",
+        [UsageEventType.VIDEO_CALL]: "video_consultation",
+        [UsageEventType.SMS_SENT]: "sms_notification",
+        [UsageEventType.EMAIL_SENT]: "email_notification",
+        [UsageEventType.DOCUMENT_GENERATED]: "document_generation",
+        [UsageEventType.REPORT_GENERATED]: "report_generation",
+        [UsageEventType.LAB_RESULT_PROCESSED]: "lab_result",
+        [UsageEventType.PRESCRIPTION_FILLED]: "prescription",
       };
 
       const feature = featureMap[event.eventType];
