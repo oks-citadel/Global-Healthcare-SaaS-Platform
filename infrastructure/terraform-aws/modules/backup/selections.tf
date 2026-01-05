@@ -3,7 +3,8 @@
 # ============================================
 
 locals {
-  selection_name = var.selection_name != "" ? var.selection_name : "${local.name}-backup-selection"
+  # Shortened to "-bksel" to stay under AWS 50-char limit for backup selection names
+  selection_name = var.selection_name != "" ? var.selection_name : "${local.name}-bksel"
 
   # Build selection tags from the map
   selection_tag_conditions = [
