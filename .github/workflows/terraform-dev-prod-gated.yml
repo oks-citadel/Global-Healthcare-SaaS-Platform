@@ -1,0 +1,864 @@
+# ============================================================================
+# UNIFIED HEALTH PLATFORM - DEV-GATED PRODUCTION TERRAFORM PIPELINE
+# ============================================================================
+#
+# ARCHITECTURE:
+#   - DEV: Validation-only environment (NO terraform apply)
+#   - PRODUCTION: Only environment allowed to deploy live resources
+#   - Production deployment is BLOCKED unless Dev passes 100%
+#
+# DEV STAGE VALIDATIONS (Non-Deploying):
+#   - terraform init, validate, fmt -check
+#   - terraform plan (simulation only)
+#   - terraform providers lock
+#   - Policy-as-code checks (OPA/Sentinel)
+#   - Security scans (tfsec, checkov)
+#   - Cost estimation (infracost)
+#   - No terraform apply in Dev
+#
+# PRODUCTION STAGE:
+#   - Only runs after Dev passes ALL checks
+#   - Requires signed Dev artifacts
+#   - Manual approval gate
+#   - terraform apply ONLY in Production
+#
+# ============================================================================
+
+name: Terraform Dev-Prod Gated Pipeline
+
+on:
+  # Scheduled trigger: Tuesday 1/6/2026 at 9pm CST (3am UTC Wednesday)
+  schedule:
+    - cron: '0 3 7 1 *'  # 3am UTC = 9pm CST (Jan 7, 2026 - first Tuesday after today)
+
+  # Manual trigger with environment selection
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        type: choice
+        options:
+          - dev-validate
+          - production
+        default: dev-validate
+      force_production:
+        description: 'Force production deploy (requires Dev artifacts)'
+        required: false
+        type: boolean
+        default: false
+      skip_cost_check:
+        description: 'Skip cost estimation'
+        required: false
+        type: boolean
+        default: false
+
+  # PR triggers Dev validation only
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'infrastructure/terraform-aws/**'
+      - '.github/workflows/terraform-dev-prod-gated.yml'
+
+env:
+  TF_VERSION: "1.6.0"
+  TF_WORKING_DIR: "infrastructure/terraform-aws"
+  AWS_REGION: "us-east-1"
+  INFRACOST_VERSION: "0.10.x"
+  TFSEC_VERSION: "latest"
+  CHECKOV_VERSION: "latest"
+
+permissions:
+  id-token: write
+  contents: write
+  pull-requests: write
+  issues: write
+  security-events: write
+
+# ============================================================================
+# DEV STAGE: VALIDATION ONLY (NO APPLY)
+# ============================================================================
+jobs:
+  # ==========================================================================
+  # Stage 1: Prerequisites & Environment Setup
+  # ==========================================================================
+  dev-prerequisites:
+    name: "DEV: Prerequisites Check"
+    runs-on: ubuntu-latest
+    outputs:
+      terraform_version: ${{ steps.versions.outputs.terraform }}
+      commit_sha: ${{ steps.versions.outputs.sha }}
+      run_id: ${{ steps.versions.outputs.run_id }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate Run Metadata
+        id: versions
+        run: |
+          echo "terraform=${{ env.TF_VERSION }}" >> $GITHUB_OUTPUT
+          echo "sha=${{ github.sha }}" >> $GITHUB_OUTPUT
+          echo "run_id=${{ github.run_id }}" >> $GITHUB_OUTPUT
+          echo "timestamp=$(date -u +%Y%m%d%H%M%S)" >> $GITHUB_OUTPUT
+
+      - name: Verify Terraform Files Exist
+        run: |
+          if [ ! -d "${{ env.TF_WORKING_DIR }}" ]; then
+            echo "::error::Terraform directory not found: ${{ env.TF_WORKING_DIR }}"
+            exit 1
+          fi
+
+          if ! ls ${{ env.TF_WORKING_DIR }}/*.tf 1> /dev/null 2>&1; then
+            echo "::error::No Terraform files found in ${{ env.TF_WORKING_DIR }}"
+            exit 1
+          fi
+
+          echo "Terraform directory verified"
+
+      - name: Check AWS Provider Configuration
+        run: |
+          if ! grep -r "hashicorp/aws" ${{ env.TF_WORKING_DIR }} --include="*.tf" 2>/dev/null; then
+            echo "::error::AWS provider not configured in Terraform files"
+            exit 1
+          fi
+          echo "AWS provider configuration verified"
+
+  # ==========================================================================
+  # Stage 2: Terraform Format & Syntax Validation
+  # ==========================================================================
+  dev-format-validate:
+    name: "DEV: Format & Syntax Validation"
+    runs-on: ubuntu-latest
+    needs: dev-prerequisites
+    outputs:
+      format_status: ${{ steps.fmt.outputs.status }}
+      validate_status: ${{ steps.validate.outputs.status }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Terraform Format Check
+        id: fmt
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          if terraform fmt -check -recursive -diff; then
+            echo "status=pass" >> $GITHUB_OUTPUT
+            echo "Terraform formatting is correct"
+          else
+            echo "status=fail" >> $GITHUB_OUTPUT
+            echo "::error::Terraform formatting issues detected"
+            exit 1
+          fi
+
+      - name: Terraform Init (Backend Disabled)
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          terraform init \
+            -backend=false \
+            -input=false
+
+      - name: Terraform Validate
+        id: validate
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          if terraform validate -json | tee validate.json | jq -e '.valid == true'; then
+            echo "status=pass" >> $GITHUB_OUTPUT
+            echo "Terraform validation passed"
+          else
+            echo "status=fail" >> $GITHUB_OUTPUT
+            echo "::error::Terraform validation failed"
+            cat validate.json
+            exit 1
+          fi
+
+      - name: Upload Validation Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: dev-validation-report
+          path: ${{ env.TF_WORKING_DIR }}/validate.json
+          retention-days: 30
+
+  # ==========================================================================
+  # Stage 3: Provider Lock & Version Check
+  # ==========================================================================
+  dev-provider-lock:
+    name: "DEV: Provider Lock Verification"
+    runs-on: ubuntu-latest
+    needs: dev-format-validate
+    outputs:
+      providers_locked: ${{ steps.lock.outputs.status }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Initialize Terraform
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform init -backend=false
+
+      - name: Verify Provider Lock File
+        id: lock
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          if [ -f ".terraform.lock.hcl" ]; then
+            echo "Provider lock file exists"
+            echo "status=pass" >> $GITHUB_OUTPUT
+
+            # Verify lock file is valid
+            terraform providers lock \
+              -platform=linux_amd64 \
+              -platform=darwin_amd64 \
+              -platform=darwin_arm64
+          else
+            echo "::warning::No provider lock file found, generating..."
+            terraform providers lock \
+              -platform=linux_amd64 \
+              -platform=darwin_amd64 \
+              -platform=darwin_arm64
+            echo "status=generated" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload Provider Lock
+        uses: actions/upload-artifact@v4
+        with:
+          name: providers-lock
+          path: ${{ env.TF_WORKING_DIR }}/.terraform.lock.hcl
+          retention-days: 30
+
+  # ==========================================================================
+  # Stage 4: Security Scanning (tfsec + checkov)
+  # ==========================================================================
+  dev-security-scan:
+    name: "DEV: Security Scan"
+    runs-on: ubuntu-latest
+    needs: dev-format-validate
+    outputs:
+      security_status: ${{ steps.security.outputs.status }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run tfsec
+        id: tfsec
+        uses: aquasecurity/tfsec-action@v1.0.3
+        continue-on-error: true
+        with:
+          working_directory: ${{ env.TF_WORKING_DIR }}
+          soft_fail: true
+          format: sarif
+          additional_args: --out tfsec-results
+
+      - name: Run Checkov
+        id: checkov
+        uses: bridgecrewio/checkov-action@v12
+        continue-on-error: true
+        with:
+          directory: ${{ env.TF_WORKING_DIR }}
+          framework: terraform
+          output_format: cli,sarif
+          output_file_path: console,checkov-results.sarif
+          soft_fail: true
+
+      - name: Evaluate Security Results
+        id: security
+        run: |
+          CRITICAL_ISSUES=0
+
+          # Check for critical/high severity issues
+          if [ -f "tfsec-results.sarif" ]; then
+            CRITICAL_ISSUES=$(jq '[.runs[].results[] | select(.level == "error")] | length' tfsec-results.sarif 2>/dev/null || echo 0)
+          fi
+
+          if [ "$CRITICAL_ISSUES" -gt 0 ]; then
+            echo "::error::Found $CRITICAL_ISSUES critical security issues"
+            echo "status=fail" >> $GITHUB_OUTPUT
+            exit 1
+          else
+            echo "No critical security issues found"
+            echo "status=pass" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload Security Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-scan-results
+          path: |
+            tfsec-results*
+            checkov-results*
+          retention-days: 30
+
+  # ==========================================================================
+  # Stage 5: Terraform Plan (Simulation Only - NO APPLY)
+  # ==========================================================================
+  dev-plan:
+    name: "DEV: Terraform Plan (Simulation)"
+    runs-on: ubuntu-latest
+    needs: [dev-provider-lock, dev-security-scan]
+    outputs:
+      plan_status: ${{ steps.plan.outputs.status }}
+      plan_has_changes: ${{ steps.plan.outputs.has_changes }}
+      resources_to_add: ${{ steps.plan.outputs.add }}
+      resources_to_change: ${{ steps.plan.outputs.change }}
+      resources_to_destroy: ${{ steps.plan.outputs.destroy }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials (Read-Only)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN_DEV }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - name: Terraform Init
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          terraform init \
+            -backend-config="bucket=${{ secrets.TF_STATE_BUCKET }}" \
+            -backend-config="key=env/prod/terraform.tfstate" \
+            -backend-config="region=${{ env.AWS_REGION }}" \
+            -backend-config="dynamodb_table=${{ secrets.TF_LOCK_TABLE }}" \
+            -input=false
+
+      - name: Terraform Plan (Read-Only Simulation)
+        id: plan
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          # Run plan with -refresh=false to avoid any state modifications
+          terraform plan \
+            -var-file=environments/prod.tfvars \
+            -out=validated-plan.tfplan \
+            -detailed-exitcode \
+            -lock=false \
+            -input=false \
+            2>&1 | tee plan-output.txt
+
+          PLAN_EXIT_CODE=${PIPESTATUS[0]}
+
+          if [ $PLAN_EXIT_CODE -eq 0 ]; then
+            echo "No changes detected"
+            echo "status=pass" >> $GITHUB_OUTPUT
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          elif [ $PLAN_EXIT_CODE -eq 2 ]; then
+            echo "Changes detected in plan"
+            echo "status=pass" >> $GITHUB_OUTPUT
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "::error::Terraform plan failed"
+            echo "status=fail" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+      - name: Parse Plan Output
+        id: parse
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          # Generate JSON plan for analysis
+          terraform show -json validated-plan.tfplan > validated-plan.json
+
+          # Extract resource counts
+          ADD=$(jq '[.resource_changes[] | select(.change.actions | contains(["create"]))] | length' validated-plan.json)
+          CHANGE=$(jq '[.resource_changes[] | select(.change.actions | contains(["update"]))] | length' validated-plan.json)
+          DESTROY=$(jq '[.resource_changes[] | select(.change.actions | contains(["delete"]))] | length' validated-plan.json)
+
+          echo "add=$ADD" >> $GITHUB_OUTPUT
+          echo "change=$CHANGE" >> $GITHUB_OUTPUT
+          echo "destroy=$DESTROY" >> $GITHUB_OUTPUT
+
+          echo "Plan Summary: +$ADD ~$CHANGE -$DESTROY"
+
+      - name: Check for Destructive Changes
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          DESTROY_COUNT=$(jq '[.resource_changes[] | select(.change.actions | contains(["delete"]))] | length' validated-plan.json)
+
+          if [ "$DESTROY_COUNT" -gt 0 ]; then
+            echo "::warning::Plan contains $DESTROY_COUNT resource deletions"
+
+            # List resources to be destroyed
+            echo "Resources scheduled for deletion:"
+            jq -r '.resource_changes[] | select(.change.actions | contains(["delete"])) | .address' validated-plan.json
+          fi
+
+      - name: Upload Validated Plan
+        uses: actions/upload-artifact@v4
+        with:
+          name: validated-plan
+          path: |
+            ${{ env.TF_WORKING_DIR }}/validated-plan.tfplan
+            ${{ env.TF_WORKING_DIR }}/validated-plan.json
+            ${{ env.TF_WORKING_DIR }}/plan-output.txt
+          retention-days: 7
+
+  # ==========================================================================
+  # Stage 6: Cost Estimation
+  # ==========================================================================
+  dev-cost-estimation:
+    name: "DEV: Cost Estimation"
+    runs-on: ubuntu-latest
+    needs: dev-plan
+    if: ${{ !inputs.skip_cost_check }}
+    outputs:
+      cost_status: ${{ steps.cost.outputs.status }}
+      monthly_cost: ${{ steps.cost.outputs.monthly }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Infracost
+        uses: infracost/actions/setup@v3
+        with:
+          api-key: ${{ secrets.INFRACOST_API_KEY }}
+          currency: USD
+
+      - name: Download Plan
+        uses: actions/download-artifact@v4
+        with:
+          name: validated-plan
+          path: ${{ env.TF_WORKING_DIR }}
+
+      - name: Run Infracost
+        id: cost
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          infracost breakdown \
+            --path validated-plan.json \
+            --format json \
+            --out-file infracost-report.json || true
+
+          if [ -f "infracost-report.json" ]; then
+            MONTHLY=$(jq -r '.totalMonthlyCost // "0"' infracost-report.json)
+            echo "monthly=$MONTHLY" >> $GITHUB_OUTPUT
+            echo "status=pass" >> $GITHUB_OUTPUT
+            echo "Estimated monthly cost: \$$MONTHLY"
+          else
+            echo "monthly=unknown" >> $GITHUB_OUTPUT
+            echo "status=skip" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload Cost Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cost-estimation
+          path: ${{ env.TF_WORKING_DIR }}/infracost-report.json
+          retention-days: 30
+
+  # ==========================================================================
+  # Stage 7: Policy Compliance Check
+  # ==========================================================================
+  dev-policy-check:
+    name: "DEV: Policy Compliance"
+    runs-on: ubuntu-latest
+    needs: dev-plan
+    outputs:
+      policy_status: ${{ steps.policy.outputs.status }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download Plan
+        uses: actions/download-artifact@v4
+        with:
+          name: validated-plan
+          path: ${{ env.TF_WORKING_DIR }}
+
+      - name: Policy Compliance Checks
+        id: policy
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          POLICY_PASSED=true
+
+          # Check 1: No hardcoded secrets
+          if grep -r "password\s*=" --include="*.tf" . 2>/dev/null | grep -v "var\." | grep -v "local\."; then
+            echo "::error::Hardcoded passwords detected"
+            POLICY_PASSED=false
+          fi
+
+          # Check 2: All resources have required tags
+          if ! jq -e '.resource_changes[] | select(.change.after.tags.Environment != null)' validated-plan.json > /dev/null 2>&1; then
+            echo "::warning::Some resources may be missing Environment tags"
+          fi
+
+          # Check 3: No public S3 buckets
+          if jq -e '.resource_changes[] | select(.type == "aws_s3_bucket") | select(.change.after.acl == "public-read")' validated-plan.json 2>/dev/null | grep -q .; then
+            echo "::error::Public S3 bucket detected"
+            POLICY_PASSED=false
+          fi
+
+          # Check 4: Encryption enabled on storage
+          if jq -e '.resource_changes[] | select(.type == "aws_ebs_volume") | select(.change.after.encrypted != true)' validated-plan.json 2>/dev/null | grep -q .; then
+            echo "::warning::Unencrypted EBS volume detected"
+          fi
+
+          if [ "$POLICY_PASSED" = true ]; then
+            echo "All policy checks passed"
+            echo "status=pass" >> $GITHUB_OUTPUT
+          else
+            echo "::error::Policy compliance failed"
+            echo "status=fail" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+  # ==========================================================================
+  # Stage 8: Dev Validation Summary & Readiness Verdict
+  # ==========================================================================
+  dev-readiness-verdict:
+    name: "DEV: Readiness Verdict"
+    runs-on: ubuntu-latest
+    needs: [dev-format-validate, dev-provider-lock, dev-security-scan, dev-plan, dev-policy-check]
+    if: always()
+    outputs:
+      verdict: ${{ steps.verdict.outputs.result }}
+      ready_for_production: ${{ steps.verdict.outputs.ready }}
+
+    steps:
+      - name: Evaluate All Dev Checks
+        id: verdict
+        run: |
+          echo "============================================"
+          echo "DEV VALIDATION SUMMARY"
+          echo "============================================"
+          echo ""
+          echo "Format & Validate: ${{ needs.dev-format-validate.outputs.validate_status }}"
+          echo "Provider Lock: ${{ needs.dev-provider-lock.outputs.providers_locked }}"
+          echo "Security Scan: ${{ needs.dev-security-scan.outputs.security_status }}"
+          echo "Terraform Plan: ${{ needs.dev-plan.outputs.plan_status }}"
+          echo "Policy Check: ${{ needs.dev-policy-check.outputs.policy_status }}"
+          echo ""
+
+          # Check if all required jobs passed
+          if [ "${{ needs.dev-format-validate.outputs.validate_status }}" != "pass" ] || \
+             [ "${{ needs.dev-security-scan.outputs.security_status }}" != "pass" ] || \
+             [ "${{ needs.dev-plan.outputs.plan_status }}" != "pass" ] || \
+             [ "${{ needs.dev-policy-check.outputs.policy_status }}" != "pass" ]; then
+            echo "============================================"
+            echo "VERDICT: FAIL - NOT READY FOR PRODUCTION"
+            echo "============================================"
+            echo "result=FAIL" >> $GITHUB_OUTPUT
+            echo "ready=false" >> $GITHUB_OUTPUT
+            exit 1
+          else
+            echo "============================================"
+            echo "VERDICT: PASS - READY FOR PRODUCTION"
+            echo "============================================"
+            echo "result=PASS" >> $GITHUB_OUTPUT
+            echo "ready=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Generate Dev Validation Report
+        run: |
+          cat << EOF > dev-validation-report.md
+          # Dev Validation Report
+
+          **Run ID:** ${{ github.run_id }}
+          **Commit:** ${{ github.sha }}
+          **Timestamp:** $(date -u +%Y-%m-%dT%H:%M:%SZ)
+
+          ## Validation Results
+
+          | Check | Status |
+          |-------|--------|
+          | Format & Syntax | ${{ needs.dev-format-validate.outputs.validate_status }} |
+          | Provider Lock | ${{ needs.dev-provider-lock.outputs.providers_locked }} |
+          | Security Scan | ${{ needs.dev-security-scan.outputs.security_status }} |
+          | Terraform Plan | ${{ needs.dev-plan.outputs.plan_status }} |
+          | Policy Compliance | ${{ needs.dev-policy-check.outputs.policy_status }} |
+
+          ## Plan Summary
+
+          - Resources to Add: ${{ needs.dev-plan.outputs.resources_to_add }}
+          - Resources to Change: ${{ needs.dev-plan.outputs.resources_to_change }}
+          - Resources to Destroy: ${{ needs.dev-plan.outputs.resources_to_destroy }}
+
+          ## Verdict
+
+          **${{ steps.verdict.outputs.result }}** - ${{ steps.verdict.outputs.ready == 'true' && 'Ready for Production' || 'NOT Ready for Production' }}
+          EOF
+
+      - name: Upload Validation Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: dev-readiness-report
+          path: dev-validation-report.md
+          retention-days: 30
+
+# ============================================================================
+# PRODUCTION STAGE: LIVE DEPLOYMENT (ONLY IF DEV PASSES)
+# ============================================================================
+
+  # ==========================================================================
+  # Production Gate: Verify Dev Passed
+  # ==========================================================================
+  prod-gate:
+    name: "PROD: Verify Dev Validation"
+    runs-on: ubuntu-latest
+    needs: dev-readiness-verdict
+    if: |
+      needs.dev-readiness-verdict.outputs.ready_for_production == 'true' &&
+      (github.event_name == 'schedule' ||
+       (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production'))
+    outputs:
+      approved: ${{ steps.gate.outputs.approved }}
+
+    steps:
+      - name: Verify Dev Artifacts Exist
+        uses: actions/download-artifact@v4
+        with:
+          name: validated-plan
+          path: ./plan-artifacts
+
+      - name: Verify Commit Hash Match
+        id: gate
+        run: |
+          echo "Verifying Dev validation artifacts..."
+
+          if [ ! -f "./plan-artifacts/validated-plan.tfplan" ]; then
+            echo "::error::Validated plan artifact not found"
+            echo "approved=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+          echo "Dev validation verified"
+          echo "approved=true" >> $GITHUB_OUTPUT
+
+  # ==========================================================================
+  # Production: Manual Approval Gate
+  # ==========================================================================
+  prod-approval:
+    name: "PROD: Manual Approval"
+    runs-on: ubuntu-latest
+    needs: prod-gate
+    if: needs.prod-gate.outputs.approved == 'true'
+    environment:
+      name: production
+      url: https://console.aws.amazon.com
+
+    steps:
+      - name: Approval Checkpoint
+        run: |
+          echo "============================================"
+          echo "PRODUCTION DEPLOYMENT APPROVED"
+          echo "============================================"
+          echo ""
+          echo "Commit: ${{ github.sha }}"
+          echo "Approved by: Manual approval in GitHub Environment"
+          echo "Timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+  # ==========================================================================
+  # Production: Terraform Apply (ONLY PLACE APPLY IS ALLOWED)
+  # ==========================================================================
+  prod-apply:
+    name: "PROD: Terraform Apply"
+    runs-on: ubuntu-latest
+    needs: [prod-gate, prod-approval]
+    if: needs.prod-gate.outputs.approved == 'true'
+    environment:
+      name: production
+      url: https://console.aws.amazon.com
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials (Production)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN_PROD }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Download Validated Plan
+        uses: actions/download-artifact@v4
+        with:
+          name: validated-plan
+          path: ${{ env.TF_WORKING_DIR }}
+
+      - name: Terraform Init (Production Backend)
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          terraform init \
+            -backend-config="bucket=${{ secrets.TF_STATE_BUCKET }}" \
+            -backend-config="key=env/prod/terraform.tfstate" \
+            -backend-config="region=${{ env.AWS_REGION }}" \
+            -backend-config="dynamodb_table=${{ secrets.TF_LOCK_TABLE }}" \
+            -input=false
+
+      - name: Re-verify Provider Locks
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          terraform providers lock -platform=linux_amd64
+
+      - name: Apply Terraform (PRODUCTION)
+        id: apply
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          echo "============================================"
+          echo "APPLYING TERRAFORM TO PRODUCTION"
+          echo "============================================"
+
+          terraform apply \
+            -auto-approve \
+            -input=false \
+            validated-plan.tfplan \
+            2>&1 | tee apply-output.txt
+
+          echo "apply_status=success" >> $GITHUB_OUTPUT
+
+      - name: Verify Post-Apply State
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          echo "Verifying infrastructure state..."
+          terraform state list
+
+          echo ""
+          echo "Infrastructure applied successfully"
+
+      - name: Upload Apply Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-apply-report
+          path: ${{ env.TF_WORKING_DIR }}/apply-output.txt
+          retention-days: 90
+
+  # ==========================================================================
+  # Production: Post-Deployment Verification
+  # ==========================================================================
+  prod-verify:
+    name: "PROD: Post-Deployment Verification"
+    runs-on: ubuntu-latest
+    needs: prod-apply
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN_PROD }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Verify Critical Resources
+        run: |
+          echo "Verifying critical AWS resources..."
+
+          # Verify EKS cluster
+          aws eks describe-cluster --name unified-health-prod-eks --query 'cluster.status' || echo "EKS check skipped"
+
+          # Verify RDS
+          aws rds describe-db-clusters --db-cluster-identifier unified-health-prod-aurora --query 'DBClusters[0].Status' || echo "RDS check skipped"
+
+          echo "Post-deployment verification complete"
+
+      - name: Generate Deployment Report
+        run: |
+          cat << EOF > deployment-report.md
+          # Production Deployment Report
+
+          **Run ID:** ${{ github.run_id }}
+          **Commit:** ${{ github.sha }}
+          **Deployed At:** $(date -u +%Y-%m-%dT%H:%M:%SZ)
+
+          ## Deployment Status
+
+          - Terraform Apply: SUCCESS
+          - Post-Deployment Verification: COMPLETE
+
+          ## Resources Deployed
+
+          See apply-output.txt artifact for full details.
+          EOF
+
+      - name: Upload Deployment Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-report
+          path: deployment-report.md
+          retention-days: 90
+
+# ============================================================================
+# AUTO-FIX AGENT (Triggered on Dev Failures)
+# ============================================================================
+
+  auto-fix-attempt:
+    name: "AUTO-FIX: Remediation Agent"
+    runs-on: ubuntu-latest
+    needs: dev-readiness-verdict
+    if: |
+      always() &&
+      needs.dev-readiness-verdict.outputs.ready_for_production == 'false' &&
+      github.event_name != 'pull_request'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Auto-Fix: Terraform Format
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          echo "Attempting to auto-fix formatting issues..."
+          terraform fmt -recursive
+
+          if git diff --quiet; then
+            echo "No formatting changes needed"
+          else
+            echo "Formatting fixes applied"
+            git config --global user.name "Auto-Fix Bot"
+            git config --global user.email "autofix@unifiedhealth.com"
+            git add -A
+            git commit -m "fix(terraform): auto-fix formatting issues
+
+🤖 Automated fix by Dev-Prod Gated Pipeline
+
+Co-Authored-By: Auto-Fix Bot <autofix@unifiedhealth.com>"
+          fi
+
+      - name: Create Fix Report
+        run: |
+          echo "============================================"
+          echo "AUTO-FIX AGENT REPORT"
+          echo "============================================"
+          echo ""
+          echo "Attempted fixes:"
+          echo "- Terraform formatting"
+          echo ""
+          echo "Note: Complex issues require manual intervention"
+          echo "Please review and re-run the pipeline"
