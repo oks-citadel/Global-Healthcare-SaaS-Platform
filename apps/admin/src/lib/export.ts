@@ -312,7 +312,7 @@ export async function exportToPDF(
   onProgress?.(100, 'Complete')
 }
 
-// Export to Excel using xlsx
+// Export to Excel using ExcelJS (secure replacement for xlsx)
 export async function exportToExcel(
   reportType: ReportType,
   data: unknown,
@@ -321,8 +321,8 @@ export async function exportToExcel(
 ): Promise<void> {
   onProgress?.(10, 'Loading Excel library...')
 
-  // Dynamic import of xlsx
-  const XLSX = await import('xlsx')
+  // Dynamic import of ExcelJS (secure alternative to xlsx)
+  const ExcelJS = await import('exceljs')
 
   const reportData = extractReportData(reportType, data)
   const columns = getReportColumns(reportType)
@@ -335,49 +335,66 @@ export async function exportToExcel(
   onProgress?.(30, 'Creating workbook...')
 
   // Create workbook
-  const workbook = XLSX.utils.book_new()
+  const workbook = new ExcelJS.Workbook()
+  workbook.creator = 'Unified Health Admin'
+  workbook.created = new Date()
 
-  // Create data for worksheet
-  const worksheetData = [
-    // Title row
-    [metadata.title],
-    [metadata.description],
-    [`Period: ${period}`],
-    [`Generated: ${format(new Date(), 'PPpp')}`],
-    [], // Empty row
-    // Headers
-    columns.map(c => c.header),
-    // Data rows
-    ...reportData.map(row => {
-      return columns.map(col => {
-        const value = (row as Record<string, unknown>)[col.key]
-        return value ?? ''
-      })
-    }),
-    [], // Empty row
-    [`Total records: ${reportData.length}`],
-  ]
+  const worksheet = workbook.addWorksheet('Report')
 
-  onProgress?.(60, 'Building worksheet...')
+  onProgress?.(50, 'Building worksheet...')
 
-  const worksheet = XLSX.utils.aoa_to_sheet(worksheetData)
+  // Add title rows
+  worksheet.addRow([metadata.title])
+  worksheet.addRow([metadata.description])
+  worksheet.addRow([`Period: ${period}`])
+  worksheet.addRow([`Generated: ${format(new Date(), 'PPpp')}`])
+  worksheet.addRow([]) // Empty row
+
+  // Style title
+  worksheet.getRow(1).font = { bold: true, size: 14 }
+
+  // Add headers
+  const headerRow = worksheet.addRow(columns.map(c => c.header))
+  headerRow.font = { bold: true }
+  headerRow.fill = {
+    type: 'pattern',
+    pattern: 'solid',
+    fgColor: { argb: 'FF428BCA' }
+  }
+  headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } }
+
+  onProgress?.(60, 'Adding data rows...')
+
+  // Add data rows
+  reportData.forEach(row => {
+    const rowData = columns.map(col => {
+      const value = (row as Record<string, unknown>)[col.key]
+      return value ?? ''
+    })
+    worksheet.addRow(rowData)
+  })
+
+  // Add footer
+  worksheet.addRow([])
+  worksheet.addRow([`Total records: ${reportData.length}`])
 
   // Set column widths
-  const colWidths = columns.map(col => ({
-    wch: Math.max(col.header.length, 15)
-  }))
-  worksheet['!cols'] = colWidths
+  columns.forEach((col, index) => {
+    worksheet.getColumn(index + 1).width = Math.max(col.header.length + 5, 15)
+  })
 
   onProgress?.(80, 'Finalizing export...')
 
-  // Add worksheet to workbook
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'Report')
+  // Generate buffer and download
+  const buffer = await workbook.xlsx.writeBuffer()
+  const blob = new Blob([buffer], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  })
 
   onProgress?.(90, 'Downloading Excel file...')
 
-  // Generate and download file
   const filename = generateFilename(reportType, 'excel')
-  XLSX.writeFile(workbook, filename)
+  downloadFile(blob, filename)
 
   onProgress?.(100, 'Complete')
 }
