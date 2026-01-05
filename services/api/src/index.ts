@@ -5,6 +5,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
+import cookieParser from 'cookie-parser';
 import { config } from './config/index.js';
 import { logger } from './utils/logger.js';
 import { errorHandler } from './middleware/error.middleware.js';
@@ -72,6 +73,9 @@ app.use('/api/v1/billing/webhook', express.raw({ type: 'application/json' }));
 // Body parsing for all other routes
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
+
+// Cookie parsing for httpOnly JWT tokens (SECURITY: required for XSS-safe auth)
+app.use(cookieParser());
 
 // Logging
 app.use(morgan('combined', {

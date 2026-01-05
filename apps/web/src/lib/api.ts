@@ -3,88 +3,107 @@ import { AuthTokens, RefreshTokenResponse } from '@/types/auth';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
 
-// Create axios instance
+/**
+ * Create axios instance with credentials: 'include' for httpOnly cookie support
+ * SECURITY: Tokens are stored as httpOnly cookies by the server, preventing XSS attacks
+ * The browser automatically sends cookies with each request when withCredentials: true
+ */
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
   timeout: 30000,
+  withCredentials: true, // SECURITY: Required for httpOnly cookies
 });
 
-// Cookie utilities
-const setCookie = (name: string, value: string, days: number = 7): void => {
-  if (typeof window === 'undefined') return;
-  const expires = new Date();
-  expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
-  document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
-};
-
-const deleteCookie = (name: string): void => {
-  if (typeof window === 'undefined') return;
-  document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
-};
-
-// Token storage utilities
+/**
+ * Token storage utilities
+ * SECURITY: Tokens are now stored as httpOnly cookies by the server
+ * These methods are kept for backward compatibility but localStorage storage is removed
+ */
 export const tokenStorage = {
+  /**
+   * @deprecated Access tokens are now managed via httpOnly cookies
+   * This method is kept for backward compatibility during migration
+   */
   getAccessToken: (): string | null => {
-    if (typeof window === 'undefined') return null;
-    return localStorage.getItem('accessToken');
+    // Tokens are now httpOnly cookies - not accessible from JavaScript (by design for security)
+    // Return null as the token will be sent automatically via cookies
+    return null;
   },
 
+  /**
+   * @deprecated Refresh tokens are now managed via httpOnly cookies
+   */
   getRefreshToken: (): string | null => {
-    if (typeof window === 'undefined') return null;
-    return localStorage.getItem('refreshToken');
+    // Tokens are now httpOnly cookies - not accessible from JavaScript (by design for security)
+    return null;
   },
 
-  setTokens: (tokens: AuthTokens): void => {
-    if (typeof window === 'undefined') return;
-    // Store in localStorage for API requests
-    localStorage.setItem('accessToken', tokens.accessToken);
-    localStorage.setItem('refreshToken', tokens.refreshToken);
-    // Also set cookies for middleware authentication
-    setCookie('accessToken', tokens.accessToken, 7);
-    setCookie('refreshToken', tokens.refreshToken, 30);
+  /**
+   * @deprecated Tokens are now set as httpOnly cookies by the server
+   * This method is kept for backward compatibility but does nothing
+   */
+  setTokens: (_tokens: AuthTokens): void => {
+    // SECURITY: Tokens are set as httpOnly cookies by the server
+    // No client-side storage needed - this prevents XSS attacks from stealing tokens
   },
 
-  clearTokens: (): void => {
-    if (typeof window === 'undefined') return;
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    // Also clear cookies
-    deleteCookie('accessToken');
-    deleteCookie('refreshToken');
+  /**
+   * Clear tokens by calling the logout endpoint
+   * The server will clear the httpOnly cookies
+   */
+  clearTokens: async (): Promise<void> => {
+    try {
+      // Call logout endpoint to clear httpOnly cookies on server
+      await axios.post(`${API_BASE_URL}/auth/logout`, {}, { withCredentials: true });
+    } catch {
+      // If logout fails, cookies will expire naturally
+    }
+  },
+
+  /**
+   * Check if user appears to be authenticated
+   * Since we can't read httpOnly cookies, we make a request to check
+   */
+  isAuthenticated: async (): Promise<boolean> => {
+    try {
+      await apiClient.get('/auth/me');
+      return true;
+    } catch {
+      return false;
+    }
   },
 };
 
 // Track if we're currently refreshing the token
 let isRefreshing = false;
 let failedQueue: Array<{
-  resolve: (value?: any) => void;
-  reject: (reason?: any) => void;
+  resolve: (value?: unknown) => void;
+  reject: (reason?: unknown) => void;
 }> = [];
 
-const processQueue = (error: Error | null, token: string | null = null) => {
+const processQueue = (error: Error | null) => {
   failedQueue.forEach((prom) => {
     if (error) {
       prom.reject(error);
     } else {
-      prom.resolve(token);
+      prom.resolve();
     }
   });
 
   failedQueue = [];
 };
 
-// Request interceptor - Add auth token to requests
+/**
+ * Request interceptor
+ * SECURITY: With httpOnly cookies, no Authorization header is needed
+ * The browser automatically includes cookies with withCredentials: true
+ */
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = tokenStorage.getAccessToken();
-
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-
+    // No need to set Authorization header - cookies are sent automatically
     return config;
   },
   (error) => {
@@ -92,7 +111,10 @@ apiClient.interceptors.request.use(
   }
 );
 
-// Response interceptor - Handle token refresh
+/**
+ * Response interceptor - Handle token refresh
+ * SECURITY: Uses httpOnly cookie-based refresh (server manages tokens)
+ */
 apiClient.interceptors.response.use(
   (response) => {
     return response;
@@ -107,10 +129,8 @@ apiClient.interceptors.response.use(
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         })
-          .then((token) => {
-            if (originalRequest.headers) {
-              originalRequest.headers.Authorization = `Bearer ${token}`;
-            }
+          .then(() => {
+            // Retry with new cookie (automatically included)
             return apiClient(originalRequest);
           })
           .catch((err) => {
@@ -121,43 +141,23 @@ apiClient.interceptors.response.use(
       originalRequest._retry = true;
       isRefreshing = true;
 
-      const refreshToken = tokenStorage.getRefreshToken();
-
-      if (!refreshToken) {
-        // No refresh token available, redirect to login
-        tokenStorage.clearTokens();
-        if (typeof window !== 'undefined') {
-          window.location.href = '/login';
-        }
-        return Promise.reject(error);
-      }
-
       try {
-        // Attempt to refresh the token
-        const response = await axios.post<RefreshTokenResponse>(
+        // Attempt to refresh the token using httpOnly cookie
+        // Server reads refresh token from cookie and sets new tokens as cookies
+        await axios.post<RefreshTokenResponse>(
           `${API_BASE_URL}/auth/refresh`,
-          { refreshToken }
+          {},
+          { withCredentials: true }
         );
 
-        const { accessToken, refreshToken: newRefreshToken } = response.data;
+        processQueue(null);
 
-        tokenStorage.setTokens({
-          accessToken,
-          refreshToken: newRefreshToken,
-        });
-
-        // Update the original request with new token
-        if (originalRequest.headers) {
-          originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-        }
-
-        processQueue(null, accessToken);
-
+        // Retry original request with new cookies (automatically included)
         return apiClient(originalRequest);
       } catch (refreshError) {
-        processQueue(refreshError as Error, null);
-        tokenStorage.clearTokens();
+        processQueue(refreshError as Error);
 
+        // Redirect to login on refresh failure
         if (typeof window !== 'undefined') {
           window.location.href = '/login';
         }

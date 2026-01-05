@@ -77,6 +77,30 @@ const nextConfig = {
 
   // Security headers
   async headers() {
+    // Content Security Policy for production
+    // SECURITY: Prevents XSS, clickjacking, and data injection attacks
+    const cspHeader = [
+      "default-src 'self'",
+      // Scripts: Allow self and Next.js inline scripts (required for hydration)
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com",
+      // Styles: Allow self and inline styles (required for CSS-in-JS)
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      // Images: Allow self, data URIs, and CDN
+      "img-src 'self' data: blob: https://*.amazonaws.com https://*.cloudfront.net https://*.stripe.com",
+      // Fonts: Allow Google Fonts
+      "font-src 'self' https://fonts.gstatic.com",
+      // Connect: Allow API and Stripe
+      "connect-src 'self' https://*.theunifiedhealth.com https://api.stripe.com wss://*.theunifiedhealth.com",
+      // Frames: Allow Stripe for payment embeds
+      "frame-src 'self' https://js.stripe.com https://hooks.stripe.com",
+      // Form submissions
+      "form-action 'self'",
+      // Base URI
+      "base-uri 'self'",
+      // Upgrade insecure requests in production
+      process.env.NODE_ENV === 'production' ? "upgrade-insecure-requests" : "",
+    ].filter(Boolean).join('; ');
+
     return [
       {
         source: '/:path*',
@@ -104,6 +128,14 @@ const nextConfig = {
           {
             key: 'Referrer-Policy',
             value: 'strict-origin-when-cross-origin'
+          },
+          {
+            key: 'Content-Security-Policy',
+            value: cspHeader
+          },
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(self), microphone=(self), geolocation=(), payment=(self)'
           },
         ],
       },

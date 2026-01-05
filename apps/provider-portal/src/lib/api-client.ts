@@ -2,6 +2,10 @@ import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from 'axios';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
 
+/**
+ * Provider Portal API Client
+ * SECURITY: Uses httpOnly cookies for token storage (XSS-safe)
+ */
 class ApiClient {
   private client: AxiosInstance;
 
@@ -12,19 +16,21 @@ class ApiClient {
         'Content-Type': 'application/json',
       },
       timeout: 30000,
+      withCredentials: true, // SECURITY: Required for httpOnly cookies
     });
 
     this.setupInterceptors();
   }
 
   private setupInterceptors() {
-    // Request interceptor
+    /**
+     * Request interceptor
+     * SECURITY: With httpOnly cookies, no Authorization header is needed
+     * The browser automatically includes cookies with withCredentials: true
+     */
     this.client.interceptors.request.use(
       (config) => {
-        const token = this.getToken();
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
-        }
+        // No need to set Authorization header - cookies are sent automatically
         return config;
       },
       (error) => {
@@ -32,34 +38,24 @@ class ApiClient {
       }
     );
 
-    // Response interceptor
+    /**
+     * Response interceptor
+     * SECURITY: Uses httpOnly cookie-based refresh (server manages tokens)
+     */
     this.client.interceptors.response.use(
       (response) => response,
       async (error: AxiosError) => {
         if (error.response?.status === 401) {
-          // Token expired, try to refresh
-          const refreshToken = this.getRefreshToken();
-          if (refreshToken) {
-            try {
-              const { data } = await axios.post(`${API_URL}/auth/refresh`, {
-                refreshToken,
-              });
-              this.setToken(data.token);
-              this.setRefreshToken(data.refreshToken);
+          // Token expired, try to refresh using httpOnly cookie
+          try {
+            await axios.post(`${API_URL}/auth/refresh`, {}, { withCredentials: true });
 
-              // Retry the original request
-              if (error.config) {
-                error.config.headers.Authorization = `Bearer ${data.token}`;
-                return this.client.request(error.config);
-              }
-            } catch (refreshError) {
-              this.clearTokens();
-              if (typeof window !== 'undefined') {
-                window.location.href = '/login';
-              }
+            // Retry the original request with new cookie (automatically included)
+            if (error.config) {
+              return this.client.request(error.config);
             }
-          } else {
-            this.clearTokens();
+          } catch {
+            // Refresh failed, redirect to login
             if (typeof window !== 'undefined') {
               window.location.href = '/login';
             }
@@ -70,36 +66,30 @@ class ApiClient {
     );
   }
 
-  private getToken(): string | null {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('token');
-    }
-    return null;
-  }
-
-  private getRefreshToken(): string | null {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('refreshToken');
-    }
-    return null;
-  }
-
+  /**
+   * @deprecated Tokens are now managed via httpOnly cookies
+   */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   setToken(token: string): void {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('token', token);
-    }
+    // SECURITY: Tokens are set as httpOnly cookies by the server
   }
 
+  /**
+   * @deprecated Tokens are now managed via httpOnly cookies
+   */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   setRefreshToken(refreshToken: string): void {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('refreshToken', refreshToken);
-    }
+    // SECURITY: Tokens are set as httpOnly cookies by the server
   }
 
-  clearTokens(): void {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('token');
-      localStorage.removeItem('refreshToken');
+  /**
+   * Clear tokens by calling the logout endpoint
+   */
+  async clearTokens(): Promise<void> {
+    try {
+      await axios.post(`${API_URL}/auth/logout`, {}, { withCredentials: true });
+    } catch {
+      // If logout fails, cookies will expire naturally
     }
   }
 

@@ -34,7 +34,27 @@ declare global {
 }
 
 /**
+ * Extract token from request
+ * Priority: 1. httpOnly cookie (most secure), 2. Authorization header (backward compatibility)
+ */
+const extractToken = (req: Request): string | null => {
+  // First, try httpOnly cookie (most secure - cannot be accessed by XSS)
+  if (req.cookies?.accessToken) {
+    return req.cookies.accessToken;
+  }
+
+  // Fall back to Authorization header for backward compatibility
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    return authHeader.substring(7);
+  }
+
+  return null;
+};
+
+/**
  * Middleware to authenticate JWT token
+ * Supports both httpOnly cookies (preferred) and Authorization header
  */
 export const authenticate = (
   req: Request,
@@ -42,13 +62,12 @@ export const authenticate = (
   next: NextFunction
 ) => {
   try {
-    const authHeader = req.headers.authorization;
+    const token = extractToken(req);
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (!token) {
       throw new UnauthorizedError('No token provided');
     }
 
-    const token = authHeader.substring(7);
     const payload = jwt.verify(token, config.jwt.secret) as JwtPayload;
 
     req.user = payload;
@@ -83,6 +102,7 @@ export const authorize = (...allowedRoles: Array<'patient' | 'provider' | 'admin
 
 /**
  * Optional authentication - doesn't fail if no token
+ * Supports both httpOnly cookies and Authorization header
  */
 export const optionalAuth = (
   req: Request,
@@ -90,10 +110,9 @@ export const optionalAuth = (
   next: NextFunction
 ) => {
   try {
-    const authHeader = req.headers.authorization;
+    const token = extractToken(req);
 
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      const token = authHeader.substring(7);
+    if (token) {
       const payload = jwt.verify(token, config.jwt.secret) as JwtPayload;
       req.user = payload;
     }

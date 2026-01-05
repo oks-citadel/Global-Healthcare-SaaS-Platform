@@ -2,29 +2,47 @@ import axios from 'axios'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
 
+/**
+ * API client with httpOnly cookie support
+ * SECURITY: Tokens are stored as httpOnly cookies by the server, preventing XSS attacks
+ */
 export const api = axios.create({
   baseURL: `${API_URL}/api`,
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true, // SECURITY: Required for httpOnly cookies
 })
 
-// Add auth token to requests
+/**
+ * Request interceptor
+ * SECURITY: With httpOnly cookies, no Authorization header is needed
+ * The browser automatically includes cookies with withCredentials: true
+ */
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('admin_token')
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
-  }
+  // No need to set Authorization header - cookies are sent automatically
   return config
 })
 
-// Handle auth errors
+/**
+ * Response interceptor - Handle auth errors
+ * SECURITY: Uses httpOnly cookie-based auth (server manages tokens)
+ */
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('admin_token')
-      window.location.href = '/login'
+      // Try to refresh token using httpOnly cookie
+      try {
+        await axios.post(`${API_URL}/api/auth/refresh`, {}, { withCredentials: true })
+        // Retry original request
+        return api.request(error.config)
+      } catch {
+        // Refresh failed, redirect to login
+        if (typeof window !== 'undefined') {
+          window.location.href = '/login'
+        }
+      }
     }
     return Promise.reject(error)
   }

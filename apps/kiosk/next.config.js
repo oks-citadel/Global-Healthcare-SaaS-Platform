@@ -22,6 +22,30 @@ const nextConfig = {
 
   // Security headers
   async headers() {
+    // Content Security Policy for kiosk application
+    // SECURITY: Strict CSP for public-facing kiosk terminals
+    const cspHeader = [
+      "default-src 'self'",
+      // Scripts: Allow self and Next.js inline scripts (required for hydration)
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+      // Styles: Allow self and inline styles (required for CSS-in-JS)
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      // Images: Allow self and data URIs only (strict for kiosk)
+      "img-src 'self' data: blob:",
+      // Fonts: Allow Google Fonts
+      "font-src 'self' https://fonts.gstatic.com",
+      // Connect: Allow API only
+      "connect-src 'self' https://*.theunifiedhealth.com",
+      // Frames: Block all frames for kiosk security
+      "frame-src 'none'",
+      // Form submissions
+      "form-action 'self'",
+      // Base URI
+      "base-uri 'self'",
+      // Upgrade insecure requests in production
+      process.env.NODE_ENV === 'production' ? "upgrade-insecure-requests" : "",
+    ].filter(Boolean).join('; ');
+
     return [
       {
         source: '/:path*',
@@ -49,6 +73,14 @@ const nextConfig = {
           {
             key: 'Referrer-Policy',
             value: 'strict-origin-when-cross-origin'
+          },
+          {
+            key: 'Content-Security-Policy',
+            value: cspHeader
+          },
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=(), payment=()'
           },
         ],
       },

@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
+import { authApi } from '@/lib/api'
 import {
   LayoutDashboard,
   Users,
@@ -29,8 +30,13 @@ const navigation = [
 export function Sidebar() {
   const pathname = usePathname()
 
-  const handleLogout = () => {
-    localStorage.removeItem('admin_token')
+  const handleLogout = async () => {
+    try {
+      // SECURITY: Call logout endpoint to clear httpOnly cookies on server
+      await authApi.logout()
+    } catch {
+      // Proceed to login page even if logout fails
+    }
     window.location.href = '/login'
   }
 

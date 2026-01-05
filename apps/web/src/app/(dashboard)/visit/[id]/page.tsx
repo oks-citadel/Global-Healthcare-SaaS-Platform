@@ -52,24 +52,31 @@ export default function VirtualVisitPage() {
   });
 
   // Load visit data and user info
+  // SECURITY: Uses httpOnly cookies for auth - no localStorage token storage
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Get auth token from storage or context
-        const storedToken = localStorage.getItem('auth_token') || '';
-        const storedUserId = localStorage.getItem('user_id') || '';
-        const storedUserRole =
-          (localStorage.getItem('user_role') as 'doctor' | 'patient') || 'patient';
+        // First, get current user info from auth API
+        // SECURITY: Auth token sent via httpOnly cookie automatically
+        const authResponse = await fetch(`${apiUrl}/api/v1/auth/me`, {
+          credentials: 'include', // SECURITY: Include httpOnly cookies
+        });
 
-        setToken(storedToken);
-        setUserId(storedUserId);
-        setUserRole(storedUserRole);
+        if (authResponse.ok) {
+          const userData = await authResponse.json();
+          setUserId(userData.userId || userData.id || '');
+          setUserRole(userData.role === 'provider' ? 'doctor' : 'patient');
+          // Token is managed by cookies, pass empty for backward compat
+          setToken('');
+        } else {
+          // Redirect to login if not authenticated
+          router.push('/login');
+          return;
+        }
 
         // Fetch visit data
         const response = await fetch(`${apiUrl}/api/v1/visits/${visitId}`, {
-          headers: {
-            Authorization: `Bearer ${storedToken}`,
-          },
+          credentials: 'include', // SECURITY: Include httpOnly cookies
         });
 
         if (response.ok) {
@@ -82,7 +89,7 @@ export default function VirtualVisitPage() {
     };
 
     loadData();
-  }, [visitId, apiUrl]);
+  }, [visitId, apiUrl, router]);
 
   const handleJoinCall = async () => {
     try {

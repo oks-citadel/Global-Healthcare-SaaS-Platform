@@ -164,14 +164,17 @@ resource "aws_security_group_rule" "redis_ingress" {
   description              = "Redis from EKS"
 }
 
+# SECURITY: ElastiCache does not require internet egress
+# Redis only responds to application connections - no outbound calls needed
+# This prevents data exfiltration via compromised cache connections
 resource "aws_security_group_rule" "redis_egress" {
-  type              = "egress"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.redis.id
-  description       = "Allow all egress"
+  type                     = "egress"
+  from_port                = 6379
+  to_port                  = 6379
+  protocol                 = "tcp"
+  source_security_group_id = var.allowed_security_group_id
+  security_group_id        = aws_security_group.redis.id
+  description              = "Redis responses to EKS only"
 }
 
 # ============================================

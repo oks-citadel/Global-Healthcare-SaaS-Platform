@@ -6,6 +6,15 @@ import type { Plan } from '@/components/billing/PlanSelector';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
 
+/**
+ * Create axios instance with httpOnly cookie support
+ * SECURITY: Tokens are managed via httpOnly cookies (XSS-safe)
+ */
+const apiClient = axios.create({
+  baseURL: API_URL,
+  withCredentials: true, // SECURITY: Required for httpOnly cookies
+});
+
 interface CreateSubscriptionData {
   priceId: string;
   paymentMethodId?: string;
@@ -63,7 +72,7 @@ export const useStripeConfig = () => {
   return useQuery<ConfigResponse>({
     queryKey: ['stripe-config'],
     queryFn: async () => {
-      const response = await axios.get(`${API_URL}/payments/config`);
+      const response = await apiClient.get('/payments/config');
       return response.data;
     },
     staleTime: Infinity, // Config doesn't change often
@@ -72,19 +81,12 @@ export const useStripeConfig = () => {
 
 /**
  * Hook to create a setup intent for saving payment method
+ * SECURITY: Auth via httpOnly cookies (no localStorage)
  */
 export const useCreateSetupIntent = () => {
   return useMutation<SetupIntentResponse, Error, Record<string, string> | undefined>({
     mutationFn: async (metadata) => {
-      const response = await axios.post(
-        `${API_URL}/payments/setup-intent`,
-        { metadata },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-          },
-        }
-      );
+      const response = await apiClient.post('/payments/setup-intent', { metadata });
       return response.data;
     },
   });
@@ -92,21 +94,14 @@ export const useCreateSetupIntent = () => {
 
 /**
  * Hook to create a subscription
+ * SECURITY: Auth via httpOnly cookies (no localStorage)
  */
 export const useCreateSubscription = () => {
   const queryClient = useQueryClient();
 
   return useMutation<SubscriptionResponse, Error, CreateSubscriptionData>({
     mutationFn: async (data) => {
-      const response = await axios.post(
-        `${API_URL}/payments/subscription`,
-        data,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-          },
-        }
-      );
+      const response = await apiClient.post('/payments/subscription', data);
       return response.data;
     },
     onSuccess: () => {
@@ -118,16 +113,13 @@ export const useCreateSubscription = () => {
 
 /**
  * Hook to get current subscription
+ * SECURITY: Auth via httpOnly cookies (no localStorage)
  */
 export const useSubscription = () => {
   return useQuery<SubscriptionResponse>({
     queryKey: ['subscription'],
     queryFn: async () => {
-      const response = await axios.get(`${API_URL}/payments/subscription`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-        },
-      });
+      const response = await apiClient.get('/payments/subscription');
       return response.data;
     },
     retry: false, // Don't retry if no subscription found (404)
@@ -136,18 +128,14 @@ export const useSubscription = () => {
 
 /**
  * Hook to cancel a subscription
+ * SECURITY: Auth via httpOnly cookies (no localStorage)
  */
 export const useCancelSubscription = () => {
   const queryClient = useQueryClient();
 
   return useMutation<SubscriptionResponse, Error, CancelSubscriptionData>({
     mutationFn: async (data) => {
-      const response = await axios.delete(`${API_URL}/payments/subscription`, {
-        data,
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-        },
-      });
+      const response = await apiClient.delete('/payments/subscription', { data });
       return response.data;
     },
     onSuccess: () => {
@@ -159,21 +147,14 @@ export const useCancelSubscription = () => {
 
 /**
  * Hook to update payment method
+ * SECURITY: Auth via httpOnly cookies (no localStorage)
  */
 export const useUpdatePaymentMethod = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<any, Error, UpdatePaymentMethodData>({
+  return useMutation<unknown, Error, UpdatePaymentMethodData>({
     mutationFn: async (data) => {
-      const response = await axios.post(
-        `${API_URL}/payments/payment-method`,
-        data,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-          },
-        }
-      );
+      const response = await apiClient.post('/payments/payment-method', data);
       return response.data;
     },
     onSuccess: () => {
@@ -185,16 +166,13 @@ export const useUpdatePaymentMethod = () => {
 
 /**
  * Hook to get payment methods
+ * SECURITY: Auth via httpOnly cookies (no localStorage)
  */
 export const usePaymentMethods = () => {
   return useQuery<PaymentMethodsResponse>({
     queryKey: ['payment-methods'],
     queryFn: async () => {
-      const response = await axios.get(`${API_URL}/payments/payment-methods`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-        },
-      });
+      const response = await apiClient.get('/payments/payment-methods');
       return response.data;
     },
   });
@@ -202,17 +180,14 @@ export const usePaymentMethods = () => {
 
 /**
  * Hook to remove a payment method
+ * SECURITY: Auth via httpOnly cookies (no localStorage)
  */
 export const useRemovePaymentMethod = () => {
   const queryClient = useQueryClient();
 
   return useMutation<void, Error, string>({
     mutationFn: async (paymentMethodId) => {
-      await axios.delete(`${API_URL}/payments/payment-method/${paymentMethodId}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-        },
-      });
+      await apiClient.delete(`/payments/payment-method/${paymentMethodId}`);
     },
     onSuccess: () => {
       // Invalidate payment methods query to refetch
@@ -223,16 +198,14 @@ export const useRemovePaymentMethod = () => {
 
 /**
  * Hook to get invoices
+ * SECURITY: Auth via httpOnly cookies (no localStorage)
  */
 export const useInvoices = (limit: number = 10) => {
   return useQuery<InvoicesResponse>({
     queryKey: ['invoices', limit],
     queryFn: async () => {
-      const response = await axios.get(`${API_URL}/payments/invoices`, {
+      const response = await apiClient.get('/payments/invoices', {
         params: { limit },
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-        },
       });
       return response.data;
     },
@@ -246,7 +219,7 @@ export const usePlans = () => {
   return useQuery<{ plans: Plan[] }>({
     queryKey: ['plans'],
     queryFn: async () => {
-      const response = await axios.get(`${API_URL}/plans`);
+      const response = await apiClient.get('/plans');
       return { plans: response.data };
     },
   });

@@ -21,8 +21,9 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      const response = await authApi.login(email, password)
-      localStorage.setItem('admin_token', response.data.token)
+      // SECURITY: Login response sets httpOnly cookies automatically
+      // No need to store tokens in localStorage (XSS vulnerable)
+      await authApi.login(email, password)
       router.push('/dashboard')
     } catch (err: any) {
       setError(err.response?.data?.message || 'Invalid credentials')
