@@ -1,0 +1,372 @@
+# ============================================
+# The Unified Health Platform - Scheduled Production Deployment
+# ============================================
+# This workflow is scheduled for Tuesday, January 6, 2026 at 9:00 PM CST (3:00 AM UTC Wednesday)
+# It performs a full production deployment after comprehensive multi-agent validation
+# ============================================
+
+name: Scheduled Production Deploy
+
+on:
+  # Scheduled trigger: Tuesday January 6, 2026 at 9:00 PM CST (03:00 UTC Wednesday)
+  schedule:
+    - cron: "0 3 7 1 *" # 03:00 UTC on January 7, 2026 (9pm CST Jan 6)
+
+  # Manual trigger for testing
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        default: "production"
+        type: choice
+        options:
+          - staging
+          - production
+      dry_run:
+        description: "Dry run (plan only, no apply)"
+        required: false
+        default: false
+        type: boolean
+      skip_tests:
+        description: "Skip test suite (NOT recommended for production)"
+        required: false
+        default: false
+        type: boolean
+
+env:
+  NODE_VERSION: "20"
+  PNPM_VERSION: "8"
+  TF_VERSION: "1.6.0"
+  AWS_REGION: "us-east-1"
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+  actions: write
+
+jobs:
+  # ==========================================
+  # Pre-flight Checks
+  # ==========================================
+  preflight:
+    name: Pre-flight Checks
+    runs-on: ubuntu-latest
+    outputs:
+      should_deploy: ${{ steps.check.outputs.should_deploy }}
+      commit_sha: ${{ steps.check.outputs.commit_sha }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Verify deployment window
+        id: check
+        run: |
+          # Get current time in CST
+          CURRENT_TIME=$(TZ='America/Chicago' date '+%Y-%m-%d %H:%M:%S')
+          CURRENT_HOUR=$(TZ='America/Chicago' date '+%H')
+          CURRENT_DAY=$(TZ='America/Chicago' date '+%u')
+
+          echo "Current time (CST): $CURRENT_TIME"
+          echo "Current day of week: $CURRENT_DAY (1=Monday, 7=Sunday)"
+          echo "Current hour: $CURRENT_HOUR"
+
+          # Check if this is the scheduled window (Tuesday 8-10pm CST) or manual dispatch
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "Manual dispatch detected"
+            echo "should_deploy=true" >> $GITHUB_OUTPUT
+          elif [[ "$CURRENT_DAY" == "2" && "$CURRENT_HOUR" -ge "20" && "$CURRENT_HOUR" -le "22" ]]; then
+            echo "Within scheduled deployment window"
+            echo "should_deploy=true" >> $GITHUB_OUTPUT
+          else
+            echo "::warning::Outside deployment window. Skipping deployment."
+            echo "should_deploy=false" >> $GITHUB_OUTPUT
+          fi
+
+          echo "commit_sha=${{ github.sha }}" >> $GITHUB_OUTPUT
+
+      - name: Verify branch is main
+        if: steps.check.outputs.should_deploy == 'true'
+        run: |
+          if [[ "${{ github.ref }}" != "refs/heads/main" ]]; then
+            echo "::error::Production deployments must be from main branch"
+            exit 1
+          fi
+          echo "Branch verification passed: main"
+
+  # ==========================================
+  # Full Test Suite
+  # ==========================================
+  run-tests:
+    name: Full Test Suite
+    runs-on: ubuntu-latest
+    needs: preflight
+    if: needs.preflight.outputs.should_deploy == 'true' && github.event.inputs.skip_tests != 'true'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v5
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run full test suite
+        run: |
+          pnpm test
+        env:
+          NODE_ENV: test
+          JWT_SECRET: test-secret-key-for-ci-tests-only-32chars
+
+      - name: Run security tests
+        run: |
+          cd services/api && pnpm test -- tests/security/ --reporter=verbose
+        env:
+          NODE_ENV: test
+          JWT_SECRET: test-secret-key-for-ci-tests-only-32chars
+
+  # ==========================================
+  # Security Scan
+  # ==========================================
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: preflight
+    if: needs.preflight.outputs.should_deploy == 'true'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: "fs"
+          scan-ref: "."
+          format: "sarif"
+          output: "trivy-results.sarif"
+          severity: "CRITICAL,HIGH"
+
+      - name: Check for critical vulnerabilities
+        run: |
+          if grep -q '"severity": "CRITICAL"' trivy-results.sarif 2>/dev/null; then
+            echo "::error::Critical vulnerabilities found. Blocking deployment."
+            exit 1
+          fi
+          echo "No critical vulnerabilities found."
+
+  # ==========================================
+  # Build and Push Images
+  # ==========================================
+  build-images:
+    name: Build and Push Docker Images
+    runs-on: ubuntu-latest
+    needs: [preflight, run-tests, security-scan]
+    if: |
+      always() &&
+      needs.preflight.outputs.should_deploy == 'true' &&
+      (needs.run-tests.result == 'success' || needs.run-tests.result == 'skipped') &&
+      needs.security-scan.result == 'success'
+
+    strategy:
+      matrix:
+        service:
+          - api
+          - web
+          - api-gateway
+          - auth-service
+          - notification-service
+          - telehealth-service
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN_PROD }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push ${{ matrix.service }}
+        uses: docker/build-push-action@v6
+        with:
+          context: ./services/${{ matrix.service }}
+          push: ${{ github.event.inputs.dry_run != 'true' }}
+          tags: |
+            ${{ steps.login-ecr.outputs.registry }}/unified-health-prod/${{ matrix.service }}:${{ needs.preflight.outputs.commit_sha }}
+            ${{ steps.login-ecr.outputs.registry }}/unified-health-prod/${{ matrix.service }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ==========================================
+  # Deploy to Production
+  # ==========================================
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [preflight, build-images]
+    if: |
+      needs.preflight.outputs.should_deploy == 'true' &&
+      needs.build-images.result == 'success' &&
+      github.event.inputs.dry_run != 'true'
+    environment:
+      name: production
+      url: https://theunifiedhealth.com
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN_PROD }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig \
+            --region ${{ env.AWS_REGION }} \
+            --name unified-health-prod-cluster
+
+      - name: Deploy services to EKS
+        run: |
+          COMMIT_SHA=${{ needs.preflight.outputs.commit_sha }}
+
+          # Update image tags in deployments
+          kubectl set image deployment/api \
+            api=${{ secrets.ECR_REGISTRY }}/unified-health-prod/api:$COMMIT_SHA \
+            -n unified-health
+
+          kubectl set image deployment/web \
+            web=${{ secrets.ECR_REGISTRY }}/unified-health-prod/web:$COMMIT_SHA \
+            -n unified-health
+
+          kubectl set image deployment/api-gateway \
+            api-gateway=${{ secrets.ECR_REGISTRY }}/unified-health-prod/api-gateway:$COMMIT_SHA \
+            -n unified-health
+
+          # Wait for rollouts
+          kubectl rollout status deployment/api -n unified-health --timeout=300s
+          kubectl rollout status deployment/web -n unified-health --timeout=300s
+          kubectl rollout status deployment/api-gateway -n unified-health --timeout=300s
+
+      - name: Verify deployment health
+        run: |
+          # Wait for pods to be ready
+          kubectl wait --for=condition=ready pod -l app=api -n unified-health --timeout=120s
+          kubectl wait --for=condition=ready pod -l app=web -n unified-health --timeout=120s
+
+          # Health check
+          API_HEALTH=$(kubectl exec -n unified-health deployment/api -- curl -s localhost:3001/health | jq -r '.status')
+          if [[ "$API_HEALTH" != "healthy" ]]; then
+            echo "::error::API health check failed"
+            exit 1
+          fi
+          echo "Deployment health verified"
+
+      - name: Post deployment notification
+        if: success()
+        run: |
+          echo "Production deployment completed successfully"
+          echo "Commit: ${{ needs.preflight.outputs.commit_sha }}"
+          echo "Time: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+
+  # ==========================================
+  # Rollback on Failure
+  # ==========================================
+  rollback:
+    name: Rollback on Failure
+    runs-on: ubuntu-latest
+    needs: [deploy-production]
+    if: failure() && needs.deploy-production.result == 'failure'
+
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN_PROD }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig \
+            --region ${{ env.AWS_REGION }} \
+            --name unified-health-prod-cluster
+
+      - name: Rollback deployments
+        run: |
+          echo "::warning::Initiating rollback due to deployment failure"
+          kubectl rollout undo deployment/api -n unified-health
+          kubectl rollout undo deployment/web -n unified-health
+          kubectl rollout undo deployment/api-gateway -n unified-health
+
+          kubectl rollout status deployment/api -n unified-health --timeout=300s
+          kubectl rollout status deployment/web -n unified-health --timeout=300s
+          kubectl rollout status deployment/api-gateway -n unified-health --timeout=300s
+
+          echo "Rollback completed"
+
+  # ==========================================
+  # Deployment Summary
+  # ==========================================
+  summary:
+    name: Deployment Summary
+    runs-on: ubuntu-latest
+    needs:
+      [preflight, run-tests, security-scan, build-images, deploy-production]
+    if: always()
+
+    steps:
+      - name: Generate summary
+        run: |
+          echo "## Production Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Stage | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Pre-flight | ${{ needs.preflight.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Tests | ${{ needs.run-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Security Scan | ${{ needs.security-scan.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build Images | ${{ needs.build-images.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Deploy | ${{ needs.deploy-production.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** ${{ needs.preflight.outputs.commit_sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Scheduled for:** Tuesday, January 6, 2026 at 9:00 PM CST" >> $GITHUB_STEP_SUMMARY

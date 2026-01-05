@@ -58,7 +58,9 @@ spec:
                 topologyKey: topology.kubernetes.io/zone
       containers:
         - name: api-gateway
-          image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/unifiedhealth/api-gateway:latest
+          # Image tag is replaced during CI/CD with specific commit SHA or release version
+          # Never deploy :latest in production - this is a placeholder for Kustomize/Helm
+          image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/unifiedhealth/api-gateway:${IMAGE_TAG:-v1.0.0}
           imagePullPolicy: Always
           ports:
             - name: http

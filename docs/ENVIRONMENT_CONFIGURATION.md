@@ -98,14 +98,14 @@ STRIPE_PUBLIC_KEY=pk_live_xxx
 STRIPE_SECRET_KEY=sk_live_xxx
 STRIPE_WEBHOOK_SECRET=whsec_xxx
 
-# SendGrid (Email)
-SENDGRID_API_KEY=SG.xxx
-SENDGRID_FROM_EMAIL=noreply@unifiedhealth.io
+# AWS SES (Email)
+AWS_SES_REGION=us-east-1
+AWS_SES_FROM_EMAIL=noreply@unifiedhealth.io
+AWS_SES_FROM_NAME=The Unified Health
 
-# Twilio (SMS/Video)
-TWILIO_ACCOUNT_SID=ACxxx
-TWILIO_AUTH_TOKEN=xxx
-TWILIO_PHONE_NUMBER=+1xxx
+# AWS SNS (SMS/Push Notifications)
+AWS_SNS_REGION=us-east-1
+AWS_SNS_SMS_SENDER_ID=UnifiedHealth
 
 # OpenAI (AI Features)
 OPENAI_API_KEY=sk-xxx
@@ -230,8 +230,8 @@ All production secrets are stored in Azure Key Vault:
 | `redis-password`             | Redis authentication  |
 | `jwt-secret`                 | JWT signing key       |
 | `stripe-secret-key`          | Stripe API key        |
-| `sendgrid-api-key`           | SendGrid API key      |
-| `twilio-auth-token`          | Twilio authentication |
+| `aws-ses-credentials`        | AWS SES credentials   |
+| `aws-sns-credentials`        | AWS SNS credentials   |
 | `openai-api-key`             | OpenAI API key        |
 
 **Accessing Secrets:**
@@ -297,16 +297,16 @@ pnpm db:seed
 
 ## External Service Dependencies
 
-| Service            | Purpose             | Required             |
-| ------------------ | ------------------- | -------------------- |
-| Azure PostgreSQL   | Primary database    | Yes                  |
-| Azure Redis        | Caching, sessions   | Yes                  |
-| Azure Blob Storage | File uploads        | Yes                  |
-| Azure Key Vault    | Secrets management  | Yes                  |
-| Stripe             | Payment processing  | Yes (for billing)    |
-| SendGrid           | Email delivery      | Yes                  |
-| Twilio             | SMS and video calls | Yes (for telehealth) |
-| OpenAI             | AI features         | Optional             |
+| Service            | Purpose                    | Required                |
+| ------------------ | -------------------------- | ----------------------- |
+| Azure PostgreSQL   | Primary database           | Yes                     |
+| Azure Redis        | Caching, sessions          | Yes                     |
+| Azure Blob Storage | File uploads               | Yes                     |
+| Azure Key Vault    | Secrets management         | Yes                     |
+| Stripe             | Payment processing         | Yes (for billing)       |
+| AWS SES            | Email delivery             | Yes                     |
+| AWS SNS            | SMS and push notifications | Yes (for notifications) |
+| OpenAI             | AI features                | Optional                |
 
 ---
 

@@ -142,6 +142,7 @@ Business Associate shall:
 **c)** Remain liable for the acts and omissions of its Subcontractors to the same extent as if such acts or omissions were performed by Business Associate.
 
 **Current Subcontractors:**
+
 - Microsoft Azure (Cloud Infrastructure)
 - Stripe (Payment Processing)
 - Twilio (Communications)
@@ -178,12 +179,14 @@ Business Associate shall:
 **d)** If an Individual requests an accounting directly from Business Associate, forward the request to Covered Entity within **five (5) business days**.
 
 **Disclosures Subject to Accounting:**
+
 - Disclosures to parties other than Covered Entity
 - Disclosures not for treatment, payment, or healthcare operations
 - Disclosures not pursuant to an Individual's authorization
 - Other disclosures as required by 45 CFR § 164.528
 
 **Disclosures Exempt from Accounting:**
+
 - To the Individual
 - For treatment, payment, and healthcare operations (until applicable compliance date)
 - Pursuant to an Individual's authorization
@@ -261,11 +264,13 @@ Upon Covered Entity's knowledge of a material breach by Business Associate, Cove
 Upon termination of this BAA, Business Associate shall:
 
 **Option 1 - Return:**
+
 - Return to Covered Entity all PHI received from Covered Entity, or created or received by Business Associate on behalf of Covered Entity, that Business Associate still maintains in any form;
 - Retain no copies of the PHI;
 - Provide written certification of return within **thirty (30) days** of termination.
 
 **Option 2 - Destruction:**
+
 - Destroy all PHI received from Covered Entity, or created or received by Business Associate on behalf of Covered Entity, that Business Associate still maintains in any form;
 - Retain no copies of the PHI;
 - Provide written certification of destruction within **thirty (30) days** of termination.
@@ -360,9 +365,9 @@ All notices under this BAA must be in writing and delivered to:
 [Name and Address]
 
 **Business Associate:**
-Unified Healthcare Platform
+The Unified Health Platform
 [Address]
-Email: legal@unifiedhealthcare.com
+Email: legal@theunifiedhealth.com
 
 **8.8 Governing Law**
 
@@ -384,17 +389,17 @@ By signing below, the parties agree to the terms of this Business Associate Agre
 
 **COVERED ENTITY:**
 
-Name: _______________________
-Title: _______________________
-Signature: _______________________
-Date: _______________________
+Name: ****\*\*****\_\_\_****\*\*****
+Title: ****\*\*****\_\_\_****\*\*****
+Signature: ****\*\*****\_\_\_****\*\*****
+Date: ****\*\*****\_\_\_****\*\*****
 
 **BUSINESS ASSOCIATE:**
 
-Name: _______________________
-Title: _______________________
-Signature: _______________________
-Date: _______________________
+Name: ****\*\*****\_\_\_****\*\*****
+Title: ****\*\*****\_\_\_****\*\*****
+Signature: ****\*\*****\_\_\_****\*\*****
+Date: ****\*\*****\_\_\_****\*\*****
 
 ---
 
@@ -403,6 +408,7 @@ Date: _______________________
 Business Associate implements the following security measures to protect PHI:
 
 ### Administrative Safeguards
+
 - Written security policies and procedures
 - Designated Security Official
 - Workforce training and management
@@ -412,12 +418,14 @@ Business Associate implements the following security measures to protect PHI:
 - Regular security assessments
 
 ### Physical Safeguards
+
 - SOC 2 Type II certified data centers
 - Facility access controls
 - Workstation use and security policies
 - Device and media controls
 
 ### Technical Safeguards
+
 - Unique user identification
 - Emergency access procedures
 - Automatic logoff (15-minute timeout)

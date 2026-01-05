@@ -4,7 +4,7 @@
 
 ![UnifiedHealth](https://via.placeholder.com/280x70/0F4C81/FFFFFF?text=UnifiedHealth+Global)
 
-**Multi-Currency | Multi-Region | AI-Powered Unified Healthcare Ecosystem**
+**Multi-Currency | Multi-Region | AI-Powered The Unified Health Ecosystem**
 
 [![Build Status](https://github.com/oks-citadel/Global-Healthcare-SaaS-Platform/actions/workflows/web-frontend-deploy.yml/badge.svg)](https://github.com/oks-citadel/Global-Healthcare-SaaS-Platform/actions)
 [![License](https://img.shields.io/badge/License-Proprietary-blue.svg)](LICENSE)
@@ -46,45 +46,45 @@
 
 ### Platform Readiness Overview
 
-| Component | Status | Details |
-|-----------|--------|---------|
-| **Backend Services** | ✅ Production Ready | 16 microservices fully operational |
-| **Frontend Apps** | ✅ Production Ready | 5 applications with real API integration |
-| **Infrastructure** | ✅ Configured | AWS/Azure Terraform modules ready |
-| **CI/CD Pipelines** | ✅ Operational | GitHub Actions workflows configured |
-| **Security** | ✅ Hardened | Rate limiting, JWT auth, encryption enabled |
-| **Compliance** | ✅ Compliant | HIPAA, GDPR, POPIA frameworks implemented |
+| Component            | Status              | Details                                     |
+| -------------------- | ------------------- | ------------------------------------------- |
+| **Backend Services** | ✅ Production Ready | 16 microservices fully operational          |
+| **Frontend Apps**    | ✅ Production Ready | 5 applications with real API integration    |
+| **Infrastructure**   | ✅ Configured       | AWS/Azure Terraform modules ready           |
+| **CI/CD Pipelines**  | ✅ Operational      | GitHub Actions workflows configured         |
+| **Security**         | ✅ Hardened         | Rate limiting, JWT auth, encryption enabled |
+| **Compliance**       | ✅ Compliant        | HIPAA, GDPR, POPIA frameworks implemented   |
 
 ### Services Status (16 Microservices)
 
-| Service | Port | Status | Database | Rate Limiting |
-|---------|------|--------|----------|---------------|
-| API Gateway | 3000 | ✅ Ready | Stateless | ✅ |
-| Auth Service | 3001 | ✅ Ready | PostgreSQL | ✅ |
-| Core API | 8080 | ✅ Ready | PostgreSQL | ✅ |
-| Telehealth Service | 3001 | ✅ Ready | PostgreSQL | ✅ |
-| Mental Health Service | 3002 | ✅ Ready | PostgreSQL | ✅ |
-| Chronic Care Service | 3003 | ✅ Ready | PostgreSQL | ✅ |
-| Pharmacy Service | 3004 | ✅ Ready | PostgreSQL | ✅ |
-| Laboratory Service | 3005 | ✅ Ready | PostgreSQL | ✅ |
-| Imaging Service | 3006 | ✅ Ready | PostgreSQL | ✅ |
-| Notification Service | 3007 | ✅ Ready | PostgreSQL + Redis | ✅ |
-| Clinical Trials Service | 3014 | ✅ Ready | PostgreSQL | ✅ |
-| Denial Management Service | 3010 | ✅ Ready | PostgreSQL | ✅ |
-| Home Health Service | 3019 | ✅ Ready | PostgreSQL | ✅ |
-| Population Health Service | 3013 | ✅ Ready | PostgreSQL | ✅ |
-| Price Transparency Service | 3011 | ✅ Ready | PostgreSQL | ✅ |
-| Vendor Risk Service | 3016 | ✅ Ready | PostgreSQL | ✅ |
+| Service                    | Port | Status   | Database           | Rate Limiting |
+| -------------------------- | ---- | -------- | ------------------ | ------------- |
+| API Gateway                | 3000 | ✅ Ready | Stateless          | ✅            |
+| Auth Service               | 3001 | ✅ Ready | PostgreSQL         | ✅            |
+| Core API                   | 8080 | ✅ Ready | PostgreSQL         | ✅            |
+| Telehealth Service         | 3001 | ✅ Ready | PostgreSQL         | ✅            |
+| Mental Health Service      | 3002 | ✅ Ready | PostgreSQL         | ✅            |
+| Chronic Care Service       | 3003 | ✅ Ready | PostgreSQL         | ✅            |
+| Pharmacy Service           | 3004 | ✅ Ready | PostgreSQL         | ✅            |
+| Laboratory Service         | 3005 | ✅ Ready | PostgreSQL         | ✅            |
+| Imaging Service            | 3006 | ✅ Ready | PostgreSQL         | ✅            |
+| Notification Service       | 3007 | ✅ Ready | PostgreSQL + Redis | ✅            |
+| Clinical Trials Service    | 3014 | ✅ Ready | PostgreSQL         | ✅            |
+| Denial Management Service  | 3010 | ✅ Ready | PostgreSQL         | ✅            |
+| Home Health Service        | 3019 | ✅ Ready | PostgreSQL         | ✅            |
+| Population Health Service  | 3013 | ✅ Ready | PostgreSQL         | ✅            |
+| Price Transparency Service | 3011 | ✅ Ready | PostgreSQL         | ✅            |
+| Vendor Risk Service        | 3016 | ✅ Ready | PostgreSQL         | ✅            |
 
 ### Frontend Applications Status
 
-| Application | Port | Status | API Integration | Security Config |
-|-------------|------|--------|-----------------|-----------------|
-| Web Portal | 3000 | ✅ Ready | Real API calls | ✅ Hardened |
-| Provider Portal | 3002 | ✅ Ready | Real API calls | ✅ Hardened |
-| Admin Dashboard | 3001 | ✅ Ready | Real API calls | ✅ Hardened |
-| Mobile App | N/A | ✅ Ready | Real API calls | ✅ Hardened |
-| Kiosk App | 3004 | ✅ Ready | Real API calls | ✅ Hardened |
+| Application     | Port | Status   | API Integration | Security Config |
+| --------------- | ---- | -------- | --------------- | --------------- |
+| Web Portal      | 3000 | ✅ Ready | Real API calls  | ✅ Hardened     |
+| Provider Portal | 3002 | ✅ Ready | Real API calls  | ✅ Hardened     |
+| Admin Dashboard | 3001 | ✅ Ready | Real API calls  | ✅ Hardened     |
+| Mobile App      | N/A  | ✅ Ready | Real API calls  | ✅ Hardened     |
+| Kiosk App       | 3004 | ✅ Ready | Real API calls  | ✅ Hardened     |
 
 ### Revenue Readiness Score: 100/100
 
@@ -425,45 +425,45 @@ The platform consists of **21 enterprise microservices** organized across 6 oper
 
 #### Domain 1: Clinical Operations (4 Modules)
 
-| #   | Service                    | Port | Database                      | Primary Responsibility                              |
-| --- | -------------------------- | ---- | ----------------------------- | --------------------------------------------------- |
-| 1   | AI Clinical Documentation  | 8080 | PostgreSQL (healthcare_db)    | Ambient listening, AI SOAP notes, coding assistance |
-| 2   | Prior Authorization        | 3004 | PostgreSQL (pharmacy_db)      | Payer rules, electronic submission, status tracking |
-| 3   | Care Coordination          | 3002 | PostgreSQL (mental_health_db) | Care transitions, provider messaging, task routing  |
-| 4   | Surgical Scheduling        | 8080 | PostgreSQL (healthcare_db)    | OR block scheduling, AI duration prediction         |
+| #   | Service                   | Port | Database                      | Primary Responsibility                              |
+| --- | ------------------------- | ---- | ----------------------------- | --------------------------------------------------- |
+| 1   | AI Clinical Documentation | 8080 | PostgreSQL (healthcare_db)    | Ambient listening, AI SOAP notes, coding assistance |
+| 2   | Prior Authorization       | 3004 | PostgreSQL (pharmacy_db)      | Payer rules, electronic submission, status tracking |
+| 3   | Care Coordination         | 3002 | PostgreSQL (mental_health_db) | Care transitions, provider messaging, task routing  |
+| 4   | Surgical Scheduling       | 8080 | PostgreSQL (healthcare_db)    | OR block scheduling, AI duration prediction         |
 
 #### Domain 2: Patient Engagement (4 Modules)
 
-| #   | Service               | Port | Database                      | Primary Responsibility                              |
-| --- | --------------------- | ---- | ----------------------------- | --------------------------------------------------- |
-| 5   | Chronic Care Service  | 3003 | PostgreSQL (chronic_care_db)  | Care plans, IoT vitals, remote patient monitoring   |
-| 6   | Patient Intake        | 8080 | PostgreSQL (healthcare_db)    | Digital forms, insurance verification, waitlists    |
-| 7   | Medication Adherence  | 3004 | PostgreSQL (pharmacy_db)      | Smart reminders, refill automation, PDMP queries    |
-| 8   | Post-Discharge        | 8080 | PostgreSQL (healthcare_db)    | LACE+ scoring, automated outreach, readmission risk |
+| #   | Service              | Port | Database                     | Primary Responsibility                              |
+| --- | -------------------- | ---- | ---------------------------- | --------------------------------------------------- |
+| 5   | Chronic Care Service | 3003 | PostgreSQL (chronic_care_db) | Care plans, IoT vitals, remote patient monitoring   |
+| 6   | Patient Intake       | 8080 | PostgreSQL (healthcare_db)   | Digital forms, insurance verification, waitlists    |
+| 7   | Medication Adherence | 3004 | PostgreSQL (pharmacy_db)     | Smart reminders, refill automation, PDMP queries    |
+| 8   | Post-Discharge       | 8080 | PostgreSQL (healthcare_db)   | LACE+ scoring, automated outreach, readmission risk |
 
 #### Domain 3: Revenue Cycle Management (3 Modules)
 
-| #   | Service                   | Port | Database                      | Primary Responsibility                              |
-| --- | ------------------------- | ---- | ----------------------------- | --------------------------------------------------- |
-| 9   | AI Denial Management      | 3010 | PostgreSQL (denial_db)        | Denial prediction, appeal letter AI, recovery tracking |
-| 10  | Price Transparency        | 3011 | PostgreSQL (pricing_db)       | CMS compliance, MRF generation, Good Faith Estimates |
-| 11  | Patient Financing         | 8080 | PostgreSQL (healthcare_db)    | Payment plans, credit checks, collection workflows  |
+| #   | Service              | Port | Database                   | Primary Responsibility                                 |
+| --- | -------------------- | ---- | -------------------------- | ------------------------------------------------------ |
+| 9   | AI Denial Management | 3010 | PostgreSQL (denial_db)     | Denial prediction, appeal letter AI, recovery tracking |
+| 10  | Price Transparency   | 3011 | PostgreSQL (pricing_db)    | CMS compliance, MRF generation, Good Faith Estimates   |
+| 11  | Patient Financing    | 8080 | PostgreSQL (healthcare_db) | Payment plans, credit checks, collection workflows     |
 
 #### Domain 4: Data & Analytics (3 Modules)
 
-| #   | Service                   | Port | Database                      | Primary Responsibility                              |
-| --- | ------------------------- | ---- | ----------------------------- | --------------------------------------------------- |
-| 12  | Data Normalization        | 8080 | PostgreSQL (healthcare_db)    | FHIR R4, HL7v2, C-CDA parsing, terminology mapping  |
-| 13  | Population Health         | 3013 | PostgreSQL (population_db)    | Cohort analysis, risk stratification, HEDIS/CMS Stars |
-| 14  | Clinical Trial Matching   | 3014 | PostgreSQL (trials_db)        | ClinicalTrials.gov API, eligibility matching, enrollment |
+| #   | Service                 | Port | Database                   | Primary Responsibility                                   |
+| --- | ----------------------- | ---- | -------------------------- | -------------------------------------------------------- |
+| 12  | Data Normalization      | 8080 | PostgreSQL (healthcare_db) | FHIR R4, HL7v2, C-CDA parsing, terminology mapping       |
+| 13  | Population Health       | 3013 | PostgreSQL (population_db) | Cohort analysis, risk stratification, HEDIS/CMS Stars    |
+| 14  | Clinical Trial Matching | 3014 | PostgreSQL (trials_db)     | ClinicalTrials.gov API, eligibility matching, enrollment |
 
 #### Domain 5: Compliance & Security (3 Modules)
 
-| #   | Service                   | Port | Database                      | Primary Responsibility                              |
-| --- | ------------------------- | ---- | ----------------------------- | --------------------------------------------------- |
-| 15  | HIPAA Compliance          | N/A  | PostgreSQL (audit_db)         | BAA automation, access logging, breach detection    |
-| 16  | Vendor Risk Management    | 3016 | PostgreSQL (vendor_db)        | Third-party security assessments, contract tracking |
-| 17  | Medical Device Security   | 3003 | PostgreSQL (chronic_care_db)  | FDA recalls, vulnerability scanning, patch management |
+| #   | Service                 | Port | Database                     | Primary Responsibility                                |
+| --- | ----------------------- | ---- | ---------------------------- | ----------------------------------------------------- |
+| 15  | HIPAA Compliance        | N/A  | PostgreSQL (audit_db)        | BAA automation, access logging, breach detection      |
+| 16  | Vendor Risk Management  | 3016 | PostgreSQL (vendor_db)       | Third-party security assessments, contract tracking   |
+| 17  | Medical Device Security | 3003 | PostgreSQL (chronic_care_db) | FDA recalls, vulnerability scanning, patch management |
 
 #### Domain 6: Specialty & Niche (4 Modules)
 
@@ -476,13 +476,13 @@ The platform consists of **21 enterprise microservices** organized across 6 oper
 
 ### Core Infrastructure Services
 
-| #   | Service               | Port | Database                      | Primary Responsibility                         |
-| --- | --------------------- | ---- | ----------------------------- | ---------------------------------------------- |
-| -   | API Gateway           | 3000 | None (stateless)              | Request routing, JWT validation, rate limiting |
-| -   | Auth Service          | 3001 | PostgreSQL (auth_db)          | Authentication, JWT issuance, MFA              |
-| -   | Notification Service  | 3006 | PostgreSQL + Redis            | Email, SMS, Push notifications                 |
-| -   | Laboratory Service    | 3005 | PostgreSQL (laboratory_db)    | Lab orders, results, LOINC codes               |
-| -   | Pharmacy Service      | 3004 | PostgreSQL (pharmacy_db)      | E-prescriptions, drug interactions, PDMP       |
+| #   | Service              | Port | Database                   | Primary Responsibility                         |
+| --- | -------------------- | ---- | -------------------------- | ---------------------------------------------- |
+| -   | API Gateway          | 3000 | None (stateless)           | Request routing, JWT validation, rate limiting |
+| -   | Auth Service         | 3001 | PostgreSQL (auth_db)       | Authentication, JWT issuance, MFA              |
+| -   | Notification Service | 3006 | PostgreSQL + Redis         | Email, SMS, Push notifications                 |
+| -   | Laboratory Service   | 3005 | PostgreSQL (laboratory_db) | Lab orders, results, LOINC codes               |
+| -   | Pharmacy Service     | 3004 | PostgreSQL (pharmacy_db)   | E-prescriptions, drug interactions, PDMP       |
 
 ---
 
@@ -1364,87 +1364,87 @@ Global-Healthcare-SaaS-Platform/
 
 | Technology           | Version | Purpose                     | Status |
 | -------------------- | ------- | --------------------------- | ------ |
-| **React**            | 19.0.0  | UI Framework                | ✅ |
-| **Next.js**          | 15.1.0  | Web Application Framework   | ✅ |
-| **React Native**     | 0.76.x  | Mobile App Framework        | ✅ |
-| **Expo**             | 52.x    | Mobile Development Platform | ✅ |
-| **TypeScript**       | 5.6.3   | Type Safety                 | ✅ |
-| **Tailwind CSS**     | 3.4.x   | Utility-First Styling       | ✅ |
-| **Zustand**          | 5.0.x   | State Management            | ✅ |
-| **TanStack Query**   | 5.62.x  | Data Fetching & Caching     | ✅ |
-| **React Hook Form**  | 7.54.x  | Form Management             | ✅ |
-| **Zod**              | 3.24.x  | Schema Validation           | ✅ |
-| **Socket.io-client** | 4.8.x   | Real-time Communication     | ✅ |
-| **Recharts**         | 2.15.x  | Data Visualization          | ✅ |
-| **simple-peer**      | 9.11.x  | WebRTC Peer Connections     | ✅ |
+| **React**            | 19.0.0  | UI Framework                | ✅     |
+| **Next.js**          | 15.1.0  | Web Application Framework   | ✅     |
+| **React Native**     | 0.76.x  | Mobile App Framework        | ✅     |
+| **Expo**             | 52.x    | Mobile Development Platform | ✅     |
+| **TypeScript**       | 5.6.3   | Type Safety                 | ✅     |
+| **Tailwind CSS**     | 3.4.x   | Utility-First Styling       | ✅     |
+| **Zustand**          | 5.0.x   | State Management            | ✅     |
+| **TanStack Query**   | 5.62.x  | Data Fetching & Caching     | ✅     |
+| **React Hook Form**  | 7.54.x  | Form Management             | ✅     |
+| **Zod**              | 3.24.x  | Schema Validation           | ✅     |
+| **Socket.io-client** | 4.8.x   | Real-time Communication     | ✅     |
+| **Recharts**         | 2.15.x  | Data Visualization          | ✅     |
+| **simple-peer**      | 9.11.x  | WebRTC Peer Connections     | ✅     |
 
 ### Backend Technologies
 
 | Technology        | Version | Purpose                        | Status |
 | ----------------- | ------- | ------------------------------ | ------ |
-| **Node.js**       | 20 LTS  | Runtime Environment            | ✅ |
-| **Express.js**    | 4.21.x  | Web Framework                  | ✅ |
-| **Prisma**        | 6.1.x   | ORM & Database Client          | ✅ |
-| **PostgreSQL**    | 16+     | Primary Relational Database    | ✅ |
-| **Redis**         | 7+      | Caching, Sessions & Job Queues | ✅ |
-| **MongoDB**       | 7+      | FHIR Document Storage          | ✅ |
-| **Elasticsearch** | 8.11.x  | Full-text Search               | ✅ |
-| **Socket.io**     | 4.8.x   | WebSocket Server               | ✅ |
-| **BullMQ**        | 5.x     | Background Job Queue           | ✅ |
-| **Stripe**        | 17.x    | Payment Processing             | ✅ |
-| **Winston**       | 3.17.x  | Structured Logging             | ✅ |
-| **OpenTelemetry** | 1.x     | Distributed Tracing            | ✅ |
-| **SendGrid**      | 8.x     | Email Delivery                 | ✅ |
-| **AWS SES**       | 3.x     | Email Delivery (Alternate)     | ✅ |
+| **Node.js**       | 20 LTS  | Runtime Environment            | ✅     |
+| **Express.js**    | 4.21.x  | Web Framework                  | ✅     |
+| **Prisma**        | 6.1.x   | ORM & Database Client          | ✅     |
+| **PostgreSQL**    | 16+     | Primary Relational Database    | ✅     |
+| **Redis**         | 7+      | Caching, Sessions & Job Queues | ✅     |
+| **MongoDB**       | 7+      | FHIR Document Storage          | ✅     |
+| **Elasticsearch** | 8.11.x  | Full-text Search               | ✅     |
+| **Socket.io**     | 4.8.x   | WebSocket Server               | ✅     |
+| **BullMQ**        | 5.x     | Background Job Queue           | ✅     |
+| **Stripe**        | 17.x    | Payment Processing             | ✅     |
+| **Winston**       | 3.17.x  | Structured Logging             | ✅     |
+| **OpenTelemetry** | 1.x     | Distributed Tracing            | ✅     |
+| **SendGrid**      | 8.x     | Email Delivery                 | ✅     |
+| **AWS SES**       | 3.x     | Email Delivery (Alternate)     | ✅     |
 
 ### Infrastructure & DevOps
 
 | Technology                                  | Purpose                    | Status |
 | ------------------------------------------- | -------------------------- | ------ |
-| **Amazon Elastic Kubernetes Service (EKS)** | Container Orchestration    | ✅ |
-| **Azure Kubernetes Service (AKS)**          | Container Orchestration    | ✅ |
-| **Amazon Elastic Container Registry (ECR)** | Docker Image Storage       | ✅ |
-| **Azure Container Registry (ACR)**          | Docker Image Storage       | ✅ |
-| **Amazon RDS for PostgreSQL**               | Managed Database           | ✅ |
-| **Azure Database for PostgreSQL**           | Managed Database           | ✅ |
-| **Amazon ElastiCache for Redis**            | Managed Cache              | ✅ |
-| **Azure Cache for Redis**                   | Managed Cache              | ✅ |
-| **AWS Secrets Manager**                     | Secrets Management         | ✅ |
-| **Azure Key Vault**                         | Secrets Management         | ✅ |
-| **Amazon S3**                               | File & Media Storage       | ✅ |
-| **Azure Blob Storage**                      | File & Media Storage       | ✅ |
-| **GitHub Actions**                          | CI/CD Pipelines            | ✅ |
-| **Terraform**                               | Infrastructure as Code     | ✅ |
-| **Helm**                                    | Kubernetes Package Manager | ✅ |
-| **Docker**                                  | Containerization           | ✅ |
-| **pnpm**                                    | Package Manager            | ✅ |
-| **Turborepo**                               | Monorepo Build System      | ✅ |
+| **Amazon Elastic Kubernetes Service (EKS)** | Container Orchestration    | ✅     |
+| **Azure Kubernetes Service (AKS)**          | Container Orchestration    | ✅     |
+| **Amazon Elastic Container Registry (ECR)** | Docker Image Storage       | ✅     |
+| **Azure Container Registry (ACR)**          | Docker Image Storage       | ✅     |
+| **Amazon RDS for PostgreSQL**               | Managed Database           | ✅     |
+| **Azure Database for PostgreSQL**           | Managed Database           | ✅     |
+| **Amazon ElastiCache for Redis**            | Managed Cache              | ✅     |
+| **Azure Cache for Redis**                   | Managed Cache              | ✅     |
+| **AWS Secrets Manager**                     | Secrets Management         | ✅     |
+| **Azure Key Vault**                         | Secrets Management         | ✅     |
+| **Amazon S3**                               | File & Media Storage       | ✅     |
+| **Azure Blob Storage**                      | File & Media Storage       | ✅     |
+| **GitHub Actions**                          | CI/CD Pipelines            | ✅     |
+| **Terraform**                               | Infrastructure as Code     | ✅     |
+| **Helm**                                    | Kubernetes Package Manager | ✅     |
+| **Docker**                                  | Containerization           | ✅     |
+| **pnpm**                                    | Package Manager            | ✅     |
+| **Turborepo**                               | Monorepo Build System      | ✅     |
 
 ### Security & Compliance
 
-| Technology                | Purpose                       | Status |
-| ------------------------- | ----------------------------- | ------ |
-| **JWT + Refresh Tokens**  | Authentication                | ✅ |
-| **bcrypt**                | Password Hashing              | ✅ |
-| **express-rate-limit**    | Rate Limiting                 | ✅ |
-| **helmet**                | Security Headers              | ✅ |
-| **CORS**                  | Cross-Origin Protection       | ✅ |
-| **AES-256-GCM**           | Field-Level Encryption        | ✅ |
-| **TLS 1.3**               | Transport Encryption          | ✅ |
-| **AWS WAF / CloudFlare**  | Web Application Firewall      | ✅ |
+| Technology               | Purpose                  | Status |
+| ------------------------ | ------------------------ | ------ |
+| **JWT + Refresh Tokens** | Authentication           | ✅     |
+| **bcrypt**               | Password Hashing         | ✅     |
+| **express-rate-limit**   | Rate Limiting            | ✅     |
+| **helmet**               | Security Headers         | ✅     |
+| **CORS**                 | Cross-Origin Protection  | ✅     |
+| **AES-256-GCM**          | Field-Level Encryption   | ✅     |
+| **TLS 1.3**              | Transport Encryption     | ✅     |
+| **AWS WAF / CloudFlare** | Web Application Firewall | ✅     |
 
 ### Testing Stack
 
 | Tool              | Purpose                     | Status |
 | ----------------- | --------------------------- | ------ |
-| **Playwright**    | E2E & Accessibility Testing | ✅ |
-| **Vitest**        | Unit & Integration Testing  | ✅ |
-| **Cypress**       | Component Testing           | ✅ |
-| **Lighthouse CI** | Performance Testing         | ✅ |
-| **Trivy**         | Container Security Scanning | ✅ |
-| **Gitleaks**      | Secret Detection            | ✅ |
-| **CodeQL**        | Static Analysis (SAST)      | ✅ |
-| **npm audit**     | Dependency Scanning         | ✅ |
+| **Playwright**    | E2E & Accessibility Testing | ✅     |
+| **Vitest**        | Unit & Integration Testing  | ✅     |
+| **Cypress**       | Component Testing           | ✅     |
+| **Lighthouse CI** | Performance Testing         | ✅     |
+| **Trivy**         | Container Security Scanning | ✅     |
+| **Gitleaks**      | Secret Detection            | ✅     |
+| **CodeQL**        | Static Analysis (SAST)      | ✅     |
+| **npm audit**     | Dependency Scanning         | ✅     |
 
 ---
 
@@ -1625,30 +1625,30 @@ GitHub Repository
 
 ### Pipeline Stages
 
-| Stage | Action | Description |
-|-------|--------|-------------|
-| **Source** | GitHub | Triggered on push to main branch |
-| **Build** | CodeBuild | Builds Docker images for all services |
-| **Push** | ECR | Pushes images to container registry |
-| **Deploy** | EKS | Updates Kubernetes deployments |
+| Stage      | Action    | Description                           |
+| ---------- | --------- | ------------------------------------- |
+| **Source** | GitHub    | Triggered on push to main branch      |
+| **Build**  | CodeBuild | Builds Docker images for all services |
+| **Push**   | ECR       | Pushes images to container registry   |
+| **Deploy** | EKS       | Updates Kubernetes deployments        |
 
 ### Services Built
 
-| Service | ECR Repository | Port |
-|---------|----------------|------|
-| API Gateway | `unified-health-prod/api-gateway` | 3000 |
-| Auth Service | `unified-health-prod/auth-service` | 3001 |
-| Core API | `unified-health-prod/api` | 8080 |
-| Telehealth Service | `unified-health-prod/telehealth-service` | 3001 |
+| Service               | ECR Repository                              | Port |
+| --------------------- | ------------------------------------------- | ---- |
+| API Gateway           | `unified-health-prod/api-gateway`           | 3000 |
+| Auth Service          | `unified-health-prod/auth-service`          | 3001 |
+| Core API              | `unified-health-prod/api`                   | 8080 |
+| Telehealth Service    | `unified-health-prod/telehealth-service`    | 3001 |
 | Mental Health Service | `unified-health-prod/mental-health-service` | 3002 |
-| Chronic Care Service | `unified-health-prod/chronic-care-service` | 3003 |
-| Pharmacy Service | `unified-health-prod/pharmacy-service` | 3004 |
-| Laboratory Service | `unified-health-prod/laboratory-service` | 3005 |
-| Imaging Service | `unified-health-prod/imaging-service` | 3006 |
-| Notification Service | `unified-health-prod/notification-service` | 3007 |
-| Web App | `unified-health-prod/web-app` | 3000 |
-| Provider Portal | `unified-health-prod/provider-portal` | 3002 |
-| Admin Portal | `unified-health-prod/admin-portal` | 3001 |
+| Chronic Care Service  | `unified-health-prod/chronic-care-service`  | 3003 |
+| Pharmacy Service      | `unified-health-prod/pharmacy-service`      | 3004 |
+| Laboratory Service    | `unified-health-prod/laboratory-service`    | 3005 |
+| Imaging Service       | `unified-health-prod/imaging-service`       | 3006 |
+| Notification Service  | `unified-health-prod/notification-service`  | 3007 |
+| Web App               | `unified-health-prod/web-app`               | 3000 |
+| Provider Portal       | `unified-health-prod/provider-portal`       | 3002 |
+| Admin Portal          | `unified-health-prod/admin-portal`          | 3001 |
 
 ### Deployment Commands
 
