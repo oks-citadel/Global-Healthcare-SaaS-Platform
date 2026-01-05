@@ -1,0 +1,21 @@
+{
+  "scenarios": {
+    "smoke": {
+      "executor": "constant-vus",
+      "vus": 3,
+      "duration": "1m"
+    }
+  },
+  "thresholds": {
+    "http_req_duration": ["p(95)<500"],
+    "http_req_failed": ["rate<0.01"]
+  },
+  "noConnectionReuse": false,
+  "userAgent": "UnifiedHealth-LoadTest/1.0",
+  "insecureSkipTLSVerify": false,
+  "throw": false,
+  "tags": {
+    "testType": "smoke",
+    "environment": "staging"
+  }
+}

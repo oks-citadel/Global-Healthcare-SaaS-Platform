@@ -1,0 +1,456 @@
+# Unified Health Synthetic Monitoring Configuration
+#
+# This configuration defines external health probes and synthetic tests
+# to detect issues before customers do.
+#
+# Deploy with: kubectl apply -f synthetic-monitoring.yaml
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: synthetic-monitoring-config
+  namespace: monitoring
+  labels:
+    app: synthetic-monitoring
+    component: health-probes
+data:
+  config.yaml: |
+    # Synthetic Monitoring Configuration
+    # Version: 1.0
+    # Last Updated: 2026-01-05
+
+    global:
+      check_interval: 30s
+      timeout: 10s
+      regions:
+        - us-east-1
+        - us-west-2
+        - eu-west-1
+      alert_channels:
+        - pagerduty
+        - slack
+
+    # Health Check Probes
+    probes:
+      # API Gateway Health
+      - name: api-health
+        type: http
+        url: https://api.theunifiedhealth.com/health
+        method: GET
+        interval: 30s
+        timeout: 5s
+        success_criteria:
+          status_code: 200
+          response_time_ms: 500
+          body_contains: '"status":"healthy"'
+        alerts:
+          - type: pagerduty
+            severity: critical
+            after_failures: 2
+          - type: slack
+            channel: "#platform-alerts"
+            after_failures: 1
+
+      # API Ready Check
+      - name: api-ready
+        type: http
+        url: https://api.theunifiedhealth.com/ready
+        method: GET
+        interval: 60s
+        timeout: 10s
+        success_criteria:
+          status_code: 200
+          response_time_ms: 1000
+        alerts:
+          - type: slack
+            channel: "#platform-alerts"
+            after_failures: 2
+
+      # Web Application
+      - name: web-health
+        type: http
+        url: https://theunifiedhealth.com
+        method: GET
+        interval: 30s
+        timeout: 10s
+        success_criteria:
+          status_code: 200
+          response_time_ms: 2000
+          body_contains: "Unified Health"
+        alerts:
+          - type: pagerduty
+            severity: critical
+            after_failures: 2
+
+      # Authentication Service
+      - name: auth-health
+        type: http
+        url: https://api.theunifiedhealth.com/api/v1/auth/health
+        method: GET
+        interval: 30s
+        timeout: 5s
+        success_criteria:
+          status_code: 200
+          response_time_ms: 300
+        alerts:
+          - type: pagerduty
+            severity: critical
+            after_failures: 2
+
+      # Provider Search (Critical Path)
+      - name: provider-search
+        type: http
+        url: https://api.theunifiedhealth.com/api/v1/providers/search?specialty=general&limit=1
+        method: GET
+        interval: 60s
+        timeout: 10s
+        success_criteria:
+          status_code: 200
+          response_time_ms: 1000
+        alerts:
+          - type: slack
+            channel: "#platform-alerts"
+            after_failures: 3
+
+      # Database Connectivity (via API)
+      - name: database-health
+        type: http
+        url: https://api.theunifiedhealth.com/health/db
+        method: GET
+        interval: 30s
+        timeout: 5s
+        success_criteria:
+          status_code: 200
+        alerts:
+          - type: pagerduty
+            severity: critical
+            after_failures: 1
+
+      # Redis/Cache Health
+      - name: cache-health
+        type: http
+        url: https://api.theunifiedhealth.com/health/cache
+        method: GET
+        interval: 30s
+        timeout: 5s
+        success_criteria:
+          status_code: 200
+        alerts:
+          - type: pagerduty
+            severity: high
+            after_failures: 2
+
+    # SSL Certificate Monitoring
+    ssl_checks:
+      - name: api-ssl
+        host: api.theunifiedhealth.com
+        port: 443
+        warning_days: 30
+        critical_days: 7
+        alerts:
+          - type: slack
+            channel: "#security-alerts"
+
+      - name: web-ssl
+        host: theunifiedhealth.com
+        port: 443
+        warning_days: 30
+        critical_days: 7
+        alerts:
+          - type: slack
+            channel: "#security-alerts"
+
+    # DNS Monitoring
+    dns_checks:
+      - name: api-dns
+        host: api.theunifiedhealth.com
+        expected_records:
+          - type: A
+          - type: AAAA
+        interval: 300s
+        alerts:
+          - type: pagerduty
+            severity: critical
+            after_failures: 1
+
+      - name: web-dns
+        host: theunifiedhealth.com
+        expected_records:
+          - type: A
+          - type: CNAME
+        interval: 300s
+        alerts:
+          - type: pagerduty
+            severity: critical
+            after_failures: 1
+
+    # TCP Port Checks
+    tcp_checks:
+      - name: postgres-port
+        host: unified-health-prod-aurora.cluster-xxxxx.us-east-1.rds.amazonaws.com
+        port: 5432
+        interval: 60s
+        timeout: 5s
+        alerts:
+          - type: pagerduty
+            severity: critical
+            after_failures: 1
+
+      - name: redis-port
+        host: master.unified-health-prod-redis.xxxxx.use1.cache.amazonaws.com
+        port: 6379
+        interval: 60s
+        timeout: 5s
+        alerts:
+          - type: pagerduty
+            severity: critical
+            after_failures: 1
+
+    # User Journey Tests (Synthetic Transactions)
+    synthetic_tests:
+      - name: login-flow
+        type: browser
+        interval: 300s
+        timeout: 60s
+        steps:
+          - action: navigate
+            url: https://theunifiedhealth.com/login
+          - action: wait
+            selector: 'input[name="email"]'
+            timeout: 5s
+          - action: type
+            selector: 'input[name="email"]'
+            value: "${SYNTHETIC_TEST_EMAIL}"
+          - action: type
+            selector: 'input[name="password"]'
+            value: "${SYNTHETIC_TEST_PASSWORD}"
+          - action: click
+            selector: 'button[type="submit"]'
+          - action: wait
+            selector: '[data-testid="dashboard"]'
+            timeout: 10s
+        success_criteria:
+          - page_loaded: true
+          - no_js_errors: true
+          - response_time_ms: 5000
+        alerts:
+          - type: slack
+            channel: "#platform-alerts"
+            after_failures: 2
+
+      - name: provider-search-flow
+        type: browser
+        interval: 300s
+        timeout: 60s
+        steps:
+          - action: navigate
+            url: https://theunifiedhealth.com/providers
+          - action: wait
+            selector: '[data-testid="specialty-select"]'
+            timeout: 5s
+          - action: select
+            selector: '[data-testid="specialty-select"]'
+            value: "general"
+          - action: click
+            selector: '[data-testid="search-button"]'
+          - action: wait
+            selector: '[data-testid="provider-card"]'
+            timeout: 10s
+        success_criteria:
+          - element_visible: '[data-testid="provider-card"]'
+          - response_time_ms: 8000
+        alerts:
+          - type: slack
+            channel: "#platform-alerts"
+            after_failures: 2
+
+    # Performance Baselines
+    performance_baselines:
+      api_health:
+        p50_ms: 50
+        p95_ms: 200
+        p99_ms: 500
+      provider_search:
+        p50_ms: 200
+        p95_ms: 800
+        p99_ms: 2000
+      web_ttfb:
+        p50_ms: 200
+        p95_ms: 500
+        p99_ms: 1000
+
+    # Alert Routing
+    alert_routing:
+      pagerduty:
+        integration_key: "${PAGERDUTY_INTEGRATION_KEY}"
+        severity_mapping:
+          critical: P1
+          high: P2
+          warning: P3
+          info: P4
+      slack:
+        webhook_url: "${SLACK_WEBHOOK_URL}"
+        channels:
+          platform-alerts: "#platform-alerts"
+          security-alerts: "#security-alerts"
+          on-call: "#on-call"
+
+---
+# Prometheus ServiceMonitor for synthetic checks
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: synthetic-monitoring
+  namespace: monitoring
+  labels:
+    app: synthetic-monitoring
+spec:
+  selector:
+    matchLabels:
+      app: synthetic-monitoring
+  endpoints:
+    - port: metrics
+      interval: 30s
+      path: /metrics
+
+---
+# PrometheusRule for synthetic monitoring alerts
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: synthetic-monitoring-alerts
+  namespace: monitoring
+  labels:
+    app: synthetic-monitoring
+spec:
+  groups:
+    - name: synthetic-monitoring
+      rules:
+        # API Health Check Failed
+        - alert: APIHealthCheckFailed
+          expr: probe_success{job="synthetic-api-health"} == 0
+          for: 1m
+          labels:
+            severity: critical
+            team: platform
+          annotations:
+            summary: "API health check failed"
+            description: "API health check has been failing for more than 1 minute"
+            runbook_url: "https://docs.theunifiedhealth.com/runbooks/api-health-failure"
+
+        # Web Application Down
+        - alert: WebApplicationDown
+          expr: probe_success{job="synthetic-web-health"} == 0
+          for: 2m
+          labels:
+            severity: critical
+            team: platform
+          annotations:
+            summary: "Web application is down"
+            description: "Web application health check has been failing for more than 2 minutes"
+            runbook_url: "https://docs.theunifiedhealth.com/runbooks/web-health-failure"
+
+        # High API Latency
+        - alert: HighAPILatency
+          expr: probe_duration_seconds{job="synthetic-api-health"} > 0.5
+          for: 5m
+          labels:
+            severity: warning
+            team: platform
+          annotations:
+            summary: "API latency is high"
+            description: "API response time is above 500ms for more than 5 minutes"
+
+        # SSL Certificate Expiring
+        - alert: SSLCertificateExpiring
+          expr: probe_ssl_earliest_cert_expiry - time() < 86400 * 30
+          for: 1h
+          labels:
+            severity: warning
+            team: security
+          annotations:
+            summary: "SSL certificate expiring soon"
+            description: "SSL certificate for {{ $labels.instance }} expires in less than 30 days"
+
+        # SSL Certificate Critical
+        - alert: SSLCertificateCritical
+          expr: probe_ssl_earliest_cert_expiry - time() < 86400 * 7
+          for: 1h
+          labels:
+            severity: critical
+            team: security
+          annotations:
+            summary: "SSL certificate expiring very soon"
+            description: "SSL certificate for {{ $labels.instance }} expires in less than 7 days"
+
+        # Database Connection Failed
+        - alert: DatabaseConnectionFailed
+          expr: probe_success{job="synthetic-database-health"} == 0
+          for: 30s
+          labels:
+            severity: critical
+            team: platform
+          annotations:
+            summary: "Database connection failed"
+            description: "Database health check has been failing"
+            runbook_url: "https://docs.theunifiedhealth.com/runbooks/database-failure"
+
+        # Cache Connection Failed
+        - alert: CacheConnectionFailed
+          expr: probe_success{job="synthetic-cache-health"} == 0
+          for: 1m
+          labels:
+            severity: high
+            team: platform
+          annotations:
+            summary: "Cache connection failed"
+            description: "Redis cache health check has been failing"
+
+        # Synthetic Test Failed
+        - alert: SyntheticTestFailed
+          expr: synthetic_test_success == 0
+          for: 10m
+          labels:
+            severity: warning
+            team: platform
+          annotations:
+            summary: "Synthetic test {{ $labels.test_name }} failed"
+            description: "User journey test has been failing for more than 10 minutes"
+
+---
+# CronJob for periodic synthetic tests
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: synthetic-health-check
+  namespace: monitoring
+spec:
+  schedule: "*/5 * * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: health-check
+              image: curlimages/curl:latest
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  # Check API health
+                  API_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 https://api.theunifiedhealth.com/health)
+                  if [ "$API_STATUS" != "200" ]; then
+                    echo "API health check failed with status $API_STATUS"
+                    exit 1
+                  fi
+
+                  # Check web health
+                  WEB_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 https://theunifiedhealth.com)
+                  if [ "$WEB_STATUS" != "200" ]; then
+                    echo "Web health check failed with status $WEB_STATUS"
+                    exit 1
+                  fi
+
+                  echo "All health checks passed"
+          restartPolicy: OnFailure

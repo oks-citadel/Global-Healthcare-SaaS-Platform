@@ -3,3 +3,9 @@ dist
 **/generated/**
 **/src/generated/**
 *.min.js
+infrastructure/load-testing/**
+packages/analytics/**
+packages/feature-flags/**
+packages/knowledge-base/**
+packages/status-page/**
+packages/support/**

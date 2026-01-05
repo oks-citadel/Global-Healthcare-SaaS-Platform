@@ -1,0 +1,24 @@
+{
+  "name": "@unified-health/load-testing",
+  "version": "1.0.0",
+  "private": true,
+  "description": "K6 Load Testing Framework for Unified Health Platform",
+  "scripts": {
+    "test:smoke": "k6 run --config config/smoke.json tests/smoke.js",
+    "test:load": "k6 run --config config/load.json tests/load.js",
+    "test:stress": "k6 run --config config/stress.json tests/stress.js",
+    "test:spike": "k6 run --config config/spike.json tests/spike.js",
+    "test:soak": "k6 run --config config/soak.json tests/soak.js",
+    "test:api": "k6 run tests/api-endpoints.js",
+    "test:auth": "k6 run tests/auth-flow.js",
+    "test:appointment": "k6 run tests/appointment-flow.js",
+    "test:all": "npm run test:smoke && npm run test:load",
+    "report": "k6 run --out json=results/results.json tests/load.js"
+  },
+  "devDependencies": {
+    "@types/k6": "^0.49.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
