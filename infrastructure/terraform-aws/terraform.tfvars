@@ -12,9 +12,9 @@ environment  = "prod"
 domain_name    = "theunifiedhealth.com"
 enable_route53 = true
 
-# Region Deployment - Start with Americas only
+# Region Deployment - All regions enabled to preserve existing infrastructure
 deploy_americas = true
-deploy_europe   = false
+deploy_europe   = true
 deploy_africa   = false
 
 # EKS Configuration
