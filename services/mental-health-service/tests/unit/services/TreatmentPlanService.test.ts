@@ -3,40 +3,77 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { TreatmentPlanService } from '../../../src/services/TreatmentPlanService';
-import { mockPrismaClient } from '../helpers/mocks';
 import {
   mockTreatmentPlan,
   mockTreatmentGoal,
   mockCreateTreatmentPlanInput,
 } from '../helpers/fixtures';
 
+// Use vi.hoisted to define mocks before hoisting
+const { mockPrismaInstance } = vi.hoisted(() => {
+  const mockFn = () => ({
+    treatmentPlan: {
+      findUnique: vi.fn(),
+      findMany: vi.fn(),
+      findFirst: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+      count: vi.fn(),
+    },
+    treatmentGoal: {
+      findUnique: vi.fn(),
+      findMany: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+      count: vi.fn(),
+    },
+    $connect: vi.fn(),
+    $disconnect: vi.fn(),
+    $transaction: vi.fn(),
+  });
+  return { mockPrismaInstance: mockFn() };
+});
+
 // Mock the Prisma client
 vi.mock('../../../src/generated/client', () => ({
-  PrismaClient: vi.fn(() => mockPrismaClient()),
+  PrismaClient: vi.fn(() => mockPrismaInstance),
+  TreatmentPlanStatus: {
+    active: 'active',
+    completed: 'completed',
+    cancelled: 'cancelled',
+    onHold: 'onHold',
+  },
+  GoalStatus: {
+    notStarted: 'notStarted',
+    inProgress: 'inProgress',
+    achieved: 'achieved',
+    notAchieved: 'notAchieved',
+  },
 }));
 
-describe('TreatmentPlanService', () => {
-  let mockPrisma: ReturnType<typeof mockPrismaClient>;
+// Import after mock is set up
+import { TreatmentPlanService } from '../../../src/services/TreatmentPlanService';
 
+describe('TreatmentPlanService', () => {
   beforeEach(() => {
-    mockPrisma = mockPrismaClient();
     vi.clearAllMocks();
 
     // Setup default mock implementations
-    mockPrisma.treatmentPlan.create.mockResolvedValue(mockTreatmentPlan);
-    mockPrisma.treatmentPlan.findUnique.mockResolvedValue(mockTreatmentPlan);
-    mockPrisma.treatmentPlan.findFirst.mockResolvedValue(mockTreatmentPlan);
-    mockPrisma.treatmentPlan.update.mockResolvedValue(mockTreatmentPlan);
-    mockPrisma.treatmentGoal.create.mockResolvedValue(mockTreatmentGoal);
-    mockPrisma.treatmentGoal.findMany.mockResolvedValue([mockTreatmentGoal]);
+    mockPrismaInstance.treatmentPlan.create.mockResolvedValue(mockTreatmentPlan);
+    mockPrismaInstance.treatmentPlan.findUnique.mockResolvedValue(mockTreatmentPlan);
+    mockPrismaInstance.treatmentPlan.findFirst.mockResolvedValue(mockTreatmentPlan);
+    mockPrismaInstance.treatmentPlan.update.mockResolvedValue(mockTreatmentPlan);
+    mockPrismaInstance.treatmentGoal.create.mockResolvedValue(mockTreatmentGoal);
+    mockPrismaInstance.treatmentGoal.findMany.mockResolvedValue([mockTreatmentGoal]);
   });
 
   describe('createTreatmentPlan', () => {
     it('should create a treatment plan with goals', async () => {
       const result = await TreatmentPlanService.createTreatmentPlan(mockCreateTreatmentPlanInput);
 
-      expect(mockPrisma.treatmentPlan.create).toHaveBeenCalledWith({
+      expect(mockPrismaInstance.treatmentPlan.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
           patientId: mockCreateTreatmentPlanInput.patientId,
           providerId: mockCreateTreatmentPlanInput.providerId,
@@ -50,7 +87,7 @@ describe('TreatmentPlanService', () => {
     it('should create goal records for each goal in input', async () => {
       await TreatmentPlanService.createTreatmentPlan(mockCreateTreatmentPlanInput);
 
-      expect(mockPrisma.treatmentGoal.create).toHaveBeenCalled();
+      expect(mockPrismaInstance.treatmentGoal.create).toHaveBeenCalled();
     });
 
     it('should not create goals when empty array provided', async () => {
@@ -61,13 +98,13 @@ describe('TreatmentPlanService', () => {
 
       await TreatmentPlanService.createTreatmentPlan(inputWithNoGoals);
 
-      expect(mockPrisma.treatmentGoal.create).not.toHaveBeenCalled();
+      expect(mockPrismaInstance.treatmentGoal.create).not.toHaveBeenCalled();
     });
 
     it('should set initial goal status to in_progress', async () => {
       await TreatmentPlanService.createTreatmentPlan(mockCreateTreatmentPlanInput);
 
-      const createCall = mockPrisma.treatmentGoal.create.mock.calls[0][0];
+      const createCall = mockPrismaInstance.treatmentGoal.create.mock.calls[0][0];
       expect(createCall.data.status).toBe('in_progress');
       expect(createCall.data.progress).toBe(0);
     });
@@ -75,8 +112,8 @@ describe('TreatmentPlanService', () => {
 
   describe('getTreatmentPlanWithGoals', () => {
     it('should return plan with associated goals', async () => {
-      mockPrisma.treatmentPlan.findUnique.mockResolvedValue(mockTreatmentPlan);
-      mockPrisma.treatmentGoal.findMany.mockResolvedValue([mockTreatmentGoal]);
+      mockPrismaInstance.treatmentPlan.findUnique.mockResolvedValue(mockTreatmentPlan);
+      mockPrismaInstance.treatmentGoal.findMany.mockResolvedValue([mockTreatmentGoal]);
 
       const result = await TreatmentPlanService.getTreatmentPlanWithGoals('plan-123');
 
@@ -85,7 +122,7 @@ describe('TreatmentPlanService', () => {
     });
 
     it('should return null when plan not found', async () => {
-      mockPrisma.treatmentPlan.findUnique.mockResolvedValue(null);
+      mockPrismaInstance.treatmentPlan.findUnique.mockResolvedValue(null);
 
       const result = await TreatmentPlanService.getTreatmentPlanWithGoals('non-existent');
 
@@ -95,19 +132,19 @@ describe('TreatmentPlanService', () => {
     it('should order goals by creation date', async () => {
       await TreatmentPlanService.getTreatmentPlanWithGoals('plan-123');
 
-      const findCall = mockPrisma.treatmentGoal.findMany.mock.calls[0][0];
+      const findCall = mockPrismaInstance.treatmentGoal.findMany.mock.calls[0][0];
       expect(findCall.orderBy.createdAt).toBe('asc');
     });
   });
 
   describe('getActivePlanForPatient', () => {
     it('should return active plan for patient', async () => {
-      mockPrisma.treatmentPlan.findFirst.mockResolvedValue(mockTreatmentPlan);
-      mockPrisma.treatmentGoal.findMany.mockResolvedValue([mockTreatmentGoal]);
+      mockPrismaInstance.treatmentPlan.findFirst.mockResolvedValue(mockTreatmentPlan);
+      mockPrismaInstance.treatmentGoal.findMany.mockResolvedValue([mockTreatmentGoal]);
 
       const result = await TreatmentPlanService.getActivePlanForPatient('patient-123');
 
-      expect(mockPrisma.treatmentPlan.findFirst).toHaveBeenCalledWith({
+      expect(mockPrismaInstance.treatmentPlan.findFirst).toHaveBeenCalledWith({
         where: {
           patientId: 'patient-123',
           status: 'active',
@@ -118,7 +155,7 @@ describe('TreatmentPlanService', () => {
     });
 
     it('should return null when no active plan exists', async () => {
-      mockPrisma.treatmentPlan.findFirst.mockResolvedValue(null);
+      mockPrismaInstance.treatmentPlan.findFirst.mockResolvedValue(null);
 
       const result = await TreatmentPlanService.getActivePlanForPatient('patient-123');
 
@@ -128,7 +165,7 @@ describe('TreatmentPlanService', () => {
     it('should get the most recent active plan', async () => {
       await TreatmentPlanService.getActivePlanForPatient('patient-123');
 
-      const findCall = mockPrisma.treatmentPlan.findFirst.mock.calls[0][0];
+      const findCall = mockPrismaInstance.treatmentPlan.findFirst.mock.calls[0][0];
       expect(findCall.orderBy.createdAt).toBe('desc');
     });
   });
@@ -136,13 +173,13 @@ describe('TreatmentPlanService', () => {
   describe('updateTreatmentPlan', () => {
     it('should update plan fields', async () => {
       const updatedPlan = { ...mockTreatmentPlan, frequency: 'bi-weekly' };
-      mockPrisma.treatmentPlan.update.mockResolvedValue(updatedPlan);
+      mockPrismaInstance.treatmentPlan.update.mockResolvedValue(updatedPlan);
 
       const result = await TreatmentPlanService.updateTreatmentPlan('plan-123', {
         frequency: 'bi-weekly',
       });
 
-      expect(mockPrisma.treatmentPlan.update).toHaveBeenCalledWith({
+      expect(mockPrismaInstance.treatmentPlan.update).toHaveBeenCalledWith({
         where: { id: 'plan-123' },
         data: { frequency: 'bi-weekly' },
       });
@@ -151,7 +188,7 @@ describe('TreatmentPlanService', () => {
 
     it('should update plan status', async () => {
       const completedPlan = { ...mockTreatmentPlan, status: 'completed' };
-      mockPrisma.treatmentPlan.update.mockResolvedValue(completedPlan);
+      mockPrismaInstance.treatmentPlan.update.mockResolvedValue(completedPlan);
 
       const result = await TreatmentPlanService.updateTreatmentPlan('plan-123', {
         status: 'completed',
@@ -174,7 +211,7 @@ describe('TreatmentPlanService', () => {
 
       const result = await TreatmentPlanService.addGoal(goalInput);
 
-      expect(mockPrisma.treatmentGoal.create).toHaveBeenCalledWith({
+      expect(mockPrismaInstance.treatmentGoal.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
           treatmentPlanId: 'plan-123',
           title: 'Improve sleep quality',
@@ -194,7 +231,7 @@ describe('TreatmentPlanService', () => {
 
       await TreatmentPlanService.addGoal(goalInput);
 
-      const createCall = mockPrisma.treatmentGoal.create.mock.calls[0][0];
+      const createCall = mockPrismaInstance.treatmentGoal.create.mock.calls[0][0];
       expect(createCall.data.measurements).toEqual([]);
     });
   });
@@ -202,13 +239,13 @@ describe('TreatmentPlanService', () => {
   describe('updateGoalProgress', () => {
     it('should update goal progress', async () => {
       const updatedGoal = { ...mockTreatmentGoal, progress: 75 };
-      mockPrisma.treatmentGoal.update.mockResolvedValue(updatedGoal);
+      mockPrismaInstance.treatmentGoal.update.mockResolvedValue(updatedGoal);
 
       const result = await TreatmentPlanService.updateGoalProgress('goal-123', {
         progress: 75,
       });
 
-      expect(mockPrisma.treatmentGoal.update).toHaveBeenCalledWith({
+      expect(mockPrismaInstance.treatmentGoal.update).toHaveBeenCalledWith({
         where: { id: 'goal-123' },
         data: { progress: 75 },
       });
@@ -217,7 +254,7 @@ describe('TreatmentPlanService', () => {
 
     it('should update goal status', async () => {
       const achievedGoal = { ...mockTreatmentGoal, status: 'achieved' };
-      mockPrisma.treatmentGoal.update.mockResolvedValue(achievedGoal);
+      mockPrismaInstance.treatmentGoal.update.mockResolvedValue(achievedGoal);
 
       const result = await TreatmentPlanService.updateGoalProgress('goal-123', {
         status: 'achieved',
@@ -231,7 +268,7 @@ describe('TreatmentPlanService', () => {
         ...mockTreatmentGoal,
         barriers: ['Time constraints', 'Motivation'],
       };
-      mockPrisma.treatmentGoal.update.mockResolvedValue(goalWithBarriers);
+      mockPrismaInstance.treatmentGoal.update.mockResolvedValue(goalWithBarriers);
 
       const result = await TreatmentPlanService.updateGoalProgress('goal-123', {
         barriers: ['Time constraints', 'Motivation'],
@@ -243,14 +280,14 @@ describe('TreatmentPlanService', () => {
 
   describe('getGoalsForPlan', () => {
     it('should return all goals for a treatment plan', async () => {
-      mockPrisma.treatmentGoal.findMany.mockResolvedValue([
+      mockPrismaInstance.treatmentGoal.findMany.mockResolvedValue([
         mockTreatmentGoal,
         { ...mockTreatmentGoal, id: 'goal-456' },
       ]);
 
       const result = await TreatmentPlanService.getGoalsForPlan('plan-123');
 
-      expect(mockPrisma.treatmentGoal.findMany).toHaveBeenCalledWith({
+      expect(mockPrismaInstance.treatmentGoal.findMany).toHaveBeenCalledWith({
         where: { treatmentPlanId: 'plan-123' },
         orderBy: { createdAt: 'asc' },
       });
@@ -258,7 +295,7 @@ describe('TreatmentPlanService', () => {
     });
 
     it('should return empty array when no goals', async () => {
-      mockPrisma.treatmentGoal.findMany.mockResolvedValue([]);
+      mockPrismaInstance.treatmentGoal.findMany.mockResolvedValue([]);
 
       const result = await TreatmentPlanService.getGoalsForPlan('plan-123');
 
@@ -268,7 +305,7 @@ describe('TreatmentPlanService', () => {
 
   describe('calculatePlanProgress', () => {
     it('should calculate overall progress', async () => {
-      mockPrisma.treatmentGoal.findMany.mockResolvedValue([
+      mockPrismaInstance.treatmentGoal.findMany.mockResolvedValue([
         { ...mockTreatmentGoal, progress: 50, status: 'in_progress' },
         { ...mockTreatmentGoal, id: 'goal-456', progress: 100, status: 'achieved' },
       ]);
@@ -282,7 +319,7 @@ describe('TreatmentPlanService', () => {
     });
 
     it('should return zero progress when no goals', async () => {
-      mockPrisma.treatmentGoal.findMany.mockResolvedValue([]);
+      mockPrismaInstance.treatmentGoal.findMany.mockResolvedValue([]);
 
       const result = await TreatmentPlanService.calculatePlanProgress('plan-123');
 
@@ -291,7 +328,7 @@ describe('TreatmentPlanService', () => {
     });
 
     it('should round progress to nearest integer', async () => {
-      mockPrisma.treatmentGoal.findMany.mockResolvedValue([
+      mockPrismaInstance.treatmentGoal.findMany.mockResolvedValue([
         { ...mockTreatmentGoal, progress: 33, status: 'in_progress' },
         { ...mockTreatmentGoal, id: 'goal-456', progress: 67, status: 'in_progress' },
       ]);
@@ -308,11 +345,11 @@ describe('TreatmentPlanService', () => {
         ...mockTreatmentPlan,
         reviewDate: new Date('2024-01-01'),
       };
-      mockPrisma.treatmentPlan.findMany.mockResolvedValue([overduePlan]);
+      mockPrismaInstance.treatmentPlan.findMany.mockResolvedValue([overduePlan]);
 
       const result = await TreatmentPlanService.checkPlansDueForReview();
 
-      expect(mockPrisma.treatmentPlan.findMany).toHaveBeenCalledWith({
+      expect(mockPrismaInstance.treatmentPlan.findMany).toHaveBeenCalledWith({
         where: {
           status: 'active',
           reviewDate: {
@@ -324,16 +361,16 @@ describe('TreatmentPlanService', () => {
     });
 
     it('should only check active plans', async () => {
-      mockPrisma.treatmentPlan.findMany.mockResolvedValue([]);
+      mockPrismaInstance.treatmentPlan.findMany.mockResolvedValue([]);
 
       await TreatmentPlanService.checkPlansDueForReview();
 
-      const findCall = mockPrisma.treatmentPlan.findMany.mock.calls[0][0];
+      const findCall = mockPrismaInstance.treatmentPlan.findMany.mock.calls[0][0];
       expect(findCall.where.status).toBe('active');
     });
 
     it('should return empty array when no plans due', async () => {
-      mockPrisma.treatmentPlan.findMany.mockResolvedValue([]);
+      mockPrismaInstance.treatmentPlan.findMany.mockResolvedValue([]);
 
       const result = await TreatmentPlanService.checkPlansDueForReview();
 
