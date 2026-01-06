@@ -72,7 +72,7 @@
     "node-cron": "^4.2.1",
     "prom-client": "^15.1.0",
     "redis": "^5.10.0",
-    "sharp": "^0.33.2",
+    "sharp": "^0.34.5",
     "socket.io": "^4.6.1",
     "stripe": "^20.1.0",
     "swagger-jsdoc": "^6.2.8",
