@@ -3,7 +3,7 @@
   "schedule": "Schedule Appointment",
   "myAppointments": "My Appointments",
   "allAppointments": "All Appointments",
-  "details": "Appointment Details",
+  "detailsTitle": "Appointment Details",
   "create": {
     "title": "Schedule New Appointment",
     "selectPatient": "Select Patient",

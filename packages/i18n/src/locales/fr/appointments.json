@@ -3,7 +3,7 @@
   "schedule": "Planifier un rendez-vous",
   "myAppointments": "Mes rendez-vous",
   "allAppointments": "Tous les rendez-vous",
-  "details": "Détails du rendez-vous",
+  "detailsTitle": "Détails du rendez-vous",
   "create": {
     "title": "Planifier un nouveau rendez-vous",
     "selectPatient": "Sélectionner un patient",

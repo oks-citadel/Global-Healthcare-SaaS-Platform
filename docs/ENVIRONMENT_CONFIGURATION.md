@@ -105,7 +105,7 @@ AWS_SES_FROM_NAME=The Unified Health
 
 # AWS SNS (SMS/Push Notifications)
 AWS_SNS_REGION=us-east-1
-AWS_SNS_SMS_SENDER_ID=UnifiedHealth
+AWS_SNS_SMS_SENDER_ID=UHealth
 
 # OpenAI (AI Features)
 OPENAI_API_KEY=sk-xxx

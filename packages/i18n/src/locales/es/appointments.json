@@ -3,7 +3,7 @@
   "schedule": "Programar Cita",
   "myAppointments": "Mis Citas",
   "allAppointments": "Todas las Citas",
-  "details": "Detalles de la Cita",
+  "detailsTitle": "Detalles de la Cita",
   "create": {
     "title": "Programar Nueva Cita",
     "selectPatient": "Seleccionar Paciente",

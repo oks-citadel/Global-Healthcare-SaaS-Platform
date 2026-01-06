@@ -1,5 +1,10 @@
-import { SNSClient, PublishCommand, SetSMSAttributesCommand, CheckIfPhoneNumberIsOptedOutCommand } from '@aws-sdk/client-sns';
-import { logger } from '../utils/logger.js';
+import {
+  SNSClient,
+  PublishCommand,
+  SetSMSAttributesCommand,
+  CheckIfPhoneNumberIsOptedOutCommand,
+} from "@aws-sdk/client-sns";
+import { logger } from "../utils/logger.js";
 
 /**
  * AWS SNS SMS Library
@@ -15,16 +20,17 @@ import { logger } from '../utils/logger.js';
  */
 
 // AWS SNS Configuration
-const AWS_REGION = process.env.AWS_REGION || 'us-east-1';
-const SMS_SENDER_ID = process.env.SNS_SMS_SENDER_ID || 'UnifiedHealth';
-const SMS_MONTHLY_SPEND_LIMIT = process.env.SNS_SMS_MONTHLY_SPEND_LIMIT || '1000';
+const AWS_REGION = process.env.AWS_REGION || "us-east-1";
+const SMS_SENDER_ID = process.env.SNS_SMS_SENDER_ID || "UHealth";
+const SMS_MONTHLY_SPEND_LIMIT =
+  process.env.SNS_SMS_MONTHLY_SPEND_LIMIT || "1000";
 
 // Initialize SNS Client
 const snsClient = new SNSClient({
   region: AWS_REGION,
 });
 
-logger.info('AWS SNS SMS client initialized', { region: AWS_REGION });
+logger.info("AWS SNS SMS client initialized", { region: AWS_REGION });
 
 /**
  * SMS options interface (compatible with previous Twilio interface)
@@ -33,7 +39,7 @@ export interface SmsOptions {
   to: string;
   message: string;
   from?: string;
-  messageType?: 'Transactional' | 'Promotional';
+  messageType?: "Transactional" | "Promotional";
   senderId?: string;
 }
 
@@ -69,22 +75,22 @@ export function isValidPhoneNumber(phoneNumber: string): boolean {
  */
 export function formatPhoneNumber(
   phoneNumber: string,
-  defaultCountryCode: string = '+1'
+  defaultCountryCode: string = "+1",
 ): string {
   // Remove all non-digit characters
-  let cleaned = phoneNumber.replace(/\D/g, '');
+  let cleaned = phoneNumber.replace(/\D/g, "");
 
   // Add country code if not present
-  if (!phoneNumber.startsWith('+')) {
+  if (!phoneNumber.startsWith("+")) {
     // If number starts with country code without +, add +
     if (cleaned.length > 10) {
-      cleaned = '+' + cleaned;
+      cleaned = "+" + cleaned;
     } else {
       // Add default country code
       cleaned = defaultCountryCode + cleaned;
     }
   } else {
-    cleaned = '+' + cleaned;
+    cleaned = "+" + cleaned;
   }
 
   return cleaned;
@@ -98,18 +104,18 @@ export async function configureSmsAttributes(): Promise<void> {
   try {
     const command = new SetSMSAttributesCommand({
       attributes: {
-        DefaultSMSType: 'Transactional', // Use Transactional for healthcare
+        DefaultSMSType: "Transactional", // Use Transactional for healthcare
         DefaultSenderID: SMS_SENDER_ID,
         MonthlySpendLimit: SMS_MONTHLY_SPEND_LIMIT,
-        UsageReportS3Bucket: process.env.SNS_SMS_USAGE_BUCKET || '',
+        UsageReportS3Bucket: process.env.SNS_SMS_USAGE_BUCKET || "",
       },
     });
 
     await snsClient.send(command);
-    logger.info('AWS SNS SMS attributes configured');
+    logger.info("AWS SNS SMS attributes configured");
   } catch (error) {
-    logger.error('Failed to configure SNS SMS attributes', {
-      error: error instanceof Error ? error.message : 'Unknown error',
+    logger.error("Failed to configure SNS SMS attributes", {
+      error: error instanceof Error ? error.message : "Unknown error",
     });
     throw error;
   }
@@ -131,8 +137,8 @@ export async function isOptedOut(phoneNumber: string): Promise<boolean> {
     const response = await snsClient.send(command);
     return response.isOptedOut || false;
   } catch (error) {
-    logger.error('Failed to check opt-out status', {
-      error: error instanceof Error ? error.message : 'Unknown error',
+    logger.error("Failed to check opt-out status", {
+      error: error instanceof Error ? error.message : "Unknown error",
       phoneNumber,
     });
     return false;
@@ -150,27 +156,29 @@ export async function sendSms(options: SmsOptions): Promise<SmsResponse> {
     // Validate phone number
     const phoneNumber = formatPhoneNumber(options.to);
     if (!isValidPhoneNumber(phoneNumber)) {
-      throw new Error('Invalid phone number format. Use E.164 format (e.g., +1234567890)');
+      throw new Error(
+        "Invalid phone number format. Use E.164 format (e.g., +1234567890)",
+      );
     }
 
     // Validate message
     if (!options.message || options.message.trim().length === 0) {
-      throw new Error('Message cannot be empty');
+      throw new Error("Message cannot be empty");
     }
 
     // Check message length (SMS limit is 1600 characters for concatenated messages)
     if (options.message.length > 1600) {
-      throw new Error('Message too long. Maximum 1600 characters.');
+      throw new Error("Message too long. Maximum 1600 characters.");
     }
 
     // Check opt-out status
     const optedOut = await isOptedOut(phoneNumber);
     if (optedOut) {
-      logger.warn('SMS not sent - phone number has opted out', { phoneNumber });
+      logger.warn("SMS not sent - phone number has opted out", { phoneNumber });
       return {
         success: false,
-        error: 'Phone number has opted out of SMS',
-        status: 'opted_out',
+        error: "Phone number has opted out of SMS",
+        status: "opted_out",
       };
     }
 
@@ -179,12 +187,12 @@ export async function sendSms(options: SmsOptions): Promise<SmsResponse> {
       PhoneNumber: phoneNumber,
       Message: options.message,
       MessageAttributes: {
-        'AWS.SNS.SMS.SMSType': {
-          DataType: 'String',
-          StringValue: options.messageType || 'Transactional',
+        "AWS.SNS.SMS.SMSType": {
+          DataType: "String",
+          StringValue: options.messageType || "Transactional",
         },
-        'AWS.SNS.SMS.SenderID': {
-          DataType: 'String',
+        "AWS.SNS.SMS.SenderID": {
+          DataType: "String",
           StringValue: options.senderId || SMS_SENDER_ID,
         },
       },
@@ -193,7 +201,7 @@ export async function sendSms(options: SmsOptions): Promise<SmsResponse> {
     // Send SMS
     const response = await snsClient.send(command);
 
-    logger.info('SMS sent successfully via AWS SNS', {
+    logger.info("SMS sent successfully via AWS SNS", {
       to: phoneNumber,
       messageId: response.MessageId,
       messageLength: options.message.length,
@@ -202,17 +210,17 @@ export async function sendSms(options: SmsOptions): Promise<SmsResponse> {
     return {
       success: true,
       messageId: response.MessageId,
-      status: 'sent',
+      status: "sent",
     };
   } catch (error) {
-    logger.error('Failed to send SMS via AWS SNS', {
-      error: error instanceof Error ? error.message : 'Unknown error',
+    logger.error("Failed to send SMS via AWS SNS", {
+      error: error instanceof Error ? error.message : "Unknown error",
       to: options.to,
     });
 
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: error instanceof Error ? error.message : "Unknown error",
     };
   }
 }
@@ -226,9 +234,9 @@ export async function sendSms(options: SmsOptions): Promise<SmsResponse> {
  */
 export async function sendBatchSms(
   recipients: string[],
-  message: string
+  message: string,
 ): Promise<SmsResponse[]> {
-  logger.info('Sending batch SMS messages via AWS SNS', {
+  logger.info("Sending batch SMS messages via AWS SNS", {
     recipientCount: recipients.length,
     messageLength: message.length,
   });
@@ -240,13 +248,13 @@ export async function sendBatchSms(
 
   for (let i = 0; i < recipients.length; i += batchSize) {
     const batch = recipients.slice(i, i + batchSize);
-    const batchPromises = batch.map(to => sendSms({ to, message }));
+    const batchPromises = batch.map((to) => sendSms({ to, message }));
     const batchResults = await Promise.all(batchPromises);
     results.push(...batchResults);
 
     // Small delay between batches to avoid rate limiting
     if (i + batchSize < recipients.length) {
-      await new Promise(resolve => setTimeout(resolve, delayMs));
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
     }
   }
 
@@ -264,9 +272,9 @@ export async function sendBatchSms(
  */
 export async function sendSmsWithDelay(
   options: SmsOptions,
-  delayMs: number = 1000
+  delayMs: number = 1000,
 ): Promise<SmsResponse> {
-  await new Promise(resolve => setTimeout(resolve, delayMs));
+  await new Promise((resolve) => setTimeout(resolve, delayMs));
   return sendSms(options);
 }
 
@@ -277,106 +285,133 @@ export const healthcareSms = {
   /**
    * Send appointment reminder SMS
    */
-  async sendAppointmentReminder(to: string, data: {
-    patientName: string;
-    providerName: string;
-    appointmentDate: string;
-    appointmentTime: string;
-  }): Promise<SmsResponse> {
+  async sendAppointmentReminder(
+    to: string,
+    data: {
+      patientName: string;
+      providerName: string;
+      appointmentDate: string;
+      appointmentTime: string;
+    },
+  ): Promise<SmsResponse> {
     const message = `Hi ${data.patientName}, reminder: You have an appointment with ${data.providerName} on ${data.appointmentDate} at ${data.appointmentTime}. Reply STOP to opt out.`;
-    return sendSms({ to, message, messageType: 'Transactional' });
+    return sendSms({ to, message, messageType: "Transactional" });
   },
 
   /**
    * Send appointment confirmation SMS
    */
-  async sendAppointmentConfirmation(to: string, data: {
-    patientName: string;
-    providerName: string;
-    appointmentDate: string;
-    appointmentTime: string;
-  }): Promise<SmsResponse> {
+  async sendAppointmentConfirmation(
+    to: string,
+    data: {
+      patientName: string;
+      providerName: string;
+      appointmentDate: string;
+      appointmentTime: string;
+    },
+  ): Promise<SmsResponse> {
     const message = `Hi ${data.patientName}, your appointment with ${data.providerName} is confirmed for ${data.appointmentDate} at ${data.appointmentTime}. Reply STOP to opt out.`;
-    return sendSms({ to, message, messageType: 'Transactional' });
+    return sendSms({ to, message, messageType: "Transactional" });
   },
 
   /**
    * Send appointment cancellation SMS
    */
-  async sendAppointmentCancellation(to: string, data: {
-    patientName: string;
-    appointmentDate: string;
-  }): Promise<SmsResponse> {
+  async sendAppointmentCancellation(
+    to: string,
+    data: {
+      patientName: string;
+      appointmentDate: string;
+    },
+  ): Promise<SmsResponse> {
     const message = `Hi ${data.patientName}, your appointment on ${data.appointmentDate} has been cancelled. Please contact us to reschedule. Reply STOP to opt out.`;
-    return sendSms({ to, message, messageType: 'Transactional' });
+    return sendSms({ to, message, messageType: "Transactional" });
   },
 
   /**
    * Send prescription ready SMS
    */
-  async sendPrescriptionReady(to: string, data: {
-    patientName: string;
-    pharmacyName: string;
-  }): Promise<SmsResponse> {
+  async sendPrescriptionReady(
+    to: string,
+    data: {
+      patientName: string;
+      pharmacyName: string;
+    },
+  ): Promise<SmsResponse> {
     const message = `Hi ${data.patientName}, your prescription is ready for pickup at ${data.pharmacyName}. Reply STOP to opt out.`;
-    return sendSms({ to, message, messageType: 'Transactional' });
+    return sendSms({ to, message, messageType: "Transactional" });
   },
 
   /**
    * Send lab results ready SMS
    */
-  async sendLabResultsReady(to: string, data: {
-    patientName: string;
-  }): Promise<SmsResponse> {
+  async sendLabResultsReady(
+    to: string,
+    data: {
+      patientName: string;
+    },
+  ): Promise<SmsResponse> {
     const message = `Hi ${data.patientName}, your lab results are ready. Log in to your patient portal to view them. Reply STOP to opt out.`;
-    return sendSms({ to, message, messageType: 'Transactional' });
+    return sendSms({ to, message, messageType: "Transactional" });
   },
 
   /**
    * Send two-factor authentication code
    */
-  async send2FACode(to: string, data: {
-    code: string;
-    expiresIn: string;
-  }): Promise<SmsResponse> {
+  async send2FACode(
+    to: string,
+    data: {
+      code: string;
+      expiresIn: string;
+    },
+  ): Promise<SmsResponse> {
     const message = `Your The Unified Health verification code is: ${data.code}. Expires in ${data.expiresIn}. Do not share this code.`;
-    return sendSms({ to, message, messageType: 'Transactional' });
+    return sendSms({ to, message, messageType: "Transactional" });
   },
 
   /**
    * Send password reset code
    */
-  async sendPasswordResetCode(to: string, data: {
-    code: string;
-    expiresIn: string;
-  }): Promise<SmsResponse> {
+  async sendPasswordResetCode(
+    to: string,
+    data: {
+      code: string;
+      expiresIn: string;
+    },
+  ): Promise<SmsResponse> {
     const message = `Your The Unified Health password reset code is: ${data.code}. Expires in ${data.expiresIn}. If you didn't request this, please ignore.`;
-    return sendSms({ to, message, messageType: 'Transactional' });
+    return sendSms({ to, message, messageType: "Transactional" });
   },
 
   /**
    * Send telehealth session reminder
    */
-  async sendTelehealthReminder(to: string, data: {
-    patientName: string;
-    providerName: string;
-    sessionTime: string;
-    sessionLink: string;
-  }): Promise<SmsResponse> {
+  async sendTelehealthReminder(
+    to: string,
+    data: {
+      patientName: string;
+      providerName: string;
+      sessionTime: string;
+      sessionLink: string;
+    },
+  ): Promise<SmsResponse> {
     const message = `Hi ${data.patientName}, your telehealth session with ${data.providerName} starts at ${data.sessionTime}. Join at: ${data.sessionLink}. Reply STOP to opt out.`;
-    return sendSms({ to, message, messageType: 'Transactional' });
+    return sendSms({ to, message, messageType: "Transactional" });
   },
 
   /**
    * Send payment reminder
    */
-  async sendPaymentReminder(to: string, data: {
-    patientName: string;
-    amount: string;
-    dueDate: string;
-  }): Promise<SmsResponse> {
+  async sendPaymentReminder(
+    to: string,
+    data: {
+      patientName: string;
+      amount: string;
+      dueDate: string;
+    },
+  ): Promise<SmsResponse> {
     const message = `Hi ${data.patientName}, reminder: Payment of ${data.amount} is due on ${data.dueDate}. Log in to your portal to pay. Reply STOP to opt out.`;
-    return sendSms({ to, message, messageType: 'Transactional' });
+    return sendSms({ to, message, messageType: "Transactional" });
   },
 };
 
