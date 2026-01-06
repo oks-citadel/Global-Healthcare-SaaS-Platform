@@ -50,7 +50,7 @@ export function useOfflineSync(options: UseOfflineSyncOptions = {}): UseOfflineS
   const [error, setError] = useState<Error | null>(null);
 
   const { isAuthenticated } = useAuthStore();
-  const syncIntervalRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const syncIntervalRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const isMounted = useRef(true);
 
   /**

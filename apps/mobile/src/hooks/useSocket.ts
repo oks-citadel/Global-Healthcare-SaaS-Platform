@@ -47,7 +47,7 @@ export function useSocket(options: UseSocketOptions = {}): UseSocketReturn {
 
   const { isAuthenticated } = useAuthStore();
   const isInitialized = useRef(false);
-  const reconnectTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
+  const reconnectTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   /**
    * Initialize socket connection
@@ -275,7 +275,7 @@ export function useChatMessages(roomId: string) {
   const [messages, setMessages] = useState<ChatMessagePayload[]>([]);
   const [typingUsers, setTypingUsers] = useState<TypingPayload[]>([]);
   const { sendMessage, sendTyping, joinRoom, leaveRoom, on } = useSocket();
-  const typingTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   /**
    * Send a message

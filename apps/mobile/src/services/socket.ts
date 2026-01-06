@@ -93,7 +93,7 @@ class SocketService {
   private connectionState: ConnectionState = 'disconnected';
   private listeners: Map<string, Set<Function>> = new Map();
   private appState: AppStateStatus = 'active';
-  private keepAliveInterval: NodeJS.Timeout | null = null;
+  private keepAliveInterval: ReturnType<typeof setTimeout> | null = null;
   private isInitialized: boolean = false;
 
   constructor() {

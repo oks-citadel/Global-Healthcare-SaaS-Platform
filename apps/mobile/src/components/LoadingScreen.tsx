@@ -4,7 +4,6 @@ import {
   ActivityIndicator,
   Text,
   StyleSheet,
-  Image,
   ViewStyle,
 } from "react-native";
 import { colors, spacing, typography } from "../theme";
@@ -44,7 +43,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xl,
   },
   logoText: {
-    fontSize: typography.sizes["2xl"],
+    fontSize: typography.sizes.xxl,
     fontWeight: "700",
     color: colors.primary[600],
   },
