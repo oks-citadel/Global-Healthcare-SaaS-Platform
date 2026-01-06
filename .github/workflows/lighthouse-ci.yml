@@ -1,0 +1,316 @@
+# ============================================
+# The Unified Health Platform - Lighthouse CI Pipeline
+# Runs Lighthouse performance audits on pull requests
+# ============================================
+
+name: Lighthouse CI
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'apps/web/**'
+      - 'packages/**'
+      - 'lighthouserc.js'
+      - '.github/workflows/lighthouse-ci.yml'
+
+  # Allow manual triggering
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '8'
+
+concurrency:
+  group: lighthouse-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ==========================================
+  # Build Web Application
+  # ==========================================
+  build:
+    name: Build Web App
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build web application
+        run: pnpm --filter @unified-health/web build
+        env:
+          NODE_ENV: production
+          # Provide mock environment variables for build
+          NEXT_PUBLIC_API_URL: http://localhost:4000
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: pk_test_mock
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-build
+          path: |
+            apps/web/.next
+            apps/web/public
+          retention-days: 1
+
+  # ==========================================
+  # Run Lighthouse CI
+  # ==========================================
+  lighthouse:
+    name: Lighthouse Audit
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+      - name: Restore pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: web-build
+          path: apps/web
+
+      - name: Install Chrome
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+
+      - name: Run Lighthouse CI
+        id: lighthouse
+        run: |
+          # Install Lighthouse CI globally
+          npm install -g @lhci/cli@0.13.x
+
+          # Run Lighthouse CI
+          lhci autorun --config=lighthouserc.js 2>&1 | tee lighthouse-output.txt
+
+          # Capture exit code
+          LHCI_EXIT_CODE=${PIPESTATUS[0]}
+
+          # Extract scores for PR comment
+          echo "LHCI_EXIT_CODE=$LHCI_EXIT_CODE" >> $GITHUB_OUTPUT
+
+          exit $LHCI_EXIT_CODE
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+          LHCI_TOKEN: ${{ secrets.LHCI_TOKEN }}
+
+      - name: Upload Lighthouse reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-reports
+          path: .lighthouseci
+          retention-days: 30
+
+      - name: Format Lighthouse results for PR comment
+        id: format-results
+        if: always() && github.event_name == 'pull_request'
+        run: |
+          # Create results summary from JSON reports
+          node << 'EOF'
+          const fs = require('fs');
+          const path = require('path');
+
+          const lhciDir = '.lighthouseci';
+          const manifestPath = path.join(lhciDir, 'manifest.json');
+
+          if (!fs.existsSync(manifestPath)) {
+            console.log('No Lighthouse manifest found');
+            fs.writeFileSync('lighthouse-summary.md', '## Lighthouse Results\n\nNo results available.');
+            process.exit(0);
+          }
+
+          const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+
+          let summary = '## Lighthouse Performance Results\n\n';
+          summary += '| URL | Performance | Accessibility | Best Practices | SEO |\n';
+          summary += '|-----|-------------|---------------|----------------|-----|\n';
+
+          const urlScores = {};
+
+          for (const entry of manifest) {
+            const report = JSON.parse(fs.readFileSync(entry.jsonPath, 'utf8'));
+            const url = new URL(entry.url).pathname || '/';
+
+            if (!urlScores[url]) {
+              urlScores[url] = { perf: [], a11y: [], bp: [], seo: [] };
+            }
+
+            urlScores[url].perf.push(report.categories.performance?.score * 100 || 0);
+            urlScores[url].a11y.push(report.categories.accessibility?.score * 100 || 0);
+            urlScores[url].bp.push(report.categories['best-practices']?.score * 100 || 0);
+            urlScores[url].seo.push(report.categories.seo?.score * 100 || 0);
+          }
+
+          function getEmoji(score, threshold) {
+            if (score >= threshold) return ':white_check_mark:';
+            if (score >= threshold - 10) return ':warning:';
+            return ':x:';
+          }
+
+          function median(arr) {
+            const sorted = arr.slice().sort((a, b) => a - b);
+            const mid = Math.floor(sorted.length / 2);
+            return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+          }
+
+          const thresholds = { perf: 80, a11y: 90, bp: 85, seo: 80 };
+
+          for (const [url, scores] of Object.entries(urlScores)) {
+            const perfMedian = Math.round(median(scores.perf));
+            const a11yMedian = Math.round(median(scores.a11y));
+            const bpMedian = Math.round(median(scores.bp));
+            const seoMedian = Math.round(median(scores.seo));
+
+            summary += `| \`${url}\` `;
+            summary += `| ${getEmoji(perfMedian, thresholds.perf)} ${perfMedian} `;
+            summary += `| ${getEmoji(a11yMedian, thresholds.a11y)} ${a11yMedian} `;
+            summary += `| ${getEmoji(bpMedian, thresholds.bp)} ${bpMedian} `;
+            summary += `| ${getEmoji(seoMedian, thresholds.seo)} ${seoMedian} |\n`;
+          }
+
+          summary += '\n### Thresholds\n';
+          summary += '- **Performance**: 80\n';
+          summary += '- **Accessibility**: 90\n';
+          summary += '- **Best Practices**: 85\n';
+          summary += '- **SEO**: 80\n';
+          summary += '\n_Scores are median values from 3 Lighthouse runs._';
+
+          fs.writeFileSync('lighthouse-summary.md', summary);
+          console.log(summary);
+          EOF
+
+      - name: Comment PR with Lighthouse results
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+
+            let body = '## Lighthouse CI Results\n\n';
+
+            // Read the formatted summary
+            if (fs.existsSync('lighthouse-summary.md')) {
+              body = fs.readFileSync('lighthouse-summary.md', 'utf8');
+            } else {
+              body += 'Lighthouse audit completed. Check the workflow artifacts for detailed reports.';
+            }
+
+            // Add workflow status
+            const exitCode = '${{ steps.lighthouse.outputs.LHCI_EXIT_CODE }}';
+            if (exitCode === '0') {
+              body += '\n\n:white_check_mark: **All Lighthouse thresholds passed!**';
+            } else {
+              body += '\n\n:x: **Some Lighthouse thresholds were not met.** Please review the results above.';
+            }
+
+            body += '\n\n---\n_Generated by Lighthouse CI workflow_';
+
+            // Find existing comment or create new one
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.find(comment =>
+              comment.user.type === 'Bot' &&
+              comment.body.includes('Lighthouse CI Results')
+            );
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body
+              });
+            }
+
+  # ==========================================
+  # Lighthouse Status Check
+  # ==========================================
+  lighthouse-status:
+    name: Lighthouse Status
+    runs-on: ubuntu-latest
+    needs: lighthouse
+    if: always()
+
+    steps:
+      - name: Check Lighthouse results
+        run: |
+          if [ "${{ needs.lighthouse.result }}" == "failure" ]; then
+            echo "::error::Lighthouse CI failed. Performance thresholds were not met."
+            echo ""
+            echo "Please review the Lighthouse report and improve:"
+            echo "- Performance: Target >= 80"
+            echo "- Accessibility: Target >= 90"
+            echo "- Best Practices: Target >= 85"
+            echo "- SEO: Target >= 80"
+            exit 1
+          fi
+
+          echo "Lighthouse CI passed successfully!"

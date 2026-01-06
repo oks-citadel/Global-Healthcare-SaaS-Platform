@@ -80,3 +80,4 @@ vars:
       apiVersion: v1
     fieldref:
       fieldpath: metadata.name
+  - pdb/

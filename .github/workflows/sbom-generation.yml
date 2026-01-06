@@ -1,0 +1,301 @@
+# SBOM (Software Bill of Materials) Generation Workflow
+# Generates CycloneDX SBOMs for all packages on release
+# Addresses M-04: SBOM generation for supply chain security
+
+name: SBOM Generation
+
+on:
+  push:
+    tags:
+      - 'v*'
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      upload_to_s3:
+        description: 'Upload SBOM to S3 for compliance storage'
+        required: false
+        default: 'true'
+        type: boolean
+
+permissions:
+  contents: write
+  id-token: write
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '9.0.0'
+  SBOM_OUTPUT_DIR: 'sbom-artifacts'
+  AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
+  SBOM_S3_BUCKET: ${{ vars.SBOM_S3_BUCKET || 'unified-health-sbom-compliance' }}
+
+jobs:
+  generate-sbom:
+    name: Generate SBOM
+    runs-on: ubuntu-latest
+    outputs:
+      sbom_version: ${{ steps.version.outputs.version }}
+      sbom_timestamp: ${{ steps.version.outputs.timestamp }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Determine version
+        id: version
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            VERSION="${{ github.ref_name }}"
+          else
+            VERSION="dev-$(git rev-parse --short HEAD)"
+          fi
+          TIMESTAMP=$(date -u +"%Y%m%d-%H%M%S")
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "timestamp=${TIMESTAMP}" >> $GITHUB_OUTPUT
+          echo "SBOM Version: ${VERSION}"
+          echo "Timestamp: ${TIMESTAMP}"
+
+      - name: Create SBOM output directory
+        run: mkdir -p ${{ env.SBOM_OUTPUT_DIR }}
+
+      - name: Generate root SBOM (JSON)
+        run: |
+          npx @cyclonedx/cyclonedx-npm \
+            --output-file ${{ env.SBOM_OUTPUT_DIR }}/sbom-root-${{ steps.version.outputs.version }}.json \
+            --output-format JSON \
+            --spec-version 1.5 \
+            --mc-type application \
+            --flatten-components
+
+      - name: Generate root SBOM (XML)
+        run: |
+          npx @cyclonedx/cyclonedx-npm \
+            --output-file ${{ env.SBOM_OUTPUT_DIR }}/sbom-root-${{ steps.version.outputs.version }}.xml \
+            --output-format XML \
+            --spec-version 1.5 \
+            --mc-type application \
+            --flatten-components
+
+      - name: Generate workspace SBOMs
+        run: |
+          chmod +x scripts/generate-sbom.sh
+          ./scripts/generate-sbom.sh ${{ steps.version.outputs.version }}
+        env:
+          SBOM_OUTPUT_DIR: ${{ env.SBOM_OUTPUT_DIR }}
+
+      - name: Create combined SBOM manifest
+        run: |
+          cat > ${{ env.SBOM_OUTPUT_DIR }}/sbom-manifest.json << EOF
+          {
+            "manifestVersion": "1.0",
+            "platform": "unified-health-platform",
+            "version": "${{ steps.version.outputs.version }}",
+            "generatedAt": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
+            "generator": "cyclonedx-npm",
+            "specVersion": "1.5",
+            "components": [
+              {
+                "name": "root",
+                "file": "sbom-root-${{ steps.version.outputs.version }}.json"
+              }
+            ],
+            "compliance": {
+              "frameworks": ["HIPAA", "SOC2", "GDPR"],
+              "retentionPeriod": "7 years",
+              "nextReview": "$(date -u -d '+90 days' +"%Y-%m-%d")"
+            },
+            "metadata": {
+              "repository": "${{ github.repository }}",
+              "commit": "${{ github.sha }}",
+              "ref": "${{ github.ref }}",
+              "workflow": "${{ github.workflow }}",
+              "runId": "${{ github.run_id }}"
+            }
+          }
+          EOF
+
+      - name: Generate SBOM checksums
+        run: |
+          cd ${{ env.SBOM_OUTPUT_DIR }}
+          sha256sum *.json *.xml > checksums.sha256
+          cat checksums.sha256
+
+      - name: Upload SBOM artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-${{ steps.version.outputs.version }}-${{ steps.version.outputs.timestamp }}
+          path: ${{ env.SBOM_OUTPUT_DIR }}/
+          retention-days: 90
+
+      - name: Validate SBOM format
+        run: |
+          # Validate JSON structure
+          for file in ${{ env.SBOM_OUTPUT_DIR }}/*.json; do
+            if [[ $(basename "$file") != "checksums.sha256" ]]; then
+              echo "Validating $file..."
+              jq empty "$file" && echo "Valid JSON: $file" || { echo "Invalid JSON: $file"; exit 1; }
+            fi
+          done
+
+  upload-to-s3:
+    name: Upload SBOM to S3
+    runs-on: ubuntu-latest
+    needs: generate-sbom
+    if: |
+      (github.event_name == 'release' ||
+       github.event_name == 'push' ||
+       (github.event_name == 'workflow_dispatch' && inputs.upload_to_s3 == 'true'))
+
+    steps:
+      - name: Download SBOM artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: sbom-${{ needs.generate-sbom.outputs.sbom_version }}-${{ needs.generate-sbom.outputs.sbom_timestamp }}
+          path: sbom-artifacts/
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_SBOM_ROLE_ARN }}
+          role-session-name: sbom-upload-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Upload to S3 compliance bucket
+        run: |
+          VERSION="${{ needs.generate-sbom.outputs.sbom_version }}"
+          TIMESTAMP="${{ needs.generate-sbom.outputs.sbom_timestamp }}"
+          S3_PATH="s3://${{ env.SBOM_S3_BUCKET }}/sbom/${VERSION}/${TIMESTAMP}/"
+
+          echo "Uploading SBOM to: ${S3_PATH}"
+
+          aws s3 cp sbom-artifacts/ "${S3_PATH}" \
+            --recursive \
+            --storage-class STANDARD_IA \
+            --metadata "version=${VERSION},timestamp=${TIMESTAMP},repository=${{ github.repository }}"
+
+          # Create latest pointer
+          aws s3 cp sbom-artifacts/ "s3://${{ env.SBOM_S3_BUCKET }}/sbom/latest/" \
+            --recursive \
+            --storage-class STANDARD_IA
+
+      - name: Update S3 compliance index
+        run: |
+          VERSION="${{ needs.generate-sbom.outputs.sbom_version }}"
+          TIMESTAMP="${{ needs.generate-sbom.outputs.sbom_timestamp }}"
+
+          # Create/update index file
+          cat > /tmp/index-entry.json << EOF
+          {
+            "version": "${VERSION}",
+            "timestamp": "${TIMESTAMP}",
+            "uploadedAt": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
+            "s3Path": "sbom/${VERSION}/${TIMESTAMP}/",
+            "artifacts": $(ls -1 sbom-artifacts/ | jq -R -s -c 'split("\n")[:-1]')
+          }
+          EOF
+
+          # Download existing index or create new
+          aws s3 cp "s3://${{ env.SBOM_S3_BUCKET }}/sbom/index.json" /tmp/index.json 2>/dev/null || echo '{"entries":[]}' > /tmp/index.json
+
+          # Append new entry
+          jq --argjson entry "$(cat /tmp/index-entry.json)" '.entries += [$entry]' /tmp/index.json > /tmp/index-updated.json
+
+          # Upload updated index
+          aws s3 cp /tmp/index-updated.json "s3://${{ env.SBOM_S3_BUCKET }}/sbom/index.json"
+
+  attach-to-release:
+    name: Attach SBOM to Release
+    runs-on: ubuntu-latest
+    needs: generate-sbom
+    if: github.event_name == 'release'
+
+    steps:
+      - name: Download SBOM artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: sbom-${{ needs.generate-sbom.outputs.sbom_version }}-${{ needs.generate-sbom.outputs.sbom_timestamp }}
+          path: sbom-artifacts/
+
+      - name: Create SBOM archive
+        run: |
+          VERSION="${{ needs.generate-sbom.outputs.sbom_version }}"
+          cd sbom-artifacts
+          zip -r "../sbom-${VERSION}.zip" .
+          tar -czvf "../sbom-${VERSION}.tar.gz" .
+
+      - name: Upload to release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            sbom-${{ needs.generate-sbom.outputs.sbom_version }}.zip
+            sbom-${{ needs.generate-sbom.outputs.sbom_version }}.tar.gz
+            sbom-artifacts/sbom-manifest.json
+            sbom-artifacts/checksums.sha256
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  notify-compliance:
+    name: Notify Compliance Team
+    runs-on: ubuntu-latest
+    needs: [generate-sbom, upload-to-s3]
+    if: |
+      always() &&
+      (github.event_name == 'release' || github.ref_type == 'tag')
+
+    steps:
+      - name: Send Slack notification
+        if: vars.SLACK_WEBHOOK_URL != ''
+        run: |
+          VERSION="${{ needs.generate-sbom.outputs.sbom_version }}"
+          STATUS="${{ needs.upload-to-s3.result }}"
+
+          if [ "$STATUS" == "success" ]; then
+            COLOR="good"
+            TITLE="SBOM Generated Successfully"
+          else
+            COLOR="danger"
+            TITLE="SBOM Generation Issue"
+          fi
+
+          curl -X POST ${{ vars.SLACK_WEBHOOK_URL }} \
+            -H 'Content-type: application/json' \
+            -d '{
+              "attachments": [{
+                "color": "'"${COLOR}"'",
+                "title": "'"${TITLE}"'",
+                "fields": [
+                  {"title": "Version", "value": "'"${VERSION}"'", "short": true},
+                  {"title": "Status", "value": "'"${STATUS}"'", "short": true},
+                  {"title": "Repository", "value": "${{ github.repository }}", "short": true},
+                  {"title": "Run", "value": "<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Workflow>", "short": true}
+                ]
+              }]
+            }'
+
+      - name: Create compliance audit log entry
+        run: |
+          echo "SBOM Compliance Audit Entry"
+          echo "=========================="
+          echo "Version: ${{ needs.generate-sbom.outputs.sbom_version }}"
+          echo "Timestamp: ${{ needs.generate-sbom.outputs.sbom_timestamp }}"
+          echo "Repository: ${{ github.repository }}"
+          echo "Commit: ${{ github.sha }}"
+          echo "Actor: ${{ github.actor }}"
+          echo "Event: ${{ github.event_name }}"
+          echo "Upload Status: ${{ needs.upload-to-s3.result }}"

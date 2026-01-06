@@ -1,0 +1,24 @@
+---
+# ============================================
+# Pod Disruption Budgets - Kustomization
+# High availability configurations for all services
+# ============================================
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Common labels for all PDB resources
+commonLabels:
+  app.kubernetes.io/part-of: unified-health-platform
+  app.kubernetes.io/managed-by: kustomize
+  tier: availability
+
+# Common annotations
+commonAnnotations:
+  documentation: "https://docs.unifiedhealth.com/infrastructure/pdb"
+  contact: "devops@unifiedhealth.com"
+
+# PDB resources to include
+resources:
+  - api-pdb.yaml
+  - web-pdb.yaml
+  - auth-pdb.yaml
