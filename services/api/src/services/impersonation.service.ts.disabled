@@ -13,7 +13,7 @@
  * - IP and device fingerprint logging
  */
 
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "../generated/client";
 import { Redis } from "ioredis";
 import { randomUUID } from "crypto";
 
