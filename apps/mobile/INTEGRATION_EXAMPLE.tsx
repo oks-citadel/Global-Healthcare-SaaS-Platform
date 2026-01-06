@@ -5,12 +5,80 @@
  * Copy the relevant parts into your actual app files.
  */
 
-import React from 'react';
-import { View, Text } from 'react-native';
-import { Stack } from 'expo-router';
-import { SocketProvider } from './src/providers/SocketProvider';
-import { I18nProvider } from './src/providers/I18nProvider';
-import { useAuthStore } from './src/store/authStore';
+import React from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  TextInput,
+  Alert,
+  Button,
+} from "react-native";
+import { Stack, Tabs } from "expo-router";
+import { SocketProvider } from "./src/providers/SocketProvider";
+import { I18nProvider } from "./src/providers/I18nProvider";
+import { useAuthStore } from "./src/store/authStore";
+import { LoadingScreen, LoadingSpinner } from "./src/components";
+
+/**
+ * STEP 2: Use Socket.io hooks in your screens
+ *
+ * Example: Chat Screen with real-time messaging
+ */
+import { useChatMessages } from "./src/hooks/useSocket";
+import { useOfflineSync } from "./src/hooks/useOfflineSync";
+import { OfflineIndicator } from "./src/components/OfflineIndicator";
+
+/**
+ * STEP 3: Use Notifications
+ *
+ * Example: Notification Bell component
+ */
+import { useNotifications } from "./src/hooks/useSocket";
+
+/**
+ * STEP 4: Use Presence Tracking
+ *
+ * Example: Show user online status
+ */
+import { usePresence } from "./src/hooks/useSocket";
+
+/**
+ * STEP 5: Offline Data Caching
+ *
+ * Example: Appointments list with offline support
+ */
+import { useCachedData } from "./src/hooks/useOfflineSync";
+import apiClient from "./src/api/client";
+
+/**
+ * STEP 6: Optimistic Updates
+ *
+ * Example: Profile editing with optimistic UI
+ */
+import { useOptimisticUpdate } from "./src/hooks/useOfflineSync";
+
+/**
+ * STEP 7: Video Call Integration
+ *
+ * Example: Start video call with existing VideoCallScreen
+ */
+import VideoCallScreen from "./src/components/telemedicine/VideoCallScreen";
+import { useSocket } from "./src/hooks/useSocket";
+
+/**
+ * STEP 8: Monitor Sync Status
+ *
+ * Example: Settings screen with sync information
+ */
+import { useOfflineSync } from "./src/hooks/useOfflineSync";
+
+/**
+ * STEP 10: Connection State Monitoring
+ *
+ * Example: Show connection state in UI
+ */
+import { useSocket } from "./src/hooks/useSocket";
 
 /**
  * STEP 1: Wrap your app with SocketProvider
@@ -41,25 +109,17 @@ export function AppLayoutExample() {
   );
 }
 
-/**
- * STEP 2: Use Socket.io hooks in your screens
- *
- * Example: Chat Screen with real-time messaging
- */
-import { useChatMessages } from './src/hooks/useSocket';
-import { useOfflineSync } from './src/hooks/useOfflineSync';
-import { OfflineIndicator } from './src/components/OfflineIndicator';
-
 export function ChatScreenExample({ route }) {
   const { roomId } = route.params;
-  const { messages, sendMessage, startTyping, stopTyping } = useChatMessages(roomId);
+  const { messages, sendMessage, startTyping, stopTyping } =
+    useChatMessages(roomId);
   const { isOnline } = useOfflineSync({ autoSync: true });
 
   const handleSend = async (text: string) => {
     try {
       await sendMessage(text);
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error("Error sending message:", error);
       // Error is automatically handled - message is queued if offline
     }
   };
@@ -68,22 +128,18 @@ export function ChatScreenExample({ route }) {
     <View style={{ flex: 1 }}>
       <OfflineIndicator position="top" showSyncButton={true} />
       {/* Your chat UI here */}
-      <Text>{isOnline ? 'Online' : 'Offline - messages will sync when online'}</Text>
+      <Text>
+        {isOnline ? "Online" : "Offline - messages will sync when online"}
+      </Text>
       {/* Message list */}
       {/* Input field */}
     </View>
   );
 }
 
-/**
- * STEP 3: Use Notifications
- *
- * Example: Notification Bell component
- */
-import { useNotifications } from './src/hooks/useSocket';
-
 export function NotificationBellExample() {
-  const { notifications, unreadCount, markAsRead, clearAll } = useNotifications();
+  const { notifications, unreadCount, markAsRead, clearAll } =
+    useNotifications();
 
   return (
     <View>
@@ -101,45 +157,32 @@ export function NotificationBellExample() {
   );
 }
 
-/**
- * STEP 4: Use Presence Tracking
- *
- * Example: Show user online status
- */
-import { usePresence } from './src/hooks/useSocket';
-
 export function UserStatusExample({ userId }) {
   const { isOnline, lastSeen, updatePresence } = usePresence(userId);
 
   React.useEffect(() => {
     // Update own presence
-    updatePresence('online');
+    updatePresence("online");
 
     return () => {
-      updatePresence('offline');
+      updatePresence("offline");
     };
   }, []);
 
   return (
     <View>
-      <View style={{
-        width: 10,
-        height: 10,
-        borderRadius: 5,
-        backgroundColor: isOnline ? '#10b981' : '#ef4444'
-      }} />
-      <Text>{isOnline ? 'Online' : `Last seen: ${lastSeen}`}</Text>
+      <View
+        style={{
+          width: 10,
+          height: 10,
+          borderRadius: 5,
+          backgroundColor: isOnline ? "#10b981" : "#ef4444",
+        }}
+      />
+      <Text>{isOnline ? "Online" : `Last seen: ${lastSeen}`}</Text>
     </View>
   );
 }
-
-/**
- * STEP 5: Offline Data Caching
- *
- * Example: Appointments list with offline support
- */
-import { useCachedData } from './src/hooks/useOfflineSync';
-import apiClient from './src/api/client';
 
 export function AppointmentsListExample() {
   const {
@@ -148,15 +191,11 @@ export function AppointmentsListExample() {
     error,
     refetch,
     isStale,
-  } = useCachedData(
-    'appointments',
-    () => apiClient.get('/appointments'),
-    {
-      staleTime: 300000, // 5 minutes
-      refetchOnMount: true,
-      refetchOnReconnect: true,
-    }
-  );
+  } = useCachedData("appointments", () => apiClient.get("/appointments"), {
+    staleTime: 300000, // 5 minutes
+    refetchOnMount: true,
+    refetchOnReconnect: true,
+  });
 
   if (isLoading) {
     return <LoadingSpinner />;
@@ -183,32 +222,25 @@ export function AppointmentsListExample() {
   );
 }
 
-/**
- * STEP 6: Optimistic Updates
- *
- * Example: Profile editing with optimistic UI
- */
-import { useOptimisticUpdate } from './src/hooks/useOfflineSync';
-
 export function ProfileEditorExample() {
   const { data: profile, update, hasPendingUpdates } = useOptimisticUpdate();
-  const [name, setName] = React.useState('');
+  const [name, setName] = React.useState("");
 
   const handleSave = async () => {
     await update(
-      'profile',
+      "profile",
       (current) => ({ ...current, name }),
-      (data) => apiClient.put('/users/profile', data),
+      (data) => apiClient.put("/users/profile", data),
       {
         onSuccess: () => {
-          Alert.alert('Success', 'Profile updated!');
+          Alert.alert("Success", "Profile updated!");
         },
         onError: (error, rollback) => {
-          Alert.alert('Error', 'Failed to update profile');
+          Alert.alert("Error", "Failed to update profile");
           rollback();
         },
-        conflictResolution: 'server-wins',
-      }
+        conflictResolution: "server-wins",
+      },
     );
   };
 
@@ -216,21 +248,13 @@ export function ProfileEditorExample() {
     <View>
       <TextInput value={name} onChangeText={setName} />
       <Button
-        title={hasPendingUpdates ? 'Saving...' : 'Save'}
+        title={hasPendingUpdates ? "Saving..." : "Save"}
         onPress={handleSave}
         disabled={hasPendingUpdates}
       />
     </View>
   );
 }
-
-/**
- * STEP 7: Video Call Integration
- *
- * Example: Start video call with existing VideoCallScreen
- */
-import VideoCallScreen from './src/components/telemedicine/VideoCallScreen';
-import { useSocket } from './src/hooks/useSocket';
 
 export function TelemedicineAppointmentExample({ appointment }) {
   const [inCall, setInCall] = React.useState(false);
@@ -239,7 +263,7 @@ export function TelemedicineAppointmentExample({ appointment }) {
 
   const startVideoCall = () => {
     if (!isConnected) {
-      Alert.alert('Error', 'Not connected to server');
+      Alert.alert("Error", "Not connected to server");
       return;
     }
     setInCall(true);
@@ -250,7 +274,7 @@ export function TelemedicineAppointmentExample({ appointment }) {
       <VideoCallScreen
         visitId={appointment.id}
         userRole="patient"
-        token={tokens?.accessToken || ''}
+        token={tokens?.accessToken || ""}
         apiUrl="http://localhost:3000"
         onEndCall={() => setInCall(false)}
       />
@@ -269,13 +293,6 @@ export function TelemedicineAppointmentExample({ appointment }) {
     </View>
   );
 }
-
-/**
- * STEP 8: Monitor Sync Status
- *
- * Example: Settings screen with sync information
- */
-import { useOfflineSync } from './src/hooks/useOfflineSync';
 
 export function SyncSettingsExample() {
   const {
@@ -301,10 +318,10 @@ export function SyncSettingsExample() {
 
   return (
     <View>
-      <Text>Network Status: {isOnline ? 'Online' : 'Offline'}</Text>
-      <Text>Sync Status: {isSyncing ? 'Syncing...' : 'Idle'}</Text>
+      <Text>Network Status: {isOnline ? "Online" : "Offline"}</Text>
+      <Text>Sync Status: {isSyncing ? "Syncing..." : "Idle"}</Text>
       <Text>Pending Actions: {pendingActions.length}</Text>
-      <Text>Last Sync: {lastSync || 'Never'}</Text>
+      <Text>Last Sync: {lastSync || "Never"}</Text>
 
       {stats && (
         <View>
@@ -347,28 +364,26 @@ export function MainTabsWithIndicatorExample() {
   );
 }
 
-/**
- * STEP 10: Connection State Monitoring
- *
- * Example: Show connection state in UI
- */
-import { useSocket } from './src/hooks/useSocket';
-
 export function ConnectionStatusExample() {
   const { isConnected, connectionState, socketId, error } = useSocket();
 
   const getStatusColor = () => {
     switch (connectionState) {
-      case 'connected': return '#10b981';
-      case 'connecting': return '#f59e0b';
-      case 'disconnected': return '#6b7280';
-      case 'error': return '#ef4444';
-      default: return '#6b7280';
+      case "connected":
+        return "#10b981";
+      case "connecting":
+        return "#f59e0b";
+      case "disconnected":
+        return "#6b7280";
+      case "error":
+        return "#ef4444";
+      default:
+        return "#6b7280";
     }
   };
 
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+    <View style={{ flexDirection: "row", alignItems: "center" }}>
       <View
         style={{
           width: 8,
@@ -379,20 +394,30 @@ export function ConnectionStatusExample() {
         }}
       />
       <Text>{connectionState}</Text>
-      {socketId && <Text style={{ fontSize: 10 }}>ID: {socketId.slice(0, 8)}</Text>}
-      {error && <Text style={{ color: '#ef4444' }}>{error.message}</Text>}
+      {socketId && (
+        <Text style={{ fontSize: 10 }}>ID: {socketId.slice(0, 8)}</Text>
+      )}
+      {error && <Text style={{ color: "#ef4444" }}>{error.message}</Text>}
     </View>
   );
 }
 
-// Export example components for reference
-export {
-  LoadingScreen,
-  LoadingSpinner,
-  AppointmentCard,
-  Alert,
-  Button,
-  TextInput,
-  TouchableOpacity,
-  Tabs,
-};
+// Placeholder component used in examples
+const AppointmentCard: React.FC<{ appointment: any }> = ({ appointment }) => (
+  <View
+    style={{
+      padding: 16,
+      backgroundColor: "#fff",
+      marginBottom: 8,
+      borderRadius: 8,
+    }}
+  >
+    <Text style={{ fontWeight: "bold" }}>
+      {appointment.doctor?.name || "Doctor"}
+    </Text>
+    <Text>{appointment.date}</Text>
+  </View>
+);
+
+// Re-export placeholder component
+export { AppointmentCard };

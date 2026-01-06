@@ -11,7 +11,7 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
     "lint": "eslint . --ext .ts",
-    "test": "jest"
+    "test": "vitest run"
   },
   "keywords": [
     "imaging",
