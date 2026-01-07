@@ -1,4 +1,4 @@
-# Testing Guide - Unified Healthcare Platform
+# Testing Guide - Unified Health Platform
 
 Comprehensive guide for E2E, accessibility, performance, and visual regression testing.
 
@@ -50,17 +50,17 @@ pnpm test:e2e:debug
 
 ### Test Coverage
 
-| Test Category | File | Critical Flows | Test Count |
-|--------------|------|----------------|------------|
-| **Authentication** | `auth.spec.ts` | Login, Registration, Logout, Session Management | 25+ |
-| **Appointments** | `appointments.spec.ts` | Booking, Viewing, Rescheduling, Cancellation | 20+ |
-| **Prescriptions** | `prescriptions.spec.ts` | Viewing, Refills, Pharmacy Management | 18+ |
-| **Medical Records** | `medical-records.spec.ts` | Viewing, Uploading, Filtering, Downloading | 22+ |
-| **Settings** | `settings.spec.ts` | Account, Privacy, Notifications, Security | 24+ |
-| **Accessibility** | `accessibility.spec.ts` | Keyboard Nav, ARIA, Screen Readers | 30+ |
-| **Performance** | `performance.spec.ts` | Core Web Vitals, Resource Loading | 15+ |
-| **Visual Regression** | `visual-regression.spec.ts` | Screenshots, Component Snapshots | 25+ |
-| **Patient Profile** | `patient-profile.spec.ts` | Profile Management, Documents | 15+ |
+| Test Category         | File                        | Critical Flows                                  | Test Count |
+| --------------------- | --------------------------- | ----------------------------------------------- | ---------- |
+| **Authentication**    | `auth.spec.ts`              | Login, Registration, Logout, Session Management | 25+        |
+| **Appointments**      | `appointments.spec.ts`      | Booking, Viewing, Rescheduling, Cancellation    | 20+        |
+| **Prescriptions**     | `prescriptions.spec.ts`     | Viewing, Refills, Pharmacy Management           | 18+        |
+| **Medical Records**   | `medical-records.spec.ts`   | Viewing, Uploading, Filtering, Downloading      | 22+        |
+| **Settings**          | `settings.spec.ts`          | Account, Privacy, Notifications, Security       | 24+        |
+| **Accessibility**     | `accessibility.spec.ts`     | Keyboard Nav, ARIA, Screen Readers              | 30+        |
+| **Performance**       | `performance.spec.ts`       | Core Web Vitals, Resource Loading               | 15+        |
+| **Visual Regression** | `visual-regression.spec.ts` | Screenshots, Component Snapshots                | 25+        |
+| **Patient Profile**   | `patient-profile.spec.ts`   | Profile Management, Documents                   | 15+        |
 
 ### Quality Gates
 
@@ -148,6 +148,7 @@ pnpm test:e2e && pnpm test:e2e:report
 Tests complete user workflows across the application.
 
 **Critical Flows:**
+
 - Patient registration and login
 - Appointment booking and management
 - Prescription viewing and refill requests
@@ -155,20 +156,21 @@ Tests complete user workflows across the application.
 - Profile and settings updates
 
 **Example:**
+
 ```typescript
-test('should book new appointment', async ({ page }) => {
+test("should book new appointment", async ({ page }) => {
   await dashboardPage.goto();
   await dashboardPage.clickBookAppointment();
 
   // Fill appointment form
-  await page.selectOption('select[name="doctorId"]', 'doctor1');
+  await page.selectOption('select[name="doctorId"]', "doctor1");
   await page.fill('input[name="date"]', futureDate);
-  await page.fill('input[name="time"]', '10:00');
+  await page.fill('input[name="time"]', "10:00");
 
   await page.click('button[type="submit"]');
 
   // Verify success
-  await page.waitForSelector('.success-message');
+  await page.waitForSelector(".success-message");
 });
 ```
 
@@ -177,6 +179,7 @@ test('should book new appointment', async ({ page }) => {
 Tests WCAG 2.1 AA compliance.
 
 **Coverage:**
+
 - Keyboard navigation
 - Screen reader compatibility
 - ARIA attributes and landmarks
@@ -185,17 +188,18 @@ Tests WCAG 2.1 AA compliance.
 - Form accessibility
 
 **Example:**
+
 ```typescript
-test('should navigate with keyboard only', async ({ page }) => {
-  await page.goto('/login');
+test("should navigate with keyboard only", async ({ page }) => {
+  await page.goto("/login");
 
   // Tab through elements
-  await page.keyboard.press('Tab');
+  await page.keyboard.press("Tab");
   let focused = await page.evaluate(() =>
-    document.activeElement?.getAttribute('name')
+    document.activeElement?.getAttribute("name"),
   );
 
-  expect(['email', 'username']).toContain(focused);
+  expect(["email", "username"]).toContain(focused);
 });
 ```
 
@@ -204,6 +208,7 @@ test('should navigate with keyboard only', async ({ page }) => {
 Tests Core Web Vitals and performance metrics.
 
 **Metrics:**
+
 - Largest Contentful Paint (LCP) < 2.5s
 - First Input Delay (FID) < 100ms
 - Cumulative Layout Shift (CLS) < 0.1
@@ -211,9 +216,10 @@ Tests Core Web Vitals and performance metrics.
 - Total Blocking Time (TBT) < 300ms
 
 **Example:**
+
 ```typescript
-test('should load within performance thresholds', async ({ page }) => {
-  await page.goto('/dashboard');
+test("should load within performance thresholds", async ({ page }) => {
+  await page.goto("/dashboard");
 
   const lcp = await page.evaluate(() => {
     return new Promise<number>((resolve) => {
@@ -222,7 +228,7 @@ test('should load within performance thresholds', async ({ page }) => {
         const lastEntry = entries[entries.length - 1];
         resolve(lastEntry.startTime);
       });
-      observer.observe({ type: 'largest-contentful-paint', buffered: true });
+      observer.observe({ type: "largest-contentful-paint", buffered: true });
     });
   });
 
@@ -235,6 +241,7 @@ test('should load within performance thresholds', async ({ page }) => {
 Tests visual consistency across releases.
 
 **Coverage:**
+
 - Full page screenshots
 - Component snapshots
 - Responsive layouts
@@ -242,20 +249,22 @@ Tests visual consistency across releases.
 - Interaction states
 
 **Example:**
-```typescript
-test('should match dashboard screenshot', async ({ page }) => {
-  await page.goto('/dashboard');
-  await page.waitForLoadState('networkidle');
 
-  await expect(page).toHaveScreenshot('dashboard.png', {
+```typescript
+test("should match dashboard screenshot", async ({ page }) => {
+  await page.goto("/dashboard");
+  await page.waitForLoadState("networkidle");
+
+  await expect(page).toHaveScreenshot("dashboard.png", {
     fullPage: true,
-    animations: 'disabled',
+    animations: "disabled",
     maxDiffPixels: 100,
   });
 });
 ```
 
 **Updating Snapshots:**
+
 ```bash
 # Update all snapshots
 pnpm test:e2e:update-snapshots
@@ -297,10 +306,10 @@ Configured in `lighthouserc.json`:
 ### Test Structure
 
 ```typescript
-import { test, expect } from '@playwright/test';
-import { LoginPage } from '../pages/login.page';
+import { test, expect } from "@playwright/test";
+import { LoginPage } from "../pages/login.page";
 
-test.describe('Feature Name', () => {
+test.describe("Feature Name", () => {
   let loginPage: LoginPage;
 
   test.beforeEach(async ({ page }) => {
@@ -308,7 +317,7 @@ test.describe('Feature Name', () => {
     // Setup code
   });
 
-  test('should do something specific', async ({ page }) => {
+  test("should do something specific", async ({ page }) => {
     // Arrange
     await loginPage.goto();
 
@@ -331,7 +340,7 @@ export class DashboardPage {
   constructor(private page: Page) {}
 
   async goto() {
-    await this.page.goto('/dashboard');
+    await this.page.goto("/dashboard");
   }
 
   async clickBookAppointment() {
@@ -343,38 +352,43 @@ export class DashboardPage {
 ### Best Practices
 
 1. **Use Data Attributes for Selectors**
+
 ```typescript
 // Good
 await page.click('[data-testid="submit-button"]');
 
 // Avoid
-await page.click('.btn.btn-primary.submit-btn');
+await page.click(".btn.btn-primary.submit-btn");
 ```
 
 2. **Wait for Network Idle**
+
 ```typescript
-await page.goto('/dashboard');
-await page.waitForLoadState('networkidle');
+await page.goto("/dashboard");
+await page.waitForLoadState("networkidle");
 ```
 
 3. **Handle Dynamic Content**
+
 ```typescript
 // Wait for specific content
-await page.waitForSelector('.appointment-card');
+await page.waitForSelector(".appointment-card");
 
 // Or wait for API response
-await page.waitForResponse(response =>
-  response.url().includes('/api/appointments')
+await page.waitForResponse((response) =>
+  response.url().includes("/api/appointments"),
 );
 ```
 
 4. **Use Soft Assertions for Non-Critical Checks**
+
 ```typescript
 // Continues test even if assertion fails
-await expect.soft(page.locator('.optional-element')).toBeVisible();
+await expect.soft(page.locator(".optional-element")).toBeVisible();
 ```
 
 5. **Clean Up Test Data**
+
 ```typescript
 test.afterEach(async ({ page }) => {
   // Clean up created data
@@ -429,6 +443,7 @@ CI=true
 **Problem:** Tests pass in CI but fail locally.
 
 **Solution:**
+
 ```bash
 # Ensure browsers are up to date
 pnpm playwright install
@@ -445,6 +460,7 @@ pnpm test:e2e
 **Problem:** Tests fail intermittently.
 
 **Solution:**
+
 - Add explicit waits: `await page.waitForLoadState('networkidle')`
 - Increase timeout: `{ timeout: 10000 }`
 - Use `waitForSelector` instead of `waitForTimeout`
@@ -455,6 +471,7 @@ pnpm test:e2e
 **Problem:** Screenshots don't match.
 
 **Solution:**
+
 ```bash
 # Review differences in UI mode
 pnpm test:e2e:ui
@@ -471,6 +488,7 @@ pnpm test:e2e:visual
 **Problem:** Tests take too long to run.
 
 **Solution:**
+
 - Run tests in parallel (default in Playwright)
 - Use `fullyParallel: true` in config
 - Reduce `timeout` values where appropriate
@@ -489,17 +507,17 @@ pnpm playwright test e2e/tests/auth.spec.ts:10 --debug
 ### Verbose Logging
 
 ```typescript
-test('test with logging', async ({ page }) => {
+test("test with logging", async ({ page }) => {
   // Enable console logging
-  page.on('console', msg => console.log(msg.text()));
+  page.on("console", (msg) => console.log(msg.text()));
 
   // Enable request logging
-  page.on('request', request =>
-    console.log('>>', request.method(), request.url())
+  page.on("request", (request) =>
+    console.log(">>", request.method(), request.url()),
   );
 
-  page.on('response', response =>
-    console.log('<<', response.status(), response.url())
+  page.on("response", (response) =>
+    console.log("<<", response.status(), response.url()),
   );
 });
 ```
@@ -512,14 +530,14 @@ Each test should be independent and not rely on other tests:
 
 ```typescript
 // Good - test has its own setup
-test('should update profile', async ({ page }) => {
+test("should update profile", async ({ page }) => {
   await loginPage.login(testUser.email, testUser.password);
   await profilePage.goto();
   // ... test logic
 });
 
 // Bad - relies on previous test state
-test('should update profile', async ({ page }) => {
+test("should update profile", async ({ page }) => {
   // Assumes user is already logged in
   await profilePage.goto();
 });
@@ -554,18 +572,16 @@ Priority order for selectors:
 
 ```typescript
 // Wait for element
-await page.waitForSelector('.appointment-card');
+await page.waitForSelector(".appointment-card");
 
 // Wait for navigation
-await page.waitForURL('/dashboard');
+await page.waitForURL("/dashboard");
 
 // Wait for network idle
-await page.waitForLoadState('networkidle');
+await page.waitForLoadState("networkidle");
 
 // Wait for function
-await page.waitForFunction(() =>
-  document.querySelector('.data-loaded')
-);
+await page.waitForFunction(() => document.querySelector(".data-loaded"));
 ```
 
 ### 5. Error Messages
@@ -577,11 +593,11 @@ Provide descriptive error messages:
 await expect(page.locator('[data-testid="appointment"]'))
   .toBeVisible({ timeout: 5000 })
   .catch(() => {
-    throw new Error('Appointment card not visible after booking');
+    throw new Error("Appointment card not visible after booking");
   });
 
 // Basic
-await expect(page.locator('.appointment')).toBeVisible();
+await expect(page.locator(".appointment")).toBeVisible();
 ```
 
 ## Test Metrics and Reporting
@@ -599,6 +615,7 @@ open coverage/index.html
 ### Test Results
 
 Test results are saved to:
+
 - **HTML Report:** `test-results/html/index.html`
 - **JSON Report:** `test-results/results.json`
 - **JUnit XML:** `test-results/junit.xml`
@@ -606,6 +623,7 @@ Test results are saved to:
 ### Performance Reports
 
 Lighthouse reports are saved to:
+
 - `.lighthouseci/` directory
 - Uploaded to Lighthouse CI server (if configured)
 

@@ -51,6 +51,7 @@ The UnifiedHealth notification system provides comprehensive email and SMS notif
 All email templates are located in `src/templates/emails/` and use the responsive base template.
 
 ### Base Template (`base.html`)
+
 - Responsive design
 - Gradient header with logo
 - Professional footer with contact info
@@ -91,6 +92,7 @@ All email templates are located in `src/templates/emails/` and use the responsiv
 ## Environment Variables
 
 ### Email (SendGrid)
+
 ```bash
 SENDGRID_API_KEY=your_sendgrid_api_key
 FROM_EMAIL=noreply@unifiedhealth.com
@@ -98,6 +100,7 @@ FROM_NAME=UnifiedHealth
 ```
 
 ### SMS (Twilio)
+
 ```bash
 TWILIO_ACCOUNT_SID=your_twilio_account_sid
 TWILIO_AUTH_TOKEN=your_twilio_auth_token
@@ -105,6 +108,7 @@ TWILIO_PHONE_NUMBER=+1234567890
 ```
 
 ### Queue (Redis)
+
 ```bash
 REDIS_HOST=localhost
 REDIS_PORT=6379
@@ -113,6 +117,7 @@ REDIS_DB=0
 ```
 
 ### Application
+
 ```bash
 APP_URL=https://unifiedhealth.com
 APP_NAME=UnifiedHealth
@@ -131,6 +136,7 @@ npm install -D @types/bull @types/node-cron
 ```
 
 ### Package Versions
+
 - `@sendgrid/mail`: ^7.7.0 or higher
 - `twilio`: ^4.19.0 or higher
 - `bull`: ^4.12.0 or higher
@@ -142,22 +148,24 @@ npm install -D @types/bull @types/node-cron
 ### Sending Emails
 
 #### Using Email Service
-```typescript
-import { sendWelcomeEmail } from './services/email.service';
 
-await sendWelcomeEmail('user@example.com', 'John Doe');
+```typescript
+import { sendWelcomeEmail } from "./services/email.service";
+
+await sendWelcomeEmail("user@example.com", "John Doe");
 ```
 
 #### Using Email Library Directly
+
 ```typescript
-import { sendEmail } from './lib/email';
+import { sendEmail } from "./lib/email";
 
 await sendEmail({
-  to: 'user@example.com',
-  subject: 'Test Email',
-  templatePath: 'welcome.html',
+  to: "user@example.com",
+  subject: "Test Email",
+  templatePath: "welcome.html",
   templateData: {
-    userName: 'John Doe',
+    userName: "John Doe",
   },
 });
 ```
@@ -165,84 +173,91 @@ await sendEmail({
 ### Sending SMS
 
 #### Using SMS Service
-```typescript
-import { sendAppointmentReminder } from './services/sms.service';
 
-await sendAppointmentReminder('+1234567890', {
-  patientName: 'John Doe',
-  providerName: 'Dr. Smith',
-  appointmentDate: 'Monday, January 15, 2025',
-  appointmentTime: '10:00 AM',
+```typescript
+import { sendAppointmentReminder } from "./services/sms.service";
+
+await sendAppointmentReminder("+1234567890", {
+  patientName: "John Doe",
+  providerName: "Dr. Smith",
+  appointmentDate: "Monday, January 15, 2025",
+  appointmentTime: "10:00 AM",
   isVirtual: true,
-  appointmentId: 'apt_123',
+  appointmentId: "apt_123",
 });
 ```
 
 #### Using SMS Library Directly
+
 ```typescript
-import { sendSms } from './lib/sms';
+import { sendSms } from "./lib/sms";
 
 await sendSms({
-  to: '+1234567890',
-  message: 'Your appointment is confirmed!',
+  to: "+1234567890",
+  message: "Your appointment is confirmed!",
 });
 ```
 
 ### Using Queues
 
 #### Queue Email
+
 ```typescript
-import { notificationService } from './services/notification.service';
+import { notificationService } from "./services/notification.service";
 
 await notificationService.queueEmail({
-  to: 'user@example.com',
-  subject: 'Test Email',
-  body: '<p>Hello World</p>',
+  to: "user@example.com",
+  subject: "Test Email",
+  body: "<p>Hello World</p>",
 });
 ```
 
 #### Queue SMS
+
 ```typescript
 await notificationService.queueSms({
-  to: '+1234567890',
-  message: 'Test message',
+  to: "+1234567890",
+  message: "Test message",
 });
 ```
 
 #### Schedule Notifications
+
 ```typescript
-import { getNotificationQueues } from './lib/queue';
+import { getNotificationQueues } from "./lib/queue";
 
 const queues = getNotificationQueues();
 
 // Schedule email for 1 hour from now
 await queues.scheduleEmail(
   {
-    to: 'user@example.com',
-    subject: 'Reminder',
-    html: '<p>Your appointment is in 1 hour</p>',
+    to: "user@example.com",
+    subject: "Reminder",
+    html: "<p>Your appointment is in 1 hour</p>",
   },
-  60 * 60 * 1000 // 1 hour in milliseconds
+  60 * 60 * 1000, // 1 hour in milliseconds
 );
 ```
 
 ### Scheduled Jobs
 
 #### Start All Jobs
+
 ```typescript
-import { startAllScheduledJobs } from './jobs/notification-scheduler';
+import { startAllScheduledJobs } from "./jobs/notification-scheduler";
 
 const tasks = startAllScheduledJobs();
 ```
 
 #### Individual Jobs
+
 ```typescript
 import {
   schedule24HourReminders,
   schedule1HourVirtualVisitReminders,
   schedulePrescriptionRefillReminders,
   schedulePaymentReminders,
-} from './jobs/notification-scheduler';
+} from "./jobs/notification-scheduler";
 
 // Start individual jobs
 const appointmentReminders = schedule24HourReminders();
@@ -254,18 +269,20 @@ const paymentReminders = schedulePaymentReminders();
 ## Queue Management
 
 ### Monitor Queue Statistics
+
 ```typescript
-import { notificationService } from './services/notification.service';
+import { notificationService } from "./services/notification.service";
 
 const stats = await notificationService.getQueueStats();
-console.log('Email queue:', stats.email);
-console.log('SMS queue:', stats.sms);
-console.log('Scheduled queue:', stats.scheduled);
+console.log("Email queue:", stats.email);
+console.log("SMS queue:", stats.sms);
+console.log("Scheduled queue:", stats.scheduled);
 ```
 
 ### Pause/Resume Queues
+
 ```typescript
-import { getNotificationQueues } from './lib/queue';
+import { getNotificationQueues } from "./lib/queue";
 
 const queues = getNotificationQueues();
 
@@ -281,6 +298,7 @@ await queues.resumeAll();
 ### Template Variables
 
 All templates support these common variables:
+
 - `appUrl` - Application URL
 - `supportEmail` - Support email address
 - `supportPhone` - Support phone number
@@ -291,6 +309,7 @@ All templates support these common variables:
 ### Custom Variables
 
 Each template has specific variables. Example for appointment confirmation:
+
 - `patientName`
 - `providerName`
 - `appointmentDate`
@@ -303,6 +322,7 @@ Each template has specific variables. Example for appointment confirmation:
 ### Template Syntax
 
 Templates use simple `{{variable}}` syntax:
+
 ```html
 <p>Hi {{userName}},</p>
 <p>Your appointment is on {{appointmentDate}} at {{appointmentTime}}.</p>
@@ -311,24 +331,28 @@ Templates use simple `{{variable}}` syntax:
 ## Scheduled Jobs
 
 ### Appointment Reminders (24 hours)
+
 - **Schedule**: Every hour
 - **Purpose**: Send reminders 24 hours before appointments
 - **Channels**: Email and SMS
 - **Conditions**: Confirmed appointments, reminder not yet sent
 
 ### Virtual Visit Reminders (1 hour)
+
 - **Schedule**: Every 15 minutes
 - **Purpose**: Send reminders 1 hour before virtual visits
 - **Channels**: Email and SMS
 - **Conditions**: Virtual appointments, immediate reminder not sent
 
 ### Prescription Refill Reminders
+
 - **Schedule**: Daily at 9:00 AM
 - **Purpose**: Remind patients about expiring prescriptions
 - **Channels**: Email and SMS
 - **Conditions**: Prescriptions expiring in 7 days
 
 ### Payment Reminders
+
 - **Schedule**: Daily at 10:00 AM
 - **Purpose**: Remind patients about overdue payments
 - **Channels**: Email and SMS
@@ -337,42 +361,51 @@ Templates use simple `{{variable}}` syntax:
 ## Error Handling
 
 ### Automatic Retries
+
 - Failed jobs automatically retry 3 times
 - Exponential backoff between retries (2s, 4s, 8s)
 - Failed jobs retained for debugging
 
 ### Logging
+
 All notification operations are logged:
+
 - Success: Info level with message ID
 - Failure: Error level with error details
 - Queue operations: Info level
 
 ### Monitoring
+
 Monitor queue health:
+
 ```typescript
 const stats = await notificationService.getQueueStats();
 
 // Check for backlogs
 if (stats.email.waiting > 100) {
-  console.warn('Email queue backlog detected');
+  console.warn("Email queue backlog detected");
 }
 
 // Check for failures
 if (stats.email.failed > 50) {
-  console.error('High email failure rate');
+  console.error("High email failure rate");
 }
 ```
 
 ## Testing
 
 ### Stub Mode
+
 When API keys are not configured, the system runs in stub mode:
+
 - Logs notifications instead of sending
 - Returns success responses
 - Useful for development and testing
 
 ### Enable Stub Mode
+
 Simply don't set the API keys:
+
 ```bash
 # Don't set these for stub mode
 # SENDGRID_API_KEY=
@@ -392,12 +425,14 @@ Simply don't set the API keys:
 ## Performance
 
 ### Queue Benefits
+
 - Async processing doesn't block API requests
 - Automatic retry on failures
 - Rate limiting protection
 - Horizontal scaling capability
 
 ### Optimization Tips
+
 1. Use queue methods for batch operations
 2. Schedule non-urgent notifications
 3. Monitor queue statistics regularly
@@ -407,24 +442,28 @@ Simply don't set the API keys:
 ## Troubleshooting
 
 ### Emails Not Sending
+
 1. Check SENDGRID_API_KEY is set
 2. Verify FROM_EMAIL is verified in SendGrid
 3. Check SendGrid API logs
 4. Review application error logs
 
 ### SMS Not Sending
+
 1. Check Twilio credentials are set
 2. Verify TWILIO_PHONE_NUMBER format
 3. Check Twilio account balance
 4. Review phone number format (E.164)
 
 ### Queue Issues
+
 1. Verify Redis is running
 2. Check Redis connection settings
 3. Monitor Redis memory usage
 4. Review Bull queue logs
 
 ### Template Rendering Issues
+
 1. Check template file exists
 2. Verify all variables are provided
 3. Review template syntax
@@ -442,6 +481,7 @@ The notification system integrates with the API routes defined in `src/routes/no
 ## Future Enhancements
 
 Potential improvements:
+
 1. Push notifications for mobile apps
 2. In-app notifications
 3. Notification preferences management
@@ -454,6 +494,7 @@ Potential improvements:
 ## Support
 
 For issues or questions:
+
 - Email: support@unifiedhealth.com
 - Documentation: https://docs.unifiedhealth.com
 - GitHub Issues: https://github.com/unifiedhealth/platform/issues

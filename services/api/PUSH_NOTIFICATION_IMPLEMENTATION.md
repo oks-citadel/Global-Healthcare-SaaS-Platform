@@ -84,6 +84,7 @@ December 17, 2025
 ## Database Models (Prisma Schema)
 
 ### DeviceToken Model
+
 ```prisma
 model DeviceToken {
   id           String       @id @default(uuid())
@@ -102,6 +103,7 @@ model DeviceToken {
 ```
 
 ### PushNotification Model
+
 ```prisma
 model PushNotification {
   id           String                 @id @default(uuid())
@@ -120,6 +122,7 @@ model PushNotification {
 ```
 
 ### NotificationPreference Model
+
 ```prisma
 model NotificationPreference {
   id                    String   @id @default(uuid())
@@ -145,27 +148,32 @@ model NotificationPreference {
 ## API Endpoints
 
 ### Device Management
+
 - `POST /api/v1/push/register` - Register device token
 - `DELETE /api/v1/push/unregister` - Unregister device
 - `GET /api/v1/push/devices` - Get user's devices
 
 ### Notifications
+
 - `GET /api/v1/push/notifications` - Get user notifications
 - `PATCH /api/v1/push/notifications/:id/read` - Mark as read
 - `POST /api/v1/push/notifications/mark-all-read` - Mark all as read
 - `GET /api/v1/push/unread-count` - Get unread count
 
 ### Preferences
+
 - `GET /api/v1/push/preferences` - Get preferences
 - `PUT /api/v1/push/preferences` - Update preferences
 
 ### Admin Endpoints
+
 - `POST /api/v1/push/send` - Send notification to user
 - `POST /api/v1/push/send-batch` - Send batch notifications
 
 ## Features Implemented
 
 ### Core Features
+
 - ✅ Multi-platform support (iOS, Android, Web)
 - ✅ Device token registration and management
 - ✅ Push notification sending (single and batch)
@@ -173,12 +181,14 @@ model NotificationPreference {
 - ✅ Read/unread status management
 
 ### User Preferences
+
 - ✅ Channel preferences (email, SMS, push)
 - ✅ Notification type preferences
 - ✅ Quiet hours with timezone support
 - ✅ Marketing email opt-in/opt-out
 
 ### Platform Integration
+
 - ✅ Firebase Cloud Messaging (FCM) for Android
 - ✅ Apple Push Notification Service (APNS) for iOS
 - ✅ Web Push API with VAPID for browsers
@@ -186,6 +196,7 @@ model NotificationPreference {
 - ✅ Automatic token cleanup on failures
 
 ### Advanced Features
+
 - ✅ Quiet hours respect (automatic delay)
 - ✅ User preference checking before sending
 - ✅ Batch notification support
@@ -195,6 +206,7 @@ model NotificationPreference {
 - ✅ Notification metrics and reporting
 
 ### Background Jobs
+
 - ✅ Appointment reminder scheduler
 - ✅ Old notification cleanup
 - ✅ Stale token deactivation
@@ -217,12 +229,14 @@ model NotificationPreference {
 ## Environment Variables Required
 
 ### Firebase Cloud Messaging (Android/iOS)
+
 ```bash
 FCM_SERVER_KEY=your-fcm-server-key
 FCM_SENDER_ID=your-fcm-sender-id
 ```
 
 ### Apple Push Notification Service (iOS)
+
 ```bash
 APNS_KEY_ID=your-apns-key-id
 APNS_TEAM_ID=your-apple-team-id
@@ -232,6 +246,7 @@ APNS_KEY_PATH=/path/to/AuthKey_XXXXXXXXXX.p8
 ```
 
 ### Web Push
+
 ```bash
 VAPID_PUBLIC_KEY=your-vapid-public-key
 VAPID_PRIVATE_KEY=your-vapid-private-key
@@ -345,7 +360,7 @@ curl -X GET "http://localhost:8080/api/v1/push/notifications?limit=20&offset=0&u
 ### Appointment Service Integration
 
 ```typescript
-import { pushService } from './services/push.service';
+import { pushService } from "./services/push.service";
 
 // In appointment creation
 async function createAppointment(data) {
@@ -353,10 +368,10 @@ async function createAppointment(data) {
 
   // Send confirmation
   await pushService.sendPushNotification(appointment.patientId, {
-    title: 'Appointment Confirmed',
+    title: "Appointment Confirmed",
     body: `Your appointment is scheduled for ${appointment.scheduledAt}`,
-    type: 'appointment_confirmation',
-    data: { appointmentId: appointment.id }
+    type: "appointment_confirmation",
+    data: { appointmentId: appointment.id },
   });
 
   return appointment;
@@ -372,10 +387,10 @@ async function sendMessage(visitId, senderId, message) {
 
   // Notify recipient
   await pushService.sendPushNotification(recipientId, {
-    title: 'New Message',
+    title: "New Message",
     body: message.substring(0, 100),
-    type: 'message_received',
-    data: { visitId, messageId: chatMessage.id }
+    type: "message_received",
+    data: { visitId, messageId: chatMessage.id },
   });
 
   return chatMessage;
@@ -395,7 +410,7 @@ npm install node-cron @types/node-cron
 Then initialize jobs in your server startup:
 
 ```typescript
-import { initializeNotificationJobs } from './jobs/push-notification.job';
+import { initializeNotificationJobs } from "./jobs/push-notification.job";
 
 // In server startup
 await initializeNotificationJobs();
@@ -444,7 +459,7 @@ await pushService.sendBatchPushNotifications(userIds, notification);
 Run the metrics generation job daily:
 
 ```typescript
-import { generateNotificationMetrics } from './jobs/push-notification.job';
+import { generateNotificationMetrics } from "./jobs/push-notification.job";
 
 const metrics = await generateNotificationMetrics();
 console.log(metrics);
@@ -470,6 +485,7 @@ console.log(metrics);
 ## Future Enhancements
 
 ### Potential Improvements
+
 - [ ] Add notification templates for common scenarios
 - [ ] Implement notification channels (topics/subscriptions)
 - [ ] Add A/B testing support for notification content

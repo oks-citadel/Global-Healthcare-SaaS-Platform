@@ -62,6 +62,7 @@ npm run db:backup
 ## Common Commands
 
 ### Migrations
+
 ```bash
 # Create new migration (dev)
 npx prisma migrate dev --name migration_name
@@ -77,6 +78,7 @@ npx prisma migrate resolve --rolled-back migration_name
 ```
 
 ### Data Operations
+
 ```bash
 # Development seed (includes test data)
 npm run db:seed
@@ -89,6 +91,7 @@ npm run db:studio
 ```
 
 ### Backup & Restore
+
 ```bash
 # Full backup
 npm run db:backup
@@ -106,6 +109,7 @@ bash scripts/backup-database.sh data-only
 ```
 
 ### Health & Monitoring
+
 ```bash
 # Run health checks
 npm run db:validate
@@ -125,17 +129,20 @@ psql $DATABASE_URL -c "SELECT count(*) FROM pg_stat_activity;"
 ## File Reference
 
 ### Documentation
+
 - **DATABASE_ADMIN_SUMMARY.md** - Complete overview
 - **DATABASE_PRODUCTION_GUIDE.md** - Production deployment guide
 - **DATABASE_MIGRATION_RUNBOOK.md** - Migration procedures
 - **DATABASE_DEPLOYMENT_CHECKLIST.md** - Deployment checklist
 
 ### Schema & Seed
+
 - **schema.prisma** - Database schema (optimized with indexes)
 - **seed.ts** - Development seed data
 - **seed-production.ts** - Production seed data
 
 ### Scripts
+
 - **backup-database.sh** - Automated backup (Linux/Mac)
 - **backup-database.bat** - Automated backup (Windows)
 - **restore-database.sh** - Safe database restore
@@ -147,16 +154,19 @@ psql $DATABASE_URL -c "SELECT count(*) FROM pg_stat_activity;"
 ## Environment Variables
 
 ### Required
+
 ```bash
 DATABASE_URL="postgresql://user:password@host:5432/database"
 ```
 
 ### Production Seed
+
 ```bash
 ADMIN_DEFAULT_PASSWORD="SecurePassword123!"  # Required for seed:prod
 ```
 
 ### Backup Configuration
+
 ```bash
 BACKUP_DIR="/var/backups/postgresql"         # Default: /var/backups/postgresql
 BACKUP_RETENTION_DAYS=30                     # Default: 30 days
@@ -172,11 +182,13 @@ DB_PASSWORD="your_password"                  # Required
 ## Production Seed Data
 
 ### Subscription Plans (6)
+
 - Basic Monthly ($29.99) / Annual ($299.99)
 - Professional Monthly ($79.99) / Annual ($799.99)
 - Enterprise Monthly ($199.99) / Annual ($1,999.99)
 
 ### Health Packages (5)
+
 - General Health Checkup ($99.99)
 - Cardiac Health Package ($249.99)
 - Diabetes Management ($149.99)
@@ -184,6 +196,7 @@ DB_PASSWORD="your_password"                  # Required
 - Executive Health Checkup ($499.99)
 
 ### Diagnostic Tests (5)
+
 - Complete Blood Count (CBC) - $25
 - Lipid Profile - $35
 - HbA1c - $40
@@ -191,6 +204,7 @@ DB_PASSWORD="your_password"                  # Required
 - Liver Function Test - $45
 
 ### Default Admin User
+
 - Email: admin@unifiedhealth.com
 - Password: Set via `ADMIN_DEFAULT_PASSWORD`
 - **⚠️ Change password immediately after first login!**
@@ -200,6 +214,7 @@ DB_PASSWORD="your_password"                  # Required
 ## Schema Optimizations
 
 ### Key Indexes Added
+
 - User: `role`, `status`, `role+status`, `createdAt`
 - RefreshToken: `expiresAt`, `userId+expiresAt`
 - Provider: `licenseNumber` (unique), `available`
@@ -208,6 +223,7 @@ DB_PASSWORD="your_password"                  # Required
 - Appointment: `patientId+scheduledAt`, `providerId+scheduledAt`
 
 ### Performance Impact
+
 - 3-5x faster user queries by role/status
 - 10x faster appointment schedule lookups
 - Optimized subscription renewal processing
@@ -218,6 +234,7 @@ DB_PASSWORD="your_password"                  # Required
 ## Troubleshooting
 
 ### Connection Issues
+
 ```bash
 # Test connection
 psql $DATABASE_URL -c '\l'
@@ -227,6 +244,7 @@ psql $DATABASE_URL -c "SELECT count(*) FROM pg_stat_activity WHERE datname = cur
 ```
 
 ### Migration Errors
+
 ```bash
 # Reset migration (DEV ONLY!)
 npx prisma migrate reset
@@ -239,6 +257,7 @@ npx prisma migrate resolve --rolled-back migration_name
 ```
 
 ### Backup Issues
+
 ```bash
 # Check disk space
 df -h /var/backups
@@ -255,6 +274,7 @@ pg_restore --list /path/to/backup.dump
 ## Health Check Interpretation
 
 ### Example Output
+
 ```
 ✓ Database Connection: Successfully connected
 ✓ Database Version: PostgreSQL 15.2
@@ -269,6 +289,7 @@ Summary: 13 passed, 0 warnings, 0 failed
 ```
 
 ### What to Watch
+
 - ⚠️ Cache hit ratio < 80%: Consider increasing shared_buffers
 - ⚠️ Connection pool > 80%: Implement connection pooling (PgBouncer)
 - ❌ Orphaned records: Run data cleanup scripts
@@ -279,18 +300,21 @@ Summary: 13 passed, 0 warnings, 0 failed
 ## Emergency Procedures
 
 ### Database Down
+
 1. Check PostgreSQL service: `sudo systemctl status postgresql`
 2. Review logs: `tail -f /var/log/postgresql/postgresql.log`
 3. Test connectivity: `psql $DATABASE_URL -c '\l'`
 4. Contact: [DBA On-Call]
 
 ### Migration Failed
+
 1. Review error logs
 2. Check migration SQL
 3. Consider rollback: See `DATABASE_MIGRATION_RUNBOOK.md`
 4. Contact: [DevOps Lead]
 
 ### Data Loss Suspected
+
 1. STOP all writes immediately
 2. Create snapshot if on cloud platform
 3. Contact: [CTO/Tech Lead]

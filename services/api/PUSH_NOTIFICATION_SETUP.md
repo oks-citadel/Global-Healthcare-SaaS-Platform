@@ -5,6 +5,7 @@ This guide explains how to set up and configure the push notification service fo
 ## Overview
 
 The push notification service supports three platforms:
+
 1. **FCM (Firebase Cloud Messaging)** - Android and iOS via Firebase
 2. **APNS (Apple Push Notification Service)** - Native iOS notifications
 3. **Web Push API** - Browser-based notifications
@@ -66,6 +67,7 @@ FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nYour private key here\n-----E
 ```
 
 **Important:**
+
 - Keep the quotes around `FIREBASE_PRIVATE_KEY`
 - Preserve the `\n` characters (they represent newlines)
 - Never commit the private key to version control
@@ -96,6 +98,7 @@ APNS_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nYour private key here\n-----END P
 ```
 
 **Notes:**
+
 - Set `APNS_PRODUCTION=true` for production environment
 - Copy the entire contents of the `.p8` file into `APNS_PRIVATE_KEY`
 - Keep the quotes and preserve `\n` characters
@@ -111,6 +114,7 @@ npx web-push generate-vapid-keys
 ```
 
 This will output:
+
 ```
 =======================================
 Public Key:
@@ -130,6 +134,7 @@ VAPID_SUBJECT=mailto:support@unifiedhealth.com
 ```
 
 **Notes:**
+
 - The `VAPID_SUBJECT` should be either a `mailto:` URL or your website URL
 - Keep your private key secure and never expose it to clients
 
@@ -138,28 +143,28 @@ VAPID_SUBJECT=mailto:support@unifiedhealth.com
 ### Send a Single Notification
 
 ```typescript
-import { pushNotificationService } from './lib/push';
+import { pushNotificationService } from "./lib/push";
 
 const result = await pushNotificationService.sendPushNotification(
-  'device-token-here',
-  'android', // or 'ios' or 'web'
+  "device-token-here",
+  "android", // or 'ios' or 'web'
   {
-    title: 'Appointment Reminder',
-    body: 'Your appointment is in 30 minutes',
+    title: "Appointment Reminder",
+    body: "Your appointment is in 30 minutes",
     data: {
-      appointmentId: '12345',
-      type: 'appointment_reminder',
+      appointmentId: "12345",
+      type: "appointment_reminder",
     },
     badge: 1,
-    sound: 'default',
-    priority: 'high',
-  }
+    sound: "default",
+    priority: "high",
+  },
 );
 
 if (result.success) {
-  console.log('Notification sent:', result.messageId);
+  console.log("Notification sent:", result.messageId);
 } else {
-  console.error('Failed to send notification:', result.error);
+  console.error("Failed to send notification:", result.error);
 }
 ```
 
@@ -167,27 +172,29 @@ if (result.success) {
 
 ```typescript
 const tokens = [
-  { token: 'android-token-1', platform: 'android' },
-  { token: 'ios-token-1', platform: 'ios' },
-  { token: 'web-subscription-json', platform: 'web' },
+  { token: "android-token-1", platform: "android" },
+  { token: "ios-token-1", platform: "ios" },
+  { token: "web-subscription-json", platform: "web" },
 ];
 
 const batchResult = await pushNotificationService.sendBatchPushNotifications(
   tokens,
   {
-    title: 'System Update',
-    body: 'A new version is available',
-    priority: 'normal',
-  }
+    title: "System Update",
+    body: "A new version is available",
+    priority: "normal",
+  },
 );
 
-console.log(`Success: ${batchResult.successCount}, Failed: ${batchResult.failureCount}`);
+console.log(
+  `Success: ${batchResult.successCount}, Failed: ${batchResult.failureCount}`,
+);
 ```
 
 ### Validate a Token
 
 ```typescript
-const isValid = pushNotificationService.validateToken(token, 'android');
+const isValid = pushNotificationService.validateToken(token, "android");
 
 if (!isValid) {
   // Remove invalid token from database
@@ -199,6 +206,7 @@ if (!isValid) {
 ### Automatic Retry Logic
 
 All notification sends include automatic retry with exponential backoff:
+
 - **Max Retries**: 3 attempts
 - **Initial Delay**: 1 second
 - **Max Delay**: 10 seconds
@@ -215,14 +223,17 @@ All notification sends include automatic retry with exponential backoff:
 The service handles specific error codes:
 
 **FCM Errors:**
+
 - `invalid-registration-token`: Token is invalid or expired
 - `registration-token-not-registered`: Token unregistered from FCM
 
 **APNS Errors:**
+
 - `410/Unregistered`: Token no longer valid
 - `400/BadDeviceToken`: Invalid token format
 
 **Web Push Errors:**
+
 - `404/410`: Subscription expired
 - `401/403`: VAPID authentication failed
 - `413`: Payload too large (max 4KB)
@@ -231,6 +242,7 @@ The service handles specific error codes:
 ### Logging
 
 All operations are logged with structured data:
+
 - Successful sends: `info` level
 - Failed sends: `error` level
 - Retries: `warn` level
@@ -265,10 +277,12 @@ All operations are logged with structured data:
 ### FCM Issues
 
 **Error: "insufficient permissions"**
+
 - Ensure the service account has the "Firebase Cloud Messaging API" enabled
 - Check that the correct private key is being used
 
 **Error: "invalid-registration-token"**
+
 - Token has expired or been unregistered
 - User uninstalled the app
 - Remove the token from your database
@@ -276,25 +290,30 @@ All operations are logged with structured data:
 ### APNS Issues
 
 **Error: "BadDeviceToken"**
+
 - Token format is incorrect (should be 64 hex characters)
 - Token is for sandbox but you're using production (or vice versa)
 
 **Error: "Unregistered"**
+
 - User uninstalled the app or disabled notifications
 - Remove the token from your database
 
 ### Web Push Issues
 
 **Error: 401/403**
+
 - Check VAPID keys are correct
 - Ensure `VAPID_SUBJECT` is properly formatted
 
 **Error: 410**
+
 - Subscription has expired
 - User cleared browser data
 - Remove subscription from database
 
 **Payload Too Large**
+
 - Web Push limit is typically 4KB
 - Reduce the size of your notification payload
 
@@ -326,17 +345,17 @@ All operations are logged with structured data:
 1. Create a test endpoint:
 
 ```typescript
-app.post('/api/test-notification', async (req, res) => {
+app.post("/api/test-notification", async (req, res) => {
   const { token, platform } = req.body;
 
   const result = await pushNotificationService.sendPushNotification(
     token,
     platform,
     {
-      title: 'Test Notification',
-      body: 'This is a test from the API',
-      data: { test: 'true' },
-    }
+      title: "Test Notification",
+      body: "This is a test from the API",
+      data: { test: "true" },
+    },
   );
 
   res.json(result);
@@ -360,8 +379,8 @@ app.post('/api/test-notification', async (req, res) => {
 
 ```typescript
 // Log aggregated stats periodically
-logger.info('Push notification stats', {
-  period: 'last_hour',
+logger.info("Push notification stats", {
+  period: "last_hour",
   fcm: { sent: 1000, failed: 10, invalidTokens: 5 },
   apns: { sent: 500, failed: 3, invalidTokens: 2 },
   webPush: { sent: 200, failed: 5, expired: 8 },
@@ -384,6 +403,7 @@ logger.info('Push notification stats', {
 ## Support
 
 For issues or questions:
+
 - Check the logs for detailed error messages
 - Verify environment variables are correct
 - Ensure tokens are in the correct format

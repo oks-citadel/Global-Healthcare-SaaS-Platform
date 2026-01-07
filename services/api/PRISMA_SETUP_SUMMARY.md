@@ -7,17 +7,20 @@ This document provides a summary of all Prisma-related files created for the Uni
 ### 1. Migration Files
 
 #### `prisma/migrations/20241217000000_initial_schema/migration.sql`
+
 - Complete initial database schema migration
 - Includes all tables, enums, indexes, and foreign keys
 - Enhanced with CASCADE delete rules for data integrity
 - Optimized composite indexes for common query patterns
 
 #### `prisma/migrations/migration_lock.toml`
+
 - Migration lock file to track database provider (PostgreSQL)
 
 ### 2. Seed Script
 
 #### `prisma/seed.ts`
+
 - Comprehensive seed script with the following features:
   - Transaction support for data integrity
   - Error handling and progress logging
@@ -25,6 +28,7 @@ This document provides a summary of all Prisma-related files created for the Uni
   - Creates realistic test data
 
 **Data Created:**
+
 - 14 Users (1 admin, 3 providers, 10 patients)
 - 3 Providers with different specialties
 - 10 Patients with complete medical records
@@ -39,45 +43,53 @@ This document provides a summary of all Prisma-related files created for the Uni
 ### 3. Seed Data Files
 
 #### `prisma/seed-data/users.json`
+
 - 14 user accounts (admin, providers, patients)
 - Includes authentication credentials
 - Pre-configured roles and email verification status
 
 #### `prisma/seed-data/providers.json`
+
 - 3 provider profiles
 - Different specialties: Cardiology, Pediatrics, Dermatology
 - License numbers and professional bios
 
 #### `prisma/seed-data/patients.json`
+
 - 10 patient profiles
 - Medical information: blood type, allergies
 - Emergency contact information
 - Diverse demographics
 
 #### `prisma/seed-data/plans.json`
+
 - 6 subscription plans (3 tiers × 2 intervals)
 - Pricing: Basic ($29.99), Professional ($79.99), Enterprise ($199.99)
 - Monthly and annual billing options
 - Feature lists for each tier
 
 #### `prisma/seed-data/types.ts`
+
 - TypeScript type definitions for seed data
 - Ensures type safety when modifying JSON files
 
 ### 4. Utility Scripts
 
 #### `scripts/reset-db.sh` (Linux/Mac)
+
 - Bash script to reset and reseed database
 - Safety checks (prevents running in production)
 - User confirmation prompt
 - Sequential execution: reset → generate → seed
 
 #### `scripts/reset-db.bat` (Windows)
+
 - Windows batch file equivalent
 - Same safety features as bash version
 - Error handling for each step
 
 #### `scripts/validate-seed-data.ts`
+
 - TypeScript validation script for seed data
 - Checks for data integrity issues
 - Validates required fields, unique constraints
@@ -87,6 +99,7 @@ This document provides a summary of all Prisma-related files created for the Uni
 ### 5. Documentation
 
 #### `prisma/README.md`
+
 - Comprehensive documentation
 - Setup instructions
 - Database schema overview
@@ -95,6 +108,7 @@ This document provides a summary of all Prisma-related files created for the Uni
 - Best practices
 
 #### `prisma/QUICKSTART.md`
+
 - Quick reference guide
 - Common commands
 - Test credentials table
@@ -104,7 +118,9 @@ This document provides a summary of all Prisma-related files created for the Uni
 ### 6. Schema Updates
 
 #### `prisma/schema.prisma` (Updated)
+
 Enhanced with:
+
 - **Cascade Delete Rules:** Most child records cascade when parent deleted
 - **Additional Indexes:**
   - Composite indexes for common query patterns
@@ -117,7 +133,9 @@ Enhanced with:
 ### 7. Configuration
 
 #### `package.json` (Updated)
+
 Added:
+
 ```json
 {
   "prisma": {
@@ -129,6 +147,7 @@ Added:
 This enables `npx prisma db seed` command.
 
 #### `prisma/.gitignore`
+
 - Ignore generated files
 - Keep migrations and seed data in version control
 
@@ -136,15 +155,15 @@ This enables `npx prisma db seed` command.
 
 After running the seed script, use these credentials:
 
-| Role | Email | Password | Description |
-|------|-------|----------|-------------|
-| Admin | admin@unifiedhealth.com | Admin123! | System administrator |
-| Provider | dr.smith@unifiedhealth.com | Provider123! | Cardiologist |
-| Provider | dr.johnson@unifiedhealth.com | Provider123! | Pediatrician |
-| Provider | dr.williams@unifiedhealth.com | Provider123! | Dermatologist |
-| Patient | john.doe@example.com | Patient123! | Patient with MRN |
-| Patient | jane.smith@example.com | Patient123! | Patient with MRN |
-| ... | (8 more patients) | Patient123! | See users.json |
+| Role     | Email                         | Password     | Description          |
+| -------- | ----------------------------- | ------------ | -------------------- |
+| Admin    | admin@unifiedhealth.com       | Admin123!    | System administrator |
+| Provider | dr.smith@unifiedhealth.com    | Provider123! | Cardiologist         |
+| Provider | dr.johnson@unifiedhealth.com  | Provider123! | Pediatrician         |
+| Provider | dr.williams@unifiedhealth.com | Provider123! | Dermatologist        |
+| Patient  | john.doe@example.com          | Patient123!  | Patient with MRN     |
+| Patient  | jane.smith@example.com        | Patient123!  | Patient with MRN     |
+| ...      | (8 more patients)             | Patient123!  | See users.json       |
 
 ## Quick Start
 
@@ -165,12 +184,14 @@ npm run db:studio
 ## Reset Database (Development Only)
 
 **Linux/Mac:**
+
 ```bash
 chmod +x scripts/reset-db.sh
 ./scripts/reset-db.sh
 ```
 
 **Windows:**
+
 ```bash
 scripts\reset-db.bat
 ```
@@ -194,12 +215,14 @@ tsx scripts/validate-seed-data.ts
 ### Optimized Indexes
 
 **Single Column Indexes:**
+
 - Email, role (User)
 - Medical record number (Patient)
 - Specialty (Provider)
 - Scheduled time, status (Appointment)
 
 **Composite Indexes:**
+
 - `patientId + scheduledAt` - Find patient appointments by date
 - `providerId + scheduledAt` - Find provider schedule
 - `userId + timestamp` - Audit trail queries
@@ -273,16 +296,19 @@ services/api/
 ## Next Steps
 
 1. **Set up environment variables:**
+
    ```bash
    DATABASE_URL="postgresql://user:password@localhost:5432/unified_health?schema=public"
    ```
 
 2. **Install dependencies:**
+
    ```bash
    npm install
    ```
 
 3. **Run setup:**
+
    ```bash
    npm run db:generate
    npm run db:migrate
@@ -290,6 +316,7 @@ services/api/
    ```
 
 4. **Verify:**
+
    ```bash
    npm run db:studio
    ```
@@ -315,6 +342,7 @@ services/api/
 ## Support
 
 For issues or questions:
+
 1. Check the README.md and QUICKSTART.md guides
 2. Validate seed data: `tsx scripts/validate-seed-data.ts`
 3. Reset database if needed: `./scripts/reset-db.sh`

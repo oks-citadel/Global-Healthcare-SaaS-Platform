@@ -1,6 +1,7 @@
 # Database Production Preparation Guide
 
 ## Overview
+
 This guide provides comprehensive instructions for preparing the Unified Healthcare Platform database for production deployment.
 
 **Last Updated:** 2025-12-17
@@ -10,6 +11,7 @@ This guide provides comprehensive instructions for preparing the Unified Healthc
 ---
 
 ## Table of Contents
+
 1. [Schema Optimizations](#schema-optimizations)
 2. [Production Seed Data](#production-seed-data)
 3. [Database Operations](#database-operations)
@@ -23,9 +25,11 @@ This guide provides comprehensive instructions for preparing the Unified Healthc
 ## Schema Optimizations
 
 ### Index Strategy
+
 The schema has been optimized with production-grade indexes for common query patterns:
 
 #### User & Authentication
+
 - **User table:**
   - `email` - Unique constraint + index for login
   - `role` - Filter by user type
@@ -40,6 +44,7 @@ The schema has been optimized with production-grade indexes for common query pat
   - `userId, expiresAt` - Composite for cleanup queries
 
 #### Clinical Data
+
 - **Patient table:**
   - `userId` - Unique constraint for one-to-one relation
   - `medicalRecordNumber` - Unique constraint for lookups
@@ -51,6 +56,7 @@ The schema has been optimized with production-grade indexes for common query pat
   - `available` - Filter available providers
 
 #### Appointments & Scheduling
+
 - **Appointment table:**
   - `patientId` - Patient's appointments
   - `providerId` - Provider's schedule
@@ -60,6 +66,7 @@ The schema has been optimized with production-grade indexes for common query pat
   - `providerId, scheduledAt` - Provider schedule
 
 #### Billing & Subscriptions
+
 - **Plan table:**
   - `active` - Filter active plans
   - `interval` - Filter by billing interval
@@ -73,6 +80,7 @@ The schema has been optimized with production-grade indexes for common query pat
   - `status, currentPeriodEnd` - Renewal queries
 
 ### Migration Notes
+
 After schema changes, create and apply migrations:
 
 ```bash
@@ -88,6 +96,7 @@ npm run db:migrate:prod
 ## Production Seed Data
 
 ### Overview
+
 The production seed script (`prisma/seed-production.ts`) creates essential baseline data:
 
 1. **Subscription Plans** (6 plans)
@@ -124,6 +133,7 @@ npm run db:seed:prod
 ```
 
 ### Post-Seed Actions
+
 - [ ] Change admin password immediately after first login
 - [ ] Enable MFA for admin account
 - [ ] Review and adjust subscription plan pricing
@@ -160,6 +170,7 @@ npm run db:restore          # Restore from backup
 ### Common Operations
 
 #### 1. Initial Production Setup
+
 ```bash
 # 1. Set environment variables
 export DATABASE_URL="postgresql://user:pass@host:5432/dbname"
@@ -179,6 +190,7 @@ npm run db:validate
 ```
 
 #### 2. Schema Updates
+
 ```bash
 # 1. Create backup
 npm run db:backup
@@ -199,6 +211,7 @@ npm run db:validate
 ```
 
 #### 3. Data Migrations
+
 ```bash
 # For data migrations, create custom scripts in scripts/migrations/
 # Example: scripts/migrations/backfill-user-roles.ts
@@ -213,6 +226,7 @@ tsx scripts/migrations/your-migration-script.ts
 ### Backup Strategy
 
 #### Automated Backups (Recommended)
+
 Set up cron jobs for automated backups:
 
 ```bash
@@ -226,17 +240,20 @@ Set up cron jobs for automated backups:
 #### Manual Backups
 
 **Full Backup:**
+
 ```bash
 npm run db:backup
 # Output: Backup location printed to console
 ```
 
 **Schema-Only Backup:**
+
 ```bash
 npm run db:backup:schema
 ```
 
 **Custom Backup:**
+
 ```bash
 # Using scripts directly
 bash scripts/backup-database.sh full
@@ -247,6 +264,7 @@ bash scripts/backup-database.sh data-only
 ### Backup Configuration
 
 Set these environment variables:
+
 ```bash
 # Backup directory
 export BACKUP_DIR="/var/backups/postgresql"
@@ -286,6 +304,7 @@ npm run db:restore /path/to/backup/directory
 ### Database Health Checks
 
 Run comprehensive health checks:
+
 ```bash
 npm run db:validate
 ```
@@ -364,6 +383,7 @@ Set up automated health checks:
 ```
 
 **Recommended Monitoring Tools:**
+
 - **Prometheus + Grafana** - Metrics visualization
 - **pgAdmin** - Database management
 - **Datadog/New Relic** - Application performance monitoring
@@ -407,6 +427,7 @@ Set up automated health checks:
 ### Compliance Requirements
 
 **HIPAA Compliance (Healthcare Data):**
+
 - [ ] Enable comprehensive audit logging
 - [ ] Implement data encryption (at rest and in transit)
 - [ ] Regular access reviews
@@ -415,6 +436,7 @@ Set up automated health checks:
 - [ ] Business associate agreements (BAAs)
 
 **GDPR Compliance:**
+
 - [ ] Data retention policies
 - [ ] Right to erasure implementation
 - [ ] Data portability features
@@ -520,6 +542,7 @@ reserve_pool_timeout = 3
 ### Application-Level Optimizations
 
 1. **Use Prisma's connection pool:**
+
 ```typescript
 const prisma = new PrismaClient({
   datasources: {
@@ -527,7 +550,7 @@ const prisma = new PrismaClient({
       url: process.env.DATABASE_URL,
     },
   },
-  log: ['error', 'warn'],
+  log: ["error", "warn"],
 });
 ```
 
@@ -537,6 +560,7 @@ const prisma = new PrismaClient({
    - CDN for static assets
 
 3. **Batch operations:**
+
 ```typescript
 // Instead of multiple inserts
 await prisma.user.createMany({
@@ -546,6 +570,7 @@ await prisma.user.createMany({
 ```
 
 4. **Selective field queries:**
+
 ```typescript
 // Only fetch needed fields
 await prisma.user.findMany({
@@ -563,9 +588,11 @@ await prisma.user.findMany({
 ## Disaster Recovery
 
 ### Recovery Time Objective (RTO)
+
 **Target:** 4 hours maximum downtime
 
 ### Recovery Point Objective (RPO)
+
 **Target:** 1 hour maximum data loss
 
 ### Disaster Recovery Plan
@@ -597,43 +624,51 @@ await prisma.user.findMany({
 ### Common Issues
 
 #### Issue: Connection Pool Exhausted
+
 ```
 Error: Can't reach database server at `localhost:5432`
 ```
 
 **Solution:**
+
 - Check max_connections in PostgreSQL
 - Implement connection pooling (PgBouncer)
 - Review application connection lifecycle
 
 #### Issue: Slow Queries
+
 ```
 Query taking > 5 seconds
 ```
 
 **Solution:**
+
 - Run EXPLAIN ANALYZE on slow queries
 - Check if indexes are being used
 - Update table statistics with ANALYZE
 - Consider query optimization or denormalization
 
 #### Issue: Disk Space Full
+
 ```
 ERROR: could not extend file
 ```
 
 **Solution:**
+
 - Run VACUUM FULL to reclaim space
 - Increase disk space
 - Implement archival strategy for old data
 - Monitor disk usage proactively
 
 #### Issue: Migration Fails
+
 ```
 Migration failed with error
 ```
 
 **Solution:**
+
 - Review migration SQL
 - Check for data inconsistencies
 - Verify foreign key constraints
@@ -656,6 +691,7 @@ Migration failed with error
 ## Support Contacts
 
 For database-related issues:
+
 - **Database Administrator:** [Contact Info]
 - **DevOps Team:** [Contact Info]
 - **On-Call Engineer:** [PagerDuty/Slack Channel]

@@ -12,10 +12,12 @@ Use this checklist to ensure proper setup of the Prisma database system.
 ## File Verification
 
 ### Migration Files
+
 - [x] `prisma/migrations/20241217000000_initial_schema/migration.sql` exists
 - [x] `prisma/migrations/migration_lock.toml` exists
 
 ### Seed Files
+
 - [x] `prisma/seed.ts` exists
 - [x] `prisma/seed-data/users.json` exists (14 users)
 - [x] `prisma/seed-data/patients.json` exists (10 patients)
@@ -24,16 +26,19 @@ Use this checklist to ensure proper setup of the Prisma database system.
 - [x] `prisma/seed-data/types.ts` exists
 
 ### Scripts
+
 - [x] `scripts/reset-db.sh` exists (Linux/Mac)
 - [x] `scripts/reset-db.bat` exists (Windows)
 - [x] `scripts/validate-seed-data.ts` exists
 
 ### Documentation
+
 - [x] `prisma/README.md` exists
 - [x] `prisma/QUICKSTART.md` exists
 - [x] `PRISMA_SETUP_SUMMARY.md` exists
 
 ### Configuration
+
 - [x] `package.json` updated with prisma seed configuration
 - [x] `prisma/schema.prisma` updated with cascade rules and indexes
 - [x] `prisma/.gitignore` exists
@@ -41,6 +46,7 @@ Use this checklist to ensure proper setup of the Prisma database system.
 ## Setup Steps
 
 ### 1. Environment Configuration
+
 - [ ] Create `.env` file if not exists
 - [ ] Set `DATABASE_URL` with correct credentials
 - [ ] Test database connection
@@ -51,31 +57,39 @@ DATABASE_URL="postgresql://postgres:password@localhost:5432/unified_health?schem
 ```
 
 ### 2. Generate Prisma Client
+
 ```bash
 npm run db:generate
 ```
+
 - [ ] No errors during generation
 - [ ] `node_modules/@prisma/client` created
 
 ### 3. Run Migrations
+
 ```bash
 npm run db:migrate
 ```
+
 - [ ] Database created (if not exists)
 - [ ] All migrations applied successfully
 - [ ] No migration errors
 
 ### 4. Validate Seed Data (Optional but Recommended)
+
 ```bash
 tsx scripts/validate-seed-data.ts
 ```
+
 - [ ] All seed data files validated
 - [ ] No critical errors found
 
 ### 5. Seed Database
+
 ```bash
 npm run db:seed
 ```
+
 - [ ] All users created (14 total)
 - [ ] All providers created (3 total)
 - [ ] All patients created (10 total)
@@ -89,9 +103,11 @@ npm run db:seed
 - [ ] No seeding errors
 
 ### 6. Verify Setup
+
 ```bash
 npm run db:studio
 ```
+
 - [ ] Prisma Studio opens successfully
 - [ ] All tables visible
 - [ ] Data correctly populated
@@ -99,16 +115,19 @@ npm run db:studio
 ## Test Login Credentials
 
 ### Admin Account
+
 - [ ] Email: admin@unifiedhealth.com
 - [ ] Password: Admin123!
 - [ ] Can login successfully
 
 ### Provider Account
+
 - [ ] Email: dr.smith@unifiedhealth.com
 - [ ] Password: Provider123!
 - [ ] Can login successfully
 
 ### Patient Account
+
 - [ ] Email: john.doe@example.com
 - [ ] Password: Patient123!
 - [ ] Can login successfully
@@ -116,6 +135,7 @@ npm run db:studio
 ## Data Verification
 
 ### Users Table
+
 - [ ] 14 records total
 - [ ] 1 admin
 - [ ] 3 providers
@@ -124,6 +144,7 @@ npm run db:studio
 - [ ] All passwords hashed
 
 ### Patients Table
+
 - [ ] 10 records total
 - [ ] All have unique MRN
 - [ ] All have emergency contacts
@@ -131,12 +152,14 @@ npm run db:studio
 - [ ] Allergies arrays populated
 
 ### Providers Table
+
 - [ ] 3 records total
 - [ ] All have license numbers
 - [ ] All have specialties
 - [ ] All marked as available
 
 ### Appointments Table
+
 - [ ] 15 records total
 - [ ] 5 past appointments (completed)
 - [ ] 3 today's appointments (confirmed)
@@ -144,12 +167,14 @@ npm run db:studio
 - [ ] All linked to patients and providers
 
 ### Encounters Table
+
 - [ ] 5 records total
 - [ ] All have clinical notes
 - [ ] All linked to completed appointments
 - [ ] Start and end times set
 
 ### Plans Table
+
 - [ ] 6 records total
 - [ ] 3 tiers (Basic, Professional, Enterprise)
 - [ ] 2 intervals (monthly, annual)
@@ -157,18 +182,21 @@ npm run db:studio
 - [ ] Features arrays populated
 
 ### Subscriptions Table
+
 - [ ] 6 records total
 - [ ] All marked as active
 - [ ] Current periods set correctly
 - [ ] Linked to valid users and plans
 
 ### Documents Table
+
 - [ ] 8 records total
 - [ ] Different types represented
 - [ ] All linked to patients
 - [ ] File metadata populated
 
 ### Consents Table
+
 - [ ] 20+ records total
 - [ ] All patients have data_sharing consent
 - [ ] All patients have treatment consent
@@ -176,6 +204,7 @@ npm run db:studio
 - [ ] Expiry dates set where applicable
 
 ### Audit Events Table
+
 - [ ] 50 records total
 - [ ] Various actions represented
 - [ ] Timestamps within last 30 days
@@ -211,11 +240,13 @@ npm run db:studio
 ## Troubleshooting
 
 If any step fails, refer to:
+
 1. `prisma/README.md` - Detailed documentation
 2. `prisma/QUICKSTART.md` - Quick reference
 3. `PRISMA_SETUP_SUMMARY.md` - Complete overview
 
 Common fixes:
+
 ```bash
 # Reset everything and start over
 ./scripts/reset-db.sh  # or scripts\reset-db.bat on Windows
@@ -257,16 +288,19 @@ npx prisma db pull
 ## Maintenance
 
 ### Weekly
+
 - [ ] Review audit logs
 - [ ] Check for slow queries
 - [ ] Monitor database size
 
 ### Monthly
+
 - [ ] Vacuum database (PostgreSQL)
 - [ ] Analyze query patterns
 - [ ] Review and optimize indexes
 
 ### As Needed
+
 - [ ] Create new migrations for schema changes
 - [ ] Update seed data for new requirements
 - [ ] Review and update documentation
@@ -280,9 +314,9 @@ npx prisma db pull
 - [ ] Documentation reviewed
 - [ ] Ready for development
 
-**Setup Completed By:** ________________
+**Setup Completed By:** ******\_\_\_\_******
 
-**Date:** ________________
+**Date:** ******\_\_\_\_******
 
 **Notes:**
 

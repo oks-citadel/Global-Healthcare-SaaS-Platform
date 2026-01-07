@@ -9,6 +9,7 @@ The SMS notification service has been completed for the Global-Healthcare-SaaS-P
 ### 1. Core SMS Library (`src/lib/sms.ts`)
 
 **Features:**
+
 - ✅ Complete Twilio integration
 - ✅ Phone number validation (E.164 format)
 - ✅ Phone number formatting with country code support
@@ -20,6 +21,7 @@ The SMS notification service has been completed for the Global-Healthcare-SaaS-P
 - ✅ Comprehensive error handling and logging
 
 **Key Functions:**
+
 - `sendSms()` - Send single SMS message
 - `sendBatchSms()` - Send multiple SMS messages
 - `sendSmsWithDelay()` - Send with rate limiting
@@ -32,6 +34,7 @@ The SMS notification service has been completed for the Global-Healthcare-SaaS-P
 **Template Methods (14 total):**
 
 #### Appointment Templates
+
 1. ✅ `sendAppointmentReminder()` - 24-hour appointment reminder
 2. ✅ `sendAppointmentConfirmation()` - New appointment confirmation
 3. ✅ `sendAppointmentCancellation()` - Cancellation notification
@@ -39,23 +42,28 @@ The SMS notification service has been completed for the Global-Healthcare-SaaS-P
 5. ✅ `sendVisitLink()` - Virtual visit join link
 
 #### Verification Templates
+
 6. ✅ `sendVerificationCode()` - Phone verification code
 
 #### Prescription & Results Templates
+
 7. ✅ `sendPrescriptionReady()` - Prescription ready for pickup
 8. ✅ `sendTestResultsAvailable()` - General test results notification
 9. ✅ `sendLabResultsAvailable()` - Lab results notification
 
 #### Payment Templates
+
 10. ✅ `sendPaymentReminder()` - Outstanding payment reminder
 11. ✅ `sendPaymentConfirmation()` - Payment received confirmation
 
 #### Medical Templates
+
 12. ✅ `sendReferralNotification()` - Specialist referral notification
 13. ✅ `sendMedicationReminder()` - Medication dose reminder
 14. ✅ `sendEmergencyAlert()` - Emergency/urgent notifications
 
 **Features:**
+
 - Professional message formatting
 - Personalized greetings
 - Actionable links and CTAs
@@ -66,6 +74,7 @@ The SMS notification service has been completed for the Global-Healthcare-SaaS-P
 ### 3. Notification Service (`src/services/notification.service.ts`)
 
 **Enhanced Features:**
+
 - ✅ SMS sending with validation
 - ✅ Batch SMS operations
 - ✅ Queue-based SMS delivery
@@ -76,6 +85,7 @@ The SMS notification service has been completed for the Global-Healthcare-SaaS-P
 - ✅ Comprehensive error responses
 
 **Key Methods:**
+
 - `sendSms()` - Send immediate SMS
 - `queueSms()` - Queue SMS for async delivery
 - `sendBatchSms()` - Send to multiple recipients
@@ -85,6 +95,7 @@ The SMS notification service has been completed for the Global-Healthcare-SaaS-P
 ### 4. SMS Templates (`src/templates/sms/`)
 
 **Created 14 Template Files:**
+
 1. ✅ `appointment-reminder.txt`
 2. ✅ `appointment-confirmation.txt`
 3. ✅ `appointment-cancellation.txt`
@@ -101,9 +112,11 @@ The SMS notification service has been completed for the Global-Healthcare-SaaS-P
 14. ✅ `emergency-alert.txt`
 
 **Additional Resources:**
+
 - ✅ `README.md` - Comprehensive template documentation
 
 **Template Features:**
+
 - Variable substitution support with `{{variable}}` syntax
 - Character count optimized (stays within SMS limits)
 - HIPAA-compliant messaging (no sensitive medical details)
@@ -115,6 +128,7 @@ The SMS notification service has been completed for the Global-Healthcare-SaaS-P
 ### 5. API Endpoints (`src/routes/index.ts`)
 
 **SMS Endpoints:**
+
 ```
 POST   /api/notifications/sms              - Send single SMS
 POST   /api/notifications/sms/batch        - Send batch SMS
@@ -122,6 +136,7 @@ GET    /api/notifications/sms/:id/status   - Get SMS delivery status
 ```
 
 **Features:**
+
 - ✅ Authentication required (JWT)
 - ✅ Admin role authorization
 - ✅ Request validation
@@ -130,11 +145,13 @@ GET    /api/notifications/sms/:id/status   - Get SMS delivery status
 ### 6. Controller (`src/controllers/notification.controller.ts`)
 
 **SMS Endpoints:**
+
 - ✅ `sendSms()` - Send single SMS with validation
 - ✅ `sendBatchSms()` - Send batch SMS with stats
 - ✅ `getSmsStatus()` - Get delivery status
 
 **Features:**
+
 - Input validation using Zod schemas
 - Success/failure tracking
 - Batch operation statistics
@@ -143,11 +160,13 @@ GET    /api/notifications/sms/:id/status   - Get SMS delivery status
 ### 7. DTOs (`src/dtos/notification.dto.ts`)
 
 **Created Schemas:**
+
 - ✅ `SendSmsNotificationSchema` - SMS send request validation
 - ✅ `SmsStatusResponseSchema` - SMS status response validation
 - ✅ Enhanced `NotificationResponseSchema` with 'queued' status
 
 **Validation Rules:**
+
 - Phone number: E.164 format (`/^\+?[1-9]\d{1,14}$/`)
 - Message: 1-1600 characters
 - Required fields enforcement
@@ -157,11 +176,13 @@ GET    /api/notifications/sms/:id/status   - Get SMS delivery status
 ### Phone Number Validation
 
 **E.164 Format:**
+
 - Format: `+[country code][number]`
 - Example: `+12025551234` (US), `+442071234567` (UK)
 - Regex: `/^\+?[1-9]\d{1,14}$/`
 
 **Auto-Formatting:**
+
 - Adds default country code (+1 for US)
 - Removes non-digit characters
 - Validates final format
@@ -176,6 +197,7 @@ GET    /api/notifications/sms/:id/status   - Get SMS delivery status
 ### Delivery Status Tracking
 
 **Twilio Message Status Values:**
+
 - `queued` - Message accepted by Twilio
 - `sending` - Message is being sent
 - `sent` - Message sent to carrier
@@ -184,11 +206,13 @@ GET    /api/notifications/sms/:id/status   - Get SMS delivery status
 - `failed` - Message failed
 
 **Status Endpoint:**
+
 ```
 GET /api/notifications/sms/:messageId/status
 ```
 
 Returns:
+
 ```json
 {
   "messageId": "SMxxxxx",
@@ -227,66 +251,66 @@ BILLING_PHONE=+1-800-BILLING
 ### 1. Send Appointment Reminder
 
 ```typescript
-import { sendAppointmentReminder } from './services/sms.service';
+import { sendAppointmentReminder } from "./services/sms.service";
 
-await sendAppointmentReminder('+12025551234', {
-  patientName: 'John Doe',
-  providerName: 'Dr. Smith',
-  appointmentDate: 'Monday, January 15, 2025',
-  appointmentTime: '10:00 AM',
-  location: 'Main Clinic, 123 Health St',
+await sendAppointmentReminder("+12025551234", {
+  patientName: "John Doe",
+  providerName: "Dr. Smith",
+  appointmentDate: "Monday, January 15, 2025",
+  appointmentTime: "10:00 AM",
+  location: "Main Clinic, 123 Health St",
   isVirtual: false,
-  appointmentId: 'apt_123',
+  appointmentId: "apt_123",
 });
 ```
 
 ### 2. Send Verification Code
 
 ```typescript
-import { sendVerificationCode } from './services/sms.service';
+import { sendVerificationCode } from "./services/sms.service";
 
-await sendVerificationCode('+12025551234', '123456');
+await sendVerificationCode("+12025551234", "123456");
 ```
 
 ### 3. Send via API (Direct)
 
 ```typescript
-import { notificationService } from './services/notification.service';
+import { notificationService } from "./services/notification.service";
 
 const result = await notificationService.sendSms({
-  to: '+12025551234',
-  message: 'Your appointment is confirmed!',
+  to: "+12025551234",
+  message: "Your appointment is confirmed!",
 });
 ```
 
 ### 4. Send via API (Queued)
 
 ```typescript
-import { notificationService } from './services/notification.service';
+import { notificationService } from "./services/notification.service";
 
 const result = await notificationService.queueSms({
-  to: '+12025551234',
-  message: 'Your test results are ready.',
+  to: "+12025551234",
+  message: "Your test results are ready.",
 });
 ```
 
 ### 5. Batch SMS
 
 ```typescript
-import { notificationService } from './services/notification.service';
+import { notificationService } from "./services/notification.service";
 
 const results = await notificationService.sendBatchSms(
-  ['+12025551234', '+12025555678'],
-  'Important: System maintenance tonight at 10 PM.'
+  ["+12025551234", "+12025555678"],
+  "Important: System maintenance tonight at 10 PM.",
 );
 ```
 
 ### 6. Check Delivery Status
 
 ```typescript
-import { notificationService } from './services/notification.service';
+import { notificationService } from "./services/notification.service";
 
-const status = await notificationService.getSmsStatus('SMxxxxx');
+const status = await notificationService.getSmsStatus("SMxxxxx");
 console.log(status.status); // 'delivered', 'failed', etc.
 ```
 
@@ -295,6 +319,7 @@ console.log(status.status); // 'delivered', 'failed', etc.
 ### Send SMS
 
 **Request:**
+
 ```http
 POST /api/notifications/sms
 Authorization: Bearer <token>
@@ -307,6 +332,7 @@ Content-Type: application/json
 ```
 
 **Response (Success):**
+
 ```json
 {
   "id": "not_abc123",
@@ -318,6 +344,7 @@ Content-Type: application/json
 ```
 
 **Response (Failure):**
+
 ```json
 {
   "id": "not_abc123",
@@ -331,6 +358,7 @@ Content-Type: application/json
 ### Batch SMS
 
 **Request:**
+
 ```http
 POST /api/notifications/sms/batch
 Authorization: Bearer <token>
@@ -343,6 +371,7 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```json
 {
   "total": 2,
@@ -370,12 +399,14 @@ Content-Type: application/json
 ### Get SMS Status
 
 **Request:**
+
 ```http
 GET /api/notifications/sms/SMxxxxx/status
 Authorization: Bearer <token>
 ```
 
 **Response:**
+
 ```json
 {
   "messageId": "SMxxxxx",
@@ -390,6 +421,7 @@ Authorization: Bearer <token>
 ### HIPAA Compliance
 
 ✅ **Implemented Safeguards:**
+
 - No detailed medical information in SMS
 - Generic language for results ("test results ready" not specific diagnoses)
 - Secure login required for sensitive information
@@ -399,6 +431,7 @@ Authorization: Bearer <token>
 ### TCPA Compliance
 
 ✅ **Best Practices:**
+
 - Only send to consented phone numbers
 - Clear sender identification (app name)
 - Opt-out instructions for marketing (when applicable)
@@ -408,6 +441,7 @@ Authorization: Bearer <token>
 ### Phone Number Privacy
 
 ✅ **Security Measures:**
+
 - E.164 format validation
 - Phone number sanitization
 - Secure storage in logs (masked when appropriate)
@@ -417,6 +451,7 @@ Authorization: Bearer <token>
 ### API Security
 
 ✅ **Protection Layers:**
+
 - JWT authentication required
 - Admin role authorization
 - Input validation (Zod schemas)
@@ -478,17 +513,23 @@ All SMS operations are logged with structured data:
 
 ```typescript
 // Success
-logger.info({
-  phoneNumber: '+12025551234',
-  messageId: 'SMxxxxx',
-  status: 'sent',
-}, 'SMS sent successfully');
+logger.info(
+  {
+    phoneNumber: "+12025551234",
+    messageId: "SMxxxxx",
+    status: "sent",
+  },
+  "SMS sent successfully",
+);
 
 // Failure
-logger.error({
-  phoneNumber: '+12025551234',
-  error: 'Invalid phone number',
-}, 'Failed to send SMS');
+logger.error(
+  {
+    phoneNumber: "+12025551234",
+    error: "Invalid phone number",
+  },
+  "Failed to send SMS",
+);
 ```
 
 ### Log Levels
@@ -502,12 +543,14 @@ logger.error({
 ### Development Mode (Stub)
 
 When Twilio credentials are not configured:
+
 - SMS operations run in stub mode
 - Logs messages instead of sending
 - Returns success responses
 - Useful for development/testing
 
 **Enable Stub Mode:**
+
 ```bash
 # Simply don't set Twilio credentials
 # TWILIO_ACCOUNT_SID=
@@ -531,10 +574,12 @@ When Twilio credentials are not configured:
 ### Rate Limiting
 
 **Twilio Limits:**
+
 - Default: 200 messages/second
 - Can be increased with Twilio
 
 **Our Implementation:**
+
 - `sendSmsWithDelay()` for controlled rate limiting
 - Queue system for batch operations
 - Prevents hitting rate limits
@@ -574,9 +619,11 @@ When Twilio credentials are not configured:
 ### Example Costs
 
 **Scenario: 1000 patients, 1 appointment reminder each**
+
 - 1000 SMS × $0.0079 = $7.90
 
 **Scenario: 100 batch reminders/day for a month**
+
 - 3000 SMS × $0.0079 = $23.70
 
 ## Troubleshooting
@@ -584,6 +631,7 @@ When Twilio credentials are not configured:
 ### SMS Not Sending
 
 **Checklist:**
+
 1. ✅ Verify `TWILIO_ACCOUNT_SID` is set
 2. ✅ Verify `TWILIO_AUTH_TOKEN` is set
 3. ✅ Verify `TWILIO_PHONE_NUMBER` is set and valid
@@ -595,6 +643,7 @@ When Twilio credentials are not configured:
 ### Messages Not Delivering
 
 **Common Issues:**
+
 - Recipient phone number inactive
 - Carrier blocking
 - Landline number (can't receive SMS)
@@ -602,6 +651,7 @@ When Twilio credentials are not configured:
 - Content filtering by carrier
 
 **Solutions:**
+
 - Check status via `/sms/:id/status` endpoint
 - Review Twilio error logs
 - Use Twilio's phone number lookup API
@@ -610,11 +660,13 @@ When Twilio credentials are not configured:
 ### Status Check Failing
 
 **Issues:**
+
 - Invalid message ID
 - Message ID from different Twilio account
 - Twilio API temporarily down
 
 **Solutions:**
+
 - Verify message ID format (starts with "SM")
 - Check Twilio account credentials
 - Retry after delay
@@ -625,6 +677,7 @@ When Twilio credentials are not configured:
 ### Notification Scheduler
 
 SMS service integrates with the notification scheduler:
+
 - 24-hour appointment reminders
 - 1-hour virtual visit reminders
 - Prescription refill reminders
@@ -635,6 +688,7 @@ SMS service integrates with the notification scheduler:
 ### Queue System
 
 SMS jobs processed via Bull queues:
+
 - Async delivery
 - Automatic retries
 - Failed job tracking
@@ -645,6 +699,7 @@ SMS jobs processed via Bull queues:
 ### Email Service
 
 Parallel with email notifications:
+
 - Same template method patterns
 - Consistent API
 - Coordinated multi-channel campaigns
@@ -707,6 +762,7 @@ Parallel with email notifications:
 ### Code Documentation
 
 All functions include:
+
 - ✅ JSDoc comments
 - ✅ Parameter descriptions
 - ✅ Return type documentation
@@ -736,6 +792,7 @@ The system is ready for integration with other platform components and can be de
 ## Support & Maintenance
 
 For issues or questions:
+
 - **Documentation:** Review this file and `NOTIFICATION_SYSTEM.md`
 - **Logs:** Check application logs for detailed error information
 - **Twilio Console:** Monitor sends and delivery in Twilio dashboard

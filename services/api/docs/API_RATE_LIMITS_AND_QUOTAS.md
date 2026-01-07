@@ -1,4 +1,5 @@
 # API Rate Limits and Quotas
+
 ## Unified Healthcare Platform API
 
 **Version:** 1.0
@@ -7,6 +8,7 @@
 ---
 
 ## Table of Contents
+
 1. [Overview](#overview)
 2. [Rate Limiting Strategy](#rate-limiting-strategy)
 3. [Rate Limit Configuration](#rate-limit-configuration)
@@ -23,6 +25,7 @@
 The Unified Healthcare Platform API implements rate limiting to ensure fair usage, prevent abuse, and maintain service quality for all users. Rate limits are applied per IP address and per authenticated user.
 
 ### Key Principles
+
 - **Fair Usage:** Ensures resources are distributed equitably
 - **System Protection:** Prevents service degradation from excessive requests
 - **HIPAA Compliance:** Protects PHI from potential data exfiltration attempts
@@ -33,21 +36,23 @@ The Unified Healthcare Platform API implements rate limiting to ensure fair usag
 ## Rate Limiting Strategy
 
 ### Implementation Details
+
 - **Technology:** Express Rate Limit middleware
 - **Storage:** In-memory (development) / Redis (production)
 - **Window Type:** Sliding window
 - **Granularity:** Per IP address + Per authenticated user
 
 ### Current Configuration
+
 ```typescript
 // services/api/src/index.ts
 const limiter = rateLimit({
-  windowMs: 60 * 1000,           // 1 minute
-  max: 100,                       // 100 requests per window
-  standardHeaders: true,          // Return rate limit info in headers
-  legacyHeaders: false,           // Disable X-RateLimit-* headers
+  windowMs: 60 * 1000, // 1 minute
+  max: 100, // 100 requests per window
+  standardHeaders: true, // Return rate limit info in headers
+  legacyHeaders: false, // Disable X-RateLimit-* headers
   message: {
-    error: 'Too many requests, please try again later'
+    error: "Too many requests, please try again later",
   },
 });
 ```
@@ -58,16 +63,17 @@ const limiter = rateLimit({
 
 ### Global Rate Limits
 
-| Tier | Requests/Minute | Requests/Hour | Requests/Day | Burst Allowance |
-|------|----------------|---------------|--------------|-----------------|
-| **Default** | 100 | 6,000 | 144,000 | 150 requests |
-| **Authenticated** | 200 | 12,000 | 288,000 | 250 requests |
-| **Premium** | 500 | 30,000 | 720,000 | 600 requests |
-| **Enterprise** | 1,000 | 60,000 | 1,440,000 | 1,200 requests |
+| Tier              | Requests/Minute | Requests/Hour | Requests/Day | Burst Allowance |
+| ----------------- | --------------- | ------------- | ------------ | --------------- |
+| **Default**       | 100             | 6,000         | 144,000      | 150 requests    |
+| **Authenticated** | 200             | 12,000        | 288,000      | 250 requests    |
+| **Premium**       | 500             | 30,000        | 720,000      | 600 requests    |
+| **Enterprise**    | 1,000           | 60,000        | 1,440,000    | 1,200 requests  |
 
 ### Configuration by Environment
 
 #### Development
+
 ```env
 RATE_LIMIT_MAX=100
 RATE_LIMIT_WINDOW_MS=60000
@@ -75,6 +81,7 @@ RATE_LIMIT_SKIP_SUCCESSFUL_REQUESTS=false
 ```
 
 #### Staging
+
 ```env
 RATE_LIMIT_MAX=200
 RATE_LIMIT_WINDOW_MS=60000
@@ -82,6 +89,7 @@ RATE_LIMIT_SKIP_SUCCESSFUL_REQUESTS=false
 ```
 
 #### Production
+
 ```env
 RATE_LIMIT_MAX=100
 RATE_LIMIT_WINDOW_MS=60000
@@ -94,94 +102,105 @@ RATE_LIMIT_STORE=redis
 ## Endpoint-Specific Limits
 
 ### Authentication Endpoints
+
 **Higher restrictions to prevent brute force attacks**
 
-| Endpoint | Method | Limit | Window | Notes |
-|----------|--------|-------|--------|-------|
-| `/api/v1/auth/register` | POST | 5 | 15 min | Prevent spam registrations |
-| `/api/v1/auth/login` | POST | 10 | 15 min | Prevent brute force |
-| `/api/v1/auth/refresh` | POST | 20 | 15 min | Allow token refreshes |
-| `/api/v1/auth/logout` | POST | 10 | 1 min | Standard rate |
-| `/api/v1/auth/me` | GET | 60 | 1 min | Frequent access allowed |
+| Endpoint                | Method | Limit | Window | Notes                      |
+| ----------------------- | ------ | ----- | ------ | -------------------------- |
+| `/api/v1/auth/register` | POST   | 5     | 15 min | Prevent spam registrations |
+| `/api/v1/auth/login`    | POST   | 10    | 15 min | Prevent brute force        |
+| `/api/v1/auth/refresh`  | POST   | 20    | 15 min | Allow token refreshes      |
+| `/api/v1/auth/logout`   | POST   | 10    | 1 min  | Standard rate              |
+| `/api/v1/auth/me`       | GET    | 60    | 1 min  | Frequent access allowed    |
 
 **Recommended Implementation:**
+
 ```typescript
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 5,
-  message: { error: 'Too many authentication attempts, please try again later' },
+  message: {
+    error: "Too many authentication attempts, please try again later",
+  },
 });
 
-router.post('/auth/login', authLimiter, authController.login);
+router.post("/auth/login", authLimiter, authController.login);
 ```
 
 ### Data Retrieval Endpoints
+
 **Moderate limits for read operations**
 
-| Endpoint | Method | Limit | Window | Notes |
-|----------|--------|-------|--------|-------|
-| `/api/v1/appointments` | GET | 100 | 1 min | List appointments |
-| `/api/v1/appointments/:id` | GET | 200 | 1 min | Single appointment |
-| `/api/v1/patients/:id` | GET | 100 | 1 min | Patient details |
-| `/api/v1/encounters` | GET | 100 | 1 min | List encounters |
-| `/api/v1/documents` | GET | 100 | 1 min | List documents |
-| `/api/v1/dashboard/stats` | GET | 60 | 1 min | Dashboard data |
+| Endpoint                   | Method | Limit | Window | Notes              |
+| -------------------------- | ------ | ----- | ------ | ------------------ |
+| `/api/v1/appointments`     | GET    | 100   | 1 min  | List appointments  |
+| `/api/v1/appointments/:id` | GET    | 200   | 1 min  | Single appointment |
+| `/api/v1/patients/:id`     | GET    | 100   | 1 min  | Patient details    |
+| `/api/v1/encounters`       | GET    | 100   | 1 min  | List encounters    |
+| `/api/v1/documents`        | GET    | 100   | 1 min  | List documents     |
+| `/api/v1/dashboard/stats`  | GET    | 60    | 1 min  | Dashboard data     |
 
 ### Data Modification Endpoints
+
 **Stricter limits for write operations**
 
-| Endpoint | Method | Limit | Window | Notes |
-|----------|--------|-------|--------|-------|
-| `/api/v1/appointments` | POST | 20 | 5 min | Create appointment |
-| `/api/v1/appointments/:id` | PATCH | 30 | 5 min | Update appointment |
-| `/api/v1/appointments/:id` | DELETE | 10 | 5 min | Cancel appointment |
-| `/api/v1/patients` | POST | 10 | 15 min | Create patient |
-| `/api/v1/patients/:id` | PATCH | 30 | 5 min | Update patient |
-| `/api/v1/encounters` | POST | 30 | 5 min | Create encounter |
-| `/api/v1/encounters/:id` | PATCH | 50 | 5 min | Update encounter |
+| Endpoint                   | Method | Limit | Window | Notes              |
+| -------------------------- | ------ | ----- | ------ | ------------------ |
+| `/api/v1/appointments`     | POST   | 20    | 5 min  | Create appointment |
+| `/api/v1/appointments/:id` | PATCH  | 30    | 5 min  | Update appointment |
+| `/api/v1/appointments/:id` | DELETE | 10    | 5 min  | Cancel appointment |
+| `/api/v1/patients`         | POST   | 10    | 15 min | Create patient     |
+| `/api/v1/patients/:id`     | PATCH  | 30    | 5 min  | Update patient     |
+| `/api/v1/encounters`       | POST   | 30    | 5 min  | Create encounter   |
+| `/api/v1/encounters/:id`   | PATCH  | 50    | 5 min  | Update encounter   |
 
 ### File Upload Endpoints
+
 **Very strict limits for resource-intensive operations**
 
-| Endpoint | Method | Limit | Window | Notes |
-|----------|--------|-------|--------|-------|
-| `/api/v1/documents` | POST | 10 | 15 min | Upload document |
-| `/api/v1/documents/:id/download` | GET | 30 | 5 min | Download document |
+| Endpoint                         | Method | Limit | Window | Notes             |
+| -------------------------------- | ------ | ----- | ------ | ----------------- |
+| `/api/v1/documents`              | POST   | 10    | 15 min | Upload document   |
+| `/api/v1/documents/:id/download` | GET    | 30    | 5 min  | Download document |
 
 **Additional File Upload Constraints:**
+
 - **Max File Size:** 10 MB
 - **Allowed Types:** PDF, JPEG, PNG, DOCX
 - **Concurrent Uploads:** 3 per user
 - **Daily Upload Quota:** 50 files per user
 
 ### Admin Endpoints
+
 **Moderate limits with audit logging**
 
-| Endpoint | Method | Limit | Window | Notes |
-|----------|--------|-------|--------|-------|
-| `/api/v1/audit/events` | GET | 50 | 1 min | View audit logs |
-| `/api/v1/roles` | GET | 30 | 1 min | List roles |
-| `/api/v1/notifications/email` | POST | 20 | 5 min | Send email |
-| `/api/v1/notifications/sms` | POST | 10 | 5 min | Send SMS |
+| Endpoint                      | Method | Limit | Window | Notes           |
+| ----------------------------- | ------ | ----- | ------ | --------------- |
+| `/api/v1/audit/events`        | GET    | 50    | 1 min  | View audit logs |
+| `/api/v1/roles`               | GET    | 30    | 1 min  | List roles      |
+| `/api/v1/notifications/email` | POST   | 20    | 5 min  | Send email      |
+| `/api/v1/notifications/sms`   | POST   | 10    | 5 min  | Send SMS        |
 
 ### Payment Endpoints
+
 **Strict limits for financial operations**
 
-| Endpoint | Method | Limit | Window | Notes |
-|----------|--------|-------|--------|-------|
-| `/api/v1/payments/charge` | POST | 5 | 15 min | Create charge |
-| `/api/v1/payments/subscription` | POST | 10 | 15 min | Create subscription |
-| `/api/v1/payments/subscription` | DELETE | 5 | 15 min | Cancel subscription |
-| `/api/v1/payments/payment-method` | POST | 10 | 15 min | Add payment method |
-| `/api/v1/payments/history` | GET | 30 | 1 min | Payment history |
+| Endpoint                          | Method | Limit | Window | Notes               |
+| --------------------------------- | ------ | ----- | ------ | ------------------- |
+| `/api/v1/payments/charge`         | POST   | 5     | 15 min | Create charge       |
+| `/api/v1/payments/subscription`   | POST   | 10    | 15 min | Create subscription |
+| `/api/v1/payments/subscription`   | DELETE | 5     | 15 min | Cancel subscription |
+| `/api/v1/payments/payment-method` | POST   | 10    | 15 min | Add payment method  |
+| `/api/v1/payments/history`        | GET    | 30    | 1 min  | Payment history     |
 
 ### Webhook Endpoints
+
 **Special handling for external integrations**
 
-| Endpoint | Method | Limit | Notes |
-|----------|--------|-------|-------|
-| `/api/v1/billing/webhook` | POST | 1000 | Per source IP |
-| `/api/v1/payments/webhook` | POST | 1000 | Stripe webhook |
+| Endpoint                   | Method | Limit | Notes          |
+| -------------------------- | ------ | ----- | -------------- |
+| `/api/v1/billing/webhook`  | POST   | 1000  | Per source IP  |
+| `/api/v1/payments/webhook` | POST   | 1000  | Stripe webhook |
 
 **Note:** Webhook endpoints use IP whitelisting instead of strict rate limiting.
 
@@ -190,6 +209,7 @@ router.post('/auth/login', authLimiter, authController.login);
 ## Rate Limit Headers
 
 ### Standard Headers
+
 All API responses include the following rate limit headers:
 
 ```http
@@ -198,13 +218,14 @@ RateLimit-Remaining: 95
 RateLimit-Reset: 1640000000
 ```
 
-| Header | Description | Example |
-|--------|-------------|---------|
-| `RateLimit-Limit` | Maximum requests allowed in window | `100` |
-| `RateLimit-Remaining` | Remaining requests in current window | `95` |
-| `RateLimit-Reset` | Unix timestamp when limit resets | `1640000000` |
+| Header                | Description                          | Example      |
+| --------------------- | ------------------------------------ | ------------ |
+| `RateLimit-Limit`     | Maximum requests allowed in window   | `100`        |
+| `RateLimit-Remaining` | Remaining requests in current window | `95`         |
+| `RateLimit-Reset`     | Unix timestamp when limit resets     | `1640000000` |
 
 ### Rate Limit Exceeded Response
+
 When rate limit is exceeded, the API returns:
 
 ```http
@@ -229,39 +250,48 @@ Retry-After: 60
 ### Client Implementation Best Practices
 
 #### 1. Check Rate Limit Headers
+
 ```typescript
-const response = await fetch('/api/v1/appointments');
+const response = await fetch("/api/v1/appointments");
 
-const limit = response.headers.get('RateLimit-Limit');
-const remaining = response.headers.get('RateLimit-Remaining');
-const reset = response.headers.get('RateLimit-Reset');
+const limit = response.headers.get("RateLimit-Limit");
+const remaining = response.headers.get("RateLimit-Remaining");
+const reset = response.headers.get("RateLimit-Reset");
 
-console.log(`Rate Limit: ${remaining}/${limit} (Resets at ${new Date(reset * 1000)})`);
+console.log(
+  `Rate Limit: ${remaining}/${limit} (Resets at ${new Date(reset * 1000)})`,
+);
 ```
 
 #### 2. Implement Exponential Backoff
+
 ```typescript
-async function apiCallWithRetry(url: string, options: RequestInit, maxRetries = 3) {
+async function apiCallWithRetry(
+  url: string,
+  options: RequestInit,
+  maxRetries = 3,
+) {
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     const response = await fetch(url, options);
 
     if (response.status === 429) {
-      const retryAfter = parseInt(response.headers.get('Retry-After') || '60');
+      const retryAfter = parseInt(response.headers.get("Retry-After") || "60");
       const backoffTime = Math.min(retryAfter * Math.pow(2, attempt), 300); // Max 5 min
 
       console.log(`Rate limited. Retrying in ${backoffTime}s...`);
-      await new Promise(resolve => setTimeout(resolve, backoffTime * 1000));
+      await new Promise((resolve) => setTimeout(resolve, backoffTime * 1000));
       continue;
     }
 
     return response;
   }
 
-  throw new Error('Max retries exceeded');
+  throw new Error("Max retries exceeded");
 }
 ```
 
 #### 3. Use Request Queuing
+
 ```typescript
 class RateLimitedQueue {
   private queue: Array<() => Promise<any>> = [];
@@ -293,7 +323,7 @@ class RateLimitedQueue {
     while (this.queue.length > 0) {
       const fn = this.queue.shift();
       if (fn) await fn();
-      await new Promise(resolve => setTimeout(resolve, delay));
+      await new Promise((resolve) => setTimeout(resolve, delay));
     }
 
     this.processing = false;
@@ -351,14 +381,14 @@ class RateLimitedQueue {
 
 ### Daily Quotas by Resource Type
 
-| Resource | Free Tier | Premium | Enterprise |
-|----------|-----------|---------|------------|
-| API Calls | 10,000/day | 100,000/day | Unlimited |
-| File Uploads | 50/day | 500/day | 5,000/day |
-| Appointments Created | 100/day | 1,000/day | 10,000/day |
-| Email Notifications | 50/day | 500/day | 5,000/day |
-| SMS Notifications | 10/day | 100/day | 1,000/day |
-| Document Storage | 1 GB | 10 GB | 100 GB |
+| Resource             | Free Tier  | Premium     | Enterprise |
+| -------------------- | ---------- | ----------- | ---------- |
+| API Calls            | 10,000/day | 100,000/day | Unlimited  |
+| File Uploads         | 50/day     | 500/day     | 5,000/day  |
+| Appointments Created | 100/day    | 1,000/day   | 10,000/day |
+| Email Notifications  | 50/day     | 500/day     | 5,000/day  |
+| SMS Notifications    | 10/day     | 100/day     | 1,000/day  |
+| Document Storage     | 1 GB       | 10 GB       | 100 GB     |
 
 ### Quota Tracking
 
@@ -370,13 +400,13 @@ const dailyQuota = {
   key: `quota:${userId}:${resourceType}:${date}`,
   limit: getTierLimit(user.tier, resourceType),
   used: getCurrentUsage(userId, resourceType),
-  resetAt: endOfDay(new Date())
+  resetAt: endOfDay(new Date()),
 };
 
 // Check quota before operation
 if (dailyQuota.used >= dailyQuota.limit) {
   throw new QuotaExceededError(
-    `Daily quota exceeded for ${resourceType}. Resets at ${dailyQuota.resetAt}`
+    `Daily quota exceeded for ${resourceType}. Resets at ${dailyQuota.resetAt}`,
   );
 }
 ```
@@ -414,6 +444,7 @@ X-Daily-Quota-Reset: 2025-12-18T00:00:00Z
 ### Alerts
 
 Configure alerts for:
+
 - Rate limit hit rate > 5%
 - Individual user exceeds 80% of quota
 - Sudden spike in 429 responses
@@ -464,6 +495,7 @@ A: The system allows brief bursts (up to 1.5x the limit) before enforcing strict
 ## Contact & Support
 
 For rate limit questions or issues:
+
 - **Email:** api-support@unifiedhealth.com
 - **Documentation:** https://docs.unifiedhealth.com/api/rate-limits
 - **Status Page:** https://status.unifiedhealth.com
