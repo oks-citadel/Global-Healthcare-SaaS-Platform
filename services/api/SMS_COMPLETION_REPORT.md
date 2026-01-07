@@ -255,7 +255,7 @@ TWILIO_AUTH_TOKEN=your_auth_token_here
 TWILIO_PHONE_NUMBER=+12025551234
 
 # Application
-APP_URL=https://theunifiedhealth.com
+APP_URL=https://thetheunifiedhealth.com
 APP_NAME=UnifiedHealth
 ```
 
@@ -263,7 +263,7 @@ APP_NAME=UnifiedHealth
 
 ```bash
 # Support Information
-SUPPORT_EMAIL=support@theunifiedhealth.com
+SUPPORT_EMAIL=support@thetheunifiedhealth.com
 SUPPORT_PHONE=+1-800-UNIFIED
 BILLING_PHONE=+1-800-BILLING
 ```

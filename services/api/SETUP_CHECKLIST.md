@@ -116,13 +116,13 @@ npm run db:studio
 
 ### Admin Account
 
-- [ ] Email: admin@theunifiedhealth.com
+- [ ] Email: admin@thetheunifiedhealth.com
 - [ ] Password: Admin123!
 - [ ] Can login successfully
 
 ### Provider Account
 
-- [ ] Email: dr.smith@theunifiedhealth.com
+- [ ] Email: dr.smith@thetheunifiedhealth.com
 - [ ] Password: Provider123!
 - [ ] Can login successfully
 

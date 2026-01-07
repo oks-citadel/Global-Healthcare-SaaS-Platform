@@ -70,8 +70,8 @@ FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY----
 # ===========================================
 # APPLICATION URLS
 # ===========================================
-APP_URL=https://app.unifiedhealth.com
-API_URL=https://api.unifiedhealth.com
+APP_URL=https://app.thetheunifiedhealth.com
+API_URL=https://api.thetheunifiedhealth.com
 ```
 
 ### 2. Installation
@@ -450,9 +450,9 @@ alerts:
 - [Firebase Documentation](https://firebase.google.com/docs)
 
 ### Team Contacts
-- Integration Team: integrations@unifiedhealth.com
-- DevOps Team: devops@unifiedhealth.com
-- Support Team: support@unifiedhealth.com
+- Integration Team: integrations@thetheunifiedhealth.com
+- DevOps Team: devops@thetheunifiedhealth.com
+- Support Team: support@thetheunifiedhealth.com
 
 ---
 

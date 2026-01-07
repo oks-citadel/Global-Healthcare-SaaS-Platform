@@ -130,7 +130,7 @@ yH4xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```bash
 VAPID_PUBLIC_KEY=BG3xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 VAPID_PRIVATE_KEY=yH4xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-VAPID_SUBJECT=mailto:support@theunifiedhealth.com
+VAPID_SUBJECT=mailto:support@thetheunifiedhealth.com
 ```
 
 **Notes:**

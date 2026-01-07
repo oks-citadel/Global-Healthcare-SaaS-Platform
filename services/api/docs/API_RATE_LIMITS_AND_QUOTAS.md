@@ -458,7 +458,7 @@ Configure alerts for:
 
 For temporary or permanent rate limit increases:
 
-1. **Contact:** api-support@theunifiedhealth.com
+1. **Contact:** api-support@thetheunifiedhealth.com
 2. **Provide:**
    - Use case description
    - Expected request volume
@@ -496,9 +496,9 @@ A: The system allows brief bursts (up to 1.5x the limit) before enforcing strict
 
 For rate limit questions or issues:
 
-- **Email:** api-support@theunifiedhealth.com
-- **Documentation:** https://docs.theunifiedhealth.com/api/rate-limits
-- **Status Page:** https://status.theunifiedhealth.com
+- **Email:** api-support@thetheunifiedhealth.com
+- **Documentation:** https://docs.thetheunifiedhealth.com/api/rate-limits
+- **Status Page:** https://status.thetheunifiedhealth.com
 
 ---
 

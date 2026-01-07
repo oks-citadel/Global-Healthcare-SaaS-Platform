@@ -36,7 +36,7 @@ import { createClient } from "@unified-health/sdk";
 
 // Create a client instance
 const client = createClient({
-  baseURL: "https://api.theunifiedhealth.com/api/v1",
+  baseURL: "https://api.thetheunifiedhealth.com/api/v1",
 });
 
 // Login
@@ -64,7 +64,7 @@ console.log("Appointments:", appointments.data);
 import { createClient } from "@unified-health/sdk";
 
 const client = createClient({
-  baseURL: "https://api.theunifiedhealth.com/api/v1",
+  baseURL: "https://api.thetheunifiedhealth.com/api/v1",
   timeout: 30000, // 30 seconds
   headers: {
     "X-Custom-Header": "value",
@@ -76,7 +76,7 @@ const client = createClient({
 
 ```typescript
 const client = createClient({
-  baseURL: "https://api.theunifiedhealth.com/api/v1",
+  baseURL: "https://api.thetheunifiedhealth.com/api/v1",
   accessToken: "your-access-token",
   refreshToken: "your-refresh-token",
   onTokenRefresh: (tokens) => {
@@ -259,7 +259,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { createClient } from '@unified-health/sdk';
 
 const client = createClient({
-  baseURL: 'https://api.theunifiedhealth.com/api/v1',
+  baseURL: 'https://api.thetheunifiedhealth.com/api/v1',
   accessToken: getAccessToken(),
 });
 
@@ -308,7 +308,7 @@ import { createClient } from "@unified-health/sdk";
 import * as SecureStore from "expo-secure-store";
 
 const client = createClient({
-  baseURL: "https://api.theunifiedhealth.com/api/v1",
+  baseURL: "https://api.thetheunifiedhealth.com/api/v1",
   onTokenRefresh: async (tokens) => {
     // Save tokens securely
     await SecureStore.setItemAsync("accessToken", tokens.accessToken);
@@ -431,6 +431,6 @@ MIT
 
 For support and questions:
 
-- Documentation: https://docs.theunifiedhealth.com
-- Email: api-support@theunifiedhealth.com
+- Documentation: https://docs.thetheunifiedhealth.com
+- Email: api-support@thetheunifiedhealth.com
 - GitHub Issues: https://github.com/unified-health/platform/issues

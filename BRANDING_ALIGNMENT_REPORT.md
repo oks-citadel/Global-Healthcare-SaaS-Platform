@@ -1,7 +1,7 @@
 # Branding Alignment Report
 
 **Date:** January 2, 2026
-**Domain:** theunifiedhealth.com
+**Domain:** thetheunifiedhealth.com
 **Project:** The Unified Health Platform
 
 ---
@@ -16,8 +16,8 @@ This report documents the controlled branding alignment completed across the ent
 |---------|------------|
 | External-facing system identity | **The Unified Health** |
 | UI shorthand (dashboards/navigation) | **Unified Health** |
-| Domain | **theunifiedhealth.com** |
-| Email domain | **@theunifiedhealth.com** |
+| Domain | **thetheunifiedhealth.com** |
+| Email domain | **@thetheunifiedhealth.com** |
 | Legal entity | **The Unified Health, Inc.** |
 
 ---
@@ -76,7 +76,7 @@ This report documents the controlled branding alignment completed across the ent
 
 | Document | Changes |
 |----------|---------|
-| `docs/compliance/PRIVACY-POLICY.md` | Company name, contact emails (@theunifiedhealth.com), legal entity |
+| `docs/compliance/PRIVACY-POLICY.md` | Company name, contact emails (@thetheunifiedhealth.com), legal entity |
 | `docs/compliance/TERMS-OF-SERVICE.md` | Company name, contact emails, legal entity, copyright |
 
 ### 7. API Documentation (OpenAPI/Swagger)
@@ -190,7 +190,7 @@ The `branding-check` job:
 |---------|----------|
 | `The Unified Health` | External-facing, canonical |
 | `Unified Health` | UI shorthand, navigation |
-| `theunifiedhealth.com` | Domain references |
+| `thetheunifiedhealth.com` | Domain references |
 
 ### 4. Disallowed Patterns
 
@@ -199,7 +199,7 @@ The `branding-check` job:
 | `UnifiedHealth` | Missing space |
 | `Unified Healthcare` | Old variant |
 | `unified-health.com` | Wrong domain |
-| `unifiedhealth.com` | Wrong domain |
+| `theunifiedhealth.com` | Wrong domain |
 
 ---
 
@@ -207,7 +207,7 @@ The `branding-check` job:
 
 Branding is now **canonical**, **consistent**, and **guarded against future drift**.
 
-All changes align with the domain `theunifiedhealth.com` and follow the established brand rules without introducing any breaking changes to the platform.
+All changes align with the domain `thetheunifiedhealth.com` and follow the established brand rules without introducing any breaking changes to the platform.
 
 ---
 

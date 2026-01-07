@@ -29,8 +29,8 @@ The Unified Healthcare Platform API is a RESTful API that provides comprehensive
 
 ```
 Development: http://localhost:4000/api/v1
-Staging: https://api-staging.unifiedhealth.com/api/v1
-Production: https://api.unifiedhealth.com/api/v1
+Staging: https://api-staging.thetheunifiedhealth.com/api/v1
+Production: https://api.thetheunifiedhealth.com/api/v1
 ```
 
 ### API Documentation
@@ -507,6 +507,6 @@ async function providerFlow() {
 ## Support
 
 For API support or questions:
-- Email: api-support@unifiedhealth.com
-- Documentation: https://docs.unifiedhealth.com
+- Email: api-support@thetheunifiedhealth.com
+- Documentation: https://docs.thetheunifiedhealth.com
 - GitHub Issues: https://github.com/unified-health/platform/issues

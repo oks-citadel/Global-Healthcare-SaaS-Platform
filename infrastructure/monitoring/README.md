@@ -197,7 +197,7 @@ kubectl apply -f alert-rules.yaml
 **Grafana**:
 ```bash
 # Import dashboards via Grafana API
-curl -X POST http://grafana.unifiedhealth.com/api/dashboards/db \
+curl -X POST http://grafana.thetheunifiedhealth.com/api/dashboards/db \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <api-key>" \
   -d @dashboard-system-health.json
@@ -368,7 +368,7 @@ az monitor action-group create \
   --name unified-health-alerts \
   --resource-group unified-health-monitoring-rg \
   --short-name UHAlerts \
-  --email-receiver name=SRE email=sre@unifiedhealth.com
+  --email-receiver name=SRE email=sre@thetheunifiedhealth.com
 
 # 3. Deploy alert rules
 # See alert-rules.yaml for rule definitions
@@ -431,7 +431,7 @@ kubectl apply -f ../kubernetes/base/api-deployment.yaml
 - Select: Unified Health dashboards
 
 **Grafana**:
-- URL: https://grafana.unifiedhealth.com
+- URL: https://grafana.thetheunifiedhealth.com
 - Dashboards > Manage > Unified Health folder
 
 ### Dashboard URLs
@@ -473,7 +473,7 @@ ApplicationLogs_CL
 ### Alert Channels
 
 **Configured Channels**:
-- Email: sre@unifiedhealth.com
+- Email: sre@thetheunifiedhealth.com
 - SMS: +1-555-0100
 - PagerDuty: Integration key configured
 - Slack: #incidents channel
@@ -504,7 +504,7 @@ Incident workflow begins
 ```bash
 # Test alert by triggering high error rate
 for i in {1..100}; do
-  curl -X GET https://api.unifiedhealth.com/api/v1/test/error
+  curl -X GET https://api.thetheunifiedhealth.com/api/v1/test/error
 done
 
 # Verify alert triggered
@@ -542,7 +542,7 @@ az monitor metrics alert list \
 
 ### Monitoring SLOs
 
-**Dashboard**: https://grafana.unifiedhealth.com/d/slo-tracking
+**Dashboard**: https://grafana.thetheunifiedhealth.com/d/slo-tracking
 
 **Error Budget Dashboard**:
 ```
@@ -692,14 +692,14 @@ az monitor action-group list \
 
 ### Contacts
 
-- **SRE Team**: sre@unifiedhealth.com
-- **On-Call**: oncall@unifiedhealth.com (PagerDuty)
-- **Security**: security@unifiedhealth.com
+- **SRE Team**: sre@thetheunifiedhealth.com
+- **On-Call**: oncall@thetheunifiedhealth.com (PagerDuty)
+- **Security**: security@thetheunifiedhealth.com
 
 ### Resources
 
 - **Runbook**: [incident-response-runbook.md](./incident-response-runbook.md)
-- **Architecture Docs**: https://wiki.unifiedhealth.com/architecture
+- **Architecture Docs**: https://wiki.thetheunifiedhealth.com/architecture
 - **Azure Monitor Docs**: https://docs.microsoft.com/azure/azure-monitor
 - **Prometheus Docs**: https://prometheus.io/docs
 

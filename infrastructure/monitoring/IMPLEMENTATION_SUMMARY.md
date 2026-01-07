@@ -692,10 +692,10 @@ chmod +x deploy-monitoring.sh
 - SLO tracking workshop (scheduled)
 
 ### Contacts
-- **SRE Team:** sre@unifiedhealth.com
+- **SRE Team:** sre@thetheunifiedhealth.com
 - **On-Call:** PagerDuty +1-555-0100
-- **Security:** security@unifiedhealth.com
-- **Compliance:** compliance@unifiedhealth.com
+- **Security:** security@thetheunifiedhealth.com
+- **Compliance:** compliance@thetheunifiedhealth.com
 
 ---
 

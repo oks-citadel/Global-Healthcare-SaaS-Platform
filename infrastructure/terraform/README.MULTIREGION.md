@@ -183,10 +183,10 @@ deploy_europe   = true
 deploy_africa   = true
 
 # Monitoring
-global_alert_email_address   = "ops@unifiedhealth.com"
-americas_alert_email_address = "ops-americas@unifiedhealth.com"
-europe_alert_email_address   = "ops-europe@unifiedhealth.com"
-africa_alert_email_address   = "ops-africa@unifiedhealth.com"
+global_alert_email_address   = "ops@theunifiedhealth.com"
+americas_alert_email_address = "ops-americas@theunifiedhealth.com"
+europe_alert_email_address   = "ops-europe@theunifiedhealth.com"
+africa_alert_email_address   = "ops-africa@theunifiedhealth.com"
 ```
 
 ### Optional Variables
@@ -197,7 +197,7 @@ enable_cross_region_peering = false
 
 # DNS management (default: false)
 manage_dns    = false
-dns_zone_name = "unifiedhealth.com"
+dns_zone_name = "theunifiedhealth.com"
 
 # Kubernetes version (default: 1.28.3)
 kubernetes_version = "1.28.3"
@@ -457,4 +457,4 @@ Copyright (c) 2025 UnifiedHealth Platform. All rights reserved.
 
 ---
 
-**Questions?** Contact: devops@unifiedhealth.com
+**Questions?** Contact: devops@thetheunifiedhealth.com

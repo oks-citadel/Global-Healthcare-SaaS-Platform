@@ -17,7 +17,7 @@ Email: [EMAIL]
 Address: [EU ADDRESS]
 Country: [EU COUNTRY]
 Data Protection Officer: [DPO NAME]
-Email: dpo@unifiedhealth.com
+Email: dpo@thetheunifiedhealth.com
 
 ---
 
@@ -365,7 +365,7 @@ Data Processor not liable if it proves it is not responsible for the event givin
 
 Data Processor DPO:
 - Name: [DPO NAME]
-- Email: dpo@unifiedhealth.com
+- Email: dpo@thetheunifiedhealth.com
 - Phone: [PHONE]
 
 **13.2 Supervisory Authority**
@@ -509,7 +509,7 @@ Date: _____________________________________
 
 ## ANNEX 2: SUB-PROCESSOR LIST
 
-Maintained at: https://www.unifiedhealth.com/sub-processors
+Maintained at: https://www.thetheunifiedhealth.com/sub-processors
 
 Updated: [DATE]
 

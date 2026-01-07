@@ -61,7 +61,7 @@ FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY----
 FIREBASE_SERVICE_ACCOUNT_PATH=/path/to/serviceAccount.json
 
 # Application
-APP_URL=https://app.unifiedhealth.com
+APP_URL=https://app.thetheunifiedhealth.com
 ```
 
 ---

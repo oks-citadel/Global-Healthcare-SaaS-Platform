@@ -713,9 +713,9 @@ infrastructure/terraform-aws/
 ## Support
 
 For issues or questions:
-- Email: devops@unifiedhealth.com
+- Email: devops@thetheunifiedhealth.com
 - Slack: #unified-health-platform
-- Documentation: https://docs.unifiedhealth.com
+- Documentation: https://docs.thetheunifiedhealth.com
 
 ---
 

@@ -111,9 +111,9 @@ Use this checklist to ensure all prerequisites and deployment steps are complete
 
 - [ ] Hosted zone created for domain
 - [ ] A/ALIAS records configured:
-  - [ ] `api.unifiedhealth.com` - Production API
-  - [ ] `api-staging.unifiedhealth.com` - Staging API
-  - [ ] `app.unifiedhealth.com` - Web application
+  - [ ] `api.thetheunifiedhealth.com` - Production API
+  - [ ] `api-staging.thetheunifiedhealth.com` - Staging API
+  - [ ] `app.thetheunifiedhealth.com` - Web application
 - [ ] Health checks configured
 - [ ] Failover routing policies (if multi-region)
 - [ ] Latency-based routing (if multi-region)
@@ -217,8 +217,8 @@ Use this checklist to ensure all prerequisites and deployment steps are complete
 
 ### Post-Deployment Validation
 
-- [ ] Test health endpoint: `curl https://api-staging.unifiedhealth.com/health`
-- [ ] Test readiness endpoint: `curl https://api-staging.unifiedhealth.com/ready`
+- [ ] Test health endpoint: `curl https://api-staging.thetheunifiedhealth.com/health`
+- [ ] Test readiness endpoint: `curl https://api-staging.thetheunifiedhealth.com/ready`
 - [ ] Test API authentication
 - [ ] Test database connectivity (RDS)
 - [ ] Test Redis connectivity (ElastiCache)
@@ -266,8 +266,8 @@ Use this checklist to ensure all prerequisites and deployment steps are complete
 
 ### Post-Deployment Validation
 
-- [ ] Test health endpoint: `curl https://api.unifiedhealth.com/health`
-- [ ] Test readiness endpoint: `curl https://api.unifiedhealth.com/ready`
+- [ ] Test health endpoint: `curl https://api.thetheunifiedhealth.com/health`
+- [ ] Test readiness endpoint: `curl https://api.thetheunifiedhealth.com/ready`
 - [ ] Test API authentication from production client
 - [ ] Verify database connections (no connection pool exhaustion)
 - [ ] Verify Redis connections

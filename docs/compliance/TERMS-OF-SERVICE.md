@@ -583,7 +583,7 @@ We are not liable for any delay or failure to perform due to causes beyond our r
 Notices to you will be sent to the email address associated with your account. Notices to us should be sent to:
 
 **The Unified Health, Inc.**
-Email: legal@theunifiedhealth.com
+Email: legal@thetheunifiedhealth.com
 Mail: [Company Address]
 
 ### 18.7 No Agency
@@ -601,12 +601,12 @@ Provisions that by their nature should survive termination will survive, includi
 If you have questions about these Terms, please contact us:
 
 **Customer Support:**
-Email: support@theunifiedhealth.com
+Email: support@thetheunifiedhealth.com
 Phone: +1 (555) 123-4567
 Hours: Monday-Friday, 9:00 AM - 5:00 PM (EST)
 
 **Legal Department:**
-Email: legal@theunifiedhealth.com
+Email: legal@thetheunifiedhealth.com
 
 **Mailing Address:**
 The Unified Health, Inc.

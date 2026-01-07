@@ -46,7 +46,7 @@ npm install @unified-health/sdk
 import { createClient } from '@unified-health/sdk';
 
 const client = createClient({
-  baseURL: 'https://api.unifiedhealth.com/api/v1',
+  baseURL: 'https://api.thetheunifiedhealth.com/api/v1',
 });
 
 // Login
@@ -67,8 +67,8 @@ See the [SDK README](../../packages/sdk/README.md) for complete documentation.
 
 Access the interactive API documentation (Swagger UI):
 - Development: http://localhost:4000/api/docs
-- Staging: https://api-staging.unifiedhealth.com/api/docs
-- Production: https://api.unifiedhealth.com/api/docs
+- Staging: https://api-staging.thetheunifiedhealth.com/api/docs
+- Production: https://api.thetheunifiedhealth.com/api/docs
 
 ### OpenAPI Specification
 
@@ -262,12 +262,12 @@ Role-based access control (RBAC):
 ## Support
 
 ### Documentation
-- API Documentation: https://docs.unifiedhealth.com
+- API Documentation: https://docs.thetheunifiedhealth.com
 - SDK Documentation: [packages/sdk/README.md](../../packages/sdk/README.md)
 - Getting Started: [getting-started.md](./getting-started.md)
 
 ### Contact
-- Email: api-support@unifiedhealth.com
+- Email: api-support@thetheunifiedhealth.com
 - GitHub: https://github.com/unified-health/platform
 - Issues: https://github.com/unified-health/platform/issues
 

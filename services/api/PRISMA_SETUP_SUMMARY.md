@@ -157,10 +157,10 @@ After running the seed script, use these credentials:
 
 | Role     | Email                         | Password     | Description          |
 | -------- | ----------------------------- | ------------ | -------------------- |
-| Admin    | admin@theunifiedhealth.com       | Admin123!    | System administrator |
-| Provider | dr.smith@theunifiedhealth.com    | Provider123! | Cardiologist         |
-| Provider | dr.johnson@theunifiedhealth.com  | Provider123! | Pediatrician         |
-| Provider | dr.williams@theunifiedhealth.com | Provider123! | Dermatologist        |
+| Admin    | admin@thetheunifiedhealth.com       | Admin123!    | System administrator |
+| Provider | dr.smith@thetheunifiedhealth.com    | Provider123! | Cardiologist         |
+| Provider | dr.johnson@thetheunifiedhealth.com  | Provider123! | Pediatrician         |
+| Provider | dr.williams@thetheunifiedhealth.com | Provider123! | Dermatologist        |
 | Patient  | john.doe@example.com          | Patient123!  | Patient with MRN     |
 | Patient  | jane.smith@example.com        | Patient123!  | Patient with MRN     |
 | ...      | (8 more patients)             | Patient123!  | See users.json       |

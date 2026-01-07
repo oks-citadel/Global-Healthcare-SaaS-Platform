@@ -943,5 +943,5 @@ ORDER BY failed_attempts DESC;
 **Review Schedule:** Quarterly
 
 **For technical questions, contact:**
-Engineering Team: engineering@theunifiedhealth.com
-Security Team: security@theunifiedhealth.com
+Engineering Team: engineering@thetheunifiedhealth.com
+Security Team: security@thetheunifiedhealth.com

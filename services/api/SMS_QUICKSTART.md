@@ -27,7 +27,7 @@ TWILIO_AUTH_TOKEN=your_auth_token_here
 TWILIO_PHONE_NUMBER=+12025551234
 
 # Application Settings
-APP_URL=https://theunifiedhealth.com
+APP_URL=https://thetheunifiedhealth.com
 APP_NAME=UnifiedHealth
 ```
 

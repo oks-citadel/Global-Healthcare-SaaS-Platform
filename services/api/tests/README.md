@@ -567,7 +567,7 @@ pnpm vitest run --coverage
 
 For questions or issues with tests:
 - **Team Chat:** #api-quality on Slack
-- **Email:** api-team@theunifiedhealth.com
+- **Email:** api-team@thetheunifiedhealth.com
 - **Issues:** GitHub Issues
 
 ---

@@ -469,7 +469,7 @@ For questions or issues:
 - Review documentation: MULTIREGION_DEPLOYMENT_GUIDE.md
 - Check README: README.MULTIREGION.md
 - Use Makefile help: `make -f Makefile.multiregion help`
-- Contact: devops@unifiedhealth.com
+- Contact: devops@thetheunifiedhealth.com
 
 ---
 

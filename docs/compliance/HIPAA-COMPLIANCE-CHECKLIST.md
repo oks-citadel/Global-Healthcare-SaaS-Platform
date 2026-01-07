@@ -57,7 +57,7 @@ This checklist ensures the Unified Health Platform complies with the Health Insu
   - Authority to implement and enforce security policies
   - **Status:** Completed
   - **Responsible:** Chief Security Officer
-  - **Contact:** security@theunifiedhealth.com
+  - **Contact:** security@thetheunifiedhealth.com
 
 ### 1.3 Workforce Security (§ 164.308(a)(3))
 
@@ -141,7 +141,7 @@ This checklist ensures the Unified Health Platform complies with the Health Insu
   - Escalation procedures defined
   - **Status:** Implemented
   - **Evidence:** `docs/compliance/INCIDENT-RESPONSE-PROCEDURES.md`
-  - **Contact:** security-incidents@theunifiedhealth.com
+  - **Contact:** security-incidents@thetheunifiedhealth.com
 
 ### 1.7 Contingency Plan (§ 164.308(a)(7))
 
@@ -804,5 +804,5 @@ I, [Compliance Officer Name], hereby certify that:
 **Retention Period:** 6 years from last active date
 
 **For questions or concerns regarding this checklist, contact:**
-Compliance Officer: compliance@theunifiedhealth.com
-Security Officer: security@theunifiedhealth.com
+Compliance Officer: compliance@thetheunifiedhealth.com
+Security Officer: security@thetheunifiedhealth.com

@@ -21,7 +21,7 @@ This directory contains comprehensive load testing scripts using [K6](https://k6
 
 2. Set environment variables:
    ```bash
-   export BASE_URL=https://api.theunifiedhealth.com
+   export BASE_URL=https://api.thetheunifiedhealth.com
    export AUTH_TOKEN=your-test-token
    ```
 
@@ -59,7 +59,7 @@ docker run -i grafana/k6 run - < tests/load.js
 ### With Environment Variables
 
 ```bash
-K6_BASE_URL=https://staging.theunifiedhealth.com \
+K6_BASE_URL=https://staging.thetheunifiedhealth.com \
 K6_VUS=100 \
 K6_DURATION=5m \
 k6 run tests/load.js

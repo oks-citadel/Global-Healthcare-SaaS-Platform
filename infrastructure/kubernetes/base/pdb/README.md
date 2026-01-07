@@ -238,4 +238,4 @@ spec:
 
 - [Kubernetes PDB Documentation](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/)
 - [Specifying a Disruption Budget](https://kubernetes.io/docs/tasks/run-application/configure-pdb/)
-- [Unified Health Platform Operations Guide](https://docs.unifiedhealth.com/ops)
+- [Unified Health Platform Operations Guide](https://docs.thetheunifiedhealth.com/ops)

@@ -6,9 +6,9 @@ The Unified Health API is a RESTful API that provides access to all platform fun
 
 **Base URLs:**
 - Local Development: `http://localhost:8080/api/v1`
-- Development: `https://api-dev.theunifiedhealth.com/api/v1`
-- Staging: `https://api-staging.theunifiedhealth.com/api/v1`
-- Production: `https://api.theunifiedhealth.com/api/v1`
+- Development: `https://api-dev.thetheunifiedhealth.com/api/v1`
+- Staging: `https://api-staging.thetheunifiedhealth.com/api/v1`
+- Production: `https://api.thetheunifiedhealth.com/api/v1`
 
 **Current Version:** 1.0.0
 
@@ -19,7 +19,7 @@ The Unified Health API is a RESTful API that provides access to all platform fun
 Obtain an access token by authenticating:
 
 ```bash
-curl -X POST https://api.theunifiedhealth.com/api/v1/auth/login \
+curl -X POST https://api.thetheunifiedhealth.com/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "user@example.com",
@@ -48,7 +48,7 @@ Response:
 Include the access token in the Authorization header:
 
 ```bash
-curl -X GET https://api.theunifiedhealth.com/api/v1/users/me \
+curl -X GET https://api.thetheunifiedhealth.com/api/v1/users/me \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 ```
 
@@ -120,7 +120,7 @@ Practical integration examples:
 
 Access the interactive API documentation at:
 - **Local:** http://localhost:8080/docs
-- **Production:** https://api.theunifiedhealth.com/docs
+- **Production:** https://api.thetheunifiedhealth.com/docs
 
 The Swagger UI allows you to:
 - Browse all available endpoints
@@ -132,7 +132,7 @@ The Swagger UI allows you to:
 
 Download the complete OpenAPI 3.0 specification:
 ```bash
-curl https://api.theunifiedhealth.com/api/v1/openapi.yaml > openapi.yaml
+curl https://api.thetheunifiedhealth.com/api/v1/openapi.yaml > openapi.yaml
 ```
 
 ## API Conventions
@@ -143,7 +143,7 @@ All API requests must include:
 
 ```http
 POST /api/v1/resource HTTP/1.1
-Host: api.theunifiedhealth.com
+Host: api.thetheunifiedhealth.com
 Content-Type: application/json
 Authorization: Bearer {access_token}
 X-Request-ID: {unique-request-id}
@@ -282,7 +282,7 @@ See [Webhook Documentation](./WEBHOOKS.md) for setup and event types.
 
 The platform supports FHIR R4 resources. Access FHIR endpoints at:
 ```
-https://api.theunifiedhealth.com/fhir/
+https://api.thetheunifiedhealth.com/fhir/
 ```
 
 Supported resources:
@@ -332,7 +332,7 @@ const appointment = await client.appointments.create({
 
 Use the sandbox environment for testing:
 ```
-https://api-sandbox.theunifiedhealth.com/api/v1
+https://api-sandbox.thetheunifiedhealth.com/api/v1
 ```
 
 **Test Credentials:**
@@ -352,10 +352,10 @@ https://api-sandbox.theunifiedhealth.com/api/v1
 
 ### Getting Help
 
-- **API Status:** https://status.theunifiedhealth.com
+- **API Status:** https://status.thetheunifiedhealth.com
 - **Support Email:** support@unifiedhealth.io
-- **Developer Portal:** https://developers.theunifiedhealth.com
-- **Community Forum:** https://community.theunifiedhealth.com
+- **Developer Portal:** https://developers.thetheunifiedhealth.com
+- **Community Forum:** https://community.thetheunifiedhealth.com
 - **GitHub Issues:** https://github.com/unified-health/platform/issues
 
 ### API Changelog

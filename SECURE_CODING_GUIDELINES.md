@@ -725,8 +725,8 @@ import cors from 'cors';
 const corsOptions = {
   origin: (origin, callback) => {
     const allowedOrigins = [
-      'https://app.unifiedhealth.com',
-      'https://staging.unifiedhealth.com',
+      'https://app.thetheunifiedhealth.com',
+      'https://staging.thetheunifiedhealth.com',
       // Add more as needed
     ];
 
@@ -1095,4 +1095,4 @@ Before approving a PR, verify:
 
 **Questions?**
 
-Contact the Security Team: security@unifiedhealth.com
+Contact the Security Team: security@thetheunifiedhealth.com

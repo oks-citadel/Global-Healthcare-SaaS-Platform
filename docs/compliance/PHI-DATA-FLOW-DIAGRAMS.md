@@ -742,5 +742,5 @@ System Events → API → SendGrid
 **Review Schedule:** Quarterly or upon architecture changes
 
 **For questions, contact:**
-Security Team: security@theunifiedhealth.com
-Compliance Team: compliance@theunifiedhealth.com
+Security Team: security@thetheunifiedhealth.com
+Compliance Team: compliance@thetheunifiedhealth.com

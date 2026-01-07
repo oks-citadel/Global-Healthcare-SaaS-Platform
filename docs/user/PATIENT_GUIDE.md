@@ -6,7 +6,7 @@ Welcome to Unified Health! This guide will help you get started with the platfor
 
 ### Creating Your Account
 
-1. **Visit** https://app.theunifiedhealth.com
+1. **Visit** https://app.thetheunifiedhealth.com
 2. **Click** "Sign Up" or "Get Started"
 3. **Enter your information:**
    - Email address
@@ -19,7 +19,7 @@ Welcome to Unified Health! This guide will help you get started with the platfor
 
 ### Logging In
 
-1. Go to https://app.theunifiedhealth.com
+1. Go to https://app.thetheunifiedhealth.com
 2. Enter your email and password
 3. If enabled, complete two-factor authentication
 4. You're in! Welcome to your dashboard

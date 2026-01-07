@@ -435,10 +435,10 @@ receivers:
 receivers:
   - name: 'email-alerts'
     email_configs:
-      - to: 'sre-team@unifiedhealth.com'
-        from: 'alerts@unifiedhealth.com'
+      - to: 'sre-team@theunifiedhealth.com'
+        from: 'alerts@thetheunifiedhealth.com'
         smarthost: 'smtp.gmail.com:587'
-        auth_username: 'alerts@unifiedhealth.com'
+        auth_username: 'alerts@thetheunifiedhealth.com'
         auth_password: 'YOUR_PASSWORD'
 ```
 
@@ -653,9 +653,9 @@ See `QUICK_REFERENCE.md` for common PromQL queries
 See `incident-response-runbook.md` for alert response procedures
 
 ### Support
-- **SRE Team**: sre@unifiedhealth.com
-- **On-Call**: oncall@unifiedhealth.com
-- **Documentation**: https://wiki.unifiedhealth.com/monitoring
+- **SRE Team**: sre@thetheunifiedhealth.com
+- **On-Call**: oncall@thetheunifiedhealth.com
+- **Documentation**: https://wiki.thetheunifiedhealth.com/monitoring
 
 ---
 

@@ -380,8 +380,8 @@ ignore:
 
 ### Support Channels
 
-- **Security Team:** security@unifiedhealth.com
-- **DevOps Team:** devops@unifiedhealth.com
+- **Security Team:** security@thetheunifiedhealth.com
+- **DevOps Team:** devops@thetheunifiedhealth.com
 - **Slack:** #security-help
 
 ### External Resources

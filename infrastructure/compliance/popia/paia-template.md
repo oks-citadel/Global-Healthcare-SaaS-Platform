@@ -4,7 +4,7 @@
 **Organization:** UnifiedHealth Platform, Inc.
 
 **Information Officer:** [NAME]
-**Email:** information.officer@unifiedhealth.com
+**Email:** information.officer@thetheunifiedhealth.com
 **Phone:** [PHONE]
 **Address:** [SA ADDRESS]
 
@@ -28,14 +28,14 @@ This manual facilitates access to records held by UnifiedHealth Platform and des
 
 ### 2.1 Information Officer
 **Name:** [INFORMATION OFFICER NAME]
-**Email:** information.officer@unifiedhealth.com
+**Email:** information.officer@thetheunifiedhealth.com
 **Phone:** [PHONE]
 **Address:** [PHYSICAL ADDRESS]
 **Postal Address:** [POSTAL ADDRESS]
 
 ### 2.2 Deputy Information Officer
 **Name:** [DEPUTY NAME]
-**Email:** deputy.io@unifiedhealth.com
+**Email:** deputy.io@thetheunifiedhealth.com
 **Phone:** [PHONE]
 
 ---
@@ -103,7 +103,7 @@ The following records are publicly available:
 - Terms of Service
 - General company information
 
-Available at: www.unifiedhealth.com/legal
+Available at: www.thetheunifiedhealth.com/legal
 
 ---
 
@@ -122,11 +122,11 @@ Available at: www.unifiedhealth.com/legal
 
 **Step 1: Complete Request Form**
 - Use Form A (request by personal requester) or Form B (request by other requester)
-- Forms available at www.unifiedhealth.com/paia or from our offices
+- Forms available at www.thetheunifiedhealth.com/paia or from our offices
 
 **Step 2: Submit Request**
 Submit to:
-- **Email:** paia.requests@unifiedhealth.com
+- **Email:** paia.requests@thetheunifiedhealth.com
 - **Post:** Information Officer, [POSTAL ADDRESS]
 - **Physical Delivery:** [PHYSICAL ADDRESS]
 
@@ -218,7 +218,7 @@ You have the right to:
 ### 7.4 Exercising Rights
 
 Contact the Information Officer:
-- **Email:** information.officer@unifiedhealth.com
+- **Email:** information.officer@thetheunifiedhealth.com
 - **Response Time:** 30 days
 - **No Fee:** For personal information requests
 
@@ -258,7 +258,7 @@ In the event of a data breach involving personal information:
 - Assessment of risk to data subjects
 
 **Report Breaches:**
-- **Email:** security@unifiedhealth.com
+- **Email:** security@thetheunifiedhealth.com
 - **Phone:** [EMERGENCY NUMBER]
 
 ---
@@ -268,7 +268,7 @@ In the event of a data breach involving personal information:
 ### 10.1 Internal Complaints
 
 Contact the Information Officer:
-- **Email:** information.officer@unifiedhealth.com
+- **Email:** information.officer@thetheunifiedhealth.com
 - **Phone:** [PHONE]
 - **Response:** Within 14 days
 
@@ -300,7 +300,7 @@ This manual is reviewed annually and updated as necessary.
 **Last Updated:** [DATE]
 **Next Review:** [DATE]
 
-Updates available at: www.unifiedhealth.com/paia
+Updates available at: www.thetheunifiedhealth.com/paia
 
 ---
 
@@ -317,7 +317,7 @@ By using UnifiedHealth Platform services, you consent to:
 ### 12.2 Withdrawal of Consent
 
 You may withdraw consent at any time:
-- **Email:** privacy@unifiedhealth.com
+- **Email:** privacy@thetheunifiedhealth.com
 - **Effect:** May limit service availability
 - **Response:** Within 5 business days
 
@@ -347,11 +347,11 @@ All third parties (operators) must:
 
 ## APPENDIX A: REQUEST FORMS
 
-**Form A:** Request for Access to Personal Information (available at www.unifiedhealth.com/paia/form-a)
+**Form A:** Request for Access to Personal Information (available at www.thetheunifiedhealth.com/paia/form-a)
 
-**Form B:** Request for Access to Records (other requesters) (available at www.unifiedhealth.com/paia/form-b)
+**Form B:** Request for Access to Records (other requesters) (available at www.thetheunifiedhealth.com/paia/form-b)
 
-**Form C:** Consent Form for Third-Party Requests (available at www.unifiedhealth.com/paia/form-c)
+**Form C:** Consent Form for Third-Party Requests (available at www.thetheunifiedhealth.com/paia/form-c)
 
 ---
 
@@ -359,17 +359,17 @@ All third parties (operators) must:
 
 As prescribed in Government Gazette No. 45057, Notice R.1003
 
-Details available in full manual at www.unifiedhealth.com/paia
+Details available in full manual at www.thetheunifiedhealth.com/paia
 
 ---
 
 ## APPENDIX C: CONTACT DIRECTORY
 
-**Information Officer:** information.officer@unifiedhealth.com
-**Privacy Queries:** privacy@unifiedhealth.com
-**PAIA Requests:** paia.requests@unifiedhealth.com
-**Security Incidents:** security@unifiedhealth.com
-**General Queries:** support@unifiedhealth.com
+**Information Officer:** information.officer@thetheunifiedhealth.com
+**Privacy Queries:** privacy@thetheunifiedhealth.com
+**PAIA Requests:** paia.requests@thetheunifiedhealth.com
+**Security Incidents:** security@thetheunifiedhealth.com
+**General Queries:** support@thetheunifiedhealth.com
 
 ---
 

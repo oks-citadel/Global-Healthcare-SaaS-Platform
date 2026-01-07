@@ -226,7 +226,7 @@ A comprehensive multi-agent autonomous audit has been completed on The Unified H
 
 1. AWS BAA is in place for HIPAA compliance
 2. Stripe production keys are configured in Secrets Manager
-3. DNS (theunifiedhealth.com) points to correct load balancer
+3. DNS (thetheunifiedhealth.com) points to correct load balancer
 4. SSL certificates are valid and auto-renewing
 
 ---

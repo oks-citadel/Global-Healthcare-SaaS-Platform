@@ -140,7 +140,7 @@ APNS_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
 ```bash
 VAPID_PUBLIC_KEY=BG3xxx...
 VAPID_PRIVATE_KEY=yH4xxx...
-VAPID_SUBJECT=mailto:support@theunifiedhealth.com
+VAPID_SUBJECT=mailto:support@thetheunifiedhealth.com
 ```
 
 ### 4. Retry Logic

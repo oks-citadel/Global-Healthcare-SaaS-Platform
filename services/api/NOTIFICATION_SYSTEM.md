@@ -95,7 +95,7 @@ All email templates are located in `src/templates/emails/` and use the responsiv
 
 ```bash
 SENDGRID_API_KEY=your_sendgrid_api_key
-FROM_EMAIL=noreply@theunifiedhealth.com
+FROM_EMAIL=noreply@thetheunifiedhealth.com
 FROM_NAME=UnifiedHealth
 ```
 
@@ -119,9 +119,9 @@ REDIS_DB=0
 ### Application
 
 ```bash
-APP_URL=https://theunifiedhealth.com
+APP_URL=https://thetheunifiedhealth.com
 APP_NAME=UnifiedHealth
-SUPPORT_EMAIL=support@theunifiedhealth.com
+SUPPORT_EMAIL=support@thetheunifiedhealth.com
 SUPPORT_PHONE=+1-800-UNIFIED
 BILLING_PHONE=+1-800-BILLING
 ```
@@ -495,6 +495,6 @@ Potential improvements:
 
 For issues or questions:
 
-- Email: support@theunifiedhealth.com
-- Documentation: https://docs.theunifiedhealth.com
+- Email: support@thetheunifiedhealth.com
+- Documentation: https://docs.thetheunifiedhealth.com
 - GitHub Issues: https://github.com/unifiedhealth/platform/issues

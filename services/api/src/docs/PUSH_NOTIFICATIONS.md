@@ -421,7 +421,7 @@ APNS_KEY_PATH=/path/to/AuthKey_XXXXXXXXXX.p8
 # Web Push (VAPID)
 VAPID_PUBLIC_KEY=your-vapid-public-key
 VAPID_PRIVATE_KEY=your-vapid-private-key
-VAPID_SUBJECT=mailto:support@theunifiedhealth.com
+VAPID_SUBJECT=mailto:support@thetheunifiedhealth.com
 ```
 
 ## Platform Integration
@@ -511,7 +511,7 @@ VAPID_SUBJECT=mailto:support@theunifiedhealth.com
    ```bash
    VAPID_PUBLIC_KEY=BG...
    VAPID_PRIVATE_KEY=M...
-   VAPID_SUBJECT=mailto:support@theunifiedhealth.com
+   VAPID_SUBJECT=mailto:support@thetheunifiedhealth.com
    ```
 
 3. **Client Integration**

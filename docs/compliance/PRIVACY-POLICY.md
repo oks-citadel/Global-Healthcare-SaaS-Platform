@@ -421,7 +421,7 @@ You have the right to lodge a complaint with a supervisory authority if you beli
 To exercise any of these rights, please contact:
 
 **Privacy Officer**
-Email: privacy@theunifiedhealth.com
+Email: privacy@thetheunifiedhealth.com
 Phone: +1 (555) 123-4567
 Mail: The Unified Health, Inc., Attn: Privacy Officer, [Address]
 
@@ -578,7 +578,7 @@ For questions, concerns, or requests regarding this Privacy Policy or your priva
 
 **Privacy Officer**
 The Unified Health, Inc.
-Email: privacy@theunifiedhealth.com
+Email: privacy@thetheunifiedhealth.com
 Phone: +1 (555) 123-4567
 Address: [Company Address]
 
@@ -589,7 +589,7 @@ Address: [Company Address]
 For HIPAA-related concerns or complaints:
 
 **Compliance Officer**
-Email: compliance@theunifiedhealth.com
+Email: compliance@thetheunifiedhealth.com
 Phone: +1 (555) 123-4568
 
 ### Data Protection Officer (for GDPR)
@@ -597,7 +597,7 @@ Phone: +1 (555) 123-4568
 For GDPR-related inquiries (EU residents):
 
 **Data Protection Officer**
-Email: dpo@theunifiedhealth.com
+Email: dpo@thetheunifiedhealth.com
 
 ### File a Complaint
 

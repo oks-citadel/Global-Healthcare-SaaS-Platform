@@ -141,7 +141,7 @@ kubectl create secret tls unified-health-tls \
 
 ```bash
 # Add Helm repository
-helm repo add unified-health https://charts.theunifiedhealth.com
+helm repo add unified-health https://charts.thetheunifiedhealth.com
 helm repo update
 
 # Install the chart
@@ -573,7 +573,7 @@ kubectl set resources deployment/api \
 ## Support
 
 For deployment issues:
-- **Documentation:** https://docs.theunifiedhealth.com/deployment
+- **Documentation:** https://docs.thetheunifiedhealth.com/deployment
 - **DevOps Support:** devops@unifiedhealth.io
 - **Emergency Hotline:** +1-800-UNIFIED-OPS
 

@@ -17,8 +17,8 @@ This document defines the API versioning strategy, deprecation timeline, and mig
 All API endpoints are versioned using URL path prefixes:
 
 ```
-https://api.theunifiedhealth.com/api/v1/patients
-https://api.theunifiedhealth.com/api/v2/patients
+https://api.thetheunifiedhealth.com/api/v1/patients
+https://api.thetheunifiedhealth.com/api/v2/patients
 ```
 
 ### Version Format
@@ -92,7 +92,7 @@ Add deprecation headers to all responses:
 HTTP/1.1 200 OK
 Deprecation: true
 Sunset: Sat, 01 Jan 2027 00:00:00 GMT
-Link: <https://docs.theunifiedhealth.com/api/migration/v1-to-v2>; rel="deprecation"
+Link: <https://docs.thetheunifiedhealth.com/api/migration/v1-to-v2>; rel="deprecation"
 X-API-Deprecation-Info: This API version will be removed on 2027-01-01. Please migrate to v2.
 ```
 
@@ -130,7 +130,7 @@ X-API-Deprecation-Info: This API version will be removed on 2027-01-01. Please m
   "error": {
     "code": "API_VERSION_SUNSET",
     "message": "API v1 has been sunset as of 2027-01-01",
-    "migration_url": "https://docs.theunifiedhealth.com/api/migration/v1-to-v2",
+    "migration_url": "https://docs.thetheunifiedhealth.com/api/migration/v1-to-v2",
     "current_version": "v2"
   }
 }
@@ -288,12 +288,12 @@ What You Need to Do:
 4. Complete migration before December 15, 2026
 
 Resources:
-- Migration Guide: https://docs.theunifiedhealth.com/api/migration/v1-to-v2
-- API v2 Reference: https://docs.theunifiedhealth.com/api/v2
-- SDK Updates: https://docs.theunifiedhealth.com/sdk/upgrade
+- Migration Guide: https://docs.thetheunifiedhealth.com/api/migration/v1-to-v2
+- API v2 Reference: https://docs.thetheunifiedhealth.com/api/v2
+- SDK Updates: https://docs.thetheunifiedhealth.com/sdk/upgrade
 
 Need Help?
-- Migration support: migration-support@theunifiedhealth.com
+- Migration support: migration-support@thetheunifiedhealth.com
 - Office hours: Every Tuesday 2-3 PM EST
 
 Thank you for using Unified Health.
@@ -319,7 +319,7 @@ immediately to avoid service disruption.
 If you have already migrated, please verify no legacy integrations remain.
 
 Emergency Support:
-- Priority ticket: https://support.theunifiedhealth.com/migration
+- Priority ticket: https://support.thetheunifiedhealth.com/migration
 - Phone: 1-800-XXX-XXXX (mention "API migration")
 
 Thank you for your prompt attention.
@@ -387,6 +387,6 @@ Clients may request a deprecation extension under these circumstances:
 
 ## Contacts
 
-- **API Team:** api-team@theunifiedhealth.com
-- **Migration Support:** migration-support@theunifiedhealth.com
-- **Documentation:** docs@theunifiedhealth.com
+- **API Team:** api-team@thetheunifiedhealth.com
+- **Migration Support:** migration-support@thetheunifiedhealth.com
+- **Documentation:** docs@thetheunifiedhealth.com

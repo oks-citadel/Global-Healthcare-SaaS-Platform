@@ -10,9 +10,9 @@
 
 | Role | Contact | Method |
 |------|---------|--------|
-| On-Call SRE | oncall@unifiedhealth.com | PagerDuty: +1-555-0100 |
-| Engineering Lead | john.doe@unifiedhealth.com | +1-555-0101 |
-| Security Lead | security@unifiedhealth.com | +1-555-0105 |
+| On-Call SRE | oncall@thetheunifiedhealth.com | PagerDuty: +1-555-0100 |
+| Engineering Lead | john.doe@thetheunifiedhealth.com | +1-555-0101 |
+| Security Lead | security@thetheunifiedhealth.com | +1-555-0105 |
 
 ---
 
@@ -23,9 +23,9 @@
 | Dashboard | URL | Use Case |
 |-----------|-----|----------|
 | System Health | https://portal.azure.com/#dashboard/system-health | Overall system status |
-| API Performance | https://grafana.unifiedhealth.com/d/api-perf | Backend performance |
-| Business Metrics | https://grafana.unifiedhealth.com/d/business | KPIs and metrics |
-| SLO Tracking | https://grafana.unifiedhealth.com/d/slo | SLO compliance |
+| API Performance | https://grafana.thetheunifiedhealth.com/d/api-perf | Backend performance |
+| Business Metrics | https://grafana.thetheunifiedhealth.com/d/business | KPIs and metrics |
+| SLO Tracking | https://grafana.thetheunifiedhealth.com/d/slo | SLO compliance |
 
 ### Key Metrics to Watch
 
@@ -364,7 +364,7 @@ SLOWLOG GET 10
 **Quick Diagnosis:**
 1. Check pod resources: `kubectl top pods -n unified-health`
 2. Check database queries: See PostgreSQL commands above
-3. Check cache hit rate: `curl https://api.unifiedhealth.com/metrics | grep cache_hit`
+3. Check cache hit rate: `curl https://api.thetheunifiedhealth.com/metrics | grep cache_hit`
 
 **Quick Fixes:**
 - Scale up: `kubectl scale deployment/unified-health-api --replicas=10 -n unified-health`
@@ -428,9 +428,9 @@ SLOWLOG GET 10
 
 | Service | URL | Expected Response |
 |---------|-----|-------------------|
-| API | https://api.unifiedhealth.com/health | 200 OK |
-| Web | https://app.unifiedhealth.com/api/health | 200 OK |
-| Metrics | https://api.unifiedhealth.com/metrics | 200 OK (Prometheus format) |
+| API | https://api.thetheunifiedhealth.com/health | 200 OK |
+| Web | https://app.thetheunifiedhealth.com/api/health | 200 OK |
+| Metrics | https://api.thetheunifiedhealth.com/metrics | 200 OK (Prometheus format) |
 
 ---
 
@@ -456,7 +456,7 @@ kubectl logs deployment/unified-health-api -n unified-health --tail=100 | grep E
 kubectl rollout history deployment/unified-health-api -n unified-health
 
 # 4. Check metrics endpoint
-curl https://api.unifiedhealth.com/metrics | head -20
+curl https://api.thetheunifiedhealth.com/metrics | head -20
 
 # 5. Check Application Insights
 # Visit: https://portal.azure.com > Application Insights > Live Metrics
@@ -466,4 +466,4 @@ curl https://api.unifiedhealth.com/metrics | head -20
 
 **Last Updated:** 2025-12-17
 **Maintained By:** SRE Team
-**Feedback:** sre@unifiedhealth.com
+**Feedback:** sre@thetheunifiedhealth.com

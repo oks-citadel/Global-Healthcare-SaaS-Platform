@@ -214,7 +214,7 @@ spec:
 1. **Generate CSR**
    ```bash
    openssl req -new -key server.key -out server.csr \
-     -subj "/CN=api.unifiedhealth.com"
+     -subj "/CN=api.thetheunifiedhealth.com"
    ```
 
 2. **Obtain Certificate from CA**
@@ -435,9 +435,9 @@ If a rotation causes issues:
 
 | Role | Contact | Responsibility |
 |------|---------|----------------|
-| Security Team Lead | security@unifiedhealth.com | Overall secret management |
-| Platform Team | platform@unifiedhealth.com | Application secret integration |
-| Infrastructure Team | infra@unifiedhealth.com | Cloud secret services |
+| Security Team Lead | security@thetheunifiedhealth.com | Overall secret management |
+| Platform Team | platform@theunifiedhealth.com | Application secret integration |
+| Infrastructure Team | infra@theunifiedhealth.com | Cloud secret services |
 | On-Call | pagerduty.com/unifiedhealth | Emergency rotation |
 
 ## Document History

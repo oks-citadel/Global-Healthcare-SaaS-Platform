@@ -280,4 +280,4 @@ await auditLogger.logPHIAccess(
 
 ---
 
-*This document is part of the Global Healthcare SaaS Platform security documentation. For questions, contact security@unifiedhealth.com*
+*This document is part of the Global Healthcare SaaS Platform security documentation. For questions, contact security@thetheunifiedhealth.com*

@@ -1,6 +1,6 @@
 # The Unified Health - AWS Deployment Guide
 
-**Domain:** theunifiedhealth.com
+**Domain:** thetheunifiedhealth.com
 **Platform:** AWS (CodePipeline → CodeBuild → ECR → EKS)
 
 ---
@@ -86,7 +86,7 @@ project_name = "unified-health"
 environment  = "prod"
 
 # Domain
-domain_name = "theunifiedhealth.com"
+domain_name = "thetheunifiedhealth.com"
 
 # Region Deployment
 deploy_americas = true
@@ -156,7 +156,7 @@ ns-123.awsdns-78.net
 ## Step 5: Configure GoDaddy Nameservers
 
 1. Log in to [GoDaddy](https://www.godaddy.com)
-2. Go to **My Products** → **Domains** → **theunifiedhealth.com**
+2. Go to **My Products** → **Domains** → **thetheunifiedhealth.com**
 3. Click **DNS** → **Nameservers** → **Change**
 4. Select **"I'll use my own nameservers"**
 5. Enter the 4 AWS Route53 nameservers:
@@ -176,14 +176,14 @@ ns-123.awsdns-78.net
 
 ```bash
 # Check nameserver delegation
-dig NS theunifiedhealth.com
+dig NS thetheunifiedhealth.com
 
 # Check A record (after ALB is created)
-dig A theunifiedhealth.com
+dig A thetheunifiedhealth.com
 
 # Check from multiple locations
-nslookup theunifiedhealth.com 8.8.8.8
-nslookup theunifiedhealth.com 1.1.1.1
+nslookup thetheunifiedhealth.com 8.8.8.8
+nslookup thetheunifiedhealth.com 1.1.1.1
 ```
 
 ---
@@ -237,7 +237,7 @@ aws codepipeline start-pipeline-execution \
 │                         ▼                                          │
 │  ┌──────────────────────────────────────────────────────────────┐  │
 │  │                       Route53                                 │  │
-│  │               theunifiedhealth.com                            │  │
+│  │               thetheunifiedhealth.com                            │  │
 │  └──────────────────────────────────────────────────────────────┘  │
 │                                                                      │
 └─────────────────────────────────────────────────────────────────────┘
@@ -249,20 +249,20 @@ aws codepipeline start-pipeline-execution \
 
 | Record | Type | Value | Purpose |
 |--------|------|-------|---------|
-| theunifiedhealth.com | A | ALB DNS | Main website |
-| www.theunifiedhealth.com | CNAME | theunifiedhealth.com | WWW redirect |
-| api.theunifiedhealth.com | A | ALB DNS | API endpoint |
-| app.theunifiedhealth.com | A | ALB DNS | Patient portal |
-| admin.theunifiedhealth.com | A | ALB DNS | Admin portal |
-| provider.theunifiedhealth.com | A | ALB DNS | Provider portal |
+| thetheunifiedhealth.com | A | ALB DNS | Main website |
+| www.thetheunifiedhealth.com | CNAME | thetheunifiedhealth.com | WWW redirect |
+| api.thetheunifiedhealth.com | A | ALB DNS | API endpoint |
+| app.thetheunifiedhealth.com | A | ALB DNS | Patient portal |
+| admin.thetheunifiedhealth.com | A | ALB DNS | Admin portal |
+| provider.thetheunifiedhealth.com | A | ALB DNS | Provider portal |
 
 ---
 
 ## SSL Certificates
 
 ACM (AWS Certificate Manager) will automatically provision SSL certificates for:
-- `theunifiedhealth.com`
-- `*.theunifiedhealth.com` (wildcard)
+- `thetheunifiedhealth.com`
+- `*.thetheunifiedhealth.com` (wildcard)
 
 Validation is done via DNS (Route53 automatically adds validation records).
 
@@ -302,7 +302,7 @@ aws codebuild batch-get-builds --ids $(aws codebuild list-builds-for-project \
 aws route53 list-resource-record-sets --hosted-zone-id YOUR_ZONE_ID
 
 # Verify nameservers at GoDaddy match Route53
-dig NS theunifiedhealth.com +short
+dig NS thetheunifiedhealth.com +short
 ```
 
 ### EKS Deployment Issues
@@ -352,5 +352,5 @@ kubectl get svc -n unified-health
 ## Support
 
 For issues or questions:
-- **Email:** support@theunifiedhealth.com
-- **Documentation:** https://docs.theunifiedhealth.com
+- **Email:** support@thetheunifiedhealth.com
+- **Documentation:** https://docs.thetheunifiedhealth.com

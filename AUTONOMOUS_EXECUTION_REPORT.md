@@ -65,7 +65,7 @@ The Autonomous Multi-Agent System has completed Phase 1 of the production readin
 - `outputs.tf` - ARNs, endpoints, queue URLs
 
 **Features:**
-- Domain identity verification (theunifiedhealth.com)
+- Domain identity verification (thetheunifiedhealth.com)
 - DKIM signing for email authentication
 - SPF records via MAIL FROM domain
 - DMARC policy (quarantine mode)
@@ -117,7 +117,7 @@ schedule_expression = "cron(0 21 * * ? *)"
 | EKS Cluster | ✅ Active | unified-health-prod-eks |
 | RDS Aurora | ⚠️ Stopped | unified-health-prod-aurora |
 | ECR Repositories | ✅ Active | 17+ repositories |
-| Route53 Zone | ✅ Active | theunifiedhealth.com |
+| Route53 Zone | ✅ Active | thetheunifiedhealth.com |
 | SES | ⚠️ Partial | Enabled, no identities |
 | SNS | ⚠️ Partial | 1 alert topic only |
 | SQS | ❌ Missing | No unified-health queues |
@@ -126,7 +126,7 @@ schedule_expression = "cron(0 21 * * ? *)"
 
 | Resource | Status | Details |
 |----------|--------|---------|
-| SES Domain Identity | 🔄 Pending | theunifiedhealth.com |
+| SES Domain Identity | 🔄 Pending | thetheunifiedhealth.com |
 | SES DKIM/SPF/DMARC | 🔄 Pending | Via Route53 |
 | SNS Topics | 🔄 Pending | 7 healthcare topics |
 | SQS Queues | 🔄 Pending | 7 queues + 7 DLQs |

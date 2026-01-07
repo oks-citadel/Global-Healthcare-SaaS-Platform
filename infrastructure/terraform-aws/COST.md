@@ -253,5 +253,5 @@ Enable AWS Cost Explorer and set up:
 - Monthly budget alerts at 50%, 80%, 100%
 - Cost allocation tags (already enabled via Terraform)
 
-Budget alert email: ops@unifiedhealth.com
+Budget alert email: ops@theunifiedhealth.com
 Monthly budget: $50,000 (allows for growth headroom)

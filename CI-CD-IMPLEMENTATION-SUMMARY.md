@@ -687,7 +687,7 @@ stripe-webhook-secret     # Stripe webhook secret
 
 ### Contact
 
-- DevOps Team: devops@unifiedhealth.com
+- DevOps Team: devops@thetheunifiedhealth.com
 - GitHub Issues: Repository issues tab
 - Slack: #devops-support
 

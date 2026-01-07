@@ -75,20 +75,20 @@ npx prisma migrate reset --force
 After seeding, you can use these credentials to test the application:
 
 ### Admin Account
-- **Email:** admin@theunifiedhealth.com
+- **Email:** admin@thetheunifiedhealth.com
 - **Password:** Admin123!
 - **Role:** Administrator
 
 ### Provider Accounts
-- **Email:** dr.smith@theunifiedhealth.com
+- **Email:** dr.smith@thetheunifiedhealth.com
 - **Password:** Provider123!
 - **Specialty:** Cardiology, Internal Medicine
 
-- **Email:** dr.johnson@theunifiedhealth.com
+- **Email:** dr.johnson@thetheunifiedhealth.com
 - **Password:** Provider123!
 - **Specialty:** Pediatrics, Family Medicine
 
-- **Email:** dr.williams@theunifiedhealth.com
+- **Email:** dr.williams@thetheunifiedhealth.com
 - **Password:** Provider123!
 - **Specialty:** Dermatology, Cosmetic Medicine
 

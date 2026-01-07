@@ -318,7 +318,7 @@ Proprietary - Unified Health Platform
 ## Support
 
 For issues or questions:
-- Email: support@theunifiedhealth.com
+- Email: support@thetheunifiedhealth.com
 - Slack: #laboratory-service
 - Documentation: /docs/laboratory-service
 

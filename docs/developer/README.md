@@ -540,9 +540,9 @@ pnpm typecheck        # TypeScript check
 
 ## Getting Help
 
-- **Documentation:** https://docs.theunifiedhealth.com
-- **API Reference:** https://api.theunifiedhealth.com/docs
-- **Community Forum:** https://community.theunifiedhealth.com
+- **Documentation:** https://docs.thetheunifiedhealth.com
+- **API Reference:** https://api.thetheunifiedhealth.com/docs
+- **Community Forum:** https://community.thetheunifiedhealth.com
 - **Slack Channel:** #engineering
 - **GitHub Issues:** https://github.com/unified-health/platform/issues
 

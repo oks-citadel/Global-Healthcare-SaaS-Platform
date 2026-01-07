@@ -102,7 +102,7 @@ Synthetic monitoring exposes these Prometheus metrics:
 View synthetic monitoring results in Grafana:
 
 - Dashboard: "Synthetic Monitoring Overview"
-- URL: https://grafana.theunifiedhealth.com/d/synthetic-monitoring
+- URL: https://grafana.thetheunifiedhealth.com/d/synthetic-monitoring
 
 ## Testing
 
@@ -110,13 +110,13 @@ Run synthetic tests manually:
 
 ```bash
 # Test API health
-curl -s https://api.theunifiedhealth.com/health | jq .
+curl -s https://api.thetheunifiedhealth.com/health | jq .
 
 # Test with timing
-curl -w "\nTotal time: %{time_total}s\n" https://api.theunifiedhealth.com/health
+curl -w "\nTotal time: %{time_total}s\n" https://api.thetheunifiedhealth.com/health
 
 # Test SSL certificate
-openssl s_client -connect api.theunifiedhealth.com:443 2>/dev/null | openssl x509 -noout -dates
+openssl s_client -connect api.thetheunifiedhealth.com:443 2>/dev/null | openssl x509 -noout -dates
 ```
 
 ## External Monitoring Services

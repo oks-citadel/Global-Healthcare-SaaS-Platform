@@ -210,7 +210,7 @@ If a deployment fails:
 
 For deployment issues or questions:
 - Slack: #unified-health-platform
-- Email: devops@unifiedhealth.com
+- Email: devops@thetheunifiedhealth.com
 
 ---
 

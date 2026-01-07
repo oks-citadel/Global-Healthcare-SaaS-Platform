@@ -4,7 +4,7 @@
 **Version:** 1.0
 **Last Updated:** 2025-12-17
 **Owner:** SRE Team
-**On-Call:** oncall@unifiedhealth.com
+**On-Call:** oncall@thetheunifiedhealth.com
 
 ---
 
@@ -149,7 +149,7 @@ This runbook provides standardized procedures for responding to incidents affect
 # Verify the issue is real (not false positive)
 
 # Quick verification commands
-curl https://api.unifiedhealth.com/health
+curl https://api.thetheunifiedhealth.com/health
 az monitor metrics list --resource <resource-id>
 kubectl get pods -n unified-health
 ```
@@ -325,7 +325,7 @@ Resolution: [What was done]
 We sincerely apologize for any inconvenience this may have caused.
 [If applicable: No patient data was compromised during this incident.]
 
-If you have any questions, please contact support@unifiedhealth.com.
+If you have any questions, please contact support@thetheunifiedhealth.com.
 
 Regards,
 Unified Health Operations Team
@@ -349,7 +349,7 @@ Unified Health Operations Team
 kubectl get pods -n unified-health | grep -v Running
 
 # Check metrics
-curl https://api.unifiedhealth.com/metrics | grep error_rate
+curl https://api.thetheunifiedhealth.com/metrics | grep error_rate
 
 # Check recent logs
 kubectl logs deployment/unified-health-api -n unified-health --since=15m | grep ERROR
@@ -464,7 +464,7 @@ az monitor log-analytics query --workspace <workspace-id> \
   --analytics-query "ApplicationLogs_CL | where TimeGenerated > ago(15m) | summarize avg(Duration) by Route | order by avg_Duration desc"
 
 # 4. Check cache hit rate
-curl https://api.unifiedhealth.com/metrics | grep cache_hit
+curl https://api.thetheunifiedhealth.com/metrics | grep cache_hit
 
 # 5. Check network latency
 kubectl exec -it deployment/unified-health-api -n unified-health -- ping -c 5 postgres-service
@@ -494,7 +494,7 @@ kubectl exec -it deployment/unified-health-api -n unified-health -- ping -c 5 po
 kubectl get pods -n unified-health | grep postgres
 
 # 2. Check connection pool metrics
-curl https://api.unifiedhealth.com/metrics | grep db_connection_pool
+curl https://api.thetheunifiedhealth.com/metrics | grep db_connection_pool
 
 # 3. Check database logs
 kubectl logs postgres-0 -n unified-health --tail=200
@@ -566,7 +566,7 @@ kubectl describe pod <pod-name> -n unified-health | grep -A 5 Limits
 kubectl logs deployment/unified-health-api -n unified-health | grep -i auth
 
 # 2. Check JWT validation
-curl -X POST https://api.unifiedhealth.com/api/v1/auth/verify \
+curl -X POST https://api.thetheunifiedhealth.com/api/v1/auth/verify \
   -H "Authorization: Bearer <token>"
 
 # 3. Check Redis (session store)
@@ -608,7 +608,7 @@ az monitor log-analytics query --workspace <workspace-id> \
   --analytics-query "ApplicationLogs_CL | where Component == 'payment' and Level == 'ERROR' | summarize count() by Message"
 
 # 4. Check payment metrics
-curl https://api.unifiedhealth.com/metrics | grep payment_
+curl https://api.thetheunifiedhealth.com/metrics | grep payment_
 ```
 
 **Critical Actions:**
@@ -657,13 +657,13 @@ Level 4: CEO + Executive Team
 
 | Role | Contact | Phone | Email |
 |------|---------|-------|-------|
-| On-Call SRE | PagerDuty | +1-555-0100 | oncall@unifiedhealth.com |
-| Engineering Lead | John Doe | +1-555-0101 | john.doe@unifiedhealth.com |
-| Senior SRE | Jane Smith | +1-555-0102 | jane.smith@unifiedhealth.com |
-| VP Engineering | Bob Johnson | +1-555-0103 | bob.johnson@unifiedhealth.com |
-| CTO | Alice Williams | +1-555-0104 | alice.williams@unifiedhealth.com |
-| Security Lead | Charlie Brown | +1-555-0105 | charlie.brown@unifiedhealth.com |
-| Compliance Officer | Diana Prince | +1-555-0106 | diana.prince@unifiedhealth.com |
+| On-Call SRE | PagerDuty | +1-555-0100 | oncall@thetheunifiedhealth.com |
+| Engineering Lead | John Doe | +1-555-0101 | john.doe@thetheunifiedhealth.com |
+| Senior SRE | Jane Smith | +1-555-0102 | jane.smith@theunifiedhealth.com |
+| VP Engineering | Bob Johnson | +1-555-0103 | bob.johnson@theunifiedhealth.com |
+| CTO | Alice Williams | +1-555-0104 | alice.williams@theunifiedhealth.com |
+| Security Lead | Charlie Brown | +1-555-0105 | charlie.brown@theunifiedhealth.com |
+| Compliance Officer | Diana Prince | +1-555-0106 | diana.prince@theunifiedhealth.com |
 
 ---
 
@@ -971,8 +971,8 @@ Incident Commander: [Name]
 |------|-----|---------|
 | Azure Portal | https://portal.azure.com | Cloud infrastructure |
 | Application Insights | https://portal.azure.com/#blade/Microsoft_Azure_Monitoring | APM and diagnostics |
-| Grafana | https://grafana.unifiedhealth.com | Dashboards and visualization |
-| Prometheus | https://prometheus.unifiedhealth.com | Metrics collection |
+| Grafana | https://grafana.thetheunifiedhealth.com | Dashboards and visualization |
+| Prometheus | https://prometheus.theunifiedhealth.com | Metrics collection |
 | Log Analytics | https://portal.azure.com/#blade/Microsoft_Azure_Monitoring/AzureMonitoringBrowseBlade/logs | Log queries |
 
 ### Communication
@@ -981,7 +981,7 @@ Incident Commander: [Name]
 |------|-----|---------|
 | Slack | https://unifiedhealth.slack.com | Team communication |
 | PagerDuty | https://unifiedhealth.pagerduty.com | On-call management |
-| Status Page | https://status.unifiedhealth.com | Customer communication |
+| Status Page | https://status.theunifiedhealth.com | Customer communication |
 | Zoom | https://zoom.us/my/unifiedhealth | War rooms |
 
 ### Development and Deployment
@@ -997,10 +997,10 @@ Incident Commander: [Name]
 
 | Resource | URL | Purpose |
 |----------|-----|---------|
-| Runbooks | https://wiki.unifiedhealth.com/runbooks | Operational procedures |
-| Architecture Docs | https://wiki.unifiedhealth.com/architecture | System architecture |
-| API Docs | https://api.unifiedhealth.com/docs | API reference |
-| SLO Dashboard | https://grafana.unifiedhealth.com/d/slo | SLI/SLO tracking |
+| Runbooks | https://wiki.thetheunifiedhealth.com/runbooks | Operational procedures |
+| Architecture Docs | https://wiki.thetheunifiedhealth.com/architecture | System architecture |
+| API Docs | https://api.thetheunifiedhealth.com/docs | API reference |
+| SLO Dashboard | https://grafana.thetheunifiedhealth.com/d/slo | SLI/SLO tracking |
 
 ### Access Requirements
 
@@ -1051,7 +1051,7 @@ az monitor log-analytics query --workspace <workspace-id> \
 az monitor metrics alert list --resource-group unified-health-rg
 
 # Check service endpoints
-curl -I https://api.unifiedhealth.com/health
+curl -I https://api.thetheunifiedhealth.com/health
 ```
 
 ---
@@ -1097,4 +1097,4 @@ curl -I https://api.unifiedhealth.com/health
 
 **Next Review Date:** 2026-03-17
 
-**Feedback:** For feedback or improvements to this runbook, please create a pull request or contact sre@unifiedhealth.com
+**Feedback:** For feedback or improvements to this runbook, please create a pull request or contact sre@thetheunifiedhealth.com

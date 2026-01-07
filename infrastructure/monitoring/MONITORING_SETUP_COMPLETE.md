@@ -471,9 +471,9 @@ Resource Group: unified-health-rg
 
 ### Contact
 
-- **SRE Team**: sre@unifiedhealth.com
-- **On-Call**: oncall@unifiedhealth.com
-- **Documentation**: https://wiki.unifiedhealth.com/monitoring
+- **SRE Team**: sre@thetheunifiedhealth.com
+- **On-Call**: oncall@thetheunifiedhealth.com
+- **Documentation**: https://wiki.thetheunifiedhealth.com/monitoring
 
 ### Maintenance Schedule
 

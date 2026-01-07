@@ -198,7 +198,7 @@ aws ec2 describe-vpc-peering-connections \
 kubectl exec -it api-pod -- pg_isready -h $DATABASE_HOST
 
 # 2. Run health check
-curl -s https://api.theunifiedhealth.com/health | jq '.database'
+curl -s https://api.thetheunifiedhealth.com/health | jq '.database'
 
 # 3. Verify application metrics
 kubectl top pods -l app=api
@@ -244,10 +244,10 @@ kubectl top pods -l app=api
 
 | Resource | URL |
 |----------|-----|
-| Aurora Dashboard | `https://grafana.theunifiedhealth.com/d/aurora-overview` |
-| Database Connections | `https://grafana.theunifiedhealth.com/d/db-connections` |
+| Aurora Dashboard | `https://grafana.thetheunifiedhealth.com/d/aurora-overview` |
+| Database Connections | `https://grafana.thetheunifiedhealth.com/d/db-connections` |
 | CloudWatch Logs | `https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logsV2:log-groups/log-group/unified-health-aurora` |
-| Kibana Logs | `https://kibana.theunifiedhealth.com/app/discover#/?_g=(filters:!(),query:(match_all:()),time:(from:now-1h,to:now))&_a=(columns:!(message),filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,key:service,negate:!f,type:phrase),query:(match_phrase:(service:database)))),index:'logs-*')` |
+| Kibana Logs | `https://kibana.thetheunifiedhealth.com/app/discover#/?_g=(filters:!(),query:(match_all:()),time:(from:now-1h,to:now))&_a=(columns:!(message),filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,key:service,negate:!f,type:phrase),query:(match_phrase:(service:database)))),index:'logs-*')` |
 
 ---
 
@@ -417,7 +417,7 @@ kubectl exec -it api-pod -- redis-cli -h $REDIS_HOST info replication
 kubectl exec -it api-pod -- redis-cli -h $REDIS_HOST info stats | grep keyspace
 
 # 4. Check application health
-curl -s https://api.theunifiedhealth.com/health | jq '.redis'
+curl -s https://api.thetheunifiedhealth.com/health | jq '.redis'
 ```
 
 ### Escalation Path
@@ -450,10 +450,10 @@ curl -s https://api.theunifiedhealth.com/health | jq '.redis'
 
 | Resource | URL |
 |----------|-----|
-| Redis Dashboard | `https://grafana.theunifiedhealth.com/d/redis-overview` |
+| Redis Dashboard | `https://grafana.thetheunifiedhealth.com/d/redis-overview` |
 | ElastiCache Console | `https://console.aws.amazon.com/elasticache/home` |
-| Cache Performance | `https://grafana.theunifiedhealth.com/d/cache-perf` |
-| Application Logs | `https://kibana.theunifiedhealth.com` (filter: `service:redis`) |
+| Cache Performance | `https://grafana.thetheunifiedhealth.com/d/cache-perf` |
+| Application Logs | `https://kibana.thetheunifiedhealth.com` (filter: `service:redis`) |
 
 ---
 
@@ -617,7 +617,7 @@ kubectl get endpoints
 
 # 4. Check application health
 for svc in api auth billing; do
-  curl -s https://${svc}.theunifiedhealth.com/health
+  curl -s https://${svc}.thetheunifiedhealth.com/health
 done
 
 # 5. Verify cluster autoscaler
@@ -654,9 +654,9 @@ kubectl logs -n kube-system -l app=cluster-autoscaler --tail=50
 
 | Resource | URL |
 |----------|-----|
-| EKS Dashboard | `https://grafana.theunifiedhealth.com/d/eks-overview` |
-| Node Resources | `https://grafana.theunifiedhealth.com/d/node-resources` |
-| Pod Status | `https://grafana.theunifiedhealth.com/d/pod-status` |
+| EKS Dashboard | `https://grafana.thetheunifiedhealth.com/d/eks-overview` |
+| Node Resources | `https://grafana.thetheunifiedhealth.com/d/node-resources` |
+| Pod Status | `https://grafana.thetheunifiedhealth.com/d/pod-status` |
 | EKS Console | `https://console.aws.amazon.com/eks/home` |
 | CloudWatch Container Insights | `https://console.aws.amazon.com/cloudwatch/home#container-insights:` |
 
@@ -823,8 +823,8 @@ kubectl exec -it ingress-controller -- nginx -c "deny 1.2.3.4;"
 kubectl exec -it api-pod -- curl -s localhost:9090/metrics | grep 'http_requests_total{.*status="5'
 
 # 2. Test critical endpoints
-curl -s -o /dev/null -w "%{http_code}" https://api.theunifiedhealth.com/health
-curl -s -o /dev/null -w "%{http_code}" https://api.theunifiedhealth.com/v1/appointments
+curl -s -o /dev/null -w "%{http_code}" https://api.thetheunifiedhealth.com/health
+curl -s -o /dev/null -w "%{http_code}" https://api.thetheunifiedhealth.com/v1/appointments
 
 # 3. Monitor for 15 minutes
 # Error rate should stabilize below 0.1%
@@ -863,10 +863,10 @@ curl -s -o /dev/null -w "%{http_code}" https://api.theunifiedhealth.com/v1/appoi
 
 | Resource | URL |
 |----------|-----|
-| API Dashboard | `https://grafana.theunifiedhealth.com/d/api-overview` |
-| Error Analysis | `https://grafana.theunifiedhealth.com/d/error-analysis` |
+| API Dashboard | `https://grafana.thetheunifiedhealth.com/d/api-overview` |
+| Error Analysis | `https://grafana.thetheunifiedhealth.com/d/error-analysis` |
 | API Gateway Console | `https://console.aws.amazon.com/apigateway/home` |
-| Application Logs | `https://kibana.theunifiedhealth.com` (filter: `level:error`) |
+| Application Logs | `https://kibana.thetheunifiedhealth.com` (filter: `level:error`) |
 
 ---
 
@@ -1025,13 +1025,13 @@ kubectl set env deployment/api-deployment AUTH_EMERGENCY_BYPASS=true
 
 ```bash
 # 1. Test login endpoint
-curl -X POST https://api.theunifiedhealth.com/auth/login \
+curl -X POST https://api.thetheunifiedhealth.com/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"test@test.com","password":"test"}'
 
 # 2. Test token validation
 curl -H "Authorization: Bearer $TOKEN" \
-  https://api.theunifiedhealth.com/v1/me
+  https://api.thetheunifiedhealth.com/v1/me
 
 # 3. Check auth metrics
 kubectl exec -it auth-pod -- curl -s localhost:9090/metrics | grep auth_
@@ -1070,10 +1070,10 @@ kubectl exec -it auth-pod -- curl -s localhost:9090/metrics | grep auth_
 
 | Resource | URL |
 |----------|-----|
-| Auth Dashboard | `https://grafana.theunifiedhealth.com/d/auth-overview` |
-| Login Analytics | `https://grafana.theunifiedhealth.com/d/login-analytics` |
+| Auth Dashboard | `https://grafana.thetheunifiedhealth.com/d/auth-overview` |
+| Login Analytics | `https://grafana.thetheunifiedhealth.com/d/login-analytics` |
 | Cognito Console | `https://console.aws.amazon.com/cognito/home` |
-| Security Logs | `https://kibana.theunifiedhealth.com` (filter: `service:auth`) |
+| Security Logs | `https://kibana.thetheunifiedhealth.com` (filter: `service:auth`) |
 
 ---
 
@@ -1275,7 +1275,7 @@ watch -n 5 'kubectl top pods -l app=<deployment>'
 kubectl get events --field-selector reason=OOMKilled --since=10m
 
 # 3. Verify response times normal
-curl -w "@curl-format.txt" -o /dev/null -s https://api.theunifiedhealth.com/health
+curl -w "@curl-format.txt" -o /dev/null -s https://api.thetheunifiedhealth.com/health
 
 # 4. Check HPA is scaling appropriately
 kubectl get hpa <deployment>-hpa --watch
@@ -1311,10 +1311,10 @@ kubectl get hpa <deployment>-hpa --watch
 
 | Resource | URL |
 |----------|-----|
-| Resource Dashboard | `https://grafana.theunifiedhealth.com/d/resource-usage` |
-| Node Resources | `https://grafana.theunifiedhealth.com/d/node-resources` |
+| Resource Dashboard | `https://grafana.thetheunifiedhealth.com/d/resource-usage` |
+| Node Resources | `https://grafana.thetheunifiedhealth.com/d/node-resources` |
 | Container Insights | `https://console.aws.amazon.com/cloudwatch/home#container-insights:` |
-| Application Profiling | `https://grafana.theunifiedhealth.com/d/app-profiling` |
+| Application Profiling | `https://grafana.thetheunifiedhealth.com/d/app-profiling` |
 
 ---
 
@@ -1343,7 +1343,7 @@ ssl_certificate_expiry_seconds / 86400
 ssl_certificate_expiry_seconds < 604800
 
 # Check specific domains
-ssl_certificate_expiry_seconds{domain=~".*theunifiedhealth.com"}
+ssl_certificate_expiry_seconds{domain=~".*thetheunifiedhealth.com"}
 ```
 
 ### Impact Assessment
@@ -1368,10 +1368,10 @@ ssl_certificate_expiry_seconds{domain=~".*theunifiedhealth.com"}
 
 ```bash
 # 1. Check certificate expiration
-echo | openssl s_client -servername api.theunifiedhealth.com -connect api.theunifiedhealth.com:443 2>/dev/null | openssl x509 -noout -dates
+echo | openssl s_client -servername api.thetheunifiedhealth.com -connect api.thetheunifiedhealth.com:443 2>/dev/null | openssl x509 -noout -dates
 
 # 2. Check all domains
-for domain in api.theunifiedhealth.com app.theunifiedhealth.com auth.theunifiedhealth.com; do
+for domain in api.thetheunifiedhealth.com app.thetheunifiedhealth.com auth.thetheunifiedhealth.com; do
   echo "=== $domain ==="
   echo | openssl s_client -servername $domain -connect $domain:443 2>/dev/null | openssl x509 -noout -dates
 done
@@ -1426,7 +1426,7 @@ aws route53 change-resource-record-sets \
     "Changes": [{
       "Action": "UPSERT",
       "ResourceRecordSet": {
-        "Name": "_xxxxx.theunifiedhealth.com",
+        "Name": "_xxxxx.thetheunifiedhealth.com",
         "Type": "CNAME",
         "TTL": 300,
         "ResourceRecords": [{"Value": "_xxxxx.acm-validations.aws"}]
@@ -1464,7 +1464,7 @@ kubectl get certificate <cert-name> -n <namespace> -o yaml
 openssl req -new -newkey rsa:2048 -nodes \
   -keyout theunifiedhealth.key \
   -out theunifiedhealth.csr \
-  -subj "/C=US/ST=State/L=City/O=UnifiedHealth/CN=*.theunifiedhealth.com"
+  -subj "/C=US/ST=State/L=City/O=UnifiedHealth/CN=*.thetheunifiedhealth.com"
 
 # 2. Submit CSR to CA and obtain certificate
 
@@ -1482,9 +1482,9 @@ kubectl rollout restart deployment/ingress-nginx-controller -n ingress-nginx
 ```bash
 # 1. If ACM, request new certificate immediately
 aws acm request-certificate \
-  --domain-name "*.theunifiedhealth.com" \
+  --domain-name "*.thetheunifiedhealth.com" \
   --validation-method DNS \
-  --subject-alternative-names "theunifiedhealth.com"
+  --subject-alternative-names "thetheunifiedhealth.com"
 
 # 2. Update ALB/CloudFront to use new certificate ARN
 aws elbv2 modify-listener \
@@ -1500,19 +1500,19 @@ kubectl patch ingress unified-health-ingress -p '{"metadata":{"annotations":{"ng
 
 ```bash
 # 1. Verify new certificate
-echo | openssl s_client -servername api.theunifiedhealth.com -connect api.theunifiedhealth.com:443 2>/dev/null | openssl x509 -noout -dates -subject
+echo | openssl s_client -servername api.thetheunifiedhealth.com -connect api.thetheunifiedhealth.com:443 2>/dev/null | openssl x509 -noout -dates -subject
 
 # 2. Check certificate chain
-echo | openssl s_client -servername api.theunifiedhealth.com -connect api.theunifiedhealth.com:443 2>/dev/null | openssl x509 -noout -text | grep -A 2 "Issuer:"
+echo | openssl s_client -servername api.thetheunifiedhealth.com -connect api.thetheunifiedhealth.com:443 2>/dev/null | openssl x509 -noout -text | grep -A 2 "Issuer:"
 
 # 3. Test HTTPS connectivity
-curl -Iv https://api.theunifiedhealth.com/health 2>&1 | grep -E "SSL|subject|expire"
+curl -Iv https://api.thetheunifiedhealth.com/health 2>&1 | grep -E "SSL|subject|expire"
 
 # 4. Verify no browser warnings
 # Test in Chrome/Firefox/Safari manually
 
 # 5. Check all endpoints
-for domain in api.theunifiedhealth.com app.theunifiedhealth.com; do
+for domain in api.thetheunifiedhealth.com app.thetheunifiedhealth.com; do
   curl -s -o /dev/null -w "%{http_code}" https://$domain/health
 done
 ```
@@ -1547,10 +1547,10 @@ done
 
 | Resource | URL |
 |----------|-----|
-| SSL Dashboard | `https://grafana.theunifiedhealth.com/d/ssl-certificates` |
+| SSL Dashboard | `https://grafana.thetheunifiedhealth.com/d/ssl-certificates` |
 | ACM Console | `https://console.aws.amazon.com/acm/home` |
-| cert-manager Dashboard | `https://grafana.theunifiedhealth.com/d/cert-manager` |
-| Certificate Logs | `https://kibana.theunifiedhealth.com` (filter: `certificate`) |
+| cert-manager Dashboard | `https://grafana.thetheunifiedhealth.com/d/cert-manager` |
+| Certificate Logs | `https://kibana.thetheunifiedhealth.com` (filter: `certificate`) |
 
 ---
 
@@ -1772,7 +1772,7 @@ aws cloudwatch get-metric-statistics \
   --statistics Sum
 
 # 3. Verify legitimate traffic is passing
-curl -w "%{http_code}\n" https://api.theunifiedhealth.com/health
+curl -w "%{http_code}\n" https://api.thetheunifiedhealth.com/health
 
 # 4. Check application metrics
 kubectl top pods -l app=api
@@ -1810,11 +1810,11 @@ kubectl top pods -l app=api
 
 | Resource | URL |
 |----------|-----|
-| Security Dashboard | `https://grafana.theunifiedhealth.com/d/security-overview` |
-| WAF Dashboard | `https://grafana.theunifiedhealth.com/d/waf-metrics` |
+| Security Dashboard | `https://grafana.thetheunifiedhealth.com/d/security-overview` |
+| WAF Dashboard | `https://grafana.thetheunifiedhealth.com/d/waf-metrics` |
 | AWS Shield Console | `https://console.aws.amazon.com/shield/home` |
 | WAF Console | `https://console.aws.amazon.com/wafv2/home` |
-| Traffic Analysis | `https://kibana.theunifiedhealth.com` (filter: `type:access-log`) |
+| Traffic Analysis | `https://kibana.thetheunifiedhealth.com` (filter: `type:access-log`) |
 
 ---
 
@@ -2112,19 +2112,19 @@ Sincerely,
 
 | Resource | URL |
 |----------|-----|
-| Security Dashboard | `https://grafana.theunifiedhealth.com/d/security-overview` |
+| Security Dashboard | `https://grafana.thetheunifiedhealth.com/d/security-overview` |
 | GuardDuty Console | `https://console.aws.amazon.com/guardduty/home` |
 | CloudTrail Console | `https://console.aws.amazon.com/cloudtrail/home` |
-| Audit Logs | `https://kibana.theunifiedhealth.com` (filter: `type:audit`) |
-| SIEM | `https://siem.theunifiedhealth.com` |
+| Audit Logs | `https://kibana.thetheunifiedhealth.com` (filter: `type:audit`) |
+| SIEM | `https://siem.thetheunifiedhealth.com` |
 
 ### Important Contacts
 
 | Role | Contact | When to Notify |
 |------|---------|----------------|
-| Security Team | security@theunifiedhealth.com | Immediately |
-| Privacy Officer | privacy@theunifiedhealth.com | Within 1 hour |
-| Legal Counsel | legal@theunifiedhealth.com | Within 1 hour |
+| Security Team | security@thetheunifiedhealth.com | Immediately |
+| Privacy Officer | privacy@thetheunifiedhealth.com | Within 1 hour |
+| Legal Counsel | legal@thetheunifiedhealth.com | Within 1 hour |
 | External Forensics | [IR Firm Contact] | If needed |
 | HHS OCR | ocrmail@hhs.gov | As required |
 | Cyber Insurance | [Insurance Contact] | Within 24 hours |
@@ -2223,9 +2223,9 @@ kubectl exec -it api-pod -- curl -s localhost:9090/metrics | grep http_requests_
 kubectl logs -l app=api --tail=500 | grep -c "error"
 
 # 3. Quick test of critical endpoints
-curl -s -o /dev/null -w "%{http_code}" https://api.theunifiedhealth.com/health
-curl -s -o /dev/null -w "%{http_code}" https://api.theunifiedhealth.com/v1/appointments
-curl -s -o /dev/null -w "%{http_code}" https://api.theunifiedhealth.com/v1/auth/login
+curl -s -o /dev/null -w "%{http_code}" https://api.thetheunifiedhealth.com/health
+curl -s -o /dev/null -w "%{http_code}" https://api.thetheunifiedhealth.com/v1/appointments
+curl -s -o /dev/null -w "%{http_code}" https://api.thetheunifiedhealth.com/v1/auth/login
 ```
 
 #### Phase 3: Execute Rollback
@@ -2312,7 +2312,7 @@ kubectl exec -it api-pod -- curl -X POST http://localhost:3000/admin/feature-fla
 kubectl exec -it redis-pod -- redis-cli DEL "feature:new-checkout-flow"
 
 # 3. Verify feature disabled
-curl -s https://api.theunifiedhealth.com/v1/features | jq '.features'
+curl -s https://api.thetheunifiedhealth.com/v1/features | jq '.features'
 ```
 
 #### Phase 4: Verification
@@ -2325,12 +2325,12 @@ kubectl describe deployment/api-deployment | grep Image
 kubectl get pods -l app=api
 
 # 3. Run health checks
-curl -s https://api.theunifiedhealth.com/health | jq
+curl -s https://api.thetheunifiedhealth.com/health | jq
 
 # 4. Test critical endpoints
 for endpoint in /health /v1/appointments /v1/patients; do
   echo "Testing $endpoint"
-  curl -s -o /dev/null -w "%{http_code}\n" https://api.theunifiedhealth.com$endpoint
+  curl -s -o /dev/null -w "%{http_code}\n" https://api.thetheunifiedhealth.com$endpoint
 done
 
 # 5. Check error rate decreasing
@@ -2388,11 +2388,11 @@ Before deploying:
 
 | Resource | URL |
 |----------|-----|
-| Deployment Dashboard | `https://grafana.theunifiedhealth.com/d/deployments` |
+| Deployment Dashboard | `https://grafana.thetheunifiedhealth.com/d/deployments` |
 | CI/CD Pipeline | `https://github.com/unified-health/platform/actions` |
-| ArgoCD | `https://argocd.theunifiedhealth.com` |
-| Application Logs | `https://kibana.theunifiedhealth.com` |
-| Error Tracking | `https://sentry.theunifiedhealth.com` |
+| ArgoCD | `https://argocd.thetheunifiedhealth.com` |
+| Application Logs | `https://kibana.thetheunifiedhealth.com` |
+| Error Tracking | `https://sentry.thetheunifiedhealth.com` |
 
 ---
 
@@ -2443,10 +2443,10 @@ aws cloudwatch get-metric-statistics --namespace <namespace> --metric-name <metr
 
 | Service | Health Check URL |
 |---------|------------------|
-| API Gateway | `https://api.theunifiedhealth.com/health` |
-| Auth Service | `https://auth.theunifiedhealth.com/health` |
-| Billing Service | `https://billing.theunifiedhealth.com/health` |
-| Video Service | `https://video.theunifiedhealth.com/health` |
+| API Gateway | `https://api.thetheunifiedhealth.com/health` |
+| Auth Service | `https://auth.thetheunifiedhealth.com/health` |
+| Billing Service | `https://billing.thetheunifiedhealth.com/health` |
+| Video Service | `https://video.thetheunifiedhealth.com/health` |
 
 ---
 

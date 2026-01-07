@@ -129,13 +129,13 @@ postgresql_admin_password = "YourSecurePassword123!"  # Change this!
 
 # DNS Configuration
 manage_dns    = false
-dns_zone_name = "unifiedhealth.com"
+dns_zone_name = "theunifiedhealth.com"
 
 # Global Monitoring
-global_alert_email_address = "ops@unifiedhealth.com"
-americas_alert_email_address = "ops-americas@unifiedhealth.com"
-europe_alert_email_address = "ops-europe@unifiedhealth.com"
-africa_alert_email_address = "ops-africa@unifiedhealth.com"
+global_alert_email_address = "ops@theunifiedhealth.com"
+americas_alert_email_address = "ops-americas@theunifiedhealth.com"
+europe_alert_email_address = "ops-europe@theunifiedhealth.com"
+africa_alert_email_address = "ops-africa@theunifiedhealth.com"
 ```
 
 ### Step 4: Initialize Terraform
@@ -245,15 +245,15 @@ FRONTDOOR_ENDPOINT=$(terraform output -raw frontdoor_api_endpoint)
 # Add DNS records
 az network dns record-set cname create \
   --resource-group rg-unified-health-global \
-  --zone-name unifiedhealth.com \
+  --zone-name theunifiedhealth.com \
   --name api \
   --target $FRONTDOOR_ENDPOINT
 ```
 
 #### Option B: External DNS Provider
 Add CNAME records pointing to:
-- API: `api.unifiedhealth.com` → `<frontdoor_api_endpoint>`
-- Web: `www.unifiedhealth.com` → `<frontdoor_web_endpoint>`
+- API: `api.thetheunifiedhealth.com` → `<frontdoor_api_endpoint>`
+- Web: `www.thetheunifiedhealth.com` → `<frontdoor_web_endpoint>`
 
 ### 5. Configure SSL/TLS Certificates
 
@@ -263,7 +263,7 @@ az afd custom-domain create \
   --profile-name $(terraform output -raw frontdoor_profile_name) \
   --resource-group rg-unified-health-global \
   --custom-domain-name api-unifiedhealth \
-  --host-name api.unifiedhealth.com \
+  --host-name api.thetheunifiedhealth.com \
   --certificate-type ManagedCertificate
 ```
 
@@ -460,7 +460,7 @@ terraform destroy
 
 For issues or questions:
 - Open an issue in the repository
-- Contact the DevOps team: devops@unifiedhealth.com
+- Contact the DevOps team: devops@thetheunifiedhealth.com
 - Check the monitoring dashboard for real-time status
 
 ---

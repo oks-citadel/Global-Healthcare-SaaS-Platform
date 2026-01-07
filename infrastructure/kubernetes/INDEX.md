@@ -235,7 +235,7 @@ infrastructure/kubernetes/
 - Resource limits (lower than production)
 - HPA configuration (2-10 replicas)
 - PDB configuration (minAvailable = 1)
-- Ingress domain override (api-staging.unifiedhealth.com)
+- Ingress domain override (api-staging.thetheunifiedhealth.com)
 - ConfigMap patches (debug logging)
 - Image tag override (staging-latest)
 
@@ -254,7 +254,7 @@ infrastructure/kubernetes/
 - Higher resource limits
 - HPA configuration (3-20 replicas)
 - PDB configuration (minAvailable = 2)
-- Ingress domain override (api.unifiedhealth.com)
+- Ingress domain override (api.thetheunifiedhealth.com)
 - ConfigMap patches (info logging, higher rate limits)
 - Image tag with specific version (v1.0.0)
 - Pod affinity rules (required anti-affinity)
@@ -362,8 +362,8 @@ infrastructure/kubernetes/
 - **Production**: `unified-health-production`
 
 ### Domains
-- **Staging**: `api-staging.unifiedhealth.com`
-- **Production**: `api.unifiedhealth.com`
+- **Staging**: `api-staging.thetheunifiedhealth.com`
+- **Production**: `api.thetheunifiedhealth.com`
 
 ### Replicas
 - **Staging**: 2 (min), 10 (max with HPA)

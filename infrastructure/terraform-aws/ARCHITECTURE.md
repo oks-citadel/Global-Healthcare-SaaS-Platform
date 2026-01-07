@@ -11,7 +11,7 @@ The Unified Health Platform runs on AWS with multi-region deployment across Amer
                                         |
                           +-------------+-------------+
                           |     Amazon Route 53      |
-                          |   (theunifiedhealth.com) |
+                          |   (thetheunifiedhealth.com) |
                           +-------------+-------------+
                                         |
             +---------------------------+---------------------------+

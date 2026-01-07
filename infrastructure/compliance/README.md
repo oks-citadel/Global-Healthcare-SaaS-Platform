@@ -252,7 +252,7 @@ terraform plan \
   -var="environment=prod" \
   -var="region=eastus" \
   -var="resource_group_name=unifiedhealth-hipaa-rg" \
-  -var="dpo_email=dpo@unifiedhealth.com"
+  -var="dpo_email=dpo@thetheunifiedhealth.com"
 
 terraform apply
 ```
@@ -268,7 +268,7 @@ terraform plan \
   -var="environment=prod" \
   -var="eu_region=westeurope" \
   -var="resource_group_name=unifiedhealth-gdpr-rg" \
-  -var="dpo_email=dpo@unifiedhealth.com"
+  -var="dpo_email=dpo@thetheunifiedhealth.com"
 
 terraform apply
 ```
@@ -284,7 +284,7 @@ terraform plan \
   -var="environment=prod" \
   -var="sa_region=southafricanorth" \
   -var="resource_group_name=unifiedhealth-popia-rg" \
-  -var="information_officer_email=io@unifiedhealth.com"
+  -var="information_officer_email=io@thetheunifiedhealth.com"
 
 terraform apply
 ```
@@ -439,13 +439,13 @@ az storage table query \
 
 ## Support and Contact
 
-**Data Protection Officer (DPO):** dpo@unifiedhealth.com
+**Data Protection Officer (DPO):** dpo@thetheunifiedhealth.com
 
-**Information Officer (POPIA):** information.officer@unifiedhealth.com
+**Information Officer (POPIA):** information.officer@thetheunifiedhealth.com
 
-**Security Team:** security@unifiedhealth.com
+**Security Team:** security@thetheunifiedhealth.com
 
-**Compliance Team:** compliance@unifiedhealth.com
+**Compliance Team:** compliance@thetheunifiedhealth.com
 
 ## License
 

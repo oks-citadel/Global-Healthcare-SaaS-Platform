@@ -367,7 +367,7 @@ All notices under this BAA must be in writing and delivered to:
 **Business Associate:**
 The Unified Health Platform
 [Address]
-Email: legal@theunifiedhealth.com
+Email: legal@thetheunifiedhealth.com
 
 **8.8 Governing Law**
 

@@ -390,9 +390,9 @@ jq '{format: .bomFormat, version: .specVersion, components: (.components | lengt
 
 ### Contact Information
 
-- **Security Team**: security@unifiedhealth.com
-- **Compliance Team**: compliance@unifiedhealth.com
-- **DevOps Support**: devops@unifiedhealth.com
+- **Security Team**: security@thetheunifiedhealth.com
+- **Compliance Team**: compliance@thetheunifiedhealth.com
+- **DevOps Support**: devops@thetheunifiedhealth.com
 - **Slack Channel**: #security-sbom
 
 ---

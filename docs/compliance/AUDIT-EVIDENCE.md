@@ -413,9 +413,9 @@ audit-evidence-package-{date}/
 **Next Review:** April 2025
 
 **Contacts:**
-- Compliance Officer: compliance@theunifiedhealth.com
-- Security Team: security@theunifiedhealth.com
-- Legal: legal@theunifiedhealth.com
+- Compliance Officer: compliance@thetheunifiedhealth.com
+- Security Team: security@thetheunifiedhealth.com
+- Legal: legal@thetheunifiedhealth.com
 
 ---
 

@@ -15,7 +15,7 @@ The primary authentication method for API access.
 **Endpoint:** `POST /api/v1/auth/register`
 
 ```bash
-curl -X POST https://api.theunifiedhealth.com/api/v1/auth/register \
+curl -X POST https://api.thetheunifiedhealth.com/api/v1/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "email": "patient@example.com",
@@ -51,7 +51,7 @@ curl -X POST https://api.theunifiedhealth.com/api/v1/auth/register \
 **Endpoint:** `POST /api/v1/auth/login`
 
 ```bash
-curl -X POST https://api.theunifiedhealth.com/api/v1/auth/login \
+curl -X POST https://api.thetheunifiedhealth.com/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "patient@example.com",
@@ -81,7 +81,7 @@ curl -X POST https://api.theunifiedhealth.com/api/v1/auth/login \
 **Endpoint:** `POST /api/v1/auth/refresh`
 
 ```bash
-curl -X POST https://api.theunifiedhealth.com/api/v1/auth/refresh \
+curl -X POST https://api.thetheunifiedhealth.com/api/v1/auth/refresh \
   -H "Content-Type: application/json" \
   -d '{
     "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
@@ -104,7 +104,7 @@ curl -X POST https://api.theunifiedhealth.com/api/v1/auth/refresh \
 Include the access token in the Authorization header:
 
 ```bash
-curl -X GET https://api.theunifiedhealth.com/api/v1/users/me \
+curl -X GET https://api.thetheunifiedhealth.com/api/v1/users/me \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 ```
 
@@ -117,7 +117,7 @@ For server-to-server integrations and machine-to-machine communication.
 **Endpoint:** `POST /api/v1/api-keys`
 
 ```bash
-curl -X POST https://api.theunifiedhealth.com/api/v1/api-keys \
+curl -X POST https://api.thetheunifiedhealth.com/api/v1/api-keys \
   -H "Authorization: Bearer {access_token}" \
   -H "Content-Type: application/json" \
   -d '{
@@ -149,7 +149,7 @@ curl -X POST https://api.theunifiedhealth.com/api/v1/api-keys \
 Include the API key in the X-API-Key header:
 
 ```bash
-curl -X GET https://api.theunifiedhealth.com/api/v1/patients \
+curl -X GET https://api.thetheunifiedhealth.com/api/v1/patients \
   -H "X-API-Key: sk_live_abc123def456..."
 ```
 
@@ -163,7 +163,7 @@ For third-party applications and SSO integrations.
 
 Redirect users to:
 ```
-https://api.theunifiedhealth.com/oauth/authorize?
+https://api.thetheunifiedhealth.com/oauth/authorize?
   response_type=code&
   client_id={client_id}&
   redirect_uri={redirect_uri}&
@@ -181,7 +181,7 @@ https://yourapp.com/callback?code={authorization_code}&state={state}
 **Step 3: Exchange Code for Tokens**
 
 ```bash
-curl -X POST https://api.theunifiedhealth.com/oauth/token \
+curl -X POST https://api.thetheunifiedhealth.com/oauth/token \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "grant_type=authorization_code" \
   -d "code={authorization_code}" \
@@ -207,7 +207,7 @@ curl -X POST https://api.theunifiedhealth.com/oauth/token \
 For machine-to-machine communication:
 
 ```bash
-curl -X POST https://api.theunifiedhealth.com/oauth/token \
+curl -X POST https://api.thetheunifiedhealth.com/oauth/token \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "grant_type=client_credentials" \
   -d "client_id={client_id}" \
@@ -222,7 +222,7 @@ curl -X POST https://api.theunifiedhealth.com/oauth/token \
 **Endpoint:** `POST /api/v1/auth/mfa/enable`
 
 ```bash
-curl -X POST https://api.theunifiedhealth.com/api/v1/auth/mfa/enable \
+curl -X POST https://api.thetheunifiedhealth.com/api/v1/auth/mfa/enable \
   -H "Authorization: Bearer {access_token}" \
   -H "Content-Type: application/json" \
   -d '{
@@ -250,7 +250,7 @@ curl -X POST https://api.theunifiedhealth.com/api/v1/auth/mfa/enable \
 **Endpoint:** `POST /api/v1/auth/mfa/verify`
 
 ```bash
-curl -X POST https://api.theunifiedhealth.com/api/v1/auth/mfa/verify \
+curl -X POST https://api.thetheunifiedhealth.com/api/v1/auth/mfa/verify \
   -H "Content-Type: application/json" \
   -d '{
     "userId": "usr_abc123",
@@ -264,7 +264,7 @@ When MFA is enabled, login requires a two-step process:
 
 **Step 1: Initial Login**
 ```bash
-curl -X POST https://api.theunifiedhealth.com/api/v1/auth/login \
+curl -X POST https://api.thetheunifiedhealth.com/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "patient@example.com",
@@ -286,7 +286,7 @@ curl -X POST https://api.theunifiedhealth.com/api/v1/auth/login \
 
 **Step 2: Verify MFA Code**
 ```bash
-curl -X POST https://api.theunifiedhealth.com/api/v1/auth/mfa/verify \
+curl -X POST https://api.thetheunifiedhealth.com/api/v1/auth/mfa/verify \
   -H "Content-Type: application/json" \
   -d '{
     "mfaToken": "mfa_temp_token_123",
@@ -351,7 +351,7 @@ Scopes define granular permissions for API access:
 **Endpoint:** `GET /api/v1/auth/permissions`
 
 ```bash
-curl -X GET https://api.theunifiedhealth.com/api/v1/auth/permissions \
+curl -X GET https://api.thetheunifiedhealth.com/api/v1/auth/permissions \
   -H "Authorization: Bearer {access_token}"
 ```
 
@@ -394,7 +394,7 @@ curl -X GET https://api.theunifiedhealth.com/api/v1/auth/permissions \
 **Endpoint:** `POST /api/v1/auth/password/reset-request`
 
 ```bash
-curl -X POST https://api.theunifiedhealth.com/api/v1/auth/password/reset-request \
+curl -X POST https://api.thetheunifiedhealth.com/api/v1/auth/password/reset-request \
   -H "Content-Type: application/json" \
   -d '{
     "email": "patient@example.com"
@@ -414,7 +414,7 @@ curl -X POST https://api.theunifiedhealth.com/api/v1/auth/password/reset-request
 **Endpoint:** `POST /api/v1/auth/password/reset`
 
 ```bash
-curl -X POST https://api.theunifiedhealth.com/api/v1/auth/password/reset \
+curl -X POST https://api.thetheunifiedhealth.com/api/v1/auth/password/reset \
   -H "Content-Type: application/json" \
   -d '{
     "token": "reset_token_from_email",
@@ -427,7 +427,7 @@ curl -X POST https://api.theunifiedhealth.com/api/v1/auth/password/reset \
 **Endpoint:** `PUT /api/v1/auth/password/change`
 
 ```bash
-curl -X PUT https://api.theunifiedhealth.com/api/v1/auth/password/change \
+curl -X PUT https://api.thetheunifiedhealth.com/api/v1/auth/password/change \
   -H "Authorization: Bearer {access_token}" \
   -H "Content-Type: application/json" \
   -d '{
@@ -443,7 +443,7 @@ curl -X PUT https://api.theunifiedhealth.com/api/v1/auth/password/change \
 **Endpoint:** `POST /api/v1/auth/logout`
 
 ```bash
-curl -X POST https://api.theunifiedhealth.com/api/v1/auth/logout \
+curl -X POST https://api.thetheunifiedhealth.com/api/v1/auth/logout \
   -H "Authorization: Bearer {access_token}"
 ```
 
@@ -452,7 +452,7 @@ curl -X POST https://api.theunifiedhealth.com/api/v1/auth/logout \
 **Endpoint:** `POST /api/v1/auth/logout-all`
 
 ```bash
-curl -X POST https://api.theunifiedhealth.com/api/v1/auth/logout-all \
+curl -X POST https://api.thetheunifiedhealth.com/api/v1/auth/logout-all \
   -H "Authorization: Bearer {access_token}"
 ```
 
@@ -461,7 +461,7 @@ curl -X POST https://api.theunifiedhealth.com/api/v1/auth/logout-all \
 **Endpoint:** `GET /api/v1/auth/sessions`
 
 ```bash
-curl -X GET https://api.theunifiedhealth.com/api/v1/auth/sessions \
+curl -X GET https://api.thetheunifiedhealth.com/api/v1/auth/sessions \
   -H "Authorization: Bearer {access_token}"
 ```
 
@@ -558,7 +558,7 @@ JWT tokens contain:
 
 Use the sandbox environment for testing:
 ```
-https://api-sandbox.theunifiedhealth.com/api/v1
+https://api-sandbox.thetheunifiedhealth.com/api/v1
 ```
 
 **Test Accounts:**

@@ -44,7 +44,7 @@ interface UserProfile {
 **Constants - UPPER_SNAKE_CASE**
 ```typescript
 const MAX_RETRY_ATTEMPTS = 3;
-const API_BASE_URL = 'https://api.theunifiedhealth.com';
+const API_BASE_URL = 'https://api.thetheunifiedhealth.com';
 const JWT_EXPIRY_TIME = 3600;
 ```
 

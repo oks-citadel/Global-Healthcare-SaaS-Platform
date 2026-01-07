@@ -481,7 +481,7 @@ Update in `src/services/socket.ts`:
 ```typescript
 const API_URL = __DEV__
   ? 'http://localhost:3000'  // Development
-  : 'https://api.theunifiedhealth.com';  // Production
+  : 'https://api.thetheunifiedhealth.com';  // Production
 ```
 
 ### Auto-Reconnection Settings

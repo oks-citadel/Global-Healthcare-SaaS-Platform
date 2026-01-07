@@ -16,7 +16,7 @@ Phone: [PHONE]
 **Business Associate:** UnifiedHealth Platform, Inc.
 Address: [UNIFIEDHEALTH ADDRESS]
 Contact: Compliance Officer
-Email: compliance@unifiedhealth.com
+Email: compliance@thetheunifiedhealth.com
 Phone: [PHONE]
 
 ---

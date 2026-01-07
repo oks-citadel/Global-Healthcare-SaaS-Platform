@@ -204,7 +204,7 @@ module "frontdoor" {
   origins = {
     primary = {
       host_name              = azurerm_kubernetes_cluster.main.fqdn
-      origin_host_header     = "api.unifiedhealth.com"
+      origin_host_header     = "api.thetheunifiedhealth.com"
       priority               = 1
       weight                 = 1000
       location               = azurerm_resource_group.main.location

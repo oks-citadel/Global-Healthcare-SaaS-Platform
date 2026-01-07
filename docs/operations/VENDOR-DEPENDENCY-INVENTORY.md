@@ -135,8 +135,8 @@ These vendors are essential for core platform operations. Outages directly impac
 **Email Deliverability Configuration:**
 
 - SPF Record: `v=spf1 include:sendgrid.net include:amazonses.com ~all`
-- DKIM: Configured for theunifiedhealth.com
-- DMARC: `v=DMARC1; p=quarantine; rua=mailto:dmarc@theunifiedhealth.com`
+- DKIM: Configured for thetheunifiedhealth.com
+- DMARC: `v=DMARC1; p=quarantine; rua=mailto:dmarc@thetheunifiedhealth.com`
 
 ---
 

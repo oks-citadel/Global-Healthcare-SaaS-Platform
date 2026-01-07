@@ -420,16 +420,16 @@ X-Debug: true
 
 Use sandbox environment to test error handling:
 ```
-https://api-sandbox.theunifiedhealth.com/api/v1
+https://api-sandbox.thetheunifiedhealth.com/api/v1
 ```
 
 ## Getting Help
 
 If you encounter persistent errors:
 
-1. **Check API Status:** https://status.theunifiedhealth.com
-2. **Review Documentation:** https://docs.theunifiedhealth.com
-3. **Search Community:** https://community.theunifiedhealth.com
+1. **Check API Status:** https://status.thetheunifiedhealth.com
+2. **Review Documentation:** https://docs.thetheunifiedhealth.com
+3. **Search Community:** https://community.thetheunifiedhealth.com
 4. **Contact Support:** support@unifiedhealth.io (Include request ID)
 
 ---

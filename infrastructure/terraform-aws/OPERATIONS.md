@@ -273,7 +273,7 @@ fields @timestamp, @message
 
 | Role | Contact | Escalation Path |
 |------|---------|-----------------|
-| On-Call Primary | PagerDuty rotation | ops@unifiedhealth.com |
-| On-Call Secondary | PagerDuty rotation | ops@unifiedhealth.com |
-| Engineering Lead | Direct contact | engineering-leads@unifiedhealth.com |
+| On-Call Primary | PagerDuty rotation | ops@theunifiedhealth.com |
+| On-Call Secondary | PagerDuty rotation | ops@theunifiedhealth.com |
+| Engineering Lead | Direct contact | engineering-leads@theunifiedhealth.com |
 | AWS Support | AWS Console | Business/Enterprise support |

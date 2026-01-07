@@ -46,8 +46,8 @@ This strategy applies to:
 We use **URL path versioning** as the primary versioning mechanism:
 
 ```
-https://api.theunifiedhealth.com/api/v1/patients
-https://api.theunifiedhealth.com/api/v2/patients
+https://api.thetheunifiedhealth.com/api/v1/patients
+https://api.thetheunifiedhealth.com/api/v2/patients
 ```
 
 ### Why URL-Based Versioning?
@@ -126,7 +126,7 @@ When a version is deprecated, responses include:
 HTTP/1.1 200 OK
 Deprecation: true
 Sunset: Sat, 31 Dec 2026 23:59:59 GMT
-Link: <https://api.theunifiedhealth.com/api/v2/patients>; rel="successor-version"
+Link: <https://api.thetheunifiedhealth.com/api/v2/patients>; rel="successor-version"
 
 {
   "data": {...},

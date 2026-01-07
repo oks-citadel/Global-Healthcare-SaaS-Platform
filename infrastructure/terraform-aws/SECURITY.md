@@ -196,12 +196,12 @@ KMS Keys
 ```
 ACM Certificates
     |
-    +-- theunifiedhealth.com (Production)
+    +-- thetheunifiedhealth.com (Production)
     |       |-- Auto-renewal: Yes
     |       |-- Validation: DNS (Route53)
     |       |-- Attached to: CloudFront, ALB
     |
-    +-- *.theunifiedhealth.com (Wildcard)
+    +-- *.thetheunifiedhealth.com (Wildcard)
             |-- Covers: api, app, provider, admin subdomains
 ```
 

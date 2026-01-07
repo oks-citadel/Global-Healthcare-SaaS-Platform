@@ -776,8 +776,8 @@ FROM node:20.11-alpine
 ## Support & Resources
 
 ### Internal Resources
-- **Security Team:** security@unifiedhealth.com
-- **DevOps Team:** devops@unifiedhealth.com
+- **Security Team:** security@thetheunifiedhealth.com
+- **DevOps Team:** devops@thetheunifiedhealth.com
 - **Documentation:** `/docs/security/`
 
 ### External Resources

@@ -150,7 +150,7 @@ az acr login --name $ACR_NAME
 
 - **Detailed Guide**: [MULTIREGION_DEPLOYMENT_GUIDE.md](./MULTIREGION_DEPLOYMENT_GUIDE.md)
 - **Makefile Help**: `make -f Makefile.multiregion help`
-- **Support**: devops@unifiedhealth.com
+- **Support**: devops@thetheunifiedhealth.com
 
 ---
 

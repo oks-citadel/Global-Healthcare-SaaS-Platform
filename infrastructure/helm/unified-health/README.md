@@ -157,5 +157,5 @@ kubectl run -it --rm debug --image=postgres:15 --restart=Never -- \
 
 For issues and questions:
 - GitHub Issues: https://github.com/your-org/unified-health-platform/issues
-- Documentation: https://docs.unifiedhealth.com
-- Email: devops@unifiedhealth.com
+- Documentation: https://docs.thetheunifiedhealth.com
+- Email: devops@thetheunifiedhealth.com

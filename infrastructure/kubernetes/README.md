@@ -429,7 +429,7 @@ kubectl get pods -n unified-health-production -w
 kubectl get ingress -n unified-health-production
 
 # Add DNS A record
-# api.unifiedhealth.com → <EXTERNAL-IP>
+# api.thetheunifiedhealth.com → <EXTERNAL-IP>
 ```
 
 ## Environment-Specific Deployments
@@ -440,7 +440,7 @@ kubectl get ingress -n unified-health-production
 - Replicas: 2
 - CPU: 200m request, 500m limit
 - Memory: 256Mi request, 512Mi limit
-- Domain: api-staging.unifiedhealth.com
+- Domain: api-staging.thetheunifiedhealth.com
 - Log level: debug
 - HPA: 2-10 replicas
 - PDB: minAvailable = 1
@@ -456,7 +456,7 @@ kubectl apply -k overlays/staging
 - Replicas: 3
 - CPU: 500m request, 2000m limit
 - Memory: 512Mi request, 2Gi limit
-- Domain: api.unifiedhealth.com
+- Domain: api.thetheunifiedhealth.com
 - Log level: info
 - HPA: 3-20 replicas
 - PDB: minAvailable = 2
@@ -734,9 +734,9 @@ kubectl apply -k overlays/production
 ## Support
 
 For issues or questions:
-- Email: devops@unifiedhealth.com
+- Email: devops@thetheunifiedhealth.com
 - Slack: #unified-health-platform
-- Documentation: https://docs.unifiedhealth.com
+- Documentation: https://docs.thetheunifiedhealth.com
 
 ---
 

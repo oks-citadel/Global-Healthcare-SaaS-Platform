@@ -152,7 +152,7 @@ These procedures apply to:
 #### **IRT Lead - Chief Security Officer (CSO)**
 
 **Name:** [CSO Name]
-**Contact:** security@theunifiedhealth.com | +1 (555) 123-4567 (24/7)
+**Contact:** security@thetheunifiedhealth.com | +1 (555) 123-4567 (24/7)
 
 **Responsibilities:**
 - Overall incident response coordination
@@ -164,7 +164,7 @@ These procedures apply to:
 #### **Compliance Officer**
 
 **Name:** [Compliance Officer Name]
-**Contact:** compliance@theunifiedhealth.com | +1 (555) 123-4568
+**Contact:** compliance@thetheunifiedhealth.com | +1 (555) 123-4568
 
 **Responsibilities:**
 - HIPAA breach determination
@@ -175,7 +175,7 @@ These procedures apply to:
 #### **IT Manager / System Administrator**
 
 **Name:** [IT Manager Name]
-**Contact:** it@theunifiedhealth.com | +1 (555) 123-4569
+**Contact:** it@thetheunifiedhealth.com | +1 (555) 123-4569
 
 **Responsibilities:**
 - Technical containment actions
@@ -186,7 +186,7 @@ These procedures apply to:
 #### **Security Analyst**
 
 **Name:** [Analyst Name]
-**Contact:** security-team@theunifiedhealth.com
+**Contact:** security-team@thetheunifiedhealth.com
 
 **Responsibilities:**
 - Initial incident triage
@@ -197,7 +197,7 @@ These procedures apply to:
 #### **Legal Counsel**
 
 **Name:** [Legal Name]
-**Contact:** legal@theunifiedhealth.com | +1 (555) 123-4570
+**Contact:** legal@thetheunifiedhealth.com | +1 (555) 123-4570
 
 **Responsibilities:**
 - Legal guidance and advice
@@ -208,7 +208,7 @@ These procedures apply to:
 #### **PR/Communications Manager**
 
 **Name:** [PR Name]
-**Contact:** communications@theunifiedhealth.com
+**Contact:** communications@thetheunifiedhealth.com
 
 **Responsibilities:**
 - External communications (media, public)
@@ -308,9 +308,9 @@ These procedures apply to:
 
 **Internal Reporting:**
 
-**Primary:** security-incidents@theunifiedhealth.com (24/7 monitored)
+**Primary:** security-incidents@thetheunifiedhealth.com (24/7 monitored)
 **Phone:** +1 (555) 123-4567 (Security Operations Center - 24/7)
-**Portal:** https://security.theunifiedhealth.com/report
+**Portal:** https://security.thetheunifiedhealth.com/report
 **Slack:** #security-incidents (for urgent internal comms)
 
 **Who Should Report:**
@@ -933,7 +933,7 @@ Approved By: [CSO], [CEO]
 ### IMMEDIATE ACTIONS (P1 Incident)
 
 ```
-☐ 1. Report incident: security-incidents@theunifiedhealth.com or
+☐ 1. Report incident: security-incidents@thetheunifiedhealth.com or
      +1 (555) 123-4567
 
 ☐ 2. Do NOT turn off affected systems (preserve evidence)
@@ -942,7 +942,7 @@ Approved By: [CSO], [CEO]
 
 ☐ 4. Disable compromised accounts
 
-☐ 5. Notify IRT Lead: security@theunifiedhealth.com
+☐ 5. Notify IRT Lead: security@thetheunifiedhealth.com
 
 ☐ 6. Preserve logs and evidence
 
@@ -955,10 +955,10 @@ Approved By: [CSO], [CEO]
 
 | Role | Contact | Phone |
 |------|---------|-------|
-| Security Operations Center | security-incidents@theunifiedhealth.com | +1 (555) 123-4567 |
-| IRT Lead (CSO) | security@theunifiedhealth.com | +1 (555) 123-4567 |
-| Compliance Officer | compliance@theunifiedhealth.com | +1 (555) 123-4568 |
-| Legal Counsel | legal@theunifiedhealth.com | +1 (555) 123-4570 |
+| Security Operations Center | security-incidents@thetheunifiedhealth.com | +1 (555) 123-4567 |
+| IRT Lead (CSO) | security@thetheunifiedhealth.com | +1 (555) 123-4567 |
+| Compliance Officer | compliance@thetheunifiedhealth.com | +1 (555) 123-4568 |
+| Legal Counsel | legal@thetheunifiedhealth.com | +1 (555) 123-4570 |
 | FBI Cyber Division | [Local Field Office] | [Phone] |
 
 ---

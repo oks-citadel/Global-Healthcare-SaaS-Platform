@@ -22,7 +22,7 @@ This document provides comprehensive guidance for implementing DNS-01 ACME chall
 **Current Situation:**
 - Platform: AWS EKS (`unified-health-eks`)
 - Region: `us-east-1` (primary), `eu-west-1` (Europe), `af-south-1` (Africa)
-- Current Domain: `api.unifiedhealth.com`
+- Current Domain: `api.thetheunifiedhealth.com`
 - Issue: HTTP-01 challenge fails because external firewall blocks port 80
 - cert-manager is installed with `letsencrypt-prod` ClusterIssuer
 
@@ -55,7 +55,7 @@ This document provides comprehensive guidance for implementing DNS-01 ACME chall
 
 ### Prerequisites
 
-1. **Own a domain** (e.g., `unifiedhealth.com`)
+1. **Own a domain** (e.g., `theunifiedhealth.com`)
 2. **Route53 Hosted Zone** in your AWS account
 3. **EKS cluster** with OIDC provider enabled
 4. **IAM Role** with Route53 permissions configured for IRSA
@@ -90,12 +90,12 @@ echo "OIDC Issuer: $OIDC_ISSUER"
 ```bash
 # Create hosted zone (if not exists)
 aws route53 create-hosted-zone \
-  --name unifiedhealth.com \
+  --name theunifiedhealth.com \
   --caller-reference $(date +%s)
 
 # Get hosted zone ID
 HOSTED_ZONE_ID=$(aws route53 list-hosted-zones-by-name \
-  --dns-name "unifiedhealth.com" \
+  --dns-name "theunifiedhealth.com" \
   --query "HostedZones[0].Id" \
   --output text | cut -d'/' -f3)
 echo "Hosted Zone ID: $HOSTED_ZONE_ID"
@@ -340,7 +340,7 @@ kubectl apply -f ingress-dns01.yaml
 Since nip.io doesn't support DNS-01, consider:
 
 1. **Skip TLS for development** (not recommended for prod-like testing)
-2. **Use a subdomain of your production domain** (e.g., `dev.unifiedhealth.com`)
+2. **Use a subdomain of your production domain** (e.g., `dev.theunifiedhealth.com`)
 3. **Use self-signed certificates** with cert-manager's `selfsigned-issuer`
 4. **Deploy ACME-DNS** and configure CNAME delegation
 
@@ -377,12 +377,12 @@ kubectl describe challenge <name> -n <namespace>
 
 ```bash
 # Check TXT record (during challenge)
-dig _acme-challenge.unifiedhealth.com TXT
+dig _acme-challenge.theunifiedhealth.com TXT
 
 # Check Route53 directly
 aws route53 list-resource-record-sets \
   --hosted-zone-id $HOSTED_ZONE_ID \
-  --query "ResourceRecordSets[?Name=='_acme-challenge.unifiedhealth.com.']"
+  --query "ResourceRecordSets[?Name=='_acme-challenge.theunifiedhealth.com.']"
 ```
 
 ---

@@ -119,7 +119,7 @@ The production seed script (`prisma/seed-production.ts`) creates essential basel
    - Liver Function Test
 
 4. **Default Admin User**
-   - Email: admin@theunifiedhealth.com
+   - Email: admin@thetheunifiedhealth.com
    - Password: Set via `ADMIN_DEFAULT_PASSWORD` env variable
 
 ### Running Production Seed
