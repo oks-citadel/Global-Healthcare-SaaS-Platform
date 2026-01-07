@@ -215,7 +215,7 @@ export const config = {
   },
 
   mfa: {
-    issuer: getOptionalEnv("MFA_ISSUER", "UnifiedHealthcare"),
+    issuer: getOptionalEnv("MFA_ISSUER", "Unified Health"),
     encryptionKey: getRequiredEnv(
       "MFA_ENCRYPTION_KEY",
       isDevelopment ? "dev-only-mfa-encryption-key-32chars!" : undefined,

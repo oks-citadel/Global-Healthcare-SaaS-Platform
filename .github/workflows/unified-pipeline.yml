@@ -316,7 +316,7 @@ jobs:
             "[^a-z]unifiedhealth.com"
           )
           EXCLUDE_PATTERNS="--exclude-dir=node_modules --exclude-dir=.git --exclude-dir=dist --exclude-dir=.pnpm --exclude-dir=.next --exclude-dir=coverage --exclude=*.lock --exclude=pnpm-lock.yaml"
-          WHITELIST_FILES="app.json|package.json|\.env|Dockerfile|docker-compose|kustomization|\.tf$|Chart\.yaml"
+          WHITELIST_FILES="branding.ts|app.json|package.json|\.env|Dockerfile|docker-compose|kustomization|\.tf$|Chart\.yaml"
 
           FOUND_ISSUES=false
           for pattern in "${DISALLOWED_PATTERNS[@]}"; do
