@@ -765,16 +765,16 @@ jobs:
           - name: admin-portal
             context: .
             dockerfile: ./docker/Dockerfile.app
-            build-args: APP_NAME=admin
+            build-args: SERVICE_PATH=apps/admin
           - name: provider-portal
             context: .
             dockerfile: ./docker/Dockerfile.app
-            build-args: APP_NAME=provider-portal
+            build-args: SERVICE_PATH=apps/provider-portal
 
           - name: kiosk
             context: .
             dockerfile: ./docker/Dockerfile.app
-            build-args: APP_NAME=kiosk
+            build-args: SERVICE_PATH=apps/kiosk
           # Healthcare Services
           - name: api-gateway
             context: ./services/api-gateway
@@ -851,6 +851,7 @@ jobs:
           tags: |
             ${{ steps.login-ecr.outputs.registry }}/unified-health-prod/${{ matrix.service.name }}:${{ needs.setup.outputs.commit_sha }}
             ${{ steps.login-ecr.outputs.registry }}/unified-health-prod/${{ matrix.service.name }}:latest
+          build-args: ${{ matrix.service.build-args }}
           cache-from: type=gha,scope=${{ matrix.service.name }}
           cache-to: type=gha,scope=${{ matrix.service.name }},mode=max
 
