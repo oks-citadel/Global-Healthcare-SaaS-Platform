@@ -19,6 +19,7 @@ FROM base AS deps
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 COPY apps/web/package.json ./apps/web/
 COPY packages/sdk/package.json ./packages/sdk/
+COPY packages/i18n/package.json ./packages/i18n/
 
 # Configure pnpm to handle peer dependency conflicts (React 19 + older packages like Stripe)
 RUN echo "auto-install-peers=true" > .npmrc && \
@@ -40,6 +41,19 @@ RUN pnpm build
 RUN ls -la dist/ && test -f dist/index.js
 
 # ============================================
+# Stage 3b: Build i18n
+# ============================================
+FROM base AS i18n-builder
+
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/packages/i18n/node_modules ./packages/i18n/node_modules
+COPY packages/i18n ./packages/i18n
+
+WORKDIR /app/packages/i18n
+RUN pnpm build
+RUN ls -la dist/ && test -f dist/index.js
+
+# ============================================
 # Stage 4: Build Web App
 # ============================================
 FROM base AS builder
@@ -47,6 +61,7 @@ FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules
 COPY --from=sdk-builder /app/packages/sdk ./packages/sdk
+COPY --from=i18n-builder /app/packages/i18n ./packages/i18n
 COPY apps/web ./apps/web
 COPY package.json pnpm-workspace.yaml turbo.json* ./
 

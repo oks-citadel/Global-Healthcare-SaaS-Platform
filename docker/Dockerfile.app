@@ -53,6 +53,8 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
+# Persist SERVICE_PATH as runtime ENV for CMD
+ENV APP_PATH=${SERVICE_PATH}
 
 # Copy standalone build
 COPY --from=builder --chown=nextjs:nodejs /app/${SERVICE_PATH}/.next/standalone ./
@@ -72,4 +74,4 @@ EXPOSE 3000
 
 ENTRYPOINT ["dumb-init", "--"]
 # For monorepo standalone builds, server.js is at SERVICE_PATH/server.js
-CMD node apps/web/server.js
+CMD ["sh", "-c", "node ${APP_PATH}/server.js"]

@@ -770,10 +770,7 @@ jobs:
             context: .
             dockerfile: ./docker/Dockerfile.app
             build-args: APP_NAME=provider-portal
-          - name: mobile
-            context: .
-            dockerfile: ./docker/Dockerfile.app
-            build-args: APP_NAME=mobile
+
           - name: kiosk
             context: .
             dockerfile: ./docker/Dockerfile.app
@@ -873,7 +870,6 @@ jobs:
           - web-app
           - admin-portal
           - provider-portal
-          - mobile
           - kiosk
           - api-gateway
           - auth-service
