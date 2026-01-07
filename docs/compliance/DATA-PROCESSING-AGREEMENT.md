@@ -454,7 +454,7 @@ Notices must be sent to:
 
 **Processor:**
 Unified Health Platform
-Email: legal@unifiedhealthcare.com
+Email: legal@theunifiedhealth.com
 Address: [Company Address]
 
 ---

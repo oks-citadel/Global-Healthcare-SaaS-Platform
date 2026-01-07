@@ -526,9 +526,9 @@ async function authorizeAccess(
 **Next Review:** January 2026
 
 **Contacts:**
-- Compliance Officer: compliance@unifiedhealthcare.com
-- Security Team: security@unifiedhealthcare.com
-- Data Protection Officer: dpo@unifiedhealthcare.com
+- Compliance Officer: compliance@theunifiedhealth.com
+- Security Team: security@theunifiedhealth.com
+- Data Protection Officer: dpo@theunifiedhealth.com
 
 ---
 

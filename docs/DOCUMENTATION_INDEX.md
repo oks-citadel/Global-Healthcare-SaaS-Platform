@@ -243,12 +243,12 @@ This comprehensive documentation covers all aspects of the Unified Health Global
 ## Support Resources
 
 ### Documentation
-- **Main Docs:** https://docs.unifiedhealthcare.com
-- **API Reference:** https://api.unifiedhealthcare.com/docs
-- **Developer Portal:** https://developers.unifiedhealthcare.com
+- **Main Docs:** https://docs.theunifiedhealth.com
+- **API Reference:** https://api.theunifiedhealth.com/docs
+- **Developer Portal:** https://developers.theunifiedhealth.com
 
 ### Community
-- **Community Forum:** https://community.unifiedhealthcare.com
+- **Community Forum:** https://community.theunifiedhealth.com
 - **GitHub Issues:** https://github.com/unified-health/platform/issues
 - **Stack Overflow:** Tag `unified-health`
 

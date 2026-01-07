@@ -264,7 +264,7 @@ description: "p95 response time > 500ms"
 
 ### Incident Communication
 
-**Status Page:** https://status.unifiedhealthcare.com
+**Status Page:** https://status.theunifiedhealth.com
 
 **Update Template:**
 ```

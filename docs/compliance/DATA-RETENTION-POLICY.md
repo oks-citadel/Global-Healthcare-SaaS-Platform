@@ -744,7 +744,7 @@ Tasks:
 - Maintain deletion certificates
 - Annual policy review
 
-**Contact:** compliance@unifiedhealthcare.com
+**Contact:** compliance@theunifiedhealth.com
 
 ### IT Manager / Database Administrator
 
@@ -755,7 +755,7 @@ Tasks:
 - Maintain backup integrity
 - Technical implementation of legal holds
 
-**Contact:** it@unifiedhealthcare.com
+**Contact:** it@theunifiedhealth.com
 
 ### Legal Department
 
@@ -765,7 +765,7 @@ Tasks:
 - Review patient data requests
 - Approve policy changes
 
-**Contact:** legal@unifiedhealthcare.com
+**Contact:** legal@theunifiedhealth.com
 
 ### Data Protection Officer (GDPR)
 
@@ -775,7 +775,7 @@ Tasks:
 - Coordinate with EU supervisory authorities
 - Review cross-border data transfers
 
-**Contact:** dpo@unifiedhealthcare.com
+**Contact:** dpo@theunifiedhealth.com
 
 ---
 

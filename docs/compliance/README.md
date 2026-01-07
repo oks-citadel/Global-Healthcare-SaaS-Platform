@@ -316,29 +316,29 @@ All quality gates must be met for ongoing HIPAA compliance:
 ### Compliance Team
 
 **Chief Compliance Officer**
-Email: compliance@unifiedhealthcare.com
+Email: compliance@theunifiedhealth.com
 Phone: +1 (555) 123-4568
 
 **Privacy Officer**
-Email: privacy@unifiedhealthcare.com
+Email: privacy@theunifiedhealth.com
 Phone: +1 (555) 123-4567
 
 **Chief Security Officer**
-Email: security@unifiedhealthcare.com
+Email: security@theunifiedhealth.com
 Phone: +1 (555) 123-4567 (24/7)
 
 **Data Protection Officer (GDPR)**
-Email: dpo@unifiedhealthcare.com
+Email: dpo@theunifiedhealth.com
 
 ### Incident Reporting
 
 **Security Incidents (24/7):**
-Email: security-incidents@unifiedhealthcare.com
+Email: security-incidents@theunifiedhealth.com
 Phone: +1 (555) 123-4567
-Portal: https://security.unifiedhealthcare.com/report
+Portal: https://security.theunifiedhealth.com/report
 
 **Privacy Complaints:**
-Email: privacy@unifiedhealthcare.com
+Email: privacy@theunifiedhealth.com
 Phone: +1 (555) 123-4567
 
 ### External Reporting
