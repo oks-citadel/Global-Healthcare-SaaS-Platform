@@ -1,6 +1,6 @@
 /**
  * Shared Metrics Library for All Microservices
- * Standardized metrics collection across the Unified Healthcare Platform
+ * Standardized metrics collection across the The Unified Health Platform
  */
 
 import { Registry, Counter, Histogram, Gauge, collectDefaultMetrics } from 'prom-client';

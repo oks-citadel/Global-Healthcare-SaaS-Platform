@@ -1,6 +1,6 @@
 /**
  * Frontend Application Insights Configuration
- * Unified Healthcare Platform
+ * The Unified Health Platform
  *
  * This configuration enables comprehensive frontend monitoring including:
  * - Page load performance

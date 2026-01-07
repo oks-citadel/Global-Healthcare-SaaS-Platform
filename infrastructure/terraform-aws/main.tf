@@ -57,16 +57,31 @@ module "ecr" {
   environment  = var.environment
 
   repository_names = [
+    # Core API
+    "api",
     "api-gateway",
+    # Frontend Apps
+    "web-app",
+    "admin-portal",
+    "provider-portal",
+    "mobile",
+    "kiosk",
+    # Healthcare Services
+    "auth-service",
+    "notification-service",
     "telehealth-service",
     "mental-health-service",
     "chronic-care-service",
     "pharmacy-service",
     "laboratory-service",
-    "auth-service",
-    "web-app",
-    "provider-portal",
-    "admin-portal"
+    "imaging-service",
+    "clinical-trials-service",
+    "interoperability-service",
+    "price-transparency-service",
+    "population-health-service",
+    "home-health-service",
+    "denial-management-service",
+    "vendor-risk-service"
   ]
 
   replication_regions = compact([

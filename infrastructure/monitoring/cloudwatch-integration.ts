@@ -1,6 +1,6 @@
 /**
  * AWS CloudWatch Monitoring Integration
- * Comprehensive monitoring, logging, and distributed tracing for the Unified Healthcare Platform
+ * Comprehensive monitoring, logging, and distributed tracing for the The Unified Health Platform
  * Replaces Azure Application Insights with AWS-native observability
  */
 

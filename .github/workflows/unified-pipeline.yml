@@ -752,15 +752,79 @@ jobs:
       fail-fast: false
       matrix:
         service:
+          # Core API
           - name: api
             context: ./services/api
             dockerfile: ./services/api/Dockerfile
-          - name: web
+          # Frontend Apps
+          - name: web-app
             context: .
             dockerfile: ./Dockerfile.web.pnpm
+          - name: admin-portal
+            context: .
+            dockerfile: ./docker/Dockerfile.app
+            build-args: APP_NAME=admin
+          - name: provider-portal
+            context: .
+            dockerfile: ./docker/Dockerfile.app
+            build-args: APP_NAME=provider-portal
+          - name: mobile
+            context: .
+            dockerfile: ./docker/Dockerfile.app
+            build-args: APP_NAME=mobile
+          - name: kiosk
+            context: .
+            dockerfile: ./docker/Dockerfile.app
+            build-args: APP_NAME=kiosk
+          # Healthcare Services
           - name: api-gateway
             context: ./services/api-gateway
             dockerfile: ./services/api-gateway/Dockerfile
+          - name: auth-service
+            context: ./services/auth-service
+            dockerfile: ./services/auth-service/Dockerfile
+          - name: notification-service
+            context: ./services/notification-service
+            dockerfile: ./services/notification-service/Dockerfile
+          - name: telehealth-service
+            context: ./services/telehealth-service
+            dockerfile: ./services/telehealth-service/Dockerfile
+          - name: mental-health-service
+            context: ./services/mental-health-service
+            dockerfile: ./services/mental-health-service/Dockerfile
+          - name: chronic-care-service
+            context: ./services/chronic-care-service
+            dockerfile: ./services/chronic-care-service/Dockerfile
+          - name: pharmacy-service
+            context: ./services/pharmacy-service
+            dockerfile: ./services/pharmacy-service/Dockerfile
+          - name: laboratory-service
+            context: ./services/laboratory-service
+            dockerfile: ./services/laboratory-service/Dockerfile
+          - name: imaging-service
+            context: ./services/imaging-service
+            dockerfile: ./services/imaging-service/Dockerfile
+          - name: clinical-trials-service
+            context: ./services/clinical-trials-service
+            dockerfile: ./services/clinical-trials-service/Dockerfile
+          - name: interoperability-service
+            context: ./services/interoperability-service
+            dockerfile: ./services/interoperability-service/Dockerfile
+          - name: price-transparency-service
+            context: ./services/price-transparency-service
+            dockerfile: ./services/price-transparency-service/Dockerfile
+          - name: population-health-service
+            context: ./services/population-health-service
+            dockerfile: ./services/population-health-service/Dockerfile
+          - name: home-health-service
+            context: ./services/home-health-service
+            dockerfile: ./services/home-health-service/Dockerfile
+          - name: denial-management-service
+            context: ./services/denial-management-service
+            dockerfile: ./services/denial-management-service/Dockerfile
+          - name: vendor-risk-service
+            context: ./services/vendor-risk-service
+            dockerfile: ./services/vendor-risk-service/Dockerfile
 
     steps:
       - name: Checkout repository
@@ -802,7 +866,29 @@ jobs:
 
     strategy:
       matrix:
-        service: [api, web, api-gateway]
+        service:
+          - api
+          - web-app
+          - admin-portal
+          - provider-portal
+          - mobile
+          - kiosk
+          - api-gateway
+          - auth-service
+          - notification-service
+          - telehealth-service
+          - mental-health-service
+          - chronic-care-service
+          - pharmacy-service
+          - laboratory-service
+          - imaging-service
+          - clinical-trials-service
+          - interoperability-service
+          - price-transparency-service
+          - population-health-service
+          - home-health-service
+          - denial-management-service
+          - vendor-risk-service
 
     steps:
       - name: Configure AWS Credentials

@@ -1,6 +1,6 @@
 /**
  * Azure Application Insights Integration
- * Comprehensive monitoring and distributed tracing for the Unified Healthcare Platform
+ * Comprehensive monitoring and distributed tracing for the The Unified Health Platform
  */
 
 import * as appInsights from 'applicationinsights';
