@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -7,10 +7,10 @@ import {
   TouchableOpacity,
   Linking,
   Alert,
-} from 'react-native';
-import { colors, spacing, typography } from '../../src/theme';
-import { Card, Input, Button } from '../../src/components';
-import apiClient from '../../src/api/client';
+} from "react-native";
+import { colors, spacing, typography } from "../../src/theme";
+import { Card, Input, Button } from "../../src/components";
+import apiClient from "../../src/api/client";
 
 interface FAQItem {
   id: string;
@@ -20,82 +20,90 @@ interface FAQItem {
 
 const FAQ_DATA: FAQItem[] = [
   {
-    id: '1',
-    question: 'How do I book an appointment?',
-    answer: 'Navigate to the Appointments tab, tap the "+" button, select a doctor and available time slot, then confirm your booking. You\'ll receive a confirmation notification.',
+    id: "1",
+    question: "How do I book an appointment?",
+    answer:
+      'Navigate to the Appointments tab, tap the "+" button, select a doctor and available time slot, then confirm your booking. You\'ll receive a confirmation notification.',
   },
   {
-    id: '2',
-    question: 'Can I cancel or reschedule an appointment?',
-    answer: 'Yes, you can cancel or reschedule appointments up to 24 hours before the scheduled time. Go to your appointment details and tap "Cancel" or "Reschedule".',
+    id: "2",
+    question: "Can I cancel or reschedule an appointment?",
+    answer:
+      'Yes, you can cancel or reschedule appointments up to 24 hours before the scheduled time. Go to your appointment details and tap "Cancel" or "Reschedule".',
   },
   {
-    id: '3',
-    question: 'How do I access my medical records?',
-    answer: 'Go to Profile > Medical History to view your complete medical records, prescriptions, test results, and visit history.',
+    id: "3",
+    question: "How do I access my medical records?",
+    answer:
+      "Go to Profile > Medical History to view your complete medical records, prescriptions, test results, and visit history.",
   },
   {
-    id: '4',
-    question: 'Is my health data secure?',
-    answer: 'Yes, we use industry-standard encryption and comply with HIPAA and GDPR regulations. Your data is stored securely and never shared without your explicit consent.',
+    id: "4",
+    question: "Is my health data secure?",
+    answer:
+      "Yes, we use industry-standard encryption and comply with HIPAA and GDPR regulations. Your data is stored securely and never shared without your explicit consent.",
   },
   {
-    id: '5',
-    question: 'How do I change my password?',
-    answer: 'Go to Profile > Privacy & Security > Change Password. You\'ll need to enter your current password and choose a new secure password.',
+    id: "5",
+    question: "How do I change my password?",
+    answer:
+      "Go to Profile > Privacy & Security > Change Password. You'll need to enter your current password and choose a new secure password.",
   },
   {
-    id: '6',
-    question: 'What payment methods are accepted?',
-    answer: 'We accept all major credit cards, debit cards, and digital wallets. Insurance claims can also be processed through the app.',
+    id: "6",
+    question: "What payment methods are accepted?",
+    answer:
+      "We accept all major credit cards, debit cards, and digital wallets. Insurance claims can also be processed through the app.",
   },
   {
-    id: '7',
-    question: 'How do I contact my doctor?',
-    answer: 'You can message your doctor directly through the Messages tab, or schedule a video consultation through the Appointments feature.',
+    id: "7",
+    question: "How do I contact my doctor?",
+    answer:
+      "You can message your doctor directly through the Messages tab, or schedule a video consultation through the Appointments feature.",
   },
   {
-    id: '8',
-    question: 'Can I share my health records with other doctors?',
-    answer: 'Yes, you can export your medical records from Profile > Privacy & Security > Export My Data, or grant access to specific doctors through the app.',
+    id: "8",
+    question: "Can I share my health records with other doctors?",
+    answer:
+      "Yes, you can export your medical records from Profile > Privacy & Security > Export My Data, or grant access to specific doctors through the app.",
   },
 ];
 
 const CONTACT_OPTIONS = [
   {
-    id: 'email',
-    title: 'Email Support',
-    description: 'support@unifiedhealth.com',
-    icon: '📧',
-    action: () => Linking.openURL('mailto:support@unifiedhealth.com'),
+    id: "email",
+    title: "Email Support",
+    description: "support@theunifiedhealth.com",
+    icon: "📧",
+    action: () => Linking.openURL("mailto:support@theunifiedhealth.com"),
   },
   {
-    id: 'phone',
-    title: 'Phone Support',
-    description: '+1 (800) 123-4567',
-    icon: '📞',
-    action: () => Linking.openURL('tel:+18001234567'),
+    id: "phone",
+    title: "Phone Support",
+    description: "+1 (800) 123-4567",
+    icon: "📞",
+    action: () => Linking.openURL("tel:+18001234567"),
   },
   {
-    id: 'chat',
-    title: 'Live Chat',
-    description: 'Available 24/7',
-    icon: '💬',
-    action: () => Alert.alert('Live Chat', 'Live chat feature coming soon!'),
+    id: "chat",
+    title: "Live Chat",
+    description: "Available 24/7",
+    icon: "💬",
+    action: () => Alert.alert("Live Chat", "Live chat feature coming soon!"),
   },
   {
-    id: 'docs',
-    title: 'Documentation',
-    description: 'Browse our help articles',
-    icon: '📚',
-    action: () => Linking.openURL('https://docs.unifiedhealth.com'),
+    id: "docs",
+    title: "Documentation",
+    description: "Browse our help articles",
+    icon: "📚",
+    action: () => Linking.openURL("https://docs.theunifiedhealth.com"),
   },
 ];
 
 export default function HelpScreen() {
   const [expandedFAQ, setExpandedFAQ] = useState<string | null>(null);
-  const [feedbackSubject, setFeedbackSubject] = useState('');
-  const [feedbackMessage, setFeedbackMessage] = useState('');
+  const [feedbackSubject, setFeedbackSubject] = useState("");
+  const [feedbackMessage, setFeedbackMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const toggleFAQ = (id: string) => {
@@ -104,30 +112,34 @@ export default function HelpScreen() {
 
   const handleSubmitFeedback = async () => {
     if (!feedbackSubject.trim() || !feedbackMessage.trim()) {
-      Alert.alert('Missing Information', 'Please provide both subject and message.');
+      Alert.alert(
+        "Missing Information",
+        "Please provide both subject and message.",
+      );
       return;
     }
 
     try {
       setSubmitting(true);
 
-      await apiClient.post('/support/feedback', {
+      await apiClient.post("/support/feedback", {
         subject: feedbackSubject,
         message: feedbackMessage,
       });
 
       Alert.alert(
-        'Feedback Submitted',
-        'Thank you for your feedback! We\'ll review it and get back to you if needed.'
+        "Feedback Submitted",
+        "Thank you for your feedback! We'll review it and get back to you if needed.",
       );
 
       // Clear form
-      setFeedbackSubject('');
-      setFeedbackMessage('');
+      setFeedbackSubject("");
+      setFeedbackMessage("");
     } catch (error: any) {
       Alert.alert(
-        'Error',
-        error.response?.data?.message || 'Failed to submit feedback. Please try again.'
+        "Error",
+        error.response?.data?.message ||
+          "Failed to submit feedback. Please try again.",
       );
     } finally {
       setSubmitting(false);
@@ -156,7 +168,9 @@ export default function HelpScreen() {
               </View>
               <View style={styles.contactInfo}>
                 <Text style={styles.contactTitle}>{option.title}</Text>
-                <Text style={styles.contactDescription}>{option.description}</Text>
+                <Text style={styles.contactDescription}>
+                  {option.description}
+                </Text>
               </View>
               <Text style={styles.contactChevron}>›</Text>
             </TouchableOpacity>
@@ -190,8 +204,13 @@ export default function HelpScreen() {
                   activeOpacity={0.7}
                 >
                   <Text style={styles.faqQuestion}>{faq.question}</Text>
-                  <Text style={[styles.faqToggle, isExpanded && styles.faqToggleExpanded]}>
-                    {isExpanded ? '−' : '+'}
+                  <Text
+                    style={[
+                      styles.faqToggle,
+                      isExpanded && styles.faqToggleExpanded,
+                    ]}
+                  >
+                    {isExpanded ? "−" : "+"}
                   </Text>
                 </TouchableOpacity>
 
@@ -250,7 +269,9 @@ export default function HelpScreen() {
         <View style={styles.resourcesList}>
           <TouchableOpacity
             style={styles.resourceItem}
-            onPress={() => Linking.openURL('https://unifiedhealth.com/terms')}
+            onPress={() =>
+              Linking.openURL("https://theunifiedhealth.com/terms")
+            }
             activeOpacity={0.7}
           >
             <Text style={styles.resourceText}>Terms of Service</Text>
@@ -259,7 +280,9 @@ export default function HelpScreen() {
 
           <TouchableOpacity
             style={styles.resourceItem}
-            onPress={() => Linking.openURL('https://unifiedhealth.com/privacy')}
+            onPress={() =>
+              Linking.openURL("https://theunifiedhealth.com/privacy")
+            }
             activeOpacity={0.7}
           >
             <Text style={styles.resourceText}>Privacy Policy</Text>
@@ -268,7 +291,9 @@ export default function HelpScreen() {
 
           <TouchableOpacity
             style={styles.resourceItem}
-            onPress={() => Linking.openURL('https://unifiedhealth.com/community')}
+            onPress={() =>
+              Linking.openURL("https://theunifiedhealth.com/community")
+            }
             activeOpacity={0.7}
           >
             <Text style={styles.resourceText}>Community Guidelines</Text>
@@ -277,7 +302,9 @@ export default function HelpScreen() {
 
           <TouchableOpacity
             style={styles.resourceItem}
-            onPress={() => Linking.openURL('https://status.unifiedhealth.com')}
+            onPress={() =>
+              Linking.openURL("https://status.theunifiedhealth.com")
+            }
             activeOpacity={0.7}
           >
             <Text style={styles.resourceText}>System Status</Text>
@@ -317,8 +344,8 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   contactItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: spacing.md,
     backgroundColor: colors.gray[50],
     borderRadius: spacing.md,
@@ -328,8 +355,8 @@ const styles = StyleSheet.create({
     height: 48,
     borderRadius: 24,
     backgroundColor: colors.primary[50],
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginRight: spacing.md,
   },
   contactIconText: {
@@ -355,11 +382,11 @@ const styles = StyleSheet.create({
   },
   faqList: {
     borderRadius: spacing.md,
-    overflow: 'hidden',
+    overflow: "hidden",
     backgroundColor: colors.gray[50],
   },
   faqItem: {
-    backgroundColor: '#ffffff',
+    backgroundColor: "#ffffff",
     borderBottomWidth: 1,
     borderBottomColor: colors.gray[200],
   },
@@ -373,9 +400,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0,
   },
   faqHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     padding: spacing.md,
   },
   faqQuestion: {
@@ -390,7 +417,7 @@ const styles = StyleSheet.create({
     color: colors.primary[500],
     fontWeight: typography.fontWeights.bold,
     width: 24,
-    textAlign: 'center',
+    textAlign: "center",
   },
   faqToggleExpanded: {
     color: colors.primary[600],
@@ -409,7 +436,7 @@ const styles = StyleSheet.create({
   },
   feedbackTextArea: {
     height: 120,
-    textAlignVertical: 'top',
+    textAlignVertical: "top",
     paddingTop: spacing.md,
   },
   resourcesCard: {
@@ -425,11 +452,11 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
   },
   resourceItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     padding: spacing.md,
-    backgroundColor: '#ffffff',
+    backgroundColor: "#ffffff",
     borderRadius: spacing.md,
   },
   resourceText: {

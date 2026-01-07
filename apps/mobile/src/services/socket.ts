@@ -1,53 +1,69 @@
-import { io, Socket } from 'socket.io-client';
-import { Platform, AppState, AppStateStatus } from 'react-native';
-import { tokenStorage } from '../api/client';
-import { AuthTokens } from '../types';
+import { io, Socket } from "socket.io-client";
+import { Platform, AppState, AppStateStatus } from "react-native";
+import { tokenStorage } from "../api/client";
+import { AuthTokens } from "../types";
 
 const API_URL = __DEV__
-  ? 'http://localhost:3000'
-  : 'https://api.unifiedhealth.com';
+  ? "http://localhost:3000"
+  : "https://api.theunifiedhealth.com";
 
-export type ConnectionState = 'connecting' | 'connected' | 'disconnected' | 'error';
+export type ConnectionState =
+  | "connecting"
+  | "connected"
+  | "disconnected"
+  | "error";
 
 export interface SocketEvents {
   // Connection events
-  'connect': () => void;
-  'disconnect': (reason: string) => void;
-  'connect_error': (error: Error) => void;
-  'reconnect': (attemptNumber: number) => void;
-  'reconnect_attempt': (attemptNumber: number) => void;
-  'reconnect_error': (error: Error) => void;
-  'reconnect_failed': () => void;
+  connect: () => void;
+  disconnect: (reason: string) => void;
+  connect_error: (error: Error) => void;
+  reconnect: (attemptNumber: number) => void;
+  reconnect_attempt: (attemptNumber: number) => void;
+  reconnect_error: (error: Error) => void;
+  reconnect_failed: () => void;
 
   // Chat events
-  'chat-message': (data: ChatMessagePayload) => void;
-  'typing': (data: TypingPayload) => void;
-  'message-delivered': (data: { messageId: string; timestamp: string }) => void;
-  'message-read': (data: { messageId: string; timestamp: string }) => void;
+  "chat-message": (data: ChatMessagePayload) => void;
+  typing: (data: TypingPayload) => void;
+  "message-delivered": (data: { messageId: string; timestamp: string }) => void;
+  "message-read": (data: { messageId: string; timestamp: string }) => void;
 
   // Presence events
-  'user-online': (data: { userId: string; timestamp: string }) => void;
-  'user-offline': (data: { userId: string; timestamp: string }) => void;
-  'presence-update': (data: { userId: string; status: 'online' | 'offline' | 'away' }) => void;
+  "user-online": (data: { userId: string; timestamp: string }) => void;
+  "user-offline": (data: { userId: string; timestamp: string }) => void;
+  "presence-update": (data: {
+    userId: string;
+    status: "online" | "offline" | "away";
+  }) => void;
 
   // Notification events
-  'notification': (data: NotificationPayload) => void;
-  'push-notification': (data: PushNotificationPayload) => void;
+  notification: (data: NotificationPayload) => void;
+  "push-notification": (data: PushNotificationPayload) => void;
 
   // Video call signaling events
-  'webrtc-offer': (data: { from: string; signal: RTCSessionDescriptionInit }) => void;
-  'webrtc-answer': (data: { from: string; signal: RTCSessionDescriptionInit }) => void;
-  'ice-candidate': (data: { from: string; signal: RTCIceCandidateInit }) => void;
-  'peer-joined': (data: { peer: PeerInfo }) => void;
-  'peer-left': (data: { peerId: string }) => void;
-  'call-ended': (data: { roomId: string; reason: string }) => void;
+  "webrtc-offer": (data: {
+    from: string;
+    signal: RTCSessionDescriptionInit;
+  }) => void;
+  "webrtc-answer": (data: {
+    from: string;
+    signal: RTCSessionDescriptionInit;
+  }) => void;
+  "ice-candidate": (data: {
+    from: string;
+    signal: RTCIceCandidateInit;
+  }) => void;
+  "peer-joined": (data: { peer: PeerInfo }) => void;
+  "peer-left": (data: { peerId: string }) => void;
+  "call-ended": (data: { roomId: string; reason: string }) => void;
 }
 
 export interface ChatMessagePayload {
   id: string;
   roomId: string;
   userId: string;
-  role: 'doctor' | 'patient';
+  role: "doctor" | "patient";
   message: string;
   timestamp: string;
   delivered?: boolean;
@@ -57,13 +73,13 @@ export interface ChatMessagePayload {
 export interface TypingPayload {
   roomId: string;
   userId: string;
-  role: 'doctor' | 'patient';
+  role: "doctor" | "patient";
   isTyping: boolean;
 }
 
 export interface NotificationPayload {
   id: string;
-  type: 'appointment' | 'message' | 'reminder' | 'update';
+  type: "appointment" | "message" | "reminder" | "update";
   title: string;
   message: string;
   data?: any;
@@ -81,7 +97,7 @@ export interface PeerInfo {
   id: string;
   userId: string;
   socketId: string;
-  role: 'doctor' | 'patient';
+  role: "doctor" | "patient";
 }
 
 export type SocketEventCallback<T extends keyof SocketEvents> = SocketEvents[T];
@@ -90,15 +106,15 @@ class SocketService {
   private socket: Socket | null = null;
   private maxReconnectAttempts: number = 10;
   private reconnectDelay: number = 1000;
-  private connectionState: ConnectionState = 'disconnected';
+  private connectionState: ConnectionState = "disconnected";
   private listeners: Map<string, Set<Function>> = new Map();
-  private appState: AppStateStatus = 'active';
+  private appState: AppStateStatus = "active";
   private keepAliveInterval: ReturnType<typeof setTimeout> | null = null;
   private isInitialized: boolean = false;
 
   constructor() {
     // Listen to app state changes
-    AppState.addEventListener('change', this.handleAppStateChange);
+    AppState.addEventListener("change", this.handleAppStateChange);
   }
 
   /**
@@ -113,13 +129,13 @@ class SocketService {
       const tokens = await tokenStorage.getTokens();
 
       if (!tokens?.accessToken) {
-        throw new Error('No authentication token available');
+        throw new Error("No authentication token available");
       }
 
       await this.connect(tokens);
       this.isInitialized = true;
     } catch (error) {
-      this.setConnectionState('error');
+      this.setConnectionState("error");
       throw error;
     }
   }
@@ -132,13 +148,13 @@ class SocketService {
       return;
     }
 
-    this.setConnectionState('connecting');
+    this.setConnectionState("connecting");
 
     this.socket = io(API_URL, {
       auth: {
         token: tokens.accessToken,
       },
-      transports: ['websocket', 'polling'],
+      transports: ["websocket", "polling"],
       reconnection: true,
       reconnectionAttempts: this.maxReconnectAttempts,
       reconnectionDelay: this.reconnectDelay,
@@ -162,49 +178,49 @@ class SocketService {
     if (!this.socket) return;
 
     // Connection events
-    this.socket.on('connect', () => {
-      this.setConnectionState('connected');
+    this.socket.on("connect", () => {
+      this.setConnectionState("connected");
       this.startKeepAlive();
-      this.emit('connect');
+      this.emit("connect");
     });
 
-    this.socket.on('disconnect', (reason: string) => {
-      this.setConnectionState('disconnected');
+    this.socket.on("disconnect", (reason: string) => {
+      this.setConnectionState("disconnected");
       this.stopKeepAlive();
-      this.emit('disconnect', reason);
+      this.emit("disconnect", reason);
 
       // Auto-reconnect on certain disconnect reasons
-      if (reason === 'io server disconnect') {
+      if (reason === "io server disconnect") {
         // Server initiated disconnect, reconnect manually
         this.socket?.connect();
       }
     });
 
-    this.socket.on('connect_error', (error: Error) => {
-      this.setConnectionState('error');
-      this.emit('connect_error', error);
+    this.socket.on("connect_error", (error: Error) => {
+      this.setConnectionState("error");
+      this.emit("connect_error", error);
     });
 
-    this.socket.on('reconnect', (attemptNumber: number) => {
-      this.setConnectionState('connected');
-      this.emit('reconnect', attemptNumber);
+    this.socket.on("reconnect", (attemptNumber: number) => {
+      this.setConnectionState("connected");
+      this.emit("reconnect", attemptNumber);
     });
 
-    this.socket.on('reconnect_attempt', (attemptNumber: number) => {
-      this.emit('reconnect_attempt', attemptNumber);
+    this.socket.on("reconnect_attempt", (attemptNumber: number) => {
+      this.emit("reconnect_attempt", attemptNumber);
     });
 
-    this.socket.on('reconnect_error', (error: Error) => {
-      this.emit('reconnect_error', error);
+    this.socket.on("reconnect_error", (error: Error) => {
+      this.emit("reconnect_error", error);
     });
 
-    this.socket.on('reconnect_failed', () => {
-      this.setConnectionState('error');
-      this.emit('reconnect_failed');
+    this.socket.on("reconnect_failed", () => {
+      this.setConnectionState("error");
+      this.emit("reconnect_failed");
     });
 
     // Authentication error handling
-    this.socket.on('unauthorized', async (_error: any) => {
+    this.socket.on("unauthorized", async (_error: any) => {
       await this.refreshTokenAndReconnect();
     });
   }
@@ -216,7 +232,7 @@ class SocketService {
     try {
       const tokens = await tokenStorage.getTokens();
       if (!tokens?.accessToken) {
-        throw new Error('No tokens available');
+        throw new Error("No tokens available");
       }
 
       // Update auth token
@@ -240,7 +256,7 @@ class SocketService {
       this.socket.disconnect();
       this.socket = null;
       this.isInitialized = false;
-      this.setConnectionState('disconnected');
+      this.setConnectionState("disconnected");
     }
   }
 
@@ -250,12 +266,12 @@ class SocketService {
   emit<T = any>(event: string, data?: any): Promise<T> {
     return new Promise((resolve, reject) => {
       if (!this.socket?.connected) {
-        reject(new Error('Socket not connected'));
+        reject(new Error("Socket not connected"));
         return;
       }
 
       const timeout = setTimeout(() => {
-        reject(new Error('Socket emit timeout'));
+        reject(new Error("Socket emit timeout"));
       }, 10000);
 
       this.socket.emit(event, data, (response: any) => {
@@ -274,7 +290,7 @@ class SocketService {
    */
   on<T extends keyof SocketEvents>(
     event: T,
-    callback: SocketEventCallback<T>
+    callback: SocketEventCallback<T>,
   ): () => void {
     if (!this.listeners.has(event)) {
       this.listeners.set(event, new Set());
@@ -303,7 +319,7 @@ class SocketService {
    */
   once<T extends keyof SocketEvents>(
     event: T,
-    callback: SocketEventCallback<T>
+    callback: SocketEventCallback<T>,
   ): void {
     const unsubscribe = this.on(event, ((...args: any[]) => {
       unsubscribe();
@@ -331,7 +347,7 @@ class SocketService {
     message: string;
     timestamp?: string;
   }): Promise<ChatMessagePayload> {
-    return this.emit('chat-message', {
+    return this.emit("chat-message", {
       ...data,
       timestamp: data.timestamp || new Date().toISOString(),
     });
@@ -342,7 +358,7 @@ class SocketService {
    */
   sendTypingIndicator(roomId: string, isTyping: boolean): void {
     if (this.socket?.connected) {
-      this.socket.emit('typing', { roomId, isTyping });
+      this.socket.emit("typing", { roomId, isTyping });
     }
   }
 
@@ -351,7 +367,7 @@ class SocketService {
    */
   markMessageDelivered(messageId: string): void {
     if (this.socket?.connected) {
-      this.socket.emit('message-delivered', {
+      this.socket.emit("message-delivered", {
         messageId,
         timestamp: new Date().toISOString(),
       });
@@ -363,7 +379,7 @@ class SocketService {
    */
   markMessageRead(messageId: string): void {
     if (this.socket?.connected) {
-      this.socket.emit('message-read', {
+      this.socket.emit("message-read", {
         messageId,
         timestamp: new Date().toISOString(),
       });
@@ -374,22 +390,22 @@ class SocketService {
    * Join chat room
    */
   async joinRoom(roomId: string): Promise<void> {
-    return this.emit('join-room', { roomId });
+    return this.emit("join-room", { roomId });
   }
 
   /**
    * Leave chat room
    */
   async leaveRoom(roomId: string): Promise<void> {
-    return this.emit('leave-room', { roomId });
+    return this.emit("leave-room", { roomId });
   }
 
   /**
    * Update presence status
    */
-  updatePresence(status: 'online' | 'offline' | 'away'): void {
+  updatePresence(status: "online" | "offline" | "away"): void {
     if (this.socket?.connected) {
-      this.socket.emit('presence-update', { status });
+      this.socket.emit("presence-update", { status });
     }
   }
 
@@ -400,19 +416,19 @@ class SocketService {
     const previousState = this.appState;
     this.appState = nextAppState;
 
-    if (previousState === 'background' && nextAppState === 'active') {
+    if (previousState === "background" && nextAppState === "active") {
       // App came to foreground
       if (!this.socket?.connected) {
         await this.initialize();
       }
-      this.updatePresence('online');
-    } else if (previousState === 'active' && nextAppState === 'background') {
+      this.updatePresence("online");
+    } else if (previousState === "active" && nextAppState === "background") {
       // App went to background
-      this.updatePresence('away');
+      this.updatePresence("away");
 
       // On Android, keep connection alive
       // On iOS, connection will be terminated by OS
-      if (Platform.OS === 'ios') {
+      if (Platform.OS === "ios") {
         this.stopKeepAlive();
       }
     }
@@ -426,7 +442,7 @@ class SocketService {
 
     this.keepAliveInterval = setInterval(() => {
       if (this.socket?.connected) {
-        this.socket.emit('ping');
+        this.socket.emit("ping");
       }
     }, 30000); // Ping every 30 seconds
   }

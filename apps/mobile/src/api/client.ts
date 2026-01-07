@@ -1,12 +1,16 @@
-import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
-import * as SecureStore from 'expo-secure-store';
-import { AuthTokens } from '../types';
+import axios, {
+  AxiosInstance,
+  AxiosError,
+  InternalAxiosRequestConfig,
+} from "axios";
+import * as SecureStore from "expo-secure-store";
+import { AuthTokens } from "../types";
 
 const API_URL = __DEV__
-  ? 'http://localhost:3000/api'
-  : 'https://api.unifiedhealth.com/api';
+  ? "http://localhost:3000/api"
+  : "https://api.theunifiedhealth.com/api";
 
-const TOKEN_KEY = 'auth_tokens';
+const TOKEN_KEY = "auth_tokens";
 
 // Secure token storage utilities
 export const tokenStorage = {
@@ -15,7 +19,7 @@ export const tokenStorage = {
       const tokens = await SecureStore.getItemAsync(TOKEN_KEY);
       return tokens ? JSON.parse(tokens) : null;
     } catch (error) {
-      console.error('Error getting tokens:', error);
+      console.error("Error getting tokens:", error);
       return null;
     }
   },
@@ -24,7 +28,7 @@ export const tokenStorage = {
     try {
       await SecureStore.setItemAsync(TOKEN_KEY, JSON.stringify(tokens));
     } catch (error) {
-      console.error('Error setting tokens:', error);
+      console.error("Error setting tokens:", error);
     }
   },
 
@@ -32,7 +36,7 @@ export const tokenStorage = {
     try {
       await SecureStore.deleteItemAsync(TOKEN_KEY);
     } catch (error) {
-      console.error('Error removing tokens:', error);
+      console.error("Error removing tokens:", error);
     }
   },
 };
@@ -40,14 +44,14 @@ export const tokenStorage = {
 class ApiClient {
   private client: AxiosInstance;
   private isRefreshing = false;
-  private refreshSubscribers: Array<(token: string) => void> = [];
+  private refreshSubscribers: ((token: string) => void)[] = [];
 
   constructor() {
     this.client = axios.create({
       baseURL: API_URL,
       timeout: 15000,
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     });
 
@@ -68,7 +72,7 @@ class ApiClient {
       },
       (error) => {
         return Promise.reject(error);
-      }
+      },
     );
 
     // Response interceptor to handle token refresh
@@ -100,7 +104,7 @@ class ApiClient {
             const tokens = await tokenStorage.getTokens();
 
             if (!tokens?.refreshToken) {
-              throw new Error('No refresh token available');
+              throw new Error("No refresh token available");
             }
 
             // Attempt to refresh the token
@@ -118,7 +122,7 @@ class ApiClient {
 
             // Notify all subscribers of the new token
             this.refreshSubscribers.forEach((callback) =>
-              callback(newTokens.accessToken)
+              callback(newTokens.accessToken),
             );
             this.refreshSubscribers = [];
 
@@ -134,7 +138,7 @@ class ApiClient {
         }
 
         return Promise.reject(error);
-      }
+      },
     );
   }
 

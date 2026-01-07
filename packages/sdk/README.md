@@ -32,20 +32,20 @@ pnpm add @unified-health/sdk
 ## Quick Start
 
 ```typescript
-import { createClient } from '@unified-health/sdk';
+import { createClient } from "@unified-health/sdk";
 
 // Create a client instance
 const client = createClient({
-  baseURL: 'https://api.unifiedhealth.com/api/v1',
+  baseURL: "https://api.theunifiedhealth.com/api/v1",
 });
 
 // Login
 const auth = await client.login({
-  email: 'user@example.com',
-  password: 'your-password',
+  email: "user@example.com",
+  password: "your-password",
 });
 
-console.log('Logged in as:', auth.user.firstName);
+console.log("Logged in as:", auth.user.firstName);
 
 // Use the API
 const appointments = await client.listAppointments({
@@ -53,7 +53,7 @@ const appointments = await client.listAppointments({
   limit: 10,
 });
 
-console.log('Appointments:', appointments.data);
+console.log("Appointments:", appointments.data);
 ```
 
 ## Configuration
@@ -61,13 +61,13 @@ console.log('Appointments:', appointments.data);
 ### Basic Configuration
 
 ```typescript
-import { createClient } from '@unified-health/sdk';
+import { createClient } from "@unified-health/sdk";
 
 const client = createClient({
-  baseURL: 'https://api.unifiedhealth.com/api/v1',
+  baseURL: "https://api.theunifiedhealth.com/api/v1",
   timeout: 30000, // 30 seconds
   headers: {
-    'X-Custom-Header': 'value',
+    "X-Custom-Header": "value",
   },
 });
 ```
@@ -76,13 +76,13 @@ const client = createClient({
 
 ```typescript
 const client = createClient({
-  baseURL: 'https://api.unifiedhealth.com/api/v1',
-  accessToken: 'your-access-token',
-  refreshToken: 'your-refresh-token',
+  baseURL: "https://api.theunifiedhealth.com/api/v1",
+  accessToken: "your-access-token",
+  refreshToken: "your-refresh-token",
   onTokenRefresh: (tokens) => {
     // Save new tokens to storage
-    localStorage.setItem('accessToken', tokens.accessToken);
-    localStorage.setItem('refreshToken', tokens.refreshToken);
+    localStorage.setItem("accessToken", tokens.accessToken);
+    localStorage.setItem("refreshToken", tokens.refreshToken);
   },
 });
 ```
@@ -94,17 +94,17 @@ const client = createClient({
 ```typescript
 // Register a new user
 const auth = await client.register({
-  email: 'newuser@example.com',
-  password: 'SecurePassword123!',
-  firstName: 'Jane',
-  lastName: 'Doe',
-  role: 'patient',
+  email: "newuser@example.com",
+  password: "SecurePassword123!",
+  firstName: "Jane",
+  lastName: "Doe",
+  role: "patient",
 });
 
 // Login
 const auth = await client.login({
-  email: 'user@example.com',
-  password: 'your-password',
+  email: "user@example.com",
+  password: "your-password",
 });
 
 // Get current user
@@ -119,21 +119,21 @@ await client.logout();
 ```typescript
 // Create a patient
 const patient = await client.createPatient({
-  firstName: 'John',
-  lastName: 'Smith',
-  dateOfBirth: '1985-03-15',
-  gender: 'male',
-  email: 'john@example.com',
-  phone: '+1234567890',
+  firstName: "John",
+  lastName: "Smith",
+  dateOfBirth: "1985-03-15",
+  gender: "male",
+  email: "john@example.com",
+  phone: "+1234567890",
 });
 
 // Get patient details
-const patient = await client.getPatient('patient-id');
+const patient = await client.getPatient("patient-id");
 
 // Update patient
-const updated = await client.updatePatient('patient-id', {
-  phone: '+1234567899',
-  address: '123 New Street',
+const updated = await client.updatePatient("patient-id", {
+  phone: "+1234567899",
+  address: "123 New Street",
 });
 ```
 
@@ -142,29 +142,29 @@ const updated = await client.updatePatient('patient-id', {
 ```typescript
 // Create an appointment
 const appointment = await client.createAppointment({
-  patientId: 'patient-id',
-  providerId: 'provider-id',
-  scheduledAt: '2024-12-20T10:00:00Z',
+  patientId: "patient-id",
+  providerId: "provider-id",
+  scheduledAt: "2024-12-20T10:00:00Z",
   duration: 30,
-  type: 'telehealth',
-  reason: 'Annual checkup',
+  type: "telehealth",
+  reason: "Annual checkup",
 });
 
 // List appointments
 const appointments = await client.listAppointments({
   page: 1,
   limit: 20,
-  status: 'scheduled',
-  patientId: 'patient-id',
+  status: "scheduled",
+  patientId: "patient-id",
 });
 
 // Update appointment
-const updated = await client.updateAppointment('appointment-id', {
-  status: 'confirmed',
+const updated = await client.updateAppointment("appointment-id", {
+  status: "confirmed",
 });
 
 // Delete appointment
-await client.deleteAppointment('appointment-id');
+await client.deleteAppointment("appointment-id");
 ```
 
 ### Clinical Encounters
@@ -172,10 +172,10 @@ await client.deleteAppointment('appointment-id');
 ```typescript
 // Create encounter
 const encounter = await client.createEncounter({
-  patientId: 'patient-id',
-  providerId: 'provider-id',
-  type: 'consultation',
-  chiefComplaint: 'Headache',
+  patientId: "patient-id",
+  providerId: "provider-id",
+  type: "consultation",
+  chiefComplaint: "Headache",
 });
 
 // Start encounter
@@ -183,17 +183,17 @@ await client.startEncounter(encounter.id);
 
 // Add clinical note
 const note = await client.addClinicalNote(encounter.id, {
-  content: 'SOAP note content...',
-  type: 'soap',
+  content: "SOAP note content...",
+  type: "soap",
 });
 
 // Update encounter
 await client.updateEncounter(encounter.id, {
   diagnosis: [
     {
-      code: 'R51',
-      description: 'Headache',
-      type: 'primary',
+      code: "R51",
+      description: "Headache",
+      type: "primary",
     },
   ],
   vitals: {
@@ -213,39 +213,39 @@ await client.endEncounter(encounter.id);
 // Upload document
 const document = await client.uploadDocument({
   file: fileBlob,
-  patientId: 'patient-id',
-  category: 'lab-result',
-  description: 'Blood test results',
+  patientId: "patient-id",
+  category: "lab-result",
+  description: "Blood test results",
 });
 
 // List documents
 const documents = await client.listDocuments({
-  patientId: 'patient-id',
-  category: 'lab-result',
+  patientId: "patient-id",
+  category: "lab-result",
 });
 
 // Get download URL
-const downloadInfo = await client.getDocumentDownloadUrl('document-id');
+const downloadInfo = await client.getDocumentDownloadUrl("document-id");
 const response = await fetch(downloadInfo.url);
 const blob = await response.blob();
 
 // Delete document
-await client.deleteDocument('document-id');
+await client.deleteDocument("document-id");
 ```
 
 ## Error Handling
 
 ```typescript
 try {
-  const patient = await client.getPatient('invalid-id');
+  const patient = await client.getPatient("invalid-id");
 } catch (error) {
-  if (error.error === 'Not Found') {
-    console.error('Patient not found');
-  } else if (error.error === 'Unauthorized') {
-    console.error('Authentication required');
+  if (error.error === "Not Found") {
+    console.error("Patient not found");
+  } else if (error.error === "Unauthorized") {
+    console.error("Authentication required");
     // Redirect to login
   } else {
-    console.error('API Error:', error.message);
+    console.error("API Error:", error.message);
   }
 }
 ```
@@ -259,7 +259,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { createClient } from '@unified-health/sdk';
 
 const client = createClient({
-  baseURL: 'https://api.unifiedhealth.com/api/v1',
+  baseURL: 'https://api.theunifiedhealth.com/api/v1',
   accessToken: getAccessToken(),
 });
 
@@ -304,22 +304,22 @@ function AppointmentsPage() {
 ## React Native Integration
 
 ```typescript
-import { createClient } from '@unified-health/sdk';
-import * as SecureStore from 'expo-secure-store';
+import { createClient } from "@unified-health/sdk";
+import * as SecureStore from "expo-secure-store";
 
 const client = createClient({
-  baseURL: 'https://api.unifiedhealth.com/api/v1',
+  baseURL: "https://api.theunifiedhealth.com/api/v1",
   onTokenRefresh: async (tokens) => {
     // Save tokens securely
-    await SecureStore.setItemAsync('accessToken', tokens.accessToken);
-    await SecureStore.setItemAsync('refreshToken', tokens.refreshToken);
+    await SecureStore.setItemAsync("accessToken", tokens.accessToken);
+    await SecureStore.setItemAsync("refreshToken", tokens.refreshToken);
   },
 });
 
 // Load tokens on app start
 async function initializeClient() {
-  const accessToken = await SecureStore.getItemAsync('accessToken');
-  const refreshToken = await SecureStore.getItemAsync('refreshToken');
+  const accessToken = await SecureStore.getItemAsync("accessToken");
+  const refreshToken = await SecureStore.getItemAsync("refreshToken");
 
   if (accessToken && refreshToken) {
     client.setTokens(accessToken, refreshToken);
@@ -416,7 +416,7 @@ import {
   CreatePatientInput,
   UpdatePatientInput,
   // ... and many more types
-} from '@unified-health/sdk';
+} from "@unified-health/sdk";
 ```
 
 ## Contributing
@@ -430,6 +430,7 @@ MIT
 ## Support
 
 For support and questions:
-- Documentation: https://docs.unifiedhealth.com
-- Email: api-support@unifiedhealth.com
+
+- Documentation: https://docs.theunifiedhealth.com
+- Email: api-support@theunifiedhealth.com
 - GitHub Issues: https://github.com/unified-health/platform/issues

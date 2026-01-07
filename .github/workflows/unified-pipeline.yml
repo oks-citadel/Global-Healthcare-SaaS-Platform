@@ -48,51 +48,51 @@ on:
     branches:
       - main
       - develop
-      - 'release/**'
+      - "release/**"
 
   # Manual trigger with environment selection
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Target environment for deployment'
+        description: "Target environment for deployment"
         required: false
         type: choice
-        default: 'none'
+        default: "none"
         options:
           - none
           - dev
           - staging
           - production
       terraform_action:
-        description: 'Terraform action (if deploying infrastructure)'
+        description: "Terraform action (if deploying infrastructure)"
         required: false
         type: choice
-        default: 'plan'
+        default: "plan"
         options:
           - plan
           - apply
       skip_tests:
-        description: 'Skip test suite (NOT recommended for production)'
+        description: "Skip test suite (NOT recommended for production)"
         required: false
         type: boolean
         default: false
       dry_run:
-        description: 'Dry run mode (no actual deployments)'
+        description: "Dry run mode (no actual deployments)"
         required: false
         type: boolean
         default: false
       run_sbom:
-        description: 'Generate SBOM'
+        description: "Generate SBOM"
         required: false
         type: boolean
         default: false
       run_drift_check:
-        description: 'Run infrastructure drift check'
+        description: "Run infrastructure drift check"
         required: false
         type: boolean
         default: false
       run_lighthouse:
-        description: 'Run Lighthouse performance audit'
+        description: "Run Lighthouse performance audit"
         required: false
         type: boolean
         default: false
@@ -104,18 +104,18 @@ on:
   # Scheduled triggers
   schedule:
     # Drift check: every 6 hours
-    - cron: '0 */6 * * *'
+    - cron: "0 */6 * * *"
     # Production deployment window: Tuesday 9pm CST (3am UTC Wednesday)
-    - cron: '0 3 * * 3'
+    - cron: "0 3 * * 3"
 
 # ============================================================================
 # ENVIRONMENT VARIABLES
 # ============================================================================
 env:
-  NODE_VERSION: '20'
-  TF_VERSION: '1.6.0'
-  AWS_REGION: 'us-east-1'
-  TF_WORKING_DIR: 'infrastructure/terraform-aws'
+  NODE_VERSION: "20"
+  TF_VERSION: "1.6.0"
+  AWS_REGION: "us-east-1"
+  TF_WORKING_DIR: "infrastructure/terraform-aws"
 
 # ============================================================================
 # PERMISSIONS (Least Privilege)
@@ -315,7 +315,7 @@ jobs:
             "unified-health\.com"
             "unifiedhealth\.com"
           )
-          EXCLUDE_PATTERNS="--exclude-dir=node_modules --exclude-dir=.git --exclude-dir=dist --exclude-dir=.pnpm --exclude=*.lock --exclude=pnpm-lock.yaml"
+          EXCLUDE_PATTERNS="--exclude-dir=node_modules --exclude-dir=.git --exclude-dir=dist --exclude-dir=.pnpm --exclude-dir=.next --exclude-dir=coverage --exclude=*.lock --exclude=pnpm-lock.yaml"
           WHITELIST_FILES="app.json|package.json|\.env|Dockerfile|docker-compose|kustomization|\.tf$|Chart\.yaml"
 
           FOUND_ISSUES=false
@@ -558,19 +558,19 @@ jobs:
       - name: Run Trivy IaC scanner
         uses: aquasecurity/trivy-action@master
         with:
-          scan-type: 'config'
-          scan-ref: './infrastructure'
-          format: 'sarif'
-          output: 'trivy-iac.sarif'
-          severity: 'CRITICAL,HIGH,MEDIUM'
+          scan-type: "config"
+          scan-ref: "./infrastructure"
+          format: "sarif"
+          output: "trivy-iac.sarif"
+          severity: "CRITICAL,HIGH,MEDIUM"
         continue-on-error: true
 
       - name: Upload Trivy IaC results
         uses: github/codeql-action/upload-sarif@v3
         if: always()
         with:
-          sarif_file: 'trivy-iac.sarif'
-          category: 'trivy-iac'
+          sarif_file: "trivy-iac.sarif"
+          category: "trivy-iac"
         continue-on-error: true
 
   # ==========================================================================
@@ -817,18 +817,18 @@ jobs:
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: '${{ secrets.ECR_REGISTRY }}/unified-health-prod/${{ matrix.service }}:latest'
-          format: 'sarif'
-          output: 'trivy-${{ matrix.service }}.sarif'
-          severity: 'CRITICAL,HIGH'
+          image-ref: "${{ secrets.ECR_REGISTRY }}/unified-health-prod/${{ matrix.service }}:latest"
+          format: "sarif"
+          output: "trivy-${{ matrix.service }}.sarif"
+          severity: "CRITICAL,HIGH"
         continue-on-error: true
 
       - name: Upload Trivy results
         uses: github/codeql-action/upload-sarif@v3
         if: always()
         with:
-          sarif_file: 'trivy-${{ matrix.service }}.sarif'
-          category: 'trivy-${{ matrix.service }}'
+          sarif_file: "trivy-${{ matrix.service }}.sarif"
+          category: "trivy-${{ matrix.service }}"
         continue-on-error: true
 
   # ==========================================================================
@@ -1110,7 +1110,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile

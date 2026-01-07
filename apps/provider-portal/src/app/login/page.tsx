@@ -1,31 +1,31 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Button, Input, Card } from '@/components/ui';
-import { authApi } from '@/lib/api';
-import { useAuthStore } from '@/store/auth-store';
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button, Input, Card } from "@/components/ui";
+import { authApi } from "@/lib/api";
+import { useAuthStore } from "@/store/auth-store";
 
 export default function LoginPage() {
   const router = useRouter();
   const { setProvider, setIsAuthenticated } = useAuthStore();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setIsLoading(true);
 
     try {
       const response = await authApi.login({ email, password });
       setProvider(response.provider);
       setIsAuthenticated(true);
-      router.push('/dashboard');
+      router.push("/dashboard");
     } catch (err) {
-      setError('Invalid email or password');
+      setError("Invalid email or password");
     } finally {
       setIsLoading(false);
     }
@@ -35,7 +35,9 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gradient-to-br from-primary-50 to-blue-100 flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Provider Portal</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Provider Portal
+          </h1>
           <p className="text-gray-600">Sign in to access your dashboard</p>
         </div>
 
@@ -66,24 +68,38 @@ export default function LoginPage() {
 
           <div className="flex items-center justify-between">
             <label className="flex items-center">
-              <input type="checkbox" className="rounded border-gray-300 text-primary-600 focus:ring-primary-500" />
+              <input
+                type="checkbox"
+                className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+              />
               <span className="ml-2 text-sm text-gray-600">Remember me</span>
             </label>
-            <a href="/forgot-password" className="text-sm text-primary-600 hover:text-primary-700">
+            <a
+              href="/forgot-password"
+              className="text-sm text-primary-600 hover:text-primary-700"
+            >
               Forgot password?
             </a>
           </div>
 
-          <Button type="submit" variant="primary" className="w-full" isLoading={isLoading}>
+          <Button
+            type="submit"
+            variant="primary"
+            className="w-full"
+            isLoading={isLoading}
+          >
             Sign In
           </Button>
         </form>
 
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600">
-            Need help? Contact{' '}
-            <a href="mailto:support@unified-health.com" className="text-primary-600 hover:text-primary-700">
-              support@unified-health.com
+            Need help? Contact{" "}
+            <a
+              href="mailto:support@theunifiedhealth.com"
+              className="text-primary-600 hover:text-primary-700"
+            >
+              support@theunifiedhealth.com
             </a>
           </p>
         </div>
