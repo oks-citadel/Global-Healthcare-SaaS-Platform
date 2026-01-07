@@ -22,7 +22,7 @@
 
 ### Purpose
 
-This document defines the API versioning strategy for the UnifiedHealth Platform. A consistent versioning approach ensures:
+This document defines the API versioning strategy for the Unified Health Platform. A consistent versioning approach ensures:
 
 - **Stability**: Clients can rely on API behavior not changing unexpectedly
 - **Evolution**: The platform can evolve without breaking existing integrations
@@ -254,14 +254,14 @@ Each version has its own OpenAPI specification:
 # services/api/openapi-v1.yaml
 openapi: 3.0.3
 info:
-  title: UnifiedHealth Platform API
+  title: Unified Health Platform API
   version: 1.0.0
   description: v1 API specification
 
 # services/api/openapi-v2.yaml
 openapi: 3.0.3
 info:
-  title: UnifiedHealth Platform API
+  title: Unified Health Platform API
   version: 2.0.0
   description: v2 API specification
 ```

@@ -1,7 +1,7 @@
 # Database Migration Runbook
 
 ## Overview
-This runbook provides step-by-step procedures for safely executing database migrations in production environments for the Unified Healthcare Platform.
+This runbook provides step-by-step procedures for safely executing database migrations in production environments for the Unified Health Platform.
 
 **Last Updated:** 2025-12-17
 **Database:** PostgreSQL

@@ -136,7 +136,7 @@ export function mockConfig() {
     },
     mfa: {
       encryptionKey: 'test-mfa-encryption-key-32chars!',
-      issuer: 'UnifiedHealth-Test',
+      issuer: 'Unified Health Test',
     },
     security: {
       bcryptRounds: 4,

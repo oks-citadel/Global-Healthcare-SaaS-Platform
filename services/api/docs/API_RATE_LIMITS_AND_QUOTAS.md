@@ -1,6 +1,6 @@
 # API Rate Limits and Quotas
 
-## Unified Healthcare Platform API
+## Unified Health Platform API
 
 **Version:** 1.0
 **Last Updated:** 2025-12-17
@@ -22,7 +22,7 @@
 
 ## Overview
 
-The Unified Healthcare Platform API implements rate limiting to ensure fair usage, prevent abuse, and maintain service quality for all users. Rate limits are applied per IP address and per authenticated user.
+The Unified Health Platform API implements rate limiting to ensure fair usage, prevent abuse, and maintain service quality for all users. Rate limits are applied per IP address and per authenticated user.
 
 ### Key Principles
 
@@ -458,7 +458,7 @@ Configure alerts for:
 
 For temporary or permanent rate limit increases:
 
-1. **Contact:** api-support@unifiedhealth.com
+1. **Contact:** api-support@theunifiedhealth.com
 2. **Provide:**
    - Use case description
    - Expected request volume
@@ -496,9 +496,9 @@ A: The system allows brief bursts (up to 1.5x the limit) before enforcing strict
 
 For rate limit questions or issues:
 
-- **Email:** api-support@unifiedhealth.com
-- **Documentation:** https://docs.unifiedhealth.com/api/rate-limits
-- **Status Page:** https://status.unifiedhealth.com
+- **Email:** api-support@theunifiedhealth.com
+- **Documentation:** https://docs.theunifiedhealth.com/api/rate-limits
+- **Status Page:** https://status.theunifiedhealth.com
 
 ---
 

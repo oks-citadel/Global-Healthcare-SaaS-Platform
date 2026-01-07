@@ -1,8 +1,8 @@
-# UnifiedHealth Platform - Microservices Architecture
+# Unified Health Platform - Microservices Architecture
 
 ## Overview
 
-The UnifiedHealth Platform has been restructured from a monolithic architecture to a microservices-based architecture for better scalability, maintainability, and deployment flexibility.
+The Unified Health Platform has been restructured from a monolithic architecture to a microservices-based architecture for better scalability, maintainability, and deployment flexibility.
 
 ## Architecture Diagram
 
@@ -508,4 +508,4 @@ When adding new features:
 
 ## License
 
-Copyright 2024 UnifiedHealth Platform. All rights reserved.
+Copyright 2024 Unified Health Platform. All rights reserved.

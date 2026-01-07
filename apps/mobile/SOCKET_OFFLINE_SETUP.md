@@ -1,6 +1,6 @@
 # Socket.io Real-time Features & Offline Sync Setup
 
-This document describes the Socket.io real-time features and offline sync implementation for the UnifiedHealth mobile app.
+This document describes the Socket.io real-time features and offline sync implementation for the Unified Health mobile app.
 
 ## Features Implemented
 
@@ -481,7 +481,7 @@ Update in `src/services/socket.ts`:
 ```typescript
 const API_URL = __DEV__
   ? 'http://localhost:3000'  // Development
-  : 'https://api.unifiedhealth.com';  // Production
+  : 'https://api.theunifiedhealth.com';  // Production
 ```
 
 ### Auto-Reconnection Settings

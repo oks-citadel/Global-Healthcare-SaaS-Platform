@@ -108,7 +108,7 @@ export default function ProfileScreen() {
       icon: 'ℹ️',
       onPress: () => {
         Alert.alert(
-          'UnifiedHealth',
+          'Unified Health',
           'Version 1.0.0\n\nA comprehensive healthcare platform for patients and doctors.',
           [{ text: 'OK' }]
         );

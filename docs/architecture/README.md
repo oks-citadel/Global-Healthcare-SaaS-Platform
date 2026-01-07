@@ -2,7 +2,7 @@
 
 ## Overview
 
-The UnifiedHealth Global Platform is built on a modern, scalable microservices architecture designed to handle healthcare data securely and efficiently across multiple regions and currencies.
+The Unified Health Global Platform is built on a modern, scalable microservices architecture designed to handle healthcare data securely and efficiently across multiple regions and currencies.
 
 ## Architecture Principles
 

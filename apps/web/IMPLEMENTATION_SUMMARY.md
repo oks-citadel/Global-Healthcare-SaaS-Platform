@@ -1,7 +1,7 @@
 # Next.js 14 Web Portal Implementation Summary
 
 ## Overview
-Successfully implemented a complete Next.js 14 web portal frontend with authentication, protected routes, and core dashboard pages for the Unified Healthcare Platform.
+Successfully implemented a complete Next.js 14 web portal frontend with authentication, protected routes, and core dashboard pages for the Unified Health Platform.
 
 ## Files Created
 

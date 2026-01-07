@@ -22,7 +22,7 @@
 
 ## Overview
 
-This document provides detailed diagrams and descriptions of how Protected Health Information (PHI) flows through the Unified Healthcare Platform. Understanding these data flows is critical for HIPAA compliance, security audits, and incident response.
+This document provides detailed diagrams and descriptions of how Protected Health Information (PHI) flows through the Unified Health Platform. Understanding these data flows is critical for HIPAA compliance, security audits, and incident response.
 
 ### Purpose
 

@@ -1,6 +1,6 @@
 # Architecture Decision Records (ADRs)
 
-This directory contains Architecture Decision Records (ADRs) for the UnifiedHealth Global Platform.
+This directory contains Architecture Decision Records (ADRs) for the Unified Health Global Platform.
 
 ## What is an ADR?
 

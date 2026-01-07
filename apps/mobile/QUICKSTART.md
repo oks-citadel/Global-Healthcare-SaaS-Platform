@@ -1,4 +1,4 @@
-# Quick Start Guide - UnifiedHealth Mobile App
+# Quick Start Guide - Unified Health Mobile App
 
 ## Installation
 

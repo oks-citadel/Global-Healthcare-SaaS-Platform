@@ -2,7 +2,7 @@
   "name": "@unified-health/web",
   "version": "1.0.0",
   "private": true,
-  "description": "UnifiedHealth Patient Portal - Next.js Web Application",
+  "description": "Unified Health Patient Portal - Next.js Web Application",
   "scripts": {
     "dev": "npx next dev -p 3000",
     "dev:webpack": "npx next dev -p 3000 --webpack",

@@ -1,6 +1,6 @@
 # Accessibility Testing Guide
 
-Comprehensive accessibility testing guide for the Unified Healthcare Platform to ensure WCAG 2.1 AA compliance.
+Comprehensive accessibility testing guide for the Unified Health Platform to ensure WCAG 2.1 AA compliance.
 
 ## Table of Contents
 
@@ -925,7 +925,7 @@ PREPARATION:
 STEP 1: Page Load Announcement
 Expected: VoiceOver announces page title
 Action: Listen after page loads
-Check: [ ] Page title announced (e.g., "Login - Unified Healthcare")
+Check: [ ] Page title announced (e.g., "Login - Unified Health")
 Check: [ ] Focus announced (skip link or first element)
 
 STEP 2: Navigate Landmarks

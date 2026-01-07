@@ -1,6 +1,6 @@
-# UnifiedHealth Web Portal
+# Unified Health Web Portal
 
-Next.js 14 web application for the Unified Healthcare Platform patient portal.
+Next.js 14 web application for the Unified Health Platform patient portal.
 
 ## Features Implemented
 

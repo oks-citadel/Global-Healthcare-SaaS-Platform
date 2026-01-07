@@ -2,7 +2,7 @@
   "name": "@unified-health/mobile",
   "version": "1.0.0",
   "private": true,
-  "description": "UnifiedHealth Mobile App - Expo/React Native",
+  "description": "Unified Health Mobile App - Expo/React Native",
   "main": "expo-router/entry",
   "scripts": {
     "dev": "expo start",

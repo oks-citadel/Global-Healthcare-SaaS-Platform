@@ -1,7 +1,7 @@
 /**
  * @unified-health/rate-limit
  *
- * Distributed rate limiting middleware with Redis support for UnifiedHealth services
+ * Distributed rate limiting middleware with Redis support for Unified Health services
  *
  * Features:
  * - Redis-based distributed rate limiting for multi-instance deployments

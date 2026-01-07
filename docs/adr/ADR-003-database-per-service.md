@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-With the adoption of a microservices architecture (see [ADR-001](./ADR-001-microservices-architecture.md)), we need to determine the data management strategy for the UnifiedHealth Platform.
+With the adoption of a microservices architecture (see [ADR-001](./ADR-001-microservices-architecture.md)), we need to determine the data management strategy for the Unified Health Platform.
 
 ### Requirements
 

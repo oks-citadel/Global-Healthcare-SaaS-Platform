@@ -377,7 +377,7 @@ export function welcomeTemplate(data: EmailTemplateData): { html: string; text: 
         Need Help Getting Started?
       </p>
       <p style="margin: 0; color: ${BRAND_STYLES.textLight}; font-size: 14px; line-height: 1.6;">
-        Our support team is here to help. Contact us at <a href="mailto:${data.supportEmail || 'support@unified-health.com'}" style="color: ${BRAND_STYLES.primaryColor}; text-decoration: none;">${data.supportEmail || 'support@unified-health.com'}</a> if you have any questions.
+        Our support team is here to help. Contact us at <a href="mailto:${data.supportEmail || 'support@theunifiedhealth.com'}" style="color: ${BRAND_STYLES.primaryColor}; text-decoration: none;">${data.supportEmail || 'support@theunifiedhealth.com'}</a> if you have any questions.
       </p>
     </div>
   `, 'Welcome to The Unified Health - Your account is ready');
@@ -400,7 +400,7 @@ Get started by visiting your dashboard:
 ${data.dashboardUrl}
 
 Need Help?
-Our support team is here to help. Contact us at ${data.supportEmail || 'support@unified-health.com'} if you have any questions.
+Our support team is here to help. Contact us at ${data.supportEmail || 'support@theunifiedhealth.com'} if you have any questions.
 
 ---
 The Unified Health

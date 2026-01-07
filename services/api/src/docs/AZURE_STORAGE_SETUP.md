@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document provides comprehensive instructions for setting up and using the Azure Blob Storage integration for the Unified Healthcare Platform. The implementation is designed to be HIPAA-compliant and production-ready.
+This document provides comprehensive instructions for setting up and using the Azure Blob Storage integration for the Unified Health Platform. The implementation is designed to be HIPAA-compliant and production-ready.
 
 ## Features
 
@@ -646,4 +646,4 @@ AZURE_STORAGE_CONNECTION_STRING="DefaultEndpointsProtocol=http;AccountName=devst
 
 ## License
 
-This implementation is part of the Unified Healthcare Platform and follows the project's license terms.
+This implementation is part of the Unified Health Platform and follows the project's license terms.

@@ -10,7 +10,7 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: '2023-10-16',
   typescript: true,
   appInfo: {
-    name: 'Unified Healthcare Platform',
+    name: 'Unified Health Platform',
     version: '1.0.0',
   },
 });

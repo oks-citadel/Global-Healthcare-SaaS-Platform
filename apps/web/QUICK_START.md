@@ -1,4 +1,4 @@
-# Quick Start Guide - UnifiedHealth Web Portal
+# Quick Start Guide - Unified Health Web Portal
 
 ## Prerequisites
 - Node.js 18+ installed
@@ -306,4 +306,4 @@ After getting the application running:
 - ✅ Can navigate between pages
 - ✅ Can logout successfully
 
-Congratulations! Your UnifiedHealth Web Portal is running. 🎉
+Congratulations! Your Unified Health Web Portal is running. 🎉

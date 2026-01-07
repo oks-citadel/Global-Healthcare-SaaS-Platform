@@ -1,5 +1,5 @@
 # API Test Report Template
-## Unified Healthcare Platform - API Quality Assessment
+## Unified Health Platform - API Quality Assessment
 
 **Date:** `[YYYY-MM-DD]`
 **Version:** `[API Version]`

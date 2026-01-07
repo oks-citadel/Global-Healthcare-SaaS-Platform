@@ -27,7 +27,7 @@ TWILIO_AUTH_TOKEN=your_auth_token_here
 TWILIO_PHONE_NUMBER=+12025551234
 
 # Application Settings
-APP_URL=https://unifiedhealth.com
+APP_URL=https://theunifiedhealth.com
 APP_NAME=UnifiedHealth
 ```
 
@@ -220,7 +220,7 @@ Example:
 ```typescript
 // ✅ Good (135 chars)
 "Hi John, reminder: appointment with Dr. Smith tomorrow at 2 PM.
-Call 555-0100 to reschedule. - UnifiedHealth"
+Call 555-0100 to reschedule. - Unified Health"
 
 // ❌ Too long (will use 2 SMS segments, costing 2x)
 "Hi John, this is a friendly reminder that you have an upcoming

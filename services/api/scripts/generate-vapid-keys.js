@@ -51,7 +51,7 @@ function generateVapidKeys() {
     console.log('==============================================\n');
     console.log(`VAPID_PUBLIC_KEY=${publicKeyBase64}`);
     console.log(`VAPID_PRIVATE_KEY=${privateKeyBase64}`);
-    console.log('VAPID_SUBJECT=mailto:support@unifiedhealth.com');
+    console.log('VAPID_SUBJECT=mailto:support@theunifiedhealth.com');
     console.log('\n==============================================');
     console.log('IMPORTANT: Keep your private key secure!');
     console.log('==============================================\n');

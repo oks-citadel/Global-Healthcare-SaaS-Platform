@@ -2,7 +2,7 @@
   "name": "@unified-health/chronic-care-service",
   "version": "1.0.0",
   "private": true,
-  "description": "UnifiedHealth Chronic Care Service - RPM, care plans, and monitoring",
+  "description": "Unified Health Chronic Care Service - RPM, care plans, and monitoring",
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",

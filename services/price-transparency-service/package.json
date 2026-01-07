@@ -2,7 +2,7 @@
   "name": "@unified-health/price-transparency-service",
   "version": "1.0.0",
   "private": true,
-  "description": "UnifiedHealth Price Transparency Service - CMS compliance, MRF generation, and price estimation",
+  "description": "Unified Health Price Transparency Service - CMS compliance, MRF generation, and price estimation",
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",

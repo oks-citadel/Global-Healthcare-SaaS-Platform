@@ -1,6 +1,6 @@
 # Notification Service
 
-Multi-channel notification service for the UnifiedHealth Platform supporting email, SMS, push notifications, and in-app messaging.
+Multi-channel notification service for the Unified Health Platform supporting email, SMS, push notifications, and in-app messaging.
 
 ## Features
 

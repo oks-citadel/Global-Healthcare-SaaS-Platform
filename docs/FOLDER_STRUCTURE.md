@@ -1,8 +1,8 @@
-# UnifiedHealth Global Platform - Canonical Folder Structure
+# Unified Health Global Platform - Canonical Folder Structure
 
 ## Overview
 
-This document defines the authoritative folder structure for the UnifiedHealth Global Healthcare SaaS Platform. All team members should follow this structure for consistency and maintainability.
+This document defines the authoritative folder structure for the Unified Health Global Healthcare SaaS Platform. All team members should follow this structure for consistency and maintainability.
 
 ---
 

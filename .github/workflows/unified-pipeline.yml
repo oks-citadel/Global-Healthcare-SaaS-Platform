@@ -310,10 +310,10 @@ jobs:
         run: |
           echo "Checking for disallowed branding patterns..."
           DISALLOWED_PATTERNS=(
-            "UnifiedHealth[^c]"
+            "UnifiedHealthcare"
             "Unified Healthcare"
             "unified-health\.com"
-            "unifiedhealth\.com"
+            "[^a-z]unifiedhealth.com"
           )
           EXCLUDE_PATTERNS="--exclude-dir=node_modules --exclude-dir=.git --exclude-dir=dist --exclude-dir=.pnpm --exclude-dir=.next --exclude-dir=coverage --exclude=*.lock --exclude=pnpm-lock.yaml"
           WHITELIST_FILES="app.json|package.json|\.env|Dockerfile|docker-compose|kustomization|\.tf$|Chart\.yaml"

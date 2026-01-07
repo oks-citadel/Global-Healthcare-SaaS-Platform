@@ -2,7 +2,7 @@
   "name": "@unified-health/telehealth-service",
   "version": "1.0.0",
   "private": true,
-  "description": "UnifiedHealth Telehealth Service - Video consultations and scheduling",
+  "description": "Unified Health Telehealth Service - Video consultations and scheduling",
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",

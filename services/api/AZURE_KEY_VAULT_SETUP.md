@@ -392,4 +392,4 @@ Cleanup all timers and resources.
 
 ## License
 
-This implementation is part of the Unified Healthcare Platform and follows HIPAA compliance standards.
+This implementation is part of the Unified Health Platform and follows HIPAA compliance standards.

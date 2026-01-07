@@ -2,7 +2,7 @@
   "name": "@unified-health/clinical-trials-service",
   "version": "1.0.0",
   "private": true,
-  "description": "UnifiedHealth Clinical Trial Matching Service - Clinical trial registry integration and patient matching",
+  "description": "Unified Health Clinical Trial Matching Service - Clinical trial registry integration and patient matching",
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",

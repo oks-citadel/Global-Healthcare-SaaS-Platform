@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document outlines the coding standards and best practices for the UnifiedHealth Global Platform. Consistent code style improves readability, maintainability, and collaboration.
+This document outlines the coding standards and best practices for the Unified Health Global Platform. Consistent code style improves readability, maintainability, and collaboration.
 
 ## General Principles
 

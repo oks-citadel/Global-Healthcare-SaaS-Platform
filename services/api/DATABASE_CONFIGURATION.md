@@ -1,6 +1,6 @@
 # Production Database Configuration Guide
 
-This document provides a comprehensive guide for configuring and managing the production database for the Unified Healthcare Platform.
+This document provides a comprehensive guide for configuring and managing the production database for the Unified Health Platform.
 
 ## Table of Contents
 

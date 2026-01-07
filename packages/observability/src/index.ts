@@ -1,7 +1,7 @@
 /**
  * @unified-health/observability
  *
- * Shared observability utilities for UnifiedHealth services.
+ * Shared observability utilities for Unified Health services.
  * Provides unified tracing, logging, and metrics configuration.
  */
 

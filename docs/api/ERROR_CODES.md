@@ -2,7 +2,7 @@
 
 ## Overview
 
-The UnifiedHealth API uses standard HTTP status codes and provides detailed error responses to help you understand and resolve issues quickly.
+The Unified Health API uses standard HTTP status codes and provides detailed error responses to help you understand and resolve issues quickly.
 
 ## Error Response Format
 

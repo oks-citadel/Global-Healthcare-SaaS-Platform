@@ -26,7 +26,7 @@
 
 ### Purpose
 
-This Data Retention and Deletion Policy establishes guidelines for the retention and secure disposal of data maintained by Unified Healthcare Platform. The policy ensures compliance with HIPAA, GDPR, state medical records laws, and other applicable regulations while supporting operational, legal, and business needs.
+This Data Retention and Deletion Policy establishes guidelines for the retention and secure disposal of data maintained by Unified Health Platform. The policy ensures compliance with HIPAA, GDPR, state medical records laws, and other applicable regulations while supporting operational, legal, and business needs.
 
 ### Scope
 
@@ -820,4 +820,4 @@ Legal Counsel: _______________ Date: _______
 **Effective Date:** January 15, 2025
 **Retention Period:** 6 years from superseded date
 
-© 2025 Unified Healthcare Platform. All rights reserved.
+© 2025 Unified Health Platform. All rights reserved.

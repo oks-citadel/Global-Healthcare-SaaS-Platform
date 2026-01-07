@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Push Notification Service provides comprehensive push notification functionality for the UnifiedHealth platform, supporting multiple platforms (iOS, Android, Web) and notification types with user preferences and quiet hours management.
+The Push Notification Service provides comprehensive push notification functionality for the Unified Health platform, supporting multiple platforms (iOS, Android, Web) and notification types with user preferences and quiet hours management.
 
 ## Table of Contents
 
@@ -421,7 +421,7 @@ APNS_KEY_PATH=/path/to/AuthKey_XXXXXXXXXX.p8
 # Web Push (VAPID)
 VAPID_PUBLIC_KEY=your-vapid-public-key
 VAPID_PRIVATE_KEY=your-vapid-private-key
-VAPID_SUBJECT=mailto:support@unifiedhealth.com
+VAPID_SUBJECT=mailto:support@theunifiedhealth.com
 ```
 
 ## Platform Integration
@@ -511,7 +511,7 @@ VAPID_SUBJECT=mailto:support@unifiedhealth.com
    ```bash
    VAPID_PUBLIC_KEY=BG...
    VAPID_PRIVATE_KEY=M...
-   VAPID_SUBJECT=mailto:support@unifiedhealth.com
+   VAPID_SUBJECT=mailto:support@theunifiedhealth.com
    ```
 
 3. **Client Integration**

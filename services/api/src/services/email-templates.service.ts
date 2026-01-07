@@ -22,7 +22,7 @@ export class EmailTemplatesService {
   private readonly privacyUrl: string;
 
   constructor() {
-    this.baseUrl = process.env.APP_URL || 'https://app.unifiedhealth.com';
+    this.baseUrl = process.env.APP_URL || 'https://app.theunifiedhealth.com';
     this.dashboardUrl = `${this.baseUrl}/dashboard`;
     this.helpUrl = `${this.baseUrl}/help`;
     this.privacyUrl = `${this.baseUrl}/privacy`;
@@ -35,7 +35,7 @@ export class EmailTemplatesService {
     try {
       await sendEmail({
         to: recipient.email,
-        subject: 'Welcome to UnifiedHealth',
+        subject: 'Welcome to Unified Health',
         templatePath: 'welcome.html',
         templateData: {
           name: recipient.firstName,

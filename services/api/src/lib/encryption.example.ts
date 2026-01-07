@@ -2,7 +2,7 @@
  * Azure Key Vault Integration - Usage Examples
  *
  * This file demonstrates how to use the Azure Key Vault integration
- * for encryption key management in the Unified Healthcare Platform.
+ * for encryption key management in the Unified Health Platform.
  */
 
 import { keyVault, encrypt, decrypt, generateSecureToken } from './encryption';

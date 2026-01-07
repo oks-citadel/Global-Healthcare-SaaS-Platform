@@ -1,4 +1,4 @@
-# Release Notes Template - UnifiedHealth Global Platform
+# Release Notes Template - Unified Health Global Platform
 
 **Version:** [X.Y.Z]
 **Release Date:** [YYYY-MM-DD]
@@ -289,12 +289,12 @@ No action required. Changes will be available automatically after deployment.
 **iOS Users:**
 1. Open the App Store
 2. Navigate to Updates
-3. Update UnifiedHealth to v[X.Y.Z]
+3. Update Unified Health to v[X.Y.Z]
 
 **Android Users:**
 1. Open Google Play Store
 2. Navigate to My apps & games
-3. Update UnifiedHealth to v[X.Y.Z]
+3. Update Unified Health to v[X.Y.Z]
 
 **Recommended:** Enable automatic updates
 

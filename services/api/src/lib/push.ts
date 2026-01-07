@@ -147,7 +147,7 @@ class PushNotificationService {
         this.webPushConfig = {
           vapidPublicKey: process.env.VAPID_PUBLIC_KEY,
           vapidPrivateKey: process.env.VAPID_PRIVATE_KEY,
-          subject: process.env.VAPID_SUBJECT || 'mailto:support@unifiedhealth.com',
+          subject: process.env.VAPID_SUBJECT || 'mailto:support@theunifiedhealth.com',
         };
 
         // Set VAPID details for web-push

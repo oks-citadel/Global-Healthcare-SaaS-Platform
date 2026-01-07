@@ -1,5 +1,5 @@
 # Smoke Test Script - Post-Deployment Validation
-## UnifiedHealth Global Platform
+## Unified Health Global Platform
 
 **Version:** 1.0
 **Last Updated:** December 2024
@@ -25,7 +25,7 @@
 ## Overview
 
 ### Purpose
-This document provides comprehensive smoke test procedures to validate the UnifiedHealth platform after deployment. These tests ensure critical functionality is working correctly before declaring deployment success.
+This document provides comprehensive smoke test procedures to validate the Unified Health platform after deployment. These tests ensure critical functionality is working correctly before declaring deployment success.
 
 ### Test Objectives
 1. Verify all critical user journeys
@@ -730,7 +730,7 @@ echo "All Health Checks Passed! ✓"
 **Device:** iPhone (iOS 14+)
 
 **Steps:**
-1. Open UnifiedHealth app
+1. Open Unified Health app
 2. Wait for splash screen
 3. Observe home screen
 
@@ -746,7 +746,7 @@ echo "All Health Checks Passed! ✓"
 **Device:** Android (10+)
 
 **Steps:**
-1. Open UnifiedHealth app
+1. Open Unified Health app
 2. Wait for splash screen
 3. Observe home screen
 

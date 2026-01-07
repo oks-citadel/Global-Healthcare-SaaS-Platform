@@ -250,7 +250,7 @@ APNS_KEY_PATH=/path/to/AuthKey_XXXXXXXXXX.p8
 ```bash
 VAPID_PUBLIC_KEY=your-vapid-public-key
 VAPID_PRIVATE_KEY=your-vapid-private-key
-VAPID_SUBJECT=mailto:support@unifiedhealth.com
+VAPID_SUBJECT=mailto:support@theunifiedhealth.com
 ```
 
 ## Setup Instructions

@@ -247,4 +247,4 @@ If you encounter issues:
 
 ---
 
-**Congratulations!** You now have a fully functional admin dashboard for your Unified Healthcare Platform.
+**Congratulations!** You now have a fully functional admin dashboard for your Unified Health Platform.

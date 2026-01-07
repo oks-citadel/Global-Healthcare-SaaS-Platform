@@ -1,8 +1,8 @@
-# UnifiedHealth Access Control Matrix
+# Unified Health Access Control Matrix
 
 ## Overview
 
-This document defines the access control segmentation for the UnifiedHealth Global Healthcare SaaS Platform. It establishes clear boundaries between operational teams (NetOps, SecOps, AppOps, DevOps) and their respective access levels to applications, services, and infrastructure.
+This document defines the access control segmentation for the Unified Health Global Healthcare SaaS Platform. It establishes clear boundaries between operational teams (NetOps, SecOps, AppOps, DevOps) and their respective access levels to applications, services, and infrastructure.
 
 ---
 

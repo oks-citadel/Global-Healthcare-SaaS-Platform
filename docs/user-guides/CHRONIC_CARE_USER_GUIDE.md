@@ -67,7 +67,7 @@ Remote Patient Monitoring (RPM) allows you to:
 #### Step 1: Download the App
 
 1. Go to your app store (iOS/Android)
-2. Search for **"UnifiedHealth Connect"**
+2. Search for **"Unified Health Connect"**
 3. Download and install
 
 #### Step 2: Pair Your Device

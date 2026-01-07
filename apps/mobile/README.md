@@ -1,6 +1,6 @@
-# UnifiedHealth Mobile App
+# Unified Health Mobile App
 
-React Native mobile application for the UnifiedHealth platform, built with Expo.
+React Native mobile application for the Unified Health platform, built with Expo.
 
 ## Features
 

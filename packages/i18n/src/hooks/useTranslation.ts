@@ -8,7 +8,7 @@ import { TranslationNamespace, defaultNS } from '../index';
  * ```tsx
  * // Using default namespace (common)
  * const { t } = useTranslation();
- * t('app.name'); // "Unified Healthcare Platform"
+ * t('app.name'); // "Unified Health Platform"
  *
  * // Using specific namespace
  * const { t } = useTranslation('auth');
@@ -16,7 +16,7 @@ import { TranslationNamespace, defaultNS } from '../index';
  *
  * // Using multiple namespaces
  * const { t } = useTranslation(['common', 'auth']);
- * t('common:app.name'); // "Unified Healthcare Platform"
+ * t('common:app.name'); // "Unified Health Platform"
  * t('auth:login.title'); // "Sign In"
  * ```
  */

@@ -1,6 +1,6 @@
 # @unified-health/i18n
 
-Internationalization package for the Unified Healthcare Platform. Provides comprehensive translation support for English, Spanish, and French across web, mobile, and API applications.
+Internationalization package for the Unified Health Platform. Provides comprehensive translation support for English, Spanish, and French across web, mobile, and API applications.
 
 ## Features
 
@@ -334,7 +334,7 @@ Error messages (general errors, validation errors, auth errors, appointment erro
 
 ```typescript
 // Example: Accessing nested translations
-t('app.name')                           // "Unified Healthcare Platform"
+t('app.name')                           // "Unified Health Platform"
 t('nav.appointments')                   // "Appointments"
 t('actions.save')                       // "Save"
 t('auth:login.title')                   // "Sign In"
@@ -392,4 +392,4 @@ To add a new language:
 
 ## License
 
-Proprietary - Unified Healthcare Platform
+Proprietary - Unified Health Platform

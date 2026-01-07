@@ -1,6 +1,6 @@
 # Accessibility Implementation
 
-This document provides a quick reference for the accessibility (a11y) implementation in the Unified Healthcare Platform web application.
+This document provides a quick reference for the accessibility (a11y) implementation in the Unified Health Platform web application.
 
 ## Quick Start
 

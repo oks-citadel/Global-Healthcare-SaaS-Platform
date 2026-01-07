@@ -1,6 +1,6 @@
 # API Test Suite - Quick Reference Index
 
-**Project:** Unified Healthcare Platform
+**Project:** Unified Health Platform
 **API Version:** 1.0.0
 **Total Endpoints:** 75
 **Total Tests:** 330+

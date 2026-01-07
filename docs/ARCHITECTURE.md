@@ -1,4 +1,4 @@
-# UnifiedHealth Platform - Enterprise Architecture
+# Unified Health Platform - Enterprise Architecture
 
 ## Table of Contents
 1. [Executive Summary](#executive-summary)
@@ -13,7 +13,7 @@
 
 ## Executive Summary
 
-The UnifiedHealth Platform is a global healthcare SaaS solution designed to serve patients across multiple regions (Americas, Europe, Africa) with specialized healthcare services including:
+The Unified Health Platform is a global healthcare SaaS solution designed to serve patients across multiple regions (Americas, Europe, Africa) with specialized healthcare services including:
 
 - **Telehealth** - Virtual consultations
 - **Mental & Behavioral Health** - Therapy, psychiatry, crisis support
@@ -512,4 +512,4 @@ data_residency:
 
 ---
 
-*This document is maintained as part of the UnifiedHealth Platform documentation.*
+*This document is maintained as part of the Unified Health Platform documentation.*

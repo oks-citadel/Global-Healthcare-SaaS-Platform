@@ -1295,7 +1295,7 @@ const HealthcarePlatformDashboard = () => {
               </div>
               <div>
                 <div className="font-bold text-gray-900">
-                  Unified Healthcare Platform
+                  Unified Health Platform
                 </div>
                 <div className="text-xs text-gray-500">
                   Enterprise Healthcare Technology

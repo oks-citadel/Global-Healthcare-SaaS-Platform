@@ -1,4 +1,4 @@
-# UnifiedHealth API Gateway
+# Unified Health API Gateway
 
 ## Overview
 

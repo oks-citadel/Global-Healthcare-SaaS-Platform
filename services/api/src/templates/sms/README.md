@@ -1,6 +1,6 @@
 # SMS Templates
 
-This directory contains SMS message templates for the UnifiedHealth notification system.
+This directory contains SMS message templates for the Unified Health notification system.
 
 ## Template Guidelines
 

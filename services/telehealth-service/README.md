@@ -1,4 +1,4 @@
-# UnifiedHealth Telehealth Service
+# Unified Health Telehealth Service
 
 ## Overview
 

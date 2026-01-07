@@ -105,7 +105,7 @@ export const DISALLOWED_BRAND_PATTERNS = [
   'UnifiedHealth', // camelCase variant
   'unified health', // lowercase
   'UNIFIED HEALTH', // uppercase
-  'Unified Healthcare', // old variant
+  'Unified Health', // old variant
   'UnifiedHealthcare', // old camelCase
   'unified-health.com', // wrong domain
   'unifiedhealth.com', // wrong domain

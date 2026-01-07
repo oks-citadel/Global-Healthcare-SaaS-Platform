@@ -72,7 +72,7 @@ export default function RegisterPage() {
             Create your account
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            Join UnifiedHealth to access quality healthcare
+            Join Unified Health to access quality healthcare
           </p>
         </div>
 

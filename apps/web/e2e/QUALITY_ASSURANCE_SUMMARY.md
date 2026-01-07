@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document provides a comprehensive summary of the frontend quality engineering work completed for the Unified Healthcare Platform, including E2E testing, accessibility testing, performance monitoring, and visual regression testing.
+This document provides a comprehensive summary of the frontend quality engineering work completed for the Unified Health Platform, including E2E testing, accessibility testing, performance monitoring, and visual regression testing.
 
 ## Deliverables
 

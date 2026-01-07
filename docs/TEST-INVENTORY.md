@@ -1,4 +1,4 @@
-# UnifiedHealth Platform - Complete Test Inventory
+# Unified Health Platform - Complete Test Inventory
 
 ## Application Access URLs
 
@@ -94,7 +94,7 @@ kubectl describe ingress unified-health-ingress -n unified-health
 | Test ID | Test Name | URL | Method | Expected Response |
 |---------|-----------|-----|--------|-------------------|
 | WEB-001 | Landing Page Load | http://20.3.27.63/ | GET | 200 OK, HTML page |
-| WEB-002 | Page Title | http://20.3.27.63/ | GET | "UnifiedHealth Platform" |
+| WEB-002 | Page Title | http://20.3.27.63/ | GET | "Unified Health Platform" |
 | WEB-003 | Status Section | http://20.3.27.63/ | GET | All status indicators green |
 | WEB-004 | Mobile Responsive | http://20.3.27.63/ | GET | Page renders on mobile |
 
@@ -103,7 +103,7 @@ kubectl describe ingress unified-health-ingress -n unified-health
 |---------|-----------|----------|--------|-------------------|
 | API-001 | Health Check | /health | GET | `{"status":"healthy","timestamp":"..."}` |
 | API-002 | Ready Check | /ready | GET | `{"ready":true}` |
-| API-003 | Root Endpoint | / | GET | `{"message":"UnifiedHealth API","version":"1.0.0"}` |
+| API-003 | Root Endpoint | / | GET | `{"message":"Unified Health API","version":"1.0.0"}` |
 | API-004 | System Status | /api/v1/status | GET | `{"status":"operational","services":{...}}` |
 | API-005 | Health Packages | /api/v1/health-packages | GET | Array of 3 packages |
 | API-006 | Providers List | /api/v1/providers | GET | Array of 3 providers |
@@ -344,5 +344,5 @@ kubectl exec -n unified-health deployment/unified-health-api -- wget -qO- http:/
 ---
 
 *Document generated: December 2025*
-*Platform: UnifiedHealth on Azure*
+*Platform: Unified Health on Azure*
 *Environment: dev2*

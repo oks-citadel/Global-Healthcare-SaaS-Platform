@@ -7,7 +7,7 @@
 
 ## Overview
 
-This directory contains comprehensive HIPAA compliance documentation for the Unified Healthcare Platform. All documents have been prepared to meet regulatory requirements under HIPAA, HITECH, GDPR, and applicable state laws.
+This directory contains comprehensive HIPAA compliance documentation for the Unified Health Platform. All documents have been prepared to meet regulatory requirements under HIPAA, HITECH, GDPR, and applicable state laws.
 
 ---
 
@@ -424,4 +424,4 @@ For questions or to request access, contact the Compliance Officer.
 **Last Updated:** January 15, 2025
 **Next Comprehensive Review:** January 15, 2026
 
-© 2025 Unified Healthcare Platform. All rights reserved.
+© 2025 Unified Health Platform. All rights reserved.

@@ -402,8 +402,8 @@ async function main() {
     console.log(`  Plans: ${plans.size}`);
     console.log(`  Appointments: ${appointments.length}`);
     console.log('\nTest Credentials:');
-    console.log('  Admin: admin@unifiedhealth.com / Admin123!');
-    console.log('  Provider: dr.smith@unifiedhealth.com / Provider123!');
+    console.log('  Admin: admin@theunifiedhealth.com / Admin123!');
+    console.log('  Provider: dr.smith@theunifiedhealth.com / Provider123!');
     console.log('  Patient: john.doe@example.com / Patient123!');
 
   } catch (error) {

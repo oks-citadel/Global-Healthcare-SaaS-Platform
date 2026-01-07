@@ -206,7 +206,7 @@ export const mockAccessToken =
 export const mockMfaSetupResponse = {
   secret: "JBSWY3DPEHPK3PXP",
   otpAuthUrl:
-    "otpauth://totp/UnifiedHealth:test@example.com?secret=JBSWY3DPEHPK3PXP&issuer=UnifiedHealth",
+    "otpauth://totp/Unified Health:test@example.com?secret=JBSWY3DPEHPK3PXP&issuer=Unified%20Health",
 };
 
 export const mockBackupCodes = [

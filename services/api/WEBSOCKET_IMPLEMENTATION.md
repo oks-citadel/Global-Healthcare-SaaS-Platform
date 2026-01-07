@@ -2,7 +2,7 @@
 
 ## Overview
 
-Complete real-time messaging infrastructure for the Unified Healthcare Platform with production-ready features including authentication, room management, presence tracking, message persistence, and horizontal scaling support.
+Complete real-time messaging infrastructure for the Unified Health Platform with production-ready features including authentication, room management, presence tracking, message persistence, and horizontal scaling support.
 
 ## Features
 
@@ -659,4 +659,4 @@ For issues or questions:
 
 ## License
 
-Internal use only - Unified Healthcare Platform
+Internal use only - Unified Health Platform

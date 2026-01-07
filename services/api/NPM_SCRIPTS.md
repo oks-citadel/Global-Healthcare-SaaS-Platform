@@ -497,4 +497,4 @@ npm run db:migrate:prod
 ---
 
 **Last Updated:** December 17, 2024
-**Project:** Unified Healthcare Platform API
+**Project:** Unified Health Platform API

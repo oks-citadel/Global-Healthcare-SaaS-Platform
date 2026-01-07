@@ -2,7 +2,7 @@
 
 ## Overview
 
-The UnifiedHealth API uses JWT (JSON Web Tokens) for authentication and implements OAuth 2.0 and OpenID Connect (OIDC) for third-party integrations. This guide covers all authentication mechanisms supported by the platform.
+The Unified Health API uses JWT (JSON Web Tokens) for authentication and implements OAuth 2.0 and OpenID Connect (OIDC) for third-party integrations. This guide covers all authentication mechanisms supported by the platform.
 
 ## Authentication Methods
 

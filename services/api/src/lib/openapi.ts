@@ -342,11 +342,11 @@ Authorization: Bearer <your-jwt-token>
         description: 'Development server',
       },
       {
-        url: 'https://api-staging.unifiedhealth.com/api/v1',
+        url: 'https://api-staging.theunifiedhealth.com/api/v1',
         description: 'Staging server',
       },
       {
-        url: 'https://api.unifiedhealth.com/api/v1',
+        url: 'https://api.theunifiedhealth.com/api/v1',
         description: 'Production server',
       },
     ],

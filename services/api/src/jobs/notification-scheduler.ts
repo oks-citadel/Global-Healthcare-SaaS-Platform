@@ -394,7 +394,7 @@ export function schedulePaymentReminders() {
               invoiceNumber: invoice.invoiceNumber,
               invoiceDate: invoice.createdAt.toLocaleDateString(),
               visitDate: invoice.visitDate?.toLocaleDateString() || 'N/A',
-              providerName: 'UnifiedHealth',
+              providerName: 'Unified Health',
               paymentStatus: 'overdue',
               items: invoice.items as any,
               subtotal: invoice.subtotal.toString(),

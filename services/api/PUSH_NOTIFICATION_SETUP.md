@@ -1,6 +1,6 @@
 # Push Notification Setup Guide
 
-This guide explains how to set up and configure the push notification service for the Unified Healthcare Platform.
+This guide explains how to set up and configure the push notification service for the Unified Health Platform.
 
 ## Overview
 
@@ -130,7 +130,7 @@ yH4xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```bash
 VAPID_PUBLIC_KEY=BG3xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 VAPID_PRIVATE_KEY=yH4xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-VAPID_SUBJECT=mailto:support@unifiedhealth.com
+VAPID_SUBJECT=mailto:support@theunifiedhealth.com
 ```
 
 **Notes:**

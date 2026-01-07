@@ -1,6 +1,6 @@
 # Developer Guide
 
-Welcome to the UnifiedHealth Global Platform developer documentation. This guide will help you set up your development environment, understand the codebase, and contribute effectively to the project.
+Welcome to the Unified Health Global Platform developer documentation. This guide will help you set up your development environment, understand the codebase, and contribute effectively to the project.
 
 ## Quick Start
 

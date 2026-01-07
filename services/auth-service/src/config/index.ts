@@ -228,9 +228,9 @@ export const config = {
     enabled: getOptionalEnv("EMAIL_ENABLED", isDevelopment ? "false" : "true") === "true",
 
     // From address configuration
-    fromAddress: getOptionalEnv("EMAIL_FROM_ADDRESS", "noreply@unified-health.com"),
+    fromAddress: getOptionalEnv("EMAIL_FROM_ADDRESS", "noreply@theunifiedhealth.com"),
     fromName: getOptionalEnv("EMAIL_FROM_NAME", "The Unified Health"),
-    supportEmail: getOptionalEnv("EMAIL_SUPPORT_ADDRESS", "support@unified-health.com"),
+    supportEmail: getOptionalEnv("EMAIL_SUPPORT_ADDRESS", "support@theunifiedhealth.com"),
 
     // Application URLs
     appUrl: getOptionalEnv("APP_URL", "http://localhost:3000"),

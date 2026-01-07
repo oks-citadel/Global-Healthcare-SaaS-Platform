@@ -406,4 +406,4 @@ PUT /api/admin/settings
 
 **Package**: @unified-health/admin
 **License**: Proprietary
-**Author**: Unified Healthcare Platform Team
+**Author**: Unified Health Platform Team

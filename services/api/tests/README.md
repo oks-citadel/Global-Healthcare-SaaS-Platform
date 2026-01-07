@@ -1,7 +1,7 @@
 # API Test Suite Documentation
-## Unified Healthcare Platform
+## Unified Health Platform
 
-This directory contains comprehensive test suites for the Unified Healthcare Platform API, ensuring quality, security, and performance standards.
+This directory contains comprehensive test suites for the Unified Health Platform API, ensuring quality, security, and performance standards.
 
 ---
 
@@ -567,7 +567,7 @@ pnpm vitest run --coverage
 
 For questions or issues with tests:
 - **Team Chat:** #api-quality on Slack
-- **Email:** api-team@unifiedhealth.com
+- **Email:** api-team@theunifiedhealth.com
 - **Issues:** GitHub Issues
 
 ---

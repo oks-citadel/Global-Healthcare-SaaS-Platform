@@ -22,7 +22,7 @@
     "data-protection",
     "privacy"
   ],
-  "author": "UnifiedHealth Platform",
+  "author": "Unified Health Platform",
   "license": "PROPRIETARY",
   "dependencies": {
     "uuid": "^13.0.0",

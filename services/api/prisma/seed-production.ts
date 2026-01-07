@@ -342,7 +342,7 @@ async function main() {
 
     // Check if admin already exists
     const existingAdmin = await prisma.user.findUnique({
-      where: { email: 'admin@unifiedhealth.com' },
+      where: { email: 'admin@theunifiedhealth.com' },
     });
 
     if (!existingAdmin) {
@@ -350,7 +350,7 @@ async function main() {
 
       const adminUser = await prisma.user.create({
         data: {
-          email: 'admin@unifiedhealth.com',
+          email: 'admin@theunifiedhealth.com',
           password: hashedPassword,
           firstName: 'System',
           lastName: 'Administrator',
@@ -378,7 +378,7 @@ async function main() {
     console.log(`  - Admin User: 1\n`);
 
     console.log('Default Credentials:');
-    console.log('  Email: admin@unifiedhealth.com');
+    console.log('  Email: admin@theunifiedhealth.com');
     console.log('  Password: See ADMIN_DEFAULT_PASSWORD env variable');
     console.log('\n⚠️  SECURITY REMINDER:');
     console.log('  1. Change the admin password immediately after first login');

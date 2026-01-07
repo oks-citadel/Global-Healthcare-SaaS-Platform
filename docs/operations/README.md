@@ -2,7 +2,7 @@
 
 ## Overview
 
-This documentation covers the operational aspects of running the UnifiedHealth Global Platform, including monitoring, logging, troubleshooting, incident response, and maintenance procedures.
+This documentation covers the operational aspects of running the Unified Health Global Platform, including monitoring, logging, troubleshooting, incident response, and maintenance procedures.
 
 ## Operational Excellence Pillars
 

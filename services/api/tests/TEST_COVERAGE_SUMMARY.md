@@ -1,7 +1,7 @@
 # Test Coverage Summary
 
 ## Overview
-Comprehensive unit tests have been created for the Unified Healthcare API service to achieve 70%+ code coverage with production-quality test cases.
+Comprehensive unit tests have been created for the Unified Health API service to achieve 70%+ code coverage with production-quality test cases.
 
 ## Test Structure
 

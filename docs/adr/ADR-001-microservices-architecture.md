@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-The UnifiedHealth Global Platform is designed to serve patients across multiple regions (Americas, Europe, Africa) with diverse healthcare services including:
+The Unified Health Global Platform is designed to serve patients across multiple regions (Americas, Europe, Africa) with diverse healthcare services including:
 
 - Telehealth/Telemedicine
 - Mental & Behavioral Health
@@ -31,7 +31,7 @@ Initially, the platform was developed as a monolithic API service. As the platfo
 
 ## Decision
 
-We will adopt a **microservices architecture** for the UnifiedHealth Platform with the following service decomposition:
+We will adopt a **microservices architecture** for the Unified Health Platform with the following service decomposition:
 
 ### Core Services
 - **API Gateway**: Single entry point for all client requests

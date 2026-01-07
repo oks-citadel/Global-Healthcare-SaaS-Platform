@@ -1,8 +1,8 @@
-# UnifiedHealth API Service
+# Unified Health API Service
 
 ## Overview
 
-The API service is the primary backend server for the UnifiedHealth platform. It provides RESTful endpoints for patient management, clinical data, appointments, and real-time communication via WebSocket.
+The API service is the primary backend server for the Unified Health platform. It provides RESTful endpoints for patient management, clinical data, appointments, and real-time communication via WebSocket.
 
 ## Technical Stack
 

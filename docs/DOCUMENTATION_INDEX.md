@@ -1,8 +1,8 @@
-# UnifiedHealth Platform - Complete Documentation Index
+# Unified Health Platform - Complete Documentation Index
 
 ## Overview
 
-This comprehensive documentation covers all aspects of the UnifiedHealth Global Platform, from high-level business strategy to technical implementation details.
+This comprehensive documentation covers all aspects of the Unified Health Global Platform, from high-level business strategy to technical implementation details.
 
 ---
 

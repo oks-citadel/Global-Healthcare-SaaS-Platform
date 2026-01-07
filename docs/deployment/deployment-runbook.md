@@ -1,4 +1,4 @@
-# Deployment Runbook - UnifiedHealth Global Platform
+# Deployment Runbook - Unified Health Global Platform
 
 **Version:** 1.0
 **Last Updated:** December 2024
@@ -21,7 +21,7 @@
 ## Overview
 
 ### Purpose
-This runbook provides comprehensive procedures for deploying the UnifiedHealth Global Platform to production environments. It ensures consistent, reliable, and safe deployments across all regions.
+This runbook provides comprehensive procedures for deploying the Unified Health Global Platform to production environments. It ensures consistent, reliable, and safe deployments across all regions.
 
 ### Deployment Windows
 - **Primary Window:** Saturday 22:00 - Sunday 06:00 UTC

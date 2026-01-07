@@ -16,7 +16,7 @@ export interface SmsRecipient {
 
 export class SmsTemplatesService {
   private readonly maxLength = 160; // Standard SMS length
-  private readonly platformName = 'UnifiedHealth';
+  private readonly platformName = 'Unified Health';
 
   /**
    * Send appointment reminder SMS

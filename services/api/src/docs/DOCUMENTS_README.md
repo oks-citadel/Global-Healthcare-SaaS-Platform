@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Document Management System provides HIPAA-compliant document storage and retrieval for the Unified Healthcare Platform. It leverages Azure Blob Storage for scalable, secure, and encrypted document storage.
+The Document Management System provides HIPAA-compliant document storage and retrieval for the Unified Health Platform. It leverages Azure Blob Storage for scalable, secure, and encrypted document storage.
 
 ## Architecture
 
@@ -518,4 +518,4 @@ For issues or questions:
 
 ## License
 
-This implementation is part of the Unified Healthcare Platform and follows the project's license terms.
+This implementation is part of the Unified Health Platform and follows the project's license terms.

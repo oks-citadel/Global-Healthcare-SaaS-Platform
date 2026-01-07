@@ -2,7 +2,7 @@
 
 ## Overview
 
-The UnifiedHealth notification system provides comprehensive email and SMS notification capabilities with queue-based delivery for reliability and scalability.
+The Unified Health notification system provides comprehensive email and SMS notification capabilities with queue-based delivery for reliability and scalability.
 
 ## Architecture
 
@@ -95,7 +95,7 @@ All email templates are located in `src/templates/emails/` and use the responsiv
 
 ```bash
 SENDGRID_API_KEY=your_sendgrid_api_key
-FROM_EMAIL=noreply@unifiedhealth.com
+FROM_EMAIL=noreply@theunifiedhealth.com
 FROM_NAME=UnifiedHealth
 ```
 
@@ -119,9 +119,9 @@ REDIS_DB=0
 ### Application
 
 ```bash
-APP_URL=https://unifiedhealth.com
+APP_URL=https://theunifiedhealth.com
 APP_NAME=UnifiedHealth
-SUPPORT_EMAIL=support@unifiedhealth.com
+SUPPORT_EMAIL=support@theunifiedhealth.com
 SUPPORT_PHONE=+1-800-UNIFIED
 BILLING_PHONE=+1-800-BILLING
 ```
@@ -495,6 +495,6 @@ Potential improvements:
 
 For issues or questions:
 
-- Email: support@unifiedhealth.com
-- Documentation: https://docs.unifiedhealth.com
+- Email: support@theunifiedhealth.com
+- Documentation: https://docs.theunifiedhealth.com
 - GitHub Issues: https://github.com/unifiedhealth/platform/issues

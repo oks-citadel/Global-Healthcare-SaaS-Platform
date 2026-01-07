@@ -9,7 +9,7 @@ vi.mock("../../../src/config/index.js", () => ({
   config: {
     mfa: {
       encryptionKey: "test-mfa-encryption-key-32chars!",
-      issuer: "UnifiedHealth-Test",
+      issuer: "Unified Health Test",
     },
   },
 }));
@@ -84,7 +84,7 @@ describe("MfaUtils", () => {
       // Email is URL-encoded in OTP auth URLs (@ becomes %40)
       expect(url).toContain(encodeURIComponent(email));
       expect(url).toContain(secret);
-      expect(url).toContain("issuer=UnifiedHealth-Test");
+      expect(url).toContain("issuer=Unified Health Test");
     });
 
     it("should URL encode email with special characters", () => {

@@ -113,7 +113,7 @@ export class SESEmailService {
       region: config.region || 'us-east-1',
       accessKeyId: config.accessKeyId,
       secretAccessKey: config.secretAccessKey,
-      fromAddress: config.fromAddress || 'noreply@unified-health.com',
+      fromAddress: config.fromAddress || 'noreply@theunifiedhealth.com',
       fromName: config.fromName || 'The Unified Health',
       configurationSetName: config.configurationSetName,
       sandboxMode: config.sandboxMode ?? true,

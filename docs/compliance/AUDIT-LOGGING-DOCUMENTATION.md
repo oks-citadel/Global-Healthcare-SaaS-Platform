@@ -22,7 +22,7 @@
 
 ## Overview
 
-The Unified Healthcare Platform implements comprehensive audit logging to meet HIPAA Audit Controls requirements (45 CFR § 164.312(b)). All access to Protected Health Information (PHI) is automatically logged with sufficient detail to support security monitoring, incident investigation, and compliance audits.
+The Unified Health Platform implements comprehensive audit logging to meet HIPAA Audit Controls requirements (45 CFR § 164.312(b)). All access to Protected Health Information (PHI) is automatically logged with sufficient detail to support security monitoring, incident investigation, and compliance audits.
 
 ### Purpose
 

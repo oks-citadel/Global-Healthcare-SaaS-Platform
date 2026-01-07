@@ -377,7 +377,7 @@ async function checkCacheHitRatio(): Promise<void> {
 async function runHealthChecks(): Promise<void> {
   log('\n============================================', 'cyan');
   log('  Database Health Check', 'cyan');
-  log('  Unified Healthcare Platform', 'cyan');
+  log('  Unified Health Platform', 'cyan');
   log('============================================\n', 'cyan');
 
   const checks = [

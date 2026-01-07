@@ -1,8 +1,8 @@
-# UnifiedHealth Platform - Error Handling Reference
+# Unified Health Platform - Error Handling Reference
 
 ## Overview
 
-This document defines the unified error handling system for the UnifiedHealth platform. All errors follow a three-layer model:
+This document defines the unified error handling system for the Unified Health platform. All errors follow a three-layer model:
 
 1. **HTTP Status Code** - Transport layer indicator
 2. **Backend Error Code** - System truth (ERR_XXXX)

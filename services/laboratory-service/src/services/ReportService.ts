@@ -170,7 +170,7 @@ export class ReportService {
 <body>
   <div class="header">
     <h1>LABORATORY REPORT</h1>
-    <p>UnifiedHealth Laboratory Services</p>
+    <p>Unified Health Laboratory Services</p>
   </div>
 
   <div class="info-section">
@@ -305,9 +305,9 @@ export class ReportService {
       If you have any questions about these results, please contact your healthcare provider.
     </p>
     <p style="margin-top: 10px;">
-      <strong>UnifiedHealth Laboratory Services</strong><br>
+      <strong>Unified Health Laboratory Services</strong><br>
       CLIA Certified | CAP Accredited<br>
-      Phone: (555) 123-4567 | Email: lab@unifiedhealth.com
+      Phone: (555) 123-4567 | Email: lab@theunifiedhealth.com
     </p>
   </div>
 </body>
@@ -325,7 +325,7 @@ export class ReportService {
 
     // For now, simulate the process
     const reportId = `report-${orderId}-${Date.now()}`;
-    const reportUrl = `https://storage.unifiedhealth.com/lab-reports/${reportId}.pdf`;
+    const reportUrl = `https://storage.theunifiedhealth.com/lab-reports/${reportId}.pdf`;
 
     logger.info('PDF report saved (simulated)', {
       orderId,

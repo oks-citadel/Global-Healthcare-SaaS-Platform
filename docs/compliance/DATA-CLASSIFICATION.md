@@ -23,7 +23,7 @@
 
 ### Purpose
 
-This Data Classification Policy establishes a framework for categorizing data based on sensitivity, regulatory requirements, and business impact. Proper classification ensures appropriate security controls are applied consistently across the Unified Healthcare Platform.
+This Data Classification Policy establishes a framework for categorizing data based on sensitivity, regulatory requirements, and business impact. Proper classification ensures appropriate security controls are applied consistently across the Unified Health Platform.
 
 ### Scope
 

@@ -2,7 +2,7 @@
   "name": "@unified-health/population-health-service",
   "version": "1.0.0",
   "private": true,
-  "description": "UnifiedHealth Population Health Analytics Service - Cohort analysis, risk stratification, and quality measures",
+  "description": "Unified Health Population Health Analytics Service - Cohort analysis, risk stratification, and quality measures",
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",

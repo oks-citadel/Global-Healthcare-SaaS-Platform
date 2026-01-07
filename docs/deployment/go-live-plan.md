@@ -1,5 +1,5 @@
 # Go-Live Day Schedule & Communication Plan
-## UnifiedHealth Global Platform
+## Unified Health Global Platform
 
 **Version:** 1.0
 **Last Updated:** December 2024
@@ -511,7 +511,7 @@ npm run test:production
 
 **Template:**
 ```
-Dear UnifiedHealth Team,
+Dear Unified Health Team,
 
 We are planning a production deployment of v[X.Y.Z] on [Date] during our
 standard maintenance window (Saturday 22:00 - Sunday 06:00 UTC).
@@ -726,7 +726,7 @@ We apologize for any inconvenience and appreciate your patience.
 Questions? Contact support@unifiedhealth.io
 
 Thank you,
-UnifiedHealth Team
+Unified Health Team
 ```
 
 **Post-Deployment (T+6 hours):**
@@ -744,7 +744,7 @@ Learn more: [Link to release notes]
 
 Thank you for being a valued customer!
 
-UnifiedHealth Team
+Unified Health Team
 ```
 
 ---

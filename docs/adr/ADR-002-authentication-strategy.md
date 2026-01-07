@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-The UnifiedHealth Platform requires a robust authentication and authorization system that:
+The Unified Health Platform requires a robust authentication and authorization system that:
 
 1. **Supports Multiple Clients**: Web application, mobile apps (iOS/Android), admin portal, and partner API integrations
 2. **Enables Microservices**: Authentication must work across distributed services without tight coupling

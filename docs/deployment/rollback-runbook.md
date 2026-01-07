@@ -1,4 +1,4 @@
-# Rollback Runbook - UnifiedHealth Global Platform
+# Rollback Runbook - Unified Health Global Platform
 
 **Version:** 1.0
 **Last Updated:** December 2024
@@ -1102,7 +1102,7 @@ If you have any questions or concerns, please contact our support team at suppor
 Thank you for your patience and understanding.
 
 Best regards,
-UnifiedHealth Team
+Unified Health Team
 ```
 
 ---

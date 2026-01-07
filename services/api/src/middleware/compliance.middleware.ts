@@ -1,6 +1,6 @@
 // @ts-nocheck
 /**
- * Compliance Middleware for UnifiedHealth API
+ * Compliance Middleware for Unified Health API
  *
  * Features:
  * - Request/Response logging for audit

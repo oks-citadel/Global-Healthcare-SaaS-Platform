@@ -95,8 +95,8 @@ After seeding, use these to test:
 
 | Role | Email | Password |
 |------|-------|----------|
-| Admin | admin@unifiedhealth.com | Admin123! |
-| Provider | dr.smith@unifiedhealth.com | Provider123! |
+| Admin | admin@theunifiedhealth.com | Admin123! |
+| Provider | dr.smith@theunifiedhealth.com | Provider123! |
 | Patient | john.doe@example.com | Patient123! |
 
 ## Quick Schema Changes

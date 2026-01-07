@@ -1,6 +1,6 @@
 # Browser Compatibility Matrix
 
-This document outlines the browser support and compatibility testing strategy for the Unified Healthcare Platform.
+This document outlines the browser support and compatibility testing strategy for the Unified Health Platform.
 
 ## Supported Browsers
 

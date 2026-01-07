@@ -1,4 +1,4 @@
-# E2E Tests - Unified Healthcare Platform
+# E2E Tests - Unified Health Platform
 
 This directory contains end-to-end (E2E) tests for the web application using Playwright.
 

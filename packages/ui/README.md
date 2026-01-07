@@ -1,6 +1,6 @@
 # @healthcare/ui
 
-Shared UI component library for the Unified Healthcare Platform. Built with React, TypeScript, and TailwindCSS.
+Shared UI component library for the Unified Health Platform. Built with React, TypeScript, and TailwindCSS.
 
 ## Installation
 

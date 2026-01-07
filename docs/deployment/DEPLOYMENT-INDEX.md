@@ -1,5 +1,5 @@
 # Deployment Documentation Index
-## UnifiedHealth Global Platform - Release Management
+## Unified Health Global Platform - Release Management
 
 **Version:** 1.0
 **Last Updated:** December 2024

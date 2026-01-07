@@ -1,7 +1,7 @@
 {
   "name": "@unified-health/i18n",
   "version": "1.0.0",
-  "description": "Internationalization package for Unified Healthcare Platform",
+  "description": "Internationalization package for Unified Health Platform",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",

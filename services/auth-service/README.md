@@ -268,4 +268,4 @@ curl http://localhost:3001/health
 
 ## License
 
-Proprietary - World Unified Healthcare Platform
+Proprietary - World Unified Health Platform

@@ -1,7 +1,7 @@
 {
   "name": "@unified-health/sdk",
   "version": "1.0.0",
-  "description": "TypeScript SDK for Unified Healthcare Platform API",
+  "description": "TypeScript SDK for Unified Health Platform API",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -41,7 +41,7 @@
     "client",
     "hipaa"
   ],
-  "author": "Unified Healthcare Platform",
+  "author": "Unified Health Platform",
   "license": "MIT",
   "dependencies": {
     "axios": "^1.6.2",

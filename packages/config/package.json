@@ -2,7 +2,7 @@
   "name": "@unified-health/config",
   "version": "1.0.0",
   "private": true,
-  "description": "Shared configuration validation utilities for UnifiedHealth services",
+  "description": "Shared configuration validation utilities for Unified Health services",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {

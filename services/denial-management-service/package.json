@@ -2,7 +2,7 @@
   "name": "@unified-health/denial-management-service",
   "version": "1.0.0",
   "private": true,
-  "description": "UnifiedHealth AI Denial Management Service - Denial prediction, appeal generation, and analytics",
+  "description": "Unified Health AI Denial Management Service - Denial prediction, appeal generation, and analytics",
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",

@@ -13,7 +13,7 @@
 ("Customer" or "Controller")
 
 **Data Processor / Business Associate:**
-Unified Healthcare Platform
+Unified Health Platform
 [Address]
 ("Processor" or "Business Associate")
 
@@ -21,7 +21,7 @@ Unified Healthcare Platform
 
 ## Background
 
-This Data Processing Agreement ("DPA") forms part of the agreement between Customer and Unified Healthcare Platform for the provision of healthcare platform services ("Services"). This DPA reflects the parties' agreement regarding the Processing of Personal Data and Protected Health Information in compliance with GDPR, HIPAA, and other applicable data protection laws.
+This Data Processing Agreement ("DPA") forms part of the agreement between Customer and Unified Health Platform for the provision of healthcare platform services ("Services"). This DPA reflects the parties' agreement regarding the Processing of Personal Data and Protected Health Information in compliance with GDPR, HIPAA, and other applicable data protection laws.
 
 ---
 
@@ -453,7 +453,7 @@ Notices must be sent to:
 [Contact information from Services agreement]
 
 **Processor:**
-Unified Healthcare Platform
+Unified Health Platform
 Email: legal@unifiedhealthcare.com
 Address: [Company Address]
 
@@ -491,4 +491,4 @@ Date: _______________________
 **Version:** 1.0
 **Effective Date:** January 15, 2025
 
-© 2025 Unified Healthcare Platform. All rights reserved.
+© 2025 Unified Health Platform. All rights reserved.

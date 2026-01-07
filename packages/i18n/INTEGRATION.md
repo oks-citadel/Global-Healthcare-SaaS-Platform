@@ -1,6 +1,6 @@
 # i18n Integration Guide
 
-This guide shows how to integrate the i18n package into different parts of the Unified Healthcare Platform.
+This guide shows how to integrate the i18n package into different parts of the Unified Health Platform.
 
 ## Web App Integration
 
@@ -489,7 +489,7 @@ import { changeLanguage } from '@unified-health/i18n';
 describe('i18n', () => {
   it('should translate keys correctly', () => {
     const { result } = renderHook(() => useTranslation('common'));
-    expect(result.current.t('app.name')).toBe('Unified Healthcare Platform');
+    expect(result.current.t('app.name')).toBe('Unified Health Platform');
   });
 
   it('should handle interpolation', () => {

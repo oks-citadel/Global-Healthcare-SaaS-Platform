@@ -2,7 +2,7 @@
 
 ## Overview
 
-This guide covers deploying the UnifiedHealth Global Platform to production environments. The platform supports multiple deployment strategies including Kubernetes, Docker Compose, and cloud-native services.
+This guide covers deploying the Unified Health Global Platform to production environments. The platform supports multiple deployment strategies including Kubernetes, Docker Compose, and cloud-native services.
 
 ## Deployment Options
 

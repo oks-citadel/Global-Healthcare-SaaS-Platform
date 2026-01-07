@@ -2,7 +2,7 @@
 
 ## Overview
 
-Successfully implemented a complete Expo/React Native mobile application for the UnifiedHealth platform with authentication, navigation, and core screens.
+Successfully implemented a complete Expo/React Native mobile application for the Unified Health platform with authentication, navigation, and core screens.
 
 ## Implementation Details
 

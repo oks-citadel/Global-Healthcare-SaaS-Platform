@@ -2,7 +2,7 @@
 
 ## Overview
 
-The UnifiedHealth API is a RESTful API that provides access to all platform functionality including patient management, appointments, clinical documentation, billing, and telemedicine services.
+The Unified Health API is a RESTful API that provides access to all platform functionality including patient management, appointments, clinical documentation, billing, and telemedicine services.
 
 **Base URLs:**
 - Local Development: `http://localhost:8080/api/v1`

@@ -40,7 +40,7 @@ export const mockStudy = {
   patientSex: 'M',
   performingPhysician: 'Dr. Smith',
   operatorName: 'Tech Johnson',
-  institutionName: 'UnifiedHealth Imaging Center',
+  institutionName: 'Unified Health Imaging Center',
   stationName: 'CT-Scanner-1',
   numberOfSeries: 2,
   numberOfInstances: 150,

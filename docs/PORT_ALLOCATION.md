@@ -1,6 +1,6 @@
 # Port Allocation
 
-This document defines the port allocation for all services and applications in the UnifiedHealth Platform.
+This document defines the port allocation for all services and applications in the Unified Health Platform.
 
 ## Frontend Applications
 

@@ -1,8 +1,8 @@
-# UnifiedHealth User Guides
+# Unified Health User Guides
 
 ## Overview
 
-This directory contains comprehensive user guides for patients, clinicians, and staff using the UnifiedHealth Global Healthcare Platform. Each guide provides step-by-step instructions for using the dashboard and service features.
+This directory contains comprehensive user guides for patients, clinicians, and staff using the Unified Health Global Healthcare Platform. Each guide provides step-by-step instructions for using the dashboard and service features.
 
 ---
 
@@ -130,4 +130,4 @@ We welcome feedback on these guides. Please submit suggestions or report issues 
 
 ---
 
-_UnifiedHealth Global Healthcare Platform - User Documentation_
+_Unified Health Global Healthcare Platform - User Documentation_

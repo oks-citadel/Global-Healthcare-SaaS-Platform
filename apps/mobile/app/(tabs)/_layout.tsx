@@ -57,7 +57,7 @@ export default function TabsLayout() {
         options={{
           title: 'Home',
           tabBarIcon: ({ color }) => <HomeIcon color={color} />,
-          headerTitle: 'UnifiedHealth',
+          headerTitle: 'Unified Health',
         }}
       />
       <Tabs.Screen

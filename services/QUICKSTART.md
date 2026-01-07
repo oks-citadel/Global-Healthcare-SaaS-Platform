@@ -1,4 +1,4 @@
-# UnifiedHealth Microservices - Quick Start Guide
+# Unified Health Microservices - Quick Start Guide
 
 ## Quick Start with Docker (Recommended)
 

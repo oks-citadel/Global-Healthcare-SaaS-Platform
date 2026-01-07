@@ -1,6 +1,6 @@
 [
   {
-    "email": "admin@unifiedhealth.com",
+    "email": "admin@theunifiedhealth.com",
     "password": "Admin123!",
     "firstName": "System",
     "lastName": "Administrator",
@@ -9,7 +9,7 @@
     "emailVerified": true
   },
   {
-    "email": "dr.smith@unifiedhealth.com",
+    "email": "dr.smith@theunifiedhealth.com",
     "password": "Provider123!",
     "firstName": "Sarah",
     "lastName": "Smith",
@@ -19,7 +19,7 @@
     "emailVerified": true
   },
   {
-    "email": "dr.johnson@unifiedhealth.com",
+    "email": "dr.johnson@theunifiedhealth.com",
     "password": "Provider123!",
     "firstName": "Michael",
     "lastName": "Johnson",
@@ -29,7 +29,7 @@
     "emailVerified": true
   },
   {
-    "email": "dr.williams@unifiedhealth.com",
+    "email": "dr.williams@theunifiedhealth.com",
     "password": "Provider123!",
     "firstName": "Emily",
     "lastName": "Williams",

@@ -27,7 +27,7 @@
 
 ### Purpose
 
-This Incident Response Procedures document establishes the processes and responsibilities for detecting, responding to, and recovering from security incidents that may affect the confidentiality, integrity, or availability of Protected Health Information (PHI) and the Unified Healthcare Platform.
+This Incident Response Procedures document establishes the processes and responsibilities for detecting, responding to, and recovering from security incidents that may affect the confidentiality, integrity, or availability of Protected Health Information (PHI) and the Unified Health Platform.
 
 ### Scope
 
@@ -678,7 +678,7 @@ Sincerely,
 
 [Name]
 [Title]
-Unified Healthcare Platform
+Unified Health Platform
 ```
 
 **Email (if patient agreed to electronic communications):**
@@ -970,4 +970,4 @@ Approved By: [CSO], [CEO]
 
 **Annual drill required - Next drill: March 2025**
 
-© 2025 Unified Healthcare Platform. All rights reserved.
+© 2025 Unified Health Platform. All rights reserved.

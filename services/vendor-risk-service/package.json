@@ -2,7 +2,7 @@
   "name": "@unified-health/vendor-risk-service",
   "version": "1.0.0",
   "private": true,
-  "description": "UnifiedHealth Vendor Risk Management Service - Vendor onboarding, security assessments, compliance tracking",
+  "description": "Unified Health Vendor Risk Management Service - Vendor onboarding, security assessments, compliance tracking",
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",

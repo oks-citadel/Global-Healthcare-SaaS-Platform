@@ -2,7 +2,7 @@
   "name": "@unified-health/mental-health-service",
   "version": "1.0.0",
   "private": true,
-  "description": "UnifiedHealth Mental Health Service - Therapy, psychiatry, and crisis support",
+  "description": "Unified Health Mental Health Service - Therapy, psychiatry, and crisis support",
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",

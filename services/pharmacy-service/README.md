@@ -1,8 +1,8 @@
-# UnifiedHealth Pharmacy Service
+# Unified Health Pharmacy Service
 
 ## Overview
 
-The Pharmacy Service manages e-prescriptions, medication dispensing, and pharmacy network integration for the UnifiedHealth platform.
+The Pharmacy Service manages e-prescriptions, medication dispensing, and pharmacy network integration for the Unified Health platform.
 
 ## Technical Stack
 

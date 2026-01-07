@@ -7,8 +7,8 @@ import { logger } from '../utils/logger.js';
  * High-level email service with template-specific methods
  */
 
-const APP_URL = process.env.APP_URL || 'https://unifiedhealth.com';
-const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL || 'support@unifiedhealth.com';
+const APP_URL = process.env.APP_URL || 'https://theunifiedhealth.com';
+const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL || 'support@theunifiedhealth.com';
 const SUPPORT_PHONE = process.env.SUPPORT_PHONE || '+1-800-UNIFIED';
 const BILLING_PHONE = process.env.BILLING_PHONE || '+1-800-BILLING';
 
@@ -37,7 +37,7 @@ export async function sendWelcomeEmail(email: string, userName: string) {
 
     const result = await sendEmail({
       to: email,
-      subject: 'Welcome to UnifiedHealth!',
+      subject: 'Welcome to Unified Health!',
       templatePath: 'welcome.html',
       templateData: {
         ...getCommonData(),
@@ -83,7 +83,7 @@ export async function sendPasswordResetEmail(
 
     const result = await sendEmail({
       to: email,
-      subject: 'Reset Your Password - UnifiedHealth',
+      subject: 'Reset Your Password - Unified Health',
       templatePath: 'password-reset.html',
       templateData: {
         ...getCommonData(),
@@ -328,7 +328,7 @@ export async function sendInvoice(data: {
 
     const result = await sendEmail({
       to: data.email,
-      subject: `Invoice ${data.invoiceNumber} - UnifiedHealth`,
+      subject: `Invoice ${data.invoiceNumber} - Unified Health`,
       templatePath: 'invoice.html',
       templateData: {
         ...getCommonData(),

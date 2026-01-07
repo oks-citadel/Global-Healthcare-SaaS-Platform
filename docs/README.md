@@ -1,6 +1,6 @@
-# UnifiedHealth Global Platform - Documentation
+# Unified Health Global Platform - Documentation
 
-Welcome to the comprehensive documentation for the UnifiedHealth Global Platform. This documentation is organized to help different stakeholders quickly find the information they need.
+Welcome to the comprehensive documentation for the Unified Health Global Platform. This documentation is organized to help different stakeholders quickly find the information they need.
 
 ## Documentation Overview
 

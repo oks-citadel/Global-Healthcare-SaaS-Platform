@@ -2,7 +2,7 @@
 
 ## Overview
 
-This guide provides comprehensive instructions for preparing the Unified Healthcare Platform database for production deployment.
+This guide provides comprehensive instructions for preparing the Unified Health Platform database for production deployment.
 
 **Last Updated:** 2025-12-17
 **Database:** PostgreSQL 13+
@@ -119,7 +119,7 @@ The production seed script (`prisma/seed-production.ts`) creates essential basel
    - Liver Function Test
 
 4. **Default Admin User**
-   - Email: admin@unifiedhealth.com
+   - Email: admin@theunifiedhealth.com
    - Password: Set via `ADMIN_DEFAULT_PASSWORD` env variable
 
 ### Running Production Seed
@@ -343,7 +343,7 @@ npm run db:validate
 ```
 ============================================
   Database Health Check
-  Unified Healthcare Platform
+  Unified Health Platform
 ============================================
 
 Results:

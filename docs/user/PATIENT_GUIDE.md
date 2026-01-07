@@ -1,6 +1,6 @@
 # Patient User Guide
 
-Welcome to UnifiedHealth! This guide will help you get started with the platform and make the most of your healthcare experience.
+Welcome to Unified Health! This guide will help you get started with the platform and make the most of your healthcare experience.
 
 ## Getting Started
 
@@ -334,8 +334,8 @@ Add and manage payment methods:
 
 ### Download the App
 
-- **iOS:** App Store - Search "UnifiedHealth"
-- **Android:** Google Play - Search "UnifiedHealth"
+- **iOS:** App Store - Search "Unified Health"
+- **Android:** Google Play - Search "Unified Health"
 
 ### App Features
 

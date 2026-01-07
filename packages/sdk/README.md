@@ -1,6 +1,6 @@
 # @unified-health/sdk
 
-Official TypeScript/JavaScript SDK for the Unified Healthcare Platform API.
+Official TypeScript/JavaScript SDK for the Unified Health Platform API.
 
 ## Features
 

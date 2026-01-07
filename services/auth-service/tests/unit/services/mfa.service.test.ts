@@ -25,7 +25,7 @@ vi.mock('../../../src/config/index.js', () => ({
     },
     mfa: {
       encryptionKey: 'test-mfa-encryption-key-32chars!',
-      issuer: 'UnifiedHealth-Test',
+      issuer: 'Unified Health Test',
     },
   },
 }));

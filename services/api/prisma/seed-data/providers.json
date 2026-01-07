@@ -1,20 +1,20 @@
 [
   {
-    "email": "dr.smith@unifiedhealth.com",
+    "email": "dr.smith@theunifiedhealth.com",
     "licenseNumber": "MD-2024-001",
     "specialty": ["Cardiology", "Internal Medicine"],
     "bio": "Dr. Sarah Smith is a board-certified cardiologist with over 15 years of experience. She specializes in preventive cardiology and heart disease management.",
     "available": true
   },
   {
-    "email": "dr.johnson@unifiedhealth.com",
+    "email": "dr.johnson@theunifiedhealth.com",
     "licenseNumber": "MD-2024-002",
     "specialty": ["Pediatrics", "Family Medicine"],
     "bio": "Dr. Michael Johnson has been practicing pediatrics for 20 years. He is passionate about children's health and preventive care for families.",
     "available": true
   },
   {
-    "email": "dr.williams@unifiedhealth.com",
+    "email": "dr.williams@theunifiedhealth.com",
     "licenseNumber": "MD-2024-003",
     "specialty": ["Dermatology", "Cosmetic Medicine"],
     "bio": "Dr. Emily Williams is a leading dermatologist specializing in both medical and cosmetic dermatology. She focuses on skin health and aesthetic treatments.",

@@ -205,7 +205,7 @@ DB_PASSWORD="your_password"                  # Required
 
 ### Default Admin User
 
-- Email: admin@unifiedhealth.com
+- Email: admin@theunifiedhealth.com
 - Password: Set via `ADMIN_DEFAULT_PASSWORD`
 - **⚠️ Change password immediately after first login!**
 

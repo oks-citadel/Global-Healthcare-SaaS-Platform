@@ -2,7 +2,7 @@
   "name": "@unified-health/api-gateway",
   "version": "1.0.0",
   "private": true,
-  "description": "UnifiedHealth API Gateway - Central routing and authentication",
+  "description": "Unified Health API Gateway - Central routing and authentication",
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",

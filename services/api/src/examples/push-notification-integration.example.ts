@@ -2,7 +2,7 @@
  * Push Notification Integration Examples
  *
  * This file demonstrates how to integrate push notifications
- * into various services of the UnifiedHealth platform.
+ * into various services of the Unified Health platform.
  */
 
 import { pushService } from '../services/push.service.js';

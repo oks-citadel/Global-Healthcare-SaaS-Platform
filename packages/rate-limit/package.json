@@ -1,7 +1,7 @@
 {
   "name": "@unified-health/rate-limit",
   "version": "1.0.0",
-  "description": "Distributed rate limiting middleware with Redis support for UnifiedHealth services",
+  "description": "Distributed rate limiting middleware with Redis support for Unified Health services",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {

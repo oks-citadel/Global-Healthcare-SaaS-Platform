@@ -1,6 +1,6 @@
-# Admin Dashboard - Unified Healthcare Platform
+# Admin Dashboard - Unified Health Platform
 
-A comprehensive admin dashboard built with Next.js 14 for managing the Unified Healthcare Platform.
+A comprehensive admin dashboard built with Next.js 14 for managing the Unified Health Platform.
 
 ## Features
 
@@ -151,4 +151,4 @@ The admin dashboard uses JWT token-based authentication:
 
 ## License
 
-Copyright © 2024 Unified Healthcare Platform
+Copyright © 2024 Unified Health Platform

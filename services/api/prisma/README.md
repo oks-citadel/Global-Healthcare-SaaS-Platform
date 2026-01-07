@@ -1,6 +1,6 @@
 # Database Setup and Seeding Guide
 
-This directory contains all database-related files for the Unified Healthcare Platform API.
+This directory contains all database-related files for the Unified Health Platform API.
 
 ## Directory Structure
 
@@ -75,20 +75,20 @@ npx prisma migrate reset --force
 After seeding, you can use these credentials to test the application:
 
 ### Admin Account
-- **Email:** admin@unifiedhealth.com
+- **Email:** admin@theunifiedhealth.com
 - **Password:** Admin123!
 - **Role:** Administrator
 
 ### Provider Accounts
-- **Email:** dr.smith@unifiedhealth.com
+- **Email:** dr.smith@theunifiedhealth.com
 - **Password:** Provider123!
 - **Specialty:** Cardiology, Internal Medicine
 
-- **Email:** dr.johnson@unifiedhealth.com
+- **Email:** dr.johnson@theunifiedhealth.com
 - **Password:** Provider123!
 - **Specialty:** Pediatrics, Family Medicine
 
-- **Email:** dr.williams@unifiedhealth.com
+- **Email:** dr.williams@theunifiedhealth.com
 - **Password:** Provider123!
 - **Specialty:** Dermatology, Cosmetic Medicine
 

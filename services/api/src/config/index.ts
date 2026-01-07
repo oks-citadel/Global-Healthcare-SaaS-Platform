@@ -222,7 +222,7 @@ export const config = {
     webPush: {
       vapidPublicKey: process.env.VAPID_PUBLIC_KEY,
       vapidPrivateKey: process.env.VAPID_PRIVATE_KEY,
-      subject: getOptionalEnv('VAPID_SUBJECT', 'mailto:support@unifiedhealth.com'),
+      subject: getOptionalEnv('VAPID_SUBJECT', 'mailto:support@theunifiedhealth.com'),
     },
   },
 };

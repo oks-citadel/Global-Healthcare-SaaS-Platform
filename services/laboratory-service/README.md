@@ -1,6 +1,6 @@
 # Laboratory Service
 
-A comprehensive Laboratory Information System (LIS) for managing laboratory orders, test results, sample tracking, and reporting as part of the UnifiedHealth SaaS Platform.
+A comprehensive Laboratory Information System (LIS) for managing laboratory orders, test results, sample tracking, and reporting as part of the Unified Health SaaS Platform.
 
 ## Features
 
@@ -313,12 +313,12 @@ npm run db:generate
 
 ## License
 
-Proprietary - UnifiedHealth Platform
+Proprietary - Unified Health Platform
 
 ## Support
 
 For issues or questions:
-- Email: support@unifiedhealth.com
+- Email: support@theunifiedhealth.com
 - Slack: #laboratory-service
 - Documentation: /docs/laboratory-service
 

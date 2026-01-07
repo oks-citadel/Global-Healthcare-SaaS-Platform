@@ -2,7 +2,7 @@
 
 ## Overview
 
-A complete, production-ready admin dashboard application for the Unified Healthcare Platform built with Next.js 14, TypeScript, and TailwindCSS.
+A complete, production-ready admin dashboard application for the Unified Health Platform built with Next.js 14, TypeScript, and TailwindCSS.
 
 ## Installation & Setup
 

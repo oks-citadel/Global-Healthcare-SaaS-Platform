@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document defines all environment configurations required to run the UnifiedHealth Global Platform across different deployment stages.
+This document defines all environment configurations required to run the Unified Health Global Platform across different deployment stages.
 
 ---
 

@@ -3,7 +3,7 @@
 **Effective Date:** January 15, 2025
 **Version:** 1.0
 
-This Business Associate Agreement ("BAA") supplements and is made a part of the Services Agreement between **[Covered Entity Name]** ("Covered Entity") and **Unified Healthcare Platform** ("Business Associate").
+This Business Associate Agreement ("BAA") supplements and is made a part of the Services Agreement between **[Covered Entity Name]** ("Covered Entity") and **Unified Health Platform** ("Business Associate").
 
 ---
 
@@ -443,4 +443,4 @@ Detailed security documentation is available in the Security Implementation Guid
 **Version:** 1.0
 **Effective Date:** January 15, 2025
 
-© 2025 Unified Healthcare Platform. All rights reserved.
+© 2025 Unified Health Platform. All rights reserved.

@@ -181,6 +181,6 @@ packages/ui/
 
 ### Notes
 
-This is the initial release of the @healthcare/ui component library, designed specifically for the Unified Healthcare Platform. All components follow accessibility best practices and are built with healthcare workflows in mind.
+This is the initial release of the @healthcare/ui component library, designed specifically for the Unified Health Platform. All components follow accessibility best practices and are built with healthcare workflows in mind.
 
 [1.0.0]: https://github.com/healthcare/ui/releases/tag/v1.0.0

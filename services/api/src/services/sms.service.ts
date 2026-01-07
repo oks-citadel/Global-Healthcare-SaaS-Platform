@@ -7,8 +7,8 @@ import { logger } from '../utils/logger.js';
  * High-level SMS service with message templates
  */
 
-const APP_URL = process.env.APP_URL || 'https://unifiedhealth.com';
-const APP_NAME = process.env.APP_NAME || 'UnifiedHealth';
+const APP_URL = process.env.APP_URL || 'https://theunifiedhealth.com';
+const APP_NAME = process.env.APP_NAME || 'Unified Health';
 
 /**
  * Send appointment reminder SMS

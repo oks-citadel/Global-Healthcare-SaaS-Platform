@@ -1,6 +1,6 @@
 # Prisma Setup Summary
 
-This document provides a summary of all Prisma-related files created for the Unified Healthcare Platform API service.
+This document provides a summary of all Prisma-related files created for the Unified Health Platform API service.
 
 ## Files Created
 
@@ -157,10 +157,10 @@ After running the seed script, use these credentials:
 
 | Role     | Email                         | Password     | Description          |
 | -------- | ----------------------------- | ------------ | -------------------- |
-| Admin    | admin@unifiedhealth.com       | Admin123!    | System administrator |
-| Provider | dr.smith@unifiedhealth.com    | Provider123! | Cardiologist         |
-| Provider | dr.johnson@unifiedhealth.com  | Provider123! | Pediatrician         |
-| Provider | dr.williams@unifiedhealth.com | Provider123! | Dermatologist        |
+| Admin    | admin@theunifiedhealth.com       | Admin123!    | System administrator |
+| Provider | dr.smith@theunifiedhealth.com    | Provider123! | Cardiologist         |
+| Provider | dr.johnson@theunifiedhealth.com  | Provider123! | Pediatrician         |
+| Provider | dr.williams@theunifiedhealth.com | Provider123! | Dermatologist        |
 | Patient  | john.doe@example.com          | Patient123!  | Patient with MRN     |
 | Patient  | jane.smith@example.com        | Patient123!  | Patient with MRN     |
 | ...      | (8 more patients)             | Patient123!  | See users.json       |
@@ -352,4 +352,4 @@ For issues or questions:
 
 **Created:** December 17, 2024
 **Author:** Claude (Anthropic)
-**Project:** Unified Healthcare Platform
+**Project:** Unified Health Platform
