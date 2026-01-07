@@ -31,6 +31,7 @@ ARG SERVICE_PATH
 COPY --from=deps /app ./
 
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV CI=true
 
 # Build shared packages
 RUN pnpm -r --filter "./packages/*" build || true

@@ -69,6 +69,7 @@ WORKDIR /app/apps/web
 
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
+ENV CI=true
 
 ARG BUILD_DATE
 ARG VERSION
@@ -100,6 +101,7 @@ WORKDIR /app
 RUN addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001 -G nodejs
 
 ENV NODE_ENV=production
+ENV CI=true
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
