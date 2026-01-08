@@ -84,7 +84,7 @@ describe("MfaUtils", () => {
       // Email is URL-encoded in OTP auth URLs (@ becomes %40)
       expect(url).toContain(encodeURIComponent(email));
       expect(url).toContain(secret);
-      expect(url).toContain("issuer=Unified Health Test");
+      expect(url).toContain("issuer=Unified%20Health%20Test");
     });
 
     it("should URL encode email with special characters", () => {
