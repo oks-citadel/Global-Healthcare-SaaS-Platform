@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
+import winston from 'winston';
 import visitsRouter from './routes/visits';
 import caregiversRouter from './routes/caregivers';
 import schedulingRouter from './routes/scheduling';
@@ -11,6 +12,22 @@ import documentationRouter from './routes/documentation';
 import { extractUser } from './middleware/extractUser';
 
 dotenv.config();
+
+const logger = winston.createLogger({
+  level: process.env.LOG_LEVEL || 'info',
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.json()
+  ),
+  transports: [
+    new winston.transports.Console({
+      format: winston.format.combine(
+        winston.format.colorize(),
+        winston.format.simple()
+      )
+    })
+  ]
+});
 
 const app: express.Application = express();
 const PORT = process.env.PORT || 3010;
@@ -35,14 +52,25 @@ const locationLimiter: RequestHandler = rateLimit({
 }) as unknown as RequestHandler;
 
 app.use(helmet());
-app.use(cors({ origin: process.env.CORS_ORIGIN || '*', credentials: true }));
+app.use(cors({
+  origin: function (origin, callback) {
+    const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:3000').split(',');
+    // Allow requests with no origin (same-origin, mobile apps, curl)
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+}));
 app.use(limiter);
 app.use(express.json({ limit: '10mb' })); // Larger limit for photos/signatures
 app.use(express.urlencoded({ extended: true }));
 app.use(extractUser);
 
 // Health check endpoint
-app.get('/health', (req, res) => {
+app.get('/health', (_req, res) => {
   res.json({
     status: 'healthy',
     service: 'home-health-service',
@@ -53,7 +81,7 @@ app.get('/health', (req, res) => {
 });
 
 // Readiness check (for Kubernetes)
-app.get('/ready', (req, res) => {
+app.get('/ready', (_req, res) => {
   // Add database connectivity check here in production
   res.json({
     status: 'ready',
@@ -82,8 +110,8 @@ app.use((req, res) => {
 });
 
 // Error handler
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error('Error:', err);
+app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  logger.error('Error:', err);
   res.status(err.status || 500).json({
     error: err.name || 'Internal Server Error',
     message: err.message || 'An unexpected error occurred',
@@ -92,14 +120,14 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 });
 
 app.listen(PORT, () => {
-  console.log(`Home Health Service running on port ${PORT}`);
-  console.log(`Health check available at http://localhost:${PORT}/health`);
-  console.log(`API endpoints:`);
-  console.log(`  - /visits       - Visit management`);
-  console.log(`  - /caregivers   - Caregiver management`);
-  console.log(`  - /scheduling   - Schedule and route optimization`);
-  console.log(`  - /evv          - Electronic Visit Verification`);
-  console.log(`  - /documentation - Visit documentation`);
+  logger.info(`Home Health Service running on port ${PORT}`);
+  logger.info(`Health check available at http://localhost:${PORT}/health`);
+  logger.info(`API endpoints:`);
+  logger.info(`  - /visits       - Visit management`);
+  logger.info(`  - /caregivers   - Caregiver management`);
+  logger.info(`  - /scheduling   - Schedule and route optimization`);
+  logger.info(`  - /evv          - Electronic Visit Verification`);
+  logger.info(`  - /documentation - Visit documentation`);
 });
 
 export default app;

@@ -130,7 +130,7 @@ export class AlertService {
     }
 
     const value = vitalReading.value;
-    let alertsCreated = [];
+    const alertsCreated = [];
 
     for (const threshold of thresholds) {
       let severity: AlertSeverity | null = null;

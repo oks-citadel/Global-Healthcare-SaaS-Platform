@@ -26,8 +26,8 @@ const nextConfig = {
     // SECURITY: Strict CSP for public-facing kiosk terminals
     const cspHeader = [
       "default-src 'self'",
-      // Scripts: Allow self and Next.js inline scripts (required for hydration)
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+      // Scripts: 'unsafe-inline' is required for Next.js hydration scripts
+      "script-src 'self' 'unsafe-inline'",
       // Styles: Allow self and inline styles (required for CSS-in-JS)
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       // Images: Allow self and data URIs only (strict for kiosk)

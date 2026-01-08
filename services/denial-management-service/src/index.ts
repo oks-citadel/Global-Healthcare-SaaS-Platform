@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
+import winston from 'winston';
 import { PrismaClient } from './generated/client';
 import denialsRouter from './routes/denials';
 import appealsRouter from './routes/appeals';
@@ -10,6 +11,22 @@ import analyticsRouter from './routes/analytics';
 import { extractUser } from './middleware/extractUser';
 
 dotenv.config();
+
+const logger = winston.createLogger({
+  level: process.env.LOG_LEVEL || 'info',
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.json()
+  ),
+  transports: [
+    new winston.transports.Console({
+      format: winston.format.combine(
+        winston.format.colorize(),
+        winston.format.simple()
+      )
+    })
+  ]
+});
 
 const app: express.Application = express();
 const PORT = process.env.PORT || 3010;
@@ -43,7 +60,15 @@ const aiLimiter: RequestHandler = rateLimit({
 // Middleware
 app.use(helmet());
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || '*',
+  origin: function (origin, callback) {
+    const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:3000').split(',');
+    // Allow requests with no origin (same-origin, mobile apps, curl)
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
 }));
 app.use(limiter);
@@ -52,7 +77,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(extractUser);
 
 // Health check endpoint
-app.get('/health', async (req, res) => {
+app.get('/health', async (_req, res) => {
   try {
     // Check database connectivity
     await prisma.$queryRaw`SELECT 1`;
@@ -73,7 +98,7 @@ app.get('/health', async (req, res) => {
 });
 
 // Readiness check endpoint
-app.get('/ready', async (req, res) => {
+app.get('/ready', async (_req, res) => {
   try {
     await prisma.$queryRaw`SELECT 1`;
     res.json({
@@ -100,7 +125,7 @@ app.use('/denials/predict-risk', aiLimiter);
 app.use('/appeals/generate', aiLimiter);
 
 // API documentation endpoint
-app.get('/docs', (req, res) => {
+app.get('/docs', (_req, res) => {
   res.json({
     service: 'Denial Management Service',
     version: '1.0.0',
@@ -164,8 +189,8 @@ app.use((req, res) => {
 });
 
 // Error handler
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error('Error:', err);
+app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  logger.error('Error:', err);
 
   // Handle Prisma errors
   if (err.code?.startsWith('P')) {
@@ -185,22 +210,22 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 
 // Graceful shutdown
 process.on('SIGTERM', async () => {
-  console.log('SIGTERM signal received: closing HTTP server');
+  logger.info('SIGTERM signal received: closing HTTP server');
   await prisma.$disconnect();
   process.exit(0);
 });
 
 process.on('SIGINT', async () => {
-  console.log('SIGINT signal received: closing HTTP server');
+  logger.info('SIGINT signal received: closing HTTP server');
   await prisma.$disconnect();
   process.exit(0);
 });
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`Denial Management Service running on port ${PORT}`);
-  console.log(`Health check available at http://localhost:${PORT}/health`);
-  console.log(`API documentation at http://localhost:${PORT}/docs`);
+  logger.info(`Denial Management Service running on port ${PORT}`);
+  logger.info(`Health check available at http://localhost:${PORT}/health`);
+  logger.info(`API documentation at http://localhost:${PORT}/docs`);
 });
 
 export default app;

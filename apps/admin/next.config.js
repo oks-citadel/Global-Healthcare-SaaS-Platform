@@ -15,7 +15,9 @@ const nextConfig = {
 
   experimental: {
     serverActions: {
-      allowedOrigins: ["localhost:3001"],
+      allowedOrigins: process.env.NODE_ENV === 'production' 
+        ? [process.env.ALLOWED_ORIGIN || 'admin.theunifiedhealth.com']
+        : ['localhost:3001', 'localhost:3000'],
     },
   },
   env: {
@@ -26,8 +28,9 @@ const nextConfig = {
     // SECURITY: Prevents XSS, clickjacking, and data injection attacks
     const cspHeader = [
       "default-src 'self'",
-      // Scripts: Allow self and Next.js inline scripts (required for hydration)
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+      // Scripts: Allow self and Next.js inline scripts
+      // SECURITY: 'unsafe-inline' required for Next.js hydration; 'unsafe-eval' removed to prevent eval-based XSS attacks
+      "script-src 'self' 'unsafe-inline'",
       // Styles: Allow self and inline styles (required for CSS-in-JS)
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       // Images: Allow self, data URIs, and CDN

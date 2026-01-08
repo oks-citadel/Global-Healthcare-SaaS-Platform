@@ -7,9 +7,9 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.js"
     },
     "./styles": "./dist/styles.css"
   },
@@ -31,13 +31,15 @@
     "react-day-picker": "^9.12.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.0.0",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
+    "autoprefixer": "^10.4.0",
+    "eslint": "^9.39.2",
+    "postcss": "^8.4.0",
     "tsup": "^8.0.0",
     "typescript": "^5.3.0",
-    "eslint": "^9.39.2",
-    "autoprefixer": "^10.4.0",
-    "postcss": "^8.4.0"
+    "typescript-eslint": "^8.0.0"
   },
   "keywords": [
     "react",

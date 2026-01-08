@@ -72,7 +72,7 @@ router.get('/', requireUser, async (req: UserRequest, res) => {
     const userRole = req.user!.role;
     const userId = req.user!.id;
 
-    let where: any = {};
+    const where: any = {};
 
     // Role-based filtering
     if (userRole === 'patient') {

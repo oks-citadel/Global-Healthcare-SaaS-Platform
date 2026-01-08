@@ -57,7 +57,7 @@ const nextConfig = {
   },
 
   // Transpile workspace packages for Turbopack compatibility
-  transpilePackages: ['@unified-health/sdk'],
+  transpilePackages: ['@unified-health/sdk', '@unified-health/i18n'],
 
   // Experimental features for performance
   experimental: {
@@ -81,8 +81,9 @@ const nextConfig = {
     // SECURITY: Prevents XSS, clickjacking, and data injection attacks
     const cspHeader = [
       "default-src 'self'",
-      // Scripts: Allow self and Next.js inline scripts (required for hydration)
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com",
+      // Scripts: Allow self and Next.js inline scripts
+      // SECURITY: 'unsafe-inline' required for Next.js hydration; 'unsafe-eval' removed to prevent eval-based XSS attacks
+      "script-src 'self' 'unsafe-inline' https://js.stripe.com",
       // Styles: Allow self and inline styles (required for CSS-in-JS)
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       // Images: Allow self, data URIs, and CDN

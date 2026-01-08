@@ -221,14 +221,16 @@ export class GoalService {
     const targetValue = goal.targetValue;
 
     switch (goal.goalType) {
-      case 'weight_loss':
+      case 'weight_loss': {
         const weightLoss = startValue - currentValue;
         const targetLoss = startValue - targetValue;
         return Math.min(100, Math.max(0, (weightLoss / targetLoss) * 100));
-      default:
+      }
+      default: {
         const progress = currentValue - startValue;
         const target = targetValue - startValue;
         return Math.min(100, Math.max(0, (progress / target) * 100));
+      }
     }
   }
 

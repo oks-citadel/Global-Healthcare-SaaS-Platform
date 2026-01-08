@@ -47,7 +47,7 @@ export class X12TransactionService {
     const lines = rawContent.trim().split(this.segmentDelimiter).filter(Boolean);
     const segments: X12Segment[] = [];
 
-    let envelope: Partial<X12Envelope> = {};
+    const envelope: Partial<X12Envelope> = {};
     let transactionType = '';
 
     for (const line of lines) {

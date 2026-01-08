@@ -7,7 +7,7 @@ import * as crypto from 'crypto';
 import type { CipherGCM, DecipherGCM } from 'crypto';
 
 export class FieldEncryption {
-  private algorithm: 'aes-256-gcm' = 'aes-256-gcm';
+  private algorithm = 'aes-256-gcm' as const;
   private keyLength = 32; // 256 bits
   private ivLength = 16; // 128 bits
   private tagLength = 16;
