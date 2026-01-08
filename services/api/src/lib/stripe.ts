@@ -2,18 +2,40 @@
 import Stripe from 'stripe';
 import { logger } from '../utils/logger.js';
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('STRIPE_SECRET_KEY is not defined in environment variables');
+// Lazy initialization to allow tests to run without STRIPE_SECRET_KEY
+let _stripe: Stripe | null = null;
+
+function getStripeClient(): Stripe {
+  if (!_stripe) {
+    const secretKey = process.env.STRIPE_SECRET_KEY;
+    if (!secretKey) {
+      throw new Error('STRIPE_SECRET_KEY is not defined in environment variables');
+    }
+    _stripe = new Stripe(secretKey, {
+      apiVersion: '2023-10-16',
+      typescript: true,
+      appInfo: {
+        name: 'Unified Health Platform',
+        version: '1.0.0',
+      },
+    });
+  }
+  return _stripe;
 }
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2023-10-16',
-  typescript: true,
-  appInfo: {
-    name: 'Unified Health Platform',
-    version: '1.0.0',
-  },
-});
+// Export a getter that lazily initializes stripe
+export const stripe = {
+  get customers() { return getStripeClient().customers; },
+  get subscriptions() { return getStripeClient().subscriptions; },
+  get invoices() { return getStripeClient().invoices; },
+  get paymentMethods() { return getStripeClient().paymentMethods; },
+  get paymentIntents() { return getStripeClient().paymentIntents; },
+  get setupIntents() { return getStripeClient().setupIntents; },
+  get prices() { return getStripeClient().prices; },
+  get refunds() { return getStripeClient().refunds; },
+  get charges() { return getStripeClient().charges; },
+  get webhooks() { return getStripeClient().webhooks; },
+};
 
 /**
  * Helper function to create a Stripe customer

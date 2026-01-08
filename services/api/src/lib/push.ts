@@ -144,19 +144,25 @@ class PushNotificationService {
 
       // Load Web Push configuration
       if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
-        this.webPushConfig = {
-          vapidPublicKey: process.env.VAPID_PUBLIC_KEY,
-          vapidPrivateKey: process.env.VAPID_PRIVATE_KEY,
-          subject: process.env.VAPID_SUBJECT || 'mailto:support@theunifiedhealth.com',
-        };
+        try {
+          this.webPushConfig = {
+            vapidPublicKey: process.env.VAPID_PUBLIC_KEY,
+            vapidPrivateKey: process.env.VAPID_PRIVATE_KEY,
+            subject: process.env.VAPID_SUBJECT || 'mailto:support@theunifiedhealth.com',
+          };
 
-        // Set VAPID details for web-push
-        webpush.setVapidDetails(
-          this.webPushConfig.subject,
-          this.webPushConfig.vapidPublicKey,
-          this.webPushConfig.vapidPrivateKey
-        );
-        logger.info('Web Push VAPID details configured');
+          // Set VAPID details for web-push
+          webpush.setVapidDetails(
+            this.webPushConfig.subject,
+            this.webPushConfig.vapidPublicKey,
+            this.webPushConfig.vapidPrivateKey
+          );
+          logger.info('Web Push VAPID details configured');
+        } catch (vapidError) {
+          // Invalid VAPID keys - skip web push configuration
+          logger.warn('Invalid VAPID keys provided, Web Push disabled', { error: vapidError });
+          this.webPushConfig = undefined;
+        }
       }
 
       this.initialized = true;
