@@ -1491,3 +1491,87 @@ resource "aws_xray_sampling_rule" "main" {
 
   attributes = {}
 }
+
+# ============================================
+# AI Security Module
+# Comprehensive AI security controls following:
+# - NIST AI RMF
+# - ISO/IEC 42001
+# - OWASP Top 10 for LLM Applications
+# - MITRE ATLAS
+# - EU AI Act
+# - HIPAA/GDPR/CCPA/PIPEDA
+# ============================================
+
+module "ai_security" {
+  source = "../terraform-aws/modules/ai-security"
+
+  project_name = var.project_name
+  environment  = var.environment
+
+  # Alerting
+  ai_security_email = var.alert_email_address
+
+  # Rate limiting (requests per 5 minutes per IP)
+  ai_api_rate_limit = var.environment == "prod" ? 500 : 1000
+
+  # Cost threshold for denial-of-wallet detection (USD/hour)
+  ai_cost_threshold = var.environment == "prod" ? 200 : 50
+
+  # Enable multi-region for production
+  enable_multi_region = var.environment == "prod"
+
+  # AI Model Types for individual kill switches
+  ai_model_types = [
+    "documentation",
+    "coding",
+    "triage",
+    "medication-safety",
+    "patient-messaging"
+  ]
+
+  # Compliance frameworks
+  compliance_frameworks = [
+    "NIST-AI-RMF",
+    "ISO-42001",
+    "OWASP-LLM",
+    "MITRE-ATLAS",
+    "EU-AI-ACT",
+    "HIPAA",
+    "GDPR",
+    "CCPA",
+    "PIPEDA"
+  ]
+
+  # Data retention (7 years for HIPAA)
+  data_retention_days      = 2555
+  audit_log_retention_days = 2555
+
+  # AI Governance
+  enable_ethics_review    = true
+  enable_risk_assessment  = true
+  model_approval_required = var.environment == "prod"
+
+  # Security Detection
+  enable_prompt_injection_detection = true
+  enable_hallucination_detection    = true
+  enable_toxicity_detection         = true
+  enable_bias_detection             = true
+  enable_pii_detection              = true
+  enable_jailbreak_detection        = true
+
+  # Model Security
+  enable_model_versioning = true
+  enable_model_rollback   = true
+  model_drift_threshold   = 0.15
+
+  # Incident Response
+  enable_kill_switch             = true
+  auto_kill_switch_on_critical   = var.environment == "prod"
+  incident_response_sla_minutes  = 15
+
+  tags = merge(local.common_tags, {
+    Module     = "ai-security"
+    Compliance = "NIST-AI-RMF,ISO-42001,OWASP-LLM,HIPAA,GDPR"
+  })
+}

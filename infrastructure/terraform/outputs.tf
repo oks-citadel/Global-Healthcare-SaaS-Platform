@@ -311,3 +311,52 @@ output "deployment_summary" {
     ecr_registry          = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.aws_region}.amazonaws.com"
   }
 }
+
+# ============================================
+# AI Security Module Outputs
+# ============================================
+
+output "ai_security_kms_key_arn" {
+  description = "AI Security KMS key ARN"
+  value       = module.ai_security.kms_key_arn
+}
+
+output "ai_model_registry_table" {
+  description = "AI Model Registry DynamoDB table name"
+  value       = module.ai_security.model_registry_table_name
+}
+
+output "ai_audit_logs_bucket" {
+  description = "AI Audit Logs S3 bucket name"
+  value       = module.ai_security.audit_logs_bucket_name
+}
+
+output "ai_security_alerts_topic_arn" {
+  description = "AI Security Alerts SNS topic ARN"
+  value       = module.ai_security.security_alerts_topic_arn
+}
+
+output "ai_kill_switch_parameter" {
+  description = "AI Kill Switch SSM parameter name"
+  value       = module.ai_security.kill_switch_parameter_name
+}
+
+output "ai_waf_web_acl_arn" {
+  description = "AI API Protection WAF Web ACL ARN"
+  value       = module.ai_security.waf_web_acl_arn
+}
+
+output "ai_prompt_scanner_function_arn" {
+  description = "Prompt Security Scanner Lambda function ARN"
+  value       = module.ai_security.prompt_scanner_function_arn
+}
+
+output "ai_output_validator_function_arn" {
+  description = "Output Safety Validator Lambda function ARN"
+  value       = module.ai_security.output_validator_function_arn
+}
+
+output "ai_compliance_summary" {
+  description = "AI Security Compliance Summary"
+  value       = module.ai_security.compliance_summary
+}
