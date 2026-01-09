@@ -825,10 +825,7 @@ jobs:
           - name: vendor-risk-service
             context: ./services/vendor-risk-service
             dockerfile: ./services/vendor-risk-service/Dockerfile
-          # Mobile App
-          - name: mobile
-            context: ./apps/mobile
-            dockerfile: ./apps/mobile/Dockerfile
+          # Note: Mobile app (React Native) doesn't have a Dockerfile - runs on iOS/Android
 
     steps:
       - name: Checkout repository
@@ -895,7 +892,6 @@ jobs:
           - home-health-service
           - denial-management-service
           - vendor-risk-service
-          - mobile
 
     steps:
       - name: Configure AWS Credentials
