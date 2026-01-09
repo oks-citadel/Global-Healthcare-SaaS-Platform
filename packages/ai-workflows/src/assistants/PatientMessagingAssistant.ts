@@ -121,7 +121,7 @@ export class PatientMessagingAssistant {
    */
   adjustTone(
     originalDraft: string,
-    targetTone: 'professional' | 'empathetic' | 'educational'
+    _targetTone: 'professional' | 'empathetic' | 'educational'
   ): string {
     // This would call the AI model to adjust tone
     // Placeholder implementation
@@ -205,7 +205,7 @@ export class PatientMessagingAssistant {
 export class MockPatientMessagingModel implements PatientMessagingModel {
   async draftResponse(
     input: PatientMessageInput,
-    context: Record<string, any>
+    _context: Record<string, any>
   ): Promise<{
     draftResponse: string;
     tone: 'professional' | 'empathetic' | 'educational';
@@ -283,7 +283,7 @@ export class MockPatientMessagingModel implements PatientMessagingModel {
     return `${greeting}\n\n${body}\n\n${closing}`;
   }
 
-  private generateUrgentDraft(input: PatientMessageInput): string {
+  private generateUrgentDraft(_input: PatientMessageInput): string {
     return [
       'Dear Patient,',
       '',
@@ -304,7 +304,7 @@ export class MockPatientMessagingModel implements PatientMessagingModel {
     ].join('\n');
   }
 
-  private getGreeting(input: PatientMessageInput): string {
+  private getGreeting(_input: PatientMessageInput): string {
     return 'Dear Patient,\n\nThank you for your message.';
   }
 

@@ -7,7 +7,6 @@ import {
   WorkflowDefinition,
   WorkflowTriggerType,
   AssistantType,
-  StepStatus,
 } from '../types';
 
 export class WorkflowDefinitionBuilder {

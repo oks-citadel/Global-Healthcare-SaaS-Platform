@@ -30,7 +30,7 @@ export class ConsentChecker {
   async checkConsent(
     patientId: string,
     organizationId: string,
-    assistantType?: AssistantType
+    _assistantType?: AssistantType
   ): Promise<ConsentCheckResult> {
     const consent = await this.repository.getConsent(patientId, organizationId);
 

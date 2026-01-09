@@ -222,7 +222,7 @@ export class TriageAssistant {
 export class MockTriageModel implements TriageModel {
   async assessPriority(
     input: TriageInput,
-    context: Record<string, any>
+    _context: Record<string, any>
   ): Promise<{
     priority: TriagePriority;
     estimatedWaitTime?: number;

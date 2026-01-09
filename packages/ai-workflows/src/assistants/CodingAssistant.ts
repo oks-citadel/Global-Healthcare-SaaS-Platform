@@ -122,8 +122,8 @@ export class CodingAssistant {
    * Search for codes by description
    */
   async searchCodes(
-    query: string,
-    codeType: 'icd' | 'cpt' | 'both' = 'both'
+    _query: string,
+    _codeType: 'icd' | 'cpt' | 'both' = 'both'
   ): Promise<Array<{
     code: string;
     description: string;
@@ -137,7 +137,7 @@ export class CodingAssistant {
   /**
    * Get code details
    */
-  async getCodeDetails(code: string, codeType: 'icd' | 'cpt'): Promise<{
+  async getCodeDetails(_code: string, _codeType: 'icd' | 'cpt'): Promise<{
     code: string;
     description: string;
     category: string;
@@ -200,7 +200,7 @@ export class CodingAssistant {
 export class MockCodingModel implements CodingModel {
   async suggestCodes(
     input: CodingInput,
-    context: Record<string, any>
+    _context: Record<string, any>
   ): Promise<{
     icdCodes: Array<{
       code: string;

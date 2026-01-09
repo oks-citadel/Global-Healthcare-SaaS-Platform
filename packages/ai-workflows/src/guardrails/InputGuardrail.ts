@@ -250,7 +250,7 @@ export class InputGuardrail {
   /**
    * Sanitize input by removing/redacting sensitive content
    */
-  async sanitize(input: any, assistantType: AssistantType): Promise<any> {
+  async sanitize(input: any, _assistantType: AssistantType): Promise<any> {
     let sanitized = JSON.parse(JSON.stringify(input)); // Deep clone
 
     // Apply PHI minimization if enabled

@@ -263,7 +263,7 @@ export class MockMedicationSafetyModel implements MedicationSafetyModel {
 
   async checkSafety(
     input: MedicationSafetyInput,
-    context: Record<string, any>
+    _context: Record<string, any>
   ): Promise<{
     interactions: Array<{
       severity: InteractionSeverity;

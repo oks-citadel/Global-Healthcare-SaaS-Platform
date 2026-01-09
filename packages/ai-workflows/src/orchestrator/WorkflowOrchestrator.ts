@@ -320,7 +320,7 @@ export class WorkflowOrchestrator {
    * Handle step failure with retry logic
    */
   private async handleStepFailure(
-    execution: WorkflowExecution,
+    _execution: WorkflowExecution,
     step: WorkflowStep,
     error: any
   ): Promise<void> {

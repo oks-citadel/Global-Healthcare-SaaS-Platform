@@ -127,7 +127,7 @@ export class DocumentationAssistant {
   /**
    * Generate rationale for suggestions
    */
-  private generateRationale(input: DocumentationInput, soapNote: SOAPNote): string {
+  private generateRationale(input: DocumentationInput, _soapNote: SOAPNote): string {
     const parts: string[] = [];
 
     if (input.chiefComplaint) {
@@ -200,7 +200,7 @@ export class DocumentationAssistant {
 export class MockDocumentationModel implements DocumentationModel {
   async generateSOAPNote(
     input: DocumentationInput,
-    context: Record<string, any>
+    _context: Record<string, any>
   ): Promise<{
     soapNote: SOAPNote;
     confidence: number;
@@ -278,7 +278,7 @@ export class MockDocumentationModel implements DocumentationModel {
     return assessment;
   }
 
-  private generatePlan(input: DocumentationInput): string {
+  private generatePlan(_input: DocumentationInput): string {
     return [
       'Treatment Plan:',
       '1. [Diagnostic tests ordered]',

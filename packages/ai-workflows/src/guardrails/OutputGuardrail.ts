@@ -9,7 +9,6 @@ import {
   GuardrailError,
   AssistantType,
   AssistantResponse,
-  ConfidenceLevel,
 } from '../types';
 
 export interface OutputValidationRule {
