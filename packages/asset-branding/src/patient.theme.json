@@ -1,0 +1,135 @@
+{
+  "$schema": "./tokens.schema.json",
+  "name": "patient",
+  "description": "Patient-facing theme layer for The Unified Health platform",
+  "version": "1.0.0",
+  "extends": "base",
+  "overrides": {
+    "color": {
+      "primary": {
+        "description": "Calming, approachable blue for patient interfaces",
+        "50": "#f0f7ff",
+        "100": "#e0effe",
+        "200": "#b9dffc",
+        "300": "#7cc7fa",
+        "400": "#36aaf5",
+        "500": "#0c8ee6",
+        "600": "#0070c4",
+        "700": "#01599f",
+        "800": "#064b83",
+        "900": "#0b3f6d",
+        "950": "#072849"
+      },
+      "accent": {
+        "description": "Warm, supportive green for patient success states",
+        "base": "#22c55e",
+        "light": "#dcfce7",
+        "dark": "#15803d"
+      }
+    },
+    "typography": {
+      "scale": {
+        "description": "Slightly larger base font for patient readability",
+        "base": "1rem",
+        "min": "0.875rem"
+      }
+    },
+    "spacing": {
+      "description": "Generous spacing for reduced cognitive load",
+      "comfortable": {
+        "card-padding": "1.5rem",
+        "section-gap": "2rem",
+        "form-gap": "1.25rem"
+      }
+    }
+  },
+  "componentOverrides": {
+    "Button": {
+      "primary": {
+        "background": "var(--uh-clinical-blue-500)",
+        "hoverBackground": "var(--uh-clinical-blue-600)",
+        "text": "#ffffff",
+        "borderRadius": "var(--uh-radius-lg)",
+        "padding": "0.75rem 1.5rem",
+        "minHeight": "48px"
+      },
+      "secondary": {
+        "background": "transparent",
+        "border": "2px solid var(--uh-clinical-blue-500)",
+        "text": "var(--uh-clinical-blue-600)",
+        "borderRadius": "var(--uh-radius-lg)"
+      }
+    },
+    "Card": {
+      "background": "var(--uh-surface-card)",
+      "border": "1px solid var(--uh-border-default)",
+      "borderRadius": "var(--uh-radius-xl)",
+      "padding": "1.5rem",
+      "shadow": "var(--uh-shadow-sm)"
+    },
+    "Alert": {
+      "info": {
+        "background": "var(--uh-info-light)",
+        "border": "1px solid var(--uh-info-base)",
+        "text": "var(--uh-info-text)",
+        "icon": "info-circle"
+      },
+      "success": {
+        "background": "var(--uh-success-light)",
+        "border": "1px solid var(--uh-success-base)",
+        "text": "var(--uh-success-text)",
+        "icon": "check-circle"
+      },
+      "warning": {
+        "background": "var(--uh-warning-light)",
+        "border": "1px solid var(--uh-warning-base)",
+        "text": "var(--uh-warning-text)",
+        "icon": "exclamation-triangle"
+      },
+      "error": {
+        "background": "var(--uh-error-light)",
+        "border": "1px solid var(--uh-error-base)",
+        "text": "var(--uh-error-text)",
+        "icon": "x-circle"
+      }
+    },
+    "Form": {
+      "input": {
+        "height": "48px",
+        "borderRadius": "var(--uh-radius-md)",
+        "border": "1px solid var(--uh-border-default)",
+        "focusBorder": "2px solid var(--uh-clinical-blue-500)",
+        "padding": "0.75rem 1rem"
+      },
+      "label": {
+        "fontSize": "var(--uh-text-sm)",
+        "fontWeight": "var(--uh-font-medium)",
+        "marginBottom": "0.5rem"
+      },
+      "error": {
+        "color": "var(--uh-error-base)",
+        "fontSize": "var(--uh-text-sm)",
+        "marginTop": "0.375rem"
+      }
+    }
+  },
+  "uxGuidelines": {
+    "language": {
+      "tone": "Warm, supportive, clear",
+      "reading-level": "6th-8th grade",
+      "avoid": ["Medical jargon", "Technical terms", "Absolute statements"],
+      "prefer": ["Plain language", "Actionable guidance", "Empathetic phrasing"]
+    },
+    "interactions": {
+      "confirmations": "Always confirm destructive actions",
+      "progress": "Show clear progress indicators for multi-step flows",
+      "errors": "Provide specific, actionable error messages",
+      "success": "Celebrate completed actions with subtle feedback"
+    },
+    "accessibility": {
+      "minimum-touch-target": "48px",
+      "focus-visible": "Always show focus indicators",
+      "color-contrast": "WCAG AA minimum, AAA preferred"
+    }
+  }
+}
