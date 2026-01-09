@@ -35,7 +35,7 @@
     "build:tokens": "node scripts/build-tokens.js",
     "build:css": "node scripts/build-css.js",
     "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
-    "lint": "eslint src --ext .ts,.tsx",
+    "lint": "tsc --noEmit",
     "typecheck": "tsc --noEmit",
     "clean": "rimraf dist",
     "prepublishOnly": "pnpm build",

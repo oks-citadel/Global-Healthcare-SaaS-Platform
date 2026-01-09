@@ -482,7 +482,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run Semgrep
-        uses: returntocorp/semgrep-action@v2
+        uses: semgrep/semgrep-action@v1
         with:
           config: >-
             p/security-audit
@@ -557,7 +557,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run Trivy IaC scanner
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@0.30.0
         with:
           scan-type: "config"
           scan-ref: "./infrastructure"
@@ -899,7 +899,7 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@0.30.0
         with:
           image-ref: "${{ secrets.ECR_REGISTRY }}/unified-health-prod/${{ matrix.service }}:latest"
           format: "sarif"
