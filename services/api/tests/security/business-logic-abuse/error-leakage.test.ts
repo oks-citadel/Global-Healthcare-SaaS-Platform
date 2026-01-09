@@ -14,8 +14,7 @@ import jwt from "jsonwebtoken";
 import { routes } from "../../../src/routes/index.js";
 import { errorHandler } from "../../../src/middleware/error.middleware.js";
 
-const TEST_JWT_SECRET = "test-secret-key-for-security-tests-only-32chars";
-
+// Define secret as a literal inside mock to avoid hoisting issues
 vi.mock("../../../src/lib/prisma.js", () => ({
   prisma: {
     user: {
@@ -36,10 +35,15 @@ vi.mock("../../../src/lib/prisma.js", () => ({
 vi.mock("../../../src/config/index.js", () => ({
   config: {
     jwt: {
-      secret: TEST_JWT_SECRET,
+      secret: "test-secret-key-for-security-tests-only-32chars",
+    },
+    logging: {
+      level: "error",
     },
   },
 }));
+
+const TEST_JWT_SECRET = "test-secret-key-for-security-tests-only-32chars";
 
 describe("Error Leakage Prevention Tests", () => {
   let app: Express;
@@ -63,6 +67,8 @@ describe("Error Leakage Prevention Tests", () => {
     process.env.NODE_ENV = "production";
 
     app = express();
+    // Disable X-Powered-By header (security best practice)
+    app.disable("x-powered-by");
     app.use(express.json());
     app.use("/api/v1", routes);
     app.use(errorHandler);

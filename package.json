@@ -46,7 +46,7 @@
     "sbom:generate:all": "bash scripts/generate-sbom.sh"
   },
   "devDependencies": {
-    "@cyclonedx/cyclonedx-npm": "^1.19.0",
+    "@cyclonedx/cyclonedx-npm": "^4.1.2",
     "@commitlint/cli": "^18.4.3",
     "@commitlint/config-conventional": "^18.4.3",
     "husky": "^8.0.3",

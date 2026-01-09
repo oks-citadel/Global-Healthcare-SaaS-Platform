@@ -84,8 +84,8 @@ cache:
   # Cache directory
   dir: .trivy-cache
 
-  # Clear cache before scanning
-  clear: false
+  # Note: cache clearing is now done via 'trivy clean --scan-cache'
+  # The 'clear' option was removed in newer Trivy versions
 
 # Timeout settings
 timeout: 5m0s
