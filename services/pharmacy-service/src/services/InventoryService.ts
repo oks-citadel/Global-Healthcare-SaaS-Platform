@@ -324,8 +324,8 @@ export class InventoryService {
    * Release reserved inventory
    */
   async releaseReservedInventory(
-    medicationId: string,
-    pharmacyId: string,
+    _medicationId: string,
+    _pharmacyId: string,
     quantity: number
   ) {
     // Simplified release - no reservation tracking in current schema

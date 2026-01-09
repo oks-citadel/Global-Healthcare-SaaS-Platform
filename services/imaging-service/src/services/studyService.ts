@@ -1,5 +1,4 @@
 import { PrismaClient } from '../generated/client';
-import { v4 as uuidv4 } from 'uuid';
 import { CreateStudyDTO, UpdateStudyDTO, StudyFilters } from '../types';
 import logger from '../utils/logger';
 import { AppError } from '../utils/errorHandler';

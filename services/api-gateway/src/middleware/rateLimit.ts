@@ -1,4 +1,4 @@
-import rateLimit, { RateLimitRequestHandler } from 'express-rate-limit';
+import rateLimit from 'express-rate-limit';
 import { RequestHandler } from 'express';
 import Redis from 'ioredis';
 
@@ -12,8 +12,8 @@ const redisClient = new Redis({
   },
 });
 
-// Store for rate limiting
-class RedisStore {
+// Store for rate limiting (exported for distributed rate limiting scenarios)
+export class RedisStore {
   private client: Redis;
   private prefix: string;
 

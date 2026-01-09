@@ -308,7 +308,7 @@ router.get('/non-compliant', requireUser, requireSupervisor, async (req: UserReq
 });
 
 // EVV compliance dashboard
-router.get('/dashboard', requireUser, requireSupervisor, async (req: UserRequest, res) => {
+router.get('/dashboard', requireUser, requireSupervisor, async (_req: UserRequest, res) => {
   try {
     const today = new Date();
     today.setHours(0, 0, 0, 0);

@@ -96,7 +96,7 @@ app.listen(PORT, () => {
   logger.info(`API Gateway running on port ${PORT}`);
   logger.info(`Health check available at http://localhost:${PORT}/health`);
   logger.info('\nRegistered services:');
-  Object.entries(services).forEach(([key, config]) => {
+  Object.entries(services).forEach(([_key, config]) => {
     logger.info(`  - ${config.name}: ${config.url}`);
   });
 });

@@ -21,7 +21,7 @@ export class PDMPService {
   /**
    * Check PDMP (Prescription Drug Monitoring Program) for controlled substances
    */
-  async checkPDMP(patientId: string, schedule?: string): Promise<PDMPCheckResult> {
+  async checkPDMP(patientId: string, _schedule?: string): Promise<PDMPCheckResult> {
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 

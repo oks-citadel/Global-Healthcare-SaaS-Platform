@@ -4,7 +4,7 @@ import { CreateStudyDTO, UpdateStudyDTO, StudyFilters } from '../types';
 import { asyncHandler } from '../utils/errorHandler';
 
 export const createStudy = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const studyData: CreateStudyDTO = req.body;
     const study = await studyService.createStudy(studyData);
 
@@ -16,7 +16,7 @@ export const createStudy = asyncHandler(
 );
 
 export const getStudies = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const filters: StudyFilters = {
       page: parseInt(req.query.page as string) || 1,
       limit: parseInt(req.query.limit as string) || 10,
@@ -38,7 +38,7 @@ export const getStudies = asyncHandler(
 );
 
 export const getStudyById = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const { id } = req.params;
     const study = await studyService.getStudyById(id);
 
@@ -50,7 +50,7 @@ export const getStudyById = asyncHandler(
 );
 
 export const updateStudy = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const { id } = req.params;
     const updateData: UpdateStudyDTO = req.body;
     const study = await studyService.updateStudy(id, updateData);
@@ -63,7 +63,7 @@ export const updateStudy = asyncHandler(
 );
 
 export const updateStudyStatus = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const { id } = req.params;
     const { status } = req.body;
     const study = await studyService.updateStudyStatus(id, status);
@@ -76,7 +76,7 @@ export const updateStudyStatus = asyncHandler(
 );
 
 export const getStudyByAccessionNumber = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const { accessionNumber } = req.params;
     const study = await studyService.getStudyByAccessionNumber(accessionNumber);
 

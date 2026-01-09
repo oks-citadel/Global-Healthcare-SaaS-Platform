@@ -146,10 +146,6 @@ export class DispenseService {
 
     // 11. Create controlled substance log if applicable
     if (medication.isControlled && medication.schedule) {
-      const pharmacy = await prisma.pharmacy.findUnique({
-        where: { id: request.pharmacyId },
-      });
-
       controlledSubstanceLog = await (prisma.controlledSubstanceLog.create as any)({
         data: {
           patientId: request.patientId,

@@ -3,16 +3,14 @@ import { PrismaClient } from '../generated/client';
 import { z } from 'zod';
 import { UserRequest, requireUser } from '../middleware/extractUser';
 import { OrderService } from '../services/OrderService';
-import { ReportService } from '../services/ReportService';
-import { FHIRConverter } from '../utils/fhir';
-import { HL7Generator } from '../utils/hl7';
+import { FHIRConverter as _FHIRConverter } from '../utils/fhir';
+import { HL7Generator as _HL7Generator } from '../utils/hl7';
 import { createOrderSchema, updateOrderSchema, filterOrdersSchema } from '../utils/validators';
 import logger from '../utils/logger';
 
 const router: ReturnType<typeof Router> = Router();
 const prisma = new PrismaClient();
 const orderService = new OrderService(prisma);
-const reportService = new ReportService(prisma);
 
 // GET /lab-orders - List orders with filters
 router.get('/', requireUser, async (req: UserRequest, res: Response): Promise<void> => {

@@ -4,7 +4,7 @@ import { CreateImageDTO } from '../types';
 import { asyncHandler } from '../utils/errorHandler';
 
 export const createImage = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const imageData: CreateImageDTO = req.body;
     const image = await imageService.createImage(imageData);
 
@@ -16,7 +16,7 @@ export const createImage = asyncHandler(
 );
 
 export const getImagesByStudy = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const { id } = req.params;
     const images = await imageService.getImagesByStudy(id);
 
@@ -28,7 +28,7 @@ export const getImagesByStudy = asyncHandler(
 );
 
 export const getImageById = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const { id } = req.params;
     const image = await imageService.getImageById(id);
 
@@ -40,7 +40,7 @@ export const getImageById = asyncHandler(
 );
 
 export const getImagesBySeries = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const { id, seriesUID } = req.params;
     const images = await imageService.getImagesBySeries(id, seriesUID);
 
@@ -52,7 +52,7 @@ export const getImagesBySeries = asyncHandler(
 );
 
 export const getImageUrl = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const { id } = req.params;
     const expiresInMinutes = parseInt(req.query.expires as string) || 60;
     const url = await imageService.getImageUrl(id, expiresInMinutes);
@@ -65,7 +65,7 @@ export const getImageUrl = asyncHandler(
 );
 
 export const updateImageMetadata = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const { id } = req.params;
     const { metadata } = req.body;
     const image = await imageService.updateImageMetadata(id, metadata);
@@ -78,7 +78,7 @@ export const updateImageMetadata = asyncHandler(
 );
 
 export const deleteImage = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const { id } = req.params;
     await imageService.deleteImage(id);
 

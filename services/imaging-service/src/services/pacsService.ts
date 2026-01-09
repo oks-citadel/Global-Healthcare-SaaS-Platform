@@ -3,7 +3,6 @@ import logger from '../utils/logger';
 import { AppError } from '../utils/errorHandler';
 import * as net from 'net';
 import * as fs from 'fs';
-import * as path from 'path';
 
 const prisma = new PrismaClient();
 
@@ -45,15 +44,6 @@ interface DicomStudyResult {
   numberOfInstances: number;
   referringPhysician?: string;
   institutionName?: string;
-}
-
-interface DicomSeriesResult {
-  seriesInstanceUID: string;
-  seriesNumber: number;
-  seriesDescription?: string;
-  modality: string;
-  numberOfInstances: number;
-  bodyPartExamined?: string;
 }
 
 interface WorklistItem {
@@ -266,7 +256,7 @@ class PACSService {
   /**
    * Build A-ASSOCIATE-RQ PDU for DICOM association
    */
-  private buildAssociateRqPdu(abstractSyntaxUid: string): Buffer {
+  private buildAssociateRqPdu(_abstractSyntaxUid: string): Buffer {
     // Simplified A-ASSOCIATE-RQ PDU builder
     // In production, use a full DICOM library like dcmjs-dimse
     const pdu = Buffer.alloc(256);
@@ -769,7 +759,7 @@ class PACSService {
   /**
    * Extract SOP Instance UID and SOP Class UID from DICOM data
    */
-  private extractSopInfo(data: Buffer): { sopInstanceUID: string; sopClassUID: string } {
+  private extractSopInfo(_data: Buffer): { sopInstanceUID: string; sopClassUID: string } {
     // Simplified extraction - in production use dcmjs or dicom-parser
     // Default to CT Image Storage SOP Class
     return {
@@ -782,7 +772,7 @@ class PACSService {
    * Perform C-STORE to external PACS
    */
   private async performCStore(
-    dicomData: Buffer,
+    _dicomData: Buffer,
     sopInfo: { sopInstanceUID: string; sopClassUID: string }
   ): Promise<boolean> {
     // In production, implement full C-STORE with proper DIMSE messaging

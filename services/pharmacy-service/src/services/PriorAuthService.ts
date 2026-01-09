@@ -106,7 +106,7 @@ export class PriorAuthService {
    */
   async denyPriorAuth(
     id: string,
-    data: {
+    _data: {
       denialReason: string;
       reviewerNotes?: string;
     }
@@ -127,7 +127,7 @@ export class PriorAuthService {
    */
   async appealPriorAuth(
     id: string,
-    appealNotes: string
+    _appealNotes: string
   ) {
     const priorAuth = await prisma.priorAuthorization.findUnique({
       where: { id },

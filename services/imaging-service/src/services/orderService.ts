@@ -1,5 +1,4 @@
 import { PrismaClient } from '../generated/client';
-import { v4 as uuidv4 } from 'uuid';
 import { CreateImagingOrderDTO, UpdateImagingOrderDTO, ImagingOrderFilters } from '../types';
 import logger from '../utils/logger';
 import { AppError } from '../utils/errorHandler';

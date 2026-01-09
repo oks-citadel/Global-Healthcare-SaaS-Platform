@@ -36,7 +36,7 @@ router.get('/', async (req: Request, res: Response): Promise<void> => {
 });
 
 // GET /test-catalog/statistics - Get catalog statistics
-router.get('/statistics', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
+router.get('/statistics', requireUser, async (_req: UserRequest, res: Response): Promise<void> => {
   try {
     const stats = await testCatalogService.getTestStatistics();
     res.json({ data: stats });

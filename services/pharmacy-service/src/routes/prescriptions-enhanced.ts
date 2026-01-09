@@ -189,7 +189,7 @@ router.post('/:id/refill', requireUser, async (req: UserRequest, res) => {
 
 router.get('/:id/refills-remaining', requireUser, async (req: UserRequest, res) => {
   try {
-    const { id } = req.params;
+    const { id: _id } = req.params;
     const { itemId } = req.query;
 
     if (!itemId) {

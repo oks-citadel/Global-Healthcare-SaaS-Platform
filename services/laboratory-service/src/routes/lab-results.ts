@@ -23,14 +23,6 @@ router.get('/', requireUser, async (req: UserRequest, res: Response): Promise<vo
       return;
     }
 
-    const filters = {
-      startDate: req.query.startDate ? new Date(req.query.startDate as string) : undefined,
-      endDate: req.query.endDate ? new Date(req.query.endDate as string) : undefined,
-      category: req.query.category as string,
-      limit: req.query.limit ? Number(req.query.limit) : 50,
-      offset: req.query.offset ? Number(req.query.offset) : 0,
-    };
-
     // This endpoint would need to be implemented in ResultsService
     res.json({
       data: [],
@@ -96,8 +88,6 @@ router.get('/test/:testId', requireUser, async (req: UserRequest, res: Response)
 router.get('/order/:orderId', requireUser, async (req: UserRequest, res: Response): Promise<void> => {
   try {
     const { orderId } = req.params;
-    const userId = req.user!.id;
-    const userRole = req.user!.role;
 
     const results = await resultsService.getResultsByOrder(orderId);
 

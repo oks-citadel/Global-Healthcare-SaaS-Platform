@@ -4,7 +4,7 @@ import { CreateCriticalFindingDTO, UpdateCriticalFindingDTO } from '../types';
 import { asyncHandler } from '../utils/errorHandler';
 
 export const createCriticalFinding = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const findingData: CreateCriticalFindingDTO = req.body;
     const finding = await criticalFindingService.createCriticalFinding(findingData);
 
@@ -16,7 +16,7 @@ export const createCriticalFinding = asyncHandler(
 );
 
 export const getCriticalFindingById = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const { id } = req.params;
     const finding = await criticalFindingService.getCriticalFindingById(id);
 
@@ -28,7 +28,7 @@ export const getCriticalFindingById = asyncHandler(
 );
 
 export const getCriticalFindingsByStudy = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const { studyId } = req.params;
     const findings = await criticalFindingService.getCriticalFindingsByStudy(studyId);
 
@@ -40,7 +40,7 @@ export const getCriticalFindingsByStudy = asyncHandler(
 );
 
 export const updateCriticalFinding = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const { id } = req.params;
     const updateData: UpdateCriticalFindingDTO = req.body;
     const finding = await criticalFindingService.updateCriticalFinding(id, updateData);
@@ -53,7 +53,7 @@ export const updateCriticalFinding = asyncHandler(
 );
 
 export const acknowledgeCriticalFinding = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const { id } = req.params;
     const { acknowledgedBy } = req.body;
     const finding = await criticalFindingService.acknowledgeCriticalFinding(id, acknowledgedBy);
@@ -66,7 +66,7 @@ export const acknowledgeCriticalFinding = asyncHandler(
 );
 
 export const getPendingCriticalFindings = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
 
@@ -80,7 +80,7 @@ export const getPendingCriticalFindings = asyncHandler(
 );
 
 export const getCriticalFindingsBySeverity = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const { severity } = req.params;
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;

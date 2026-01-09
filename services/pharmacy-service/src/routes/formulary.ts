@@ -316,7 +316,7 @@ router.get('/controlled-substances', requireUser, async (req: UserRequest, res: 
  * GET /formulary/therapeutic-classes
  * Get list of therapeutic classes
  */
-router.get('/therapeutic-classes', requireUser, async (req: UserRequest, res: Response) => {
+router.get('/therapeutic-classes', requireUser, async (_req: UserRequest, res: Response) => {
   try {
     const medications = await (prisma.medication.findMany as any)({
       where: { isActive: true },

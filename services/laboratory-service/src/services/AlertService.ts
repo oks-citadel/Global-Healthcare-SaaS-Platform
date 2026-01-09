@@ -38,7 +38,6 @@ interface StoredAlert {
  * to the Prisma schema, update the implementation to use database persistence.
  */
 export class AlertService {
-  private prisma: PrismaClient;
   private notificationServiceUrl: string;
 
   /**
@@ -47,8 +46,7 @@ export class AlertService {
    */
   private alertStore: Map<string, StoredAlert> = new Map();
 
-  constructor(prisma: PrismaClient) {
-    this.prisma = prisma;
+  constructor(_prisma: PrismaClient) {
     this.notificationServiceUrl = process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:3002';
   }
 

@@ -116,7 +116,7 @@ export class RxNormUtil {
   /**
    * Get related RxNorm concepts (e.g., generic equivalents, brand names)
    */
-  static async getRelatedConcepts(rxcui: string): Promise<RxNormConcept[]> {
+  static async getRelatedConcepts(_rxcui: string): Promise<RxNormConcept[]> {
     // In production, this would call:
     // https://rxnav.nlm.nih.gov/REST/rxcui/{rxcui}/related.json?tty=SBD+SCD
 
@@ -127,7 +127,7 @@ export class RxNormUtil {
   /**
    * Get drug interactions from RxNorm
    */
-  static async getInteractions(rxcuiList: string[]): Promise<any[]> {
+  static async getInteractions(_rxcuiList: string[]): Promise<any[]> {
     // In production, this would call:
     // https://rxnav.nlm.nih.gov/REST/interaction/list.json?rxcuis={rxcuiList}
 

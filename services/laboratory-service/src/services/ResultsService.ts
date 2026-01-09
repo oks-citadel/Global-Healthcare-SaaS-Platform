@@ -1,7 +1,7 @@
-import { PrismaClient, LabResult } from '../generated/client';
+import { PrismaClient } from '../generated/client';
 import { CreateLabResultInput } from '../types';
 import logger from '../utils/logger';
-import { validateReferenceRange, validateCriticalValue } from '../utils/validators';
+import { validateReferenceRange } from '../utils/validators';
 
 export class ResultsService {
   private prisma: PrismaClient;

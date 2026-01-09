@@ -338,7 +338,7 @@ router.get('/unassigned', requireUser, requireSupervisor, async (req: UserReques
 });
 
 // Get scheduling dashboard data
-router.get('/dashboard', requireUser, requireSupervisor, async (req: UserRequest, res) => {
+router.get('/dashboard', requireUser, requireSupervisor, async (_req: UserRequest, res) => {
   try {
     const today = new Date();
     today.setHours(0, 0, 0, 0);

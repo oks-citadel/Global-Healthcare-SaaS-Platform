@@ -1,7 +1,7 @@
 import { Router, IRouter } from 'express';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { getServiceUrl } from '../config/services';
-import { authenticate, authorize } from '../middleware/auth';
+import { authenticate } from '../middleware/auth';
 
 const router: IRouter = Router();
 

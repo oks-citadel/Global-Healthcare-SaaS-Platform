@@ -74,8 +74,6 @@ const pharmacyConfigSchema = z.object({
 // Type Exports
 // ============================================================================
 
-type PharmacyConfigEnv = z.infer<typeof pharmacyConfigSchema>;
-
 export interface PharmacyConfig {
   env: 'development' | 'production' | 'test';
   port: number;

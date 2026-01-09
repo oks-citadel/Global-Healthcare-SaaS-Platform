@@ -4,7 +4,7 @@ import { CreateImagingOrderDTO, UpdateImagingOrderDTO, ImagingOrderFilters } fro
 import { asyncHandler } from '../utils/errorHandler';
 
 export const createOrder = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const orderData: CreateImagingOrderDTO = req.body;
     const order = await orderService.createOrder(orderData);
 
@@ -16,7 +16,7 @@ export const createOrder = asyncHandler(
 );
 
 export const getOrders = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const filters: ImagingOrderFilters = {
       page: parseInt(req.query.page as string) || 1,
       limit: parseInt(req.query.limit as string) || 10,
@@ -40,7 +40,7 @@ export const getOrders = asyncHandler(
 );
 
 export const getOrderById = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const { id } = req.params;
     const order = await orderService.getOrderById(id);
 
@@ -52,7 +52,7 @@ export const getOrderById = asyncHandler(
 );
 
 export const updateOrder = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const { id } = req.params;
     const updateData: UpdateImagingOrderDTO = req.body;
     const order = await orderService.updateOrder(id, updateData);
@@ -65,7 +65,7 @@ export const updateOrder = asyncHandler(
 );
 
 export const cancelOrder = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const { id } = req.params;
     const order = await orderService.cancelOrder(id);
 
@@ -77,7 +77,7 @@ export const cancelOrder = asyncHandler(
 );
 
 export const getOrdersByPatient = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const { patientId } = req.params;
     const orders = await orderService.getOrdersByPatient(patientId);
 

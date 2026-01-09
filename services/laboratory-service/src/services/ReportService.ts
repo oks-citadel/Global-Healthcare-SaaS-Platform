@@ -57,7 +57,7 @@ export class ReportService {
 
   private generateReportHTML(
     order: LabOrder & { tests: (LabTest & { results: LabResult[] })[] },
-    options?: PDFReportOptions
+    _options?: PDFReportOptions
   ): string {
     const reportDate = new Date().toLocaleDateString();
 
@@ -317,7 +317,7 @@ export class ReportService {
     return html;
   }
 
-  private async savePDFReport(orderId: string, htmlContent: string): Promise<string> {
+  private async savePDFReport(orderId: string, _htmlContent: string): Promise<string> {
     // In production, you would:
     // 1. Convert HTML to PDF using a library like puppeteer or pdfkit
     // 2. Upload to cloud storage (AWS S3)

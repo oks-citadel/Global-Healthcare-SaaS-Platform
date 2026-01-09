@@ -1,4 +1,4 @@
-import { PrismaClient, EVVRecordType, EVVVerificationMethod } from '../generated/client';
+import { PrismaClient, EVVVerificationMethod } from '../generated/client';
 
 const prisma = new PrismaClient();
 
@@ -35,14 +35,6 @@ export interface EVVComplianceReport {
 
 export class EVVService {
   private readonly DEFAULT_GEOFENCE_RADIUS = 100; // meters
-
-  // Convert meters to degrees (approximate)
-  private metersToDistance(meters: number, latitude: number): number {
-    // At the equator, 1 degree is about 111,320 meters
-    // This varies by latitude
-    const metersPerDegree = 111320 * Math.cos((latitude * Math.PI) / 180);
-    return meters / metersPerDegree;
-  }
 
   // Calculate distance between two points in meters
   private calculateDistanceMeters(point1: GeoLocation, point2: GeoLocation): number {
@@ -286,10 +278,8 @@ export class EVVService {
     // Check timing
     if (visit.actualStartTime && visit.actualEndTime) {
       const scheduledStart = new Date(`${visit.scheduledDate.toISOString().split('T')[0]}T${visit.scheduledStartTime}`);
-      const scheduledEnd = new Date(`${visit.scheduledDate.toISOString().split('T')[0]}T${visit.scheduledEndTime}`);
 
       const startDiff = Math.abs(visit.actualStartTime.getTime() - scheduledStart.getTime()) / 60000;
-      const endDiff = Math.abs(visit.actualEndTime.getTime() - scheduledEnd.getTime()) / 60000;
 
       if (startDiff > 30) {
         issues.push(`Visit started ${Math.round(startDiff)} minutes ${visit.actualStartTime > scheduledStart ? 'late' : 'early'}`);

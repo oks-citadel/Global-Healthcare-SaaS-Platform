@@ -20,7 +20,7 @@ const createPharmacySchema = z.object({
   operatingHours: z.record(z.any()).optional(),
 });
 
-router.get('/', async (req, res) => {
+router.get('/', async (_req, res) => {
   try {
     const pharmacies = await prisma.pharmacy.findMany({
       where: { isActive: true },

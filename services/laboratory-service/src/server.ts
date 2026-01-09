@@ -27,7 +27,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Request logging
-app.use((req, res, next) => {
+app.use((req, _res, next) => {
   logger.info('Incoming request', {
     method: req.method,
     path: req.path,
@@ -39,7 +39,7 @@ app.use((req, res, next) => {
 app.use(extractUser);
 
 // Health check
-app.get('/health', (req, res) => {
+app.get('/health', (_req, res) => {
   res.json({
     status: 'healthy',
     service: 'laboratory-service',
@@ -60,7 +60,7 @@ app.use('/orders', ordersRouter);
 app.use('/results', resultsRouter);
 
 // API documentation endpoint
-app.get('/api-docs', (req, res) => {
+app.get('/api-docs', (_req, res) => {
   res.json({
     service: 'laboratory-service',
     version: '1.0.0',
@@ -111,7 +111,7 @@ app.use((req, res) => {
 });
 
 // Error handler
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+app.use((err: any, req: express.Request, res: express.Response, _next: express.NextFunction) => {
   logger.error('Unhandled error', {
     error: err.message,
     stack: err.stack,

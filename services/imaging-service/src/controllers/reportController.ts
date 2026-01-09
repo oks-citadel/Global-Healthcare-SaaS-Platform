@@ -4,7 +4,7 @@ import { CreateRadiologyReportDTO, UpdateRadiologyReportDTO } from '../types';
 import { asyncHandler } from '../utils/errorHandler';
 
 export const createReport = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const reportData: CreateRadiologyReportDTO = req.body;
     const report = await reportService.createReport(reportData);
 
@@ -16,7 +16,7 @@ export const createReport = asyncHandler(
 );
 
 export const getReportById = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const { id } = req.params;
     const report = await reportService.getReportById(id);
 
@@ -28,7 +28,7 @@ export const getReportById = asyncHandler(
 );
 
 export const getReportsByStudy = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const { studyId } = req.params;
     const reports = await reportService.getReportByStudyId(studyId);
 
@@ -40,7 +40,7 @@ export const getReportsByStudy = asyncHandler(
 );
 
 export const updateReport = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const { id } = req.params;
     const updateData: UpdateRadiologyReportDTO = req.body;
     const report = await reportService.updateReport(id, updateData);
@@ -53,7 +53,7 @@ export const updateReport = asyncHandler(
 );
 
 export const signReport = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const { id } = req.params;
     const { signedBy } = req.body;
     const report = await reportService.signReport(id, signedBy);
@@ -66,7 +66,7 @@ export const signReport = asyncHandler(
 );
 
 export const amendReport = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const { id } = req.params;
     const { amendmentReason, ...updates } = req.body;
     const report = await reportService.amendReport(id, amendmentReason, updates);
@@ -79,7 +79,7 @@ export const amendReport = asyncHandler(
 );
 
 export const getReportsByRadiologist = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const { radiologistId } = req.params;
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
@@ -94,7 +94,7 @@ export const getReportsByRadiologist = asyncHandler(
 );
 
 export const deleteReport = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const { id } = req.params;
     await reportService.deleteReport(id);
 

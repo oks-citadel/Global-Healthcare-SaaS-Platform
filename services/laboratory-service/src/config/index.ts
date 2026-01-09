@@ -66,8 +66,6 @@ const laboratoryConfigSchema = z.object({
 // Type Exports
 // ============================================================================
 
-type LaboratoryConfigEnv = z.infer<typeof laboratoryConfigSchema>;
-
 export interface LaboratoryConfig {
   env: 'development' | 'production' | 'test';
   port: number;

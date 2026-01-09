@@ -25,7 +25,7 @@ export interface AuthRequest extends Request {
  * Validates JWT token structure and signature
  * Logs audit trail for PHI access
  */
-export const authenticate = (req: AuthRequest, res: Response, next: NextFunction) => {
+export const authenticate = (req: AuthRequest, _res: Response, next: NextFunction) => {
   try {
     const authHeader = req.headers.authorization;
 
@@ -104,7 +104,7 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
  * Checks if user has one of the required roles
  */
 export const authorize = (...roles: string[]) => {
-  return (req: AuthRequest, res: Response, next: NextFunction) => {
+  return (req: AuthRequest, _res: Response, next: NextFunction) => {
     if (!req.user) {
       logger.warn('Authorization attempt without authenticated user', {
         ip: req.ip,
@@ -144,7 +144,7 @@ export const authorize = (...roles: string[]) => {
  * Checks if user has the required permission
  */
 export const requirePermission = (permission: string) => {
-  return (req: AuthRequest, res: Response, next: NextFunction) => {
+  return (req: AuthRequest, _res: Response, next: NextFunction) => {
     if (!req.user) {
       logger.warn('Permission check without authenticated user', {
         ip: req.ip,
@@ -185,7 +185,7 @@ export const requirePermission = (permission: string) => {
  * Ensures user can only access data from their assigned facilities
  */
 export const checkFacilityAccess = (getFacilityId: (req: AuthRequest) => string | undefined) => {
-  return (req: AuthRequest, res: Response, next: NextFunction) => {
+  return (req: AuthRequest, _res: Response, next: NextFunction) => {
     if (!req.user) {
       return next(new AppError('Authentication required', 401));
     }

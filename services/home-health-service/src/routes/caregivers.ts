@@ -281,7 +281,7 @@ router.put('/:id/schedule', requireUser, async (req: UserRequest, res) => {
     });
 
     // Create new schedules
-    const created = await prisma.caregiverSchedule.createMany({
+    await prisma.caregiverSchedule.createMany({
       data: validatedSchedules.map(s => ({
         caregiverId: req.params.id,
         dayOfWeek: s.dayOfWeek,
@@ -446,7 +446,7 @@ router.post('/mileage/:entryId/approve', requireUser, requireSupervisor, async (
 });
 
 // Get caregivers with expiring licenses
-router.get('/reports/expiring-licenses', requireUser, requireSupervisor, async (req: UserRequest, res) => {
+router.get('/reports/expiring-licenses', requireUser, requireSupervisor, async (_req: UserRequest, res) => {
   try {
     const thirtyDaysFromNow = new Date();
     thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
