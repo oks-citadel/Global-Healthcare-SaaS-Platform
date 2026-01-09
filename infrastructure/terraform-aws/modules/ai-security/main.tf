@@ -1538,7 +1538,7 @@ exports.handler = async (event) => {
   const sns = new SNSClient({});
 
   // Log incident
-  const incidentId = \`INC-\${Date.now()}-\${Math.random().toString(36).substr(2, 9)}\`;
+  const incidentId = \`INC-$${Date.now()}-$${Math.random().toString(36).substr(2, 9)}\`;
   await db.send(new PutItemCommand({
     TableName: process.env.INCIDENTS_TABLE,
     Item: {
@@ -1564,7 +1564,7 @@ exports.handler = async (event) => {
   // Send alert
   await sns.send(new PublishCommand({
     TopicArn: process.env.SNS_TOPIC_ARN,
-    Subject: \`[AI Security] \${severity.toUpperCase()} - \${incidentType}\`,
+    Subject: \`[AI Security] $${severity.toUpperCase()} - $${incidentType}\`,
     Message: JSON.stringify({ incidentId, severity, incidentType, modelId, details, timestamp: new Date().toISOString() })
   }));
 
