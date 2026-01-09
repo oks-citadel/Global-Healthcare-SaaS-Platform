@@ -888,7 +888,7 @@ jobs:
     # SECURITY NOTE: Scans images and uploads findings to GitHub Security tab
     # Non-blocking - findings should be reviewed and addressed separately
     needs: [setup, build-images]
-    if: needs.build-images.result == 'success' && secrets.AWS_ROLE_ARN != ''
+    if: needs.build-images.result == 'success'
     continue-on-error: true
 
     strategy:
@@ -956,12 +956,11 @@ jobs:
     name: Deploy to Dev
     runs-on: ubuntu-latest
     needs: [setup, build-images, terraform-plan]
-    # Only deploy if credentials are available and build succeeded
+    # Only deploy if build succeeded - credentials checked at step level
     if: |
       needs.setup.outputs.should_run_deploy == 'true' &&
       needs.setup.outputs.target_environment == 'dev' &&
-      needs.build-images.result == 'success' &&
-      secrets.AWS_ROLE_ARN_DEV != ''
+      needs.build-images.result == 'success'
     environment:
       name: dev
       url: https://dev.theunifiedhealth.com
@@ -1009,12 +1008,11 @@ jobs:
     name: Deploy to Staging
     runs-on: ubuntu-latest
     needs: [setup, build-images, terraform-plan]
-    # Only deploy if credentials are available and build succeeded
+    # Only deploy if build succeeded - credentials checked at step level
     if: |
       needs.setup.outputs.should_run_deploy == 'true' &&
       needs.setup.outputs.target_environment == 'staging' &&
-      needs.build-images.result == 'success' &&
-      secrets.AWS_ROLE_ARN_STAGING != ''
+      needs.build-images.result == 'success'
     environment:
       name: staging
       url: https://staging.theunifiedhealth.com
@@ -1062,13 +1060,12 @@ jobs:
     name: Deploy to Production
     runs-on: ubuntu-latest
     needs: [setup, build-images, terraform-plan]
-    # Only deploy if credentials are available and build succeeded
+    # Only deploy if build succeeded - credentials checked at step level
     if: |
       needs.setup.outputs.should_run_deploy == 'true' &&
       needs.setup.outputs.target_environment == 'production' &&
       needs.build-images.result == 'success' &&
-      github.event.inputs.dry_run != 'true' &&
-      secrets.AWS_ROLE_ARN_PROD != ''
+      github.event.inputs.dry_run != 'true'
     environment:
       name: production
       url: https://theunifiedhealth.com
