@@ -94,9 +94,9 @@ AZURE_KEY_VAULT_URL=https://<vault-name>.vault.azure.net/
 
 ```bash
 # Stripe (Payments)
-STRIPE_PUBLIC_KEY=pk_live_xxx
-STRIPE_SECRET_KEY=sk_live_xxx
-STRIPE_WEBHOOK_SECRET=whsec_xxx
+STRIPE_PUBLIC_KEY=<your-stripe-publishable-key>
+STRIPE_SECRET_KEY=<your-stripe-secret-key>
+STRIPE_WEBHOOK_SECRET=<your-stripe-webhook-secret>
 
 # AWS SES (Email)
 AWS_SES_REGION=us-east-1
@@ -108,7 +108,7 @@ AWS_SNS_REGION=us-east-1
 AWS_SNS_SMS_SENDER_ID=UHealth
 
 # OpenAI (AI Features)
-OPENAI_API_KEY=sk-xxx
+OPENAI_API_KEY=<your-openai-key>
 OPENAI_MODEL=gpt-4
 ```
 

@@ -94,9 +94,9 @@ JWT_REFRESH_SECRET=your-refresh-secret
 ENCRYPTION_KEY=your-encryption-key
 
 # External Services
-STRIPE_SECRET_KEY=sk_live_...
-TWILIO_ACCOUNT_SID=AC...
-SENDGRID_API_KEY=SG...
+STRIPE_SECRET_KEY=<your-stripe-secret-key>
+TWILIO_ACCOUNT_SID=<your-twilio-sid>
+SENDGRID_API_KEY=<your-sendgrid-key>
 ```
 
 ## Quick Deployment (Kubernetes)

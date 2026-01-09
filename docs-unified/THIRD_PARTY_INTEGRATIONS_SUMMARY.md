@@ -31,7 +31,7 @@ Copy the following to your `.env` file:
 # ===========================================
 # STRIPE CONFIGURATION
 # ===========================================
-STRIPE_SECRET_KEY=sk_test_xxxxxxxxxxxxxxxxxxxxx
+STRIPE_SECRET_KEY=<your-stripe-test-secret-key>
 STRIPE_PUBLISHABLE_KEY=pk_test_xxxxxxxxxxxxxxxxxxxxx
 STRIPE_WEBHOOK_SECRET=whsec_xxxxxxxxxxxxxxxxxxxxx
 

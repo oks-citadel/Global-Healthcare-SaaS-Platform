@@ -133,7 +133,7 @@ curl -X POST https://api.thetheunifiedhealth.com/api/v1/api-keys \
   "success": true,
   "data": {
     "id": "key_xyz789",
-    "key": "sk_live_abc123def456...",
+    "key": "<your-api-key>",
     "name": "Production Integration",
     "scopes": ["read:patients", "write:appointments"],
     "createdAt": "2025-12-17T10:00:00Z",
@@ -150,7 +150,7 @@ Include the API key in the X-API-Key header:
 
 ```bash
 curl -X GET https://api.thetheunifiedhealth.com/api/v1/patients \
-  -H "X-API-Key: sk_live_abc123def456..."
+  -H "X-API-Key: <your-api-key>"
 ```
 
 ### 3. OAuth 2.0 / OpenID Connect

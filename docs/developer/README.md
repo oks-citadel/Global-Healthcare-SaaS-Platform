@@ -51,10 +51,10 @@ JWT_SECRET="your-super-secret-jwt-key"
 JWT_REFRESH_SECRET="your-refresh-secret-key"
 
 # API Keys
-STRIPE_SECRET_KEY="sk_test_..."
-TWILIO_ACCOUNT_SID="AC..."
+STRIPE_SECRET_KEY="<your-stripe-secret-key>"
+TWILIO_ACCOUNT_SID="<your-twilio-sid>"
 TWILIO_AUTH_TOKEN="..."
-SENDGRID_API_KEY="SG..."
+SENDGRID_API_KEY="<your-sendgrid-key>"
 ```
 
 4. **Start Development Databases**

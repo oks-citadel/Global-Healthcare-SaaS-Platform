@@ -20,21 +20,21 @@ This checklist ensures proper configuration of Stripe for the Unified Healthcare
 - [ ] Obtain test mode API keys from Stripe Dashboard
   - Navigate to: Developers > API keys
   - Copy "Publishable key" (starts with `pk_test_`)
-  - Copy "Secret key" (starts with `sk_test_`)
+  - Copy "Secret key" (starts with sk_test_)
 
 ### Production
 - [ ] Obtain live mode API keys
   - Switch to "Live mode" in Stripe Dashboard
   - Navigate to: Developers > API keys
-  - Copy "Publishable key" (starts with `pk_live_`)
-  - Copy "Secret key" (starts with `sk_live_`)
+  - Copy "Publishable key" (starts with pk_live_)
+  - Copy "Secret key" (starts with sk_live_)
 
 ### Environment Variables
 Add to your `.env` file:
 
 ```bash
 # Stripe Configuration
-STRIPE_SECRET_KEY=sk_test_xxxxxxxxxxxxxxxxxxxxx
+STRIPE_SECRET_KEY=<your-stripe-test-secret-key>
 STRIPE_PUBLISHABLE_KEY=pk_test_xxxxxxxxxxxxxxxxxxxxx
 STRIPE_WEBHOOK_SECRET=whsec_xxxxxxxxxxxxxxxxxxxxx
 ```
