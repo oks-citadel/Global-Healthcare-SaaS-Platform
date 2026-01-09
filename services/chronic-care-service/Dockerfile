@@ -23,11 +23,11 @@ COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/src/generated ./dist/generated
 USER chroniccare
-EXPOSE 3003
-ENV PORT=3003
+EXPOSE 3008
+ENV PORT=3008
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=20s --retries=3 \
-  CMD curl -f http://localhost:3003/health || exit 1
+  CMD curl -f http://localhost:3008/health || exit 1
 
 ENTRYPOINT ["dumb-init", "--"]
 CMD ["node", "dist/index.js"]

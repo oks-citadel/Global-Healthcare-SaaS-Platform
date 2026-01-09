@@ -23,11 +23,11 @@ COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/src/generated ./dist/generated
 USER pophealth
-EXPOSE 3013
-ENV PORT=3013
+EXPOSE 3012
+ENV PORT=3012
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=20s --retries=3 \
-  CMD curl -f http://localhost:3013/health || exit 1
+  CMD curl -f http://localhost:3012/health || exit 1
 
 ENTRYPOINT ["dumb-init", "--"]
 CMD ["node", "dist/index.js"]

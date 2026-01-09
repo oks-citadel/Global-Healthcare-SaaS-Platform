@@ -23,11 +23,11 @@ COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/src/generated ./dist/generated
 USER interop
-EXPOSE 3020
-ENV PORT=3020
+EXPOSE 3015
+ENV PORT=3015
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=20s --retries=3 \
-  CMD curl -f http://localhost:3020/health || exit 1
+  CMD curl -f http://localhost:3015/health || exit 1
 
 ENTRYPOINT ["dumb-init", "--"]
 CMD ["node", "dist/index.js"]
