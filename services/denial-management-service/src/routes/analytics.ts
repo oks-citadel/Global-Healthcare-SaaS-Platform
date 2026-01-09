@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import { PrismaClient } from '../generated/client';
-import { z } from 'zod';
 import { UserRequest, requireUser, requireRole } from '../middleware/extractUser';
 import denialAnalyticsService from '../services/denial-analytics.service';
 import { subDays, startOfMonth, endOfMonth, subMonths } from 'date-fns';
@@ -9,7 +8,7 @@ const router: ReturnType<typeof Router> = Router();
 const prisma = new PrismaClient();
 
 // Get dashboard summary
-router.get('/dashboard', requireUser, async (req: UserRequest, res) => {
+router.get('/dashboard', requireUser, async (_req: UserRequest, res) => {
   try {
     const summary = await denialAnalyticsService.getDashboardSummary();
     res.json({ data: summary });
@@ -401,7 +400,7 @@ router.get('/procedures', requireUser, async (req: UserRequest, res) => {
 });
 
 // Get trending issues
-router.get('/trending', requireUser, async (req: UserRequest, res) => {
+router.get('/trending', requireUser, async (_req: UserRequest, res) => {
   try {
     const now = new Date();
     const thisMonth = startOfMonth(now);

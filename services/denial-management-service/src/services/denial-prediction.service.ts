@@ -24,7 +24,7 @@ interface ClaimData {
   serviceDate?: Date;
 }
 
-interface HistoricalDenialData {
+export interface HistoricalDenialData {
   payerId: string;
   procedureCode: string;
   carcCode: string;
@@ -194,7 +194,6 @@ export class DenialPredictionService {
     }
 
     // Procedures requiring modifiers
-    const modifierRequiredProcedures = ['59', '76', '77', '78', '79'];
     if (procedureCode.startsWith('9') && procedureModifiers.length === 0) {
       score += 15;
       issues.push('E/M code may require modifier for same-day procedures');
@@ -260,7 +259,7 @@ export class DenialPredictionService {
    * Analyze coding accuracy
    */
   private async analyzeCodingAccuracy(claimData: ClaimData): Promise<RiskFactor> {
-    const { procedureCode, diagnosisCodes, placeOfService } = claimData;
+    const { procedureCode, diagnosisCodes } = claimData;
     let score = 0;
     const issues: string[] = [];
 
@@ -406,7 +405,7 @@ export class DenialPredictionService {
   /**
    * Generate recommendations based on risk factors
    */
-  private generateRecommendations(riskFactors: RiskFactor[], claimData: ClaimData): string[] {
+  private generateRecommendations(riskFactors: RiskFactor[], _claimData: ClaimData): string[] {
     const recommendations: string[] = [];
 
     for (const factor of riskFactors) {
@@ -566,7 +565,7 @@ export class DenialPredictionService {
   /**
    * Get suggested actions for a denial category
    */
-  private getSuggestedActionsForCategory(category: string, carcCode: string): string[] {
+  private getSuggestedActionsForCategory(category: string, _carcCode: string): string[] {
     const actions: Record<string, string[]> = {
       prior_authorization: [
         'Obtain retroactive authorization if available',

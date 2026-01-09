@@ -368,7 +368,7 @@ export class DenialAnalyticsService {
   /**
    * Get suggested actions for pattern
    */
-  private getSuggestedActions(denialCategory: string, carcCode: string): string[] {
+  private getSuggestedActions(denialCategory: string, _carcCode: string): string[] {
     const actions: string[] = [];
 
     switch (denialCategory) {

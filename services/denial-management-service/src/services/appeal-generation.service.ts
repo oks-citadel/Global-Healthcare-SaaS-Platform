@@ -550,7 +550,7 @@ Enclosures: ${request.medicalRecords?.length || 0} document(s)
   /**
    * Get pitfalls to avoid
    */
-  private getPitfallsToAvoid(denialCategory: string): string[] {
+  private getPitfallsToAvoid(_denialCategory: string): string[] {
     return [
       'Missing filing deadline',
       'Incomplete documentation submission',
@@ -622,7 +622,7 @@ Enclosures: ${request.medicalRecords?.length || 0} document(s)
   /**
    * Get payer-specific requirements
    */
-  private getPayerRequirements(payerConfig: any | null, denialCategory: string): string[] {
+  private getPayerRequirements(payerConfig: any | null, _denialCategory: string): string[] {
     const requirements: string[] = [];
 
     if (payerConfig) {
