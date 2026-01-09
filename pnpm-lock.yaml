@@ -25,8 +25,8 @@ importers:
         specifier: ^18.4.3
         version: 18.6.3
       '@cyclonedx/cyclonedx-npm':
-        specifier: ^1.19.0
-        version: 1.20.0
+        specifier: ^4.1.2
+        version: 4.1.2
       husky:
         specifier: ^8.0.3
         version: 8.0.3
@@ -3467,13 +3467,30 @@ packages:
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
     engines: {node: '>=12'}
 
-  '@cyclonedx/cyclonedx-library@6.13.1':
-    resolution: {integrity: sha512-u7Q01G2PAci3Qh+cY/7ReA8g2qJLQOncLQdzzdvpII84h6UICqZZZ1N0y9PLTVhS2Ra4x3kl4xY5bnP+lmrw2Q==}
-    engines: {node: '>=14.0.0'}
+  '@cyclonedx/cyclonedx-library@9.4.1':
+    resolution: {integrity: sha512-fY/ZEFXEKM4X/eC2vClPrpucgb4IsyKYT1q9SBFx2+ySJ0jA2NELIf1va+8SDlcv6yUgwyLqtJ92g2KivQp3eA==}
+    engines: {node: '>=20.18.0'}
+    peerDependencies:
+      ajv: ^8.12.0
+      ajv-formats: ^3.0.1
+      ajv-formats-draft2019: ^1.6.1
+      libxmljs2: ^0.35||^0.37
+      xmlbuilder2: ^3.0.2||^4.0.0
+    peerDependenciesMeta:
+      ajv:
+        optional: true
+      ajv-formats:
+        optional: true
+      ajv-formats-draft2019:
+        optional: true
+      libxmljs2:
+        optional: true
+      xmlbuilder2:
+        optional: true
 
-  '@cyclonedx/cyclonedx-npm@1.20.0':
-    resolution: {integrity: sha512-0xr9v1PVJjP+UOZYQUZi9fOGx9qjSjHZb/vt9+BkmjROhkLTpEc5bLxXsrwD2xBbwUCLhqUZyuWpWCYgwbzoWw==}
-    engines: {node: '>=14', npm: 6 - 11}
+  '@cyclonedx/cyclonedx-npm@4.1.2':
+    resolution: {integrity: sha512-SYabtTOgXQeiwTDSnXVqwDEKmcyF7tcMdH62roCacxqfIey0HOxdh1L0JkjM45t6WO9Z8QnA/hQ8FQzLU03AMA==}
+    engines: {node: '>=20.18.0', npm: '>=9'}
     hasBin: true
 
   '@dabh/diagnostics@2.0.8':
@@ -7795,10 +7812,6 @@ packages:
   command-exists@1.2.9:
     resolution: {integrity: sha512-LTQ/SGc+s0Xc0Fu5WaKnR0YiygZkm9eKFvyS+fRsU7/ZWFF8ykFM6Pc9aCVf1+xasOOZpO3BAVgVrKvsqKHV7w==}
 
-  commander@10.0.1:
-    resolution: {integrity: sha512-y4Mg2tXshplEbSGzx7amzPwKKOCGuoSRP/CjEdwwk0FOGlUbq6lKuoyDZTNZkmxHdJtp54hdfY/JUrdL7Xfdug==}
-    engines: {node: '>=14'}
-
   commander@12.1.0:
     resolution: {integrity: sha512-Vw8qHK3bZM9y/P10u3Vib8o/DdkvA2OtPtZvD871QKjy74Wj1WSKFILMPRPSdUSx5RFK1arlJzEtA4PkFgnbuA==}
     engines: {node: '>=18'}
@@ -9427,6 +9440,10 @@ packages:
   hosted-git-info@7.0.2:
     resolution: {integrity: sha512-puUZAUKT5m8Zzvs72XWy3HtvVbTWljRE66cP60bxJzAqf2DgICo7lYTY2IHUmLnNpjYvw5bvmoHvPc0QO2a62w==}
     engines: {node: ^16.14.0 || >=18.0.0}
+
+  hosted-git-info@9.0.2:
+    resolution: {integrity: sha512-M422h7o/BR3rmCQ8UHi7cyyMqKltdP9Uo+J2fXK+RSAY+wTcKOIRyhTuKv4qn+DJf3g+PL890AzId5KZpX+CBg==}
+    engines: {node: ^20.17.0 || >=22.9.0}
 
   html-encoding-sniffer@3.0.0:
     resolution: {integrity: sha512-oWv4T4yJ52iKrufjnyZPkrN0CH3QnrUqdB6In1g5Fe1mia8GmF36gnfNySxoZtxD5+NmYw1EElVXiBk93UeskA==}
@@ -11355,6 +11372,10 @@ packages:
     resolution: {integrity: sha512-p2W1sgqij3zMMyRC067Dg16bfzVH+w7hyegmpIvZ4JNjqtGOVAIvLmjBx3yP7YTe9vKJgkoNOPjwQGogDoMXFA==}
     engines: {node: '>=10'}
 
+  normalize-package-data@8.0.0:
+    resolution: {integrity: sha512-RWk+PI433eESQ7ounYxIp67CYuVsS1uYSonX3kA6ps/3LWfjVQa/ptEg6Y3T6uAMq1mWpX9PQ+qx+QaHpsc7gQ==}
+    engines: {node: ^20.17.0 || >=22.9.0}
+
   normalize-path@3.0.0:
     resolution: {integrity: sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==}
     engines: {node: '>=0.10.0'}
@@ -11556,8 +11577,8 @@ packages:
   package-json-from-dist@1.0.1:
     resolution: {integrity: sha512-UEZIS3/by4OC8vL3P2dTXRETpebLI2NiI5vIrjaD/5UtrkFX/tNbwjTSRAGC/+7CAo2pIcBaRgWmcBBHcsaCIw==}
 
-  packageurl-js@1.2.1:
-    resolution: {integrity: sha512-cZ6/MzuXaoFd16/k0WnwtI298UCaDHe/XlSh85SeOKbGZ1hq0xvNbx3ILyCMyk7uFQxl6scF3Aucj6/EO9NwcA==}
+  packageurl-js@2.0.1:
+    resolution: {integrity: sha512-N5ixXjzTy4QDQH0Q9YFjqIWd6zH6936Djpl2m9QNFmDv5Fum8q8BjkpAcHNMzOFE0IwQrFhJWex3AN6kS0OSwg==}
 
   pako@1.0.11:
     resolution: {integrity: sha512-4hLB8Py4zZce5s4yd9XzopqwVv/yGNhV1Bl8NTmCq1763HeK2+EwVTv+leGeL13Dnh2wfbqowVPXCIO0z4taYw==}
@@ -15828,9 +15849,9 @@ snapshots:
     dependencies:
       '@jridgewell/trace-mapping': 0.3.9
 
-  '@cyclonedx/cyclonedx-library@6.13.1':
+  '@cyclonedx/cyclonedx-library@9.4.1(ajv-formats-draft2019@1.6.1(ajv@8.17.1))(ajv-formats@3.0.1(ajv@8.17.1))(ajv@8.17.1)(libxmljs2@0.35.0)(xmlbuilder2@3.1.1)':
     dependencies:
-      packageurl-js: 1.2.1
+      packageurl-js: 2.0.1
       spdx-expression-parse: 3.0.1
     optionalDependencies:
       ajv: 8.17.1
@@ -15838,15 +15859,18 @@ snapshots:
       ajv-formats-draft2019: 1.6.1(ajv@8.17.1)
       libxmljs2: 0.35.0
       xmlbuilder2: 3.1.1
-    transitivePeerDependencies:
-      - supports-color
 
-  '@cyclonedx/cyclonedx-npm@1.20.0':
+  '@cyclonedx/cyclonedx-npm@4.1.2':
     dependencies:
-      '@cyclonedx/cyclonedx-library': 6.13.1
-      commander: 10.0.1
-      normalize-package-data: 3.0.3
+      '@cyclonedx/cyclonedx-library': 9.4.1(ajv-formats-draft2019@1.6.1(ajv@8.17.1))(ajv-formats@3.0.1(ajv@8.17.1))(ajv@8.17.1)(libxmljs2@0.35.0)(xmlbuilder2@3.1.1)
+      commander: 14.0.2
+      normalize-package-data: 8.0.0
       xmlbuilder2: 3.1.1
+    optionalDependencies:
+      ajv: 8.17.1
+      ajv-formats: 3.0.1(ajv@8.17.1)
+      ajv-formats-draft2019: 1.6.1(ajv@8.17.1)
+      libxmljs2: 0.35.0
     transitivePeerDependencies:
       - supports-color
 
@@ -21505,8 +21529,6 @@ snapshots:
   command-exists@1.2.9:
     optional: true
 
-  commander@10.0.1: {}
-
   commander@12.1.0: {}
 
   commander@14.0.2: {}
@@ -23759,6 +23781,10 @@ snapshots:
   hosted-git-info@7.0.2:
     dependencies:
       lru-cache: 10.4.3
+
+  hosted-git-info@9.0.2:
+    dependencies:
+      lru-cache: 11.2.4
 
   html-encoding-sniffer@3.0.0:
     dependencies:
@@ -26408,6 +26434,12 @@ snapshots:
       semver: 7.7.3
       validate-npm-package-license: 3.0.4
 
+  normalize-package-data@8.0.0:
+    dependencies:
+      hosted-git-info: 9.0.2
+      semver: 7.7.3
+      validate-npm-package-license: 3.0.4
+
   normalize-path@3.0.0: {}
 
   notepack.io@3.0.1: {}
@@ -26650,7 +26682,7 @@ snapshots:
 
   package-json-from-dist@1.0.1: {}
 
-  packageurl-js@1.2.1: {}
+  packageurl-js@2.0.1: {}
 
   pako@1.0.11: {}
 
