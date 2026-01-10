@@ -21,6 +21,7 @@ export interface JwtPayload {
   userId: string;
   email: string;
   role: 'patient' | 'provider' | 'admin';
+  tenantId?: string; // Multi-tenant isolation
   iat?: number;
   exp?: number;
 }

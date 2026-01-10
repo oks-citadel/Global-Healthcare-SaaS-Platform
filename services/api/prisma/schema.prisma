@@ -27,6 +27,48 @@ datasource db {
 }
 
 // ==========================================
+// Multi-Tenant Support
+// SECURITY: All data queries MUST include tenantId scoping
+// ==========================================
+
+model Tenant {
+  id          String       @id @default(uuid())
+  name        String
+  slug        String       @unique // URL-friendly identifier
+  domain      String?      @unique // Optional custom domain
+  status      TenantStatus @default(active)
+  settings    Json?        // Tenant-specific configuration
+
+  // Billing
+  stripeCustomerId     String?  @unique
+  subscriptionTier     String   @default("free")
+  subscriptionStatus   String   @default("active")
+  subscriptionExpiresAt DateTime?
+
+  // Relations
+  users       User[]
+  patients    Patient[]
+  providers   Provider[]
+  appointments Appointment[]
+  encounters  Encounter[]
+  documents   Document[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+  @@index([status])
+  @@index([subscriptionTier, status])
+}
+
+enum TenantStatus {
+  active
+  suspended
+  pending
+  deleted
+}
+
+// ==========================================
 // User & Authentication
 // ==========================================
 
@@ -42,6 +84,10 @@ model User {
   status        UserStatus @default(active)
   emailVerified Boolean    @default(false)
 
+  // SECURITY: Multi-tenant isolation
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
   // Relations
   patient       Patient?
   provider      Provider?
@@ -51,11 +97,15 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@unique([email, tenantId]) // Email unique within tenant
   @@index([email])
   @@index([role])
   @@index([status])
   @@index([role, status])
   @@index([createdAt])
+  @@index([tenantId])
+  @@index([tenantId, role])
+  @@index([tenantId, status])
 }
 
 enum Role {
@@ -99,6 +149,10 @@ model Patient {
   bloodType           String?
   allergies           String[]
 
+  // SECURITY: Multi-tenant isolation
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
   // Emergency contact (JSON)
   emergencyContact Json?
 
@@ -113,6 +167,8 @@ model Patient {
 
   @@index([userId])
   @@index([medicalRecordNumber])
+  @@index([tenantId])
+  @@index([tenantId, medicalRecordNumber])
 }
 
 enum Gender {
@@ -135,6 +191,10 @@ model Provider {
   bio           String?
   available     Boolean  @default(true)
 
+  // SECURITY: Multi-tenant isolation
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
   // Relations
   appointments Appointment[]
   encounters   Encounter[]
@@ -146,6 +206,9 @@ model Provider {
   @@index([specialty])
   @@index([available])
   @@index([licenseNumber])
+  @@index([tenantId])
+  @@index([tenantId, specialty])
+  @@index([tenantId, available])
 }
 
 // ==========================================
@@ -165,6 +228,10 @@ model Appointment {
   reasonForVisit String?
   notes          String?
 
+  // SECURITY: Multi-tenant isolation
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
   // Relations
   visit     Visit?
   encounter Encounter?
@@ -178,6 +245,9 @@ model Appointment {
   @@index([status])
   @@index([patientId, scheduledAt])
   @@index([providerId, scheduledAt])
+  @@index([tenantId])
+  @@index([tenantId, scheduledAt])
+  @@index([tenantId, status])
 }
 
 enum AppointmentType {
@@ -254,6 +324,10 @@ model Encounter {
   startedAt     DateTime?
   endedAt       DateTime?
 
+  // SECURITY: Multi-tenant isolation
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
   // Relations
   notes ClinicalNote[]
 
@@ -265,6 +339,9 @@ model Encounter {
   @@index([status])
   @@index([patientId, createdAt])
   @@index([providerId, createdAt])
+  @@index([tenantId])
+  @@index([tenantId, patientId])
+  @@index([tenantId, providerId])
 }
 
 enum EncounterType {
@@ -308,6 +385,10 @@ model Document {
   uploadedBy  String
   version     Int          @default(1) // Document version number
 
+  // SECURITY: Multi-tenant isolation
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -317,6 +398,8 @@ model Document {
   @@index([uploadedBy])
   @@index([blobName])
   @@index([patientId, type])
+  @@index([tenantId])
+  @@index([tenantId, patientId])
 }
 
 enum DocumentType {

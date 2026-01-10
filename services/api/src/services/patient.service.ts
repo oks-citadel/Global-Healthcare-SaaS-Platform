@@ -2,6 +2,7 @@
 import { CreatePatientInput, UpdatePatientInput, PatientResponse } from '../dtos/patient.dto.js';
 import { NotFoundError, ConflictError } from '../utils/errors.js';
 import { prisma } from '../lib/prisma.js';
+import { logger } from '../utils/logger.js';
 
 function generateMRN(): string {
   return `MRN-${Date.now()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
@@ -97,6 +98,49 @@ export const patientService = {
       createdAt: patient.createdAt.toISOString(),
       updatedAt: patient.updatedAt.toISOString(),
     };
+  },
+
+  /**
+   * SECURITY: Check if a provider has a care relationship with the patient
+   * A provider can access patient data if they have:
+   * - An encounter with the patient
+   * - An appointment with the patient
+   *
+   * This prevents IDOR attacks where providers access arbitrary patient records
+   */
+  async hasProviderPatientRelationship(providerId: string, patientId: string): Promise<boolean> {
+    // Check for existing encounters between this provider and patient
+    const encounterCount = await prisma.encounter.count({
+      where: {
+        providerId,
+        patientId,
+      },
+    });
+
+    if (encounterCount > 0) {
+      return true;
+    }
+
+    // Check for existing appointments between this provider and patient
+    const appointmentCount = await prisma.appointment.count({
+      where: {
+        providerId,
+        patientId,
+      },
+    });
+
+    if (appointmentCount > 0) {
+      return true;
+    }
+
+    logger.debug('Provider-patient relationship check failed', {
+      providerId,
+      patientId,
+      hasEncounters: encounterCount > 0,
+      hasAppointments: appointmentCount > 0,
+    });
+
+    return false;
   },
 
   /**

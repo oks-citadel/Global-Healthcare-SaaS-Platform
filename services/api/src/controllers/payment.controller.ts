@@ -429,6 +429,11 @@ class PaymentController {
   /**
    * POST /payments/charge
    * Create a one-time charge with proper error handling and audit logging
+   *
+   * SECURITY: Server-side price validation
+   * - Admin users can specify any amount (for custom charges)
+   * - Regular users must provide referenceType/referenceId to look up price from DB
+   * - Client-provided amounts are ignored for non-admin users
    */
   async createCharge(req: AuthRequest, res: Response): Promise<void> {
     try {
@@ -440,9 +445,68 @@ class PaymentController {
       const validatedData = CreateChargeSchema.parse(req.body);
       const requestContext = getRequestContext(req);
 
+      // SECURITY FIX: Server-side price validation
+      let serverSideAmount: number;
+      let description = validatedData.description;
+
+      if (req.user.role === 'admin' && validatedData.amount) {
+        // Admin can specify custom amounts
+        serverSideAmount = validatedData.amount;
+        logger.info('Admin creating custom charge', {
+          userId: req.user.id,
+          amount: serverSideAmount,
+          referenceType: validatedData.referenceType,
+        });
+      } else if (validatedData.referenceType && validatedData.referenceId) {
+        // Look up price from database based on reference
+        const priceInfo = await paymentService.getPriceForReference(
+          validatedData.referenceType,
+          validatedData.referenceId
+        );
+
+        if (!priceInfo) {
+          res.status(400).json({
+            error: 'Invalid reference',
+            message: 'Could not find price for the specified reference',
+          });
+          return;
+        }
+
+        serverSideAmount = priceInfo.amount;
+        description = description || priceInfo.description;
+
+        // SECURITY: Log if client tried to specify a different amount
+        if (validatedData.amount && validatedData.amount !== serverSideAmount) {
+          logger.warn('Client attempted price manipulation', {
+            userId: req.user.id,
+            clientAmount: validatedData.amount,
+            serverAmount: serverSideAmount,
+            referenceType: validatedData.referenceType,
+            referenceId: validatedData.referenceId,
+            ipAddress: requestContext?.ipAddress,
+          });
+        }
+      } else {
+        // Non-admin without valid reference
+        logger.warn('Non-admin attempted charge without valid reference', {
+          userId: req.user.id,
+          role: req.user.role,
+          ipAddress: requestContext?.ipAddress,
+        });
+        res.status(400).json({
+          error: 'Invalid request',
+          message: 'Please provide a valid referenceType and referenceId',
+        });
+        return;
+      }
+
       const result = await paymentService.createCharge(
         req.user.id,
-        validatedData,
+        {
+          ...validatedData,
+          amount: serverSideAmount, // Always use server-side amount
+          description,
+        },
         requestContext
       );
 

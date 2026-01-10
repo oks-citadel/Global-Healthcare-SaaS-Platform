@@ -12,7 +12,9 @@ export const CreateAppointmentSchema = z.object({
   notes: z.string().optional(),
   // Billing options
   paymentMethodId: z.string().optional(), // Stripe payment method ID for paid appointments
-  skipPayment: z.boolean().optional(), // Skip payment for this appointment (admin/provider use)
+  // SECURITY: skipPayment is validated in controller - only admin/provider can use it
+  // Patients attempting to set this will have it stripped (see appointment.controller.ts)
+  skipPayment: z.boolean().optional(),
 });
 
 export const UpdateAppointmentSchema = z.object({

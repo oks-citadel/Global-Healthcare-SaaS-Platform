@@ -122,6 +122,21 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
+exports.Prisma.TenantScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  slug: 'slug',
+  domain: 'domain',
+  status: 'status',
+  settings: 'settings',
+  stripeCustomerId: 'stripeCustomerId',
+  subscriptionTier: 'subscriptionTier',
+  subscriptionStatus: 'subscriptionStatus',
+  subscriptionExpiresAt: 'subscriptionExpiresAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   email: 'email',
@@ -133,6 +148,7 @@ exports.Prisma.UserScalarFieldEnum = {
   role: 'role',
   status: 'status',
   emailVerified: 'emailVerified',
+  tenantId: 'tenantId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -153,6 +169,7 @@ exports.Prisma.PatientScalarFieldEnum = {
   gender: 'gender',
   bloodType: 'bloodType',
   allergies: 'allergies',
+  tenantId: 'tenantId',
   emergencyContact: 'emergencyContact',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -165,6 +182,7 @@ exports.Prisma.ProviderScalarFieldEnum = {
   specialty: 'specialty',
   bio: 'bio',
   available: 'available',
+  tenantId: 'tenantId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -179,6 +197,7 @@ exports.Prisma.AppointmentScalarFieldEnum = {
   status: 'status',
   reasonForVisit: 'reasonForVisit',
   notes: 'notes',
+  tenantId: 'tenantId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -212,6 +231,7 @@ exports.Prisma.EncounterScalarFieldEnum = {
   status: 'status',
   startedAt: 'startedAt',
   endedAt: 'endedAt',
+  tenantId: 'tenantId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -237,6 +257,7 @@ exports.Prisma.DocumentScalarFieldEnum = {
   description: 'description',
   uploadedBy: 'uploadedBy',
   version: 'version',
+  tenantId: 'tenantId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -546,16 +567,23 @@ exports.Prisma.QueryMode = {
   insensitive: 'insensitive'
 };
 
-exports.Prisma.NullsOrder = {
-  first: 'first',
-  last: 'last'
-};
-
 exports.Prisma.JsonNullValueFilter = {
   DbNull: Prisma.DbNull,
   JsonNull: Prisma.JsonNull,
   AnyNull: Prisma.AnyNull
 };
+
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
+};
+exports.TenantStatus = exports.$Enums.TenantStatus = {
+  active: 'active',
+  suspended: 'suspended',
+  pending: 'pending',
+  deleted: 'deleted'
+};
+
 exports.Role = exports.$Enums.Role = {
   patient: 'patient',
   provider: 'provider',
@@ -763,6 +791,7 @@ exports.BillingTransactionStatus = exports.$Enums.BillingTransactionStatus = {
 };
 
 exports.Prisma.ModelName = {
+  Tenant: 'Tenant',
   User: 'User',
   RefreshToken: 'RefreshToken',
   Patient: 'Patient',

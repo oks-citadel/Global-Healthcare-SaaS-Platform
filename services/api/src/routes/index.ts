@@ -18,6 +18,7 @@ import { pushController } from '../controllers/push.controller.js';
 import { dashboardController } from '../controllers/dashboard.controller.js';
 import { authenticate, authorize, requireSubscription, requireEmailVerified } from '../middleware/auth.middleware.js';
 import { stripeWebhookIdempotency, webhookIdempotency } from '../middleware/idempotency.middleware.js';
+import { authenticateService } from '../middleware/service-auth.middleware.js';
 import stripeWebhookRouter from './webhooks/stripe.js';
 import { premiumRoutes } from './premium.routes.js';
 import { postDischargeRoutes } from './post-discharge.routes.js';
@@ -150,8 +151,10 @@ router.use('/webhooks/stripe', stripeWebhookRouter);
 // ==========================================
 // Telehealth service billing webhook - receives billing events from telehealth service
 // Uses idempotency based on visitId header to prevent duplicate billing
+// SECURITY: Uses service authentication middleware for proper auth + logging
 router.post(
   '/billing/telehealth-visit',
+  authenticateService({ allowedServices: ['telehealth-service'] }),
   webhookIdempotency({
     source: 'telehealth',
     getEventId: (req) => req.body?.visitId || req.headers['x-visit-id'] as string || null,
@@ -160,15 +163,6 @@ router.post(
   }),
   async (req, res) => {
   try {
-    const serviceKey = req.headers['x-service-key'];
-    const expectedKey = process.env.SERVICE_API_KEY;
-
-    // Verify service-to-service authentication
-    if (!expectedKey || serviceKey !== expectedKey) {
-      res.status(401).json({ error: 'Unauthorized service request' });
-      return;
-    }
-
     const {
       visitId,
       appointmentId,
@@ -246,7 +240,8 @@ router.delete('/payments/payment-method/:id', authenticate, paymentController.re
 router.post('/payments/charge', authenticate, paymentController.createCharge);
 router.get('/payments/history', authenticate, paymentController.getPaymentHistory);
 router.get('/payments/:id', authenticate, paymentController.getPayment);
-router.post('/payments/:id/refund', authenticate, paymentController.refundPayment);
+// SECURITY FIX: Payment refunds require admin authorization
+router.post('/payments/:id/refund', authenticate, authorize('admin'), paymentController.refundPayment);
 router.get('/payments/invoices', authenticate, paymentController.getInvoices);
 router.post('/payments/webhook', stripeWebhookIdempotency(), paymentController.handleWebhook);
 

@@ -1,12 +1,54 @@
 import { Request, Response, NextFunction } from 'express';
 import { encounterService } from '../services/encounter.service.js';
 import { patientService } from '../services/patient.service.js';
+import { providerService } from '../services/provider.service.js';
 import {
   CreateEncounterSchema,
   UpdateEncounterSchema,
   AddClinicalNoteSchema
 } from '../dtos/encounter.dto.js';
 import { ForbiddenError, BadRequestError } from '../utils/errors.js';
+import { logger } from '../utils/logger.js';
+
+/**
+ * SECURITY: Helper to check if provider has access to encounter
+ * Providers can only access encounters where they are the assigned provider
+ */
+async function checkProviderEncounterAccess(
+  userId: string,
+  encounter: { providerId?: string | null },
+  action: string
+): Promise<void> {
+  // Get the provider record for this user
+  const provider = await providerService.getProviderByUserId(userId);
+
+  if (!provider) {
+    logger.warn('User attempted provider action without provider record', {
+      userId,
+      action,
+    });
+    throw new ForbiddenError('You do not have provider access');
+  }
+
+  // If encounter has no providerId, deny access
+  if (!encounter.providerId) {
+    logger.warn('Encounter has no assigned provider', {
+      userId,
+      action,
+    });
+    throw new ForbiddenError('Cannot access this encounter - no provider assigned');
+  }
+
+  if (provider.id !== encounter.providerId) {
+    logger.warn('Provider attempted to access another provider\'s encounter', {
+      userId,
+      providerId: provider.id,
+      encounterProviderId: encounter.providerId,
+      action,
+    });
+    throw new ForbiddenError('Cannot access this encounter - not your assigned patient');
+  }
+}
 
 export const encounterController = {
   /**
@@ -39,7 +81,7 @@ export const encounterController = {
       const { id } = req.params;
       const encounter = await encounterService.getEncounterById(id);
 
-      // Check access permissions
+      // Check access permissions based on role
       if (req.user?.role === 'patient') {
         // Patient can only view their own encounters
         const userPatient = await patientService.getPatientByUserId(req.user.userId);
@@ -47,10 +89,10 @@ export const encounterController = {
           throw new ForbiddenError('Cannot access this encounter');
         }
       } else if (req.user?.role === 'provider') {
-        // Provider can view encounters they are assigned to
-        // In a real system, we'd check if this provider is associated with this encounter
-        // For now, providers can view all encounters they are part of or all if admin-like access
+        // SECURITY FIX: Provider can ONLY view encounters where they are the assigned provider
+        await checkProviderEncounterAccess(req.user.userId, encounter, 'getEncounter');
       }
+      // Admin can view all encounters (implicit)
 
       res.json(encounter);
     } catch (error) {
@@ -106,6 +148,12 @@ export const encounterController = {
         throw new ForbiddenError('Patients cannot update encounters');
       }
 
+      // SECURITY FIX: Check provider has access to this encounter before update
+      if (req.user?.role === 'provider') {
+        const encounter = await encounterService.getEncounterById(id);
+        await checkProviderEncounterAccess(req.user.userId, encounter, 'updateEncounter');
+      }
+
       const encounter = await encounterService.updateEncounter(id, input);
       res.json(encounter);
     } catch (error) {
@@ -125,6 +173,12 @@ export const encounterController = {
 
       if (req.user?.role === 'patient') {
         throw new ForbiddenError('Patients cannot add clinical notes');
+      }
+
+      // SECURITY FIX: Check provider has access to this encounter before adding notes
+      if (req.user?.role === 'provider') {
+        const encounter = await encounterService.getEncounterById(id);
+        await checkProviderEncounterAccess(req.user.userId, encounter, 'addClinicalNote');
       }
 
       const note = await encounterService.addClinicalNote(id, input, req.user!.userId);
@@ -150,6 +204,9 @@ export const encounterController = {
         if (!userPatient || userPatient.id !== encounter.patientId) {
           throw new ForbiddenError('Cannot access notes for this encounter');
         }
+      } else if (req.user?.role === 'provider') {
+        // SECURITY FIX: Provider can only view notes for encounters they're assigned to
+        await checkProviderEncounterAccess(req.user.userId, encounter, 'getClinicalNotes');
       }
 
       const notes = await encounterService.getClinicalNotes(id);
@@ -171,6 +228,12 @@ export const encounterController = {
         throw new ForbiddenError('Patients cannot start encounters');
       }
 
+      // SECURITY FIX: Check provider has access to this encounter before starting
+      if (req.user?.role === 'provider') {
+        const existing = await encounterService.getEncounterById(id);
+        await checkProviderEncounterAccess(req.user.userId, existing, 'startEncounter');
+      }
+
       const encounter = await encounterService.startEncounter(id);
       res.json(encounter);
     } catch (error) {
@@ -188,6 +251,12 @@ export const encounterController = {
 
       if (req.user?.role === 'patient') {
         throw new ForbiddenError('Patients cannot end encounters');
+      }
+
+      // SECURITY FIX: Check provider has access to this encounter before ending
+      if (req.user?.role === 'provider') {
+        const existing = await encounterService.getEncounterById(id);
+        await checkProviderEncounterAccess(req.user.userId, existing, 'endEncounter');
       }
 
       const encounter = await encounterService.endEncounter(id);

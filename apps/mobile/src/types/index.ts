@@ -224,3 +224,6 @@ export interface ConnectionInfo {
   lastConnectedAt?: string;
   error?: string;
 }
+
+// Re-export all healthcare types
+export * from './healthcare';

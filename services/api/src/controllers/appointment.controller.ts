@@ -24,6 +24,18 @@ export const appointmentController = {
     try {
       const input = CreateAppointmentSchema.parse(req.body);
 
+      // SECURITY FIX: Only admins and providers can skip payment
+      // Patients must always go through the payment flow for paid appointments
+      if (input.skipPayment && req.user?.role === 'patient') {
+        logger.warn('Patient attempted to use skipPayment privilege', {
+          userId: req.user.userId,
+          appointmentType: input.type,
+          ipAddress: req.ip,
+        });
+        // Strip the skipPayment flag - don't throw error to avoid information leakage
+        input.skipPayment = false;
+      }
+
       // Pass userId if available for payment creation
       const userId = req.user?.userId;
       const appointment = await appointmentService.createAppointment(input, userId);

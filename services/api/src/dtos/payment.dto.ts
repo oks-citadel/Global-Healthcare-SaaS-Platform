@@ -195,15 +195,36 @@ export type RetryInvoiceDto = z.infer<typeof RetryInvoiceSchema>;
 
 /**
  * Schema for creating a charge (one-time payment)
+ *
+ * SECURITY: Amount is determined server-side based on referenceType and referenceId.
+ * Client-provided amounts are only used for admin-initiated charges.
+ * Normal users must provide a valid reference that maps to a server-side price.
  */
 export const CreateChargeSchema = z.object({
-  amount: z.number().int().positive('Amount must be positive'),
+  // SECURITY: Reference to what is being charged for (required for non-admin users)
+  // The server will look up the price from this reference
+  referenceType: z.enum(['appointment', 'service', 'product', 'custom']).optional(),
+  referenceId: z.string().uuid().optional(),
+
+  // SECURITY: Amount is ONLY accepted from admin users
+  // For regular users, this field is ignored and price is fetched from database
+  // Amount is in cents (e.g., 5000 = $50.00)
+  amount: z.number().int().positive('Amount must be positive').optional(),
+
   currency: z.string().length(3, 'Currency must be 3 characters').default('usd'),
   paymentMethodId: z.string().optional(),
   description: z.string().optional(),
   metadata: z.record(z.string()).optional(),
   confirmImmediately: z.boolean().default(true),
-});
+}).refine(
+  (data) => {
+    // Either referenceType+referenceId must be provided, or amount for custom charges
+    return (data.referenceType && data.referenceId) || data.amount !== undefined;
+  },
+  {
+    message: 'Either referenceType with referenceId, or amount must be provided',
+  }
+);
 
 export type CreateChargeDto = z.infer<typeof CreateChargeSchema>;
 

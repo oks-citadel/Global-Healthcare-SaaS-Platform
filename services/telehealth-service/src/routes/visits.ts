@@ -246,12 +246,14 @@ router.post('/:visitId/end', requireUser, async (req: UserRequest, res) => {
     };
 
     // Post billing event to main API (async, non-blocking)
+    // SECURITY: Include service name header for service-to-service auth validation
     const apiUrl = process.env.API_URL || 'http://localhost:3001';
     fetch(`${apiUrl}/api/billing/telehealth-visit`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'X-Service-Key': process.env.SERVICE_API_KEY || '',
+        'X-Service-Name': 'telehealth-service',
       },
       body: JSON.stringify(billingEvent),
     }).catch((err) => {

@@ -41,6 +41,7 @@ export function createTestApp() {
 
 /**
  * Create a test user and return authentication tokens
+ * Throws if database is unavailable (test should be skipped)
  */
 export async function createTestUser(
   role: 'patient' | 'provider' | 'admin' = 'patient'
@@ -48,21 +49,31 @@ export async function createTestUser(
   const email = `test-${role}-${Date.now()}@example.com`;
   const password = 'TestPassword123!';
 
-  const result = await authService.register({
-    email,
-    password,
-    firstName: 'Test',
-    lastName: 'User',
-    role,
-  });
+  try {
+    const result = await authService.register({
+      email,
+      password,
+      firstName: 'Test',
+      lastName: 'User',
+      role,
+    });
 
-  return {
-    user: result.user,
-    accessToken: result.accessToken,
-    refreshToken: result.refreshToken,
-    email,
-    password,
-  };
+    return {
+      user: result.user,
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken,
+      email,
+      password,
+    };
+  } catch (error: any) {
+    // If database is unavailable, throw a specific error
+    if (error?.message?.includes("Can't reach database") ||
+        error?.code === 'P1001' ||
+        error?.name === 'PrismaClientInitializationError') {
+      throw new Error('DATABASE_UNAVAILABLE: Integration tests require a running database');
+    }
+    throw error;
+  }
 }
 
 /**

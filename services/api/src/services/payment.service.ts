@@ -184,6 +184,87 @@ export class PaymentService {
   }
 
   /**
+   * SECURITY: Get price from database based on reference type and ID
+   * This is used to prevent client-side price manipulation
+   *
+   * @param referenceType - Type of reference (appointment, service, product, custom)
+   * @param referenceId - UUID of the referenced entity
+   * @returns Price info with amount (in cents) and description, or null if not found
+   */
+  async getPriceForReference(
+    referenceType: 'appointment' | 'service' | 'product' | 'custom',
+    referenceId: string
+  ): Promise<{ amount: number; description: string; currency: string } | null> {
+    try {
+      switch (referenceType) {
+        case 'appointment': {
+          // Look up appointment and calculate price
+          const appointment = await prisma.appointment.findUnique({
+            where: { id: referenceId },
+            include: { provider: true },
+          });
+
+          if (!appointment) {
+            logger.warn('Appointment not found for price lookup', { referenceId });
+            return null;
+          }
+
+          // Calculate price based on appointment type and duration
+          // Base rates in cents
+          const baseRates: Record<string, number> = {
+            video: 15000,      // $150/hour base
+            audio: 10000,      // $100/hour base
+            chat: 5000,        // $50/hour base
+            'in-person': 20000, // $200/hour base
+          };
+
+          const baseRate = baseRates[appointment.type] || 15000;
+          const durationMultiplier = appointment.duration / 60;
+          const amount = Math.round(baseRate * durationMultiplier);
+
+          return {
+            amount,
+            description: `${appointment.type} appointment (${appointment.duration} min)`,
+            currency: 'usd',
+          };
+        }
+
+        case 'service': {
+          // Look up service price from database
+          // This would be a Service model in a full implementation
+          logger.warn('Service pricing not yet implemented', { referenceId });
+          return null;
+        }
+
+        case 'product': {
+          // Look up product price from database
+          // This would be a Product model in a full implementation
+          logger.warn('Product pricing not yet implemented', { referenceId });
+          return null;
+        }
+
+        case 'custom': {
+          // Custom charges require admin approval
+          // Return null to force admin-only custom charge flow
+          logger.info('Custom charge requested - requires admin', { referenceId });
+          return null;
+        }
+
+        default:
+          logger.warn('Unknown reference type for price lookup', { referenceType, referenceId });
+          return null;
+      }
+    } catch (error) {
+      logger.error('Error looking up price for reference', {
+        referenceType,
+        referenceId,
+        error: (error as Error).message,
+      });
+      return null;
+    }
+  }
+
+  /**
    * Create a subscription for a user with idempotency and audit logging
    */
   async createSubscription(
