@@ -103,3 +103,30 @@ export interface EmailServiceStats {
   lastHourSent: number;
   rateLimitRemaining: number;
 }
+
+export interface SendGridConfig {
+  apiKey: string;
+  fromAddress: string;
+  fromName: string;
+  sandboxMode: boolean;
+  maxRetries: number;
+  retryDelay: number;
+  rateLimitPerSecond: number;
+}
+
+export interface EmailProviderInterface {
+  initialize(): Promise<void>;
+  send(options: EmailOptions, emailType?: EmailType): Promise<EmailResult>;
+  getStats(): EmailServiceStats;
+  getQuota(): Promise<{
+    maxSendRate?: number;
+    max24HourSend?: number;
+    sentLast24Hours?: number;
+  }>;
+  isProductionMode(): boolean;
+  getServiceConfig(): {
+    fromAddress: string;
+    sandboxMode: boolean;
+    rateLimitPerSecond: number;
+  };
+}
