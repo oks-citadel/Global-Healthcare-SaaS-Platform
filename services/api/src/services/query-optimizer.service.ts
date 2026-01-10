@@ -3,7 +3,7 @@
  * Optimizes database queries for cost and performance
  */
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "../generated/client/index.js";
 
 export interface QueryMetrics {
   query: string;
@@ -17,7 +17,7 @@ export interface QueryMetrics {
 export interface QueryAnalysis {
   suggestions: string[];
   estimatedCostReduction: number;
-  priority: 'low' | 'medium' | 'high' | 'critical';
+  priority: "low" | "medium" | "high" | "critical";
 }
 
 export interface ConnectionPoolConfig {
@@ -95,41 +95,41 @@ export class QueryOptimizerService {
 
     // Analyze slow queries
     const slowQueries = this.queryHistory.filter(
-      q => q.duration > this.slowQueryThresholdMs
+      (q) => q.duration > this.slowQueryThresholdMs,
     );
 
     if (slowQueries.length > 0) {
       suggestions.push(
-        `Found ${slowQueries.length} slow queries (>${this.slowQueryThresholdMs}ms). Consider adding indexes.`
+        `Found ${slowQueries.length} slow queries (>${this.slowQueryThresholdMs}ms). Consider adding indexes.`,
       );
       estimatedCostReduction += slowQueries.length * 5;
     }
 
     // Analyze queries not using indexes
-    const noIndexQueries = this.queryHistory.filter(q => !q.usingIndex);
+    const noIndexQueries = this.queryHistory.filter((q) => !q.usingIndex);
     if (noIndexQueries.length > this.queryHistory.length * 0.2) {
       suggestions.push(
-        `${Math.round((noIndexQueries.length / this.queryHistory.length) * 100)}% of queries not using indexes. Review query plans.`
+        `${Math.round((noIndexQueries.length / this.queryHistory.length) * 100)}% of queries not using indexes. Review query plans.`,
       );
       estimatedCostReduction += 15;
     }
 
     // Analyze high row examination
     const highExamination = this.queryHistory.filter(
-      q => q.rowsExamined > q.rowsReturned * 10 && q.rowsExamined > 100
+      (q) => q.rowsExamined > q.rowsReturned * 10 && q.rowsExamined > 100,
     );
     if (highExamination.length > 0) {
       suggestions.push(
-        `${highExamination.length} queries examining 10x more rows than returned. Add more specific indexes.`
+        `${highExamination.length} queries examining 10x more rows than returned. Add more specific indexes.`,
       );
       estimatedCostReduction += highExamination.length * 3;
     }
 
     // Determine priority
-    let priority: 'low' | 'medium' | 'high' | 'critical' = 'low';
-    if (estimatedCostReduction > 30) priority = 'critical';
-    else if (estimatedCostReduction > 20) priority = 'high';
-    else if (estimatedCostReduction > 10) priority = 'medium';
+    let priority: "low" | "medium" | "high" | "critical" = "low";
+    if (estimatedCostReduction > 30) priority = "critical";
+    else if (estimatedCostReduction > 20) priority = "high";
+    else if (estimatedCostReduction > 10) priority = "medium";
 
     return {
       suggestions,
@@ -157,7 +157,7 @@ export class QueryOptimizerService {
     for (const [pattern, count] of queryPatterns.entries()) {
       if (count > 10) {
         recommendations.push(
-          `Consider composite index for pattern: ${pattern} (used ${count} times)`
+          `Consider composite index for pattern: ${pattern} (used ${count} times)`,
         );
       }
     }
@@ -172,8 +172,8 @@ export class QueryOptimizerService {
     const whereMatch = query.match(/WHERE\s+(.+?)(?:ORDER|LIMIT|GROUP|$)/i);
     if (whereMatch) {
       return whereMatch[1]
-        .replace(/=\s*'[^']*'/g, '= ?')
-        .replace(/=\s*\d+/g, '= ?')
+        .replace(/=\s*'[^']*'/g, "= ?")
+        .replace(/=\s*\d+/g, "= ?")
         .trim();
     }
     return null;
@@ -204,17 +204,17 @@ export class QueryOptimizerService {
     }
 
     const durations = this.queryHistory
-      .map(q => q.duration)
+      .map((q) => q.duration)
       .sort((a, b) => a - b);
 
     return {
       totalQueries: this.queryHistory.length,
-      averageDuration:
-        durations.reduce((a, b) => a + b, 0) / durations.length,
+      averageDuration: durations.reduce((a, b) => a + b, 0) / durations.length,
       slowQueries: this.queryHistory.filter(
-        q => q.duration > this.slowQueryThresholdMs
+        (q) => q.duration > this.slowQueryThresholdMs,
       ).length,
-      queriesWithoutIndex: this.queryHistory.filter(q => !q.usingIndex).length,
+      queriesWithoutIndex: this.queryHistory.filter((q) => !q.usingIndex)
+        .length,
       p50Duration: durations[Math.floor(durations.length * 0.5)],
       p95Duration: durations[Math.floor(durations.length * 0.95)],
       p99Duration: durations[Math.floor(durations.length * 0.99)],
@@ -275,7 +275,10 @@ export const queryPatterns = {
    * Pagination patterns for cost-effective data retrieval
    */
   pagination: {
-    cursor: <T extends { id: string }>(cursor?: string, limit: number = 20) => ({
+    cursor: <T extends { id: string }>(
+      cursor?: string,
+      limit: number = 20,
+    ) => ({
       take: limit + 1,
       ...(cursor && {
         cursor: { id: cursor },
@@ -308,18 +311,19 @@ export const queryPatterns = {
  */
 export function buildOptimizedConnectionString(
   baseUrl: string,
-  environment: string = 'production'
+  environment: string = "production",
 ): string {
-  const config = connectionPoolConfigs[environment] || connectionPoolConfigs.production;
+  const config =
+    connectionPoolConfigs[environment] || connectionPoolConfigs.production;
 
   const params = new URLSearchParams({
     connection_limit: config.max.toString(),
     pool_timeout: Math.floor(config.acquireTimeoutMs / 1000).toString(),
-    connect_timeout: '10',
-    socket_timeout: '60',
+    connect_timeout: "10",
+    socket_timeout: "60",
   });
 
-  const separator = baseUrl.includes('?') ? '&' : '?';
+  const separator = baseUrl.includes("?") ? "&" : "?";
   return `${baseUrl}${separator}${params.toString()}`;
 }
 
@@ -327,19 +331,21 @@ export function buildOptimizedConnectionString(
  * Create optimized Prisma client with logging
  */
 export function createOptimizedPrismaClient(
-  environment: string = process.env.NODE_ENV || 'production'
+  environment: string = process.env.NODE_ENV || "production",
 ): PrismaClient {
-  const config = connectionPoolConfigs[environment] || connectionPoolConfigs.production;
+  const config =
+    connectionPoolConfigs[environment] || connectionPoolConfigs.production;
 
   return new PrismaClient({
-    log: environment === 'development'
-      ? ['query', 'info', 'warn', 'error']
-      : ['warn', 'error'],
+    log:
+      environment === "development"
+        ? ["query", "info", "warn", "error"]
+        : ["warn", "error"],
     datasources: {
       db: {
         url: buildOptimizedConnectionString(
-          process.env.DATABASE_URL || '',
-          environment
+          process.env.DATABASE_URL || "",
+          environment,
         ),
       },
     },

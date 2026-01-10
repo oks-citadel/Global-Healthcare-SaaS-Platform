@@ -3,10 +3,10 @@
  * Server-side response caching using Redis for high-performance caching
  */
 
-import { Request, Response, NextFunction, RequestHandler } from 'express';
-import { cacheService } from '../services/cache.service.js';
-import { cacheKeys, cacheConfig } from '../config/cache.config.js';
-import crypto from 'crypto';
+import { Request, Response, NextFunction, RequestHandler } from "express";
+import { cacheService } from "../services/cache.service.js";
+import { cacheKeys, cacheConfig } from "../config/cache.config.js";
+import crypto from "crypto";
 
 export interface RedisCacheOptions {
   ttl?: number;
@@ -24,13 +24,13 @@ export interface RedisCacheOptions {
 
 const defaultOptions: RedisCacheOptions = {
   ttl: 300,
-  keyPrefix: 'api',
+  keyPrefix: "api",
   includeQuery: true,
-  includeHeaders: ['Accept', 'Accept-Language'],
+  includeHeaders: ["Accept", "Accept-Language"],
   includeUserId: true,
   includeTenantId: true,
-  excludePaths: ['/auth', '/health', '/metrics', '/webhooks'],
-  excludeMethods: ['POST', 'PUT', 'PATCH', 'DELETE'],
+  excludePaths: ["/auth", "/health", "/metrics", "/webhooks"],
+  excludeMethods: ["POST", "PUT", "PATCH", "DELETE"],
   cacheSuccessOnly: true,
   staleWhileRevalidate: 60,
   lockTimeout: 5000,
@@ -41,7 +41,7 @@ const defaultOptions: RedisCacheOptions = {
  */
 function generateCacheKey(req: Request, options: RedisCacheOptions): string {
   const components: string[] = [
-    options.keyPrefix || 'api',
+    options.keyPrefix || "api",
     req.method,
     req.path,
   ];
@@ -50,8 +50,8 @@ function generateCacheKey(req: Request, options: RedisCacheOptions): string {
   if (options.includeQuery && Object.keys(req.query).length > 0) {
     const sortedQuery = Object.keys(req.query)
       .sort()
-      .map(key => `${key}=${req.query[key]}`)
-      .join('&');
+      .map((key) => `${key}=${req.query[key]}`)
+      .join("&");
     components.push(sortedQuery);
   }
 
@@ -75,8 +75,12 @@ function generateCacheKey(req: Request, options: RedisCacheOptions): string {
     }
   }
 
-  const keyString = components.join('|');
-  const hash = crypto.createHash('sha256').update(keyString).digest('hex').substring(0, 16);
+  const keyString = components.join("|");
+  const hash = crypto
+    .createHash("sha256")
+    .update(keyString)
+    .digest("hex")
+    .substring(0, 16);
   return `${options.keyPrefix}:${hash}`;
 }
 
@@ -90,13 +94,16 @@ function shouldCache(req: Request, options: RedisCacheOptions): boolean {
   }
 
   // Skip excluded paths
-  if (options.excludePaths?.some(path => req.path.startsWith(path))) {
+  if (options.excludePaths?.some((path) => req.path.startsWith(path))) {
     return false;
   }
 
   // Skip if Cache-Control: no-cache
-  const cacheControl = req.get('Cache-Control');
-  if (cacheControl?.includes('no-cache') || cacheControl?.includes('no-store')) {
+  const cacheControl = req.get("Cache-Control");
+  if (
+    cacheControl?.includes("no-cache") ||
+    cacheControl?.includes("no-store")
+  ) {
     return false;
   }
 
@@ -106,7 +113,9 @@ function shouldCache(req: Request, options: RedisCacheOptions): boolean {
 /**
  * Redis cache middleware - caches API responses in Redis
  */
-export function redisCacheMiddleware(options: RedisCacheOptions = {}): RequestHandler {
+export function redisCacheMiddleware(
+  options: RedisCacheOptions = {},
+): RequestHandler {
   const opts = { ...defaultOptions, ...options };
 
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -134,13 +143,20 @@ export function redisCacheMiddleware(options: RedisCacheOptions = {}): RequestHa
 
         if (age < ttlMs) {
           // Return cached response
-          res.set('X-Cache', 'HIT');
-          res.set('X-Cache-Age', Math.floor(age / 1000).toString());
-          res.set('Cache-Control', `public, max-age=${Math.floor((ttlMs - age) / 1000)}`);
+          res.set("X-Cache", "HIT");
+          res.set("X-Cache-Age", Math.floor(age / 1000).toString());
+          res.set(
+            "Cache-Control",
+            `public, max-age=${Math.floor((ttlMs - age) / 1000)}`,
+          );
 
           // Set cached headers
           for (const [key, value] of Object.entries(cachedResponse.headers)) {
-            if (!['content-length', 'transfer-encoding'].includes(key.toLowerCase())) {
+            if (
+              !["content-length", "transfer-encoding"].includes(
+                key.toLowerCase(),
+              )
+            ) {
               res.set(key, value);
             }
           }
@@ -149,13 +165,20 @@ export function redisCacheMiddleware(options: RedisCacheOptions = {}): RequestHa
         }
 
         // Data is stale but within revalidation window
-        if (opts.staleWhileRevalidate && age < ttlMs + opts.staleWhileRevalidate * 1000) {
+        if (
+          opts.staleWhileRevalidate &&
+          age < ttlMs + opts.staleWhileRevalidate * 1000
+        ) {
           // Return stale data immediately
-          res.set('X-Cache', 'STALE');
-          res.set('X-Cache-Age', Math.floor(age / 1000).toString());
+          res.set("X-Cache", "STALE");
+          res.set("X-Cache-Age", Math.floor(age / 1000).toString());
 
           for (const [key, value] of Object.entries(cachedResponse.headers)) {
-            if (!['content-length', 'transfer-encoding'].includes(key.toLowerCase())) {
+            if (
+              !["content-length", "transfer-encoding"].includes(
+                key.toLowerCase(),
+              )
+            ) {
               res.set(key, value);
             }
           }
@@ -164,7 +187,10 @@ export function redisCacheMiddleware(options: RedisCacheOptions = {}): RequestHa
           setImmediate(async () => {
             try {
               // Acquire lock to prevent thundering herd
-              const lock = await cacheService.acquireLock(cacheKey, opts.lockTimeout);
+              const lock = await cacheService.acquireLock(
+                cacheKey,
+                opts.lockTimeout,
+              );
               if (lock) {
                 // This will be handled by the intercepted response
                 // For now, just delete stale cache to trigger refresh on next request
@@ -181,19 +207,22 @@ export function redisCacheMiddleware(options: RedisCacheOptions = {}): RequestHa
       }
 
       // Cache miss - intercept response
-      res.set('X-Cache', 'MISS');
+      res.set("X-Cache", "MISS");
 
       const originalJson = res.json.bind(res);
       const originalSend = res.send.bind(res);
 
       const cacheResponse = async (body: any) => {
         // Only cache successful responses
-        if (opts.cacheSuccessOnly && (res.statusCode < 200 || res.statusCode >= 300)) {
+        if (
+          opts.cacheSuccessOnly &&
+          (res.statusCode < 200 || res.statusCode >= 300)
+        ) {
           return;
         }
 
         const headers: Record<string, string> = {};
-        const headersToCache = ['content-type', 'etag', 'last-modified'];
+        const headersToCache = ["content-type", "etag", "last-modified"];
         for (const header of headersToCache) {
           const value = res.get(header);
           if (value) {
@@ -201,21 +230,25 @@ export function redisCacheMiddleware(options: RedisCacheOptions = {}): RequestHa
           }
         }
 
-        await cacheService.set(cacheKey, {
-          status: res.statusCode,
-          headers,
-          body,
-          timestamp: Date.now(),
-        }, opts.ttl);
+        await cacheService.set(
+          cacheKey,
+          {
+            status: res.statusCode,
+            headers,
+            body,
+            timestamp: Date.now(),
+          },
+          opts.ttl,
+        );
       };
 
-      res.json = function(body: any): Response {
+      res.json = function (body: any): Response {
         cacheResponse(body).catch(() => {});
         return originalJson(body);
       };
 
-      res.send = function(body: any): Response {
-        if (typeof body === 'object') {
+      res.send = function (body: any): Response {
+        if (typeof body === "object") {
           cacheResponse(body).catch(() => {});
         }
         return originalSend(body);
@@ -224,7 +257,7 @@ export function redisCacheMiddleware(options: RedisCacheOptions = {}): RequestHa
       next();
     } catch (error) {
       // On cache error, proceed without caching
-      res.set('X-Cache', 'ERROR');
+      res.set("X-Cache", "ERROR");
       next();
     }
   };
@@ -233,11 +266,13 @@ export function redisCacheMiddleware(options: RedisCacheOptions = {}): RequestHa
 /**
  * Cache invalidation middleware for mutations
  */
-export function cacheInvalidationMiddleware(patterns: string[]): RequestHandler {
+export function cacheInvalidationMiddleware(
+  patterns: string[],
+): RequestHandler {
   return async (req: Request, res: Response, next: NextFunction) => {
     const originalEnd = res.end.bind(res);
 
-    res.end = function(chunk?: any, encoding?: any, callback?: any): Response {
+    res.end = function (chunk?: any, encoding?: any, callback?: any): Response {
       // Only invalidate on successful mutations
       if (res.statusCode >= 200 && res.statusCode < 300) {
         setImmediate(async () => {
@@ -286,14 +321,14 @@ export const resourceCache = {
   records: (ttl: number = cacheConfig.resources.medicalRecord) =>
     redisCacheMiddleware({
       ttl,
-      keyPrefix: cacheConfig.prefixes.medicalRecord,
+      keyPrefix: cacheConfig.prefixes.record,
       includeUserId: true,
     }),
 
-  static: (ttl: number = cacheConfig.resources.staticContent) =>
+  static: (ttl: number = cacheConfig.ttl.static) =>
     redisCacheMiddleware({
       ttl,
-      keyPrefix: 'static',
+      keyPrefix: "static",
       includeUserId: false,
       includeTenantId: false,
     }),
@@ -305,9 +340,9 @@ export const resourceCache = {
 export function cacheBypassMiddleware(): RequestHandler {
   return (req: Request, res: Response, next: NextFunction) => {
     // Allow cache bypass with special header (for debugging/admin)
-    if (req.get('X-Cache-Bypass') === 'true') {
-      res.set('X-Cache', 'BYPASS');
-      res.set('Cache-Control', 'no-store');
+    if (req.get("X-Cache-Bypass") === "true") {
+      res.set("X-Cache", "BYPASS");
+      res.set("Cache-Control", "no-store");
     }
     next();
   };

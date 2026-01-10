@@ -4,18 +4,77 @@
  * Optimized for cost and performance
  */
 
-import Redis from 'ioredis';
-import { LRUCache } from 'lru-cache';
-import { gzip, gunzip } from 'zlib';
-import { promisify } from 'util';
-import { cacheConfig, cacheKeys, invalidationPatterns } from '../config/cache.config.js';
+import Redis from "ioredis";
+import { gzip, gunzip } from "zlib";
+import { promisify } from "util";
+import {
+  cacheConfig,
+  cacheKeys,
+  invalidationPatterns,
+} from "../config/cache.config.js";
 
 const gzipAsync = promisify(gzip);
 const gunzipAsync = promisify(gunzip);
 
+// Simple LRU Cache implementation
+class SimpleLRUCache<K, V> {
+  private cache: Map<K, { value: V; expires: number }>;
+  private maxSize: number;
+  private defaultTtl: number;
+
+  constructor(options: { max: number; ttl: number }) {
+    this.cache = new Map();
+    this.maxSize = options.max;
+    this.defaultTtl = options.ttl;
+  }
+
+  get(key: K): V | undefined {
+    const item = this.cache.get(key);
+    if (!item) return undefined;
+    if (Date.now() > item.expires) {
+      this.cache.delete(key);
+      return undefined;
+    }
+    // Move to end (most recently used)
+    this.cache.delete(key);
+    this.cache.set(key, item);
+    return item.value;
+  }
+
+  set(key: K, value: V, options?: { ttl?: number }): void {
+    if (this.cache.size >= this.maxSize) {
+      // Delete oldest (first) entry
+      const firstKey = this.cache.keys().next().value;
+      if (firstKey !== undefined) this.cache.delete(firstKey);
+    }
+    const ttl = options?.ttl ?? this.defaultTtl;
+    this.cache.set(key, { value, expires: Date.now() + ttl });
+  }
+
+  delete(key: K): boolean {
+    return this.cache.delete(key);
+  }
+
+  keys(): IterableIterator<K> {
+    return this.cache.keys();
+  }
+
+  clear(): void {
+    this.cache.clear();
+  }
+
+  get size(): number {
+    return this.cache.size;
+  }
+
+  get max(): number {
+    return this.maxSize;
+  }
+}
+
 export class CacheService {
   private redis: Redis;
-  private memoryCache: LRUCache<string, any>;
+  private memoryCache: SimpleLRUCache<string, any>;
   private isConnected: boolean = false;
 
   constructor() {
@@ -34,28 +93,26 @@ export class CacheService {
     });
 
     // Initialize L1 memory cache
-    this.memoryCache = new LRUCache({
+    this.memoryCache = new SimpleLRUCache({
       max: cacheConfig.memory.maxItems,
       ttl: cacheConfig.memory.ttl * 1000,
-      updateAgeOnGet: true,
-      updateAgeOnHas: false,
     });
 
     this.setupEventHandlers();
   }
 
   private setupEventHandlers() {
-    this.redis.on('connect', () => {
+    this.redis.on("connect", () => {
       this.isConnected = true;
-      console.log('Redis connected');
+      console.log("Redis connected");
     });
 
-    this.redis.on('error', (err) => {
-      console.error('Redis error:', err.message);
+    this.redis.on("error", (err) => {
+      console.error("Redis error:", err.message);
       this.isConnected = false;
     });
 
-    this.redis.on('close', () => {
+    this.redis.on("close", () => {
       this.isConnected = false;
     });
   }
@@ -112,7 +169,9 @@ export class CacheService {
 
     // Set in L1 memory cache
     if (cacheConfig.memory.enabled) {
-      this.memoryCache.set(key, value, { ttl: Math.min(ttl, cacheConfig.memory.ttl) * 1000 });
+      this.memoryCache.set(key, value, {
+        ttl: Math.min(ttl, cacheConfig.memory.ttl) * 1000,
+      });
     }
 
     // Set in L2 Redis cache
@@ -158,21 +217,21 @@ export class CacheService {
       }
 
       // Clear matching keys from L2 using SCAN (memory-efficient)
-      let cursor = '0';
+      let cursor = "0";
       do {
         const [nextCursor, keys] = await this.redis.scan(
           cursor,
-          'MATCH',
+          "MATCH",
           pattern,
-          'COUNT',
-          100
+          "COUNT",
+          100,
         );
         cursor = nextCursor;
 
         if (keys.length > 0) {
           await this.redis.del(...keys);
         }
-      } while (cursor !== '0');
+      } while (cursor !== "0");
     } catch (error) {
       console.error(`Cache delete pattern error for ${pattern}:`, error);
     }
@@ -185,7 +244,9 @@ export class CacheService {
     resource: keyof typeof invalidationPatterns,
     ...args: string[]
   ): Promise<void> {
-    const patterns = (invalidationPatterns[resource] as (...args: string[]) => string[])(...args);
+    const patterns = (
+      invalidationPatterns[resource] as (...args: string[]) => string[]
+    )(...args);
     await Promise.all(patterns.map((pattern) => this.deletePattern(pattern)));
   }
 
@@ -195,7 +256,7 @@ export class CacheService {
   async getOrSet<T>(
     key: string,
     factory: () => Promise<T>,
-    ttlSeconds?: number
+    ttlSeconds?: number,
   ): Promise<T> {
     const cached = await this.get<T>(key);
     if (cached !== null) {
@@ -212,7 +273,7 @@ export class CacheService {
    */
   async acquireLock(
     resource: string,
-    ttlMs: number = 10000
+    ttlMs: number = 10000,
   ): Promise<string | null> {
     if (!this.isConnected) return null;
 
@@ -223,9 +284,9 @@ export class CacheService {
       const acquired = await this.redis.set(
         lockKey,
         lockValue,
-        'PX',
+        "PX",
         ttlMs,
-        'NX'
+        "NX",
       );
       return acquired ? lockValue : null;
     } catch (error) {
@@ -266,10 +327,14 @@ export class CacheService {
   async checkRateLimit(
     key: string,
     limit: number,
-    windowSeconds: number
+    windowSeconds: number,
   ): Promise<{ allowed: boolean; remaining: number; resetAt: number }> {
     if (!this.isConnected) {
-      return { allowed: true, remaining: limit, resetAt: Date.now() + windowSeconds * 1000 };
+      return {
+        allowed: true,
+        remaining: limit,
+        resetAt: Date.now() + windowSeconds * 1000,
+      };
     }
 
     const rateLimitKey = cacheKeys.rateLimit(key);
@@ -308,7 +373,7 @@ export class CacheService {
         now,
         windowStart,
         limit,
-        windowSeconds
+        windowSeconds,
       )) as [number, number];
 
       return {
@@ -318,7 +383,11 @@ export class CacheService {
       };
     } catch (error) {
       console.error(`Rate limit check error for ${key}:`, error);
-      return { allowed: true, remaining: limit, resetAt: Date.now() + windowSeconds * 1000 };
+      return {
+        allowed: true,
+        remaining: limit,
+        resetAt: Date.now() + windowSeconds * 1000,
+      };
     }
   }
 
@@ -328,9 +397,12 @@ export class CacheService {
   private async compress(data: any): Promise<string> {
     const json = JSON.stringify(data);
 
-    if (cacheConfig.compression.enabled && json.length > cacheConfig.compression.threshold) {
+    if (
+      cacheConfig.compression.enabled &&
+      json.length > cacheConfig.compression.threshold
+    ) {
       const compressed = await gzipAsync(json);
-      return `gz:${compressed.toString('base64')}`;
+      return `gz:${compressed.toString("base64")}`;
     }
 
     return json;
@@ -340,8 +412,8 @@ export class CacheService {
    * Decompress data if compressed
    */
   private async decompress(data: string): Promise<any> {
-    if (data.startsWith('gz:')) {
-      const compressed = Buffer.from(data.slice(3), 'base64');
+    if (data.startsWith("gz:")) {
+      const compressed = Buffer.from(data.slice(3), "base64");
       const decompressed = await gunzipAsync(compressed);
       return JSON.parse(decompressed.toString());
     }
@@ -354,7 +426,7 @@ export class CacheService {
    */
   private matchPattern(key: string, pattern: string): boolean {
     const regex = new RegExp(
-      '^' + pattern.replace(/\*/g, '.*').replace(/\?/g, '.') + '$'
+      "^" + pattern.replace(/\*/g, ".*").replace(/\?/g, ".") + "$",
     );
     return regex.test(key);
   }
@@ -378,12 +450,12 @@ export class CacheService {
 
     if (this.isConnected) {
       try {
-        const info = await this.redis.info('memory');
+        const info = await this.redis.info("memory");
         const dbSize = await this.redis.dbsize();
         const memoryMatch = info.match(/used_memory_human:(.+)/);
 
         stats.redis.keys = dbSize;
-        stats.redis.memory = memoryMatch ? memoryMatch[1].trim() : 'unknown';
+        stats.redis.memory = memoryMatch ? memoryMatch[1].trim() : "unknown";
       } catch (error) {
         // Ignore stats errors
       }
