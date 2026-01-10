@@ -41,12 +41,10 @@
     "security:abuse-tests": "pnpm --filter @unified-health/api test -- tests/security/business-logic-abuse/",
     "security:pr": "pnpm security:audit && pnpm security:agent && pnpm security:abuse-tests",
     "security:all": "pnpm security:audit && pnpm security:secrets && pnpm security:agent && pnpm lint && pnpm typecheck",
-    "sbom:generate": "cyclonedx-npm --output-file sbom.json --output-format JSON",
-    "sbom:generate:xml": "cyclonedx-npm --output-file sbom.xml --output-format XML",
+    "sbom:generate": "echo 'Use CI pipeline or run: bash scripts/generate-sbom.sh (requires Syft)'",
     "sbom:generate:all": "bash scripts/generate-sbom.sh"
   },
   "devDependencies": {
-    "@cyclonedx/cyclonedx-npm": "^4.1.2",
     "@commitlint/cli": "^18.4.3",
     "@commitlint/config-conventional": "^18.4.3",
     "husky": "^8.0.3",

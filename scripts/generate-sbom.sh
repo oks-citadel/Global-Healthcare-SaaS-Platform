@@ -2,7 +2,7 @@
 
 #==============================================================================
 # SBOM Generation Script for UnifiedHealth Platform
-# Generates CycloneDX SBOMs for all workspaces in the monorepo
+# Generates CycloneDX SBOMs for all workspaces in the monorepo using Syft
 #
 # Usage:
 #   ./scripts/generate-sbom.sh [version]
@@ -12,8 +12,11 @@
 #
 # Environment Variables:
 #   SBOM_OUTPUT_DIR   Output directory for SBOMs (default: ./sbom-artifacts)
-#   SBOM_FORMAT       Output format: JSON or XML (default: JSON)
-#   SBOM_SPEC_VERSION CycloneDX spec version (default: 1.5)
+#   SBOM_FORMAT       Output format: json or xml (default: json)
+#
+# Prerequisites:
+#   - Syft (https://github.com/anchore/syft)
+#   Install: curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
 #==============================================================================
 
 set -euo pipefail
@@ -25,8 +28,7 @@ ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 # Default configuration
 VERSION="${1:-}"
 SBOM_OUTPUT_DIR="${SBOM_OUTPUT_DIR:-${ROOT_DIR}/sbom-artifacts}"
-SBOM_FORMAT="${SBOM_FORMAT:-JSON}"
-SBOM_SPEC_VERSION="${SBOM_SPEC_VERSION:-1.5}"
+SBOM_FORMAT="${SBOM_FORMAT:-json}"
 
 # Colors for output
 RED='\033[0;31m'
@@ -53,6 +55,19 @@ log_warning() {
 
 log_error() {
     echo -e "${RED}[ERROR]${NC} $1" >&2
+}
+
+#------------------------------------------------------------------------------
+# Check prerequisites
+#------------------------------------------------------------------------------
+
+check_syft() {
+    if ! command -v syft &> /dev/null; then
+        log_error "Syft is not installed. Please install it first:"
+        log_error "  curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin"
+        log_error "Or use the CI pipeline which has Syft pre-installed."
+        exit 1
+    fi
 }
 
 #------------------------------------------------------------------------------
@@ -87,7 +102,7 @@ generate_sbom() {
     local workspace_dir="$1"
     local workspace_name="$2"
     local version="$3"
-    local output_file="${SBOM_OUTPUT_DIR}/sbom-${workspace_name}-${version}.${SBOM_FORMAT,,}"
+    local output_file="${SBOM_OUTPUT_DIR}/sbom-${workspace_name}-${version}.${SBOM_FORMAT}"
 
     log_info "Generating SBOM for ${workspace_name}..."
 
@@ -97,20 +112,14 @@ generate_sbom() {
         return 0
     fi
 
-    # Check if node_modules exists
-    if [[ ! -d "${workspace_dir}/node_modules" ]]; then
-        log_warning "No node_modules found in ${workspace_dir}, running install..."
-        (cd "${workspace_dir}" && pnpm install --frozen-lockfile 2>/dev/null) || true
-    fi
+    # Determine syft output format
+    local syft_format="cyclonedx-${SBOM_FORMAT}"
 
-    # Generate SBOM using cyclonedx-npm
-    if npx @cyclonedx/cyclonedx-npm \
-        --package-json "${workspace_dir}/package.json" \
-        --output-file "${output_file}" \
-        --output-format "${SBOM_FORMAT}" \
-        --spec-version "${SBOM_SPEC_VERSION}" \
-        --mc-type application \
-        --flatten-components 2>/dev/null; then
+    # Generate SBOM using Syft
+    if syft scan "dir:${workspace_dir}" \
+        --output "${syft_format}=${output_file}" \
+        --name "${workspace_name}" \
+        --version "${version}" 2>/dev/null; then
         log_success "Generated: ${output_file}"
         return 0
     else
@@ -177,6 +186,9 @@ main() {
     log_info "UnifiedHealth SBOM Generation"
     log_info "=========================================="
 
+    # Check prerequisites
+    check_syft
+
     # Navigate to root directory
     cd "${ROOT_DIR}"
 
@@ -185,7 +197,7 @@ main() {
     log_info "Version: ${VERSION}"
     log_info "Output directory: ${SBOM_OUTPUT_DIR}"
     log_info "Format: ${SBOM_FORMAT}"
-    log_info "Spec version: ${SBOM_SPEC_VERSION}"
+    log_info "Generator: Syft (CycloneDX)"
 
     # Create output directory
     mkdir -p "${SBOM_OUTPUT_DIR}"
@@ -204,7 +216,7 @@ main() {
     ((total++)) || true
     if generate_sbom "${ROOT_DIR}" "root" "${VERSION}"; then
         ((success++)) || true
-        generated_files+=("sbom-root-${VERSION}.${SBOM_FORMAT,,}")
+        generated_files+=("sbom-root-${VERSION}.${SBOM_FORMAT}")
     else
         ((failed++)) || true
     fi
@@ -229,7 +241,7 @@ main() {
                 ((total++)) || true
                 if generate_sbom "${workspace_dir}" "${full_name}" "${VERSION}"; then
                     ((success++)) || true
-                    generated_files+=("sbom-${full_name}-${VERSION}.${SBOM_FORMAT,,}")
+                    generated_files+=("sbom-${full_name}-${VERSION}.${SBOM_FORMAT}")
                 else
                     ((failed++)) || true
                 fi
@@ -264,10 +276,10 @@ main() {
   "version": "${VERSION}",
   "generatedAt": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
   "generator": {
-    "tool": "cyclonedx-npm",
+    "tool": "syft",
+    "format": "cyclonedx",
     "script": "scripts/generate-sbom.sh"
   },
-  "specVersion": "${SBOM_SPEC_VERSION}",
   "format": "${SBOM_FORMAT}",
   "statistics": {
     "total": ${total},
