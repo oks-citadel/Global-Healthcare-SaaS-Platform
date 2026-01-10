@@ -312,10 +312,18 @@ router.get('/person/:personId/documents/:documentId', requireUser, async (req: U
       return;
     }
 
-    // Return the document content
+    // Return the document content with security headers
+    // Security: Force download to prevent XSS via rendered HTML content
     const contentType = result.data?.contentType || 'application/octet-stream';
+    const documentContent = Buffer.from(result.data?.content || '', 'base64');
+
+    // Security headers to prevent XSS
     res.set('Content-Type', contentType);
-    res.send(Buffer.from(result.data?.content, 'base64'));
+    res.set('X-Content-Type-Options', 'nosniff');
+    res.set('Content-Disposition', 'attachment'); // Force download, never render in browser
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+
+    res.send(documentContent);
   } catch (error: any) {
     logger.error('Error retrieving document', { error: error.message });
     res.status(500).json({

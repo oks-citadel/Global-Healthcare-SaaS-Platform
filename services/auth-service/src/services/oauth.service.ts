@@ -47,7 +47,8 @@ export class OAuthService {
     const cipher = createCipheriv(
       this.ENCRYPTION_ALGORITHM,
       this.getEncryptionKey(),
-      iv
+      iv,
+      { authTagLength: this.AUTH_TAG_LENGTH }
     );
 
     let encrypted = cipher.update(text, 'utf8', 'hex');
@@ -75,7 +76,8 @@ export class OAuthService {
     const decipher = createDecipheriv(
       this.ENCRYPTION_ALGORITHM,
       this.getEncryptionKey(),
-      iv
+      iv,
+      { authTagLength: this.AUTH_TAG_LENGTH }
     );
     decipher.setAuthTag(authTag);
 

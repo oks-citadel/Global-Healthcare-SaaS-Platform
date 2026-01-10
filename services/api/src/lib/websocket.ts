@@ -147,7 +147,8 @@ async function setupRedisAdapter(): Promise<void> {
       const delay = Math.min(times * 50, 2000);
       return delay;
     },
-    tls: redisUrl.startsWith('rediss://') ? { rejectUnauthorized: false } : undefined,
+    // Enable TLS with proper certificate verification for security
+    tls: redisUrl.startsWith('rediss://') ? { rejectUnauthorized: true } : undefined,
   };
 
   redisPubClient = new Redis(redisUrl, redisOptions);

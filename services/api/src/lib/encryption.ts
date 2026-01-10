@@ -72,8 +72,10 @@ export function encrypt(plaintext: string, masterKey?: string): string {
     // Generate IV
     const iv = generateIV();
 
-    // Create cipher
-    const cipher = crypto.createCipheriv(ALGORITHM, derivedKey, iv);
+    // Create cipher with explicit auth tag length for GCM security
+    const cipher = crypto.createCipheriv(ALGORITHM, derivedKey, iv, {
+      authTagLength: AUTH_TAG_LENGTH,
+    });
 
     // Encrypt data
     let encrypted = cipher.update(plaintext, 'utf8', 'base64');
@@ -118,8 +120,10 @@ export function decrypt(encryptedData: string, masterKey?: string): string {
     // Derive key
     const derivedKey = deriveKey(key, salt);
 
-    // Create decipher
-    const decipher = crypto.createDecipheriv(ALGORITHM, derivedKey, iv);
+    // Create decipher with explicit auth tag length for GCM security
+    const decipher = crypto.createDecipheriv(ALGORITHM, derivedKey, iv, {
+      authTagLength: AUTH_TAG_LENGTH,
+    });
     decipher.setAuthTag(authTag);
 
     // Decrypt data

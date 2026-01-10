@@ -140,16 +140,29 @@ export function strictSecurityHeaders(req: Request, res: Response, next: NextFun
 /**
  * CORS Security Headers
  * Apply CORS headers based on configuration
+ * Security: Never use wildcard (*) with credentials to prevent security vulnerabilities
  */
 export function corsSecurityHeaders(req: Request, res: Response, next: NextFunction): void {
   const origin = req.headers.origin;
 
-  // Check if origin is allowed
-  if (origin && securityConfig.cors.origins.includes(origin)) {
+  // Development allowed origins (localhost variants)
+  const devOrigins = [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'http://localhost:4000',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:3001',
+  ];
+
+  // Check if origin is allowed from config or development origins
+  const isAllowedOrigin = origin && (
+    securityConfig.cors.origins.includes(origin) ||
+    (process.env.NODE_ENV === 'development' && devOrigins.includes(origin))
+  );
+
+  if (isAllowedOrigin && origin) {
+    // Only set specific origin, never use wildcard with credentials
     res.setHeader('Access-Control-Allow-Origin', origin);
-  } else if (process.env.NODE_ENV === 'development') {
-    // In development, allow all origins
-    res.setHeader('Access-Control-Allow-Origin', origin || '*');
   }
 
   // Set other CORS headers
@@ -157,7 +170,8 @@ export function corsSecurityHeaders(req: Request, res: Response, next: NextFunct
   res.setHeader('Access-Control-Allow-Headers', securityConfig.cors.allowedHeaders.join(', '));
   res.setHeader('Access-Control-Expose-Headers', securityConfig.cors.exposedHeaders.join(', '));
 
-  if (securityConfig.cors.credentials) {
+  // Only set credentials if origin is explicitly allowed (not wildcard)
+  if (securityConfig.cors.credentials && isAllowedOrigin) {
     res.setHeader('Access-Control-Allow-Credentials', 'true');
   }
 

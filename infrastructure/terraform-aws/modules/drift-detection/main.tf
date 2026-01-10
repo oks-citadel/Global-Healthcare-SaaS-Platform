@@ -74,13 +74,30 @@ resource "aws_s3_bucket_versioning" "config" {
   }
 }
 
+resource "aws_kms_key" "config" {
+  description             = "KMS key for AWS Config data - ${local.name}"
+  deletion_window_in_days = 30
+  enable_key_rotation     = true
+
+  tags = merge(local.tags, {
+    Name = "${local.name}-config-kms"
+  })
+}
+
+resource "aws_kms_alias" "config" {
+  name          = "alias/${local.name}-config"
+  target_key_id = aws_kms_key.config.key_id
+}
+
 resource "aws_s3_bucket_server_side_encryption_configuration" "config" {
   bucket = aws_s3_bucket.config.id
 
   rule {
     apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
+      sse_algorithm     = "aws:kms"
+      kms_master_key_id = aws_kms_key.config.arn
     }
+    bucket_key_enabled = true
   }
 }
 
@@ -184,6 +201,9 @@ resource "aws_iam_role_policy" "config_s3" {
 
 resource "aws_sns_topic" "config_alerts" {
   name = "${local.name}-config-alerts"
+
+  # Security: Enable encryption at rest
+  kms_master_key_id = aws_kms_key.config.id
 
   tags = local.tags
 }

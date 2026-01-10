@@ -646,7 +646,8 @@ resource "aws_cloudwatch_log_group" "country" {
 # SNS Topic for Country Alerts
 resource "aws_sns_topic" "country_alerts" {
   name              = "${local.name_prefix}-alerts"
-  kms_master_key_id = var.isolation_enabled ? aws_kms_key.country[0].id : null
+  # Security: Always use KMS encryption for SNS topics
+  kms_master_key_id = var.isolation_enabled ? aws_kms_key.country[0].id : var.regional_kms_key_arn
 
   tags = local.common_tags
 }

@@ -64,6 +64,54 @@ function normalizeEmailAddresses(addresses: string | string[] | undefined): stri
 }
 
 /**
+ * Variable names that contain URLs and should be sanitized
+ * Security: Ensures URLs are validated before being placed in href/src attributes
+ */
+const URL_VARIABLE_PATTERNS = [
+  /url$/i,        // ends with 'url' (e.g., resetUrl, dashboardUrl)
+  /link$/i,       // ends with 'link' (e.g., verificationLink)
+  /^app/i,        // starts with 'app' (e.g., appUrl)
+  /^maps/i,       // starts with 'maps' (e.g., mapsUrl)
+  /^join/i,       // starts with 'join' (e.g., joinUrl)
+  /^payment/i,    // starts with 'payment' (e.g., paymentUrl)
+  /^unsubscribe/i,// starts with 'unsubscribe' (e.g., unsubscribeUrl)
+];
+
+/**
+ * Check if a variable name represents a URL
+ */
+function isUrlVariable(key: string): boolean {
+  return URL_VARIABLE_PATTERNS.some(pattern => pattern.test(key));
+}
+
+/**
+ * Sanitize template data by validating URLs
+ * Security: Validates URL values to prevent XSS via javascript: URLs
+ *
+ * @param data - Template data to sanitize
+ * @returns Sanitized template data
+ */
+function sanitizeTemplateData(data: Record<string, any>): Record<string, any> {
+  const sanitized: Record<string, any> = {};
+
+  for (const [key, value] of Object.entries(data)) {
+    if (value === null || value === undefined) {
+      sanitized[key] = '';
+    } else if (typeof value === 'string' && isUrlVariable(key)) {
+      // Sanitize URL values
+      sanitized[key] = sanitizeUrl(value);
+    } else if (typeof value === 'object' && !Array.isArray(value)) {
+      // Recursively sanitize nested objects
+      sanitized[key] = sanitizeTemplateData(value);
+    } else {
+      sanitized[key] = value;
+    }
+  }
+
+  return sanitized;
+}
+
+/**
  * Load and render email template
  *
  * @param templatePath - Path to template file relative to templates/emails/
@@ -81,10 +129,13 @@ export async function renderTemplate(
     // Read template file
     let html = await fs.readFile(fullPath, 'utf-8');
 
+    // Security: Sanitize URL values before template rendering
+    const sanitizedData = sanitizeTemplateData(data);
+
     // Simple template rendering - replace {{variable}} with data values
-    Object.keys(data).forEach(key => {
+    Object.keys(sanitizedData).forEach(key => {
       const regex = new RegExp(`{{\\s*${key}\\s*}}`, 'g');
-      html = html.replace(regex, String(data[key] ?? ''));
+      html = html.replace(regex, String(sanitizedData[key] ?? ''));
     });
 
     // Load base template if this is not the base template
@@ -97,9 +148,9 @@ export async function renderTemplate(
         html = baseHtml.replace('{{content}}', html);
 
         // Apply data to the combined template
-        Object.keys(data).forEach(key => {
+        Object.keys(sanitizedData).forEach(key => {
           const regex = new RegExp(`{{\\s*${key}\\s*}}`, 'g');
-          html = html.replace(regex, String(data[key] ?? ''));
+          html = html.replace(regex, String(sanitizedData[key] ?? ''));
         });
       } catch {
         // Base template not found, use template as-is
@@ -359,6 +410,71 @@ export function isValidEmail(email: string): boolean {
 }
 
 /**
+ * Allowed URL protocols for email templates
+ * Security: Prevents XSS through javascript:, data:, vbscript: URLs
+ */
+const ALLOWED_URL_PROTOCOLS = ['https:', 'http:', 'mailto:', 'tel:'];
+
+/**
+ * Sanitize URL to prevent XSS attacks
+ * Only allows safe protocols (https, http, mailto, tel)
+ *
+ * @param url - URL to sanitize
+ * @returns Sanitized URL or empty string if invalid
+ */
+export function sanitizeUrl(url: string): string {
+  if (!url || typeof url !== 'string') {
+    return '';
+  }
+
+  const trimmedUrl = url.trim();
+
+  // Empty URLs are safe
+  if (trimmedUrl === '' || trimmedUrl === '#') {
+    return trimmedUrl;
+  }
+
+  try {
+    // Handle relative URLs (starting with /)
+    if (trimmedUrl.startsWith('/')) {
+      // Ensure it doesn't start with // (protocol-relative)
+      if (trimmedUrl.startsWith('//')) {
+        return '';
+      }
+      return trimmedUrl;
+    }
+
+    // Parse the URL to check protocol
+    const parsedUrl = new URL(trimmedUrl);
+
+    // Check if protocol is allowed
+    if (!ALLOWED_URL_PROTOCOLS.includes(parsedUrl.protocol)) {
+      logger.warn('Blocked potentially dangerous URL protocol in email template', {
+        protocol: parsedUrl.protocol,
+        url: trimmedUrl.substring(0, 50), // Log only first 50 chars for security
+      });
+      return '';
+    }
+
+    return trimmedUrl;
+  } catch {
+    // If URL parsing fails, check if it looks like a safe relative path
+    // This handles cases like "page.html" or "path/to/page"
+    if (/^[a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=%]+$/.test(trimmedUrl) &&
+        !trimmedUrl.toLowerCase().startsWith('javascript') &&
+        !trimmedUrl.toLowerCase().startsWith('data') &&
+        !trimmedUrl.toLowerCase().startsWith('vbscript')) {
+      return trimmedUrl;
+    }
+
+    logger.warn('Invalid URL blocked in email template', {
+      url: trimmedUrl.substring(0, 50),
+    });
+    return '';
+  }
+}
+
+/**
  * Send transactional email types (convenience functions)
  */
 export const transactional = {
@@ -510,5 +626,6 @@ export default {
   sendBatchEmail,
   renderTemplate,
   isValidEmail,
+  sanitizeUrl,
   transactional,
 };

@@ -27,7 +27,9 @@ export class MfaUtils {
   static encryptSecret(secret: string): string {
     const key = this.getEncryptionKey();
     const iv = randomBytes(this.IV_LENGTH);
-    const cipher = createCipheriv(this.ALGORITHM, key, iv);
+    const cipher = createCipheriv(this.ALGORITHM, key, iv, {
+      authTagLength: this.AUTH_TAG_LENGTH,
+    });
     let enc = cipher.update(secret, "utf8", "hex");
     enc += cipher.final("hex");
     return iv.toString("hex") + cipher.getAuthTag().toString("hex") + enc;
@@ -38,7 +40,9 @@ export class MfaUtils {
     const iv = Buffer.from(data.slice(0, 32), "hex");
     const tag = Buffer.from(data.slice(32, 64), "hex");
     const enc = data.slice(64);
-    const dec = createDecipheriv(this.ALGORITHM, key, iv);
+    const dec = createDecipheriv(this.ALGORITHM, key, iv, {
+      authTagLength: this.AUTH_TAG_LENGTH,
+    });
     dec.setAuthTag(tag);
     return dec.update(enc, "hex", "utf8") + dec.final("utf8");
   }

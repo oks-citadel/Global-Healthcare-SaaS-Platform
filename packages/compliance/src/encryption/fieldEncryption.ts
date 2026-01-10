@@ -35,7 +35,9 @@ export class FieldEncryption {
       'sha512'
     );
 
-    const cipher = crypto.createCipheriv(this.algorithm, key, iv) as CipherGCM;
+    const cipher = crypto.createCipheriv(this.algorithm, key, iv, {
+      authTagLength: this.tagLength,
+    }) as CipherGCM;
 
     // Add authenticated data if context provided
     if (context) {
@@ -82,7 +84,9 @@ export class FieldEncryption {
       'sha512'
     );
 
-    const decipher = crypto.createDecipheriv(this.algorithm, key, iv) as DecipherGCM;
+    const decipher = crypto.createDecipheriv(this.algorithm, key, iv, {
+      authTagLength: this.tagLength,
+    }) as DecipherGCM;
     decipher.setAuthTag(authTag);
 
     if (context) {
