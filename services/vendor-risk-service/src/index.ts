@@ -105,7 +105,7 @@ app.use((req, res, next) => {
 });
 
 // Health check endpoint
-app.get('/health', (req, res) => {
+app.get('/health', (_req, res) => {
   res.json({
     status: 'healthy',
     service: 'vendor-risk-service',
@@ -116,7 +116,7 @@ app.get('/health', (req, res) => {
 });
 
 // Ready check endpoint (for Kubernetes)
-app.get('/ready', (req, res) => {
+app.get('/ready', (_req, res) => {
   // Add database connection check here if needed
   res.json({
     status: 'ready',
@@ -142,7 +142,8 @@ app.use((req, res) => {
 });
 
 // Global error handler
-app.use((err: Error & { status?: number }, req: express.Request, res: express.Response, next: express.NextFunction) => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+app.use((err: Error & { status?: number }, req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error('Error:', {
     message: err.message,
     stack: err.stack,

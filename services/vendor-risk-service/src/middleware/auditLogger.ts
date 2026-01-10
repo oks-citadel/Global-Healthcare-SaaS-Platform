@@ -56,11 +56,11 @@ export const auditMiddleware = (
     const originalEnd = res.end;
     const originalJson = res.json;
 
-    let responseBody: unknown;
+    let _responseBody: unknown;
 
     // Override json to capture response
     res.json = function(body: unknown) {
-      responseBody = body;
+      _responseBody = body;
       return originalJson.call(this, body);
     };
 
