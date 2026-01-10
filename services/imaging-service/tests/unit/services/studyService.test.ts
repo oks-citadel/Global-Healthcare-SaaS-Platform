@@ -98,11 +98,11 @@ describe("StudyService", () => {
     });
   });
 
-  describe("getStudy", () => {
+  describe("getStudyById", () => {
     it("should return study when found", async () => {
       mockPrismaInstance.study.findUnique.mockResolvedValue(mockStudy);
 
-      const result = await StudyService.getStudy("study-123");
+      const result = await StudyService.getStudyById("study-123");
 
       expect(mockPrismaInstance.study.findUnique).toHaveBeenCalledWith({
         where: { id: "study-123" },
@@ -111,19 +111,25 @@ describe("StudyService", () => {
       expect(result).toEqual(mockStudy);
     });
 
-    it("should return null when study not found", async () => {
+    it("should throw error when study not found", async () => {
       mockPrismaInstance.study.findUnique.mockResolvedValue(null);
 
-      const result = await StudyService.getStudy("non-existent");
-
-      expect(result).toBeNull();
+      await expect(StudyService.getStudyById("non-existent")).rejects.toThrow(
+        "Study not found",
+      );
     });
   });
 
   describe("updateStudyStatus", () => {
     it("should update study status", async () => {
-      const updatedStudy = { ...mockStudy, status: "COMPLETED" };
+      const updatedStudy = {
+        ...mockStudy,
+        status: "COMPLETED",
+        orderId: "order-123",
+      };
       mockPrismaInstance.study.update.mockResolvedValue(updatedStudy);
+      mockPrismaInstance.study.findMany.mockResolvedValue([updatedStudy]);
+      mockPrismaInstance.imagingOrder.update.mockResolvedValue({});
 
       const result = await StudyService.updateStudyStatus(
         "study-123",
@@ -138,15 +144,15 @@ describe("StudyService", () => {
     });
   });
 
-  describe("listStudies", () => {
+  describe("getStudies", () => {
     it("should return paginated studies", async () => {
       mockPrismaInstance.study.findMany.mockResolvedValue([mockStudy]);
       mockPrismaInstance.study.count.mockResolvedValue(1);
 
-      const result = await StudyService.listStudies({ limit: 20, offset: 0 });
+      const result = await StudyService.getStudies({ page: 1, limit: 20 });
 
       expect(result.studies).toHaveLength(1);
-      expect(result.total).toBe(1);
+      expect(result.pagination.total).toBe(1);
     });
   });
 });

@@ -5,8 +5,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 // Use vi.hoisted to define mocks before hoisting
-const { mockPrismaInstance } = vi.hoisted(() => {
-  const mockFn = () => ({
+const { mockPrismaInstance, MockPrismaClient } = vi.hoisted(() => {
+  const instance = {
     imagingOrder: {
       findUnique: vi.fn(),
       findMany: vi.fn(),
@@ -26,13 +26,19 @@ const { mockPrismaInstance } = vi.hoisted(() => {
     $connect: vi.fn(),
     $disconnect: vi.fn(),
     $transaction: vi.fn(),
-  });
-  return { mockPrismaInstance: mockFn() };
+  };
+
+  // Create a class-like constructor
+  function MockPrismaClient() {
+    return instance;
+  }
+
+  return { mockPrismaInstance: instance, MockPrismaClient };
 });
 
 // Mock the Prisma client
 vi.mock("../../../src/generated/client", () => ({
-  PrismaClient: vi.fn(() => mockPrismaInstance),
+  PrismaClient: MockPrismaClient,
 }));
 
 // Mock logger
@@ -86,11 +92,11 @@ describe("OrderService", () => {
     });
   });
 
-  describe("getOrder", () => {
+  describe("getOrderById", () => {
     it("should return order when found", async () => {
       mockPrismaInstance.imagingOrder.findUnique.mockResolvedValue(mockOrder);
 
-      const result = await OrderService.getOrder("order-123");
+      const result = await OrderService.getOrderById("order-123");
 
       expect(mockPrismaInstance.imagingOrder.findUnique).toHaveBeenCalledWith({
         where: { id: "order-123" },
@@ -99,30 +105,27 @@ describe("OrderService", () => {
       expect(result).toEqual(mockOrder);
     });
 
-    it("should return null when order not found", async () => {
+    it("should throw error when order not found", async () => {
       mockPrismaInstance.imagingOrder.findUnique.mockResolvedValue(null);
 
-      const result = await OrderService.getOrder("non-existent");
-
-      expect(result).toBeNull();
+      await expect(OrderService.getOrderById("non-existent")).rejects.toThrow(
+        "Imaging order not found",
+      );
     });
   });
 
-  describe("updateOrderStatus", () => {
-    it("should update order status", async () => {
-      const updatedOrder = { ...mockOrder, status: "IN_PROGRESS" };
-      mockPrismaInstance.imagingOrder.update.mockResolvedValue(updatedOrder);
+  describe("cancelOrder", () => {
+    it("should cancel order", async () => {
+      const cancelledOrder = { ...mockOrder, status: "CANCELLED" };
+      mockPrismaInstance.imagingOrder.update.mockResolvedValue(cancelledOrder);
 
-      const result = await OrderService.updateOrderStatus(
-        "order-123",
-        "IN_PROGRESS",
-      );
+      const result = await OrderService.cancelOrder("order-123");
 
       expect(mockPrismaInstance.imagingOrder.update).toHaveBeenCalledWith({
         where: { id: "order-123" },
-        data: { status: "IN_PROGRESS" },
+        data: { status: "CANCELLED" },
       });
-      expect(result.status).toBe("IN_PROGRESS");
+      expect(result.status).toBe("CANCELLED");
     });
   });
 });

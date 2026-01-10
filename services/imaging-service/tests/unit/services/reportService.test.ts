@@ -11,8 +11,8 @@ import {
 } from "../helpers/fixtures";
 
 // Use vi.hoisted to define mocks before hoisting
-const { mockPrismaInstance } = vi.hoisted(() => {
-  const mockFn = () => ({
+const { mockPrismaInstance, MockPrismaClient } = vi.hoisted(() => {
+  const instance = {
     radiologyReport: {
       findUnique: vi.fn(),
       findMany: vi.fn(),
@@ -40,13 +40,19 @@ const { mockPrismaInstance } = vi.hoisted(() => {
     $connect: vi.fn(),
     $disconnect: vi.fn(),
     $transaction: vi.fn(),
-  });
-  return { mockPrismaInstance: mockFn() };
+  };
+
+  // Create a class-like constructor
+  function MockPrismaClient() {
+    return instance;
+  }
+
+  return { mockPrismaInstance: instance, MockPrismaClient };
 });
 
 // Mock the Prisma client
 vi.mock("../../../src/generated/client", () => ({
-  PrismaClient: vi.fn(() => mockPrismaInstance),
+  PrismaClient: MockPrismaClient,
 }));
 
 // Mock logger
@@ -82,13 +88,13 @@ describe("ReportService", () => {
     });
   });
 
-  describe("getReport", () => {
+  describe("getReportById", () => {
     it("should return report when found", async () => {
       mockPrismaInstance.radiologyReport.findUnique.mockResolvedValue(
         mockRadiologyReport,
       );
 
-      const result = await ReportService.getReport("report-123");
+      const result = await ReportService.getReportById("report-123");
 
       expect(
         mockPrismaInstance.radiologyReport.findUnique,
@@ -99,25 +105,23 @@ describe("ReportService", () => {
       expect(result).toEqual(mockRadiologyReport);
     });
 
-    it("should return null when report not found", async () => {
+    it("should throw error when report not found", async () => {
       mockPrismaInstance.radiologyReport.findUnique.mockResolvedValue(null);
 
-      const result = await ReportService.getReport("non-existent");
-
-      expect(result).toBeNull();
+      await expect(ReportService.getReportById("non-existent")).rejects.toThrow(
+        "Report not found",
+      );
     });
   });
 
-  describe("finalizeReport", () => {
-    it("should finalize a preliminary report", async () => {
-      mockPrismaInstance.radiologyReport.findUnique.mockResolvedValue(
-        mockRadiologyReport,
-      );
+  describe("signReport", () => {
+    it("should sign a report", async () => {
       mockPrismaInstance.radiologyReport.update.mockResolvedValue(
         mockFinalReport,
       );
+      mockPrismaInstance.study.update.mockResolvedValue(mockStudy);
 
-      const result = await ReportService.finalizeReport(
+      const result = await ReportService.signReport(
         "report-123",
         "radiologist-123",
       );
@@ -126,7 +130,7 @@ describe("ReportService", () => {
         where: { id: "report-123" },
         data: expect.objectContaining({
           status: "FINAL",
-          finalizedById: "radiologist-123",
+          signedBy: "radiologist-123",
         }),
       });
       expect(result.status).toBe("FINAL");
