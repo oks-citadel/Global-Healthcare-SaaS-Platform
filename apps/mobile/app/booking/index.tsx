@@ -3,7 +3,7 @@
  * Allows selecting appointment type
  */
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -11,33 +11,39 @@ import {
   TouchableOpacity,
   Image,
   ActivityIndicator,
-} from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { useProvider } from '../../src/hooks';
-import { AppointmentType } from '../../src/types';
-import { colors, spacing, borderRadius, typography, shadows } from '../../src/theme';
+} from "react-native";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { useProvider } from "../../src/hooks";
+import { AppointmentType } from "../../src/types";
+import {
+  colors,
+  spacing,
+  borderRadius,
+  typography,
+  shadows,
+} from "../../src/theme";
 
 const appointmentTypes = [
   {
-    type: 'video' as AppointmentType,
-    title: 'Video Visit',
-    description: 'Connect with your doctor via video call from anywhere',
-    icon: 'videocam',
+    type: "video" as AppointmentType,
+    title: "Video Visit",
+    description: "Connect with your doctor via video call from anywhere",
+    icon: "videocam",
     color: colors.primary[500],
   },
   {
-    type: 'phone' as AppointmentType,
-    title: 'Phone Call',
-    description: 'Speak with your doctor over the phone',
-    icon: 'call',
+    type: "phone" as AppointmentType,
+    title: "Phone Call",
+    description: "Speak with your doctor over the phone",
+    icon: "call",
     color: colors.success[500],
   },
   {
-    type: 'in-person' as AppointmentType,
-    title: 'In-Person Visit',
-    description: 'Visit the doctor at their office location',
-    icon: 'location',
+    type: "in-person" as AppointmentType,
+    title: "In-Person Visit",
+    description: "Visit the doctor at their office location",
+    icon: "location",
     color: colors.secondary[500],
   },
 ];
@@ -45,14 +51,16 @@ const appointmentTypes = [
 export default function BookingScreen() {
   const { providerId } = useLocalSearchParams<{ providerId: string }>();
   const router = useRouter();
-  const [selectedType, setSelectedType] = useState<AppointmentType | null>(null);
+  const [selectedType, setSelectedType] = useState<AppointmentType | null>(
+    null,
+  );
 
   const { data: provider, isLoading } = useProvider(providerId);
 
   const handleContinue = useCallback(() => {
     if (selectedType) {
       router.push({
-        pathname: '/booking/datetime',
+        pathname: "/booking/datetime",
         params: {
           providerId,
           appointmentType: selectedType,
@@ -61,10 +69,10 @@ export default function BookingScreen() {
     }
   }, [router, providerId, selectedType]);
 
-  const availableTypes = appointmentTypes.filter(apt => {
+  const availableTypes = appointmentTypes.filter((apt) => {
     if (!provider?.availability) return true;
-    return provider.availability.some(slot =>
-      slot.appointmentTypes.includes(apt.type)
+    return provider.availability.some((slot) =>
+      slot.appointmentTypes.includes(apt.type),
     );
   });
 
@@ -82,7 +90,9 @@ export default function BookingScreen() {
       {provider && (
         <View style={styles.providerCard}>
           <Image
-            source={{ uri: provider.avatar || 'https://via.placeholder.com/60' }}
+            source={{
+              uri: provider.avatar || "https://via.placeholder.com/60",
+            }}
             style={styles.providerAvatar}
           />
           <View style={styles.providerInfo}>
@@ -111,14 +121,10 @@ export default function BookingScreen() {
             <View
               style={[
                 styles.typeIconContainer,
-                { backgroundColor: apt.color + '20' },
+                { backgroundColor: apt.color + "20" },
               ]}
             >
-              <Ionicons
-                name={apt.icon as any}
-                size={28}
-                color={apt.color}
-              />
+              <Ionicons name={apt.icon as any} size={28} color={apt.color} />
             </View>
             <View style={styles.typeInfo}>
               <Text style={styles.typeTitle}>{apt.title}</Text>
@@ -130,9 +136,7 @@ export default function BookingScreen() {
                 selectedType === apt.type && styles.radioOuterSelected,
               ]}
             >
-              {selectedType === apt.type && (
-                <View style={styles.radioInner} />
-              )}
+              {selectedType === apt.type && <View style={styles.radioInner} />}
             </View>
           </TouchableOpacity>
         ))}
@@ -167,12 +171,12 @@ const styles = StyleSheet.create({
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   providerCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: spacing.lg,
     backgroundColor: colors.light.card,
     borderBottomWidth: 1,
@@ -208,14 +212,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
   },
   typeCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: spacing.lg,
     backgroundColor: colors.light.card,
     borderRadius: borderRadius.lg,
     marginBottom: spacing.md,
     borderWidth: 2,
-    borderColor: 'transparent',
+    borderColor: "transparent",
     ...shadows.sm,
   },
   typeCardSelected: {
@@ -226,8 +230,8 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: borderRadius.lg,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   typeInfo: {
     flex: 1,
@@ -249,8 +253,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 2,
     borderColor: colors.gray[300],
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   radioOuterSelected: {
     borderColor: colors.primary[500],
@@ -262,7 +266,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary[500],
   },
   bottomContainer: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
@@ -272,9 +276,9 @@ const styles = StyleSheet.create({
     borderTopColor: colors.light.divider,
   },
   continueButton: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     backgroundColor: colors.primary[500],
     paddingVertical: spacing.md,
     borderRadius: borderRadius.lg,

@@ -3,24 +3,26 @@
  * Manages subscriptions, payments, and invoices
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import apiClient from '../api/client';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import apiClient from "../api/client";
 import {
   Subscription,
   SubscriptionPlan,
   PaymentMethod,
   Invoice,
   PaginatedResponse,
-} from '../types';
+} from "../types";
 
 // ===== Subscription Management =====
 
 // Fetch current subscription
 export const useSubscription = () => {
   return useQuery({
-    queryKey: ['subscription'],
+    queryKey: ["subscription"],
     queryFn: async () => {
-      const response = await apiClient.get<Subscription>('/billing/subscription');
+      const response = await apiClient.get<Subscription>(
+        "/billing/subscription",
+      );
       return response;
     },
   });
@@ -29,9 +31,10 @@ export const useSubscription = () => {
 // Fetch available plans
 export const useSubscriptionPlans = () => {
   return useQuery({
-    queryKey: ['subscription-plans'],
+    queryKey: ["subscription-plans"],
     queryFn: async () => {
-      const response = await apiClient.get<SubscriptionPlan[]>('/billing/plans');
+      const response =
+        await apiClient.get<SubscriptionPlan[]>("/billing/plans");
       return response;
     },
     staleTime: 1000 * 60 * 60, // 1 hour - plans rarely change
@@ -50,14 +53,17 @@ export const useSubscribe = () => {
       planId: string;
       paymentMethodId: string;
     }) => {
-      const response = await apiClient.post<Subscription>('/billing/subscribe', {
-        planId,
-        paymentMethodId,
-      });
+      const response = await apiClient.post<Subscription>(
+        "/billing/subscribe",
+        {
+          planId,
+          paymentMethodId,
+        },
+      );
       return response;
     },
     onSuccess: (data) => {
-      queryClient.setQueryData(['subscription'], data);
+      queryClient.setQueryData(["subscription"], data);
     },
   });
 };
@@ -69,13 +75,13 @@ export const useChangePlan = () => {
   return useMutation({
     mutationFn: async (planId: string) => {
       const response = await apiClient.patch<Subscription>(
-        '/billing/subscription/plan',
-        { planId }
+        "/billing/subscription/plan",
+        { planId },
       );
       return response;
     },
     onSuccess: (data) => {
-      queryClient.setQueryData(['subscription'], data);
+      queryClient.setQueryData(["subscription"], data);
     },
   });
 };
@@ -85,15 +91,15 @@ export const useCancelSubscription = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (cancelAtPeriodEnd = true) => {
+    mutationFn: async (cancelAtPeriodEnd: boolean) => {
       const response = await apiClient.post<Subscription>(
-        '/billing/subscription/cancel',
-        { cancelAtPeriodEnd }
+        "/billing/subscription/cancel",
+        { cancelAtPeriodEnd },
       );
       return response;
     },
     onSuccess: (data) => {
-      queryClient.setQueryData(['subscription'], data);
+      queryClient.setQueryData(["subscription"], data);
     },
   });
 };
@@ -105,12 +111,12 @@ export const useResumeSubscription = () => {
   return useMutation({
     mutationFn: async () => {
       const response = await apiClient.post<Subscription>(
-        '/billing/subscription/resume'
+        "/billing/subscription/resume",
       );
       return response;
     },
     onSuccess: (data) => {
-      queryClient.setQueryData(['subscription'], data);
+      queryClient.setQueryData(["subscription"], data);
     },
   });
 };
@@ -120,10 +126,10 @@ export const useResumeSubscription = () => {
 // Fetch payment methods
 export const usePaymentMethods = () => {
   return useQuery({
-    queryKey: ['payment-methods'],
+    queryKey: ["payment-methods"],
     queryFn: async () => {
       const response = await apiClient.get<PaymentMethod[]>(
-        '/billing/payment-methods'
+        "/billing/payment-methods",
       );
       return response;
     },
@@ -137,13 +143,13 @@ export const useAddPaymentMethod = () => {
   return useMutation({
     mutationFn: async (paymentMethodToken: string) => {
       const response = await apiClient.post<PaymentMethod>(
-        '/billing/payment-methods',
-        { token: paymentMethodToken }
+        "/billing/payment-methods",
+        { token: paymentMethodToken },
       );
       return response;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['payment-methods'] });
+      queryClient.invalidateQueries({ queryKey: ["payment-methods"] });
     },
   });
 };
@@ -158,7 +164,7 @@ export const useRemovePaymentMethod = () => {
       return paymentMethodId;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['payment-methods'] });
+      queryClient.invalidateQueries({ queryKey: ["payment-methods"] });
     },
   });
 };
@@ -170,12 +176,12 @@ export const useSetDefaultPaymentMethod = () => {
   return useMutation({
     mutationFn: async (paymentMethodId: string) => {
       const response = await apiClient.patch<PaymentMethod>(
-        `/billing/payment-methods/${paymentMethodId}/default`
+        `/billing/payment-methods/${paymentMethodId}/default`,
       );
       return response;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['payment-methods'] });
+      queryClient.invalidateQueries({ queryKey: ["payment-methods"] });
     },
   });
 };
@@ -185,10 +191,10 @@ export const useSetDefaultPaymentMethod = () => {
 // Fetch invoices
 export const useInvoices = (page = 1, limit = 20) => {
   return useQuery({
-    queryKey: ['invoices', page, limit],
+    queryKey: ["invoices", page, limit],
     queryFn: async () => {
       const response = await apiClient.get<PaginatedResponse<Invoice>>(
-        `/billing/invoices?page=${page}&limit=${limit}`
+        `/billing/invoices?page=${page}&limit=${limit}`,
       );
       return response;
     },
@@ -198,7 +204,7 @@ export const useInvoices = (page = 1, limit = 20) => {
 // Fetch single invoice
 export const useInvoice = (id: string) => {
   return useQuery({
-    queryKey: ['invoice', id],
+    queryKey: ["invoice", id],
     queryFn: async () => {
       const response = await apiClient.get<Invoice>(`/billing/invoices/${id}`);
       return response;
@@ -212,7 +218,7 @@ export const useDownloadInvoice = () => {
   return useMutation({
     mutationFn: async (invoiceId: string) => {
       const response = await apiClient.get<{ downloadUrl: string }>(
-        `/billing/invoices/${invoiceId}/download`
+        `/billing/invoices/${invoiceId}/download`,
       );
       return response;
     },
@@ -233,14 +239,14 @@ export const usePayInvoice = () => {
     }) => {
       const response = await apiClient.post<Invoice>(
         `/billing/invoices/${invoiceId}/pay`,
-        { paymentMethodId }
+        { paymentMethodId },
       );
       return response;
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['invoices'] });
-      queryClient.setQueryData(['invoice', data.id], data);
-      queryClient.invalidateQueries({ queryKey: ['subscription'] });
+      queryClient.invalidateQueries({ queryKey: ["invoices"] });
+      queryClient.setQueryData(["invoice", data.id], data);
+      queryClient.invalidateQueries({ queryKey: ["subscription"] });
     },
   });
 };
@@ -252,8 +258,8 @@ export const useBillingPortal = () => {
   return useMutation({
     mutationFn: async (returnUrl?: string) => {
       const response = await apiClient.post<{ url: string }>(
-        '/billing/portal',
-        { returnUrl }
+        "/billing/portal",
+        { returnUrl },
       );
       return response;
     },
@@ -263,10 +269,10 @@ export const useBillingPortal = () => {
 // Get payment setup intent
 export const useSetupIntent = () => {
   return useQuery({
-    queryKey: ['setup-intent'],
+    queryKey: ["setup-intent"],
     queryFn: async () => {
       const response = await apiClient.post<{ clientSecret: string }>(
-        '/billing/setup-intent'
+        "/billing/setup-intent",
       );
       return response;
     },
@@ -279,7 +285,7 @@ export const useSetupIntent = () => {
 // Fetch usage summary
 export const useUsageSummary = () => {
   return useQuery({
-    queryKey: ['usage-summary'],
+    queryKey: ["usage-summary"],
     queryFn: async () => {
       const response = await apiClient.get<{
         currentPeriod: {
@@ -292,7 +298,7 @@ export const useUsageSummary = () => {
         };
         nextBillingDate: string;
         estimatedCost: number;
-      }>('/billing/usage');
+      }>("/billing/usage");
       return response;
     },
   });
@@ -301,15 +307,17 @@ export const useUsageSummary = () => {
 // Fetch billing history
 export const useBillingHistory = () => {
   return useQuery({
-    queryKey: ['billing-history'],
+    queryKey: ["billing-history"],
     queryFn: async () => {
-      const response = await apiClient.get<Array<{
-        id: string;
-        date: string;
-        description: string;
-        amount: number;
-        status: 'paid' | 'pending' | 'failed';
-      }>>('/billing/history');
+      const response = await apiClient.get<
+        Array<{
+          id: string;
+          date: string;
+          description: string;
+          amount: number;
+          status: "paid" | "pending" | "failed";
+        }>
+      >("/billing/history");
       return response;
     },
   });

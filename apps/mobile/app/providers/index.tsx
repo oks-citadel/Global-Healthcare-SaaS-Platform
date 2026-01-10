@@ -3,7 +3,7 @@
  * Allows patients to search and find doctors
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -14,23 +14,36 @@ import {
   Image,
   ActivityIndicator,
   RefreshControl,
-} from 'react-native';
-import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { useProviderSearch, useSpecialties, useFeaturedProviders } from '../../src/hooks';
-import { Provider, ProviderSearchParams } from '../../src/types';
-import { colors, spacing, borderRadius, typography, shadows } from '../../src/theme';
+} from "react-native";
+import { useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import {
+  useProviderSearch,
+  useSpecialties,
+  useFeaturedProviders,
+} from "../../src/hooks";
+import { Provider, ProviderSearchParams } from "../../src/types";
+import {
+  colors,
+  spacing,
+  borderRadius,
+  typography,
+  shadows,
+} from "../../src/theme";
 
 export default function ProvidersScreen() {
   const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedSpecialty, setSelectedSpecialty] = useState<string | undefined>();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedSpecialty, setSelectedSpecialty] = useState<
+    string | undefined
+  >();
   const [searchParams, setSearchParams] = useState<ProviderSearchParams>({
     limit: 20,
   });
 
   const { data: specialties } = useSpecialties();
-  const { data: featuredProviders, isLoading: featuredLoading } = useFeaturedProviders(5);
+  const { data: featuredProviders, isLoading: _featuredLoading } =
+    useFeaturedProviders(5);
   const {
     data,
     fetchNextPage,
@@ -41,82 +54,100 @@ export default function ProvidersScreen() {
     isRefetching,
   } = useProviderSearch(searchParams);
 
-  const providers = data?.pages.flatMap(page => page.data) ?? [];
-  const showFeatured = !searchQuery && !selectedSpecialty && providers.length === 0;
+  const providers = data?.pages.flatMap((page) => page.data) ?? [];
+  const showFeatured =
+    !searchQuery && !selectedSpecialty && providers.length === 0;
 
   const handleSearch = useCallback(() => {
-    setSearchParams(prev => ({
+    setSearchParams((prev) => ({
       ...prev,
       query: searchQuery || undefined,
       specialty: selectedSpecialty,
     }));
   }, [searchQuery, selectedSpecialty]);
 
-  const handleSpecialtySelect = useCallback((specialty: string) => {
-    const newSpecialty = specialty === selectedSpecialty ? undefined : specialty;
-    setSelectedSpecialty(newSpecialty);
-    setSearchParams(prev => ({
-      ...prev,
-      specialty: newSpecialty,
-    }));
-  }, [selectedSpecialty]);
+  const handleSpecialtySelect = useCallback(
+    (specialty: string) => {
+      const newSpecialty =
+        specialty === selectedSpecialty ? undefined : specialty;
+      setSelectedSpecialty(newSpecialty);
+      setSearchParams((prev) => ({
+        ...prev,
+        specialty: newSpecialty,
+      }));
+    },
+    [selectedSpecialty],
+  );
 
-  const handleProviderPress = useCallback((provider: Provider) => {
-    router.push(`/providers/${provider.id}`);
-  }, [router]);
+  const handleProviderPress = useCallback(
+    (provider: Provider) => {
+      router.push(`/providers/${provider.id}`);
+    },
+    [router],
+  );
 
-  const renderProviderCard = useCallback(({ item }: { item: Provider }) => (
-    <TouchableOpacity
-      style={styles.providerCard}
-      onPress={() => handleProviderPress(item)}
-      activeOpacity={0.7}
-    >
-      <Image
-        source={{ uri: item.avatar || 'https://via.placeholder.com/80' }}
-        style={styles.providerAvatar}
-      />
-      <View style={styles.providerInfo}>
-        <Text style={styles.providerName}>
-          Dr. {item.firstName} {item.lastName}
-        </Text>
-        <Text style={styles.providerSpecialty}>{item.specialty}</Text>
-        {item.rating && (
-          <View style={styles.ratingContainer}>
-            <Ionicons name="star" size={14} color={colors.warning[500]} />
-            <Text style={styles.ratingText}>
-              {item.rating.toFixed(1)} ({item.reviewCount || 0} reviews)
-            </Text>
-          </View>
-        )}
-        {item.acceptingNewPatients && (
-          <View style={styles.acceptingBadge}>
-            <Ionicons name="checkmark-circle" size={12} color={colors.success[500]} />
-            <Text style={styles.acceptingText}>Accepting new patients</Text>
-          </View>
-        )}
-      </View>
-      <Ionicons name="chevron-forward" size={20} color={colors.gray[400]} />
-    </TouchableOpacity>
-  ), [handleProviderPress]);
-
-  const renderSpecialtyChip = useCallback(({ item }: { item: string }) => (
-    <TouchableOpacity
-      style={[
-        styles.specialtyChip,
-        selectedSpecialty === item && styles.specialtyChipSelected,
-      ]}
-      onPress={() => handleSpecialtySelect(item)}
-    >
-      <Text
-        style={[
-          styles.specialtyChipText,
-          selectedSpecialty === item && styles.specialtyChipTextSelected,
-        ]}
+  const renderProviderCard = useCallback(
+    ({ item }: { item: Provider }) => (
+      <TouchableOpacity
+        style={styles.providerCard}
+        onPress={() => handleProviderPress(item)}
+        activeOpacity={0.7}
       >
-        {item}
-      </Text>
-    </TouchableOpacity>
-  ), [selectedSpecialty, handleSpecialtySelect]);
+        <Image
+          source={{ uri: item.avatar || "https://via.placeholder.com/80" }}
+          style={styles.providerAvatar}
+        />
+        <View style={styles.providerInfo}>
+          <Text style={styles.providerName}>
+            Dr. {item.firstName} {item.lastName}
+          </Text>
+          <Text style={styles.providerSpecialty}>{item.specialty}</Text>
+          {item.rating && (
+            <View style={styles.ratingContainer}>
+              <Ionicons name="star" size={14} color={colors.warning[500]} />
+              <Text style={styles.ratingText}>
+                {item.rating.toFixed(1)} ({item.reviewCount || 0} reviews)
+              </Text>
+            </View>
+          )}
+          {item.acceptingNewPatients && (
+            <View style={styles.acceptingBadge}>
+              <Ionicons
+                name="checkmark-circle"
+                size={12}
+                color={colors.success[500]}
+              />
+              <Text style={styles.acceptingText}>Accepting new patients</Text>
+            </View>
+          )}
+        </View>
+        <Ionicons name="chevron-forward" size={20} color={colors.gray[400]} />
+      </TouchableOpacity>
+    ),
+    [handleProviderPress],
+  );
+
+  const renderSpecialtyChip = useCallback(
+    ({ item }: { item: string }) => (
+      <TouchableOpacity
+        style={[
+          styles.specialtyChip,
+          selectedSpecialty === item && styles.specialtyChipSelected,
+        ]}
+        onPress={() => handleSpecialtySelect(item)}
+      >
+        <Text
+          style={[
+            styles.specialtyChipText,
+            selectedSpecialty === item && styles.specialtyChipTextSelected,
+          ]}
+        >
+          {item}
+        </Text>
+      </TouchableOpacity>
+    ),
+    [selectedSpecialty, handleSpecialtySelect],
+  );
 
   const renderHeader = () => (
     <View style={styles.header}>
@@ -132,7 +163,7 @@ export default function ProvidersScreen() {
           placeholderTextColor={colors.gray[400]}
         />
         {searchQuery.length > 0 && (
-          <TouchableOpacity onPress={() => setSearchQuery('')}>
+          <TouchableOpacity onPress={() => setSearchQuery("")}>
             <Ionicons name="close-circle" size={20} color={colors.gray[400]} />
           </TouchableOpacity>
         )}
@@ -160,14 +191,18 @@ export default function ProvidersScreen() {
               onPress={() => handleProviderPress(provider)}
             >
               <Image
-                source={{ uri: provider.avatar || 'https://via.placeholder.com/60' }}
+                source={{
+                  uri: provider.avatar || "https://via.placeholder.com/60",
+                }}
                 style={styles.featuredAvatar}
               />
               <View style={styles.featuredInfo}>
                 <Text style={styles.featuredName}>
                   Dr. {provider.firstName} {provider.lastName}
                 </Text>
-                <Text style={styles.featuredSpecialty}>{provider.specialty}</Text>
+                <Text style={styles.featuredSpecialty}>
+                  {provider.specialty}
+                </Text>
               </View>
             </TouchableOpacity>
           ))}
@@ -249,8 +284,8 @@ const styles = StyleSheet.create({
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     backgroundColor: colors.light.background,
   },
   loadingText: {
@@ -262,8 +297,8 @@ const styles = StyleSheet.create({
     padding: spacing.md,
   },
   searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: colors.gray[100],
     borderRadius: borderRadius.lg,
     paddingHorizontal: spacing.md,
@@ -308,8 +343,8 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   featuredCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: spacing.md,
     backgroundColor: colors.light.card,
     borderRadius: borderRadius.lg,
@@ -344,8 +379,8 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xl,
   },
   providerCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: spacing.md,
     marginHorizontal: spacing.md,
     marginBottom: spacing.sm,
@@ -373,8 +408,8 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   ratingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginTop: spacing.xs,
   },
   ratingText: {
@@ -383,8 +418,8 @@ const styles = StyleSheet.create({
     marginLeft: spacing.xs,
   },
   acceptingBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginTop: spacing.xs,
   },
   acceptingText: {
@@ -394,10 +429,10 @@ const styles = StyleSheet.create({
   },
   loadingFooter: {
     paddingVertical: spacing.lg,
-    alignItems: 'center',
+    alignItems: "center",
   },
   emptyContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     paddingVertical: spacing.xxxl,
   },
   emptyTitle: {

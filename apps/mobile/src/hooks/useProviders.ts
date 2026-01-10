@@ -3,42 +3,52 @@
  * Manages provider search, profiles, and availability
  */
 
-import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
-import apiClient from '../api/client';
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  useInfiniteQuery,
+} from "@tanstack/react-query";
+import apiClient from "../api/client";
 import {
   Provider,
   ProviderSearchParams,
   TimeSlot,
-  AvailabilitySlot,
   PaginatedResponse,
-} from '../types';
+} from "../types";
 
 // Search providers with filters
 export const useProviderSearch = (params: ProviderSearchParams) => {
   return useInfiniteQuery({
-    queryKey: ['providers', 'search', params],
+    queryKey: ["providers", "search", params],
     queryFn: async ({ pageParam = 1 }) => {
       const queryParams = new URLSearchParams();
 
-      if (params.query) queryParams.append('query', params.query);
-      if (params.specialty) queryParams.append('specialty', params.specialty);
-      if (params.location) queryParams.append('location', params.location);
+      if (params.query) queryParams.append("query", params.query);
+      if (params.specialty) queryParams.append("specialty", params.specialty);
+      if (params.location) queryParams.append("location", params.location);
       if (params.acceptingNewPatients !== undefined) {
-        queryParams.append('acceptingNewPatients', String(params.acceptingNewPatients));
+        queryParams.append(
+          "acceptingNewPatients",
+          String(params.acceptingNewPatients),
+        );
       }
-      if (params.insuranceAccepted) queryParams.append('insuranceAccepted', params.insuranceAccepted);
-      if (params.gender) queryParams.append('gender', params.gender);
-      if (params.language) queryParams.append('language', params.language);
-      if (params.availableDate) queryParams.append('availableDate', params.availableDate);
-      if (params.appointmentType) queryParams.append('appointmentType', params.appointmentType);
-      if (params.sortBy) queryParams.append('sortBy', params.sortBy);
-      if (params.sortOrder) queryParams.append('sortOrder', params.sortOrder);
+      if (params.insuranceAccepted)
+        queryParams.append("insuranceAccepted", params.insuranceAccepted);
+      if (params.gender) queryParams.append("gender", params.gender);
+      if (params.language) queryParams.append("language", params.language);
+      if (params.availableDate)
+        queryParams.append("availableDate", params.availableDate);
+      if (params.appointmentType)
+        queryParams.append("appointmentType", params.appointmentType);
+      if (params.sortBy) queryParams.append("sortBy", params.sortBy);
+      if (params.sortOrder) queryParams.append("sortOrder", params.sortOrder);
 
-      queryParams.append('page', String(pageParam));
-      queryParams.append('limit', String(params.limit || 20));
+      queryParams.append("page", String(pageParam));
+      queryParams.append("limit", String(params.limit || 20));
 
       const response = await apiClient.get<PaginatedResponse<Provider>>(
-        `/providers/search?${queryParams.toString()}`
+        `/providers/search?${queryParams.toString()}`,
       );
       return response;
     },
@@ -53,7 +63,7 @@ export const useProviderSearch = (params: ProviderSearchParams) => {
 // Fetch single provider profile
 export const useProvider = (id: string) => {
   return useQuery({
-    queryKey: ['provider', id],
+    queryKey: ["provider", id],
     queryFn: async () => {
       const response = await apiClient.get<Provider>(`/providers/${id}`);
       return response;
@@ -67,19 +77,26 @@ export const useProviderAvailability = (
   providerId: string,
   startDate: string,
   endDate: string,
-  appointmentType?: string
+  appointmentType?: string,
 ) => {
   return useQuery({
-    queryKey: ['provider', providerId, 'availability', startDate, endDate, appointmentType],
+    queryKey: [
+      "provider",
+      providerId,
+      "availability",
+      startDate,
+      endDate,
+      appointmentType,
+    ],
     queryFn: async () => {
       const params = new URLSearchParams({
         startDate,
         endDate,
       });
-      if (appointmentType) params.append('appointmentType', appointmentType);
+      if (appointmentType) params.append("appointmentType", appointmentType);
 
       const response = await apiClient.get<TimeSlot[]>(
-        `/providers/${providerId}/availability?${params.toString()}`
+        `/providers/${providerId}/availability?${params.toString()}`,
       );
       return response;
     },
@@ -91,16 +108,16 @@ export const useProviderAvailability = (
 export const useTimeSlots = (
   providerId: string,
   date: string,
-  appointmentType?: string
+  appointmentType?: string,
 ) => {
   return useQuery({
-    queryKey: ['provider', providerId, 'slots', date, appointmentType],
+    queryKey: ["provider", providerId, "slots", date, appointmentType],
     queryFn: async () => {
       const params = new URLSearchParams({ date });
-      if (appointmentType) params.append('appointmentType', appointmentType);
+      if (appointmentType) params.append("appointmentType", appointmentType);
 
       const response = await apiClient.get<TimeSlot[]>(
-        `/providers/${providerId}/slots?${params.toString()}`
+        `/providers/${providerId}/slots?${params.toString()}`,
       );
       return response;
     },
@@ -112,9 +129,9 @@ export const useTimeSlots = (
 // Fetch list of specialties
 export const useSpecialties = () => {
   return useQuery({
-    queryKey: ['specialties'],
+    queryKey: ["specialties"],
     queryFn: async () => {
-      const response = await apiClient.get<string[]>('/providers/specialties');
+      const response = await apiClient.get<string[]>("/providers/specialties");
       return response;
     },
     staleTime: 1000 * 60 * 60, // 1 hour - specialties rarely change
@@ -124,10 +141,10 @@ export const useSpecialties = () => {
 // Fetch featured/recommended providers
 export const useFeaturedProviders = (limit = 5) => {
   return useQuery({
-    queryKey: ['providers', 'featured', limit],
+    queryKey: ["providers", "featured", limit],
     queryFn: async () => {
       const response = await apiClient.get<Provider[]>(
-        `/providers/featured?limit=${limit}`
+        `/providers/featured?limit=${limit}`,
       );
       return response;
     },
@@ -139,20 +156,27 @@ export const useNearbyProviders = (
   latitude: number,
   longitude: number,
   radiusMiles = 25,
-  specialty?: string
+  specialty?: string,
 ) => {
   return useQuery({
-    queryKey: ['providers', 'nearby', latitude, longitude, radiusMiles, specialty],
+    queryKey: [
+      "providers",
+      "nearby",
+      latitude,
+      longitude,
+      radiusMiles,
+      specialty,
+    ],
     queryFn: async () => {
       const params = new URLSearchParams({
         lat: String(latitude),
         lng: String(longitude),
         radius: String(radiusMiles),
       });
-      if (specialty) params.append('specialty', specialty);
+      if (specialty) params.append("specialty", specialty);
 
       const response = await apiClient.get<Provider[]>(
-        `/providers/nearby?${params.toString()}`
+        `/providers/nearby?${params.toString()}`,
       );
       return response;
     },
@@ -165,7 +189,13 @@ export const useFavoriteProvider = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ providerId, isFavorite }: { providerId: string; isFavorite: boolean }) => {
+    mutationFn: async ({
+      providerId,
+      isFavorite,
+    }: {
+      providerId: string;
+      isFavorite: boolean;
+    }) => {
       if (isFavorite) {
         await apiClient.delete(`/patients/favorites/${providerId}`);
       } else {
@@ -174,8 +204,8 @@ export const useFavoriteProvider = () => {
       return { providerId, isFavorite: !isFavorite };
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['favorites'] });
-      queryClient.invalidateQueries({ queryKey: ['providers'] });
+      queryClient.invalidateQueries({ queryKey: ["favorites"] });
+      queryClient.invalidateQueries({ queryKey: ["providers"] });
     },
   });
 };
@@ -183,26 +213,32 @@ export const useFavoriteProvider = () => {
 // Fetch patient's favorite providers
 export const useFavoriteProviders = () => {
   return useQuery({
-    queryKey: ['favorites', 'providers'],
+    queryKey: ["favorites", "providers"],
     queryFn: async () => {
-      const response = await apiClient.get<Provider[]>('/patients/favorites');
+      const response = await apiClient.get<Provider[]>("/patients/favorites");
       return response;
     },
   });
 };
 
 // Fetch provider reviews
-export const useProviderReviews = (providerId: string, page = 1, limit = 10) => {
+export const useProviderReviews = (
+  providerId: string,
+  page = 1,
+  limit = 10,
+) => {
   return useQuery({
-    queryKey: ['provider', providerId, 'reviews', page, limit],
+    queryKey: ["provider", providerId, "reviews", page, limit],
     queryFn: async () => {
-      const response = await apiClient.get<PaginatedResponse<{
-        id: string;
-        rating: number;
-        comment?: string;
-        patientName: string;
-        createdAt: string;
-      }>>(`/providers/${providerId}/reviews?page=${page}&limit=${limit}`);
+      const response = await apiClient.get<
+        PaginatedResponse<{
+          id: string;
+          rating: number;
+          comment?: string;
+          patientName: string;
+          createdAt: string;
+        }>
+      >(`/providers/${providerId}/reviews?page=${page}&limit=${limit}`);
       return response;
     },
     enabled: !!providerId,
@@ -223,18 +259,21 @@ export const useSubmitReview = () => {
       rating: number;
       comment?: string;
     }) => {
-      const response = await apiClient.post(`/providers/${providerId}/reviews`, {
-        rating,
-        comment,
-      });
+      const response = await apiClient.post(
+        `/providers/${providerId}/reviews`,
+        {
+          rating,
+          comment,
+        },
+      );
       return response;
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ['provider', variables.providerId, 'reviews']
+        queryKey: ["provider", variables.providerId, "reviews"],
       });
       queryClient.invalidateQueries({
-        queryKey: ['provider', variables.providerId]
+        queryKey: ["provider", variables.providerId],
       });
     },
   });

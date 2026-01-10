@@ -3,7 +3,7 @@
  * Reviews all booking details before final submission
  */
 
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo } from "react";
 import {
   View,
   Text,
@@ -13,17 +13,26 @@ import {
   Image,
   ActivityIndicator,
   Alert,
-} from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { useProvider, useBookAppointment } from '../../src/hooks';
-import { AppointmentType } from '../../src/types';
-import { colors, spacing, borderRadius, typography, shadows } from '../../src/theme';
+} from "react-native";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { useProvider, useBookAppointment } from "../../src/hooks";
+import { AppointmentType } from "../../src/types";
+import {
+  colors,
+  spacing,
+  borderRadius,
+  typography,
+  shadows,
+} from "../../src/theme";
 
-const appointmentTypeLabels: Record<AppointmentType, { label: string; icon: string }> = {
-  video: { label: 'Video Visit', icon: 'videocam' },
-  phone: { label: 'Phone Call', icon: 'call' },
-  'in-person': { label: 'In-Person Visit', icon: 'location' },
+const appointmentTypeLabels: Record<
+  AppointmentType,
+  { label: string; icon: string }
+> = {
+  video: { label: "Video Visit", icon: "videocam" },
+  phone: { label: "Phone Call", icon: "call" },
+  "in-person": { label: "In-Person Visit", icon: "location" },
 };
 
 export default function ConfirmScreen() {
@@ -41,28 +50,31 @@ export default function ConfirmScreen() {
   }>();
   const router = useRouter();
 
-  const { data: provider, isLoading: providerLoading } = useProvider(params.providerId);
-  const { mutate: bookAppointment, isPending: isBooking } = useBookAppointment();
+  const { data: provider, isLoading: providerLoading } = useProvider(
+    params.providerId,
+  );
+  const { mutate: bookAppointment, isPending: isBooking } =
+    useBookAppointment();
 
   const symptoms = useMemo(() => {
-    return params.symptoms ? params.symptoms.split(',').filter(Boolean) : [];
+    return params.symptoms ? params.symptoms.split(",").filter(Boolean) : [];
   }, [params.symptoms]);
 
   const formatDate = useCallback((dateStr: string) => {
     const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric',
+    return date.toLocaleDateString("en-US", {
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+      year: "numeric",
     });
   }, []);
 
   const formatTime = useCallback((time: string) => {
-    const [hours, minutes] = time.split(':').map(Number);
-    const period = hours >= 12 ? 'PM' : 'AM';
+    const [hours, minutes] = time.split(":").map(Number);
+    const period = hours >= 12 ? "PM" : "AM";
     const hour = hours % 12 || 12;
-    return `${hour}:${minutes.toString().padStart(2, '0')} ${period}`;
+    return `${hour}:${minutes.toString().padStart(2, "0")} ${period}`;
   }, []);
 
   const handleConfirmBooking = useCallback(() => {
@@ -84,21 +96,21 @@ export default function ConfirmScreen() {
         reason: params.reason,
         notes: params.notes,
         symptoms: symptoms,
-        isNewPatient: params.isNewPatient === 'true',
-        step: 'confirm',
+        isNewPatient: params.isNewPatient === "true",
+        step: "confirm",
       },
       {
         onSuccess: () => {
-          router.replace('/booking/success');
+          router.replace("/booking/success");
         },
-        onError: (error) => {
+        onError: (_error) => {
           Alert.alert(
-            'Booking Failed',
-            'Unable to complete your booking. Please try again.',
-            [{ text: 'OK' }]
+            "Booking Failed",
+            "Unable to complete your booking. Please try again.",
+            [{ text: "OK" }],
           );
         },
-      }
+      },
     );
   }, [provider, params, symptoms, bookAppointment, router]);
 
@@ -110,14 +122,23 @@ export default function ConfirmScreen() {
     );
   }
 
-  const typeInfo = appointmentTypeLabels[params.appointmentType] || appointmentTypeLabels.video;
+  const typeInfo =
+    appointmentTypeLabels[params.appointmentType] ||
+    appointmentTypeLabels.video;
 
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Header */}
         <View style={styles.header}>
-          <Ionicons name="checkmark-circle" size={48} color={colors.success[500]} />
+          <Ionicons
+            name="checkmark-circle"
+            size={48}
+            color={colors.success[500]}
+          />
           <Text style={styles.headerTitle}>Review Your Booking</Text>
           <Text style={styles.headerSubtitle}>
             Please verify the details before confirming
@@ -130,14 +151,18 @@ export default function ConfirmScreen() {
             <Text style={styles.cardTitle}>Doctor</Text>
             <View style={styles.providerRow}>
               <Image
-                source={{ uri: provider.avatar || 'https://via.placeholder.com/50' }}
+                source={{
+                  uri: provider.avatar || "https://via.placeholder.com/50",
+                }}
                 style={styles.providerAvatar}
               />
               <View style={styles.providerInfo}>
                 <Text style={styles.providerName}>
                   Dr. {provider.firstName} {provider.lastName}
                 </Text>
-                <Text style={styles.providerSpecialty}>{provider.specialty}</Text>
+                <Text style={styles.providerSpecialty}>
+                  {provider.specialty}
+                </Text>
               </View>
             </View>
           </View>
@@ -149,7 +174,11 @@ export default function ConfirmScreen() {
 
           <View style={styles.detailRow}>
             <View style={styles.detailIconContainer}>
-              <Ionicons name={typeInfo.icon as any} size={20} color={colors.primary[500]} />
+              <Ionicons
+                name={typeInfo.icon as any}
+                size={20}
+                color={colors.primary[500]}
+              />
             </View>
             <View style={styles.detailInfo}>
               <Text style={styles.detailLabel}>Type</Text>
@@ -197,7 +226,11 @@ export default function ConfirmScreen() {
           {symptoms.length > 0 && (
             <View style={styles.detailRow}>
               <View style={styles.detailIconContainer}>
-                <Ionicons name="fitness" size={20} color={colors.primary[500]} />
+                <Ionicons
+                  name="fitness"
+                  size={20}
+                  color={colors.primary[500]}
+                />
               </View>
               <View style={styles.detailInfo}>
                 <Text style={styles.detailLabel}>Symptoms</Text>
@@ -215,7 +248,11 @@ export default function ConfirmScreen() {
           {params.notes && (
             <View style={styles.detailRow}>
               <View style={styles.detailIconContainer}>
-                <Ionicons name="document-text" size={20} color={colors.primary[500]} />
+                <Ionicons
+                  name="document-text"
+                  size={20}
+                  color={colors.primary[500]}
+                />
               </View>
               <View style={styles.detailInfo}>
                 <Text style={styles.detailLabel}>Notes</Text>
@@ -224,21 +261,28 @@ export default function ConfirmScreen() {
             </View>
           )}
 
-          {params.isNewPatient === 'true' && (
+          {params.isNewPatient === "true" && (
             <View style={styles.newPatientBadge}>
               <Ionicons name="person-add" size={16} color={colors.info[600]} />
-              <Text style={styles.newPatientText}>First visit with this doctor</Text>
+              <Text style={styles.newPatientText}>
+                First visit with this doctor
+              </Text>
             </View>
           )}
         </View>
 
         {/* Cancellation Policy */}
         <View style={styles.policyCard}>
-          <Ionicons name="information-circle" size={20} color={colors.info[500]} />
+          <Ionicons
+            name="information-circle"
+            size={20}
+            color={colors.info[500]}
+          />
           <View style={styles.policyContent}>
             <Text style={styles.policyTitle}>Cancellation Policy</Text>
             <Text style={styles.policyText}>
-              You can cancel or reschedule your appointment up to 24 hours before the scheduled time without any charges.
+              You can cancel or reschedule your appointment up to 24 hours
+              before the scheduled time without any charges.
             </Text>
           </View>
         </View>
@@ -268,7 +312,11 @@ export default function ConfirmScreen() {
             <ActivityIndicator size="small" color={colors.light.text.inverse} />
           ) : (
             <>
-              <Ionicons name="checkmark" size={20} color={colors.light.text.inverse} />
+              <Ionicons
+                name="checkmark"
+                size={20}
+                color={colors.light.text.inverse}
+              />
               <Text style={styles.confirmButtonText}>Confirm Booking</Text>
             </>
           )}
@@ -288,11 +336,11 @@ const styles = StyleSheet.create({
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   header: {
-    alignItems: 'center',
+    alignItems: "center",
     padding: spacing.xl,
     backgroundColor: colors.light.background,
   },
@@ -322,8 +370,8 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   providerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   providerAvatar: {
     width: 50,
@@ -345,8 +393,8 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   detailRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    alignItems: "flex-start",
     marginBottom: spacing.md,
   },
   detailIconContainer: {
@@ -354,8 +402,8 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     backgroundColor: colors.primary[50],
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   detailInfo: {
     marginLeft: spacing.md,
@@ -372,8 +420,8 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   symptomsRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     marginTop: spacing.xs,
     gap: spacing.xs,
   },
@@ -388,8 +436,8 @@ const styles = StyleSheet.create({
     color: colors.gray[700],
   },
   newPatientBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: colors.info[50],
     padding: spacing.sm,
     borderRadius: borderRadius.md,
@@ -401,8 +449,8 @@ const styles = StyleSheet.create({
     marginLeft: spacing.sm,
   },
   policyCard: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    alignItems: "flex-start",
     backgroundColor: colors.info[50],
     marginHorizontal: spacing.lg,
     marginTop: spacing.md,
@@ -425,11 +473,11 @@ const styles = StyleSheet.create({
     lineHeight: typography.lineHeights.sm,
   },
   bottomContainer: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
-    flexDirection: 'row',
+    flexDirection: "row",
     padding: spacing.lg,
     backgroundColor: colors.light.background,
     borderTopWidth: 1,
@@ -442,8 +490,8 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.lg,
     borderWidth: 1,
     borderColor: colors.gray[300],
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   backButtonText: {
     color: colors.gray[600],
@@ -452,9 +500,9 @@ const styles = StyleSheet.create({
   },
   confirmButton: {
     flex: 2,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     backgroundColor: colors.primary[500],
     paddingVertical: spacing.md,
     borderRadius: borderRadius.lg,

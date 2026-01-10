@@ -3,23 +3,25 @@
  * Manages patient-provider messaging and conversations
  */
 
-import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
-import { useCallback, useEffect, useRef } from 'react';
-import apiClient from '../api/client';
-import { useSocket } from './useSocket';
 import {
-  Conversation,
-  Message,
-  Attachment,
-  PaginatedResponse,
-} from '../types';
+  useQuery,
+  useMutation,
+  useQueryClient,
+  useInfiniteQuery,
+} from "@tanstack/react-query";
+import { useCallback, useEffect, useRef } from "react";
+import apiClient from "../api/client";
+import { useSocket } from "./useSocket";
+import { Conversation, Message, Attachment } from "../types";
 
 // Fetch conversations list
 export const useConversations = () => {
   return useQuery({
-    queryKey: ['conversations'],
+    queryKey: ["conversations"],
     queryFn: async () => {
-      const response = await apiClient.get<Conversation[]>('/messages/conversations');
+      const response = await apiClient.get<Conversation[]>(
+        "/messages/conversations",
+      );
       return response;
     },
     staleTime: 1000 * 30, // 30 seconds
@@ -29,10 +31,10 @@ export const useConversations = () => {
 // Fetch single conversation with messages
 export const useConversation = (conversationId: string) => {
   return useQuery({
-    queryKey: ['conversation', conversationId],
+    queryKey: ["conversation", conversationId],
     queryFn: async () => {
       const response = await apiClient.get<Conversation>(
-        `/messages/conversations/${conversationId}`
+        `/messages/conversations/${conversationId}`,
       );
       return response;
     },
@@ -43,9 +45,9 @@ export const useConversation = (conversationId: string) => {
 // Fetch messages for a conversation with pagination
 export const useMessages = (conversationId: string) => {
   return useInfiniteQuery({
-    queryKey: ['messages', conversationId],
+    queryKey: ["messages", conversationId],
     queryFn: async ({ pageParam }) => {
-      const params = pageParam ? `?before=${pageParam}` : '';
+      const params = pageParam ? `?before=${pageParam}` : "";
       const response = await apiClient.get<{
         messages: Message[];
         hasMore: boolean;
@@ -81,16 +83,16 @@ export const useSendMessage = () => {
       if (attachments && attachments.length > 0) {
         const formData = new FormData();
         attachments.forEach((file) => {
-          formData.append('files', file as any);
+          formData.append("files", file as any);
         });
-        formData.append('conversationId', conversationId);
+        formData.append("conversationId", conversationId);
 
         attachmentData = await apiClient.post<Attachment[]>(
-          '/messages/attachments/upload',
+          "/messages/attachments/upload",
           formData,
           {
-            headers: { 'Content-Type': 'multipart/form-data' },
-          }
+            headers: { "Content-Type": "multipart/form-data" },
+          },
         );
       }
 
@@ -100,14 +102,14 @@ export const useSendMessage = () => {
           content,
           attachments: attachmentData.map((a) => a.id),
           replyTo,
-        }
+        },
       );
       return response;
     },
     onSuccess: (data, variables) => {
       // Add new message to cache
       queryClient.setQueryData(
-        ['messages', variables.conversationId],
+        ["messages", variables.conversationId],
         (old: any) => {
           if (!old) return old;
           return {
@@ -115,14 +117,14 @@ export const useSendMessage = () => {
             pages: old.pages.map((page: any, index: number) =>
               index === 0
                 ? { ...page, messages: [data, ...page.messages] }
-                : page
+                : page,
             ),
           };
-        }
+        },
       );
 
       // Update conversation last message
-      queryClient.invalidateQueries({ queryKey: ['conversations'] });
+      queryClient.invalidateQueries({ queryKey: ["conversations"] });
     },
   });
 };
@@ -137,8 +139,10 @@ export const useMarkAsRead = () => {
       return conversationId;
     },
     onSuccess: (conversationId) => {
-      queryClient.invalidateQueries({ queryKey: ['conversations'] });
-      queryClient.invalidateQueries({ queryKey: ['conversation', conversationId] });
+      queryClient.invalidateQueries({ queryKey: ["conversations"] });
+      queryClient.invalidateQueries({
+        queryKey: ["conversation", conversationId],
+      });
     },
   });
 };
@@ -158,17 +162,17 @@ export const useCreateConversation = () => {
       initialMessage?: string;
     }) => {
       const response = await apiClient.post<Conversation>(
-        '/messages/conversations',
+        "/messages/conversations",
         {
           participantIds,
           subject,
           initialMessage,
-        }
+        },
       );
       return response;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['conversations'] });
+      queryClient.invalidateQueries({ queryKey: ["conversations"] });
     },
   });
 };
@@ -191,7 +195,7 @@ export const useArchiveConversation = () => {
       return { conversationId, archive };
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['conversations'] });
+      queryClient.invalidateQueries({ queryKey: ["conversations"] });
     },
   });
 };
@@ -214,7 +218,7 @@ export const usePinConversation = () => {
       return { conversationId, pin };
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['conversations'] });
+      queryClient.invalidateQueries({ queryKey: ["conversations"] });
     },
   });
 };
@@ -232,13 +236,13 @@ export const useDeleteMessage = () => {
       messageId: string;
     }) => {
       await apiClient.delete(
-        `/messages/conversations/${conversationId}/messages/${messageId}`
+        `/messages/conversations/${conversationId}/messages/${messageId}`,
       );
       return { conversationId, messageId };
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ['messages', variables.conversationId]
+        queryKey: ["messages", variables.conversationId],
       });
     },
   });
@@ -260,13 +264,13 @@ export const useEditMessage = () => {
     }) => {
       const response = await apiClient.patch<Message>(
         `/messages/conversations/${conversationId}/messages/${messageId}`,
-        { content }
+        { content },
       );
       return response;
     },
     onSuccess: (data, variables) => {
       queryClient.setQueryData(
-        ['messages', variables.conversationId],
+        ["messages", variables.conversationId],
         (old: any) => {
           if (!old) return old;
           return {
@@ -274,11 +278,11 @@ export const useEditMessage = () => {
             pages: old.pages.map((page: any) => ({
               ...page,
               messages: page.messages.map((msg: Message) =>
-                msg.id === data.id ? data : msg
+                msg.id === data.id ? data : msg,
               ),
             })),
           };
-        }
+        },
       );
     },
   });
@@ -287,77 +291,59 @@ export const useEditMessage = () => {
 // Real-time messaging hook
 export const useRealtimeMessages = (conversationId: string) => {
   const queryClient = useQueryClient();
-  const { socket, isConnected } = useSocket();
-  const typingTimeoutRef = useRef<NodeJS.Timeout>();
+  const { emit, on, isConnected } = useSocket();
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
 
   useEffect(() => {
-    if (!socket || !isConnected || !conversationId) return;
+    if (!isConnected || !conversationId) return;
 
     // Join conversation room
-    socket.emit('conversation:join', { conversationId });
+    emit("conversation:join", { conversationId });
 
     // Listen for new messages
-    const handleNewMessage = (message: Message) => {
-      if (message.conversationId === conversationId) {
-        queryClient.setQueryData(
-          ['messages', conversationId],
-          (old: any) => {
-            if (!old) return old;
-            return {
-              ...old,
-              pages: old.pages.map((page: any, index: number) =>
-                index === 0
-                  ? { ...page, messages: [message, ...page.messages] }
-                  : page
-              ),
-            };
-          }
-        );
-      }
-    };
+    const unsubscribeNew = on("chat-message", (chatMessage) => {
+      // Convert chat message to Message format for cache update
+      const message = {
+        ...chatMessage,
+        conversationId: chatMessage.roomId,
+      } as unknown as Message;
 
-    // Listen for message updates
-    const handleMessageUpdate = (message: Message) => {
-      queryClient.setQueryData(
-        ['messages', conversationId],
-        (old: any) => {
+      if (message.conversationId === conversationId) {
+        queryClient.setQueryData(["messages", conversationId], (old: any) => {
           if (!old) return old;
           return {
             ...old,
-            pages: old.pages.map((page: any) => ({
-              ...page,
-              messages: page.messages.map((msg: Message) =>
-                msg.id === message.id ? message : msg
-              ),
-            })),
+            pages: old.pages.map((page: any, index: number) =>
+              index === 0
+                ? { ...page, messages: [message, ...page.messages] }
+                : page,
+            ),
           };
-        }
-      );
-    };
-
-    socket.on('message:new', handleNewMessage);
-    socket.on('message:update', handleMessageUpdate);
+        });
+      }
+    });
 
     return () => {
-      socket.emit('conversation:leave', { conversationId });
-      socket.off('message:new', handleNewMessage);
-      socket.off('message:update', handleMessageUpdate);
+      emit("conversation:leave", { conversationId });
+      unsubscribeNew();
     };
-  }, [socket, isConnected, conversationId, queryClient]);
+  }, [emit, on, isConnected, conversationId, queryClient]);
 
   const sendTypingIndicator = useCallback(() => {
-    if (!socket || !isConnected) return;
+    if (!isConnected) return;
 
-    socket.emit('typing:start', { conversationId });
+    emit("typing:start", { conversationId });
 
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
     }
 
     typingTimeoutRef.current = setTimeout(() => {
-      socket.emit('typing:stop', { conversationId });
+      emit("typing:stop", { conversationId });
     }, 3000);
-  }, [socket, isConnected, conversationId]);
+  }, [emit, isConnected, conversationId]);
 
   return { sendTypingIndicator };
 };
@@ -365,10 +351,10 @@ export const useRealtimeMessages = (conversationId: string) => {
 // Unread message count
 export const useUnreadCount = () => {
   return useQuery({
-    queryKey: ['messages', 'unread-count'],
+    queryKey: ["messages", "unread-count"],
     queryFn: async () => {
       const response = await apiClient.get<{ count: number }>(
-        '/messages/unread-count'
+        "/messages/unread-count",
       );
       return response.count;
     },
@@ -379,7 +365,7 @@ export const useUnreadCount = () => {
 // Search messages
 export const useSearchMessages = (query: string) => {
   return useQuery({
-    queryKey: ['messages', 'search', query],
+    queryKey: ["messages", "search", query],
     queryFn: async () => {
       const response = await apiClient.get<{
         messages: Message[];
