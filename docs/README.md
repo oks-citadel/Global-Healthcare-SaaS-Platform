@@ -2,6 +2,8 @@
 
 Welcome to the comprehensive documentation for the Unified Health Global Platform. This documentation is organized to help different stakeholders quickly find the information they need.
 
+> **Note:** This folder (`docs/`) contains user and operational documentation. For development standards, API inventories, and PRD documents, see [docs-unified/](../docs-unified/README.md).
+
 ## Documentation Overview
 
 ### For Business & Product Teams
@@ -58,6 +60,21 @@ Welcome to the comprehensive documentation for the Unified Health Global Platfor
 - [Telemedicine Setup](../TELEMEDICINE_IMPLEMENTATION.md)
 - [Internationalization](../I18N-SETUP-SUMMARY.md)
 - [Accessibility Implementation](../ACCESSIBILITY_IMPLEMENTATION.md)
+
+## Root-Level Documentation
+
+The following documentation files are in the project root:
+
+| Document | Description |
+|----------|-------------|
+| [README.md](../README.md) | Platform overview, architecture, technology stack |
+| [DEPLOYMENT.md](../DEPLOYMENT.md) | AWS EKS deployment guide |
+| [DEPLOYMENT_GUIDE.md](../DEPLOYMENT_GUIDE.md) | Terraform infrastructure deployment |
+| [QUICKSTART-DEPLOYMENT.md](../QUICKSTART-DEPLOYMENT.md) | 60-minute deployment guide |
+| [BUILD_QUICKSTART.md](../BUILD_QUICKSTART.md) | Build instructions |
+| [DOCKER.md](../DOCKER.md) | Docker setup and commands |
+| [API_SETUP.md](../API_SETUP.md) | API and SDK setup |
+| [DATABASE_SETUP_CHECKLIST.md](../DATABASE_SETUP_CHECKLIST.md) | Database configuration |
 
 ## Documentation Structure
 

@@ -126,37 +126,31 @@ variable "vpc_elasticache_subnets" {
 }
 
 # ============================================
-# EKS Configuration
+# ECS Fargate Configuration (Replaces EKS)
 # ============================================
 
-variable "eks_cluster_version" {
-  description = "Kubernetes version for EKS"
-  type        = string
-  default     = "1.29"
+variable "ecs_enable_container_insights" {
+  description = "Enable CloudWatch Container Insights for ECS"
+  type        = bool
+  default     = true
 }
 
-variable "eks_node_instance_types" {
-  description = "Instance types for EKS node groups"
-  type        = list(string)
-  default     = ["m6i.xlarge", "m6i.2xlarge"]
-}
-
-variable "eks_node_min_size" {
-  description = "Minimum number of EKS nodes"
+variable "ecs_fargate_weight" {
+  description = "Weight for Fargate capacity provider (on-demand)"
   type        = number
-  default     = 2
+  default     = 20
 }
 
-variable "eks_node_max_size" {
-  description = "Maximum number of EKS nodes"
+variable "ecs_fargate_spot_weight" {
+  description = "Weight for Fargate Spot capacity provider"
   type        = number
-  default     = 10
+  default     = 80
 }
 
-variable "eks_node_desired_size" {
-  description = "Desired number of EKS nodes"
+variable "ecs_log_retention_days" {
+  description = "CloudWatch log retention in days for ECS"
   type        = number
-  default     = 3
+  default     = 30
 }
 
 # ============================================

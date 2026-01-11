@@ -1,7 +1,7 @@
 # ============================================
 # The Unified Health Platform - AWS CodePipeline
 # ============================================
-# CI/CD Pipeline: GitHub → CodeBuild → ECR → EKS
+# CI/CD Pipeline: GitHub → CodeBuild → ECR → ECS Fargate
 # Domain: theunifiedhealth.com
 # ============================================
 
@@ -94,8 +94,12 @@ resource "aws_iam_role_policy" "codepipeline" {
       {
         Effect = "Allow"
         Action = [
-          "eks:DescribeCluster",
-          "eks:ListClusters"
+          "ecs:DescribeClusters",
+          "ecs:ListClusters",
+          "ecs:DescribeServices",
+          "ecs:UpdateService",
+          "ecs:DescribeTaskDefinition",
+          "ecs:RegisterTaskDefinition"
         ]
         Resource = "*"
       }
@@ -170,10 +174,28 @@ resource "aws_iam_role_policy" "codebuild" {
       {
         Effect = "Allow"
         Action = [
-          "eks:DescribeCluster",
-          "eks:ListClusters"
+          "ecs:DescribeClusters",
+          "ecs:ListClusters",
+          "ecs:DescribeServices",
+          "ecs:UpdateService",
+          "ecs:DescribeTaskDefinition",
+          "ecs:RegisterTaskDefinition",
+          "ecs:ListServices",
+          "ecs:ListTaskDefinitions"
         ]
         Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "iam:PassRole"
+        ]
+        Resource = "*"
+        Condition = {
+          StringEqualsIfExists = {
+            "iam:PassedToService" = "ecs-tasks.amazonaws.com"
+          }
+        }
       },
       {
         Effect = "Allow"
@@ -371,12 +393,12 @@ resource "aws_codepipeline" "main" {
     }
   }
 
-  # Stage 3: Deploy to EKS
+  # Stage 3: Deploy to ECS Fargate
   stage {
     name = "Deploy"
 
     action {
-      name            = "Deploy_to_EKS"
+      name            = "Deploy_to_ECS"
       category        = "Build"
       owner           = "AWS"
       provider        = "CodeBuild"
@@ -455,10 +477,10 @@ resource "aws_iam_role_policy" "eventbridge" {
   })
 }
 
-# Deploy Project (kubectl apply)
+# Deploy Project (ECS Fargate)
 resource "aws_codebuild_project" "deploy" {
   name          = "${var.project_name}-${var.environment}-deploy"
-  description   = "Deploy The Unified Health to EKS"
+  description   = "Deploy The Unified Health to ECS Fargate"
   build_timeout = 20
   service_role  = aws_iam_role.codebuild.arn
 
@@ -473,8 +495,8 @@ resource "aws_codebuild_project" "deploy" {
     image_pull_credentials_type = "CODEBUILD"
 
     environment_variable {
-      name  = "EKS_CLUSTER_NAME"
-      value = var.eks_cluster_name
+      name  = "ECS_CLUSTER_NAME"
+      value = var.ecs_cluster_name
     }
 
     environment_variable {

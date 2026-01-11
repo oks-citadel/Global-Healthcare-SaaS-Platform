@@ -13,7 +13,7 @@ Primary CI/CD workflow for the UnifiedHealth Platform.
 **Jobs:**
 1. **Build** - Builds SDK and web frontend, pushes to Amazon ECR
 2. **Security Scan** - Runs Trivy vulnerability scanner
-3. **Deploy to EKS** - Optional deployment to Amazon EKS
+3. **Deploy to ECS** - Optional deployment to Amazon ECS Fargate
 4. **Notify** - Posts build status summary
 
 ### Terraform AWS (`terraform-aws.yml`)
@@ -65,7 +65,7 @@ Simple workflow for testing GitHub Actions configuration.
 | `AWS_SECRET_ACCESS_KEY` | AWS secret access key |
 | `AWS_REGION` | AWS region (e.g., us-east-1) |
 | `ECR_REGISTRY` | ECR registry URL (account.dkr.ecr.region.amazonaws.com) |
-| `EKS_CLUSTER_NAME` | EKS cluster name |
+| `ECS_CLUSTER_NAME` | ECS Fargate cluster name |
 | `AWS_ROLE_ARN_DEV` | IAM role ARN for dev environment (OIDC) |
 | `AWS_ROLE_ARN_STAGING` | IAM role ARN for staging environment (OIDC) |
 | `AWS_ROLE_ARN_PROD` | IAM role ARN for prod environment (OIDC) |
@@ -78,7 +78,7 @@ Simple workflow for testing GitHub Actions configuration.
 | Resource | Description |
 |----------|-------------|
 | ECR Registry | Container image registry |
-| EKS Cluster | Kubernetes cluster for deployments |
+| ECS Cluster | ECS Fargate cluster for deployments |
 | S3 Bucket | Terraform state storage |
 | DynamoDB Table | Terraform state locking |
 
@@ -86,7 +86,7 @@ Simple workflow for testing GitHub Actions configuration.
 
 ```bash
 gh workflow run "Web Frontend - Build & Deploy" \
-  --field deploy_to_eks=true \
+  --field deploy_to_ecs=true \
   --field environment=production
 ```
 
@@ -113,7 +113,9 @@ gh run list --workflow="Web Frontend - Build & Deploy"
 # View logs
 gh run view <run-id> --log
 
-# Check EKS status
-aws eks update-kubeconfig --name <cluster-name> --region <region>
-kubectl get pods -n unifiedhealth-dev
+# Check ECS cluster status
+aws ecs describe-clusters --clusters unified-health-prod --region us-east-1
+
+# Check ECS services
+aws ecs list-services --cluster unified-health-prod
 ```

@@ -4,7 +4,7 @@ This guide provides instructions for deploying the Hospital Kiosk application in
 
 ## Prerequisites
 
-- Node.js 18.x or higher
+- Node.js 20.x or higher
 - Touch-screen display (recommended: 1920x1080 or higher)
 - Stable network connection
 - Optional: Card reader for insurance/payment processing

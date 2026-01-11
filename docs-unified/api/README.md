@@ -2,6 +2,10 @@
 
 Comprehensive documentation for the Unified Healthcare Platform API.
 
+> **Related Documentation:**
+> - [API Reference (Complete)](../../docs/api/README.md) - Comprehensive API reference with rate limits, SDKs, FHIR
+> - [API Setup Guide](../../API_SETUP.md) - SDK and Swagger setup instructions
+
 ## Table of Contents
 
 - [Getting Started](./getting-started.md) - Quick start guide and authentication
@@ -66,7 +70,7 @@ See the [SDK README](../../packages/sdk/README.md) for complete documentation.
 ### Interactive Documentation
 
 Access the interactive API documentation (Swagger UI):
-- Development: http://localhost:4000/api/docs
+- Development: http://localhost:8080/api/docs
 - Staging: https://api-staging.thetheunifiedhealth.com/api/docs
 - Production: https://api.thetheunifiedhealth.com/api/docs
 
@@ -98,7 +102,7 @@ Create a `.env` file in `services/api/`:
 
 ```env
 # Server
-PORT=4000
+PORT=8080
 NODE_ENV=development
 
 # Database
@@ -132,7 +136,7 @@ cd services/api
 npm run dev
 ```
 
-The API will be available at http://localhost:4000
+The API will be available at http://localhost:8080
 
 ### 5. Build the SDK
 

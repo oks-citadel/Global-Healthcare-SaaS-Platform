@@ -114,43 +114,7 @@ provider "aws" {
 }
 
 # ============================================
-# Kubernetes Provider (configured after EKS)
+# Note: Using ECS Fargate - No Kubernetes/Helm providers needed
+# ECS Fargate is a serverless container platform managed via AWS APIs
+# See docs/architecture/ecs-fargate-architecture.md
 # ============================================
-
-provider "kubernetes" {
-  host                   = try(module.eks_americas[0].cluster_endpoint, "")
-  cluster_ca_certificate = try(base64decode(module.eks_americas[0].cluster_ca_certificate), "")
-
-  exec {
-    api_version = "client.authentication.k8s.io/v1beta1"
-    command     = "aws"
-    args = [
-      "eks",
-      "get-token",
-      "--cluster-name",
-      try(module.eks_americas[0].cluster_name, ""),
-      "--region",
-      var.aws_region
-    ]
-  }
-}
-
-provider "helm" {
-  kubernetes {
-    host                   = try(module.eks_americas[0].cluster_endpoint, "")
-    cluster_ca_certificate = try(base64decode(module.eks_americas[0].cluster_ca_certificate), "")
-
-    exec {
-      api_version = "client.authentication.k8s.io/v1beta1"
-      command     = "aws"
-      args = [
-        "eks",
-        "get-token",
-        "--cluster-name",
-        try(module.eks_americas[0].cluster_name, ""),
-        "--region",
-        var.aws_region
-      ]
-    }
-  }
-}

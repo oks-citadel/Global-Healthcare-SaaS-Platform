@@ -1,7 +1,14 @@
 # The Unified Health - AWS Deployment Guide
 
 **Domain:** thetheunifiedhealth.com
-**Platform:** AWS (CodePipeline → CodeBuild → ECR → EKS)
+**Platform:** AWS (CodePipeline → CodeBuild → ECR → ECS Fargate)
+
+> **Note:** This platform uses **ECS Fargate** (serverless containers), not EKS.
+
+> **Related Documentation:**
+> - [Full Deployment Guide](DEPLOYMENT.md) - Comprehensive ECS Fargate deployment
+> - [Quick Start Deployment](QUICKSTART-DEPLOYMENT.md) - Get deployed in 60 minutes
+> - [ECS Fargate Architecture](docs/architecture/ecs-fargate-architecture.md) - Target architecture
 
 ---
 
@@ -9,7 +16,6 @@
 
 - AWS CLI configured with appropriate credentials
 - Terraform >= 1.6.0
-- kubectl
 - GitHub account with repository access
 - GoDaddy account (for domain nameserver configuration)
 

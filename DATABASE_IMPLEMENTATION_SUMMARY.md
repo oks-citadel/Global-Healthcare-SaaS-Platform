@@ -459,7 +459,7 @@ log_lock_waits = on
 
 ### Required:
 - PostgreSQL 12+
-- Node.js 18+
+- Node.js 20+
 - Prisma 5.22+
 - bash (for scripts)
 - psql, pg_dump (PostgreSQL client tools)

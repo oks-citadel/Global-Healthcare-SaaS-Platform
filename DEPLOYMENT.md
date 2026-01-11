@@ -1,6 +1,14 @@
 # UnifiedHealth Platform - Deployment Guide
 
-Complete guide for deploying the UnifiedHealth Platform to Amazon Elastic Kubernetes Service (EKS).
+Complete guide for deploying the UnifiedHealth Platform to **AWS ECS Fargate** (serverless containers).
+
+> **Note:** This platform uses **ECS Fargate**, not EKS. See [ECS Fargate Architecture](docs/architecture/ecs-fargate-architecture.md) for details.
+
+> **Related Documentation:**
+> - [Quick Start Deployment](QUICKSTART-DEPLOYMENT.md) - Get deployed in 60 minutes
+> - [AWS Terraform Deployment](DEPLOYMENT_GUIDE.md) - Infrastructure as Code setup
+> - [Deployment Overview](docs/deployment/README.md) - Comprehensive deployment options
+> - [ECS Fargate Architecture](docs/architecture/ecs-fargate-architecture.md) - Target architecture
 
 ## Table of Contents
 
@@ -31,18 +39,16 @@ Complete guide for deploying the UnifiedHealth Platform to Amazon Elastic Kubern
 │  └──────────────┘                                           │
 │                                                               │
 │  ┌─────────────────────────────────────────────────────┐   │
-│  │              EKS (Kubernetes Cluster)                │   │
+│  │           ECS Fargate (Serverless Containers)        │   │
 │  │                                                       │   │
 │  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐ │   │
-│  │  │   Blue      │  │   Green     │  │  ALB        │ │   │
-│  │  │ Deployment  │  │ Deployment  │  │  Ingress    │ │   │
+│  │  │ API Service │  │ Web Service │  │ Auth Service│ │   │
+│  │  │  (Fargate)  │  │  (Fargate)  │  │  (Fargate)  │ │   │
 │  │  └─────────────┘  └─────────────┘  └─────────────┘ │   │
 │  │                                                       │   │
 │  │  ┌────────────────────────────────────────────────┐ │   │
-│  │  │           Unified Health API Pods              │ │   │
-│  │  │  ┌──────┐  ┌──────┐  ┌──────┐  ┌──────┐      │ │   │
-│  │  │  │ Pod1 │  │ Pod2 │  │ Pod3 │  │ PodN │      │ │   │
-│  │  │  └──────┘  └──────┘  └──────┘  └──────┘      │ │   │
+│  │  │    Application Load Balancer (ALB)             │ │   │
+│  │  │    Target Groups per Service                   │ │   │
 │  │  └────────────────────────────────────────────────┘ │   │
 │  └─────────────────────────────────────────────────────┘   │
 │                                                               │
@@ -63,9 +69,9 @@ Complete guide for deploying the UnifiedHealth Platform to Amazon Elastic Kubern
 ### Deployment Strategy
 
 - **Staging**: Rolling updates with automated deployment on main branch
-- **Production**: Blue-green deployment with manual approval
+- **Production**: Blue-green deployment with CodeDeploy
 - **Database**: Migrations with automatic backup and rollback
-- **Secrets**: AWS Secrets Manager with CSI driver integration
+- **Secrets**: AWS Secrets Manager integration with ECS task definitions
 
 ## Prerequisites
 
@@ -82,14 +88,14 @@ Complete guide for deploying the UnifiedHealth Platform to Amazon Elastic Kubern
    aws configure
    ```
 
-2. **eksctl** (v0.150+)
+2. **Terraform** (v1.5+)
    ```bash
-   # Install
-   curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
-   sudo mv /tmp/eksctl /usr/local/bin
+   # Install (macOS/Linux)
+   brew install terraform
+   # Or download from https://www.terraform.io/downloads
    ```
 
-4. **kubectl** (v1.28+)
+3. **ECS CLI** (optional, for local debugging)
    ```bash
    # Install
    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"

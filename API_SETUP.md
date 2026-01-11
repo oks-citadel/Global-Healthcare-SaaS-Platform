@@ -32,14 +32,14 @@ cd services/api
 npm run dev
 ```
 
-The API will start on http://localhost:4000
+The API will start on http://localhost:8080
 
 ### 3. Access API Documentation
 
 Open your browser and navigate to:
-- **Swagger UI**: http://localhost:4000/api/docs
-- **OpenAPI JSON**: http://localhost:4000/api/docs/openapi.json
-- **OpenAPI YAML**: http://localhost:4000/api/docs/openapi.yaml
+- **Swagger UI**: http://localhost:8080/api/docs
+- **OpenAPI JSON**: http://localhost:8080/api/docs/openapi.json
+- **OpenAPI YAML**: http://localhost:8080/api/docs/openapi.yaml
 
 ### 4. Build the SDK
 
@@ -105,7 +105,7 @@ Global-Healthcare-SaaS-Platform/
 ### Accessing Swagger UI
 
 1. Start the API server: `cd services/api && npm run dev`
-2. Open http://localhost:4000/api/docs in your browser
+2. Open http://localhost:8080/api/docs in your browser
 3. You'll see interactive documentation for all endpoints
 
 ### Testing Endpoints
@@ -144,7 +144,7 @@ import { createClient } from '@unified-health/sdk';
 
 // Create client
 const client = createClient({
-  baseURL: 'http://localhost:4000/api/v1',
+  baseURL: 'http://localhost:8080/api/v1',
 });
 
 // Login
@@ -169,7 +169,7 @@ const appointments = await client.listAppointments({
 import { createClient } from '@unified-health/sdk';
 
 const client = createClient({
-  baseURL: 'http://localhost:4000/api/v1',
+  baseURL: 'http://localhost:8080/api/v1',
   // Load existing tokens
   accessToken: localStorage.getItem('accessToken'),
   refreshToken: localStorage.getItem('refreshToken'),
@@ -398,7 +398,7 @@ Edit `packages/sdk/package.json` to customize:
 
 ## Next Steps
 
-1. **Explore the API**: Open http://localhost:4000/api/docs
+1. **Explore the API**: Open http://localhost:8080/api/docs
 2. **Read the Documentation**: Check `docs-unified/api/getting-started.md`
 3. **Try the SDK**: Import in your app and test endpoints
 4. **Build Features**: Use the SDK to build your application features

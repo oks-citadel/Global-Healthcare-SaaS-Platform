@@ -17,12 +17,15 @@ deploy_americas = true
 deploy_europe   = true
 deploy_africa   = false
 
-# EKS Configuration
-eks_cluster_version     = "1.29"
-eks_node_instance_types = ["m6i.large"]
-eks_node_min_size       = 2
-eks_node_max_size       = 10
-eks_node_desired_size   = 3
+# ECS Fargate Configuration (EKS removed - using serverless containers)
+ecs_cluster_name           = "unified-health-prod"
+ecs_enable_container_insights = true
+ecs_capacity_providers     = ["FARGATE", "FARGATE_SPOT"]
+ecs_default_capacity_provider = "FARGATE_SPOT"
+ecs_task_cpu               = 512
+ecs_task_memory            = 1024
+ecs_service_min_count      = 2
+ecs_service_max_count      = 10
 
 # RDS Configuration
 rds_engine_version        = "15.4"

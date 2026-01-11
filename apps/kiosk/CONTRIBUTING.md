@@ -6,7 +6,7 @@ Thank you for your interest in contributing to the Hospital Kiosk application. T
 
 ### Prerequisites
 
-- Node.js 18.x or higher
+- Node.js 20.x or higher
 - npm or yarn
 - Git
 - Code editor (VS Code recommended)

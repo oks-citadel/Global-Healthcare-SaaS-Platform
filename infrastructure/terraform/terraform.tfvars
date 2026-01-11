@@ -14,17 +14,16 @@ project_name = "unified-health"
 environment  = "prod"
 aws_region   = "us-east-1"
 
-# EKS Configuration
-kubernetes_version   = "1.29"
-eks_public_access    = true
-eks_system_node_count = 2
-eks_system_node_size  = "m6i.large"
-eks_system_node_min   = 2
-eks_system_node_max   = 4
-eks_user_node_count   = 3
-eks_user_node_size    = "m6i.xlarge"
-eks_user_node_min     = 2
-eks_user_node_max     = 10
+# ECS Fargate Configuration (EKS removed - using serverless containers)
+# See docs/architecture/ecs-fargate-architecture.md for details
+ecs_cluster_name              = "unified-health-prod"
+ecs_enable_container_insights = true
+ecs_capacity_providers        = ["FARGATE", "FARGATE_SPOT"]
+ecs_default_capacity_provider = "FARGATE_SPOT"
+ecs_task_cpu                  = 512
+ecs_task_memory               = 1024
+ecs_service_min_count         = 2
+ecs_service_max_count         = 10
 
 # RDS Configuration
 postgresql_admin_username = "unifiedhealth_admin"

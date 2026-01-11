@@ -40,8 +40,8 @@ variable "github_branch" {
   default     = "main"
 }
 
-variable "eks_cluster_name" {
-  description = "Name of the EKS cluster"
+variable "ecs_cluster_name" {
+  description = "Name of the ECS Fargate cluster"
   type        = string
 }
 

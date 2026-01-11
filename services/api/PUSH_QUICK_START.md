@@ -1,6 +1,11 @@
-# Push Notifications - Quick Start Guide
+# Push Notifications - Integration Guide
 
 This is a quick reference for developers who want to integrate push notifications into their features.
+
+> **Related Documentation:**
+> - [Push Setup Guide](PUSH_QUICKSTART.md) - Initial Firebase/APNS/VAPID setup (start here!)
+> - [Push API Examples](PUSH_API_EXAMPLES.md) - API endpoint examples
+> - [Push Notification Setup](PUSH_NOTIFICATION_SETUP.md) - Complete setup guide
 
 ## 🚀 Quick Setup (5 minutes)
 

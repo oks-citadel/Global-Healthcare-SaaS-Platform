@@ -20,14 +20,19 @@ output "americas_vpc_id" {
   value       = try(module.vpc_americas[0].vpc_id, null)
 }
 
-output "americas_eks_cluster_endpoint" {
-  description = "Americas EKS cluster endpoint"
-  value       = try(module.eks_americas[0].cluster_endpoint, null)
+output "americas_ecs_cluster_name" {
+  description = "Americas ECS Fargate cluster name"
+  value       = try(module.ecs_americas[0].cluster_name, null)
 }
 
-output "americas_eks_cluster_name" {
-  description = "Americas EKS cluster name"
-  value       = try(module.eks_americas[0].cluster_name, null)
+output "americas_ecs_cluster_arn" {
+  description = "Americas ECS Fargate cluster ARN"
+  value       = try(module.ecs_americas[0].cluster_arn, null)
+}
+
+output "americas_alb_dns_name" {
+  description = "Americas ALB DNS name"
+  value       = try(module.alb_americas[0].dns_name, null)
 }
 
 output "americas_rds_endpoint" {
@@ -49,14 +54,19 @@ output "europe_vpc_id" {
   value       = try(module.vpc_europe[0].vpc_id, null)
 }
 
-output "europe_eks_cluster_endpoint" {
-  description = "Europe EKS cluster endpoint"
-  value       = try(module.eks_europe[0].cluster_endpoint, null)
+output "europe_ecs_cluster_name" {
+  description = "Europe ECS Fargate cluster name"
+  value       = try(module.ecs_europe[0].cluster_name, null)
 }
 
-output "europe_eks_cluster_name" {
-  description = "Europe EKS cluster name"
-  value       = try(module.eks_europe[0].cluster_name, null)
+output "europe_ecs_cluster_arn" {
+  description = "Europe ECS Fargate cluster ARN"
+  value       = try(module.ecs_europe[0].cluster_arn, null)
+}
+
+output "europe_alb_dns_name" {
+  description = "Europe ALB DNS name"
+  value       = try(module.alb_europe[0].dns_name, null)
 }
 
 output "europe_rds_endpoint" {
@@ -78,14 +88,19 @@ output "africa_vpc_id" {
   value       = try(module.vpc_africa[0].vpc_id, null)
 }
 
-output "africa_eks_cluster_endpoint" {
-  description = "Africa EKS cluster endpoint"
-  value       = try(module.eks_africa[0].cluster_endpoint, null)
+output "africa_ecs_cluster_name" {
+  description = "Africa ECS Fargate cluster name"
+  value       = try(module.ecs_africa[0].cluster_name, null)
 }
 
-output "africa_eks_cluster_name" {
-  description = "Africa EKS cluster name"
-  value       = try(module.eks_africa[0].cluster_name, null)
+output "africa_ecs_cluster_arn" {
+  description = "Africa ECS Fargate cluster ARN"
+  value       = try(module.ecs_africa[0].cluster_arn, null)
+}
+
+output "africa_alb_dns_name" {
+  description = "Africa ALB DNS name"
+  value       = try(module.alb_africa[0].dns_name, null)
 }
 
 output "africa_rds_endpoint" {

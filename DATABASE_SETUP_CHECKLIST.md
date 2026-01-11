@@ -2,11 +2,17 @@
 
 Use this checklist to set up production-ready database configuration, backup/restore system, and performance monitoring.
 
+> **Related Documentation:**
+> - [Database Quick Start](services/api/DATABASE_QUICKSTART.md) - Daily operations and common commands
+> - [Prisma Quick Start](services/api/prisma/DATABASE_QUICK_START.md) - Migration commands and workflows
+> - [Database Implementation Summary](DATABASE_IMPLEMENTATION_SUMMARY.md) - Architecture overview
+> - [Database Backup/Restore](infrastructure/runbooks/DATABASE_BACKUP_RESTORE.md) - Operational runbook
+
 ## Prerequisites
 
 ### System Requirements
 - [ ] PostgreSQL 12+ installed and running
-- [ ] Node.js 18+ installed
+- [ ] Node.js 20+ installed
 - [ ] bash shell available
 - [ ] psql and pg_dump tools available
 - [ ] gzip installed (for compression)

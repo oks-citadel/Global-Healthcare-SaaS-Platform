@@ -3,86 +3,135 @@ version: 0.2
 # ============================================
 # The Unified Health Platform - Deploy Spec
 # ============================================
-# Deploy to EKS using kubectl
+# Deploy to ECS Fargate using AWS CLI
 # ============================================
-
-env:
-  variables:
-    KUBECTL_VERSION: "v1.28.0"
 
 phases:
   install:
     runtime-versions:
       python: 3.11
     commands:
-      - echo "Installing kubectl..."
-      - curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
-      - chmod +x kubectl
-      - mv kubectl /usr/local/bin/
-      - kubectl version --client
+      - echo "Installing jq for JSON processing..."
+      - yum install -y jq || apt-get install -y jq
 
   pre_build:
     commands:
-      - echo "Configuring kubectl for EKS cluster ${EKS_CLUSTER_NAME}..."
-      - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
-      - echo "Verifying cluster connectivity..."
-      - kubectl cluster-info
-      - kubectl get nodes
-      - echo "Ensuring namespace exists..."
-      - kubectl get namespace $NAMESPACE || kubectl create namespace $NAMESPACE
+      - echo "Configuring deployment for ECS cluster ${ECS_CLUSTER_NAME}..."
+      - echo "Verifying cluster exists..."
+      - aws ecs describe-clusters --clusters $ECS_CLUSTER_NAME --region $AWS_REGION
+      - echo "Listing current services..."
+      - aws ecs list-services --cluster $ECS_CLUSTER_NAME --region $AWS_REGION
 
   build:
     commands:
-      - echo "Deploying to EKS cluster ${EKS_CLUSTER_NAME}..."
+      - echo "Deploying to ECS cluster ${ECS_CLUSTER_NAME}..."
       - echo "Listing available artifacts..."
       - ls -la
 
-      # Check if k8s-patch.yaml exists and apply it
+      # Deploy web-app service
       - |
-        if [ -f "k8s-patch.yaml" ]; then
-          echo "Applying k8s-patch.yaml..."
-          kubectl apply -f k8s-patch.yaml -n $NAMESPACE
-        else
-          echo "k8s-patch.yaml not found, using kubectl set image..."
+        if [ -f "web-app-image.txt" ]; then
+          WEB_APP_IMAGE=$(cat web-app-image.txt)
+          echo "Updating web-app service with image: ${WEB_APP_IMAGE}"
 
-          # Get the image tags from build artifacts
-          if [ -f "web-app-image.txt" ]; then
-            WEB_APP_IMAGE=$(cat web-app-image.txt)
-            echo "Updating web-app deployment with image: ${WEB_APP_IMAGE}"
-            kubectl set image deployment/web-app web-app=${WEB_APP_IMAGE} -n $NAMESPACE
-          fi
+          # Get current task definition
+          TASK_DEF=$(aws ecs describe-services \
+            --cluster "$ECS_CLUSTER_NAME" \
+            --services "web-app" \
+            --query 'services[0].taskDefinition' \
+            --output text --region $AWS_REGION 2>/dev/null || echo "")
 
-          if [ -f "api-image.txt" ]; then
-            API_IMAGE=$(cat api-image.txt)
-            echo "Updating api deployment with image: ${API_IMAGE}"
-            kubectl set image deployment/api api=${API_IMAGE} -n $NAMESPACE
+          if [ -n "$TASK_DEF" ] && [ "$TASK_DEF" != "None" ]; then
+            # Get task definition JSON
+            TASK_DEF_JSON=$(aws ecs describe-task-definition \
+              --task-definition "$TASK_DEF" \
+              --query 'taskDefinition' \
+              --region $AWS_REGION)
+
+            # Update container image
+            NEW_TASK_DEF=$(echo "$TASK_DEF_JSON" | jq \
+              --arg IMAGE "$WEB_APP_IMAGE" \
+              '.containerDefinitions = [.containerDefinitions[] | if .name == "web-app" then .image = $IMAGE else . end]' | \
+              jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)')
+
+            # Register new task definition
+            NEW_TASK_DEF_ARN=$(aws ecs register-task-definition \
+              --cli-input-json "$NEW_TASK_DEF" \
+              --query 'taskDefinition.taskDefinitionArn' \
+              --output text --region $AWS_REGION)
+
+            # Update service
+            aws ecs update-service \
+              --cluster "$ECS_CLUSTER_NAME" \
+              --service "web-app" \
+              --task-definition "$NEW_TASK_DEF_ARN" \
+              --force-new-deployment \
+              --region $AWS_REGION
+
+            echo "web-app service updated successfully"
+          else
+            echo "web-app service not found, skipping..."
           fi
         fi
 
-      # Verify deployments are rolling out
-      - echo "Waiting for web-app deployment rollout..."
-      - kubectl rollout status deployment/web-app -n $NAMESPACE --timeout=300s || echo "web-app deployment not found or rollout timeout"
+      # Deploy api service
+      - |
+        if [ -f "api-image.txt" ]; then
+          API_IMAGE=$(cat api-image.txt)
+          echo "Updating api service with image: ${API_IMAGE}"
 
-      - echo "Waiting for api deployment rollout..."
-      - kubectl rollout status deployment/api -n $NAMESPACE --timeout=300s || echo "api deployment not found or rollout timeout"
+          TASK_DEF=$(aws ecs describe-services \
+            --cluster "$ECS_CLUSTER_NAME" \
+            --services "api" \
+            --query 'services[0].taskDefinition' \
+            --output text --region $AWS_REGION 2>/dev/null || echo "")
+
+          if [ -n "$TASK_DEF" ] && [ "$TASK_DEF" != "None" ]; then
+            TASK_DEF_JSON=$(aws ecs describe-task-definition \
+              --task-definition "$TASK_DEF" \
+              --query 'taskDefinition' \
+              --region $AWS_REGION)
+
+            NEW_TASK_DEF=$(echo "$TASK_DEF_JSON" | jq \
+              --arg IMAGE "$API_IMAGE" \
+              '.containerDefinitions = [.containerDefinitions[] | if .name == "api" then .image = $IMAGE else . end]' | \
+              jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)')
+
+            NEW_TASK_DEF_ARN=$(aws ecs register-task-definition \
+              --cli-input-json "$NEW_TASK_DEF" \
+              --query 'taskDefinition.taskDefinitionArn' \
+              --output text --region $AWS_REGION)
+
+            aws ecs update-service \
+              --cluster "$ECS_CLUSTER_NAME" \
+              --service "api" \
+              --task-definition "$NEW_TASK_DEF_ARN" \
+              --force-new-deployment \
+              --region $AWS_REGION
+
+            echo "api service updated successfully"
+          else
+            echo "api service not found, skipping..."
+          fi
+        fi
+
+      # Wait for services to stabilize
+      - echo "Waiting for services to stabilize..."
+      - aws ecs wait services-stable --cluster $ECS_CLUSTER_NAME --services web-app api --region $AWS_REGION || echo "Some services may not exist yet"
 
   post_build:
     commands:
       - echo "Deployment completed at $(date)"
       - echo "Verifying deployment status..."
-      - kubectl get deployments -n $NAMESPACE
-      - kubectl get pods -n $NAMESPACE
-      - kubectl get services -n $NAMESPACE
 
-      # Output deployment details
-      - echo "Web App Deployment:"
-      - kubectl describe deployment/web-app -n $NAMESPACE 2>/dev/null || echo "web-app deployment not found"
+      # List all services in the cluster
+      - aws ecs list-services --cluster $ECS_CLUSTER_NAME --region $AWS_REGION
 
-      - echo "API Deployment:"
-      - kubectl describe deployment/api -n $NAMESPACE 2>/dev/null || echo "api deployment not found"
+      # Get service details
+      - echo "Web App Service:"
+      - aws ecs describe-services --cluster $ECS_CLUSTER_NAME --services web-app --region $AWS_REGION --query 'services[0].{status:status,runningCount:runningCount,desiredCount:desiredCount,taskDefinition:taskDefinition}' 2>/dev/null || echo "web-app service not found"
 
-      - echo "Deployment completed successfully!"
+      - echo "API Service:"
+      - aws ecs describe-services --cluster $ECS_CLUSTER_NAME --services api --region $AWS_REGION --query 'services[0].{status:status,runningCount:runningCount,desiredCount:desiredCount,taskDefinition:taskDefinition}' 2>/dev/null || echo "api service not found"
 
-cache:
-  paths:
-    - /root/.kube/**/*
+      - echo "ECS Fargate deployment completed successfully!"

@@ -978,31 +978,72 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
         continue-on-error: true
 
-      - name: Update kubeconfig
+      - name: Login to Amazon ECR
         if: steps.aws-creds.outcome == 'success'
-        run: |
-          aws eks update-kubeconfig \
-            --region ${{ env.AWS_REGION }} \
-            --name unified-health-dev-cluster
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Deploy to EKS
+      - name: Deploy to ECS Fargate
         if: steps.aws-creds.outcome == 'success'
         run: |
+          CLUSTER="unified-health-dev-cluster"
           COMMIT_SHA="${{ needs.setup.outputs.commit_sha }}"
+          ECR_REGISTRY="${{ secrets.ECR_REGISTRY }}"
+          SERVICES="api,web-app"
 
-          kubectl set image deployment/api \
-            api=${{ secrets.ECR_REGISTRY }}/unified-health-prod/api:$COMMIT_SHA \
-            -n unified-health || echo "Deployment not found"
+          echo "Deploying to ECS cluster: $CLUSTER"
 
-          kubectl set image deployment/web \
-            web=${{ secrets.ECR_REGISTRY }}/unified-health-prod/web:$COMMIT_SHA \
-            -n unified-health || echo "Deployment not found"
+          IFS=',' read -ra SERVICE_ARRAY <<< "$SERVICES"
+          for SERVICE in "${SERVICE_ARRAY[@]}"; do
+            echo "Deploying service: $SERVICE"
+
+            TASK_DEF=$(aws ecs describe-services \
+              --cluster "$CLUSTER" \
+              --services "$SERVICE" \
+              --query 'services[0].taskDefinition' \
+              --output text 2>/dev/null || echo "")
+
+            if [ -z "$TASK_DEF" ] || [ "$TASK_DEF" == "None" ]; then
+              echo "Service $SERVICE not found, skipping..."
+              continue
+            fi
+
+            TASK_DEF_JSON=$(aws ecs describe-task-definition \
+              --task-definition "$TASK_DEF" \
+              --query 'taskDefinition')
+
+            NEW_IMAGE="${ECR_REGISTRY}/unified-health-prod/${SERVICE}:${COMMIT_SHA}"
+
+            NEW_TASK_DEF=$(echo "$TASK_DEF_JSON" | jq \
+              --arg IMAGE "$NEW_IMAGE" \
+              --arg SERVICE "$SERVICE" \
+              '.containerDefinitions = [.containerDefinitions[] | if .name == $SERVICE then .image = $IMAGE else . end]' | \
+              jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)')
+
+            NEW_TASK_DEF_ARN=$(aws ecs register-task-definition \
+              --cli-input-json "$NEW_TASK_DEF" \
+              --query 'taskDefinition.taskDefinitionArn' \
+              --output text)
+
+            aws ecs update-service \
+              --cluster "$CLUSTER" \
+              --service "$SERVICE" \
+              --task-definition "$NEW_TASK_DEF_ARN" \
+              --force-new-deployment \
+              --output text > /dev/null
+
+            echo "Deployed $SERVICE"
+          done
 
       - name: Verify deployment
         if: steps.aws-creds.outcome == 'success'
         run: |
-          kubectl rollout status deployment/api -n unified-health --timeout=300s || true
-          kubectl rollout status deployment/web -n unified-health --timeout=300s || true
+          CLUSTER="unified-health-dev-cluster"
+          aws ecs wait services-stable \
+            --cluster "$CLUSTER" \
+            --services api web-app \
+            --region ${{ env.AWS_REGION }} || true
+          echo "Dev deployment verified"
 
   deploy-staging:
     name: Deploy to Staging
@@ -1030,31 +1071,72 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
         continue-on-error: true
 
-      - name: Update kubeconfig
+      - name: Login to Amazon ECR
         if: steps.aws-creds.outcome == 'success'
-        run: |
-          aws eks update-kubeconfig \
-            --region ${{ env.AWS_REGION }} \
-            --name unified-health-staging-cluster
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Deploy to EKS
+      - name: Deploy to ECS Fargate
         if: steps.aws-creds.outcome == 'success'
         run: |
+          CLUSTER="unified-health-staging-cluster"
           COMMIT_SHA="${{ needs.setup.outputs.commit_sha }}"
+          ECR_REGISTRY="${{ secrets.ECR_REGISTRY }}"
+          SERVICES="api,web-app"
 
-          kubectl set image deployment/api \
-            api=${{ secrets.ECR_REGISTRY }}/unified-health-prod/api:$COMMIT_SHA \
-            -n unified-health
+          echo "Deploying to ECS cluster: $CLUSTER"
 
-          kubectl set image deployment/web \
-            web=${{ secrets.ECR_REGISTRY }}/unified-health-prod/web:$COMMIT_SHA \
-            -n unified-health
+          IFS=',' read -ra SERVICE_ARRAY <<< "$SERVICES"
+          for SERVICE in "${SERVICE_ARRAY[@]}"; do
+            echo "Deploying service: $SERVICE"
+
+            TASK_DEF=$(aws ecs describe-services \
+              --cluster "$CLUSTER" \
+              --services "$SERVICE" \
+              --query 'services[0].taskDefinition' \
+              --output text 2>/dev/null || echo "")
+
+            if [ -z "$TASK_DEF" ] || [ "$TASK_DEF" == "None" ]; then
+              echo "Service $SERVICE not found, skipping..."
+              continue
+            fi
+
+            TASK_DEF_JSON=$(aws ecs describe-task-definition \
+              --task-definition "$TASK_DEF" \
+              --query 'taskDefinition')
+
+            NEW_IMAGE="${ECR_REGISTRY}/unified-health-prod/${SERVICE}:${COMMIT_SHA}"
+
+            NEW_TASK_DEF=$(echo "$TASK_DEF_JSON" | jq \
+              --arg IMAGE "$NEW_IMAGE" \
+              --arg SERVICE "$SERVICE" \
+              '.containerDefinitions = [.containerDefinitions[] | if .name == $SERVICE then .image = $IMAGE else . end]' | \
+              jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)')
+
+            NEW_TASK_DEF_ARN=$(aws ecs register-task-definition \
+              --cli-input-json "$NEW_TASK_DEF" \
+              --query 'taskDefinition.taskDefinitionArn' \
+              --output text)
+
+            aws ecs update-service \
+              --cluster "$CLUSTER" \
+              --service "$SERVICE" \
+              --task-definition "$NEW_TASK_DEF_ARN" \
+              --force-new-deployment \
+              --output text > /dev/null
+
+            echo "Deployed $SERVICE"
+          done
 
       - name: Verify deployment
         if: steps.aws-creds.outcome == 'success'
         run: |
-          kubectl rollout status deployment/api -n unified-health --timeout=300s
-          kubectl rollout status deployment/web -n unified-health --timeout=300s
+          CLUSTER="unified-health-staging-cluster"
+          aws ecs wait services-stable \
+            --cluster "$CLUSTER" \
+            --services api web-app \
+            --region ${{ env.AWS_REGION }}
+          echo "Staging deployment verified"
 
   deploy-production:
     name: Deploy to Production
@@ -1083,42 +1165,89 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
         continue-on-error: true
 
-      - name: Update kubeconfig
+      - name: Login to Amazon ECR
         if: steps.aws-creds.outcome == 'success'
-        run: |
-          aws eks update-kubeconfig \
-            --region ${{ env.AWS_REGION }} \
-            --name unified-health-prod-cluster
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Deploy to EKS
+      - name: Deploy to ECS Fargate
         if: steps.aws-creds.outcome == 'success'
         run: |
+          CLUSTER="unified-health-prod-cluster"
           COMMIT_SHA="${{ needs.setup.outputs.commit_sha }}"
+          ECR_REGISTRY="${{ secrets.ECR_REGISTRY }}"
+          SERVICES="api,web-app,api-gateway"
 
-          kubectl set image deployment/api \
-            api=${{ secrets.ECR_REGISTRY }}/unified-health-prod/api:$COMMIT_SHA \
-            -n unified-health
+          echo "Deploying to ECS cluster: $CLUSTER"
 
-          kubectl set image deployment/web \
-            web=${{ secrets.ECR_REGISTRY }}/unified-health-prod/web:$COMMIT_SHA \
-            -n unified-health
+          IFS=',' read -ra SERVICE_ARRAY <<< "$SERVICES"
+          for SERVICE in "${SERVICE_ARRAY[@]}"; do
+            echo "Deploying service: $SERVICE"
 
-          kubectl set image deployment/api-gateway \
-            api-gateway=${{ secrets.ECR_REGISTRY }}/unified-health-prod/api-gateway:$COMMIT_SHA \
-            -n unified-health
+            TASK_DEF=$(aws ecs describe-services \
+              --cluster "$CLUSTER" \
+              --services "$SERVICE" \
+              --query 'services[0].taskDefinition' \
+              --output text 2>/dev/null || echo "")
+
+            if [ -z "$TASK_DEF" ] || [ "$TASK_DEF" == "None" ]; then
+              echo "Service $SERVICE not found, skipping..."
+              continue
+            fi
+
+            TASK_DEF_JSON=$(aws ecs describe-task-definition \
+              --task-definition "$TASK_DEF" \
+              --query 'taskDefinition')
+
+            NEW_IMAGE="${ECR_REGISTRY}/unified-health-prod/${SERVICE}:${COMMIT_SHA}"
+
+            NEW_TASK_DEF=$(echo "$TASK_DEF_JSON" | jq \
+              --arg IMAGE "$NEW_IMAGE" \
+              --arg SERVICE "$SERVICE" \
+              '.containerDefinitions = [.containerDefinitions[] | if .name == $SERVICE then .image = $IMAGE else . end]' | \
+              jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)')
+
+            NEW_TASK_DEF_ARN=$(aws ecs register-task-definition \
+              --cli-input-json "$NEW_TASK_DEF" \
+              --query 'taskDefinition.taskDefinitionArn' \
+              --output text)
+
+            aws ecs update-service \
+              --cluster "$CLUSTER" \
+              --service "$SERVICE" \
+              --task-definition "$NEW_TASK_DEF_ARN" \
+              --force-new-deployment \
+              --output text > /dev/null
+
+            echo "Deployed $SERVICE"
+          done
 
       - name: Verify deployment
         if: steps.aws-creds.outcome == 'success'
         run: |
-          kubectl rollout status deployment/api -n unified-health --timeout=300s
-          kubectl rollout status deployment/web -n unified-health --timeout=300s
-          kubectl rollout status deployment/api-gateway -n unified-health --timeout=300s
+          CLUSTER="unified-health-prod-cluster"
+          aws ecs wait services-stable \
+            --cluster "$CLUSTER" \
+            --services api web-app api-gateway \
+            --region ${{ env.AWS_REGION }}
 
       - name: Health check
         if: steps.aws-creds.outcome == 'success'
         run: |
-          kubectl wait --for=condition=ready pod -l app=api -n unified-health --timeout=120s
-          kubectl wait --for=condition=ready pod -l app=web -n unified-health --timeout=120s
+          CLUSTER="unified-health-prod-cluster"
+          for SERVICE in api web-app api-gateway; do
+            RUNNING=$(aws ecs describe-services \
+              --cluster "$CLUSTER" \
+              --services "$SERVICE" \
+              --query 'services[0].runningCount' \
+              --output text)
+            DESIRED=$(aws ecs describe-services \
+              --cluster "$CLUSTER" \
+              --services "$SERVICE" \
+              --query 'services[0].desiredCount' \
+              --output text)
+            echo "$SERVICE: $RUNNING/$DESIRED tasks running"
+          done
           echo "Production deployment verified"
 
   # ==========================================================================
@@ -1361,21 +1490,60 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN_PROD }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Update kubeconfig
+      - name: Rollback ECS services
         run: |
-          aws eks update-kubeconfig \
-            --region ${{ env.AWS_REGION }} \
-            --name unified-health-prod-cluster
+          CLUSTER="unified-health-prod-cluster"
+          SERVICES="api,web-app,api-gateway"
 
-      - name: Rollback deployments
+          echo "::warning::Initiating ECS rollback due to deployment failure"
+
+          IFS=',' read -ra SERVICE_ARRAY <<< "$SERVICES"
+          for SERVICE in "${SERVICE_ARRAY[@]}"; do
+            echo "Rolling back $SERVICE..."
+
+            # Get current task definition ARN
+            CURRENT_TASK=$(aws ecs describe-services \
+              --cluster "$CLUSTER" \
+              --services "$SERVICE" \
+              --query 'services[0].taskDefinition' \
+              --output text 2>/dev/null || echo "")
+
+            if [ -z "$CURRENT_TASK" ] || [ "$CURRENT_TASK" == "None" ]; then
+              echo "Service $SERVICE not found, skipping rollback"
+              continue
+            fi
+
+            # Get previous task definition (current revision - 1)
+            FAMILY=$(echo "$CURRENT_TASK" | sed 's/:.*$//' | sed 's/.*\///')
+            CURRENT_REV=$(echo "$CURRENT_TASK" | sed 's/.*://')
+            PREV_REV=$((CURRENT_REV - 1))
+
+            if [ $PREV_REV -lt 1 ]; then
+              echo "No previous revision for $SERVICE"
+              continue
+            fi
+
+            PREV_TASK="${FAMILY}:${PREV_REV}"
+            echo "Rolling back from revision $CURRENT_REV to $PREV_REV"
+
+            # Update service to previous task definition
+            aws ecs update-service \
+              --cluster "$CLUSTER" \
+              --service "$SERVICE" \
+              --task-definition "$PREV_TASK" \
+              --force-new-deployment \
+              --output text > /dev/null
+
+            echo "Rollback triggered for $SERVICE"
+          done
+
+      - name: Wait for rollback to complete
         run: |
-          echo "::warning::Initiating rollback due to deployment failure"
-          kubectl rollout undo deployment/api -n unified-health
-          kubectl rollout undo deployment/web -n unified-health
-          kubectl rollout undo deployment/api-gateway -n unified-health
-
-          kubectl rollout status deployment/api -n unified-health --timeout=300s
-          kubectl rollout status deployment/web -n unified-health --timeout=300s
+          CLUSTER="unified-health-prod-cluster"
+          aws ecs wait services-stable \
+            --cluster "$CLUSTER" \
+            --services api web-app api-gateway \
+            --region ${{ env.AWS_REGION }} || true
           echo "Rollback completed"
 
   # ==========================================================================

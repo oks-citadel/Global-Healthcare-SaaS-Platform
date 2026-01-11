@@ -4,6 +4,11 @@
 
 This quick reference provides the essential commands and workflows for database operations.
 
+> **Related Documentation:**
+> - [Database Setup Checklist](../../../DATABASE_SETUP_CHECKLIST.md) - Production setup guide
+> - [Database Operations Guide](../DATABASE_QUICKSTART.md) - Daily operations
+> - [Database Backup/Restore](../../../infrastructure/runbooks/DATABASE_BACKUP_RESTORE.md) - Operational runbook
+
 ---
 
 ## Quick Setup (Development)

@@ -126,8 +126,37 @@ module "vpc_americas" {
   })
 }
 
-module "eks_americas" {
-  source = "./modules/eks"
+# ECS Fargate Cluster - Americas (replaces EKS)
+module "ecs_americas" {
+  source = "./modules/ecs-cluster"
+  count  = var.deploy_americas ? 1 : 0
+
+  providers = {
+    aws = aws.americas
+  }
+
+  project     = var.project_name
+  environment = var.environment
+  aws_region  = "us-east-1"
+
+  vpc_id                 = module.vpc_americas[0].vpc_id
+  alb_security_group_ids = module.alb_americas[0].security_group_ids
+
+  enable_container_insights = var.ecs_enable_container_insights
+  enable_service_discovery  = true
+  log_retention_days        = 30
+
+  fargate_weight      = 20
+  fargate_spot_weight = 80
+
+  tags = merge(local.common_tags, {
+    Region = "Americas"
+  })
+}
+
+# ALB for Americas region
+module "alb_americas" {
+  source = "./modules/alb"
   count  = var.deploy_americas ? 1 : 0
 
   providers = {
@@ -136,22 +165,9 @@ module "eks_americas" {
 
   project_name = var.project_name
   environment  = var.environment
-  region_name  = "americas"
 
   vpc_id     = module.vpc_americas[0].vpc_id
-  subnet_ids = module.vpc_americas[0].private_subnet_ids
-
-  cluster_version = var.eks_cluster_version
-
-  system_node_instance_types = ["m6i.large"]
-  system_node_min_size       = 2
-  system_node_max_size       = 4
-  system_node_desired_size   = 2
-
-  app_node_instance_types = var.eks_node_instance_types
-  app_node_min_size       = var.eks_node_min_size
-  app_node_max_size       = var.eks_node_max_size
-  app_node_desired_size   = var.eks_node_desired_size
+  subnet_ids = module.vpc_americas[0].public_subnet_ids
 
   tags = merge(local.common_tags, {
     Region = "Americas"
@@ -172,7 +188,7 @@ module "rds_americas" {
 
   vpc_id                    = module.vpc_americas[0].vpc_id
   db_subnet_group_name      = module.vpc_americas[0].db_subnet_group_name
-  allowed_security_group_id = module.eks_americas[0].node_security_group_id
+  allowed_security_group_id = module.ecs_americas[0].ecs_tasks_security_group_id
 
   engine_version        = var.rds_engine_version
   instance_class        = var.rds_instance_class
@@ -198,7 +214,7 @@ module "elasticache_americas" {
 
   vpc_id                    = module.vpc_americas[0].vpc_id
   subnet_ids                = module.vpc_americas[0].elasticache_subnet_ids
-  allowed_security_group_id = module.eks_americas[0].node_security_group_id
+  allowed_security_group_id = module.ecs_americas[0].ecs_tasks_security_group_id
 
   node_type          = var.elasticache_node_type
   num_cache_clusters = var.elasticache_num_cache_clusters
@@ -242,8 +258,37 @@ module "vpc_europe" {
   })
 }
 
-module "eks_europe" {
-  source = "./modules/eks"
+# ECS Fargate Cluster - Europe (replaces EKS)
+module "ecs_europe" {
+  source = "./modules/ecs-cluster"
+  count  = var.deploy_europe ? 1 : 0
+
+  providers = {
+    aws = aws.europe
+  }
+
+  project     = var.project_name
+  environment = var.environment
+  aws_region  = "eu-west-1"
+
+  vpc_id                 = module.vpc_europe[0].vpc_id
+  alb_security_group_ids = module.alb_europe[0].security_group_ids
+
+  enable_container_insights = var.ecs_enable_container_insights
+  enable_service_discovery  = true
+  log_retention_days        = 30
+
+  fargate_weight      = 20
+  fargate_spot_weight = 80
+
+  tags = merge(local.common_tags, {
+    Region = "Europe"
+  })
+}
+
+# ALB for Europe region
+module "alb_europe" {
+  source = "./modules/alb"
   count  = var.deploy_europe ? 1 : 0
 
   providers = {
@@ -252,22 +297,9 @@ module "eks_europe" {
 
   project_name = var.project_name
   environment  = var.environment
-  region_name  = "europe"
 
   vpc_id     = module.vpc_europe[0].vpc_id
-  subnet_ids = module.vpc_europe[0].private_subnet_ids
-
-  cluster_version = var.eks_cluster_version
-
-  system_node_instance_types = ["m6i.large"]
-  system_node_min_size       = 2
-  system_node_max_size       = 4
-  system_node_desired_size   = 2
-
-  app_node_instance_types = var.eks_node_instance_types
-  app_node_min_size       = var.eks_node_min_size
-  app_node_max_size       = var.eks_node_max_size
-  app_node_desired_size   = var.eks_node_desired_size
+  subnet_ids = module.vpc_europe[0].public_subnet_ids
 
   tags = merge(local.common_tags, {
     Region = "Europe"
@@ -288,7 +320,7 @@ module "rds_europe" {
 
   vpc_id                    = module.vpc_europe[0].vpc_id
   db_subnet_group_name      = module.vpc_europe[0].db_subnet_group_name
-  allowed_security_group_id = module.eks_europe[0].node_security_group_id
+  allowed_security_group_id = module.ecs_europe[0].ecs_tasks_security_group_id
 
   engine_version        = var.rds_engine_version
   instance_class        = var.rds_instance_class
@@ -314,7 +346,7 @@ module "elasticache_europe" {
 
   vpc_id                    = module.vpc_europe[0].vpc_id
   subnet_ids                = module.vpc_europe[0].elasticache_subnet_ids
-  allowed_security_group_id = module.eks_europe[0].node_security_group_id
+  allowed_security_group_id = module.ecs_europe[0].ecs_tasks_security_group_id
 
   node_type          = var.elasticache_node_type
   num_cache_clusters = var.elasticache_num_cache_clusters
@@ -358,8 +390,37 @@ module "vpc_africa" {
   })
 }
 
-module "eks_africa" {
-  source = "./modules/eks"
+# ECS Fargate Cluster - Africa (replaces EKS)
+module "ecs_africa" {
+  source = "./modules/ecs-cluster"
+  count  = var.deploy_africa ? 1 : 0
+
+  providers = {
+    aws = aws.africa
+  }
+
+  project     = var.project_name
+  environment = var.environment
+  aws_region  = "af-south-1"
+
+  vpc_id                 = module.vpc_africa[0].vpc_id
+  alb_security_group_ids = module.alb_africa[0].security_group_ids
+
+  enable_container_insights = var.ecs_enable_container_insights
+  enable_service_discovery  = true
+  log_retention_days        = 30
+
+  fargate_weight      = 20
+  fargate_spot_weight = 80
+
+  tags = merge(local.common_tags, {
+    Region = "Africa"
+  })
+}
+
+# ALB for Africa region
+module "alb_africa" {
+  source = "./modules/alb"
   count  = var.deploy_africa ? 1 : 0
 
   providers = {
@@ -368,22 +429,9 @@ module "eks_africa" {
 
   project_name = var.project_name
   environment  = var.environment
-  region_name  = "africa"
 
   vpc_id     = module.vpc_africa[0].vpc_id
-  subnet_ids = module.vpc_africa[0].private_subnet_ids
-
-  cluster_version = var.eks_cluster_version
-
-  system_node_instance_types = ["m6i.large"]
-  system_node_min_size       = 2
-  system_node_max_size       = 4
-  system_node_desired_size   = 2
-
-  app_node_instance_types = var.eks_node_instance_types
-  app_node_min_size       = var.eks_node_min_size
-  app_node_max_size       = var.eks_node_max_size
-  app_node_desired_size   = var.eks_node_desired_size
+  subnet_ids = module.vpc_africa[0].public_subnet_ids
 
   tags = merge(local.common_tags, {
     Region = "Africa"
@@ -404,7 +452,7 @@ module "rds_africa" {
 
   vpc_id                    = module.vpc_africa[0].vpc_id
   db_subnet_group_name      = module.vpc_africa[0].db_subnet_group_name
-  allowed_security_group_id = module.eks_africa[0].node_security_group_id
+  allowed_security_group_id = module.ecs_africa[0].ecs_tasks_security_group_id
 
   engine_version        = var.rds_engine_version
   instance_class        = var.rds_instance_class
@@ -430,7 +478,7 @@ module "elasticache_africa" {
 
   vpc_id                    = module.vpc_africa[0].vpc_id
   subnet_ids                = module.vpc_africa[0].elasticache_subnet_ids
-  allowed_security_group_id = module.eks_africa[0].node_security_group_id
+  allowed_security_group_id = module.ecs_africa[0].ecs_tasks_security_group_id
 
   node_type          = var.elasticache_node_type
   num_cache_clusters = var.elasticache_num_cache_clusters
@@ -452,16 +500,16 @@ module "route53" {
   environment  = var.environment
   domain_name  = var.domain_name
 
-  # DNS Records
+  # DNS Records - Points to ALB (ECS Fargate)
   records = [
     {
       name            = ""
       type            = "A"
       ttl             = 300
       values          = []
-      alias_target    = var.deploy_americas && length(module.eks_americas) > 0 ? {
-        dns_name               = module.eks_americas[0].cluster_endpoint
-        zone_id                = "Z35SXDOTRQ7X7K"  # us-east-1 ALB zone
+      alias_target    = var.deploy_americas && length(module.alb_americas) > 0 ? {
+        dns_name               = module.alb_americas[0].dns_name
+        zone_id                = module.alb_americas[0].zone_id
         evaluate_target_health = true
       } : null
       weight          = null
@@ -532,7 +580,8 @@ module "codepipeline" {
   github_repository     = var.github_repository
   github_branch         = var.github_branch
 
-  eks_cluster_name = var.deploy_americas ? module.eks_americas[0].cluster_name : ""
+  # ECS Fargate cluster (replaces EKS)
+  ecs_cluster_name = var.deploy_americas ? module.ecs_americas[0].cluster_name : ""
 
   tags = local.common_tags
 }

@@ -2,15 +2,21 @@
 
 This guide will get you from zero to deployed in approximately 60 minutes.
 
+> **Note:** This platform uses **ECS Fargate** (serverless containers).
+
+> **Related Documentation:**
+> - [Full Deployment Guide](DEPLOYMENT.md) - Comprehensive ECS Fargate deployment
+> - [AWS Terraform Deployment](DEPLOYMENT_GUIDE.md) - Infrastructure as Code setup with Terraform
+> - [ECS Fargate Architecture](docs/architecture/ecs-fargate-architecture.md) - Target architecture
+
 ## Prerequisites Checklist
 
 Before starting, ensure you have:
 
 - [ ] AWS account with admin access
 - [ ] AWS CLI installed and configured (`aws configure`)
-- [ ] eksctl installed
+- [ ] Terraform >= 1.5 installed
 - [ ] Docker installed and running
-- [ ] kubectl installed
 - [ ] Git repository access
 - [ ] Node.js 20+ and pnpm installed
 
@@ -25,7 +31,7 @@ aws iam create-user --user-name unified-health-deploy
 # Attach required policies
 aws iam attach-user-policy \
   --user-name unified-health-deploy \
-  --policy-arn arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
+  --policy-arn arn:aws:iam::aws:policy/AmazonECS_FullAccess
 
 aws iam attach-user-policy \
   --user-name unified-health-deploy \
@@ -52,7 +58,7 @@ chmod +x scripts/*.sh
 ./scripts/setup-aws.sh staging
 
 # Expected duration: ~15 minutes
-# Creates: EKS cluster, ECR, RDS PostgreSQL, ElastiCache Redis, Secrets Manager, S3
+# Creates: ECS Fargate cluster, ECR, RDS PostgreSQL, ElastiCache Redis, Secrets Manager, S3
 ```
 
 ### 1.4 Setup Secrets
@@ -71,18 +77,19 @@ chmod +x scripts/*.sh
 ### 1.5 Verify Setup
 
 ```bash
-# Get EKS credentials
-aws eks update-kubeconfig \
+# Verify ECS cluster is running
+aws ecs describe-clusters \
   --region us-east-1 \
-  --name unified-health-eks-staging
+  --clusters unified-health-staging
 
-# Check cluster is running
-kubectl get nodes
-kubectl get namespaces
+# List ECS services
+aws ecs list-services \
+  --region us-east-1 \
+  --cluster unified-health-staging
 
 # Should see:
-# - 3 nodes in Ready state
-# - unified-health-staging namespace
+# - Cluster status: ACTIVE
+# - Services deployed
 ```
 
 ## Step 2: First Deployment (15 minutes)
@@ -100,25 +107,29 @@ make deploy-staging
 ### 2.2 Watch Deployment
 
 ```bash
-# Watch pods starting up
-kubectl get pods -n unified-health-staging -w
+# Watch ECS service deployment
+aws ecs describe-services \
+  --cluster unified-health-staging \
+  --services unified-health-api \
+  --query 'services[0].deployments'
 
-# Check deployment status
-kubectl rollout status deployment/unified-health-api -n unified-health-staging
-
-# View logs
-kubectl logs -f -n unified-health-staging -l app=unified-health-api
+# View logs in CloudWatch
+aws logs tail /ecs/unified-health-staging/api --follow
 ```
 
 ### 2.3 Verify Deployment
 
 ```bash
-# Check all pods are running
-kubectl get pods -n unified-health-staging
+# Check all services are running
+aws ecs list-services --cluster unified-health-staging
 
-# Test health endpoint
-kubectl port-forward -n unified-health-staging svc/unified-health-api 8080:80 &
-curl http://localhost:8080/health
+# Check service status
+aws ecs describe-services \
+  --cluster unified-health-staging \
+  --services unified-health-api
+
+# Test health endpoint via ALB
+curl https://api-staging.unified-health.com/health
 
 # Should return: {"status":"ok"}
 ```
@@ -170,13 +181,14 @@ git push origin main
 ### 4.2 Configure Production Settings
 
 ```bash
-# Switch to production context
-aws eks update-kubeconfig \
+# Verify production ECS cluster
+aws ecs describe-clusters \
   --region us-east-1 \
-  --name unified-health-eks-prod
+  --clusters unified-health-prod
 
-# Verify
-kubectl get nodes
+# List production services
+aws ecs list-services \
+  --cluster unified-health-prod
 ```
 
 ### 4.3 First Production Deployment
@@ -303,39 +315,36 @@ aws configure
 aws sts get-caller-identity
 ```
 
-### Issue: EKS credentials not working
+### Issue: ECS service not starting
 ```bash
-aws eks update-kubeconfig \
-  --region us-east-1 \
-  --name unified-health-eks-staging
-```
+# Check service status
+aws ecs describe-services \
+  --cluster unified-health-staging \
+  --services unified-health-api
 
-### Issue: Pods not starting
-```bash
-# Check pod status
-kubectl get pods -n unified-health-staging
+# List tasks
+aws ecs list-tasks \
+  --cluster unified-health-staging \
+  --service-name unified-health-api
 
-# Describe pod for details
-kubectl describe pod <pod-name> -n unified-health-staging
+# Describe task for details
+aws ecs describe-tasks \
+  --cluster unified-health-staging \
+  --tasks <task-id>
 
-# Check logs
-kubectl logs <pod-name> -n unified-health-staging
-
-# Check events
-kubectl get events -n unified-health-staging --sort-by='.lastTimestamp'
+# Check CloudWatch logs
+aws logs tail /ecs/unified-health-staging/api --since 1h
 ```
 
 ### Issue: Database connection failed
 ```bash
-# Check secrets exist
-kubectl get secrets -n unified-health-staging
+# Check secrets in Secrets Manager
+aws secretsmanager get-secret-value \
+  --secret-id unified-health-staging/database-url
 
-# Verify database URL
-kubectl get secret unified-health-secrets -n unified-health-staging -o jsonpath='{.data.database-url}' | base64 -d
-
-# Test database connectivity from pod
-kubectl exec -it <pod-name> -n unified-health-staging -- sh
-# Then: psql $DATABASE_URL
+# Check security group allows database access
+aws ec2 describe-security-groups \
+  --group-ids <security-group-id>
 ```
 
 ### Issue: Docker build failed
@@ -392,8 +401,8 @@ docker build --no-cache -f services/api/Dockerfile services/api
 - On-call: +1-XXX-XXX-XXXX
 
 ### Useful Resources
-- [AWS EKS Docs](https://docs.aws.amazon.com/eks/)
-- [Kubernetes Docs](https://kubernetes.io/docs/)
+- [AWS ECS Docs](https://docs.aws.amazon.com/ecs/)
+- [AWS Fargate Docs](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/AWS_Fargate.html)
 - [Docker Docs](https://docs.docker.com/)
 
 ## Checklist: Production Readiness

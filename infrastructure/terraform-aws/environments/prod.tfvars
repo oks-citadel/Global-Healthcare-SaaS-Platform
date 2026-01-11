@@ -18,12 +18,11 @@ deploy_africa   = true
 compliance_standards    = ["HIPAA", "SOC2", "ISO27001", "GDPR", "POPIA"]
 data_residency_required = true
 
-# EKS Configuration (production-grade)
-eks_cluster_version     = "1.29"
-eks_node_instance_types = ["m6i.xlarge", "m6i.2xlarge"]
-eks_node_min_size       = 3
-eks_node_max_size       = 20
-eks_node_desired_size   = 5
+# ECS Fargate Configuration (production-grade, replaces EKS)
+ecs_enable_container_insights = true
+ecs_fargate_weight            = 20  # More on-demand for production
+ecs_fargate_spot_weight       = 80
+ecs_log_retention_days        = 90
 
 # RDS Configuration (production-grade)
 rds_engine_version        = "15.4"

@@ -2,6 +2,11 @@
 
 Quick reference for common database operations and maintenance tasks.
 
+> **Related Documentation:**
+> - [Database Setup Checklist](../../DATABASE_SETUP_CHECKLIST.md) - Production setup guide
+> - [Prisma Quick Start](prisma/DATABASE_QUICK_START.md) - Migration commands
+> - [Database Backup/Restore](../../infrastructure/runbooks/DATABASE_BACKUP_RESTORE.md) - Operational runbook
+
 ## Table of Contents
 
 - [Initial Setup](#initial-setup)

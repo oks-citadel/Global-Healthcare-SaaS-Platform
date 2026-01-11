@@ -406,7 +406,7 @@ UnifiedHealth is uniquely positioned to capture this opportunity with the **only
     |  Americas   |          |   Europe    |          |Asia-Pacific |
     |  US-East-2  |          |  EU-West-1  |          |AP-Southeast |
     +-------------+          +-------------+          +-------------+
-    | - EKS       |          | - EKS       |          | - EKS       |
+    | - ECS       |          | - ECS       |          | - ECS       |
     | - RDS       |          | - RDS       |          | - RDS       |
     | - ElastiCache|         | - ElastiCache|         | - ElastiCache|
     | - S3        |          | - S3        |          | - S3        |
@@ -1401,8 +1401,8 @@ Global-Healthcare-SaaS-Platform/
 
 | Technology                                  | Purpose                    | Status |
 | ------------------------------------------- | -------------------------- | ------ |
-| **Amazon Elastic Kubernetes Service (EKS)** | Container Orchestration    | ✅     |
-| **Azure Kubernetes Service (AKS)**          | Container Orchestration    | ✅     |
+| **Amazon ECS Fargate**                      | Serverless Containers      | ✅     |
+| **Azure Container Apps**                    | Serverless Containers      | ✅     |
 | **Amazon Elastic Container Registry (ECR)** | Docker Image Storage       | ✅     |
 | **Azure Container Registry (ACR)**          | Docker Image Storage       | ✅     |
 | **Amazon RDS for PostgreSQL**               | Managed Database           | ✅     |
@@ -1415,7 +1415,7 @@ Global-Healthcare-SaaS-Platform/
 | **Azure Blob Storage**                      | File & Media Storage       | ✅     |
 | **GitHub Actions**                          | CI/CD Pipelines            | ✅     |
 | **Terraform**                               | Infrastructure as Code     | ✅     |
-| **Helm**                                    | Kubernetes Package Manager | ✅     |
+| **AWS CDK**                                 | Infrastructure as Code     | ✅     |
 | **Docker**                                  | Containerization           | ✅     |
 | **pnpm**                                    | Package Manager            | ✅     |
 | **Turborepo**                               | Monorepo Build System      | ✅     |
@@ -1619,7 +1619,7 @@ GitHub Repository
          │
          ▼
 ┌──────────────────┐
-│   Amazon EKS     │ ◄── Runs containerized services
+│  ECS Fargate     │ ◄── Runs serverless containers
 └──────────────────┘
 ```
 
@@ -1630,7 +1630,7 @@ GitHub Repository
 | **Source** | GitHub    | Triggered on push to main branch      |
 | **Build**  | CodeBuild | Builds Docker images for all services |
 | **Push**   | ECR       | Pushes images to container registry   |
-| **Deploy** | EKS       | Updates Kubernetes deployments        |
+| **Deploy** | ECS       | Updates ECS Fargate services          |
 
 ### Services Built
 
@@ -1665,8 +1665,8 @@ aws codepipeline get-pipeline-state --name unified-health-prod-pipeline
 # Check ECR repositories
 aws ecr describe-repositories --repository-names unified-health-prod/api-gateway
 
-# Update kubeconfig for EKS
-aws eks update-kubeconfig --name unified-health-prod-eks --region us-east-1
+# View ECS cluster status
+aws ecs describe-clusters --clusters unified-health-prod --region us-east-1
 ```
 
 ---

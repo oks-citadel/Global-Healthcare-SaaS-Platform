@@ -28,7 +28,7 @@ A comprehensive admin dashboard built with Next.js 14 for managing the Unified H
 
 ### Prerequisites
 
-- Node.js 18+ and npm/yarn
+- Node.js 20+ and npm/yarn
 - Backend API running (see backend documentation)
 
 ### Installation
@@ -45,7 +45,7 @@ cp .env.example .env
 
 3. Update environment variables:
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:4000
+NEXT_PUBLIC_API_URL=http://localhost:8080
 ```
 
 ### Development

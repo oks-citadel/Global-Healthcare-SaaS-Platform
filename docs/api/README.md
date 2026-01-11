@@ -1,5 +1,9 @@
 # API Documentation
 
+> **Related Documentation:**
+> - [API Setup Guide](../../API_SETUP.md) - SDK and Swagger setup instructions
+> - [API Developer Guide](../../docs-unified/api/README.md) - Development standards and SDK generation
+
 ## Overview
 
 The Unified Health API is a RESTful API that provides access to all platform functionality including patient management, appointments, clinical documentation, billing, and telemedicine services.

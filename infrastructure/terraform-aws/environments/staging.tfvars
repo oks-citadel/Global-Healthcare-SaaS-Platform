@@ -16,12 +16,11 @@ deploy_africa   = false
 # Compliance
 compliance_standards = ["HIPAA", "SOC2", "ISO27001"]
 
-# EKS Configuration
-eks_cluster_version     = "1.29"
-eks_node_instance_types = ["m6i.xlarge"]
-eks_node_min_size       = 2
-eks_node_max_size       = 5
-eks_node_desired_size   = 3
+# ECS Fargate Configuration (replaces EKS)
+ecs_enable_container_insights = true
+ecs_fargate_weight            = 30
+ecs_fargate_spot_weight       = 70
+ecs_log_retention_days        = 30
 
 # RDS Configuration
 rds_engine_version        = "15.4"

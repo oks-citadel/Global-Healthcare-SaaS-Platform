@@ -2,8 +2,8 @@
 
 **Single Source of Truth for Platform Development**
 
-> This folder contains all authoritative documentation for the UnifiedHealth Platform.
-> All guidance, PRDs, inventories, and runbooks live here.
+> This folder (`docs-unified/`) contains authoritative development documentation, PRDs, inventories, and API specifications.
+> For user guides, compliance documentation, and operational procedures, see [docs/](../docs/README.md).
 
 ## Platform Overview
 

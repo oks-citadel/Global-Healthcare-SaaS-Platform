@@ -1,5 +1,7 @@
 # Implementation Complete - Next.js 14 Web Portal
 
+> **Note:** This is a historical completion report. For current documentation, see [README.md](README.md).
+
 ## Status: ✅ COMPLETE
 
 All required features have been successfully implemented for the Unified Health Web Portal.

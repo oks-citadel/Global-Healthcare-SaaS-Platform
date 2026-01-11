@@ -65,7 +65,7 @@ apps/mobile/
 
 ### Prerequisites
 
-- Node.js 18+ and npm/yarn
+- Node.js 20+ and npm/yarn
 - Expo CLI (`npm install -g expo-cli`)
 - iOS Simulator (Mac only) or Android Emulator
 - Physical device with Expo Go app (optional)
