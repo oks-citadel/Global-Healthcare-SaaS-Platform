@@ -32,7 +32,7 @@ output "americas_ecs_cluster_arn" {
 
 output "americas_alb_dns_name" {
   description = "Americas ALB DNS name"
-  value       = try(module.alb_americas[0].dns_name, null)
+  value       = try(module.alb_americas[0].alb_dns_name, null)
 }
 
 output "americas_rds_endpoint" {
@@ -66,7 +66,7 @@ output "europe_ecs_cluster_arn" {
 
 output "europe_alb_dns_name" {
   description = "Europe ALB DNS name"
-  value       = try(module.alb_europe[0].dns_name, null)
+  value       = try(module.alb_europe[0].alb_dns_name, null)
 }
 
 output "europe_rds_endpoint" {
@@ -100,7 +100,7 @@ output "africa_ecs_cluster_arn" {
 
 output "africa_alb_dns_name" {
   description = "Africa ALB DNS name"
-  value       = try(module.alb_africa[0].dns_name, null)
+  value       = try(module.alb_africa[0].alb_dns_name, null)
 }
 
 output "africa_rds_endpoint" {

@@ -140,7 +140,7 @@ module "ecs_americas" {
   aws_region  = "us-east-1"
 
   vpc_id                 = module.vpc_americas[0].vpc_id
-  alb_security_group_ids = module.alb_americas[0].security_group_ids
+  alb_security_group_ids = [module.alb_americas[0].alb_security_group_id]
 
   enable_container_insights = var.ecs_enable_container_insights
   enable_service_discovery  = true
@@ -165,9 +165,14 @@ module "alb_americas" {
 
   project_name = var.project_name
   environment  = var.environment
+  region_name  = "americas"
 
   vpc_id     = module.vpc_americas[0].vpc_id
   subnet_ids = module.vpc_americas[0].public_subnet_ids
+
+  certificate_arn    = var.acm_certificate_arn_americas
+  access_logs_bucket = var.alb_access_logs_bucket
+  enable_access_logs = var.enable_alb_access_logs
 
   tags = merge(local.common_tags, {
     Region = "Americas"
@@ -272,7 +277,7 @@ module "ecs_europe" {
   aws_region  = "eu-west-1"
 
   vpc_id                 = module.vpc_europe[0].vpc_id
-  alb_security_group_ids = module.alb_europe[0].security_group_ids
+  alb_security_group_ids = [module.alb_europe[0].alb_security_group_id]
 
   enable_container_insights = var.ecs_enable_container_insights
   enable_service_discovery  = true
@@ -297,9 +302,14 @@ module "alb_europe" {
 
   project_name = var.project_name
   environment  = var.environment
+  region_name  = "europe"
 
   vpc_id     = module.vpc_europe[0].vpc_id
   subnet_ids = module.vpc_europe[0].public_subnet_ids
+
+  certificate_arn    = var.acm_certificate_arn_europe
+  access_logs_bucket = var.alb_access_logs_bucket
+  enable_access_logs = var.enable_alb_access_logs
 
   tags = merge(local.common_tags, {
     Region = "Europe"
@@ -404,7 +414,7 @@ module "ecs_africa" {
   aws_region  = "af-south-1"
 
   vpc_id                 = module.vpc_africa[0].vpc_id
-  alb_security_group_ids = module.alb_africa[0].security_group_ids
+  alb_security_group_ids = [module.alb_africa[0].alb_security_group_id]
 
   enable_container_insights = var.ecs_enable_container_insights
   enable_service_discovery  = true
@@ -429,9 +439,14 @@ module "alb_africa" {
 
   project_name = var.project_name
   environment  = var.environment
+  region_name  = "africa"
 
   vpc_id     = module.vpc_africa[0].vpc_id
   subnet_ids = module.vpc_africa[0].public_subnet_ids
+
+  certificate_arn    = var.acm_certificate_arn_africa
+  access_logs_bucket = var.alb_access_logs_bucket
+  enable_access_logs = var.enable_alb_access_logs
 
   tags = merge(local.common_tags, {
     Region = "Africa"
@@ -508,8 +523,8 @@ module "route53" {
       ttl             = 300
       values          = []
       alias_target    = var.deploy_americas && length(module.alb_americas) > 0 ? {
-        dns_name               = module.alb_americas[0].dns_name
-        zone_id                = module.alb_americas[0].zone_id
+        dns_name               = module.alb_americas[0].alb_dns_name
+        zone_id                = module.alb_americas[0].alb_zone_id
         evaluate_target_health = true
       } : null
       weight          = null

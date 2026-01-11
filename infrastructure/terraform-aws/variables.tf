@@ -154,6 +154,40 @@ variable "ecs_log_retention_days" {
 }
 
 # ============================================
+# ALB Configuration
+# ============================================
+
+variable "acm_certificate_arn_americas" {
+  description = "ACM certificate ARN for Americas ALB (us-east-1)"
+  type        = string
+  default     = ""
+}
+
+variable "acm_certificate_arn_europe" {
+  description = "ACM certificate ARN for Europe ALB (eu-west-1)"
+  type        = string
+  default     = ""
+}
+
+variable "acm_certificate_arn_africa" {
+  description = "ACM certificate ARN for Africa ALB (af-south-1)"
+  type        = string
+  default     = ""
+}
+
+variable "alb_access_logs_bucket" {
+  description = "S3 bucket for ALB access logs"
+  type        = string
+  default     = ""
+}
+
+variable "enable_alb_access_logs" {
+  description = "Enable ALB access logging"
+  type        = bool
+  default     = false
+}
+
+# ============================================
 # RDS / Aurora Configuration
 # ============================================
 
