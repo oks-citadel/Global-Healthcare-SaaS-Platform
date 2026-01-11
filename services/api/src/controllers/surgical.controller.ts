@@ -86,7 +86,7 @@ export const surgicalController = {
    */
   getORBlock: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id } = req.params;
+      const id = req.params.id as string;
       const block = await surgicalSchedulingService.getORBlockById(id);
 
       res.json(block);
@@ -134,7 +134,7 @@ export const surgicalController = {
    */
   getSurgicalCase: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id } = req.params;
+      const id = req.params.id as string;
       const surgicalCase = await surgicalSchedulingService.getSurgicalCaseById(id);
 
       // Check access
@@ -152,7 +152,7 @@ export const surgicalController = {
    */
   updateSurgicalCase: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id } = req.params;
+      const id = req.params.id as string;
       const input = UpdateSurgicalCaseSchema.parse(req.body);
 
       // Get existing case to check access
@@ -183,7 +183,7 @@ export const surgicalController = {
    */
   getCaseDurationPrediction: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id } = req.params;
+      const id = req.params.id as string;
 
       const prediction = await surgicalSchedulingService.predictCaseDuration(id);
 
