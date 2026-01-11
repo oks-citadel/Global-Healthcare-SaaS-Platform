@@ -122,11 +122,11 @@ resource "aws_backup_vault_policy" "main" {
         Resource = aws_backup_vault.main.arn
       },
       {
-        Sid    = "DenyDeleteRecoveryPoints"
-        Effect = "Deny"
+        Sid       = "DenyDeleteRecoveryPoints"
+        Effect    = "Deny"
         Principal = "*"
-        Action   = "backup:DeleteRecoveryPoint"
-        Resource = aws_backup_vault.main.arn
+        Action    = "backup:DeleteRecoveryPoint"
+        Resource  = aws_backup_vault.main.arn
         Condition = {
           StringNotEquals = {
             "aws:PrincipalAccount" = data.aws_caller_identity.current.account_id

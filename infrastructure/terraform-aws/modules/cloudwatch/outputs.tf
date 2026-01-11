@@ -182,10 +182,10 @@ output "metric_filter_names" {
 output "query_definition_ids" {
   description = "Map of query definition names to their IDs"
   value = {
-    "error-analysis"    = aws_cloudwatch_query_definition.error_analysis.query_definition_id
-    "auth-failures"     = aws_cloudwatch_query_definition.auth_failures.query_definition_id
-    "phi-access-audit"  = aws_cloudwatch_query_definition.phi_access_audit.query_definition_id
-    "slow-requests"     = aws_cloudwatch_query_definition.slow_requests.query_definition_id
+    "error-analysis"   = aws_cloudwatch_query_definition.error_analysis.query_definition_id
+    "auth-failures"    = aws_cloudwatch_query_definition.auth_failures.query_definition_id
+    "phi-access-audit" = aws_cloudwatch_query_definition.phi_access_audit.query_definition_id
+    "slow-requests"    = aws_cloudwatch_query_definition.slow_requests.query_definition_id
   }
 }
 

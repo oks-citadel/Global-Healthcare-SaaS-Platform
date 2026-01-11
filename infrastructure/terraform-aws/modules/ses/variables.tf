@@ -85,7 +85,7 @@ variable "kms_key_id" {
 variable "allowed_from_addresses" {
   description = "List of allowed from email addresses"
   type        = list(string)
-  default     = [
+  default = [
     "*@theunifiedhealth.com"
   ]
 }

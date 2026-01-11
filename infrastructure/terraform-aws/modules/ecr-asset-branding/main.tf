@@ -41,7 +41,7 @@ locals {
 
 resource "aws_ecr_repository" "asset_branding" {
   name                 = local.repository_name
-  image_tag_mutability = "IMMUTABLE"  # CRITICAL: No mutable tags allowed
+  image_tag_mutability = "IMMUTABLE" # CRITICAL: No mutable tags allowed
 
   encryption_configuration {
     encryption_type = "KMS"

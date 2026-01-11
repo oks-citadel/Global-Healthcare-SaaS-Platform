@@ -68,8 +68,8 @@ resource "aws_route53_health_check" "endpoints" {
   regions = each.value.regions
 
   # CloudWatch alarm integration
-  cloudwatch_alarm_name   = each.value.cloudwatch_alarm_name
-  cloudwatch_alarm_region = each.value.cloudwatch_alarm_region
+  cloudwatch_alarm_name           = each.value.cloudwatch_alarm_name
+  cloudwatch_alarm_region         = each.value.cloudwatch_alarm_region
   insufficient_data_health_status = each.value.insufficient_data_health_status
 
   tags = merge(local.tags, {
@@ -392,6 +392,6 @@ resource "aws_route53_key_signing_key" "main" {
 resource "aws_route53_hosted_zone_dnssec" "main" {
   count = var.enable_dnssec ? 1 : 0
 
-  depends_on = [aws_route53_key_signing_key.main]
+  depends_on     = [aws_route53_key_signing_key.main]
   hosted_zone_id = aws_route53_zone.main.zone_id
 }

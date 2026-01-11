@@ -32,7 +32,7 @@ elasticache_node_type          = "cache.t4g.small"
 elasticache_num_cache_clusters = 1
 
 # Monitoring
-cloudwatch_retention_days = 30
+cloudwatch_retention_days  = 30
 enable_enhanced_monitoring = false
 
 # Cost management

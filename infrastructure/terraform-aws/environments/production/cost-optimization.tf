@@ -38,10 +38,10 @@ module "cost_optimization" {
   cost_center  = local.cost_center
 
   # Budget Configuration
-  monthly_budget_limit   = "15000"
-  compute_budget_limit   = "7000"
-  database_budget_limit  = "3000"
-  budget_alert_emails    = var.budget_alert_emails
+  monthly_budget_limit  = "15000"
+  compute_budget_limit  = "7000"
+  database_budget_limit = "3000"
+  budget_alert_emails   = var.budget_alert_emails
 
   # Spot Instance Configuration
   enable_spot_instances = true
@@ -76,10 +76,10 @@ module "cost_optimization" {
   rds_secret_arn    = module.rds.secret_arn
 
   # ElastiCache Configuration
-  enable_elasticache  = true
-  cache_node_type     = "cache.t3.small"
-  cache_num_nodes     = 2
-  cache_subnet_group  = module.vpc.elasticache_subnet_group
+  enable_elasticache = true
+  cache_node_type    = "cache.t3.small"
+  cache_num_nodes    = 2
+  cache_subnet_group = module.vpc.elasticache_subnet_group
 
   # CloudWatch Logs Configuration
   log_groups = {
@@ -93,7 +93,7 @@ module "cost_optimization" {
     }
     audit = {
       name           = "/aws/${local.project_name}/audit"
-      retention_days = 365  # HIPAA compliance
+      retention_days = 365 # HIPAA compliance
     }
   }
 
@@ -130,8 +130,8 @@ module "cdn" {
   price_class = "PriceClass_100"
 
   # Enable Origin Shield for additional caching layer
-  enable_origin_shield   = true
-  origin_shield_region   = "us-east-1"
+  enable_origin_shield = true
+  origin_shield_region = "us-east-1"
 
   # Domain Configuration
   domain_aliases      = var.cdn_domain_aliases
@@ -264,27 +264,27 @@ variable "savings_plan_commitment" {
 output "cost_optimization_summary" {
   description = "Cost optimization configuration summary"
   value = {
-    cdn_price_class       = "PriceClass_100 (US/Canada/Europe)"
-    origin_shield_enabled = true
-    spot_instances        = true
-    predictive_scaling    = true
-    scheduled_scaling     = true
-    rds_proxy_enabled     = true
-    s3_intelligent_tiering = true
+    cdn_price_class         = "PriceClass_100 (US/Canada/Europe)"
+    origin_shield_enabled   = true
+    spot_instances          = true
+    predictive_scaling      = true
+    scheduled_scaling       = true
+    rds_proxy_enabled       = true
+    s3_intelligent_tiering  = true
     log_retention_optimized = true
-    budget_monitoring     = true
+    budget_monitoring       = true
   }
 }
 
 output "estimated_monthly_savings" {
   description = "Estimated monthly savings from optimizations"
   value = {
-    spot_instances        = "30-70% on EC2"
-    cdn_price_class       = "~30% vs PriceClass_All"
-    origin_shield         = "Reduced origin requests"
-    scheduled_scaling     = "~40% during off-hours"
-    s3_lifecycle          = "Up to 80% on archived data"
-    rds_proxy             = "Better connection efficiency"
-    compression           = "40-60% bandwidth reduction"
+    spot_instances    = "30-70% on EC2"
+    cdn_price_class   = "~30% vs PriceClass_All"
+    origin_shield     = "Reduced origin requests"
+    scheduled_scaling = "~40% during off-hours"
+    s3_lifecycle      = "Up to 80% on archived data"
+    rds_proxy         = "Better connection efficiency"
+    compression       = "40-60% bandwidth reduction"
   }
 }

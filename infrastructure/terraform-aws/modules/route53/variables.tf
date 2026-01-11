@@ -31,16 +31,16 @@ variable "domain_name" {
 variable "records" {
   description = "List of DNS records to create"
   type = list(object({
-    name                = string
-    type                = string
-    ttl                 = optional(number, 300)
-    values              = optional(list(string), [])
-    weight              = optional(number)
-    set_identifier      = optional(string)
-    health_check_name   = optional(string)
-    failover_enabled    = optional(bool, false)
-    failover_type       = optional(string) # PRIMARY or SECONDARY
-    latency_region      = optional(string)
+    name              = string
+    type              = string
+    ttl               = optional(number, 300)
+    values            = optional(list(string), [])
+    weight            = optional(number)
+    set_identifier    = optional(string)
+    health_check_name = optional(string)
+    failover_enabled  = optional(bool, false)
+    failover_type     = optional(string) # PRIMARY or SECONDARY
+    latency_region    = optional(string)
     geolocation = optional(object({
       continent   = optional(string)
       country     = optional(string)

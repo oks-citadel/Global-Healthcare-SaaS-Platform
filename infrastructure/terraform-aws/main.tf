@@ -16,25 +16,25 @@ locals {
   # Region configurations
   regions = {
     americas = {
-      enabled        = var.deploy_americas
-      aws_region     = "us-east-1"
-      vpc_cidr       = "10.10.0.0/16"
-      azs            = ["us-east-1a", "us-east-1b", "us-east-1c"]
-      compliance     = ["HIPAA", "SOC2", "ISO27001"]
+      enabled    = var.deploy_americas
+      aws_region = "us-east-1"
+      vpc_cidr   = "10.10.0.0/16"
+      azs        = ["us-east-1a", "us-east-1b", "us-east-1c"]
+      compliance = ["HIPAA", "SOC2", "ISO27001"]
     }
     europe = {
-      enabled        = var.deploy_europe
-      aws_region     = "eu-west-1"
-      vpc_cidr       = "10.20.0.0/16"
-      azs            = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
-      compliance     = ["GDPR", "ISO27001", "SOC2"]
+      enabled    = var.deploy_europe
+      aws_region = "eu-west-1"
+      vpc_cidr   = "10.20.0.0/16"
+      azs        = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
+      compliance = ["GDPR", "ISO27001", "SOC2"]
     }
     africa = {
-      enabled        = var.deploy_africa
-      aws_region     = "af-south-1"
-      vpc_cidr       = "10.30.0.0/16"
-      azs            = ["af-south-1a", "af-south-1b", "af-south-1c"]
-      compliance     = ["POPIA", "ISO27001", "SOC2"]
+      enabled    = var.deploy_africa
+      aws_region = "af-south-1"
+      vpc_cidr   = "10.30.0.0/16"
+      azs        = ["af-south-1a", "af-south-1b", "af-south-1c"]
+      compliance = ["POPIA", "ISO27001", "SOC2"]
     }
   }
 }
@@ -104,11 +104,11 @@ module "vpc_americas" {
     aws = aws.americas
   }
 
-  project_name    = var.project_name
-  environment     = var.environment
-  region_name     = "americas"
-  aws_region      = "us-east-1"
-  vpc_cidr        = local.regions.americas.vpc_cidr
+  project_name       = var.project_name
+  environment        = var.environment
+  region_name        = "americas"
+  aws_region         = "us-east-1"
+  vpc_cidr           = local.regions.americas.vpc_cidr
   availability_zones = local.regions.americas.azs
 
   public_subnet_cidrs      = ["10.10.1.0/24", "10.10.2.0/24", "10.10.3.0/24"]
@@ -241,11 +241,11 @@ module "vpc_europe" {
     aws = aws.europe
   }
 
-  project_name    = var.project_name
-  environment     = var.environment
-  region_name     = "europe"
-  aws_region      = "eu-west-1"
-  vpc_cidr        = local.regions.europe.vpc_cidr
+  project_name       = var.project_name
+  environment        = var.environment
+  region_name        = "europe"
+  aws_region         = "eu-west-1"
+  vpc_cidr           = local.regions.europe.vpc_cidr
   availability_zones = local.regions.europe.azs
 
   public_subnet_cidrs      = ["10.20.1.0/24", "10.20.2.0/24", "10.20.3.0/24"]
@@ -378,11 +378,11 @@ module "vpc_africa" {
     aws = aws.africa
   }
 
-  project_name    = var.project_name
-  environment     = var.environment
-  region_name     = "africa"
-  aws_region      = "af-south-1"
-  vpc_cidr        = local.regions.africa.vpc_cidr
+  project_name       = var.project_name
+  environment        = var.environment
+  region_name        = "africa"
+  aws_region         = "af-south-1"
+  vpc_cidr           = local.regions.africa.vpc_cidr
   availability_zones = local.regions.africa.azs
 
   public_subnet_cidrs      = ["10.30.1.0/24", "10.30.2.0/24", "10.30.3.0/24"]
@@ -518,61 +518,61 @@ module "route53" {
   # DNS Records - Points to ALB (ECS Fargate)
   records = [
     {
-      name            = ""
-      type            = "A"
-      ttl             = 300
-      values          = []
-      alias_target    = var.deploy_americas && length(module.alb_americas) > 0 ? {
+      name   = ""
+      type   = "A"
+      ttl    = 300
+      values = []
+      alias_target = var.deploy_americas && length(module.alb_americas) > 0 ? {
         dns_name               = module.alb_americas[0].alb_dns_name
         zone_id                = module.alb_americas[0].alb_zone_id
         evaluate_target_health = true
       } : null
-      weight          = null
-      set_identifier  = null
-      geolocation     = null
-      latency_region  = null
-      health_check_name     = null
-      failover_enabled      = false
-      failover_type         = null
+      weight            = null
+      set_identifier    = null
+      geolocation       = null
+      latency_region    = null
+      health_check_name = null
+      failover_enabled  = false
+      failover_type     = null
     },
     {
-      name            = "www"
-      type            = "CNAME"
-      ttl             = 300
-      values          = [var.domain_name]
-      alias_target    = null
-      weight          = null
-      set_identifier  = null
-      geolocation     = null
-      latency_region  = null
-      health_check_name     = null
-      failover_enabled      = false
-      failover_type         = null
+      name              = "www"
+      type              = "CNAME"
+      ttl               = 300
+      values            = [var.domain_name]
+      alias_target      = null
+      weight            = null
+      set_identifier    = null
+      geolocation       = null
+      latency_region    = null
+      health_check_name = null
+      failover_enabled  = false
+      failover_type     = null
     },
     {
-      name            = "api"
-      type            = "CNAME"
-      ttl             = 300
-      values          = ["api.${var.domain_name}"]
-      alias_target    = null
-      weight          = null
-      set_identifier  = null
-      geolocation     = null
-      latency_region  = null
-      health_check_name     = null
-      failover_enabled      = false
-      failover_type         = null
+      name              = "api"
+      type              = "CNAME"
+      ttl               = 300
+      values            = ["api.${var.domain_name}"]
+      alias_target      = null
+      weight            = null
+      set_identifier    = null
+      geolocation       = null
+      latency_region    = null
+      health_check_name = null
+      failover_enabled  = false
+      failover_type     = null
     }
   ]
 
-  health_check_configs = {}
-  enable_caa_records     = true
-  caa_email              = "security@${var.domain_name}"
-  enable_query_logging   = true
+  health_check_configs     = {}
+  enable_caa_records       = true
+  caa_email                = "security@${var.domain_name}"
+  enable_query_logging     = true
   query_log_retention_days = 90
-  kms_key_arn            = null
-  enable_dnssec          = false
-  dnssec_kms_key_arn     = null
+  kms_key_arn              = null
+  enable_dnssec            = false
+  dnssec_kms_key_arn       = null
 
   tags = local.common_tags
 }
@@ -616,10 +616,10 @@ module "ses" {
   route53_zone_id       = var.enable_route53 ? module.route53[0].zone_id : null
   wait_for_verification = false
 
-  enable_dmarc     = true
-  dmarc_policy     = "quarantine"
-  dmarc_rua_email  = "dmarc-reports@${var.domain_name}"
-  dmarc_ruf_email  = "dmarc-forensic@${var.domain_name}"
+  enable_dmarc    = true
+  dmarc_policy    = "quarantine"
+  dmarc_rua_email = "dmarc-reports@${var.domain_name}"
+  dmarc_ruf_email = "dmarc-forensic@${var.domain_name}"
 
   create_notification_topics = true
   enable_alarms              = true
@@ -664,9 +664,9 @@ module "sns_sqs_americas" {
 
     # System Alerts
     system-alerts = {
-      display_name    = "System Alerts"
-      purpose         = "Infrastructure-and-application-alerts"
-      fifo_topic      = false
+      display_name        = "System Alerts"
+      purpose             = "Infrastructure-and-application-alerts"
+      fifo_topic          = false
       email_subscriptions = [var.alert_email]
     }
 
@@ -841,10 +841,10 @@ module "backup_americas" {
   region_name  = "americas"
 
   # Backup schedule configuration
-  daily_backup_retention_days  = var.backup_retention_days
-  enable_weekly_backup         = var.backup_enable_weekly
-  weekly_backup_retention_days = var.backup_weekly_retention_days
-  enable_monthly_backup        = var.backup_enable_monthly
+  daily_backup_retention_days   = var.backup_retention_days
+  enable_weekly_backup          = var.backup_enable_weekly
+  weekly_backup_retention_days  = var.backup_weekly_retention_days
+  enable_monthly_backup         = var.backup_enable_monthly
   monthly_backup_retention_days = var.backup_monthly_retention_days
 
   # Compliance configuration
@@ -855,8 +855,8 @@ module "backup_americas" {
   copy_destination_vault_arn = var.backup_enable_cross_region_copy && var.deploy_europe ? module.backup_europe[0].vault_arn : ""
 
   # Notifications
-  enable_notifications  = true
-  notification_emails   = length(var.backup_notification_emails) > 0 ? var.backup_notification_emails : [var.alert_email]
+  enable_notifications = true
+  notification_emails  = length(var.backup_notification_emails) > 0 ? var.backup_notification_emails : [var.alert_email]
 
   # Tag-based resource selection
   selection_tags = {
@@ -886,23 +886,23 @@ module "backup_europe" {
   region_name  = "europe"
 
   # Backup schedule configuration
-  daily_backup_retention_days  = var.backup_retention_days
-  enable_weekly_backup         = var.backup_enable_weekly
-  weekly_backup_retention_days = var.backup_weekly_retention_days
-  enable_monthly_backup        = var.backup_enable_monthly
+  daily_backup_retention_days   = var.backup_retention_days
+  enable_weekly_backup          = var.backup_enable_weekly
+  weekly_backup_retention_days  = var.backup_weekly_retention_days
+  enable_monthly_backup         = var.backup_enable_monthly
   monthly_backup_retention_days = var.backup_monthly_retention_days
 
   # Compliance configuration - GDPR requires stricter controls
   enable_vault_lock             = var.backup_enable_vault_lock
-  vault_lock_min_retention_days = 30  # GDPR data retention
+  vault_lock_min_retention_days = 30 # GDPR data retention
 
   # Cross-region copy for disaster recovery
   enable_cross_region_copy   = var.backup_enable_cross_region_copy && var.deploy_americas
   copy_destination_vault_arn = var.backup_enable_cross_region_copy && var.deploy_americas ? module.backup_americas[0].vault_arn : ""
 
   # Notifications
-  enable_notifications  = true
-  notification_emails   = length(var.backup_notification_emails) > 0 ? var.backup_notification_emails : [var.alert_email]
+  enable_notifications = true
+  notification_emails  = length(var.backup_notification_emails) > 0 ? var.backup_notification_emails : [var.alert_email]
 
   # Tag-based resource selection
   selection_tags = {
@@ -933,10 +933,10 @@ module "backup_africa" {
   region_name  = "africa"
 
   # Backup schedule configuration
-  daily_backup_retention_days  = var.backup_retention_days
-  enable_weekly_backup         = var.backup_enable_weekly
-  weekly_backup_retention_days = var.backup_weekly_retention_days
-  enable_monthly_backup        = var.backup_enable_monthly
+  daily_backup_retention_days   = var.backup_retention_days
+  enable_weekly_backup          = var.backup_enable_weekly
+  weekly_backup_retention_days  = var.backup_weekly_retention_days
+  enable_monthly_backup         = var.backup_enable_monthly
   monthly_backup_retention_days = var.backup_monthly_retention_days
 
   # Compliance configuration - POPIA requirements
@@ -948,8 +948,8 @@ module "backup_africa" {
   copy_destination_vault_arn = var.backup_enable_cross_region_copy && var.deploy_europe ? module.backup_europe[0].vault_arn : ""
 
   # Notifications
-  enable_notifications  = true
-  notification_emails   = length(var.backup_notification_emails) > 0 ? var.backup_notification_emails : [var.alert_email]
+  enable_notifications = true
+  notification_emails  = length(var.backup_notification_emails) > 0 ? var.backup_notification_emails : [var.alert_email]
 
   # Tag-based resource selection
   selection_tags = {

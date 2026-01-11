@@ -229,7 +229,7 @@ resource "aws_wafv2_web_acl" "main" {
     action {
       block {
         custom_response {
-          response_code = 429
+          response_code            = 429
           custom_response_body_key = "rate-limit-response"
         }
       }
@@ -286,7 +286,7 @@ resource "aws_wafv2_web_acl" "main" {
       action {
         block {
           custom_response {
-            response_code = 403
+            response_code            = 403
             custom_response_body_key = "geo-block-response"
           }
         }
@@ -510,8 +510,8 @@ resource "aws_wafv2_web_acl" "main" {
   # Custom Response Bodies
   # ============================================
   custom_response_body {
-    key          = "rate-limit-response"
-    content      = jsonencode({
+    key = "rate-limit-response"
+    content = jsonencode({
       error   = "Too Many Requests"
       message = "Rate limit exceeded. Please try again later."
       code    = 429
@@ -520,8 +520,8 @@ resource "aws_wafv2_web_acl" "main" {
   }
 
   custom_response_body {
-    key          = "geo-block-response"
-    content      = jsonencode({
+    key = "geo-block-response"
+    content = jsonencode({
       error   = "Access Denied"
       message = "This service is not available in your region due to regulatory requirements."
       code    = 403

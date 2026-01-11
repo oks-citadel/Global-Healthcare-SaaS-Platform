@@ -15,10 +15,10 @@ terraform {
     # encrypt        = true
 
     # Placeholder - override via backend config files
-    bucket         = "unified-health-tfstate"
-    key            = "terraform.tfstate"
-    region         = "us-east-1"
-    encrypt        = true
+    bucket  = "unified-health-tfstate"
+    key     = "terraform.tfstate"
+    region  = "us-east-1"
+    encrypt = true
   }
 }
 

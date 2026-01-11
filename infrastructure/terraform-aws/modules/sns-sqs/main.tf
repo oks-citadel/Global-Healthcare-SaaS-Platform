@@ -174,18 +174,18 @@ resource "aws_sns_topic_policy" "topics" {
         Action   = "SNS:Publish"
         Resource = aws_sns_topic.topics[each.key].arn
       }
-    ],
-    # Add custom allowed principals
-    [
-      for principal in coalesce(each.value.allowed_publishers, []) : {
-        Sid    = "AllowPublisher-${replace(principal, "/", "-")}"
-        Effect = "Allow"
-        Principal = {
-          AWS = principal
+      ],
+      # Add custom allowed principals
+      [
+        for principal in coalesce(each.value.allowed_publishers, []) : {
+          Sid    = "AllowPublisher-${replace(principal, "/", "-")}"
+          Effect = "Allow"
+          Principal = {
+            AWS = principal
+          }
+          Action   = "SNS:Publish"
+          Resource = aws_sns_topic.topics[each.key].arn
         }
-        Action   = "SNS:Publish"
-        Resource = aws_sns_topic.topics[each.key].arn
-      }
     ])
   })
 }
@@ -200,11 +200,11 @@ resource "aws_sqs_queue" "queues" {
   name = each.value.fifo_queue ? "${local.name}-${each.key}.fifo" : "${local.name}-${each.key}"
 
   # Message settings
-  visibility_timeout_seconds  = each.value.visibility_timeout_seconds
-  message_retention_seconds   = each.value.message_retention_seconds
-  max_message_size            = each.value.max_message_size
-  delay_seconds               = each.value.delay_seconds
-  receive_wait_time_seconds   = each.value.receive_wait_time_seconds
+  visibility_timeout_seconds = each.value.visibility_timeout_seconds
+  message_retention_seconds  = each.value.message_retention_seconds
+  max_message_size           = each.value.max_message_size
+  delay_seconds              = each.value.delay_seconds
+  receive_wait_time_seconds  = each.value.receive_wait_time_seconds
 
   # FIFO queue settings
   fifo_queue                  = each.value.fifo_queue
@@ -213,8 +213,8 @@ resource "aws_sqs_queue" "queues" {
   fifo_throughput_limit       = each.value.fifo_queue ? each.value.fifo_throughput_limit : null
 
   # HIPAA: Server-side encryption
-  sqs_managed_sse_enabled = var.kms_key_id == null && !var.create_kms_key ? true : null
-  kms_master_key_id       = var.create_kms_key ? aws_kms_key.messaging[0].id : var.kms_key_id
+  sqs_managed_sse_enabled           = var.kms_key_id == null && !var.create_kms_key ? true : null
+  kms_master_key_id                 = var.create_kms_key ? aws_kms_key.messaging[0].id : var.kms_key_id
   kms_data_key_reuse_period_seconds = var.kms_key_id != null || var.create_kms_key ? 300 : null
 
   # Dead-letter queue
@@ -250,8 +250,8 @@ resource "aws_sqs_queue" "dlq" {
   fifo_queue = each.value.fifo_queue
 
   # HIPAA: Server-side encryption
-  sqs_managed_sse_enabled = var.kms_key_id == null && !var.create_kms_key ? true : null
-  kms_master_key_id       = var.create_kms_key ? aws_kms_key.messaging[0].id : var.kms_key_id
+  sqs_managed_sse_enabled           = var.kms_key_id == null && !var.create_kms_key ? true : null
+  kms_master_key_id                 = var.create_kms_key ? aws_kms_key.messaging[0].id : var.kms_key_id
   kms_data_key_reuse_period_seconds = var.kms_key_id != null || var.create_kms_key ? 300 : null
 
   tags = merge(local.tags, {
@@ -284,37 +284,37 @@ resource "aws_sqs_queue_policy" "queues" {
         ]
         Resource = aws_sqs_queue.queues[each.key].arn
       }
-    ],
-    # Allow SNS topics to send messages
-    [
-      for topic_key in coalesce(each.value.subscribe_to_topics, []) : {
-        Sid    = "AllowSNS-${topic_key}"
-        Effect = "Allow"
-        Principal = {
-          Service = "sns.amazonaws.com"
-        }
-        Action   = "sqs:SendMessage"
-        Resource = aws_sqs_queue.queues[each.key].arn
-        Condition = {
-          ArnEquals = {
-            "aws:SourceArn" = aws_sns_topic.topics[topic_key].arn
+      ],
+      # Allow SNS topics to send messages
+      [
+        for topic_key in coalesce(each.value.subscribe_to_topics, []) : {
+          Sid    = "AllowSNS-${topic_key}"
+          Effect = "Allow"
+          Principal = {
+            Service = "sns.amazonaws.com"
+          }
+          Action   = "sqs:SendMessage"
+          Resource = aws_sqs_queue.queues[each.key].arn
+          Condition = {
+            ArnEquals = {
+              "aws:SourceArn" = aws_sns_topic.topics[topic_key].arn
+            }
           }
         }
-      }
-    ],
-    # Custom allowed senders
-    [
-      for principal in coalesce(each.value.allowed_senders, []) : {
-        Sid    = "AllowSender-${replace(principal, "/", "-")}"
-        Effect = "Allow"
-        Principal = {
-          AWS = principal
+      ],
+      # Custom allowed senders
+      [
+        for principal in coalesce(each.value.allowed_senders, []) : {
+          Sid    = "AllowSender-${replace(principal, "/", "-")}"
+          Effect = "Allow"
+          Principal = {
+            AWS = principal
+          }
+          Action = [
+            "sqs:SendMessage"
+          ]
+          Resource = aws_sqs_queue.queues[each.key].arn
         }
-        Action = [
-          "sqs:SendMessage"
-        ]
-        Resource = aws_sqs_queue.queues[each.key].arn
-      }
     ])
   })
 }
@@ -337,7 +337,7 @@ resource "aws_sns_topic_subscription" "sqs" {
   raw_message_delivery = each.value.raw_message_delivery
 
   # Filter policy for selective message delivery
-  filter_policy = each.value.filter_policy != null ? jsonencode(each.value.filter_policy) : null
+  filter_policy       = each.value.filter_policy != null ? jsonencode(each.value.filter_policy) : null
   filter_policy_scope = each.value.filter_policy != null ? "MessageAttributes" : null
 
   # Redrive policy for failed deliveries

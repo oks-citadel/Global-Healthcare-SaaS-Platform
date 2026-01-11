@@ -142,7 +142,7 @@ resource "aws_lb_listener_rule" "services" {
 
   # Optional: CloudFront origin validation
   dynamic "condition" {
-    for_each = var.cloudfront_secret != "" ? [1] : []
+    for_each = var.cloudfront_secret != "" ? toset(["enabled"]) : toset([])
     content {
       http_header {
         http_header_name = "X-CloudFront-Secret"

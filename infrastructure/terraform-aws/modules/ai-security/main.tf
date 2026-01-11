@@ -13,9 +13,9 @@ locals {
   name_prefix = "${var.project_name}-${var.environment}"
 
   common_tags = merge(var.tags, {
-    Module      = "ai-security"
-    Compliance  = "NIST-AI-RMF,ISO-42001,OWASP-LLM,HIPAA,GDPR"
-    ManagedBy   = "Terraform"
+    Module     = "ai-security"
+    Compliance = "NIST-AI-RMF,ISO-42001,OWASP-LLM,HIPAA,GDPR"
+    ManagedBy  = "Terraform"
   })
 }
 
@@ -25,10 +25,10 @@ locals {
 
 # DynamoDB table for AI Model Registry
 resource "aws_dynamodb_table" "ai_model_registry" {
-  name           = "${local.name_prefix}-ai-model-registry"
-  billing_mode   = "PAY_PER_REQUEST"
-  hash_key       = "model_id"
-  range_key      = "version"
+  name         = "${local.name_prefix}-ai-model-registry"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "model_id"
+  range_key    = "version"
 
   attribute {
     name = "model_id"
@@ -79,10 +79,10 @@ resource "aws_dynamodb_table" "ai_model_registry" {
 
 # DynamoDB table for AI Risk Assessments
 resource "aws_dynamodb_table" "ai_risk_assessments" {
-  name           = "${local.name_prefix}-ai-risk-assessments"
-  billing_mode   = "PAY_PER_REQUEST"
-  hash_key       = "assessment_id"
-  range_key      = "created_at"
+  name         = "${local.name_prefix}-ai-risk-assessments"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "assessment_id"
+  range_key    = "created_at"
 
   attribute {
     name = "assessment_id"
@@ -127,10 +127,10 @@ resource "aws_dynamodb_table" "ai_risk_assessments" {
 
 # DynamoDB table for AI Ethics Review Board Decisions
 resource "aws_dynamodb_table" "ai_ethics_decisions" {
-  name           = "${local.name_prefix}-ai-ethics-decisions"
-  billing_mode   = "PAY_PER_REQUEST"
-  hash_key       = "decision_id"
-  range_key      = "decision_date"
+  name         = "${local.name_prefix}-ai-ethics-decisions"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "decision_id"
+  range_key    = "decision_date"
 
   attribute {
     name = "decision_id"
@@ -288,7 +288,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "ai_audit_logs" {
     }
 
     expiration {
-      days = 2555  # 7 years for HIPAA compliance
+      days = 2555 # 7 years for HIPAA compliance
     }
   }
 }
@@ -336,10 +336,10 @@ resource "aws_s3_bucket_public_access_block" "ai_training_data" {
 
 # DynamoDB table for Prompt Templates (versioned)
 resource "aws_dynamodb_table" "prompt_templates" {
-  name           = "${local.name_prefix}-prompt-templates"
-  billing_mode   = "PAY_PER_REQUEST"
-  hash_key       = "template_id"
-  range_key      = "version"
+  name         = "${local.name_prefix}-prompt-templates"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "template_id"
+  range_key    = "version"
 
   attribute {
     name = "template_id"
@@ -379,9 +379,9 @@ resource "aws_dynamodb_table" "prompt_templates" {
 
 # DynamoDB table for Prompt Injection Patterns
 resource "aws_dynamodb_table" "prompt_injection_patterns" {
-  name           = "${local.name_prefix}-prompt-injection-patterns"
-  billing_mode   = "PAY_PER_REQUEST"
-  hash_key       = "pattern_id"
+  name         = "${local.name_prefix}-prompt-injection-patterns"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "pattern_id"
 
   attribute {
     name = "pattern_id"
@@ -416,9 +416,9 @@ resource "aws_dynamodb_table" "prompt_injection_patterns" {
 
 # DynamoDB table for Toxicity/Bias Patterns
 resource "aws_dynamodb_table" "content_safety_patterns" {
-  name           = "${local.name_prefix}-content-safety-patterns"
-  billing_mode   = "PAY_PER_REQUEST"
-  hash_key       = "pattern_id"
+  name         = "${local.name_prefix}-content-safety-patterns"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "pattern_id"
 
   attribute {
     name = "pattern_id"
@@ -449,9 +449,9 @@ resource "aws_dynamodb_table" "content_safety_patterns" {
 
 # DynamoDB table for Hallucination Detection Rules
 resource "aws_dynamodb_table" "hallucination_rules" {
-  name           = "${local.name_prefix}-hallucination-rules"
-  billing_mode   = "PAY_PER_REQUEST"
-  hash_key       = "rule_id"
+  name         = "${local.name_prefix}-hallucination-rules"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "rule_id"
 
   attribute {
     name = "rule_id"
@@ -524,7 +524,7 @@ resource "aws_secretsmanager_secret" "model_credentials" {
 # CloudWatch Log Group for AI Security Events
 resource "aws_cloudwatch_log_group" "ai_security_events" {
   name              = "/aws/ai-security/${local.name_prefix}/events"
-  retention_in_days = 2555  # 7 years for HIPAA
+  retention_in_days = 2555 # 7 years for HIPAA
 
   kms_key_id = aws_kms_key.ai_security.arn
 
@@ -644,7 +644,7 @@ resource "aws_cloudwatch_metric_alarm" "hallucination_rate_high" {
   namespace           = "AI/Security"
   period              = 300
   statistic           = "Average"
-  threshold           = 0.05  # 5% hallucination rate
+  threshold           = 0.05 # 5% hallucination rate
   alarm_description   = "High hallucination rate detected"
   alarm_actions       = [aws_sns_topic.ai_security_alerts.arn]
 
@@ -879,10 +879,10 @@ resource "aws_wafv2_web_acl" "ai_api_protection" {
 
 # DynamoDB table for AI Incident Tracking
 resource "aws_dynamodb_table" "ai_incidents" {
-  name           = "${local.name_prefix}-ai-incidents"
-  billing_mode   = "PAY_PER_REQUEST"
-  hash_key       = "incident_id"
-  range_key      = "created_at"
+  name         = "${local.name_prefix}-ai-incidents"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "incident_id"
+  range_key    = "created_at"
 
   attribute {
     name = "incident_id"
@@ -1120,11 +1120,11 @@ resource "aws_lambda_function" "prompt_security_scanner" {
 
   environment {
     variables = {
-      ENVIRONMENT              = var.environment
-      PATTERNS_TABLE           = aws_dynamodb_table.prompt_injection_patterns.name
-      INCIDENTS_TABLE          = aws_dynamodb_table.ai_incidents.name
-      SNS_TOPIC_ARN            = aws_sns_topic.ai_security_alerts.arn
-      KILL_SWITCH_PARAM        = aws_ssm_parameter.ai_kill_switch.name
+      ENVIRONMENT       = var.environment
+      PATTERNS_TABLE    = aws_dynamodb_table.prompt_injection_patterns.name
+      INCIDENTS_TABLE   = aws_dynamodb_table.ai_incidents.name
+      SNS_TOPIC_ARN     = aws_sns_topic.ai_security_alerts.arn
+      KILL_SWITCH_PARAM = aws_ssm_parameter.ai_kill_switch.name
     }
   }
 
@@ -1196,10 +1196,10 @@ resource "aws_lambda_function" "ai_incident_response" {
 
 # DynamoDB table for Compliance Audit Trail
 resource "aws_dynamodb_table" "ai_compliance_audit" {
-  name           = "${local.name_prefix}-ai-compliance-audit"
-  billing_mode   = "PAY_PER_REQUEST"
-  hash_key       = "audit_id"
-  range_key      = "timestamp"
+  name         = "${local.name_prefix}-ai-compliance-audit"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "audit_id"
+  range_key    = "timestamp"
 
   attribute {
     name = "audit_id"
@@ -1250,10 +1250,10 @@ resource "aws_dynamodb_table" "ai_compliance_audit" {
 
 # DynamoDB table for Data Subject Requests (GDPR/CCPA)
 resource "aws_dynamodb_table" "data_subject_requests" {
-  name           = "${local.name_prefix}-data-subject-requests"
-  billing_mode   = "PAY_PER_REQUEST"
-  hash_key       = "request_id"
-  range_key      = "created_at"
+  name         = "${local.name_prefix}-data-subject-requests"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "request_id"
+  range_key    = "created_at"
 
   attribute {
     name = "request_id"
@@ -1313,10 +1313,10 @@ resource "aws_dynamodb_table" "data_subject_requests" {
 
 # DynamoDB table for AI Decision Explanations
 resource "aws_dynamodb_table" "ai_explanations" {
-  name           = "${local.name_prefix}-ai-explanations"
-  billing_mode   = "PAY_PER_REQUEST"
-  hash_key       = "decision_id"
-  range_key      = "timestamp"
+  name         = "${local.name_prefix}-ai-explanations"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "decision_id"
+  range_key    = "timestamp"
 
   attribute {
     name = "decision_id"
@@ -1356,10 +1356,10 @@ resource "aws_dynamodb_table" "ai_explanations" {
 
 # DynamoDB table for Fairness Metrics
 resource "aws_dynamodb_table" "fairness_metrics" {
-  name           = "${local.name_prefix}-fairness-metrics"
-  billing_mode   = "PAY_PER_REQUEST"
-  hash_key       = "metric_id"
-  range_key      = "timestamp"
+  name         = "${local.name_prefix}-fairness-metrics"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "metric_id"
+  range_key    = "timestamp"
 
   attribute {
     name = "metric_id"

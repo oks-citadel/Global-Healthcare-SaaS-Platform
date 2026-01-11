@@ -36,7 +36,7 @@ variable "topic_configs" {
         })
       })
     }))
-    allowed_publishers = optional(list(string))
+    allowed_publishers  = optional(list(string))
     email_subscriptions = optional(list(string))
     https_subscriptions = optional(list(object({
       url          = string
@@ -54,25 +54,25 @@ variable "topic_configs" {
 variable "queue_configs" {
   description = "Map of SQS queue configurations"
   type = map(object({
-    purpose                     = optional(string, "general")
-    visibility_timeout_seconds  = optional(number, 30)
-    message_retention_seconds   = optional(number, 1209600) # 14 days
-    max_message_size            = optional(number, 262144)  # 256 KB
-    delay_seconds               = optional(number, 0)
-    receive_wait_time_seconds   = optional(number, 20) # Long polling
-    fifo_queue                  = optional(bool, false)
-    content_based_deduplication = optional(bool, false)
-    deduplication_scope         = optional(string, "queue")
-    fifo_throughput_limit       = optional(string, "perQueue")
-    enable_dlq                  = optional(bool, true)
-    max_receive_count           = optional(number, 3)
+    purpose                       = optional(string, "general")
+    visibility_timeout_seconds    = optional(number, 30)
+    message_retention_seconds     = optional(number, 1209600) # 14 days
+    max_message_size              = optional(number, 262144)  # 256 KB
+    delay_seconds                 = optional(number, 0)
+    receive_wait_time_seconds     = optional(number, 20) # Long polling
+    fifo_queue                    = optional(bool, false)
+    content_based_deduplication   = optional(bool, false)
+    deduplication_scope           = optional(string, "queue")
+    fifo_throughput_limit         = optional(string, "perQueue")
+    enable_dlq                    = optional(bool, true)
+    max_receive_count             = optional(number, 3)
     dlq_message_retention_seconds = optional(number, 1209600) # 14 days
-    subscribe_to_topics         = optional(list(string))
-    allowed_senders             = optional(list(string))
-    raw_message_delivery        = optional(bool, true)
-    filter_policy               = optional(map(list(string)))
-    enable_age_alarm            = optional(bool, false)
-    age_alarm_threshold         = optional(number, 3600) # 1 hour in seconds
+    subscribe_to_topics           = optional(list(string))
+    allowed_senders               = optional(list(string))
+    raw_message_delivery          = optional(bool, true)
+    filter_policy                 = optional(map(list(string)))
+    enable_age_alarm              = optional(bool, false)
+    age_alarm_threshold           = optional(number, 3600) # 1 hour in seconds
   }))
   default = {}
 

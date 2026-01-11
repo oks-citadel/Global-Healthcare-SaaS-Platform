@@ -189,10 +189,10 @@ variable "compliance_tags" {
   description = "Compliance-related tags (HIPAA, SOC2, etc.)"
   type        = map(string)
   default = {
-    Compliance       = "HIPAA"
+    Compliance         = "HIPAA"
     DataClassification = "PHI"
-    Encryption       = "AES-256-KMS"
-    AccessControl    = "Private"
+    Encryption         = "AES-256-KMS"
+    AccessControl      = "Private"
   }
 }
 

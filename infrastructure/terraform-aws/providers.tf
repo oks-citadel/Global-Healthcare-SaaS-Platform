@@ -19,13 +19,13 @@ provider "aws" {
 
   default_tags {
     tags = {
-      Project        = "The Unified Health"
-      Environment    = var.environment
-      ManagedBy      = "terraform"
-      Owner          = "citadel-cloud-management"
-      CostCenter     = "healthcare-platform"
-      Compliance     = join("-", var.compliance_standards)
-      DataResidency  = var.aws_region
+      Project       = "The Unified Health"
+      Environment   = var.environment
+      ManagedBy     = "terraform"
+      Owner         = "citadel-cloud-management"
+      CostCenter    = "healthcare-platform"
+      Compliance    = join("-", var.compliance_standards)
+      DataResidency = var.aws_region
     }
   }
 }

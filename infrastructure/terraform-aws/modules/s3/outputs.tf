@@ -326,14 +326,14 @@ output "backup_policy_document" {
 output "compliance_info" {
   description = "Compliance-related information for auditing"
   value = {
-    encryption_type     = "AES-256-KMS"
-    encryption_key_arn  = aws_kms_key.s3.arn
-    versioning_enabled  = var.enable_versioning
-    access_logging      = true
+    encryption_type       = "AES-256-KMS"
+    encryption_key_arn    = aws_kms_key.s3.arn
+    versioning_enabled    = var.enable_versioning
+    access_logging        = true
     public_access_blocked = true
-    ssl_enforced        = true
-    object_lock_enabled = var.enable_object_lock
-    replication_enabled = var.enable_replication
+    ssl_enforced          = true
+    object_lock_enabled   = var.enable_object_lock
+    replication_enabled   = var.enable_replication
   }
 }
 

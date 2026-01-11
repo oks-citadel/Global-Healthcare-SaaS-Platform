@@ -250,18 +250,18 @@ output "compliance_summary" {
     ]
     controls = {
       governance = {
-        model_registry       = true
-        risk_assessment      = true
-        ethics_review        = true
-        version_control      = true
-        change_management    = true
+        model_registry    = true
+        risk_assessment   = true
+        ethics_review     = true
+        version_control   = true
+        change_management = true
       }
       data_security = {
-        encryption_at_rest   = true
+        encryption_at_rest    = true
         encryption_in_transit = true
-        pii_detection        = true
-        data_lineage         = true
-        retention_controls   = true
+        pii_detection         = true
+        data_lineage          = true
+        retention_controls    = true
       }
       prompt_security = {
         injection_prevention = true
@@ -270,23 +270,23 @@ output "compliance_summary" {
         input_validation     = true
       }
       output_security = {
-        toxicity_filtering   = true
-        bias_detection       = true
+        toxicity_filtering      = true
+        bias_detection          = true
         hallucination_detection = true
-        confidence_thresholds = true
+        confidence_thresholds   = true
       }
       monitoring = {
-        audit_logging        = true
-        anomaly_detection    = true
-        cost_monitoring      = true
-        drift_detection      = true
-        siem_ready           = true
+        audit_logging     = true
+        anomaly_detection = true
+        cost_monitoring   = true
+        drift_detection   = true
+        siem_ready        = true
       }
       incident_response = {
-        kill_switch          = true
-        auto_response        = true
-        incident_tracking    = true
-        rollback_capability  = true
+        kill_switch         = true
+        auto_response       = true
+        incident_tracking   = true
+        rollback_capability = true
       }
     }
     audit_retention_years = 7

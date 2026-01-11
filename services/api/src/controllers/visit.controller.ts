@@ -14,7 +14,7 @@ export const visitController = {
    */
   startVisit: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id } = req.params;
+      const id = req.params.id as string;
       const userId = req.user!.userId;
 
       const result = await visitService.startVisit(id, userId);
@@ -30,7 +30,7 @@ export const visitController = {
    */
   endVisit: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id } = req.params;
+      const id = req.params.id as string;
       const userId = req.user!.userId;
 
       const result = await visitService.endVisit(id, userId);
@@ -46,7 +46,7 @@ export const visitController = {
    */
   sendChatMessage: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id } = req.params;
+      const id = req.params.id as string;
       const userId = req.user!.userId;
       const input = ChatMessageSchema.parse(req.body);
 

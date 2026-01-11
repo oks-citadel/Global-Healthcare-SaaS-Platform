@@ -103,10 +103,10 @@ resource "aws_cloudwatch_log_group" "services" {
   kms_key_id = var.create_kms_key ? aws_kms_key.cloudwatch[0].arn : var.kms_key_arn
 
   tags = merge(local.tags, {
-    Name        = "${local.name}-${each.value}-logs"
-    Service     = each.value
-    LogType     = "application"
-    Compliance  = "HIPAA-Audit"
+    Name       = "${local.name}-${each.value}-logs"
+    Service    = each.value
+    LogType    = "application"
+    Compliance = "HIPAA-Audit"
   })
 }
 

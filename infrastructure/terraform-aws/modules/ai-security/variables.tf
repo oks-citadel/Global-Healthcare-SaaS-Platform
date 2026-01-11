@@ -77,13 +77,13 @@ variable "compliance_frameworks" {
 variable "data_retention_days" {
   description = "Default data retention period in days"
   type        = number
-  default     = 2555  # 7 years for HIPAA
+  default     = 2555 # 7 years for HIPAA
 }
 
 variable "audit_log_retention_days" {
   description = "Audit log retention period in days"
   type        = number
-  default     = 2555  # 7 years for HIPAA
+  default     = 2555 # 7 years for HIPAA
 }
 
 # ============================================

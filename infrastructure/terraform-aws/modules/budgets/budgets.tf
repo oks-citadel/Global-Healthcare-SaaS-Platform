@@ -101,10 +101,10 @@ resource "aws_budgets_budget" "monthly" {
 resource "aws_budgets_budget_action" "cost_control" {
   count = var.enable_auto_actions && var.auto_action_iam_role_arn != "" && var.auto_action_policy_arn != "" ? 1 : 0
 
-  budget_name        = aws_budgets_budget.monthly.name
-  action_type        = var.auto_action_type
-  approval_model     = "AUTOMATIC"
-  notification_type  = "ACTUAL"
+  budget_name       = aws_budgets_budget.monthly.name
+  action_type       = var.auto_action_type
+  approval_model    = "AUTOMATIC"
+  notification_type = "ACTUAL"
 
   action_threshold {
     action_threshold_type  = "PERCENTAGE"

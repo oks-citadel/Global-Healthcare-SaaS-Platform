@@ -38,8 +38,8 @@ resource "aws_rds_cluster" "main" {
   preferred_maintenance_window = var.maintenance_window
   copy_tags_to_snapshot        = true
 
-  deletion_protection = var.deletion_protection
-  skip_final_snapshot = var.skip_final_snapshot
+  deletion_protection       = var.deletion_protection
+  skip_final_snapshot       = var.skip_final_snapshot
   final_snapshot_identifier = var.skip_final_snapshot ? null : "${local.name}-final-snapshot"
 
   enabled_cloudwatch_logs_exports = ["postgresql"]
@@ -73,10 +73,10 @@ resource "aws_rds_cluster_instance" "main" {
 
   db_parameter_group_name = aws_db_parameter_group.main.name
 
-  publicly_accessible          = false
-  auto_minor_version_upgrade   = true
-  performance_insights_enabled = var.performance_insights_enabled
-  performance_insights_kms_key_id = var.performance_insights_enabled ? (var.kms_key_arn != "" ? var.kms_key_arn : aws_kms_key.rds[0].arn) : null
+  publicly_accessible                   = false
+  auto_minor_version_upgrade            = true
+  performance_insights_enabled          = var.performance_insights_enabled
+  performance_insights_kms_key_id       = var.performance_insights_enabled ? (var.kms_key_arn != "" ? var.kms_key_arn : aws_kms_key.rds[0].arn) : null
   performance_insights_retention_period = var.performance_insights_enabled ? var.performance_insights_retention : null
 
   monitoring_interval = var.enhanced_monitoring_interval

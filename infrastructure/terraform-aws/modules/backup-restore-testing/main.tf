@@ -342,9 +342,9 @@ resource "aws_iam_role_policy" "backup_restore_test" {
       },
       # IAM PassRole for RDS
       {
-        Sid    = "IAMPassRole"
-        Effect = "Allow"
-        Action = "iam:PassRole"
+        Sid      = "IAMPassRole"
+        Effect   = "Allow"
+        Action   = "iam:PassRole"
         Resource = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:role/*-rds-monitoring-role"
         Condition = {
           StringEquals = {
@@ -394,16 +394,16 @@ resource "aws_lambda_function" "backup_restore_test" {
 
   environment {
     variables = {
-      PROJECT_NAME            = var.project_name
-      ENVIRONMENT             = var.environment
-      REGION_NAME             = var.region_name
-      RDS_CLUSTER_IDENTIFIER  = var.rds_cluster_identifier
-      DB_SUBNET_GROUP_NAME    = var.db_subnet_group_name
-      VPC_SECURITY_GROUP_IDS  = join(",", var.vpc_security_group_ids)
-      SNS_TOPIC_ARN           = aws_sns_topic.backup_test_notifications.arn
-      TEST_QUERIES            = jsonencode(var.test_queries)
-      CLEANUP_AFTER_TEST      = tostring(var.cleanup_after_test)
-      MAX_WAIT_MINUTES        = tostring(var.max_wait_minutes)
+      PROJECT_NAME           = var.project_name
+      ENVIRONMENT            = var.environment
+      REGION_NAME            = var.region_name
+      RDS_CLUSTER_IDENTIFIER = var.rds_cluster_identifier
+      DB_SUBNET_GROUP_NAME   = var.db_subnet_group_name
+      VPC_SECURITY_GROUP_IDS = join(",", var.vpc_security_group_ids)
+      SNS_TOPIC_ARN          = aws_sns_topic.backup_test_notifications.arn
+      TEST_QUERIES           = jsonencode(var.test_queries)
+      CLEANUP_AFTER_TEST     = tostring(var.cleanup_after_test)
+      MAX_WAIT_MINUTES       = tostring(var.max_wait_minutes)
     }
   }
 
@@ -638,7 +638,7 @@ resource "aws_cloudwatch_dashboard" "backup_restore_testing" {
         width  = 12
         height = 6
         properties = {
-          title  = "Backup Restoration Alarms"
+          title = "Backup Restoration Alarms"
           alarms = [
             aws_cloudwatch_metric_alarm.restore_test_failure.arn,
             aws_cloudwatch_metric_alarm.restore_test_missed.arn,

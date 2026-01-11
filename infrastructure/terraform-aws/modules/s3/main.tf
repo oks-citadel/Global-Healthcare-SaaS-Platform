@@ -9,8 +9,8 @@ locals {
   name = "${var.project_name}-${var.environment}-${var.region_name}"
 
   tags = merge(var.tags, {
-    Module           = "s3"
-    Compliance       = "HIPAA"
+    Module             = "s3"
+    Compliance         = "HIPAA"
     DataClassification = "PHI"
   })
 
@@ -184,10 +184,10 @@ resource "aws_s3_bucket_policy" "access_logs" {
         }
       },
       {
-        Sid    = "DenyInsecureTransport"
-        Effect = "Deny"
+        Sid       = "DenyInsecureTransport"
+        Effect    = "Deny"
         Principal = "*"
-        Action = "s3:*"
+        Action    = "s3:*"
         Resource = [
           aws_s3_bucket.access_logs.arn,
           "${aws_s3_bucket.access_logs.arn}/*"
@@ -211,10 +211,10 @@ resource "aws_s3_bucket" "documents" {
   force_destroy = var.force_destroy
 
   tags = merge(local.tags, {
-    Name             = "${local.name}-documents"
-    Purpose          = "Patient Document Storage"
-    DataType         = "PHI"
-    RetentionPolicy  = "7-years"
+    Name            = "${local.name}-documents"
+    Purpose         = "Patient Document Storage"
+    DataType        = "PHI"
+    RetentionPolicy = "7-years"
   })
 }
 
@@ -281,7 +281,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "documents" {
     }
 
     noncurrent_version_expiration {
-      noncurrent_days = 2555  # 7 years for HIPAA compliance
+      noncurrent_days = 2555 # 7 years for HIPAA compliance
     }
   }
 
@@ -408,10 +408,10 @@ resource "aws_s3_bucket" "medical_images" {
   force_destroy = var.force_destroy
 
   tags = merge(local.tags, {
-    Name             = "${local.name}-medical-images"
-    Purpose          = "Medical Imaging Storage (DICOM)"
-    DataType         = "PHI"
-    RetentionPolicy  = "10-years"
+    Name            = "${local.name}-medical-images"
+    Purpose         = "Medical Imaging Storage (DICOM)"
+    DataType        = "PHI"
+    RetentionPolicy = "10-years"
   })
 }
 
@@ -593,10 +593,10 @@ resource "aws_s3_bucket" "backups" {
   force_destroy = var.force_destroy
 
   tags = merge(local.tags, {
-    Name             = "${local.name}-backups"
-    Purpose          = "Database and System Backups"
-    DataType         = "PHI"
-    RetentionPolicy  = "35-days"
+    Name            = "${local.name}-backups"
+    Purpose         = "Database and System Backups"
+    DataType        = "PHI"
+    RetentionPolicy = "35-days"
   })
 }
 
@@ -712,7 +712,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "backups" {
     }
 
     expiration {
-      days = 2555  # 7 years
+      days = 2555 # 7 years
     }
 
     noncurrent_version_expiration {
@@ -805,8 +805,8 @@ resource "aws_s3_bucket" "quarantine" {
   force_destroy = var.force_destroy
 
   tags = merge(local.tags, {
-    Name    = "${local.name}-quarantine"
-    Purpose = "Malware Quarantine and Virus Scanning"
+    Name     = "${local.name}-quarantine"
+    Purpose  = "Malware Quarantine and Virus Scanning"
     DataType = "Untrusted"
   })
 }
@@ -996,7 +996,7 @@ resource "aws_iam_role_policy" "replication" {
         ]
         Condition = {
           StringLike = {
-            "kms:ViaService"   = "s3.${data.aws_region.current.name}.amazonaws.com"
+            "kms:ViaService" = "s3.${data.aws_region.current.name}.amazonaws.com"
             "kms:EncryptionContext:aws:s3:arn" = [
               "${aws_s3_bucket.documents.arn}/*",
               "${aws_s3_bucket.medical_images.arn}/*",

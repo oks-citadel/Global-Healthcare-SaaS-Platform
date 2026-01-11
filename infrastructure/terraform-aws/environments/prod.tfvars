@@ -20,7 +20,7 @@ data_residency_required = true
 
 # ECS Fargate Configuration (production-grade, replaces EKS)
 ecs_enable_container_insights = true
-ecs_fargate_weight            = 20  # More on-demand for production
+ecs_fargate_weight            = 20 # More on-demand for production
 ecs_fargate_spot_weight       = 80
 ecs_log_retention_days        = 90
 

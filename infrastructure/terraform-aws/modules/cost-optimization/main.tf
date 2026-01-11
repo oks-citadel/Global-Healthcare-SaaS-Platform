@@ -527,10 +527,10 @@ resource "aws_lambda_function" "cost_optimizer" {
 
   environment {
     variables = {
-      ENVIRONMENT    = var.environment
-      PROJECT_NAME   = var.project_name
-      ALERT_EMAILS   = join(",", var.budget_alert_emails)
-      SNS_TOPIC_ARN  = var.sns_topic_arn
+      ENVIRONMENT   = var.environment
+      PROJECT_NAME  = var.project_name
+      ALERT_EMAILS  = join(",", var.budget_alert_emails)
+      SNS_TOPIC_ARN = var.sns_topic_arn
     }
   }
 
