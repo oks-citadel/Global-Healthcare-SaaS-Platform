@@ -16,7 +16,7 @@
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.51.0",
     "zod": "^3.23.8",
-    "@hookform/resolvers": "^3.3.4",
+    "@hookform/resolvers": "^5.2.2",
     "clsx": "^2.1.0",
     "date-fns": "^3.6.0",
     "lucide-react": "^0.378.0"
