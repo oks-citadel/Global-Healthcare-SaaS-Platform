@@ -24,7 +24,7 @@
     "@unified-health/i18n": "workspace:*",
     "@unified-health/sdk": "workspace:*",
     "axios": "^1.6.2",
-    "expo": "~54.0.30",
+    "expo": "~54.0.31",
     "expo-constants": "^18.0.13",
     "expo-device": "^8.0.10",
     "expo-localization": "~15.0.3",
