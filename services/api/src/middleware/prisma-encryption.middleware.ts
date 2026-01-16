@@ -55,13 +55,18 @@ const READ_ACTIONS: PrismaAction[] = [
 
 /**
  * Encrypt data before write operations
+ * @param model - The Prisma model name
+ * @param action - The Prisma action being performed
+ * @param args - The arguments to the Prisma operation
+ * @param customFields - Optional custom fields array (overrides default fields if provided)
  */
 function encryptWriteData(
   model: string,
   action: PrismaAction,
-  args: Record<string, unknown>
+  args: Record<string, unknown>,
+  customFields?: string[]
 ): Record<string, unknown> {
-  const fields = getEncryptedFieldsForModel(model);
+  const fields = customFields ?? getEncryptedFieldsForModel(model);
 
   if (fields.length === 0) {
     return args;
@@ -125,12 +130,16 @@ function encryptWriteData(
 
 /**
  * Decrypt data after read operations
+ * @param model - The Prisma model name
+ * @param data - The data returned from the Prisma operation
+ * @param customFields - Optional custom fields array (overrides default fields if provided)
  */
 function decryptReadData(
   model: string,
-  data: unknown
+  data: unknown,
+  customFields?: string[]
 ): unknown {
-  const fields = getEncryptedFieldsForModel(model);
+  const fields = customFields ?? getEncryptedFieldsForModel(model);
 
   if (fields.length === 0 || !data) {
     return data;
@@ -388,17 +397,17 @@ export function createSelectiveEncryptionMiddleware(
 
     const typedAction = action as PrismaAction;
 
-    // Encrypt data before write operations
+    // Encrypt data before write operations (use custom fields array)
     if (WRITE_ACTIONS.includes(typedAction) && args) {
-      params.args = encryptWriteData(model, typedAction, args as Record<string, unknown>);
+      params.args = encryptWriteData(model, typedAction, args as Record<string, unknown>, fields);
     }
 
     // Execute the query
     const result = await next(params);
 
-    // Decrypt data after read operations
+    // Decrypt data after read operations (use custom fields array)
     if (READ_ACTIONS.includes(typedAction) && result) {
-      return decryptReadData(model, result);
+      return decryptReadData(model, result, fields);
     }
 
     return result;
