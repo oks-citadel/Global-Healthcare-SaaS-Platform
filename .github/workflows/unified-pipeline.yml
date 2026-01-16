@@ -1488,8 +1488,13 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build web application
-        run: pnpm --filter @unified-health/web build
+      - name: Build web application with dependencies
+        run: |
+          # Build workspace dependencies first (i18n, ui, shared packages)
+          pnpm --filter "@unified-health/i18n" build || true
+          pnpm --filter "@unified-health/ui" build || true
+          # Build the web app (using ... to include any remaining dependencies)
+          pnpm --filter "@unified-health/web..." build
         env:
           NODE_ENV: production
           NEXT_PUBLIC_API_URL: http://localhost:4000
@@ -1607,26 +1612,20 @@ jobs:
       - name: Generate SBOM (CycloneDX JSON format)
         run: |
           mkdir -p sbom-artifacts
-          syft scan dir:. \
-            --output cyclonedx-json=sbom-artifacts/sbom-cyclonedx-${{ steps.version.outputs.version }}.json \
-            --name unified-health-platform \
-            --version ${{ steps.version.outputs.version }}
+          syft dir:. \
+            -o cyclonedx-json=sbom-artifacts/sbom-cyclonedx-${{ steps.version.outputs.version }}.json
           echo "CycloneDX SBOM generated successfully"
 
       - name: Generate SBOM (SPDX JSON format)
         run: |
-          syft scan dir:. \
-            --output spdx-json=sbom-artifacts/sbom-spdx-${{ steps.version.outputs.version }}.json \
-            --name unified-health-platform \
-            --version ${{ steps.version.outputs.version }}
+          syft dir:. \
+            -o spdx-json=sbom-artifacts/sbom-spdx-${{ steps.version.outputs.version }}.json
           echo "SPDX SBOM generated successfully"
 
       - name: Generate SBOM (Table format for review)
         run: |
-          syft scan dir:. \
-            --output table=sbom-artifacts/sbom-summary-${{ steps.version.outputs.version }}.txt \
-            --name unified-health-platform \
-            --version ${{ steps.version.outputs.version }}
+          syft dir:. \
+            -o table=sbom-artifacts/sbom-summary-${{ steps.version.outputs.version }}.txt
           echo "SBOM summary table generated"
 
       - name: Install Grype for vulnerability scanning
