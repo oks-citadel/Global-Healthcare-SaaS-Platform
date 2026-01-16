@@ -1,0 +1,105 @@
+# ============================================
+# UnifiedHealth Mobile - Docker Ignore
+# ============================================
+
+# Dependencies
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store
+
+# Expo
+.expo
+.expo-shared
+dist
+web-build
+
+# React Native
+.bundle
+.react-native
+
+# Build outputs
+*.ipa
+*.apk
+*.aab
+android/app/build
+ios/Pods
+ios/build
+ios/*.xcworkspace
+ios/*.xcodeproj
+
+# Testing
+coverage
+.nyc_output
+__tests__
+__mocks__
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+README.md
+CHANGELOG.md
+docs
+*.md
+
+# CI/CD
+.github
+.gitlab-ci.yml
+.travis.yml
+Jenkinsfile
+azure-pipelines.yml
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Logs
+logs
+*.log
+
+# Temporary files
+tmp
+temp
+.tmp
+
+# Editor config
+.editorconfig
+.eslintrc*
+.prettierrc*
+tsconfig.json
+
+# EAS
+eas.json
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
+
+# Other
+.husky
+.commitlint*

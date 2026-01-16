@@ -1,0 +1,67 @@
+################################################################################
+# Production Environment Variables
+# Global SaaS Marketing Platform
+################################################################################
+
+# General Configuration
+project_name = "marketing-platform"
+environment  = "prod"
+aws_region   = "us-east-1"
+cost_center  = "production"
+
+# VPC Configuration
+vpc_cidr = "10.2.0.0/16"
+
+# EKS Configuration
+eks_cluster_version = "1.29"
+
+# Allowed AWS Regions
+allowed_regions = ["us-east-1", "us-west-2", "eu-west-1", "ap-southeast-1"]
+
+# WAF Configuration
+waf_blocked_countries = []  # Add country codes to block (e.g., ["CN", "RU"])
+
+# CloudFront Configuration
+cloudfront_domain_names = ["example.com", "www.example.com"]
+acm_certificate_arn     = ""  # ACM certificate ARN for CloudFront (must be in us-east-1)
+
+# Route53 Configuration
+route53_zone_id = ""  # Route53 hosted zone ID
+
+# CORS Configuration
+cors_allowed_origins = [
+  "https://example.com",
+  "https://www.example.com",
+  "https://admin.example.com",
+  "https://app.example.com"
+]
+
+# SES Configuration
+ses_domain_name           = "example.com"
+ses_tracking_domain       = "track.example.com"
+dmarc_email               = "dmarc@example.com"
+ses_allowed_from_addresses = [
+  "noreply@example.com",
+  "support@example.com",
+  "marketing@example.com"
+]
+
+# OpenSearch Configuration
+create_opensearch_service_linked_role = false
+opensearch_master_user_arn            = ""  # IAM user/role ARN for OpenSearch access
+
+# Shield Advanced (enable for production DDoS protection)
+enable_shield_advanced = true
+
+# Geo Restriction (optional)
+geo_restriction_type      = "none"  # "whitelist" or "blacklist" or "none"
+geo_restriction_locations = []       # ISO 3166-1-alpha-2 country codes
+
+# Lake Formation
+lake_formation_admin_arn = ""  # IAM user/role ARN for Lake Formation admin
+
+# Alerting
+alert_email_addresses = [
+  "sre-team@example.com",
+  "on-call@example.com"
+]

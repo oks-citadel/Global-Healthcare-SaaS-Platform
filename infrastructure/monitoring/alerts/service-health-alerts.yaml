@@ -1,0 +1,127 @@
+# Prometheus Alerting Rules - Service Health
+# Global Healthcare SaaS Platform
+# Focus: Service availability and health monitoring
+
+groups:
+  # ==========================================
+  # Service Availability Alerts
+  # ==========================================
+  - name: service_health
+    interval: 30s
+    rules:
+      # Critical: Service is completely down
+      - alert: ServiceDown
+        expr: up{job=~".*-service|.*-api|api-gateway", namespace="unified-health"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          category: availability
+          team: platform-sre
+        annotations:
+          summary: "Service {{ $labels.job }} is DOWN"
+          description: |
+            Service {{ $labels.job }} on instance {{ $labels.instance }} has been down for more than 1 minute.
+            This is a critical alert requiring immediate attention.
+          runbook_url: "https://runbooks.unifiedhealth.io/service-down"
+          dashboard_url: "https://grafana.unifiedhealth.io/d/healthcare-platform-overview"
+
+      # Warning: Service has no healthy instances
+      - alert: ServiceNoHealthyInstances
+        expr: |
+          count by (job) (up{job=~".*-service|.*-api", namespace="unified-health"} == 1) == 0
+        for: 2m
+        labels:
+          severity: critical
+          category: availability
+          team: platform-sre
+        annotations:
+          summary: "No healthy instances for {{ $labels.job }}"
+          description: |
+            Service {{ $labels.job }} has no healthy instances running.
+            All pods are either down or failing health checks.
+          runbook_url: "https://runbooks.unifiedhealth.io/no-healthy-instances"
+
+      # Warning: Service availability is degraded (some pods down)
+      - alert: ServiceDegraded
+        expr: |
+          (
+            count by (job) (up{job=~".*-service|.*-api", namespace="unified-health"} == 1)
+            /
+            count by (job) (up{job=~".*-service|.*-api", namespace="unified-health"})
+          ) < 0.5
+        for: 5m
+        labels:
+          severity: warning
+          category: availability
+          team: platform-sre
+        annotations:
+          summary: "Service {{ $labels.job }} is degraded"
+          description: |
+            Less than 50% of instances for {{ $labels.job }} are healthy.
+            Current availability: {{ $value | humanizePercentage }}
+          runbook_url: "https://runbooks.unifiedhealth.io/service-degraded"
+
+      # Critical: Multiple services down simultaneously
+      - alert: MultipleServicesDown
+        expr: |
+          count(up{job=~".*-service|.*-api", namespace="unified-health"} == 0) >= 2
+        for: 2m
+        labels:
+          severity: critical
+          category: availability
+          team: platform-sre
+          escalation: urgent
+        annotations:
+          summary: "Multiple services are DOWN"
+          description: |
+            {{ $value }} services are currently down in the healthcare platform.
+            This indicates a potential infrastructure-wide issue.
+          runbook_url: "https://runbooks.unifiedhealth.io/multiple-services-down"
+
+      # Warning: Pod restart rate is high
+      - alert: HighPodRestartRate
+        expr: |
+          rate(kube_pod_container_status_restarts_total{namespace="unified-health"}[15m]) > 0.05
+        for: 10m
+        labels:
+          severity: warning
+          category: availability
+          team: platform-sre
+        annotations:
+          summary: "High pod restart rate for {{ $labels.pod }}"
+          description: |
+            Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} is restarting frequently.
+            Restart rate: {{ $value | humanize }} restarts/second over 15 minutes.
+          runbook_url: "https://runbooks.unifiedhealth.io/pod-restarts"
+
+      # Critical: Pod is in CrashLoopBackOff
+      - alert: PodCrashLoopBackOff
+        expr: |
+          kube_pod_container_status_waiting_reason{reason="CrashLoopBackOff", namespace="unified-health"} > 0
+        for: 3m
+        labels:
+          severity: critical
+          category: availability
+          team: platform-sre
+        annotations:
+          summary: "Pod {{ $labels.pod }} is in CrashLoopBackOff"
+          description: |
+            Container {{ $labels.container }} in pod {{ $labels.pod }} is in CrashLoopBackOff state.
+            This indicates the container is crashing repeatedly and cannot start successfully.
+          runbook_url: "https://runbooks.unifiedhealth.io/crashloopbackoff"
+
+      # Warning: Pod is pending for too long
+      - alert: PodPendingTooLong
+        expr: |
+          kube_pod_status_phase{phase="Pending", namespace="unified-health"} == 1
+        for: 10m
+        labels:
+          severity: warning
+          category: availability
+          team: platform-sre
+        annotations:
+          summary: "Pod {{ $labels.pod }} has been pending for too long"
+          description: |
+            Pod {{ $labels.pod }} has been in Pending state for more than 10 minutes.
+            Check for resource constraints or scheduling issues.
+          runbook_url: "https://runbooks.unifiedhealth.io/pod-pending"

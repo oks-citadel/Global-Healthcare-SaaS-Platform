@@ -1,0 +1,141 @@
+[
+  {
+    "email": "admin@theunifiedhealth.com",
+    "password": "Admin123!",
+    "firstName": "System",
+    "lastName": "Administrator",
+    "phone": "+1-555-0100",
+    "role": "admin",
+    "emailVerified": true
+  },
+  {
+    "email": "dr.smith@theunifiedhealth.com",
+    "password": "Provider123!",
+    "firstName": "Sarah",
+    "lastName": "Smith",
+    "phone": "+1-555-0101",
+    "dateOfBirth": "1980-05-15",
+    "role": "provider",
+    "emailVerified": true
+  },
+  {
+    "email": "dr.johnson@theunifiedhealth.com",
+    "password": "Provider123!",
+    "firstName": "Michael",
+    "lastName": "Johnson",
+    "phone": "+1-555-0102",
+    "dateOfBirth": "1975-08-22",
+    "role": "provider",
+    "emailVerified": true
+  },
+  {
+    "email": "dr.williams@theunifiedhealth.com",
+    "password": "Provider123!",
+    "firstName": "Emily",
+    "lastName": "Williams",
+    "phone": "+1-555-0103",
+    "dateOfBirth": "1985-11-30",
+    "role": "provider",
+    "emailVerified": true
+  },
+  {
+    "email": "john.doe@example.com",
+    "password": "Patient123!",
+    "firstName": "John",
+    "lastName": "Doe",
+    "phone": "+1-555-0201",
+    "dateOfBirth": "1990-01-15",
+    "role": "patient",
+    "emailVerified": true
+  },
+  {
+    "email": "jane.smith@example.com",
+    "password": "Patient123!",
+    "firstName": "Jane",
+    "lastName": "Smith",
+    "phone": "+1-555-0202",
+    "dateOfBirth": "1988-03-22",
+    "role": "patient",
+    "emailVerified": true
+  },
+  {
+    "email": "robert.brown@example.com",
+    "password": "Patient123!",
+    "firstName": "Robert",
+    "lastName": "Brown",
+    "phone": "+1-555-0203",
+    "dateOfBirth": "1985-07-10",
+    "role": "patient",
+    "emailVerified": true
+  },
+  {
+    "email": "maria.garcia@example.com",
+    "password": "Patient123!",
+    "firstName": "Maria",
+    "lastName": "Garcia",
+    "phone": "+1-555-0204",
+    "dateOfBirth": "1992-09-05",
+    "role": "patient",
+    "emailVerified": true
+  },
+  {
+    "email": "david.miller@example.com",
+    "password": "Patient123!",
+    "firstName": "David",
+    "lastName": "Miller",
+    "phone": "+1-555-0205",
+    "dateOfBirth": "1995-12-18",
+    "role": "patient",
+    "emailVerified": true
+  },
+  {
+    "email": "lisa.wilson@example.com",
+    "password": "Patient123!",
+    "firstName": "Lisa",
+    "lastName": "Wilson",
+    "phone": "+1-555-0206",
+    "dateOfBirth": "1987-04-25",
+    "role": "patient",
+    "emailVerified": true
+  },
+  {
+    "email": "james.taylor@example.com",
+    "password": "Patient123!",
+    "firstName": "James",
+    "lastName": "Taylor",
+    "phone": "+1-555-0207",
+    "dateOfBirth": "1991-06-30",
+    "role": "patient",
+    "emailVerified": true
+  },
+  {
+    "email": "patricia.anderson@example.com",
+    "password": "Patient123!",
+    "firstName": "Patricia",
+    "lastName": "Anderson",
+    "phone": "+1-555-0208",
+    "dateOfBirth": "1989-11-12",
+    "role": "patient",
+    "emailVerified": true
+  },
+  {
+    "email": "michael.thomas@example.com",
+    "password": "Patient123!",
+    "firstName": "Michael",
+    "lastName": "Thomas",
+    "phone": "+1-555-0209",
+    "dateOfBirth": "1993-02-20",
+    "role": "patient",
+    "emailVerified": true
+  },
+  {
+    "email": "jennifer.jackson@example.com",
+    "password": "Patient123!",
+    "firstName": "Jennifer",
+    "lastName": "Jackson",
+    "phone": "+1-555-0210",
+    "dateOfBirth": "1986-08-08",
+    "role": "patient",
+    "emailVerified": true
+  }
+]

@@ -1,0 +1,557 @@
+---
+# ============================================
+# Service Level Indicators (SLIs) and
+# Service Level Objectives (SLOs)
+# Unified Healthcare Platform
+# ============================================
+
+apiVersion: slo.unified-health.io/v1
+kind: SLODefinitions
+metadata:
+  name: unified-health-slos
+  version: "1.0"
+  lastUpdated: "2025-12-17"
+
+# ==========================================
+# Global Configuration
+# ==========================================
+global:
+  evaluationWindow: "30d" # Rolling 30-day window
+  complianceTarget: 99.5 # Minimum acceptable compliance percentage
+  errorBudgetPolicy: "burn-rate"
+
+  # Measurement intervals
+  measurementIntervals:
+    realtime: "1m"
+    shortTerm: "5m"
+    mediumTerm: "1h"
+    longTerm: "24h"
+
+# ==========================================
+# Availability SLIs/SLOs
+# ==========================================
+availability:
+
+  - name: "API Service Availability"
+    description: "Percentage of successful API requests"
+    category: "availability"
+
+    sli:
+      metric: "availability_percentage"
+      calculation: |
+        (sum(http_requests_total{status_code!~"5.."}) / sum(http_requests_total)) * 100
+
+      # Good events vs total events approach
+      goodEvents: "http_requests_total{status_code!~'5..'}"
+      totalEvents: "http_requests_total"
+
+    slo:
+      target: 99.95 # 99.95% availability
+      period: "30d"
+
+      # Error budget
+      errorBudget:
+        percentage: 0.05 # 0.05% error budget
+        absoluteMinutes: 21.6 # 21.6 minutes downtime per month
+
+      # Alerting thresholds
+      alerting:
+        - severity: "warning"
+          threshold: 99.90 # Alert at 90% error budget consumption
+          window: "1h"
+
+        - severity: "critical"
+          threshold: 99.80 # Alert at 60% error budget consumption
+          window: "15m"
+
+      # Burn rate alerts (fast/slow burn)
+      burnRateAlerts:
+        - name: "Fast Burn"
+          window: "1h"
+          burnRate: 14.4 # 2% of error budget in 1 hour
+          severity: "critical"
+
+        - name: "Slow Burn"
+          window: "6h"
+          burnRate: 6 # 2% of error budget in 6 hours
+          severity: "warning"
+
+  - name: "Frontend Application Availability"
+    description: "Percentage of successful page loads"
+    category: "availability"
+
+    sli:
+      metric: "frontend_availability"
+      calculation: |
+        (count(page_load_success) / count(page_load_attempts)) * 100
+      datasource: "Application Insights"
+
+    slo:
+      target: 99.9
+      period: "30d"
+      errorBudget:
+        percentage: 0.1
+        absoluteMinutes: 43.2
+
+  - name: "Health Check Endpoint Availability"
+    description: "Percentage of successful health check responses"
+    category: "availability"
+
+    sli:
+      metric: "health_check_success_rate"
+      calculation: |
+        (count(health_check_success) / count(health_check_total)) * 100
+
+    slo:
+      target: 99.99
+      period: "30d"
+      errorBudget:
+        percentage: 0.01
+        absoluteMinutes: 4.32
+
+# ==========================================
+# Latency SLIs/SLOs
+# ==========================================
+latency:
+
+  - name: "API Response Time (P95)"
+    description: "95th percentile API response time"
+    category: "latency"
+
+    sli:
+      metric: "api_latency_p95"
+      calculation: |
+        histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))
+      unit: "seconds"
+
+    slo:
+      target: 0.5 # 500ms
+      period: "30d"
+
+      # Latency budget
+      errorBudget:
+        slowRequests: 5 # 5% of requests can be slow
+
+      alerting:
+        - severity: "warning"
+          threshold: 0.8 # 800ms
+          window: "15m"
+
+        - severity: "critical"
+          threshold: 1.5 # 1500ms
+          window: "5m"
+
+  - name: "API Response Time (P99)"
+    description: "99th percentile API response time"
+    category: "latency"
+
+    sli:
+      metric: "api_latency_p99"
+      calculation: |
+        histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))
+      unit: "seconds"
+
+    slo:
+      target: 2.0 # 2 seconds
+      period: "30d"
+
+      alerting:
+        - severity: "warning"
+          threshold: 3.0
+          window: "10m"
+
+        - severity: "critical"
+          threshold: 5.0
+          window: "5m"
+
+  - name: "Database Query Latency (P95)"
+    description: "95th percentile database query response time"
+    category: "latency"
+
+    sli:
+      metric: "db_query_latency_p95"
+      calculation: |
+        histogram_quantile(0.95, sum(rate(db_query_duration_seconds_bucket[5m])) by (le))
+      unit: "seconds"
+
+    slo:
+      target: 0.1 # 100ms
+      period: "30d"
+
+      alerting:
+        - severity: "warning"
+          threshold: 0.5
+          window: "15m"
+
+        - severity: "critical"
+          threshold: 1.0
+          window: "5m"
+
+  - name: "Page Load Time (P75)"
+    description: "75th percentile page load time for frontend"
+    category: "latency"
+
+    sli:
+      metric: "page_load_time_p75"
+      calculation: |
+        percentile(page_load_duration, 75)
+      unit: "seconds"
+      datasource: "Application Insights"
+
+    slo:
+      target: 2.0 # 2 seconds
+      period: "30d"
+
+  - name: "External Service Call Latency (P95)"
+    description: "95th percentile response time for external service calls"
+    category: "latency"
+
+    sli:
+      metric: "external_service_latency_p95"
+      calculation: |
+        histogram_quantile(0.95, sum(rate(external_service_duration_seconds_bucket[5m])) by (le, service))
+      unit: "seconds"
+
+    slo:
+      target: 3.0 # 3 seconds
+      period: "30d"
+
+# ==========================================
+# Error Rate SLIs/SLOs
+# ==========================================
+errorRate:
+
+  - name: "API Error Rate"
+    description: "Percentage of API requests returning errors"
+    category: "error_rate"
+
+    sli:
+      metric: "api_error_rate"
+      calculation: |
+        (sum(rate(http_requests_total{status_code=~"5.."}[5m])) / sum(rate(http_requests_total[5m]))) * 100
+      unit: "percentage"
+
+    slo:
+      target: 0.1 # 0.1% error rate (99.9% success rate)
+      period: "30d"
+
+      errorBudget:
+        percentage: 0.1
+
+      alerting:
+        - severity: "warning"
+          threshold: 0.5 # 0.5% error rate
+          window: "15m"
+
+        - severity: "critical"
+          threshold: 1.0 # 1% error rate
+          window: "5m"
+
+  - name: "Critical Error Rate"
+    description: "Rate of critical errors that require immediate attention"
+    category: "error_rate"
+
+    sli:
+      metric: "critical_error_rate"
+      calculation: |
+        sum(rate(critical_errors_total[5m]))
+      unit: "errors_per_second"
+
+    slo:
+      target: 0 # Zero critical errors
+      period: "30d"
+
+      alerting:
+        - severity: "critical"
+          threshold: 1 # Any critical error
+          window: "1m"
+
+  - name: "Database Error Rate"
+    description: "Percentage of database queries resulting in errors"
+    category: "error_rate"
+
+    sli:
+      metric: "db_error_rate"
+      calculation: |
+        (sum(rate(db_query_duration_seconds_count{status="error"}[5m])) / sum(rate(db_query_duration_seconds_count[5m]))) * 100
+      unit: "percentage"
+
+    slo:
+      target: 0.05 # 0.05% error rate
+      period: "30d"
+
+  - name: "Payment Processing Error Rate"
+    description: "Percentage of failed payment transactions"
+    category: "error_rate"
+
+    sli:
+      metric: "payment_error_rate"
+      calculation: |
+        (sum(rate(payments_processed_total{status="failed"}[5m])) / sum(rate(payments_processed_total[5m]))) * 100
+      unit: "percentage"
+
+    slo:
+      target: 0.5 # 0.5% error rate (99.5% success rate)
+      period: "30d"
+
+      alerting:
+        - severity: "warning"
+          threshold: 2.0
+          window: "15m"
+
+        - severity: "critical"
+          threshold: 5.0
+          window: "5m"
+
+# ==========================================
+# Data Quality SLIs/SLOs
+# ==========================================
+dataQuality:
+
+  - name: "Data Freshness"
+    description: "Percentage of data updated within acceptable time window"
+    category: "data_quality"
+
+    sli:
+      metric: "data_freshness_compliance"
+      calculation: |
+        (count(data_age < threshold) / count(total_data_points)) * 100
+      unit: "percentage"
+
+    slo:
+      target: 99.0
+      period: "30d"
+      threshold: "5m" # Data should be no older than 5 minutes
+
+  - name: "Data Completeness"
+    description: "Percentage of records with all required fields populated"
+    category: "data_quality"
+
+    sli:
+      metric: "data_completeness"
+      calculation: |
+        (count(complete_records) / count(total_records)) * 100
+      unit: "percentage"
+
+    slo:
+      target: 99.9
+      period: "30d"
+
+# ==========================================
+# Business Metrics SLIs/SLOs
+# ==========================================
+business:
+
+  - name: "Appointment Booking Success Rate"
+    description: "Percentage of successful appointment bookings"
+    category: "business"
+
+    sli:
+      metric: "appointment_booking_success_rate"
+      calculation: |
+        (sum(rate(appointments_created_total{status="confirmed"}[5m])) / sum(rate(appointments_created_total[5m]))) * 100
+      unit: "percentage"
+
+    slo:
+      target: 95.0 # 95% success rate
+      period: "30d"
+
+  - name: "Consultation Start Time Accuracy"
+    description: "Percentage of consultations starting within 5 minutes of scheduled time"
+    category: "business"
+
+    sli:
+      metric: "consultation_punctuality"
+      calculation: |
+        (count(consultation_delay <= 5m) / count(total_consultations)) * 100
+      unit: "percentage"
+
+    slo:
+      target: 90.0 # 90% on-time
+      period: "30d"
+
+  - name: "User Satisfaction Score"
+    description: "Average user satisfaction rating"
+    category: "business"
+
+    sli:
+      metric: "user_satisfaction"
+      calculation: |
+        avg(user_rating)
+      unit: "score"
+      range: "1-5"
+
+    slo:
+      target: 4.5 # 4.5 out of 5
+      period: "30d"
+
+# ==========================================
+# Security & Compliance SLIs/SLOs
+# ==========================================
+security:
+
+  - name: "Authentication Success Rate"
+    description: "Percentage of successful authentication attempts"
+    category: "security"
+
+    sli:
+      metric: "auth_success_rate"
+      calculation: |
+        (sum(rate(user_login_attempts_total{status="success"}[5m])) / sum(rate(user_login_attempts_total[5m]))) * 100
+      unit: "percentage"
+
+    slo:
+      target: 98.0 # 98% success rate (accounting for user errors)
+      period: "30d"
+
+  - name: "Audit Log Completeness"
+    description: "Percentage of security-relevant events properly logged"
+    category: "security"
+
+    sli:
+      metric: "audit_log_completeness"
+      calculation: |
+        (count(audited_events) / count(auditable_events)) * 100
+      unit: "percentage"
+
+    slo:
+      target: 100.0 # Must log all security events
+      period: "30d"
+
+  - name: "HIPAA Compliance Score"
+    description: "Compliance with HIPAA security and privacy requirements"
+    category: "security"
+
+    sli:
+      metric: "hipaa_compliance"
+      calculation: |
+        (count(compliant_operations) / count(total_operations)) * 100
+      unit: "percentage"
+
+    slo:
+      target: 100.0 # Must be fully compliant
+      period: "30d"
+
+# ==========================================
+# Capacity & Performance SLIs/SLOs
+# ==========================================
+capacity:
+
+  - name: "API Throughput Capacity"
+    description: "Maximum requests per second handled successfully"
+    category: "capacity"
+
+    sli:
+      metric: "api_throughput"
+      calculation: |
+        sum(rate(http_requests_total[1m]))
+      unit: "requests_per_second"
+
+    slo:
+      target: 10000 # 10,000 req/s capacity
+      period: "30d"
+      direction: "minimum"
+
+  - name: "Resource Utilization"
+    description: "Average CPU and memory utilization"
+    category: "capacity"
+
+    sli:
+      metric: "resource_utilization"
+      calculation: |
+        avg((cpu_usage + memory_usage) / 2)
+      unit: "percentage"
+
+    slo:
+      target: 70 # Keep average utilization below 70%
+      period: "30d"
+      direction: "maximum"
+
+# ==========================================
+# SLO Reporting Configuration
+# ==========================================
+reporting:
+
+  # Report generation schedule
+  schedule:
+    daily: "00:00 UTC"
+    weekly: "Mon 00:00 UTC"
+    monthly: "1st 00:00 UTC"
+
+  # Report recipients
+  recipients:
+    - email: "sre-team@unifiedhealth.com"
+      type: "daily"
+
+    - email: "engineering-leads@unifiedhealth.com"
+      type: "weekly"
+
+    - email: "executives@unifiedhealth.com"
+      type: "monthly"
+
+  # Report format
+  format:
+    - type: "pdf"
+      include:
+        - summary
+        - trends
+        - errorBudget
+        - alerts
+
+    - type: "json"
+      include:
+        - rawData
+        - metrics
+
+  # Dashboard links
+  dashboards:
+    - name: "System Health"
+      url: "https://portal.azure.com/#blade/Microsoft_Azure_Monitoring/AzureMonitoringBrowseBlade/dashboards/system-health"
+
+    - name: "API Performance"
+      url: "https://portal.azure.com/#blade/Microsoft_Azure_Monitoring/AzureMonitoringBrowseBlade/dashboards/api-performance"
+
+    - name: "Business Metrics"
+      url: "https://portal.azure.com/#blade/Microsoft_Azure_Monitoring/AzureMonitoringBrowseBlade/dashboards/business-metrics"
+
+# ==========================================
+# Error Budget Policy
+# ==========================================
+errorBudgetPolicy:
+
+  # Action thresholds
+  thresholds:
+    - name: "Healthy"
+      budgetRemaining: "100-75%"
+      actions:
+        - "Continue normal operations"
+        - "Focus on feature development"
+
+    - name: "Warning"
+      budgetRemaining: "75-50%"
+      actions:
+        - "Review recent changes"
+        - "Increase monitoring vigilance"
+        - "Notify engineering leads"
+
+    - name: "Critical"
+      budgetRemaining: "50-25%"
+      actions:
+        - "Freeze non-critical deployments"
+        - "Focus on reliability improvements"
+        - "Daily SLO review meetings"
+        - "Executive notification"
+
+    - name: "Emergency"
+      budgetRemaining: "25-0%"
+      actions:
+        - "Freeze all deployments"
+        - "All hands on reliability"
+        - "Root cause analysis for all incidents"
+        - "Executive war room"
+        - "Customer communication plan"
+
+  # Budget reset policy
+  reset:
+    frequency: "monthly"
+    carryover: false # Don't carry over unused budget

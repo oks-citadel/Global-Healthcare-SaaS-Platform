@@ -1,0 +1,1 @@
+Hi {{patientName}}, reminder: appointment with Dr. {{providerName}} on {{appointmentDate}} at {{appointmentTime}}. {{locationInfo}} Reply CONFIRM to confirm. - {{appName}}

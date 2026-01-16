@@ -1,0 +1,33 @@
+{
+  "name": "@unified-health/knowledge-base",
+  "version": "1.0.0",
+  "description": "Knowledge base and FAQ system for Unified Health",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "license": "UNLICENSED",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "eslint src/",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "fuse.js": "^7.0.0",
+    "marked": "^11.0.0"
+  },
+  "peerDependencies": {
+    "@prisma/client": "^5.0.0",
+    "ioredis": "^5.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "@types/node": "^20.0.0",
+    "eslint": "^9.0.0",
+    "typescript": "^5.3.0",
+    "typescript-eslint": "^8.0.0",
+    "vitest": "^1.0.0"
+  },
+  "files": [
+    "dist"
+  ]
+}

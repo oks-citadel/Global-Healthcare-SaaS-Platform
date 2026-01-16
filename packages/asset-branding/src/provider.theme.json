@@ -1,0 +1,243 @@
+{
+  "$schema": "./tokens.schema.json",
+  "name": "provider",
+  "description": "Provider/clinician-facing theme layer for The Unified Health platform",
+  "version": "1.0.0",
+  "extends": "base",
+  "overrides": {
+    "color": {
+      "primary": {
+        "description": "Professional, authoritative blue for clinical interfaces",
+        "50": "#f0f7ff",
+        "100": "#e0effe",
+        "200": "#b9dffc",
+        "300": "#7cc7fa",
+        "400": "#36aaf5",
+        "500": "#0c8ee6",
+        "600": "#0070c4",
+        "700": "#01599f",
+        "800": "#064b83",
+        "900": "#0b3f6d",
+        "950": "#072849"
+      },
+      "clinical": {
+        "description": "Clinical status indicators for healthcare providers",
+        "stable": "#22c55e",
+        "monitoring": "#f59e0b",
+        "attention": "#ef4444",
+        "critical": "#dc2626",
+        "unknown": "#6b7280"
+      },
+      "data-provenance": {
+        "description": "FHIR data source indicators",
+        "verified": "#22c55e",
+        "external": "#3b82f6",
+        "patient-reported": "#8b5cf6",
+        "stale": "#f59e0b",
+        "unverified": "#6b7280"
+      }
+    },
+    "typography": {
+      "scale": {
+        "description": "Standard clinical typography for information density",
+        "base": "0.9375rem",
+        "min": "0.75rem"
+      },
+      "clinical-data": {
+        "fontFamily": "var(--uh-font-mono)",
+        "fontSize": "0.8125rem",
+        "lineHeight": "1.4"
+      }
+    },
+    "spacing": {
+      "description": "Compact spacing for clinical efficiency",
+      "efficient": {
+        "card-padding": "1rem",
+        "section-gap": "1.5rem",
+        "form-gap": "1rem",
+        "table-cell": "0.75rem"
+      }
+    }
+  },
+  "componentOverrides": {
+    "Button": {
+      "primary": {
+        "background": "var(--uh-clinical-blue-600)",
+        "hoverBackground": "var(--uh-clinical-blue-700)",
+        "text": "#ffffff",
+        "borderRadius": "var(--uh-radius-md)",
+        "padding": "0.5rem 1rem",
+        "minHeight": "36px"
+      },
+      "secondary": {
+        "background": "transparent",
+        "border": "1px solid var(--uh-clinical-blue-600)",
+        "text": "var(--uh-clinical-blue-700)",
+        "borderRadius": "var(--uh-radius-md)"
+      },
+      "danger": {
+        "background": "var(--uh-error-base)",
+        "hoverBackground": "var(--uh-error-dark)",
+        "text": "#ffffff",
+        "requireConfirmation": true
+      }
+    },
+    "Card": {
+      "background": "var(--uh-surface-card)",
+      "border": "1px solid var(--uh-border-default)",
+      "borderRadius": "var(--uh-radius-md)",
+      "padding": "1rem",
+      "shadow": "none"
+    },
+    "Table": {
+      "header": {
+        "background": "var(--uh-trust-black-50)",
+        "fontWeight": "var(--uh-font-semibold)",
+        "fontSize": "var(--uh-text-xs)",
+        "textTransform": "uppercase",
+        "letterSpacing": "var(--uh-tracking-wide)"
+      },
+      "row": {
+        "borderBottom": "1px solid var(--uh-border-default)",
+        "hoverBackground": "var(--uh-clinical-blue-50)"
+      },
+      "cell": {
+        "padding": "0.75rem",
+        "fontSize": "var(--uh-text-sm)"
+      }
+    },
+    "DataBadge": {
+      "verified": {
+        "background": "var(--uh-success-light)",
+        "text": "var(--uh-success-text)",
+        "icon": "shield-check"
+      },
+      "external": {
+        "background": "var(--uh-info-light)",
+        "text": "var(--uh-info-text)",
+        "icon": "link-external"
+      },
+      "patient-reported": {
+        "background": "#f3e8ff",
+        "text": "#6b21a8",
+        "icon": "user"
+      },
+      "stale": {
+        "background": "var(--uh-warning-light)",
+        "text": "var(--uh-warning-text)",
+        "icon": "clock"
+      }
+    },
+    "ClinicalStatus": {
+      "stable": {
+        "color": "#22c55e",
+        "background": "#f0fdf4",
+        "label": "Stable"
+      },
+      "monitoring": {
+        "color": "#f59e0b",
+        "background": "#fffbeb",
+        "label": "Monitoring"
+      },
+      "attention": {
+        "color": "#ef4444",
+        "background": "#fef2f2",
+        "label": "Needs Attention"
+      },
+      "critical": {
+        "color": "#dc2626",
+        "background": "#fee2e2",
+        "label": "Critical",
+        "animation": "pulse-subtle"
+      }
+    }
+  },
+  "uxGuidelines": {
+    "language": {
+      "tone": "Clinical, precise, efficient",
+      "reading-level": "Professional medical",
+      "prefer": ["Standard medical terminology", "Concise labels", "Data-driven language"],
+      "required": ["Timestamps on clinical data", "Source attribution", "Provenance indicators"]
+    },
+    "interactions": {
+      "confirmations": "Required for clinical actions affecting patient records",
+      "timestamps": "Always display relative and absolute timestamps",
+      "data-freshness": "Indicate data age and sync status",
+      "audit-trail": "Log all clinical data modifications"
+    },
+    "dataDisplay": {
+      "provenance": "Always indicate data source and verification status",
+      "freshness": "Display last-updated timestamps",
+      "confidence": "Show AI confidence levels when applicable",
+      "units": "Always include units with clinical values"
+    },
+    "accessibility": {
+      "minimum-touch-target": "44px",
+      "keyboard-navigation": "Full keyboard support required",
+      "screen-reader": "All clinical data must be screen-reader accessible"
+    }
+  },
+  "fhirIndicators": {
+    "description": "Visual indicators for FHIR data provenance and trust",
+    "sources": {
+      "ehr": {
+        "label": "EHR Verified",
+        "icon": "shield-check",
+        "color": "var(--uh-success-base)",
+        "trustLevel": "high"
+      },
+      "lab": {
+        "label": "Lab Result",
+        "icon": "flask",
+        "color": "var(--uh-clinical-blue-500)",
+        "trustLevel": "high"
+      },
+      "imaging": {
+        "label": "Imaging",
+        "icon": "scan",
+        "color": "var(--uh-clinical-blue-600)",
+        "trustLevel": "high"
+      },
+      "patient": {
+        "label": "Patient Reported",
+        "icon": "user",
+        "color": "#8b5cf6",
+        "trustLevel": "medium"
+      },
+      "device": {
+        "label": "Device Data",
+        "icon": "device",
+        "color": "#06b6d4",
+        "trustLevel": "medium"
+      },
+      "external": {
+        "label": "External Source",
+        "icon": "link-external",
+        "color": "var(--uh-info-base)",
+        "trustLevel": "requires-verification"
+      }
+    },
+    "freshness": {
+      "current": {
+        "label": "Current",
+        "maxAge": "24h",
+        "color": "var(--uh-success-base)"
+      },
+      "recent": {
+        "label": "Recent",
+        "maxAge": "7d",
+        "color": "var(--uh-text-secondary)"
+      },
+      "stale": {
+        "label": "May be outdated",
+        "maxAge": "30d",
+        "color": "var(--uh-warning-base)"
+      },
+      "historical": {
+        "label": "Historical",
+        "maxAge": "unlimited",
+        "color": "var(--uh-text-tertiary)"
+      }
+    }
+  }
+}

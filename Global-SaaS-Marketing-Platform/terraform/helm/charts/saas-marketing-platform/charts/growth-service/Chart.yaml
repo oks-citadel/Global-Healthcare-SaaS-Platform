@@ -1,0 +1,16 @@
+apiVersion: v2
+name: growth-service
+description: Growth Service - Campaigns, landing pages, referrals, and affiliates
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - growth
+  - campaigns
+  - landing-pages
+  - referrals
+  - affiliates
+  - marketing
+maintainers:
+  - name: Platform Team
+    email: platform@example.com

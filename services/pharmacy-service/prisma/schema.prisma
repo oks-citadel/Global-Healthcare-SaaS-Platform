@@ -1,0 +1,241 @@
+generator client {
+  output = "./../src/generated/client"
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// Pharmacy Domain
+// ==========================================
+
+model Prescription {
+  id          String             @id @default(uuid())
+  patientId   String
+  providerId  String
+  encounterId String?
+  status      PrescriptionStatus @default(active)
+  items       PrescriptionItem[]
+  notes       String?
+  validFrom   DateTime           @default(now())
+  validUntil  DateTime?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  @@index([patientId])
+  @@index([providerId])
+  @@index([status])
+  @@index([validUntil])
+}
+
+enum PrescriptionStatus {
+  active
+  completed
+  cancelled
+  expired
+}
+
+model PrescriptionItem {
+  id               String       @id @default(uuid())
+  prescriptionId   String
+  prescription     Prescription @relation(fields: [prescriptionId], references: [id], onDelete: Cascade)
+  medicationName   String
+  dosage           String
+  frequency        String
+  duration         String?
+  quantity         Int?
+  refillsAllowed   Int          @default(0)
+  refillsUsed      Int          @default(0)
+  instructions     String?
+  isGenericAllowed Boolean      @default(true)
+  createdAt        DateTime     @default(now())
+
+  @@index([prescriptionId])
+  @@index([medicationName])
+}
+
+model Pharmacy {
+  id              String   @id @default(uuid())
+  name            String
+  licenseNumber   String   @unique
+  phone           String
+  email           String?
+  address         Json
+  operatingHours  Json?
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([licenseNumber])
+  @@index([isActive])
+}
+
+model Medication {
+  id                String   @id @default(uuid())
+  name              String
+  genericName       String?
+  brandNames        String[]
+  strength          String
+  dosageForm        String
+  manufacturer      String?
+  ndcCode           String?  @unique
+  description       String?
+  sideEffects       String[]
+  interactions      String[]
+  isControlled      Boolean  @default(false)
+  schedule          String?
+  requiresPriorAuth Boolean  @default(false)
+  isActive          Boolean  @default(true)
+  inventory         Inventory[]
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([name])
+  @@index([genericName])
+  @@index([ndcCode])
+  @@index([isActive])
+}
+
+// ==========================================
+// Prior Authorization
+// ==========================================
+
+model PriorAuthorization {
+  id              String              @id @default(uuid())
+  prescriptionId  String
+  patientId       String
+  providerId      String
+  insurerId       String?
+  medicationName  String
+  status          PriorAuthStatus     @default(pending)
+  requestDate     DateTime            @default(now())
+  approvalDate    DateTime?
+  denialDate      DateTime?
+  expirationDate  DateTime?
+  denialReason    String?
+  approvalCode    String?
+  notes           String?
+
+  dispensings     Dispensing[]
+
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  @@index([prescriptionId])
+  @@index([patientId])
+  @@index([status])
+  @@index([expirationDate])
+}
+
+enum PriorAuthStatus {
+  pending
+  approved
+  denied
+  expired
+  cancelled
+  appealed
+}
+
+model Dispensing {
+  id                  String             @id @default(uuid())
+  prescriptionId      String
+  patientId           String
+  pharmacyId          String
+  priorAuthorizationId String?
+  priorAuthorization  PriorAuthorization? @relation(fields: [priorAuthorizationId], references: [id])
+  medicationName      String
+  quantity            Int
+  dispensedAt         DateTime           @default(now())
+  pharmacist          String?
+  notes               String?
+
+  createdAt           DateTime           @default(now())
+
+  @@index([prescriptionId])
+  @@index([patientId])
+  @@index([pharmacyId])
+  @@index([dispensedAt])
+}
+
+// ==========================================
+// PDMP (Prescription Drug Monitoring Program)
+// ==========================================
+
+model ControlledSubstanceLog {
+  id              String   @id @default(uuid())
+  patientId       String
+  prescriberId    String
+  pharmacyId      String
+  medicationName  String
+  schedule        String
+  quantity        Int
+  daysSupply      Int
+  dispensedAt     DateTime @default(now())
+  reportedToPDMP  Boolean  @default(false)
+  pdmpReportDate  DateTime?
+
+  createdAt       DateTime @default(now())
+
+  @@index([patientId])
+  @@index([prescriberId])
+  @@index([pharmacyId])
+  @@index([dispensedAt])
+  @@index([medicationName])
+}
+
+// ==========================================
+// Inventory Management
+// ==========================================
+
+model Inventory {
+  id              String   @id @default(uuid())
+  pharmacyId      String
+  medicationId    String
+  medication      Medication @relation(fields: [medicationId], references: [id])
+  quantity        Int      @default(0)
+  reorderLevel    Int      @default(10)
+  lotNumber       String?
+  expirationDate  DateTime?
+  lastRestocked   DateTime?
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  @@unique([pharmacyId, medicationId, lotNumber])
+  @@index([pharmacyId])
+  @@index([medicationId])
+}
+
+// ==========================================
+// Drug Interactions and Allergies
+// ==========================================
+
+model DrugInteraction {
+  id              String   @id @default(uuid())
+  drug1Name       String
+  drug2Name       String
+  severity        String
+  description     String
+  source          String?
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  @@index([drug1Name])
+  @@index([drug2Name])
+}
+
+model DrugAllergy {
+  id              String   @id @default(uuid())
+  patientId       String
+  allergen        String
+  reaction        String?
+  severity        String?
+  onsetDate       DateTime?
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  @@index([patientId])
+  @@index([allergen])
+}

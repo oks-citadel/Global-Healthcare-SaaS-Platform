@@ -1,0 +1,482 @@
+# Prometheus Alert Rules for Unified Healthcare Platform
+# Production-ready alerting configuration
+
+groups:
+  # ==========================================
+  # High Priority - Service Availability
+  # ==========================================
+  - name: service_availability
+    interval: 30s
+    rules:
+      - alert: ServiceDown
+        expr: up{job=~".*-service|.*-api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          category: availability
+        annotations:
+          summary: "Service {{ $labels.job }} is down"
+          description: "{{ $labels.job }} on {{ $labels.instance }} has been down for more than 1 minute."
+          runbook_url: "https://runbooks.unifiedhealth.com/service-down"
+          dashboard: "https://grafana.unifiedhealth.com/d/system-health"
+
+      - alert: HighPodRestartRate
+        expr: rate(kube_pod_container_status_restarts_total{namespace="unified-health"}[15m]) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          category: availability
+        annotations:
+          summary: "High pod restart rate for {{ $labels.pod }}"
+          description: "Pod {{ $labels.pod }} is restarting frequently ({{ $value }} restarts/sec)"
+          runbook_url: "https://runbooks.unifiedhealth.com/pod-restarts"
+
+      - alert: ServiceUnavailable
+        expr: |
+          (
+            sum(rate(http_requests_total{status_code=~"5.."}[5m])) by (job)
+            /
+            sum(rate(http_requests_total[5m])) by (job)
+          ) > 0.5
+        for: 2m
+        labels:
+          severity: critical
+          category: availability
+        annotations:
+          summary: "Service {{ $labels.job }} returning too many 5xx errors"
+          description: "More than 50% of requests to {{ $labels.job }} are failing with 5xx errors"
+
+  # ==========================================
+  # Error Rate Monitoring
+  # ==========================================
+  - name: error_rates
+    interval: 30s
+    rules:
+      - alert: HighErrorRate
+        expr: |
+          (
+            sum(rate(http_requests_total{status_code=~"[45].."}[5m])) by (job)
+            /
+            sum(rate(http_requests_total[5m])) by (job)
+          ) * 100 > 5
+        for: 5m
+        labels:
+          severity: warning
+          category: errors
+        annotations:
+          summary: "High error rate on {{ $labels.job }}"
+          description: "Error rate is {{ $value | humanize }}% on {{ $labels.job }}"
+          runbook_url: "https://runbooks.unifiedhealth.com/high-error-rate"
+          dashboard: "https://grafana.unifiedhealth.com/d/errors"
+
+      - alert: CriticalErrorRate
+        expr: |
+          (
+            sum(rate(http_requests_total{status_code=~"5.."}[5m])) by (job)
+            /
+            sum(rate(http_requests_total[5m])) by (job)
+          ) * 100 > 10
+        for: 2m
+        labels:
+          severity: critical
+          category: errors
+        annotations:
+          summary: "Critical error rate on {{ $labels.job }}"
+          description: "5xx error rate is {{ $value | humanize }}% on {{ $labels.job }}"
+          runbook_url: "https://runbooks.unifiedhealth.com/critical-errors"
+
+      - alert: CriticalErrorsDetected
+        expr: increase(critical_errors_total[5m]) > 10
+        for: 1m
+        labels:
+          severity: critical
+          category: errors
+        annotations:
+          summary: "Critical errors detected in {{ $labels.component }}"
+          description: "{{ $value }} critical errors in {{ $labels.component }} (type: {{ $labels.type }})"
+          runbook_url: "https://runbooks.unifiedhealth.com/critical-errors"
+
+      - alert: HighAuthenticationFailureRate
+        expr: |
+          (
+            sum(rate(user_login_attempts_total{status="failed"}[5m]))
+            /
+            sum(rate(user_login_attempts_total[5m]))
+          ) > 0.3
+        for: 5m
+        labels:
+          severity: warning
+          category: security
+        annotations:
+          summary: "High authentication failure rate"
+          description: "{{ $value | humanizePercentage }} of login attempts are failing"
+          runbook_url: "https://runbooks.unifiedhealth.com/auth-failures"
+
+  # ==========================================
+  # Latency Monitoring
+  # ==========================================
+  - name: latency
+    interval: 30s
+    rules:
+      - alert: HighAPILatency
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(http_request_duration_seconds_bucket[5m])) by (le, job)
+          ) > 1.0
+        for: 10m
+        labels:
+          severity: warning
+          category: latency
+        annotations:
+          summary: "High P95 latency on {{ $labels.job }}"
+          description: "P95 latency is {{ $value }}s on {{ $labels.job }}"
+          runbook_url: "https://runbooks.unifiedhealth.com/high-latency"
+          dashboard: "https://grafana.unifiedhealth.com/d/api-performance"
+
+      - alert: CriticalAPILatency
+        expr: |
+          histogram_quantile(0.99,
+            sum(rate(http_request_duration_seconds_bucket[5m])) by (le, job)
+          ) > 3.0
+        for: 5m
+        labels:
+          severity: critical
+          category: latency
+        annotations:
+          summary: "Critical P99 latency on {{ $labels.job }}"
+          description: "P99 latency is {{ $value }}s on {{ $labels.job }}"
+          runbook_url: "https://runbooks.unifiedhealth.com/critical-latency"
+
+      - alert: SlowDatabaseQueries
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(db_query_duration_seconds_bucket[5m])) by (le, operation)
+          ) > 0.5
+        for: 10m
+        labels:
+          severity: warning
+          category: database
+        annotations:
+          summary: "Slow database queries detected"
+          description: "P95 query time for {{ $labels.operation }} is {{ $value }}s"
+          runbook_url: "https://runbooks.unifiedhealth.com/slow-queries"
+
+      - alert: ExternalServiceTimeout
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(external_service_duration_seconds_bucket[5m])) by (le, service)
+          ) > 10.0
+        for: 5m
+        labels:
+          severity: warning
+          category: external_services
+        annotations:
+          summary: "External service {{ $labels.service }} is slow"
+          description: "P95 response time for {{ $labels.service }} is {{ $value }}s"
+
+  # ==========================================
+  # Resource Utilization
+  # ==========================================
+  - name: resource_utilization
+    interval: 1m
+    rules:
+      - alert: HighCPUUsage
+        expr: |
+          (
+            sum(rate(container_cpu_usage_seconds_total{namespace="unified-health"}[5m])) by (pod)
+            /
+            sum(container_spec_cpu_quota{namespace="unified-health"} / container_spec_cpu_period{namespace="unified-health"}) by (pod)
+          ) * 100 > 80
+        for: 10m
+        labels:
+          severity: warning
+          category: resources
+        annotations:
+          summary: "High CPU usage on {{ $labels.pod }}"
+          description: "CPU usage is {{ $value | humanize }}% on {{ $labels.pod }}"
+          runbook_url: "https://runbooks.unifiedhealth.com/high-cpu"
+
+      - alert: CriticalCPUUsage
+        expr: |
+          (
+            sum(rate(container_cpu_usage_seconds_total{namespace="unified-health"}[5m])) by (pod)
+            /
+            sum(container_spec_cpu_quota{namespace="unified-health"} / container_spec_cpu_period{namespace="unified-health"}) by (pod)
+          ) * 100 > 95
+        for: 5m
+        labels:
+          severity: critical
+          category: resources
+        annotations:
+          summary: "Critical CPU usage on {{ $labels.pod }}"
+          description: "CPU usage is {{ $value | humanize }}% on {{ $labels.pod }}"
+
+      - alert: HighMemoryUsage
+        expr: |
+          (
+            sum(container_memory_working_set_bytes{namespace="unified-health"}) by (pod)
+            /
+            sum(container_spec_memory_limit_bytes{namespace="unified-health"}) by (pod)
+          ) * 100 > 85
+        for: 10m
+        labels:
+          severity: warning
+          category: resources
+        annotations:
+          summary: "High memory usage on {{ $labels.pod }}"
+          description: "Memory usage is {{ $value | humanize }}% on {{ $labels.pod }}"
+          runbook_url: "https://runbooks.unifiedhealth.com/high-memory"
+
+      - alert: CriticalMemoryUsage
+        expr: |
+          (
+            sum(container_memory_working_set_bytes{namespace="unified-health"}) by (pod)
+            /
+            sum(container_spec_memory_limit_bytes{namespace="unified-health"}) by (pod)
+          ) * 100 > 95
+        for: 5m
+        labels:
+          severity: critical
+          category: resources
+        annotations:
+          summary: "Critical memory usage on {{ $labels.pod }}"
+          description: "Memory usage is {{ $value | humanize }}% on {{ $labels.pod }}"
+
+      - alert: DiskSpaceWarning
+        expr: |
+          (
+            node_filesystem_avail_bytes{mountpoint="/"}
+            /
+            node_filesystem_size_bytes{mountpoint="/"}
+          ) * 100 < 20
+        for: 5m
+        labels:
+          severity: warning
+          category: resources
+        annotations:
+          summary: "Low disk space on {{ $labels.instance }}"
+          description: "Only {{ $value | humanize }}% disk space remaining on {{ $labels.instance }}"
+
+      - alert: DiskSpaceCritical
+        expr: |
+          (
+            node_filesystem_avail_bytes{mountpoint="/"}
+            /
+            node_filesystem_size_bytes{mountpoint="/"}
+          ) * 100 < 10
+        for: 5m
+        labels:
+          severity: critical
+          category: resources
+        annotations:
+          summary: "Critical disk space on {{ $labels.instance }}"
+          description: "Only {{ $value | humanize }}% disk space remaining on {{ $labels.instance }}"
+
+  # ==========================================
+  # Database Health
+  # ==========================================
+  - name: database_health
+    interval: 30s
+    rules:
+      - alert: DatabaseConnectionPoolExhausted
+        expr: db_connection_pool_waiting > 5
+        for: 2m
+        labels:
+          severity: warning
+          category: database
+        annotations:
+          summary: "Database connection pool under pressure"
+          description: "{{ $value }} connections waiting for a database connection"
+          runbook_url: "https://runbooks.unifiedhealth.com/db-connection-pool"
+
+      - alert: DatabaseConnectionPoolCritical
+        expr: db_connection_pool_waiting > 10
+        for: 1m
+        labels:
+          severity: critical
+          category: database
+        annotations:
+          summary: "Database connection pool exhausted"
+          description: "{{ $value }} connections waiting - immediate action required"
+
+      - alert: HighDatabaseErrorRate
+        expr: |
+          (
+            sum(rate(db_query_duration_seconds_count{status="error"}[5m]))
+            /
+            sum(rate(db_query_duration_seconds_count[5m]))
+          ) * 100 > 1
+        for: 5m
+        labels:
+          severity: warning
+          category: database
+        annotations:
+          summary: "High database error rate"
+          description: "Database error rate is {{ $value | humanize }}%"
+
+      - alert: DatabaseDown
+        expr: up{job="postgres-exporter"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          category: database
+        annotations:
+          summary: "Database is down"
+          description: "PostgreSQL database is not responding"
+          runbook_url: "https://runbooks.unifiedhealth.com/db-down"
+
+  # ==========================================
+  # Cache Health
+  # ==========================================
+  - name: cache_health
+    interval: 1m
+    rules:
+      - alert: LowCacheHitRate
+        expr: |
+          (
+            sum(rate(cache_hits_total[5m]))
+            /
+            (sum(rate(cache_hits_total[5m])) + sum(rate(cache_misses_total[5m])))
+          ) * 100 < 70
+        for: 15m
+        labels:
+          severity: warning
+          category: cache
+        annotations:
+          summary: "Low cache hit rate"
+          description: "Cache hit rate is {{ $value | humanize }}%"
+          runbook_url: "https://runbooks.unifiedhealth.com/low-cache-hit-rate"
+
+      - alert: RedisDown
+        expr: up{job="redis-exporter"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          category: cache
+        annotations:
+          summary: "Redis cache is down"
+          description: "Redis is not responding"
+
+  # ==========================================
+  # Business Metrics
+  # ==========================================
+  - name: business_metrics
+    interval: 5m
+    rules:
+      - alert: LowAppointmentCreationRate
+        expr: sum(rate(appointments_created_total[1h])) < 5
+        for: 30m
+        labels:
+          severity: warning
+          category: business
+        annotations:
+          summary: "Low appointment creation rate"
+          description: "Only {{ $value | humanize }} appointments created per hour"
+
+      - alert: HighPaymentFailureRate
+        expr: |
+          (
+            sum(rate(payments_processed_total{status="failed"}[5m]))
+            /
+            sum(rate(payments_processed_total[5m]))
+          ) * 100 > 5
+        for: 10m
+        labels:
+          severity: warning
+          category: business
+        annotations:
+          summary: "High payment failure rate"
+          description: "Payment failure rate is {{ $value | humanize }}%"
+          runbook_url: "https://runbooks.unifiedhealth.com/payment-failures"
+
+      - alert: SuspiciousMedicalRecordAccess
+        expr: sum(rate(medical_records_accessed_total[5m])) by (user_role) > 20
+        for: 5m
+        labels:
+          severity: warning
+          category: security
+        annotations:
+          summary: "Suspicious medical record access pattern"
+          description: "{{ $labels.user_role }} accessing {{ $value }} records/sec"
+          runbook_url: "https://runbooks.unifiedhealth.com/suspicious-access"
+
+  # ==========================================
+  # Security Alerts
+  # ==========================================
+  - name: security
+    interval: 1m
+    rules:
+      - alert: HighRateLimitViolations
+        expr: sum(rate(rate_limit_exceeded_total[5m])) > 10
+        for: 5m
+        labels:
+          severity: warning
+          category: security
+        annotations:
+          summary: "High rate of rate limit violations"
+          description: "{{ $value | humanize }} rate limit violations per second"
+          runbook_url: "https://runbooks.unifiedhealth.com/rate-limiting"
+
+      - alert: PossibleDDoSAttack
+        expr: sum(rate(rate_limit_exceeded_total[1m])) > 100
+        for: 2m
+        labels:
+          severity: critical
+          category: security
+        annotations:
+          summary: "Possible DDoS attack detected"
+          description: "{{ $value | humanize }} rate limit violations per second - possible DDoS"
+          runbook_url: "https://runbooks.unifiedhealth.com/ddos-response"
+
+  # ==========================================
+  # SLO/SLI Monitoring
+  # ==========================================
+  - name: slo_monitoring
+    interval: 5m
+    rules:
+      - alert: ErrorBudgetBurnRateHigh
+        expr: |
+          (
+            sum(rate(http_requests_total{status_code=~"5.."}[1h]))
+            /
+            sum(rate(http_requests_total[1h]))
+          ) > (1 - 0.9995) * 14.4  # 14.4x burn rate for 99.95% SLO
+        for: 5m
+        labels:
+          severity: critical
+          category: slo
+        annotations:
+          summary: "Error budget burning too fast"
+          description: "At current error rate, monthly error budget will be exhausted in < 2 days"
+          runbook_url: "https://runbooks.unifiedhealth.com/error-budget"
+
+      - alert: SLOViolation
+        expr: |
+          (
+            sum(rate(http_requests_total{status_code!~"5.."}[30d]))
+            /
+            sum(rate(http_requests_total[30d]))
+          ) < 0.9995
+        for: 5m
+        labels:
+          severity: critical
+          category: slo
+        annotations:
+          summary: "SLO violation - availability below 99.95%"
+          description: "30-day availability is {{ $value | humanizePercentage }}"
+
+  # ==========================================
+  # WebSocket Monitoring
+  # ==========================================
+  - name: websocket_health
+    interval: 1m
+    rules:
+      - alert: HighWebSocketDisconnectRate
+        expr: rate(websocket_connections[5m]) < -10
+        for: 5m
+        labels:
+          severity: warning
+          category: websocket
+        annotations:
+          summary: "High WebSocket disconnect rate"
+          description: "WebSocket connections dropping at {{ $value | humanize }}/sec"

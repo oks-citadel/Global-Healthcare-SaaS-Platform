@@ -1,0 +1,701 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "metadata": {
+    "title": "AWS EOL/EOS Registry - Global Healthcare SaaS Platform",
+    "description": "Lifecycle tracking for AWS resources with end-of-life and end-of-support dates",
+    "version": "1.0.0",
+    "lastUpdated": "2025-12-30",
+    "maintainer": "Platform Engineering Team",
+    "project": "UnifiedHealth Global Healthcare SaaS Platform"
+  },
+  "riskClassification": {
+    "green": {
+      "description": "More than 365 days until EOL",
+      "action": "Monitor and plan upgrade during next planning cycle",
+      "icon": "check-circle"
+    },
+    "yellow": {
+      "description": "Between 180-365 days until EOL",
+      "action": "Schedule upgrade within next quarter",
+      "icon": "alert-triangle"
+    },
+    "red": {
+      "description": "Less than 180 days until EOL",
+      "action": "Immediate upgrade planning required",
+      "icon": "x-circle"
+    },
+    "critical": {
+      "description": "Already past EOL or in extended support",
+      "action": "Emergency upgrade required",
+      "icon": "alert-octagon"
+    }
+  },
+  "resources": {
+    "eks": {
+      "resourceType": "Amazon Elastic Kubernetes Service",
+      "awsService": "EKS",
+      "terraformModule": "infrastructure/terraform-aws/modules/eks",
+      "instances": [
+        {
+          "identifier": "eks-americas",
+          "location": "us-east-1",
+          "configPath": "infrastructure/terraform-aws/main.tf",
+          "currentVersion": "1.29",
+          "lifecycle": {
+            "releaseDate": "2024-01-23",
+            "standardSupportEnd": "2025-03-23",
+            "extendedSupportEnd": "2026-03-23",
+            "extendedSupportCostPerClusterHour": 0.60
+          },
+          "daysUntilStandardEOL": 83,
+          "daysUntilExtendedEOL": 448,
+          "riskLevel": "red",
+          "recommendedVersion": "1.31",
+          "upgradeNotes": "EKS 1.29 enters extended support in March 2025. Plan upgrade to 1.31 for continued standard support."
+        },
+        {
+          "identifier": "eks-europe",
+          "location": "eu-west-1",
+          "configPath": "infrastructure/terraform-aws/main.tf",
+          "currentVersion": "1.29",
+          "lifecycle": {
+            "releaseDate": "2024-01-23",
+            "standardSupportEnd": "2025-03-23",
+            "extendedSupportEnd": "2026-03-23",
+            "extendedSupportCostPerClusterHour": 0.60
+          },
+          "daysUntilStandardEOL": 83,
+          "daysUntilExtendedEOL": 448,
+          "riskLevel": "red",
+          "recommendedVersion": "1.31",
+          "upgradeNotes": "EKS 1.29 enters extended support in March 2025. Plan upgrade to 1.31 for continued standard support."
+        },
+        {
+          "identifier": "eks-africa",
+          "location": "af-south-1",
+          "configPath": "infrastructure/terraform-aws/main.tf",
+          "currentVersion": "1.29",
+          "lifecycle": {
+            "releaseDate": "2024-01-23",
+            "standardSupportEnd": "2025-03-23",
+            "extendedSupportEnd": "2026-03-23",
+            "extendedSupportCostPerClusterHour": 0.60
+          },
+          "daysUntilStandardEOL": 83,
+          "daysUntilExtendedEOL": 448,
+          "riskLevel": "red",
+          "recommendedVersion": "1.31",
+          "upgradeNotes": "EKS 1.29 enters extended support in March 2025. Plan upgrade to 1.31 for continued standard support."
+        }
+      ],
+      "versionLifecycle": {
+        "1.29": {
+          "releaseDate": "2024-01-23",
+          "standardSupportEnd": "2025-03-23",
+          "extendedSupportEnd": "2026-03-23"
+        },
+        "1.30": {
+          "releaseDate": "2024-05-23",
+          "standardSupportEnd": "2025-07-23",
+          "extendedSupportEnd": "2026-07-23"
+        },
+        "1.31": {
+          "releaseDate": "2024-09-19",
+          "standardSupportEnd": "2025-11-19",
+          "extendedSupportEnd": "2026-11-19"
+        },
+        "1.32": {
+          "releaseDate": "2025-01-21",
+          "standardSupportEnd": "2026-03-21",
+          "extendedSupportEnd": "2027-03-21"
+        }
+      }
+    },
+    "eksAddons": {
+      "resourceType": "EKS Add-ons",
+      "awsService": "EKS",
+      "terraformModule": "infrastructure/terraform-aws/modules/eks",
+      "instances": [
+        {
+          "identifier": "vpc-cni",
+          "configPath": "infrastructure/terraform-aws/modules/eks/variables.tf",
+          "currentVersion": "v1.18.5-eksbuild.1",
+          "lifecycle": {
+            "releaseDate": "2024-09-01",
+            "compatibleEKSVersions": ["1.28", "1.29", "1.30", "1.31"]
+          },
+          "riskLevel": "green",
+          "recommendedVersion": "v1.19.0-eksbuild.1",
+          "upgradeNotes": "Consider upgrading to latest stable version for security patches and new features."
+        },
+        {
+          "identifier": "coredns",
+          "configPath": "infrastructure/terraform-aws/modules/eks/variables.tf",
+          "currentVersion": "v1.11.3-eksbuild.1",
+          "lifecycle": {
+            "releaseDate": "2024-08-01",
+            "compatibleEKSVersions": ["1.28", "1.29", "1.30", "1.31"]
+          },
+          "riskLevel": "green",
+          "recommendedVersion": "v1.11.3-eksbuild.2",
+          "upgradeNotes": "Current version is recent. Monitor for security updates."
+        },
+        {
+          "identifier": "kube-proxy",
+          "configPath": "infrastructure/terraform-aws/modules/eks/variables.tf",
+          "currentVersion": "v1.29.7-eksbuild.5",
+          "lifecycle": {
+            "releaseDate": "2024-09-01",
+            "compatibleEKSVersions": ["1.29"]
+          },
+          "riskLevel": "yellow",
+          "recommendedVersion": "v1.31.2-eksbuild.3",
+          "upgradeNotes": "Version is tied to EKS 1.29. Will need to upgrade when EKS cluster upgrades."
+        },
+        {
+          "identifier": "aws-ebs-csi-driver",
+          "configPath": "infrastructure/terraform-aws/modules/eks/variables.tf",
+          "currentVersion": "v1.36.0-eksbuild.1",
+          "lifecycle": {
+            "releaseDate": "2024-10-01",
+            "compatibleEKSVersions": ["1.28", "1.29", "1.30", "1.31"]
+          },
+          "riskLevel": "green",
+          "recommendedVersion": "v1.37.0-eksbuild.1",
+          "upgradeNotes": "Current version is relatively recent. Consider upgrading for latest features."
+        }
+      ]
+    },
+    "rds": {
+      "resourceType": "Amazon Aurora PostgreSQL",
+      "awsService": "RDS",
+      "terraformModule": "infrastructure/terraform-aws/modules/rds",
+      "instances": [
+        {
+          "identifier": "aurora-americas",
+          "location": "us-east-1",
+          "configPath": "infrastructure/terraform-aws/main.tf",
+          "currentVersion": "15.4",
+          "engine": "aurora-postgresql",
+          "parameterGroupFamily": "aurora-postgresql15",
+          "lifecycle": {
+            "releaseDate": "2023-10-01",
+            "standardSupportEnd": "2027-11-01",
+            "extendedSupportEnd": "2030-11-01"
+          },
+          "daysUntilStandardEOL": 672,
+          "riskLevel": "green",
+          "recommendedVersion": "15.6",
+          "upgradeNotes": "PostgreSQL 15 is well supported. Consider minor version upgrade to 15.6 for latest patches."
+        },
+        {
+          "identifier": "aurora-europe",
+          "location": "eu-west-1",
+          "configPath": "infrastructure/terraform-aws/main.tf",
+          "currentVersion": "15.4",
+          "engine": "aurora-postgresql",
+          "parameterGroupFamily": "aurora-postgresql15",
+          "lifecycle": {
+            "releaseDate": "2023-10-01",
+            "standardSupportEnd": "2027-11-01",
+            "extendedSupportEnd": "2030-11-01"
+          },
+          "daysUntilStandardEOL": 672,
+          "riskLevel": "green",
+          "recommendedVersion": "15.6",
+          "upgradeNotes": "PostgreSQL 15 is well supported. Consider minor version upgrade to 15.6 for latest patches."
+        },
+        {
+          "identifier": "aurora-africa",
+          "location": "af-south-1",
+          "configPath": "infrastructure/terraform-aws/main.tf",
+          "currentVersion": "15.4",
+          "engine": "aurora-postgresql",
+          "parameterGroupFamily": "aurora-postgresql15",
+          "lifecycle": {
+            "releaseDate": "2023-10-01",
+            "standardSupportEnd": "2027-11-01",
+            "extendedSupportEnd": "2030-11-01"
+          },
+          "daysUntilStandardEOL": 672,
+          "riskLevel": "green",
+          "recommendedVersion": "15.6",
+          "upgradeNotes": "PostgreSQL 15 is well supported. Consider minor version upgrade to 15.6 for latest patches."
+        }
+      ],
+      "versionLifecycle": {
+        "13": {
+          "standardSupportEnd": "2025-02-28",
+          "extendedSupportEnd": "2028-02-28",
+          "status": "approaching-eol"
+        },
+        "14": {
+          "standardSupportEnd": "2026-05-31",
+          "extendedSupportEnd": "2029-05-31",
+          "status": "supported"
+        },
+        "15": {
+          "standardSupportEnd": "2027-11-01",
+          "extendedSupportEnd": "2030-11-01",
+          "status": "supported"
+        },
+        "16": {
+          "standardSupportEnd": "2028-11-01",
+          "extendedSupportEnd": "2031-11-01",
+          "status": "current"
+        }
+      }
+    },
+    "elasticache": {
+      "resourceType": "Amazon ElastiCache for Redis",
+      "awsService": "ElastiCache",
+      "terraformModule": "infrastructure/terraform-aws/modules/elasticache",
+      "instances": [
+        {
+          "identifier": "redis-americas",
+          "location": "us-east-1",
+          "configPath": "infrastructure/terraform-aws/main.tf",
+          "currentVersion": "7.0",
+          "parameterGroupFamily": "redis7",
+          "lifecycle": {
+            "releaseDate": "2022-09-01",
+            "standardSupportEnd": "2026-09-01"
+          },
+          "daysUntilStandardEOL": 611,
+          "riskLevel": "green",
+          "recommendedVersion": "7.1",
+          "upgradeNotes": "Redis 7.0 is well supported. Consider upgrading to 7.1 for latest features and performance improvements."
+        },
+        {
+          "identifier": "redis-europe",
+          "location": "eu-west-1",
+          "configPath": "infrastructure/terraform-aws/main.tf",
+          "currentVersion": "7.0",
+          "parameterGroupFamily": "redis7",
+          "lifecycle": {
+            "releaseDate": "2022-09-01",
+            "standardSupportEnd": "2026-09-01"
+          },
+          "daysUntilStandardEOL": 611,
+          "riskLevel": "green",
+          "recommendedVersion": "7.1",
+          "upgradeNotes": "Redis 7.0 is well supported. Consider upgrading to 7.1 for latest features and performance improvements."
+        },
+        {
+          "identifier": "redis-africa",
+          "location": "af-south-1",
+          "configPath": "infrastructure/terraform-aws/main.tf",
+          "currentVersion": "7.0",
+          "parameterGroupFamily": "redis7",
+          "lifecycle": {
+            "releaseDate": "2022-09-01",
+            "standardSupportEnd": "2026-09-01"
+          },
+          "daysUntilStandardEOL": 611,
+          "riskLevel": "green",
+          "recommendedVersion": "7.1",
+          "upgradeNotes": "Redis 7.0 is well supported. Consider upgrading to 7.1 for latest features and performance improvements."
+        }
+      ],
+      "versionLifecycle": {
+        "6.2": {
+          "standardSupportEnd": "2025-08-31",
+          "status": "approaching-eol"
+        },
+        "7.0": {
+          "standardSupportEnd": "2026-09-01",
+          "status": "supported"
+        },
+        "7.1": {
+          "standardSupportEnd": "2027-09-01",
+          "status": "current"
+        }
+      }
+    },
+    "nodeRuntime": {
+      "resourceType": "Node.js Container Runtime",
+      "awsService": "ECR/EKS",
+      "terraformModule": "infrastructure/terraform-aws/modules/ecr",
+      "instances": [
+        {
+          "identifier": "api-service",
+          "configPath": "services/api/Dockerfile",
+          "currentVersion": "25-alpine",
+          "lifecycle": {
+            "releaseDate": "2025-04-01",
+            "activeMaintenanceEnd": "2026-10-01",
+            "endOfLifeDate": "2028-04-01"
+          },
+          "daysUntilEOL": 822,
+          "riskLevel": "green",
+          "recommendedVersion": "22-alpine (LTS)",
+          "upgradeNotes": "Using Node.js 25 (Current). Node 22 LTS recommended for production stability. Node 25 support is still experimental."
+        },
+        {
+          "identifier": "web-app",
+          "configPath": "apps/web/Dockerfile",
+          "currentVersion": "25-alpine",
+          "lifecycle": {
+            "releaseDate": "2025-04-01",
+            "activeMaintenanceEnd": "2026-10-01",
+            "endOfLifeDate": "2028-04-01"
+          },
+          "daysUntilEOL": 822,
+          "riskLevel": "green",
+          "recommendedVersion": "22-alpine (LTS)",
+          "upgradeNotes": "Using Node.js 25 (Current). Node 22 LTS recommended for production stability."
+        },
+        {
+          "identifier": "api-gateway",
+          "configPath": "services/api-gateway/Dockerfile",
+          "currentVersion": "20-alpine",
+          "lifecycle": {
+            "releaseDate": "2023-04-18",
+            "activeMaintenanceEnd": "2024-10-22",
+            "endOfLifeDate": "2026-04-30"
+          },
+          "daysUntilEOL": 486,
+          "riskLevel": "green",
+          "recommendedVersion": "22-alpine (LTS)",
+          "upgradeNotes": "Node.js 20 is in maintenance LTS. Plan upgrade to Node.js 22 LTS for extended support."
+        },
+        {
+          "identifier": "telehealth-service",
+          "configPath": "services/telehealth-service/Dockerfile",
+          "currentVersion": "20-slim",
+          "lifecycle": {
+            "releaseDate": "2023-04-18",
+            "activeMaintenanceEnd": "2024-10-22",
+            "endOfLifeDate": "2026-04-30"
+          },
+          "daysUntilEOL": 486,
+          "riskLevel": "green",
+          "recommendedVersion": "22-slim (LTS)",
+          "upgradeNotes": "Node.js 20 is in maintenance LTS. Plan upgrade to Node.js 22 LTS for extended support."
+        },
+        {
+          "identifier": "laboratory-service",
+          "configPath": "services/laboratory-service/Dockerfile",
+          "currentVersion": "20-slim",
+          "lifecycle": {
+            "releaseDate": "2023-04-18",
+            "activeMaintenanceEnd": "2024-10-22",
+            "endOfLifeDate": "2026-04-30"
+          },
+          "daysUntilEOL": 486,
+          "riskLevel": "green",
+          "recommendedVersion": "22-slim (LTS)",
+          "upgradeNotes": "Node.js 20 is in maintenance LTS. Plan upgrade to Node.js 22 LTS for extended support."
+        },
+        {
+          "identifier": "pharmacy-service",
+          "configPath": "services/pharmacy-service/Dockerfile",
+          "currentVersion": "20-slim",
+          "lifecycle": {
+            "releaseDate": "2023-04-18",
+            "activeMaintenanceEnd": "2024-10-22",
+            "endOfLifeDate": "2026-04-30"
+          },
+          "daysUntilEOL": 486,
+          "riskLevel": "green",
+          "recommendedVersion": "22-slim (LTS)",
+          "upgradeNotes": "Node.js 20 is in maintenance LTS. Plan upgrade to Node.js 22 LTS for extended support."
+        },
+        {
+          "identifier": "imaging-service",
+          "configPath": "services/imaging-service/Dockerfile",
+          "currentVersion": "20-slim",
+          "lifecycle": {
+            "releaseDate": "2023-04-18",
+            "activeMaintenanceEnd": "2024-10-22",
+            "endOfLifeDate": "2026-04-30"
+          },
+          "daysUntilEOL": 486,
+          "riskLevel": "green",
+          "recommendedVersion": "22-slim (LTS)",
+          "upgradeNotes": "Node.js 20 is in maintenance LTS. Plan upgrade to Node.js 22 LTS for extended support."
+        },
+        {
+          "identifier": "mental-health-service",
+          "configPath": "services/mental-health-service/Dockerfile",
+          "currentVersion": "20-slim",
+          "lifecycle": {
+            "releaseDate": "2023-04-18",
+            "activeMaintenanceEnd": "2024-10-22",
+            "endOfLifeDate": "2026-04-30"
+          },
+          "daysUntilEOL": 486,
+          "riskLevel": "green",
+          "recommendedVersion": "22-slim (LTS)",
+          "upgradeNotes": "Node.js 20 is in maintenance LTS. Plan upgrade to Node.js 22 LTS for extended support."
+        },
+        {
+          "identifier": "chronic-care-service",
+          "configPath": "services/chronic-care-service/Dockerfile",
+          "currentVersion": "20-slim",
+          "lifecycle": {
+            "releaseDate": "2023-04-18",
+            "activeMaintenanceEnd": "2024-10-22",
+            "endOfLifeDate": "2026-04-30"
+          },
+          "daysUntilEOL": 486,
+          "riskLevel": "green",
+          "recommendedVersion": "22-slim (LTS)",
+          "upgradeNotes": "Node.js 20 is in maintenance LTS. Plan upgrade to Node.js 22 LTS for extended support."
+        },
+        {
+          "identifier": "auth-service",
+          "configPath": "services/auth-service/Dockerfile",
+          "currentVersion": "20-alpine",
+          "lifecycle": {
+            "releaseDate": "2023-04-18",
+            "activeMaintenanceEnd": "2024-10-22",
+            "endOfLifeDate": "2026-04-30"
+          },
+          "daysUntilEOL": 486,
+          "riskLevel": "green",
+          "recommendedVersion": "22-alpine (LTS)",
+          "upgradeNotes": "Node.js 20 is in maintenance LTS. Plan upgrade to Node.js 22 LTS for extended support."
+        },
+        {
+          "identifier": "mobile-app",
+          "configPath": "apps/mobile/Dockerfile",
+          "currentVersion": "20-alpine",
+          "lifecycle": {
+            "releaseDate": "2023-04-18",
+            "activeMaintenanceEnd": "2024-10-22",
+            "endOfLifeDate": "2026-04-30"
+          },
+          "daysUntilEOL": 486,
+          "riskLevel": "green",
+          "recommendedVersion": "22-alpine (LTS)",
+          "upgradeNotes": "Node.js 20 is in maintenance LTS. Plan upgrade to Node.js 22 LTS for extended support."
+        }
+      ],
+      "versionLifecycle": {
+        "18": {
+          "releaseDate": "2022-04-19",
+          "activeMaintenanceEnd": "2023-10-18",
+          "endOfLifeDate": "2025-04-30",
+          "status": "end-of-life-imminent"
+        },
+        "20": {
+          "releaseDate": "2023-04-18",
+          "activeMaintenanceEnd": "2024-10-22",
+          "endOfLifeDate": "2026-04-30",
+          "status": "maintenance-lts"
+        },
+        "22": {
+          "releaseDate": "2024-04-24",
+          "activeMaintenanceEnd": "2025-10-21",
+          "endOfLifeDate": "2027-04-30",
+          "status": "active-lts"
+        },
+        "25": {
+          "releaseDate": "2025-04-01",
+          "activeMaintenanceEnd": "2026-10-01",
+          "endOfLifeDate": "2028-04-01",
+          "status": "current"
+        }
+      }
+    },
+    "awsSdk": {
+      "resourceType": "AWS SDK for JavaScript v3",
+      "awsService": "SDK",
+      "instances": [
+        {
+          "identifier": "api-service-sdk",
+          "configPath": "services/api/package.json",
+          "packages": [
+            "@aws-sdk/client-s3",
+            "@aws-sdk/client-secrets-manager",
+            "@aws-sdk/client-kms",
+            "@aws-sdk/s3-request-presigner"
+          ],
+          "currentVersion": "^3.400.0",
+          "lifecycle": {
+            "majorVersion": 3,
+            "isLongTermSupport": true
+          },
+          "riskLevel": "green",
+          "recommendedVersion": "^3.700.0",
+          "upgradeNotes": "AWS SDK v3 is the current LTS version. Update to latest patch for security fixes. SDK v2 is deprecated."
+        },
+        {
+          "identifier": "imaging-service-sdk",
+          "configPath": "services/imaging-service/package.json",
+          "packages": [
+            "@aws-sdk/client-s3",
+            "@aws-sdk/s3-request-presigner"
+          ],
+          "currentVersion": "^3.400.0",
+          "lifecycle": {
+            "majorVersion": 3,
+            "isLongTermSupport": true
+          },
+          "riskLevel": "green",
+          "recommendedVersion": "^3.700.0",
+          "upgradeNotes": "AWS SDK v3 is the current LTS version. Update to latest patch for security fixes."
+        }
+      ]
+    },
+    "amazonLinux": {
+      "resourceType": "Amazon Linux 2 (EKS Node AMI)",
+      "awsService": "EC2/EKS",
+      "terraformModule": "infrastructure/terraform-aws/modules/eks",
+      "instances": [
+        {
+          "identifier": "eks-node-ami-americas",
+          "location": "us-east-1",
+          "configPath": "infrastructure/terraform-aws/modules/eks/main.tf",
+          "currentVersion": "Amazon Linux 2",
+          "lifecycle": {
+            "releaseDate": "2017-12-13",
+            "standardSupportEnd": "2025-06-30",
+            "extendedSupportEnd": "2026-06-30"
+          },
+          "daysUntilStandardEOL": 182,
+          "daysUntilExtendedEOL": 547,
+          "riskLevel": "yellow",
+          "recommendedVersion": "Amazon Linux 2023",
+          "upgradeNotes": "Amazon Linux 2 ends standard support June 30, 2025. EKS nodes should migrate to AL2023-based AMIs when available for EKS version."
+        },
+        {
+          "identifier": "eks-node-ami-europe",
+          "location": "eu-west-1",
+          "configPath": "infrastructure/terraform-aws/modules/eks/main.tf",
+          "currentVersion": "Amazon Linux 2",
+          "lifecycle": {
+            "releaseDate": "2017-12-13",
+            "standardSupportEnd": "2025-06-30",
+            "extendedSupportEnd": "2026-06-30"
+          },
+          "daysUntilStandardEOL": 182,
+          "daysUntilExtendedEOL": 547,
+          "riskLevel": "yellow",
+          "recommendedVersion": "Amazon Linux 2023",
+          "upgradeNotes": "Amazon Linux 2 ends standard support June 30, 2025. EKS nodes should migrate to AL2023-based AMIs when available for EKS version."
+        },
+        {
+          "identifier": "eks-node-ami-africa",
+          "location": "af-south-1",
+          "configPath": "infrastructure/terraform-aws/modules/eks/main.tf",
+          "currentVersion": "Amazon Linux 2",
+          "lifecycle": {
+            "releaseDate": "2017-12-13",
+            "standardSupportEnd": "2025-06-30",
+            "extendedSupportEnd": "2026-06-30"
+          },
+          "daysUntilStandardEOL": 182,
+          "daysUntilExtendedEOL": 547,
+          "riskLevel": "yellow",
+          "recommendedVersion": "Amazon Linux 2023",
+          "upgradeNotes": "Amazon Linux 2 ends standard support June 30, 2025. EKS nodes should migrate to AL2023-based AMIs when available for EKS version."
+        }
+      ],
+      "versionLifecycle": {
+        "amazon-linux-2": {
+          "standardSupportEnd": "2025-06-30",
+          "extendedSupportEnd": "2026-06-30",
+          "status": "approaching-eol"
+        },
+        "amazon-linux-2023": {
+          "standardSupportEnd": "2028-03-15",
+          "status": "current"
+        }
+      }
+    },
+    "ec2InstanceTypes": {
+      "resourceType": "EC2 Instance Types",
+      "awsService": "EC2",
+      "terraformModule": "infrastructure/terraform-aws/modules/eks",
+      "instances": [
+        {
+          "identifier": "m6i-instances",
+          "configPath": "infrastructure/terraform-aws/variables.tf",
+          "currentTypes": ["m6i.large", "m6i.xlarge", "m6i.2xlarge"],
+          "lifecycle": {
+            "generation": 6,
+            "processor": "Intel Ice Lake",
+            "launchDate": "2021-08-16"
+          },
+          "riskLevel": "green",
+          "upgradeNotes": "M6i instances are current generation. Consider M7i for latest performance when upgrading."
+        },
+        {
+          "identifier": "r6g-instances",
+          "configPath": "infrastructure/terraform-aws/variables.tf",
+          "currentTypes": ["cache.r6g.large", "db.r6g.large"],
+          "lifecycle": {
+            "generation": 6,
+            "processor": "AWS Graviton2",
+            "launchDate": "2020-05-11"
+          },
+          "riskLevel": "green",
+          "upgradeNotes": "R6g instances are current generation ARM-based. Consider R7g for latest Graviton3 performance."
+        }
+      ]
+    }
+  },
+  "deprecatedServices": {
+    "awsServices": [
+      {
+        "service": "AWS SDK v2",
+        "status": "deprecated",
+        "deprecationDate": "2024-09-08",
+        "endOfSupportDate": "2025-09-08",
+        "recommendation": "Migrate to AWS SDK v3",
+        "inUse": false,
+        "notes": "Platform is already using SDK v3. No action required."
+      },
+      {
+        "service": "Amazon Elasticsearch Service",
+        "status": "deprecated",
+        "deprecationDate": "2021-09-08",
+        "recommendation": "Use Amazon OpenSearch Service",
+        "inUse": false,
+        "notes": "Platform does not use Elasticsearch. No action required."
+      },
+      {
+        "service": "Classic Load Balancer",
+        "status": "deprecated",
+        "recommendation": "Use Application Load Balancer or Network Load Balancer",
+        "inUse": false,
+        "notes": "Platform uses ALB. No action required."
+      }
+    ]
+  },
+  "summary": {
+    "totalResources": 31,
+    "byRiskLevel": {
+      "critical": 0,
+      "red": 3,
+      "yellow": 3,
+      "green": 25
+    },
+    "immediateActionRequired": [
+      {
+        "resource": "EKS Clusters (all regions)",
+        "issue": "EKS 1.29 standard support ends March 23, 2025 (83 days)",
+        "action": "Upgrade to EKS 1.31",
+        "priority": "high"
+      }
+    ],
+    "planningRequired": [
+      {
+        "resource": "Amazon Linux 2 (EKS Node AMIs)",
+        "issue": "Standard support ends June 30, 2025 (182 days)",
+        "action": "Migrate to AL2023-based AMIs",
+        "priority": "medium"
+      },
+      {
+        "resource": "kube-proxy addon",
+        "issue": "Version tied to EKS 1.29",
+        "action": "Upgrade with EKS cluster upgrade",
+        "priority": "medium"
+      }
+    ],
+    "generatedAt": "2025-12-30T00:00:00Z",
+    "nextReviewDate": "2026-01-30"
+  }
+}

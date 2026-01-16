@@ -1,0 +1,182 @@
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+  poweredByHeader: false,
+  // output: 'standalone', // Disabled locally. Enable in CI.
+  ...(process.env.CI === 'true' ? { output: 'standalone' } : {}),
+
+  // TypeScript strict mode - do not ignore errors in production
+  typescript: {
+    ignoreBuildErrors: false,
+  },
+
+
+  // Image optimization
+  images: {
+    formats: ['image/avif', 'image/webp'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    minimumCacheTTL: 60 * 60 * 24 * 365, // 1 year
+    dangerouslyAllowSVG: true,
+    contentDispositionType: 'attachment',
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**.amazonaws.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.cloudfront.net',
+      },
+    ],
+  },
+
+  // Compiler optimizations
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['error', 'warn'],
+    } : false,
+  },
+
+  // Production source maps (disabled for performance)
+  productionBrowserSourceMaps: false,
+
+  // Turbopack configuration (Next.js 16+)
+  // Note: Turbopack is now the default bundler in Next.js 16
+  // Use `next build --webpack` to fall back to webpack if needed
+  turbopack: {
+    // Resolve aliases for Turbopack (mirrors webpack config)
+    resolveAlias: {
+      '@': './src',
+      '@components': './src/components',
+      '@hooks': './src/hooks',
+      '@lib': './src/lib',
+      '@api': './src/api',
+    },
+  },
+
+  // Transpile workspace packages for Turbopack compatibility
+  transpilePackages: ['@unified-health/sdk', '@unified-health/i18n'],
+
+  // Experimental features for performance
+  experimental: {
+    // optimizeCss is now stable in Next.js 16, moved out of experimental
+    optimizePackageImports: [
+      '@tanstack/react-query',
+      'zustand',
+      'axios',
+      'zod',
+      'lucide-react',
+      'date-fns',
+      'recharts',
+    ],
+  },
+
+  // CSS optimization - cssChunking removed in Next.js 16
+
+  // Security headers
+  async headers() {
+    // Content Security Policy for production
+    // SECURITY: Prevents XSS, clickjacking, and data injection attacks
+    const cspHeader = [
+      "default-src 'self'",
+      // Scripts: Allow self and Next.js inline scripts
+      // SECURITY: 'unsafe-inline' required for Next.js hydration; 'unsafe-eval' removed to prevent eval-based XSS attacks
+      "script-src 'self' 'unsafe-inline' https://js.stripe.com",
+      // Styles: Allow self and inline styles (required for CSS-in-JS)
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      // Images: Allow self, data URIs, and CDN
+      "img-src 'self' data: blob: https://*.amazonaws.com https://*.cloudfront.net https://*.stripe.com",
+      // Fonts: Allow Google Fonts
+      "font-src 'self' https://fonts.gstatic.com",
+      // Connect: Allow API and Stripe
+      "connect-src 'self' https://*.theunifiedhealth.com https://api.stripe.com wss://*.theunifiedhealth.com",
+      // Frames: Allow Stripe for payment embeds
+      "frame-src 'self' https://js.stripe.com https://hooks.stripe.com",
+      // Form submissions
+      "form-action 'self'",
+      // Base URI
+      "base-uri 'self'",
+      // Upgrade insecure requests in production
+      process.env.NODE_ENV === 'production' ? "upgrade-insecure-requests" : "",
+    ].filter(Boolean).join('; ');
+
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'X-DNS-Prefetch-Control',
+            value: 'on'
+          },
+          {
+            key: 'Strict-Transport-Security',
+            value: 'max-age=63072000; includeSubDomains; preload'
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff'
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY'
+          },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block'
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin'
+          },
+          {
+            key: 'Content-Security-Policy',
+            value: cspHeader
+          },
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(self), microphone=(self), geolocation=(), payment=(self)'
+          },
+        ],
+      },
+      // Cache static assets
+      {
+        source: '/static/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      // Cache images
+      {
+        source: '/_next/image/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+    ];
+  },
+
+  // Redirects for optimization
+  async redirects() {
+    return [];
+  },
+
+  // Rewrites for API proxy (optional)
+  async rewrites() {
+    return [];
+  },
+
+  // Environment variables (public)
+  env: {
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1',
+  },
+};
+
+module.exports = nextConfig;

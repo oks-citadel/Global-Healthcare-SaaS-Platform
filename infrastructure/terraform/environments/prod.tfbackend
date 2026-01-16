@@ -1,0 +1,59 @@
+# ============================================
+# Production Environment Backend Configuration
+# ============================================
+# AWS S3 backend for Terraform state management
+# Production state is isolated and protected with additional controls
+#
+# IMPORTANT: This S3 bucket must have:
+# - Versioning enabled for state history and recovery
+# - Server-side encryption (SSE-KMS recommended)
+# - Access restricted via IAM policies and bucket policies
+# - Cross-region replication for disaster recovery
+# - Lifecycle policies for version retention
+# - MFA delete protection enabled (recommended)
+# - S3 access logging enabled for audit trails
+#
+# IMPORTANT: Before using this backend, run the setup script:
+#   ./setup-backend.sh --env prod --kms
+#
+# Usage: terraform init -backend-config=environments/prod.tfbackend
+
+# S3 Bucket Configuration
+# The bucket name includes your AWS account ID for uniqueness
+# Update this after running setup-backend.sh
+bucket         = "unified-health-tfstate-prod-ACCOUNT_ID"
+key            = "env/prod/terraform.tfstate"
+region         = "us-east-1"
+
+# Encryption - Always enabled, KMS recommended for production
+encrypt        = true
+
+# DynamoDB table for state locking
+# Production requires extra caution - consider implementing approval workflows
+# Point-in-time recovery is automatically enabled for production tables
+dynamodb_table = "unified-health-terraform-locks-prod"
+
+# KMS encryption - Strongly recommended for production
+# This provides customer-managed key encryption for state files
+# kms_key_id   = "alias/unified-health-terraform-prod"
+
+# Optional: Enable assume role for cross-account access
+# For production, consider using a dedicated infrastructure account
+# role_arn     = "arn:aws:iam::ACCOUNT_ID:role/TerraformStateAccess"
+
+# Optional: External ID for assume role (required for enhanced security)
+# external_id  = "unified-health-terraform-prod"
+
+# Optional: Session name for assume role (helps with CloudTrail audit)
+# session_name = "TerraformProd"
+
+# ============================================
+# Production Security Recommendations
+# ============================================
+# 1. Enable MFA delete on the S3 bucket
+# 2. Configure S3 Object Lock for compliance requirements
+# 3. Set up CloudTrail logging for all S3 and DynamoDB access
+# 4. Implement least-privilege IAM policies
+# 5. Use separate AWS accounts for production isolation
+# 6. Enable AWS Config rules to monitor bucket compliance
+# 7. Set up alerts for unauthorized access attempts

@@ -1,0 +1,390 @@
+// Prisma Schema for Content Marketing Service
+// Unified Health - Global SaaS Marketing Platform
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enums
+enum ContentStatus {
+  DRAFT
+  SCHEDULED
+  PUBLISHED
+  ARCHIVED
+  DELETED
+}
+
+enum ContentType {
+  PAGE
+  BLOG_POST
+  LANDING_PAGE
+  ARTICLE
+  GUIDE
+  CASE_STUDY
+  WHITEPAPER
+  EBOOK
+  INFOGRAPHIC
+  VIDEO
+  PODCAST
+}
+
+enum TopicClusterType {
+  PILLAR
+  CLUSTER
+  SUPPORTING
+}
+
+// Content Page - Main content entity
+model ContentPage {
+  id                String          @id @default(uuid())
+  tenantId          String          @map("tenant_id")
+
+  // Core content fields
+  title             String
+  slug              String
+  excerpt           String?
+  content           Json            // Rich content structure
+  metaTitle         String?         @map("meta_title")
+  metaDescription   String?         @map("meta_description")
+  featuredImage     String?         @map("featured_image")
+
+  // Classification
+  type              ContentType     @default(PAGE)
+  status            ContentStatus   @default(DRAFT)
+
+  // Publishing
+  publishedAt       DateTime?       @map("published_at")
+  scheduledAt       DateTime?       @map("scheduled_at")
+
+  // Author and tracking
+  authorId          String          @map("author_id")
+  createdBy         String          @map("created_by")
+  updatedBy         String?         @map("updated_by")
+
+  // Version control
+  currentVersionId  String?         @unique @map("current_version_id")
+  versionNumber     Int             @default(1) @map("version_number")
+
+  // SEO and indexing
+  canonicalUrl      String?         @map("canonical_url")
+  noIndex           Boolean         @default(false) @map("no_index")
+  noFollow          Boolean         @default(false) @map("no_follow")
+
+  // Timestamps
+  createdAt         DateTime        @default(now()) @map("created_at")
+  updatedAt         DateTime        @updatedAt @map("updated_at")
+  deletedAt         DateTime?       @map("deleted_at")
+
+  // Relations
+  versions          ContentVersion[]
+  topics            ContentTopic[]
+  performance       ContentPerformance[]
+  media             ContentMedia[]
+  clusterMappings   TopicClusterMapping[]
+
+  @@unique([tenantId, slug])
+  @@index([tenantId])
+  @@index([status])
+  @@index([type])
+  @@index([publishedAt])
+  @@index([authorId])
+  @@map("content_pages")
+}
+
+// Content Version - Version history for content
+model ContentVersion {
+  id              String        @id @default(uuid())
+  pageId          String        @map("page_id")
+  versionNumber   Int           @map("version_number")
+
+  // Snapshot of content at this version
+  title           String
+  slug            String
+  excerpt         String?
+  content         Json
+  metaTitle       String?       @map("meta_title")
+  metaDescription String?       @map("meta_description")
+  featuredImage   String?       @map("featured_image")
+
+  // Version metadata
+  changeMessage   String?       @map("change_message")
+  createdBy       String        @map("created_by")
+  createdAt       DateTime      @default(now()) @map("created_at")
+
+  // Diff from previous version
+  diff            Json?
+
+  // Relations
+  page            ContentPage   @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  @@unique([pageId, versionNumber])
+  @@index([pageId])
+  @@map("content_versions")
+}
+
+// Topic - Content topics for clustering
+model Topic {
+  id              String              @id @default(uuid())
+  tenantId        String              @map("tenant_id")
+
+  name            String
+  slug            String
+  description     String?
+
+  // Topic metrics
+  searchVolume    Int?                @map("search_volume")
+  difficulty      Float?
+  relevanceScore  Float?              @map("relevance_score")
+
+  // Parent topic for hierarchy
+  parentId        String?             @map("parent_id")
+  parent          Topic?              @relation("TopicHierarchy", fields: [parentId], references: [id])
+  children        Topic[]             @relation("TopicHierarchy")
+
+  // Timestamps
+  createdAt       DateTime            @default(now()) @map("created_at")
+  updatedAt       DateTime            @updatedAt @map("updated_at")
+
+  // Relations
+  contentTopics   ContentTopic[]
+  clusters        TopicCluster[]
+
+  @@unique([tenantId, slug])
+  @@index([tenantId])
+  @@map("topics")
+}
+
+// Content Topic - Many-to-many relation between content and topics
+model ContentTopic {
+  id          String        @id @default(uuid())
+  pageId      String        @map("page_id")
+  topicId     String        @map("topic_id")
+
+  isPrimary   Boolean       @default(false) @map("is_primary")
+  relevance   Float?
+
+  // Relations
+  page        ContentPage   @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  topic       Topic         @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@unique([pageId, topicId])
+  @@map("content_topics")
+}
+
+// Topic Cluster - Pillar-cluster organization
+model TopicCluster {
+  id              String                @id @default(uuid())
+  tenantId        String                @map("tenant_id")
+
+  name            String
+  description     String?
+
+  // Pillar topic
+  pillarTopicId   String?               @map("pillar_topic_id")
+  pillarTopic     Topic?                @relation(fields: [pillarTopicId], references: [id])
+
+  // Cluster metrics
+  totalPages      Int                   @default(0) @map("total_pages")
+  avgPerformance  Float?                @map("avg_performance")
+
+  // Timestamps
+  createdAt       DateTime              @default(now()) @map("created_at")
+  updatedAt       DateTime              @updatedAt @map("updated_at")
+
+  // Relations
+  mappings        TopicClusterMapping[]
+
+  @@index([tenantId])
+  @@map("topic_clusters")
+}
+
+// Topic Cluster Mapping - Content to cluster mapping
+model TopicClusterMapping {
+  id          String            @id @default(uuid())
+  clusterId   String            @map("cluster_id")
+  pageId      String            @map("page_id")
+
+  type        TopicClusterType  @default(CLUSTER)
+  position    Int               @default(0)
+
+  // Relations
+  cluster     TopicCluster      @relation(fields: [clusterId], references: [id], onDelete: Cascade)
+  page        ContentPage       @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  @@unique([clusterId, pageId])
+  @@map("topic_cluster_mappings")
+}
+
+// Content Performance - Analytics and metrics
+model ContentPerformance {
+  id              String        @id @default(uuid())
+  pageId          String        @map("page_id")
+
+  // Time period
+  date            DateTime      @db.Date
+
+  // Traffic metrics
+  pageViews       Int           @default(0) @map("page_views")
+  uniqueVisitors  Int           @default(0) @map("unique_visitors")
+
+  // Engagement metrics
+  avgDwellTime    Float?        @map("avg_dwell_time")     // in seconds
+  bounceRate      Float?        @map("bounce_rate")        // percentage
+  scrollDepth     Float?        @map("scroll_depth")       // percentage
+
+  // Conversion metrics
+  conversions     Int           @default(0)
+  conversionRate  Float?        @map("conversion_rate")
+
+  // Social metrics
+  shares          Int           @default(0)
+  comments        Int           @default(0)
+
+  // SEO metrics
+  organicTraffic  Int           @default(0) @map("organic_traffic")
+  avgPosition     Float?        @map("avg_position")
+  impressions     Int           @default(0)
+  clicks          Int           @default(0)
+  ctr             Float?
+
+  // Relations
+  page            ContentPage   @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  @@unique([pageId, date])
+  @@index([pageId])
+  @@index([date])
+  @@map("content_performance")
+}
+
+// Content Media - Media assets for content
+model ContentMedia {
+  id              String        @id @default(uuid())
+  pageId          String?       @map("page_id")
+  tenantId        String        @map("tenant_id")
+
+  // File info
+  filename        String
+  originalName    String        @map("original_name")
+  mimeType        String        @map("mime_type")
+  size            Int                                   // in bytes
+
+  // Storage
+  s3Key           String        @map("s3_key")
+  s3Bucket        String        @map("s3_bucket")
+  cdnUrl          String?       @map("cdn_url")
+
+  // Metadata
+  alt             String?
+  caption         String?
+  width           Int?
+  height          Int?
+  duration        Float?                                // for video/audio, in seconds
+
+  // Timestamps
+  createdAt       DateTime      @default(now()) @map("created_at")
+  createdBy       String        @map("created_by")
+
+  // Relations
+  page            ContentPage?  @relation(fields: [pageId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId])
+  @@index([pageId])
+  @@map("content_media")
+}
+
+// Content Outline - AI-generated outlines
+model ContentOutline {
+  id              String        @id @default(uuid())
+  tenantId        String        @map("tenant_id")
+
+  // Input
+  topic           String
+  keywords        String[]
+  targetAudience  String?       @map("target_audience")
+  contentType     ContentType   @map("content_type")
+
+  // Generated outline
+  outline         Json
+
+  // Generation metadata
+  modelUsed       String?       @map("model_used")
+  promptVersion   String?       @map("prompt_version")
+
+  // Usage tracking
+  usedInPageId    String?       @map("used_in_page_id")
+
+  // Timestamps
+  createdAt       DateTime      @default(now()) @map("created_at")
+  createdBy       String        @map("created_by")
+
+  @@index([tenantId])
+  @@map("content_outlines")
+}
+
+// Content Brief - AI-generated briefs
+model ContentBrief {
+  id                String        @id @default(uuid())
+  tenantId          String        @map("tenant_id")
+
+  // Brief details
+  title             String
+  objective         String?
+  targetAudience    String?       @map("target_audience")
+  keyMessages       String[]      @map("key_messages")
+  keywords          String[]
+  competitorUrls    String[]      @map("competitor_urls")
+
+  // Generated brief
+  brief             Json
+
+  // Recommendations
+  wordCountMin      Int?          @map("word_count_min")
+  wordCountMax      Int?          @map("word_count_max")
+  suggestedHeadings String[]      @map("suggested_headings")
+
+  // Generation metadata
+  modelUsed         String?       @map("model_used")
+
+  // Usage tracking
+  usedInPageId      String?       @map("used_in_page_id")
+
+  // Timestamps
+  createdAt         DateTime      @default(now()) @map("created_at")
+  createdBy         String        @map("created_by")
+
+  @@index([tenantId])
+  @@map("content_briefs")
+}
+
+// Content Repurpose - Track repurposed content
+model ContentRepurpose {
+  id              String        @id @default(uuid())
+  tenantId        String        @map("tenant_id")
+
+  // Source content
+  sourcePageId    String        @map("source_page_id")
+  sourceType      ContentType   @map("source_type")
+
+  // Target content
+  targetType      ContentType   @map("target_type")
+  targetContent   Json          @map("target_content")
+
+  // Generation metadata
+  modelUsed       String?       @map("model_used")
+
+  // Usage tracking
+  usedInPageId    String?       @map("used_in_page_id")
+
+  // Timestamps
+  createdAt       DateTime      @default(now()) @map("created_at")
+  createdBy       String        @map("created_by")
+
+  @@index([tenantId])
+  @@index([sourcePageId])
+  @@map("content_repurpose")
+}

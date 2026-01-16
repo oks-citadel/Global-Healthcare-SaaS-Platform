@@ -1,0 +1,76 @@
+{
+  "name": "@unifiedhealth/compliance",
+  "version": "1.0.0",
+  "description": "Compliance utilities for HIPAA, GDPR, and POPIA",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "npx tsup src/index.ts --format cjs,esm --dts",
+    "dev": "npx tsup src/index.ts --format cjs,esm --dts --watch",
+    "lint": "eslint src",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "compliance",
+    "hipaa",
+    "gdpr",
+    "popia",
+    "healthcare",
+    "data-protection",
+    "privacy"
+  ],
+  "author": "Unified Health Platform",
+  "license": "PROPRIETARY",
+  "dependencies": {
+    "uuid": "^9.0.1",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "@types/node": "^20.10.0",
+    "@types/uuid": "^9.0.7",
+    "eslint": "^9.17.0",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.3",
+    "typescript-eslint": "^8.19.0",
+    "vitest": "^1.0.4"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./audit": {
+      "types": "./dist/audit/index.d.ts",
+      "import": "./dist/audit/index.mjs",
+      "require": "./dist/audit/index.js"
+    },
+    "./consent": {
+      "types": "./dist/consent/index.d.ts",
+      "import": "./dist/consent/index.mjs",
+      "require": "./dist/consent/index.js"
+    },
+    "./encryption": {
+      "types": "./dist/encryption/index.d.ts",
+      "import": "./dist/encryption/index.mjs",
+      "require": "./dist/encryption/index.js"
+    },
+    "./retention": {
+      "types": "./dist/retention/index.d.ts",
+      "import": "./dist/retention/index.mjs",
+      "require": "./dist/retention/index.js"
+    },
+    "./deletion": {
+      "types": "./dist/deletion/index.d.ts",
+      "import": "./dist/deletion/index.mjs",
+      "require": "./dist/deletion/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ]
+}

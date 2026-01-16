@@ -1,0 +1,295 @@
+# ============================================
+# UnifiedHealth Platform - Multi-Region Makefile
+# ============================================
+# Simplifies multi-region Terraform operations
+
+.PHONY: help init plan apply destroy validate format clean
+.DEFAULT_GOAL := help
+
+# Variables
+TERRAFORM := terraform
+TF_VAR_FILE := terraform.tfvars
+TF_PLAN := multiregion.tfplan
+
+# Colors for output
+RED := \033[0;31m
+GREEN := \033[0;32m
+YELLOW := \033[1;33m
+NC := \033[0m # No Color
+
+help: ## Show this help message
+	@echo "$(GREEN)UnifiedHealth Multi-Region Terraform Commands$(NC)"
+	@echo ""
+	@echo "Usage: make [target]"
+	@echo ""
+	@echo "Targets:"
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  $(GREEN)%-20s$(NC) %s\n", $$1, $$2}'
+
+init: ## Initialize Terraform with multi-region backend
+	@echo "$(GREEN)Initializing Terraform...$(NC)"
+	$(TERRAFORM) init -upgrade
+	@echo "$(GREEN)Terraform initialized successfully$(NC)"
+
+validate: ## Validate Terraform configuration
+	@echo "$(GREEN)Validating Terraform configuration...$(NC)"
+	$(TERRAFORM) validate
+	$(TERRAFORM) fmt -check -recursive
+	@echo "$(GREEN)Configuration is valid$(NC)"
+
+format: ## Format Terraform files
+	@echo "$(GREEN)Formatting Terraform files...$(NC)"
+	$(TERRAFORM) fmt -recursive
+	@echo "$(GREEN)Formatting complete$(NC)"
+
+plan: ## Create Terraform execution plan for all regions
+	@echo "$(GREEN)Creating Terraform plan for all regions...$(NC)"
+	$(TERRAFORM) plan -out=$(TF_PLAN)
+	@echo "$(GREEN)Plan created: $(TF_PLAN)$(NC)"
+
+plan-americas: ## Plan deployment for Americas region only
+	@echo "$(GREEN)Creating plan for Americas region...$(NC)"
+	$(TERRAFORM) plan \
+		-var="deploy_americas=true" \
+		-var="deploy_europe=false" \
+		-var="deploy_africa=false" \
+		-out=$(TF_PLAN)
+
+plan-europe: ## Plan deployment for Europe region only
+	@echo "$(GREEN)Creating plan for Europe region...$(NC)"
+	$(TERRAFORM) plan \
+		-var="deploy_americas=false" \
+		-var="deploy_europe=true" \
+		-var="deploy_africa=false" \
+		-out=$(TF_PLAN)
+
+plan-africa: ## Plan deployment for Africa region only
+	@echo "$(GREEN)Creating plan for Africa region...$(NC)"
+	$(TERRAFORM) plan \
+		-var="deploy_americas=false" \
+		-var="deploy_europe=false" \
+		-var="deploy_africa=true" \
+		-out=$(TF_PLAN)
+
+apply: ## Apply Terraform plan
+	@echo "$(YELLOW)Applying Terraform plan...$(NC)"
+	@echo "$(RED)WARNING: This will create/modify resources in Azure$(NC)"
+	$(TERRAFORM) apply $(TF_PLAN)
+	@echo "$(GREEN)Infrastructure deployed successfully$(NC)"
+
+apply-auto: ## Apply without confirmation (use with caution)
+	@echo "$(YELLOW)Auto-applying Terraform changes...$(NC)"
+	$(TERRAFORM) apply -auto-approve
+	@echo "$(GREEN)Infrastructure deployed successfully$(NC)"
+
+destroy: ## Destroy all multi-region infrastructure
+	@echo "$(RED)WARNING: This will destroy ALL multi-region infrastructure$(NC)"
+	@echo "$(RED)Press Ctrl+C to cancel, or wait 10 seconds to continue...$(NC)"
+	@sleep 10
+	$(TERRAFORM) destroy
+	@echo "$(GREEN)Infrastructure destroyed$(NC)"
+
+destroy-americas: ## Destroy Americas region only
+	@echo "$(YELLOW)Destroying Americas region...$(NC)"
+	$(TERRAFORM) destroy -target=module.americas
+	@echo "$(GREEN)Americas region destroyed$(NC)"
+
+destroy-europe: ## Destroy Europe region only
+	@echo "$(YELLOW)Destroying Europe region...$(NC)"
+	$(TERRAFORM) destroy -target=module.europe
+	@echo "$(GREEN)Europe region destroyed$(NC)"
+
+destroy-africa: ## Destroy Africa region only
+	@echo "$(YELLOW)Destroying Africa region...$(NC)"
+	$(TERRAFORM) destroy -target=module.africa
+	@echo "$(GREEN)Africa region destroyed$(NC)"
+
+output: ## Show Terraform outputs
+	@echo "$(GREEN)Terraform Outputs:$(NC)"
+	$(TERRAFORM) output
+
+output-json: ## Show Terraform outputs in JSON format
+	$(TERRAFORM) output -json
+
+show-global: ## Show global resources
+	@echo "$(GREEN)Global Resources:$(NC)"
+	@$(TERRAFORM) output global_acr_name
+	@$(TERRAFORM) output frontdoor_api_endpoint
+	@$(TERRAFORM) output traffic_manager_fqdn
+
+show-americas: ## Show Americas region resources
+	@echo "$(GREEN)Americas Region Resources:$(NC)"
+	@$(TERRAFORM) output americas_aks_cluster_name
+	@$(TERRAFORM) output americas_postgresql_fqdn
+	@$(TERRAFORM) output americas_redis_hostname
+
+show-europe: ## Show Europe region resources
+	@echo "$(GREEN)Europe Region Resources:$(NC)"
+	@$(TERRAFORM) output europe_aks_cluster_name
+	@$(TERRAFORM) output europe_postgresql_fqdn
+	@$(TERRAFORM) output europe_redis_hostname
+
+show-africa: ## Show Africa region resources
+	@echo "$(GREEN)Africa Region Resources:$(NC)"
+	@$(TERRAFORM) output africa_aks_cluster_name
+	@$(TERRAFORM) output africa_postgresql_fqdn
+	@$(TERRAFORM) output africa_redis_hostname
+
+kubeconfig: ## Get kubeconfig for all AKS clusters
+	@echo "$(GREEN)Configuring kubectl for all regions...$(NC)"
+	@az aks get-credentials \
+		--resource-group $$($(TERRAFORM) output -raw americas_resource_group_name) \
+		--name $$($(TERRAFORM) output -raw americas_aks_cluster_name) \
+		--context americas-prod --overwrite-existing || true
+	@az aks get-credentials \
+		--resource-group $$($(TERRAFORM) output -raw europe_resource_group_name) \
+		--name $$($(TERRAFORM) output -raw europe_aks_cluster_name) \
+		--context europe-prod --overwrite-existing || true
+	@az aks get-credentials \
+		--resource-group $$($(TERRAFORM) output -raw africa_resource_group_name) \
+		--name $$($(TERRAFORM) output -raw africa_aks_cluster_name) \
+		--context africa-prod --overwrite-existing || true
+	@echo "$(GREEN)Kubeconfig updated for all regions$(NC)"
+	@kubectl config get-contexts
+
+kubeconfig-americas: ## Get kubeconfig for Americas AKS
+	@az aks get-credentials \
+		--resource-group $$($(TERRAFORM) output -raw americas_resource_group_name) \
+		--name $$($(TERRAFORM) output -raw americas_aks_cluster_name) \
+		--context americas-prod --overwrite-existing
+	@echo "$(GREEN)Americas kubeconfig updated$(NC)"
+
+kubeconfig-europe: ## Get kubeconfig for Europe AKS
+	@az aks get-credentials \
+		--resource-group $$($(TERRAFORM) output -raw europe_resource_group_name) \
+		--name $$($(TERRAFORM) output -raw europe_aks_cluster_name) \
+		--context europe-prod --overwrite-existing
+	@echo "$(GREEN)Europe kubeconfig updated$(NC)"
+
+kubeconfig-africa: ## Get kubeconfig for Africa AKS
+	@az aks get-credentials \
+		--resource-group $$($(TERRAFORM) output -raw africa_resource_group_name) \
+		--name $$($(TERRAFORM) output -raw africa_aks_cluster_name) \
+		--context africa-prod --overwrite-existing
+	@echo "$(GREEN)Africa kubeconfig updated$(NC)"
+
+health-check: ## Check health of all deployed resources
+	@echo "$(GREEN)Checking health of all regions...$(NC)"
+	@echo "\n$(YELLOW)Americas Region:$(NC)"
+	@az aks show \
+		--resource-group $$($(TERRAFORM) output -raw americas_resource_group_name) \
+		--name $$($(TERRAFORM) output -raw americas_aks_cluster_name) \
+		--query "provisioningState" -o tsv || echo "Not deployed"
+	@echo "\n$(YELLOW)Europe Region:$(NC)"
+	@az aks show \
+		--resource-group $$($(TERRAFORM) output -raw europe_resource_group_name) \
+		--name $$($(TERRAFORM) output -raw europe_aks_cluster_name) \
+		--query "provisioningState" -o tsv || echo "Not deployed"
+	@echo "\n$(YELLOW)Africa Region:$(NC)"
+	@az aks show \
+		--resource-group $$($(TERRAFORM) output -raw africa_resource_group_name) \
+		--name $$($(TERRAFORM) output -raw africa_aks_cluster_name) \
+		--query "provisioningState" -o tsv || echo "Not deployed"
+
+cost-estimate: ## Estimate monthly costs
+	@echo "$(GREEN)Monthly Cost Estimate:$(NC)"
+	@echo "$(YELLOW)Per Region (approximate):$(NC)"
+	@echo "  AKS Cluster:           $$500-1000"
+	@echo "  PostgreSQL:            $$400-800"
+	@echo "  Redis Premium:         $$300-500"
+	@echo "  Storage:               $$50-100"
+	@echo "  Networking:            $$100-200"
+	@echo "  $(GREEN)Total per region:    ~$$1,500-3,000/month$(NC)"
+	@echo ""
+	@echo "$(YELLOW)Global Resources:$(NC)"
+	@echo "  Front Door Premium:    $$300-500"
+	@echo "  ACR Premium:           $$200-300"
+	@echo "  $(GREEN)Total global:        ~$$500-800/month$(NC)"
+	@echo ""
+	@echo "$(GREEN)3 Regions Total:       ~$$5,000-10,000/month$(NC)"
+
+refresh: ## Refresh Terraform state
+	@echo "$(GREEN)Refreshing Terraform state...$(NC)"
+	$(TERRAFORM) refresh
+	@echo "$(GREEN)State refreshed$(NC)"
+
+graph: ## Generate dependency graph
+	@echo "$(GREEN)Generating dependency graph...$(NC)"
+	$(TERRAFORM) graph | dot -Tpng > multiregion-graph.png
+	@echo "$(GREEN)Graph saved to multiregion-graph.png$(NC)"
+
+clean: ## Clean temporary files
+	@echo "$(GREEN)Cleaning temporary files...$(NC)"
+	rm -f $(TF_PLAN)
+	rm -f multiregion-graph.png
+	@echo "$(GREEN)Cleanup complete$(NC)"
+
+state-list: ## List all resources in Terraform state
+	$(TERRAFORM) state list
+
+state-show: ## Show details of a specific resource (usage: make state-show RESOURCE=resource_address)
+	$(TERRAFORM) state show $(RESOURCE)
+
+import-check: ## Check if resources need to be imported
+	@echo "$(GREEN)Checking for resources that need import...$(NC)"
+	@echo "Run: terraform import <resource_type>.<name> <azure_resource_id>"
+
+providers: ## Show provider requirements
+	$(TERRAFORM) providers
+
+version: ## Show Terraform version
+	$(TERRAFORM) version
+
+upgrade: ## Upgrade providers to latest versions
+	@echo "$(GREEN)Upgrading providers...$(NC)"
+	$(TERRAFORM) init -upgrade
+	@echo "$(GREEN)Providers upgraded$(NC)"
+
+docs: ## Open deployment documentation
+	@echo "$(GREEN)Opening deployment guide...$(NC)"
+	@cat MULTIREGION_DEPLOYMENT_GUIDE.md | less
+
+# Advanced operations
+lock-state: ## Lock Terraform state
+	$(TERRAFORM) force-unlock $(LOCK_ID)
+
+console: ## Open Terraform console for testing expressions
+	$(TERRAFORM) console
+
+test: ## Run basic tests on configuration
+	@echo "$(GREEN)Running configuration tests...$(NC)"
+	$(TERRAFORM) validate
+	$(TERRAFORM) fmt -check -recursive
+	@echo "$(GREEN)Tests passed$(NC)"
+
+# Compliance checks
+compliance-check: ## Check compliance tags on resources
+	@echo "$(GREEN)Checking compliance tags...$(NC)"
+	@echo "This will show resources with their compliance standards"
+	@az resource list --query "[?tags.ComplianceStandards].{Name:name, Compliance:tags.ComplianceStandards}" -o table
+
+# Monitoring
+logs: ## View recent deployment logs
+	@echo "$(GREEN)Recent Terraform logs:$(NC)"
+	@tail -n 50 terraform.log || echo "No log file found"
+
+# Quick deployment presets
+deploy-global-only: ## Deploy only global resources
+	@echo "$(GREEN)Deploying global resources only...$(NC)"
+	$(TERRAFORM) apply -target=azurerm_resource_group.global \
+		-target=azurerm_container_registry.global \
+		-target=azurerm_key_vault.global \
+		-target=azurerm_log_analytics_workspace.global \
+		-target=azurerm_cdn_frontdoor_profile.global
+
+deploy-minimal: ## Deploy with minimal configuration (1 region)
+	@echo "$(GREEN)Deploying minimal configuration (Americas only)...$(NC)"
+	$(MAKE) plan-americas
+	$(MAKE) apply
+
+deploy-full: ## Deploy full multi-region setup
+	@echo "$(GREEN)Deploying full multi-region setup...$(NC)"
+	$(MAKE) plan
+	$(MAKE) apply
+
+.PHONY: all
+all: init validate plan ## Run init, validate, and plan

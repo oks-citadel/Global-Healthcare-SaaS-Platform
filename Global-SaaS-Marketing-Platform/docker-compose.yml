@@ -1,0 +1,231 @@
+################################################################################
+# Docker Compose - Local Development Environment
+# Global SaaS Marketing Platform
+################################################################################
+
+services:
+  # ============================================================================
+  # Database Services
+  # ============================================================================
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: marketing-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: marketing
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - marketing-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: marketing-redis
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - marketing-network
+
+  opensearch:
+    image: opensearchproject/opensearch:2.11.0
+    container_name: marketing-opensearch
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+      - DISABLE_SECURITY_PLUGIN=true
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    ports:
+      - "9200:9200"
+      - "9600:9600"
+    volumes:
+      - opensearch_data:/usr/share/opensearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:9200 >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - marketing-network
+
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:2.11.0
+    container_name: marketing-opensearch-dashboards
+    environment:
+      - OPENSEARCH_HOSTS=["http://opensearch:9200"]
+      - DISABLE_SECURITY_DASHBOARDS_PLUGIN=true
+    ports:
+      - "5601:5601"
+    depends_on:
+      opensearch:
+        condition: service_healthy
+    networks:
+      - marketing-network
+
+  # ============================================================================
+  # Object Storage (S3 Compatible)
+  # ============================================================================
+
+  minio:
+    image: minio/minio:latest
+    container_name: marketing-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio123
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    networks:
+      - marketing-network
+
+  # ============================================================================
+  # Message Queue (LocalStack for AWS Services)
+  # ============================================================================
+
+  localstack:
+    image: localstack/localstack:latest
+    container_name: marketing-localstack
+    environment:
+      - SERVICES=sqs,sns,ses,events,kinesis,firehose
+      - DEBUG=0
+      - DATA_DIR=/tmp/localstack/data
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - AWS_DEFAULT_REGION=us-east-1
+    ports:
+      - "4566:4566"
+      - "4510-4559:4510-4559"
+    volumes:
+      - localstack_data:/tmp/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - marketing-network
+
+  # ============================================================================
+  # Monitoring & Observability
+  # ============================================================================
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: marketing-prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    networks:
+      - marketing-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: marketing-grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./config/grafana/provisioning:/etc/grafana/provisioning:ro
+    depends_on:
+      - prometheus
+    networks:
+      - marketing-network
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: marketing-jaeger
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    ports:
+      - "16686:16686"   # Jaeger UI
+      - "4317:4317"     # OTLP gRPC
+      - "4318:4318"     # OTLP HTTP
+      - "14268:14268"   # Jaeger thrift
+    networks:
+      - marketing-network
+
+  # ============================================================================
+  # Email Testing
+  # ============================================================================
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: marketing-mailhog
+    ports:
+      - "1025:1025"   # SMTP
+      - "8025:8025"   # Web UI
+    networks:
+      - marketing-network
+
+# ==============================================================================
+# Networks
+# ==============================================================================
+
+networks:
+  marketing-network:
+    driver: bridge
+    name: marketing-network
+
+# ==============================================================================
+# Volumes
+# ==============================================================================
+
+volumes:
+  postgres_data:
+    name: marketing-postgres-data
+  redis_data:
+    name: marketing-redis-data
+  opensearch_data:
+    name: marketing-opensearch-data
+  minio_data:
+    name: marketing-minio-data
+  localstack_data:
+    name: marketing-localstack-data
+  prometheus_data:
+    name: marketing-prometheus-data
+  grafana_data:
+    name: marketing-grafana-data

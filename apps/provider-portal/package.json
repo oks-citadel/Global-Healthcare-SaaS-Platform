@@ -1,0 +1,46 @@
+{
+  "name": "@unified-health/provider-portal",
+  "version": "1.0.0",
+  "description": "Healthcare Provider Portal for doctors, nurses, and specialists",
+  "private": true,
+  "scripts": {
+    "dev": "npx next dev -p 3002",
+    "build": "npx next build",
+    "start": "npx next start -p 3002",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx --ignore-pattern node_modules --ignore-pattern .next",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@unified-health/asset-branding": "workspace:*",
+    "next": "14.2.35",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "@tanstack/react-query": "^5.28.4",
+    "@tanstack/react-query-devtools": "^5.28.4",
+    "axios": "^1.6.8",
+    "clsx": "^2.1.0",
+    "date-fns": "^3.3.1",
+    "lucide-react": "^0.358.0",
+    "react-big-calendar": "^1.11.2",
+    "react-hook-form": "^7.51.0",
+    "zod": "^3.22.4",
+    "@hookform/resolvers": "^3.3.4",
+    "zustand": "^4.5.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "@types/node": "^20.11.30",
+    "@types/react": "^18.2.70",
+    "@types/react-dom": "^18.2.22",
+    "@types/react-big-calendar": "^1.8.9",
+    "autoprefixer": "^10.4.19",
+    "eslint": "^9.39.2",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5.3.3",
+    "typescript-eslint": "^8.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

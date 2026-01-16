@@ -1,0 +1,215 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Languages
+model Language {
+  id          String   @id @default(uuid())
+  code        String   @unique // ISO 639-1 code (en, es, fr)
+  name        String
+  nativeName  String   @map("native_name")
+  direction   String   @default("ltr") // ltr or rtl
+  isActive    Boolean  @default(true) @map("is_active")
+  isDefault   Boolean  @default(false) @map("is_default")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  locales     Locale[]
+  strings     LocalizedString[]
+
+  @@index([isActive])
+  @@map("languages")
+}
+
+// Locales (language + region)
+model Locale {
+  id              String   @id @default(uuid())
+  code            String   @unique // BCP 47 code (en-US, es-MX)
+  languageCode    String   @map("language_code")
+  region          String?  // Country/region code
+  name            String
+  dateFormat      String   @map("date_format")
+  timeFormat      String   @map("time_format")
+  numberFormat    Json     @map("number_format")
+  currencyCode    String   @map("currency_code")
+  timezone        String
+  isActive        Boolean  @default(true) @map("is_active")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  language        Language @relation(fields: [languageCode], references: [code])
+  pricing         LocalizedPricing[]
+  content         LocalizedContent[]
+
+  @@index([languageCode])
+  @@index([isActive])
+  @@map("locales")
+}
+
+// Localized Strings
+model LocalizedString {
+  id            String   @id @default(uuid())
+  tenantId      String?  @map("tenant_id") // null for global strings
+  key           String
+  languageCode  String   @map("language_code")
+  value         String   @db.Text
+  namespace     String   @default("common") // common, marketing, product, legal
+  context       String?  // Additional context for translators
+  isApproved    Boolean  @default(false) @map("is_approved")
+  approvedBy    String?  @map("approved_by")
+  approvedAt    DateTime? @map("approved_at")
+  metadata      Json     @default("{}")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  language      Language @relation(fields: [languageCode], references: [code])
+
+  @@unique([tenantId, key, languageCode])
+  @@index([tenantId, namespace, languageCode])
+  @@index([key])
+  @@map("localized_strings")
+}
+
+// Translation Requests
+model TranslationRequest {
+  id              String    @id @default(uuid())
+  tenantId        String    @map("tenant_id")
+  sourceLanguage  String    @map("source_language")
+  targetLanguages String[]  @map("target_languages")
+  contentType     String    @map("content_type") // string, document, bulk
+  content         Json
+  status          String    @default("pending") // pending, in_progress, completed, failed
+  priority        String    @default("normal") // low, normal, high, urgent
+  requestedBy     String    @map("requested_by")
+  assignedTo      String?   @map("assigned_to")
+  completedAt     DateTime? @map("completed_at")
+  result          Json?
+  metadata        Json      @default("{}")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@index([tenantId, status])
+  @@index([status, priority])
+  @@map("translation_requests")
+}
+
+// Localized Pricing
+model LocalizedPricing {
+  id              String   @id @default(uuid())
+  tenantId        String   @map("tenant_id")
+  localeCode      String   @map("locale_code")
+  productId       String   @map("product_id")
+  planId          String?  @map("plan_id")
+  basePrice       Float    @map("base_price")
+  localPrice      Float    @map("local_price")
+  currencyCode    String   @map("currency_code")
+  exchangeRate    Float    @map("exchange_rate")
+  adjustmentType  String?  @map("adjustment_type") // percentage, fixed
+  adjustmentValue Float?   @map("adjustment_value")
+  taxRate         Float?   @map("tax_rate")
+  taxInclusive    Boolean  @default(false) @map("tax_inclusive")
+  validFrom       DateTime @map("valid_from")
+  validTo         DateTime? @map("valid_to")
+  isActive        Boolean  @default(true) @map("is_active")
+  metadata        Json     @default("{}")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  locale          Locale   @relation(fields: [localeCode], references: [code])
+
+  @@unique([tenantId, localeCode, productId, planId, validFrom])
+  @@index([tenantId, localeCode, isActive])
+  @@index([productId])
+  @@map("localized_pricing")
+}
+
+// Currency
+model Currency {
+  id            String   @id @default(uuid())
+  code          String   @unique // ISO 4217 code (USD, EUR)
+  name          String
+  symbol        String
+  symbolPosition String  @map("symbol_position") // before, after
+  decimalPlaces Int      @map("decimal_places")
+  decimalSeparator String @map("decimal_separator")
+  thousandsSeparator String @map("thousands_separator")
+  exchangeRate  Float    @map("exchange_rate") // Relative to USD
+  isActive      Boolean  @default(true) @map("is_active")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@index([isActive])
+  @@map("currencies")
+}
+
+// Geo Content (region-specific content)
+model LocalizedContent {
+  id            String   @id @default(uuid())
+  tenantId      String   @map("tenant_id")
+  localeCode    String   @map("locale_code")
+  contentType   String   @map("content_type") // page, component, banner, footer
+  contentKey    String   @map("content_key")
+  content       Json
+  isActive      Boolean  @default(true) @map("is_active")
+  validFrom     DateTime? @map("valid_from")
+  validTo       DateTime? @map("valid_to")
+  metadata      Json     @default("{}")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  locale        Locale   @relation(fields: [localeCode], references: [code])
+
+  @@unique([tenantId, localeCode, contentType, contentKey])
+  @@index([tenantId, localeCode, contentType])
+  @@map("localized_content")
+}
+
+// Compliance Messages (GDPR, CCPA, etc.)
+model ComplianceMessage {
+  id            String   @id @default(uuid())
+  tenantId      String?  @map("tenant_id") // null for global messages
+  type          String   // cookie_banner, privacy_notice, terms_update, data_request
+  region        String   // GDPR, CCPA, LGPD, global
+  languageCode  String   @map("language_code")
+  title         String
+  content       String   @db.Text
+  actionText    String?  @map("action_text")
+  rejectText    String?  @map("reject_text")
+  learnMoreUrl  String?  @map("learn_more_url")
+  version       String
+  isActive      Boolean  @default(true) @map("is_active")
+  effectiveFrom DateTime @map("effective_from")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@unique([tenantId, type, region, languageCode, version])
+  @@index([tenantId, type, region])
+  @@index([isActive])
+  @@map("compliance_messages")
+}
+
+// Regional Analytics
+model RegionalAnalytics {
+  id            String   @id @default(uuid())
+  tenantId      String   @map("tenant_id")
+  date          DateTime @db.Date
+  region        String   // Country code
+  locale        String
+  visitors      Int      @default(0)
+  pageViews     Int      @default(0) @map("page_views")
+  sessions      Int      @default(0)
+  conversions   Int      @default(0)
+  revenue       Float    @default(0)
+  currencyCode  String   @map("currency_code")
+  metadata      Json     @default("{}")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@unique([tenantId, date, region, locale])
+  @@index([tenantId, date])
+  @@index([tenantId, region])
+  @@map("regional_analytics")
+}

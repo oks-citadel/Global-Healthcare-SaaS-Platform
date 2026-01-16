@@ -1,0 +1,548 @@
+// Lifecycle Service Prisma Schema
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==================== LISTS ====================
+
+model List {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  type        ListType @default(STATIC)
+  status      ListStatus @default(ACTIVE)
+
+  // Settings
+  doubleOptIn     Boolean @default(false)
+  welcomeEmailId  String?
+
+  // Stats
+  subscriberCount Int     @default(0)
+  unsubscribeCount Int    @default(0)
+  bounceCount     Int     @default(0)
+  complaintCount  Int     @default(0)
+
+  // Metadata
+  tags        String[]
+  metadata    Json?
+
+  // Relations
+  subscribers ListSubscriber[]
+
+  // Audit
+  createdBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+
+  @@map("lists")
+  @@index([status])
+  @@index([createdAt])
+}
+
+enum ListType {
+  STATIC
+  DYNAMIC
+  SUPPRESSION
+}
+
+enum ListStatus {
+  ACTIVE
+  ARCHIVED
+  PAUSED
+}
+
+model ListSubscriber {
+  id          String   @id @default(uuid())
+  listId      String
+  list        List     @relation(fields: [listId], references: [id], onDelete: Cascade)
+
+  email       String
+  firstName   String?
+  lastName    String?
+  phone       String?
+
+  status      SubscriberStatus @default(PENDING)
+  source      String?
+  sourceId    String?
+
+  // Custom fields
+  customFields Json?
+
+  // Tracking
+  confirmedAt     DateTime?
+  unsubscribedAt  DateTime?
+  bounceType      String?
+  bouncedAt       DateTime?
+
+  metadata    Json?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([listId, email])
+  @@map("list_subscribers")
+  @@index([email])
+  @@index([status])
+}
+
+enum SubscriberStatus {
+  PENDING
+  ACTIVE
+  UNSUBSCRIBED
+  BOUNCED
+  COMPLAINED
+  CLEANED
+}
+
+// ==================== SEGMENTS ====================
+
+model Segment {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  status      SegmentStatus @default(ACTIVE)
+
+  // Segment definition
+  conditions  Json     // Array of conditions with AND/OR logic
+  queryType   QueryType @default(ALL_MATCH)
+
+  // Stats (cached)
+  memberCount Int      @default(0)
+  lastCalculatedAt DateTime?
+
+  // Relations
+  members     SegmentMember[]
+
+  // Audit
+  createdBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("segments")
+  @@index([status])
+}
+
+enum SegmentStatus {
+  ACTIVE
+  DRAFT
+  ARCHIVED
+}
+
+enum QueryType {
+  ALL_MATCH
+  ANY_MATCH
+  CUSTOM
+}
+
+model SegmentMember {
+  id          String   @id @default(uuid())
+  segmentId   String
+  segment     Segment  @relation(fields: [segmentId], references: [id], onDelete: Cascade)
+
+  email       String
+  userId      String?
+
+  addedAt     DateTime @default(now())
+  removedAt   DateTime?
+
+  @@unique([segmentId, email])
+  @@map("segment_members")
+  @@index([email])
+}
+
+// ==================== TRIGGERS ====================
+
+model Trigger {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  status      TriggerStatus @default(ACTIVE)
+
+  // Trigger configuration
+  type        TriggerType
+  eventName   String?
+  conditions  Json?
+  schedule    Json?      // For scheduled triggers
+
+  // Actions
+  actions     TriggerAction[]
+
+  // Stats
+  totalFired  Int      @default(0)
+  lastFiredAt DateTime?
+
+  // Audit
+  createdBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("triggers")
+  @@index([status])
+  @@index([type])
+  @@index([eventName])
+}
+
+enum TriggerStatus {
+  ACTIVE
+  PAUSED
+  ARCHIVED
+}
+
+enum TriggerType {
+  EVENT
+  SCHEDULED
+  API
+  WEBHOOK
+}
+
+model TriggerAction {
+  id          String   @id @default(uuid())
+  triggerId   String
+  trigger     Trigger  @relation(fields: [triggerId], references: [id], onDelete: Cascade)
+
+  type        ActionType
+  config      Json
+
+  order       Int      @default(0)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("trigger_actions")
+}
+
+enum ActionType {
+  SEND_EMAIL
+  ADD_TO_LIST
+  REMOVE_FROM_LIST
+  UPDATE_CONTACT
+  START_FLOW
+  WEBHOOK
+  WAIT
+  CONDITION
+}
+
+// ==================== FLOWS ====================
+
+model Flow {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  status      FlowStatus @default(DRAFT)
+
+  // Entry
+  entryType   FlowEntryType
+  entryConfig Json?
+
+  // Exit
+  exitConfig  Json?
+
+  // Settings
+  allowReentry Boolean @default(false)
+  maxEntries  Int?
+
+  // Stats
+  totalEntered    Int  @default(0)
+  totalCompleted  Int  @default(0)
+  totalExited     Int  @default(0)
+  activeCount     Int  @default(0)
+
+  // Relations
+  steps       FlowStep[]
+  executions  FlowExecution[]
+
+  // Audit
+  publishedAt DateTime?
+  createdBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("flows")
+  @@index([status])
+}
+
+enum FlowStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  ARCHIVED
+}
+
+enum FlowEntryType {
+  TRIGGER
+  SEGMENT
+  LIST
+  API
+  MANUAL
+}
+
+model FlowStep {
+  id          String   @id @default(uuid())
+  flowId      String
+  flow        Flow     @relation(fields: [flowId], references: [id], onDelete: Cascade)
+
+  type        FlowStepType
+  name        String?
+  config      Json
+
+  // Position in flow
+  order       Int
+  parentId    String?   // For branching
+  branchKey   String?   // yes/no, condition match key
+
+  // Stats
+  totalReached    Int  @default(0)
+  totalCompleted  Int  @default(0)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("flow_steps")
+  @@index([flowId])
+}
+
+enum FlowStepType {
+  SEND_EMAIL
+  WAIT
+  CONDITION
+  SPLIT
+  UPDATE_CONTACT
+  ADD_TO_LIST
+  REMOVE_FROM_LIST
+  WEBHOOK
+  GOAL
+  EXIT
+}
+
+model FlowExecution {
+  id          String   @id @default(uuid())
+  flowId      String
+  flow        Flow     @relation(fields: [flowId], references: [id], onDelete: Cascade)
+
+  contactEmail String
+  contactId   String?
+
+  status      ExecutionStatus @default(ACTIVE)
+  currentStepId String?
+  currentStepOrder Int @default(0)
+
+  // Tracking
+  enteredAt   DateTime @default(now())
+  completedAt DateTime?
+  exitedAt    DateTime?
+  exitReason  String?
+
+  // Context data
+  context     Json?
+
+  updatedAt   DateTime @updatedAt
+
+  @@map("flow_executions")
+  @@index([flowId])
+  @@index([contactEmail])
+  @@index([status])
+}
+
+enum ExecutionStatus {
+  ACTIVE
+  WAITING
+  COMPLETED
+  EXITED
+  FAILED
+}
+
+// ==================== EVENTS ====================
+
+model Event {
+  id          String   @id @default(uuid())
+  name        String
+  contactEmail String?
+  contactId   String?
+
+  // Event data
+  properties  Json?
+  source      String?
+  sessionId   String?
+
+  // Tracking
+  ipAddress   String?
+  userAgent   String?
+  timestamp   DateTime @default(now())
+
+  createdAt   DateTime @default(now())
+
+  @@map("events")
+  @@index([name])
+  @@index([contactEmail])
+  @@index([timestamp])
+}
+
+// ==================== EMAIL TEMPLATES ====================
+
+model EmailTemplate {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  status      TemplateStatus @default(DRAFT)
+
+  // Content
+  subject     String
+  preheader   String?
+  htmlContent String
+  textContent String?
+  mjmlContent String?
+
+  // Settings
+  fromName    String?
+  fromEmail   String?
+  replyTo     String?
+
+  // Variables
+  variables   Json?   // Available template variables
+
+  // Stats
+  totalSent   Int     @default(0)
+  totalOpens  Int     @default(0)
+  totalClicks Int     @default(0)
+
+  // Audit
+  createdBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("email_templates")
+  @@index([status])
+}
+
+enum TemplateStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+// ==================== EMAIL SENDS ====================
+
+model EmailSend {
+  id          String   @id @default(uuid())
+  templateId  String?
+
+  // Recipients
+  toEmail     String
+  toName      String?
+  fromEmail   String
+  fromName    String?
+  replyTo     String?
+
+  // Content
+  subject     String
+  htmlContent String?
+  textContent String?
+
+  // Status
+  status      EmailSendStatus @default(QUEUED)
+  messageId   String?
+
+  // Tracking
+  sentAt      DateTime?
+  deliveredAt DateTime?
+  openedAt    DateTime?
+  clickedAt   DateTime?
+  bouncedAt   DateTime?
+  complainedAt DateTime?
+  unsubscribedAt DateTime?
+
+  // Bounce/complaint info
+  bounceType  String?
+  bounceSubType String?
+  complaintType String?
+
+  // Metadata
+  tags        String[]
+  metadata    Json?
+
+  // Source
+  source      String?    // flow, campaign, trigger, api
+  sourceId    String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("email_sends")
+  @@index([toEmail])
+  @@index([status])
+  @@index([sentAt])
+  @@index([messageId])
+}
+
+enum EmailSendStatus {
+  QUEUED
+  SENDING
+  SENT
+  DELIVERED
+  OPENED
+  CLICKED
+  BOUNCED
+  COMPLAINED
+  FAILED
+}
+
+// ==================== SUPPRESSION LIST ====================
+
+model SuppressionEntry {
+  id          String   @id @default(uuid())
+  email       String   @unique
+
+  type        SuppressionType
+  reason      String?
+  source      String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("suppression_list")
+  @@index([email])
+  @@index([type])
+}
+
+enum SuppressionType {
+  BOUNCE
+  COMPLAINT
+  UNSUBSCRIBE
+  MANUAL
+  INVALID
+}
+
+// ==================== DELIVERABILITY ====================
+
+model DeliverabilityMetric {
+  id          String   @id @default(uuid())
+  date        DateTime @db.Date
+
+  // Volume
+  totalSent       Int  @default(0)
+  totalDelivered  Int  @default(0)
+  totalBounced    Int  @default(0)
+  totalComplaints Int  @default(0)
+
+  // Rates
+  deliveryRate    Decimal? @db.Decimal(5, 4)
+  bounceRate      Decimal? @db.Decimal(5, 4)
+  complaintRate   Decimal? @db.Decimal(5, 4)
+  openRate        Decimal? @db.Decimal(5, 4)
+  clickRate       Decimal? @db.Decimal(5, 4)
+
+  // Domain breakdown
+  domainMetrics   Json?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([date])
+  @@map("deliverability_metrics")
+}

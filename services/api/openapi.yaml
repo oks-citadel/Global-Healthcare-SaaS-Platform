@@ -1,0 +1,2341 @@
+openapi: 3.0.3
+info:
+  title: The Unified Health Platform API
+  version: 1.0.0
+  description: |
+    Comprehensive API for The Unified Health Global Platform providing telemedicine,
+    patient management, appointments, clinical documentation, and billing services.
+
+    ## Authentication
+    Most endpoints require JWT Bearer token authentication. Obtain tokens via `/auth/login` or `/auth/register`.
+
+    ## Rate Limiting
+    API requests are rate-limited to 100 requests per minute per IP address.
+
+  contact:
+    name: API Support
+    email: support@theunifiedhealth.com
+  license:
+    name: Proprietary
+    url: https://theunifiedhealth.com/terms
+
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Local development server
+  - url: https://api-dev.unifiedhealthcare.com/api/v1
+    description: Development environment
+  - url: https://api-staging.unifiedhealthcare.com/api/v1
+    description: Staging environment
+  - url: https://api.unifiedhealthcare.com/api/v1
+    description: Production environment
+
+tags:
+  - name: Platform
+    description: System health and configuration endpoints
+  - name: Authentication
+    description: User authentication and authorization
+  - name: Users
+    description: User profile management
+  - name: Patients
+    description: Patient records and medical information
+  - name: Appointments
+    description: Appointment scheduling and management
+  - name: Encounters
+    description: Clinical encounters and documentation
+  - name: Documents
+    description: Medical document storage and retrieval
+  - name: Visits
+    description: Virtual visit sessions
+  - name: Plans
+    description: Subscription plans
+  - name: Subscriptions
+    description: User subscription management
+  - name: Billing
+    description: Payment and billing webhooks
+  - name: Audit
+    description: Audit logging and compliance
+  - name: Consent
+    description: Patient consent management
+
+security:
+  - BearerAuth: []
+
+paths:
+  # ==========================================
+  # Platform & System Endpoints
+  # ==========================================
+  /health:
+    get:
+      tags:
+        - Platform
+      summary: Health check
+      description: Simple health check endpoint for monitoring
+      operationId: getHealth
+      security: []
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: healthy
+                  timestamp:
+                    type: string
+                    format: date-time
+                  version:
+                    type: string
+                    example: 1.0.0
+
+  /ready:
+    get:
+      tags:
+        - Platform
+      summary: Readiness check
+      description: Checks if service is ready to accept traffic (including database connectivity)
+      operationId: getReadiness
+      security: []
+      responses:
+        '200':
+          description: Service is ready
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ready
+                  checks:
+                    type: object
+                    properties:
+                      database:
+                        type: object
+                        properties:
+                          connected:
+                            type: boolean
+                          latency:
+                            type: string
+                            example: "12ms"
+        '503':
+          description: Service not ready
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /version:
+    get:
+      tags:
+        - Platform
+      summary: Get API version
+      description: Returns version and build information
+      operationId: getVersion
+      security: []
+      responses:
+        '200':
+          description: Version information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  version:
+                    type: string
+                    example: 1.0.0
+                  build:
+                    type: string
+                    example: dev
+                  commit:
+                    type: string
+                    example: abc123
+                  environment:
+                    type: string
+                    example: development
+
+  /config/public:
+    get:
+      tags:
+        - Platform
+      summary: Get public configuration
+      description: Returns public configuration for client applications
+      operationId: getPublicConfig
+      security: []
+      responses:
+        '200':
+          description: Public configuration
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  features:
+                    type: object
+                    properties:
+                      telemedicine:
+                        type: boolean
+                      appointments:
+                        type: boolean
+                      billing:
+                        type: boolean
+                      chat:
+                        type: boolean
+                      videoCall:
+                        type: boolean
+                      mfa:
+                        type: boolean
+                      aiTriage:
+                        type: boolean
+                  supportedRegions:
+                    type: array
+                    items:
+                      type: string
+                    example: ["us", "uk", "ng"]
+                  supportedCurrencies:
+                    type: array
+                    items:
+                      type: string
+                    example: ["USD", "GBP", "NGN"]
+                  minAppVersion:
+                    type: object
+                    properties:
+                      ios:
+                        type: string
+                      android:
+                        type: string
+                  maintenance:
+                    type: object
+                    properties:
+                      scheduled:
+                        type: boolean
+                      message:
+                        type: string
+                        nullable: true
+
+  # ==========================================
+  # Authentication Endpoints
+  # ==========================================
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register new user
+      description: Create a new user account
+      operationId: register
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: User already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Login user
+      description: Authenticate user and receive JWT tokens
+      operationId: login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh access token
+      description: Get a new access token using refresh token
+      operationId: refreshToken
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - refreshToken
+              properties:
+                refreshToken:
+                  type: string
+                  description: Valid refresh token
+      responses:
+        '200':
+          description: Token refreshed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Invalid or expired refresh token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Logout user
+      description: Invalidate user tokens
+      operationId: logout
+      responses:
+        '200':
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Logged out successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /auth/me:
+    get:
+      tags:
+        - Authentication
+      summary: Get current user
+      description: Get authenticated user information
+      operationId: getCurrentUser
+      responses:
+        '200':
+          description: Current user information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /roles:
+    get:
+      tags:
+        - Authentication
+      summary: List available roles
+      description: Get list of all system roles (admin only)
+      operationId: getRoles
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: List of roles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      format: uuid
+                    name:
+                      type: string
+                      example: provider
+                    description:
+                      type: string
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  # ==========================================
+  # User Endpoints
+  # ==========================================
+  /users/{id}:
+    get:
+      tags:
+        - Users
+      summary: Get user by ID
+      description: Retrieve user profile information
+      operationId: getUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+    patch:
+      tags:
+        - Users
+      summary: Update user profile
+      description: Update user information
+      operationId: updateUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+      responses:
+        '200':
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  # ==========================================
+  # Patient Endpoints
+  # ==========================================
+  /patients:
+    post:
+      tags:
+        - Patients
+      summary: Create patient record
+      description: Create a new patient medical record
+      operationId: createPatient
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePatientRequest'
+      responses:
+        '201':
+          description: Patient created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /patients/{id}:
+    get:
+      tags:
+        - Patients
+      summary: Get patient by ID
+      description: Retrieve patient medical record
+      operationId: getPatient
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Patient found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+    patch:
+      tags:
+        - Patients
+      summary: Update patient record
+      description: Update patient medical information
+      operationId: updatePatient
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePatientRequest'
+      responses:
+        '200':
+          description: Patient updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /patients/{patientId}/documents:
+    get:
+      tags:
+        - Patients
+      summary: Get patient documents
+      description: Retrieve all documents for a specific patient
+      operationId: getPatientDocuments
+      parameters:
+        - name: patientId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of patient documents
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DocumentResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  # ==========================================
+  # Encounter Endpoints
+  # ==========================================
+  /encounters:
+    post:
+      tags:
+        - Encounters
+      summary: Create clinical encounter
+      description: Create a new clinical encounter (provider/admin only)
+      operationId: createEncounter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEncounterRequest'
+      responses:
+        '201':
+          description: Encounter created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EncounterResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+    get:
+      tags:
+        - Encounters
+      summary: List encounters
+      description: List encounters with optional filtering
+      operationId: listEncounters
+      parameters:
+        - name: patientId
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Filter by patient ID
+        - name: providerId
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Filter by provider ID
+      responses:
+        '200':
+          description: List of encounters
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EncounterResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /encounters/{id}:
+    get:
+      tags:
+        - Encounters
+      summary: Get encounter by ID
+      description: Retrieve specific encounter details
+      operationId: getEncounter
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Encounter found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EncounterResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+    patch:
+      tags:
+        - Encounters
+      summary: Update encounter
+      description: Update encounter status (provider/admin only)
+      operationId: updateEncounter
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEncounterRequest'
+      responses:
+        '200':
+          description: Encounter updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EncounterResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /encounters/{id}/notes:
+    post:
+      tags:
+        - Encounters
+      summary: Add clinical note
+      description: Add a clinical note to an encounter (provider/admin only)
+      operationId: addClinicalNote
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddClinicalNoteRequest'
+      responses:
+        '201':
+          description: Note added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClinicalNoteResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+    get:
+      tags:
+        - Encounters
+      summary: Get clinical notes
+      description: Retrieve all clinical notes for an encounter
+      operationId: getClinicalNotes
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of clinical notes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ClinicalNoteResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /encounters/{id}/start:
+    post:
+      tags:
+        - Encounters
+      summary: Start encounter
+      description: Mark encounter as started (provider/admin only)
+      operationId: startEncounter
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Encounter started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EncounterResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /encounters/{id}/end:
+    post:
+      tags:
+        - Encounters
+      summary: End encounter
+      description: Mark encounter as finished (provider/admin only)
+      operationId: endEncounter
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Encounter ended
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EncounterResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  # ==========================================
+  # Document Endpoints
+  # ==========================================
+  /documents:
+    post:
+      tags:
+        - Documents
+      summary: Upload document
+      description: Upload a new medical document (metadata)
+      operationId: uploadDocument
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UploadDocumentRequest'
+      responses:
+        '201':
+          description: Document uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  document:
+                    $ref: '#/components/schemas/DocumentResponse'
+                  uploadUrl:
+                    type: string
+                    format: uri
+                    description: Pre-signed URL for file upload
+                  uploadUrlExpiresAt:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+    get:
+      tags:
+        - Documents
+      summary: List documents
+      description: List documents with filtering and pagination
+      operationId: listDocuments
+      parameters:
+        - name: patientId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [lab_result, imaging, prescription, other]
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: List of documents
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentListResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /documents/{id}:
+    get:
+      tags:
+        - Documents
+      summary: Get document by ID
+      description: Retrieve document metadata
+      operationId: getDocument
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Document found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+    delete:
+      tags:
+        - Documents
+      summary: Delete document
+      description: Delete a document
+      operationId: deleteDocument
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Document deleted successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /documents/{id}/download:
+    get:
+      tags:
+        - Documents
+      summary: Get download URL
+      description: Get pre-signed URL for document download
+      operationId: getDocumentDownloadUrl
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Download URL generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  downloadUrl:
+                    type: string
+                    format: uri
+                  expiresAt:
+                    type: string
+                    format: date-time
+                  fileName:
+                    type: string
+                  mimeType:
+                    type: string
+                  size:
+                    type: integer
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  # ==========================================
+  # Appointment Endpoints
+  # ==========================================
+  /appointments:
+    post:
+      tags:
+        - Appointments
+      summary: Create appointment
+      description: Schedule a new appointment
+      operationId: createAppointment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAppointmentRequest'
+      responses:
+        '201':
+          description: Appointment created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppointmentResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+    get:
+      tags:
+        - Appointments
+      summary: List appointments
+      description: List appointments with filtering and pagination
+      operationId: listAppointments
+      parameters:
+        - name: patientId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: providerId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [scheduled, confirmed, in-progress, completed, cancelled, no-show]
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: List of appointments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAppointments'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /appointments/{id}:
+    get:
+      tags:
+        - Appointments
+      summary: Get appointment by ID
+      description: Retrieve specific appointment details
+      operationId: getAppointment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Appointment found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppointmentResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+    patch:
+      tags:
+        - Appointments
+      summary: Update appointment
+      description: Update appointment details
+      operationId: updateAppointment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAppointmentRequest'
+      responses:
+        '200':
+          description: Appointment updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppointmentResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+    delete:
+      tags:
+        - Appointments
+      summary: Cancel appointment
+      description: Cancel an appointment
+      operationId: cancelAppointment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Appointment cancelled successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  # ==========================================
+  # Visit Endpoints
+  # ==========================================
+  /visits/{id}/start:
+    post:
+      tags:
+        - Visits
+      summary: Start virtual visit
+      description: Start a virtual visit session
+      operationId: startVisit
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Appointment ID
+      responses:
+        '200':
+          description: Visit started successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  visitId:
+                    type: string
+                    format: uuid
+                  appointmentId:
+                    type: string
+                    format: uuid
+                  startedAt:
+                    type: string
+                    format: date-time
+                  sessionToken:
+                    type: string
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /visits/{id}/end:
+    post:
+      tags:
+        - Visits
+      summary: End virtual visit
+      description: End a virtual visit session
+      operationId: endVisit
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Visit ID
+      responses:
+        '200':
+          description: Visit ended successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  visitId:
+                    type: string
+                    format: uuid
+                  endedAt:
+                    type: string
+                    format: date-time
+                  duration:
+                    type: integer
+                    description: Duration in minutes
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /visits/{id}/chat:
+    post:
+      tags:
+        - Visits
+      summary: Send chat message
+      description: Send a chat message during visit
+      operationId: sendChatMessage
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Visit ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - message
+              properties:
+                message:
+                  type: string
+                  minLength: 1
+                  maxLength: 2000
+                attachments:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+      responses:
+        '201':
+          description: Message sent successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  visitId:
+                    type: string
+                    format: uuid
+                  senderId:
+                    type: string
+                    format: uuid
+                  message:
+                    type: string
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  # ==========================================
+  # Plan Endpoints
+  # ==========================================
+  /plans:
+    get:
+      tags:
+        - Plans
+      summary: List subscription plans
+      description: Get all available subscription plans
+      operationId: listPlans
+      security: []
+      parameters:
+        - name: region
+          in: query
+          schema:
+            type: string
+            example: us
+        - name: currency
+          in: query
+          schema:
+            type: string
+            default: USD
+            example: USD
+      responses:
+        '200':
+          description: List of plans
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PlanResponse'
+
+  # ==========================================
+  # Subscription Endpoints
+  # ==========================================
+  /subscriptions:
+    post:
+      tags:
+        - Subscriptions
+      summary: Create subscription
+      description: Create a new subscription
+      operationId: createSubscription
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - planId
+                - paymentMethodId
+              properties:
+                planId:
+                  type: string
+                  format: uuid
+                paymentMethodId:
+                  type: string
+                couponCode:
+                  type: string
+      responses:
+        '201':
+          description: Subscription created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /subscriptions/{id}:
+    delete:
+      tags:
+        - Subscriptions
+      summary: Cancel subscription
+      description: Cancel an active subscription
+      operationId: cancelSubscription
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Subscription cancelled successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  # ==========================================
+  # Billing Endpoints
+  # ==========================================
+  /billing/webhook:
+    post:
+      tags:
+        - Billing
+      summary: Stripe webhook
+      description: Handle Stripe webhook events
+      operationId: handleBillingWebhook
+      security: []
+      parameters:
+        - name: stripe-signature
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Stripe webhook event payload
+      responses:
+        '200':
+          description: Webhook processed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  received:
+                    type: boolean
+                    example: true
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+
+  # ==========================================
+  # Audit Endpoints
+  # ==========================================
+  /audit/events:
+    get:
+      tags:
+        - Audit
+      summary: List audit events
+      description: List audit log events (admin only)
+      operationId: listAuditEvents
+      parameters:
+        - name: userId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: action
+          in: query
+          schema:
+            type: string
+        - name: resource
+          in: query
+          schema:
+            type: string
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+      responses:
+        '200':
+          description: List of audit events
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AuditEventResponse'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  # ==========================================
+  # Consent Endpoints
+  # ==========================================
+  /consents:
+    post:
+      tags:
+        - Consent
+      summary: Create consent record
+      description: Record patient consent
+      operationId: createConsent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateConsentRequest'
+      responses:
+        '201':
+          description: Consent recorded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsentResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /consents/{id}:
+    get:
+      tags:
+        - Consent
+      summary: Get consent record
+      description: Retrieve consent record by ID
+      operationId: getConsent
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Consent record found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsentResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token obtained from /auth/login or /auth/register
+
+  schemas:
+    # ==========================================
+    # Authentication Schemas
+    # ==========================================
+    RegisterRequest:
+      type: object
+      required:
+        - email
+        - password
+        - firstName
+        - lastName
+      properties:
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        password:
+          type: string
+          format: password
+          minLength: 12
+          example: StrongPassword123!
+        firstName:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: John
+        lastName:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: Doe
+        phone:
+          type: string
+          example: "+1234567890"
+        dateOfBirth:
+          type: string
+          format: date
+          example: "1990-01-01"
+        role:
+          type: string
+          enum: [patient, provider, admin]
+          default: patient
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        password:
+          type: string
+          format: password
+          example: StrongPassword123!
+
+    AuthResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          description: JWT access token
+        refreshToken:
+          type: string
+          description: JWT refresh token
+        expiresIn:
+          type: integer
+          description: Token expiration time in seconds
+          example: 3600
+        tokenType:
+          type: string
+          example: Bearer
+        user:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            email:
+              type: string
+              format: email
+            firstName:
+              type: string
+            lastName:
+              type: string
+            role:
+              type: string
+
+    # ==========================================
+    # User Schemas
+    # ==========================================
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        firstName:
+          type: string
+        lastName:
+          type: string
+        phone:
+          type: string
+        role:
+          type: string
+          enum: [patient, provider, admin]
+        status:
+          type: string
+          enum: [active, inactive, suspended]
+        emailVerified:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    UpdateUserRequest:
+      type: object
+      properties:
+        firstName:
+          type: string
+          minLength: 1
+          maxLength: 100
+        lastName:
+          type: string
+          minLength: 1
+          maxLength: 100
+        phone:
+          type: string
+        address:
+          type: object
+          properties:
+            street:
+              type: string
+            city:
+              type: string
+            state:
+              type: string
+            postalCode:
+              type: string
+            country:
+              type: string
+        preferences:
+          type: object
+          additionalProperties: true
+
+    # ==========================================
+    # Patient Schemas
+    # ==========================================
+    CreatePatientRequest:
+      type: object
+      required:
+        - userId
+        - dateOfBirth
+        - gender
+      properties:
+        userId:
+          type: string
+          format: uuid
+        dateOfBirth:
+          type: string
+          format: date
+          example: "1990-01-01"
+        gender:
+          type: string
+          enum: [male, female, other, prefer-not-to-say]
+        bloodType:
+          type: string
+          example: "O+"
+        allergies:
+          type: array
+          items:
+            type: string
+          example: ["Penicillin", "Peanuts"]
+        emergencyContact:
+          type: object
+          properties:
+            name:
+              type: string
+            relationship:
+              type: string
+            phone:
+              type: string
+
+    UpdatePatientRequest:
+      type: object
+      properties:
+        dateOfBirth:
+          type: string
+          format: date
+        gender:
+          type: string
+          enum: [male, female, other, prefer-not-to-say]
+        bloodType:
+          type: string
+        allergies:
+          type: array
+          items:
+            type: string
+        emergencyContact:
+          type: object
+          properties:
+            name:
+              type: string
+            relationship:
+              type: string
+            phone:
+              type: string
+
+    PatientResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        medicalRecordNumber:
+          type: string
+          example: "MRN-123456"
+        dateOfBirth:
+          type: string
+          format: date
+        gender:
+          type: string
+        bloodType:
+          type: string
+        allergies:
+          type: array
+          items:
+            type: string
+        emergencyContact:
+          type: object
+          properties:
+            name:
+              type: string
+            relationship:
+              type: string
+            phone:
+              type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    # ==========================================
+    # Appointment Schemas
+    # ==========================================
+    CreateAppointmentRequest:
+      type: object
+      required:
+        - patientId
+        - providerId
+        - scheduledAt
+        - type
+        - duration
+      properties:
+        patientId:
+          type: string
+          format: uuid
+        providerId:
+          type: string
+          format: uuid
+        scheduledAt:
+          type: string
+          format: date-time
+        type:
+          type: string
+          enum: [video, audio, chat, in-person]
+        duration:
+          type: integer
+          enum: [15, 30, 45, 60]
+          description: Duration in minutes
+        reasonForVisit:
+          type: string
+        notes:
+          type: string
+
+    UpdateAppointmentRequest:
+      type: object
+      properties:
+        scheduledAt:
+          type: string
+          format: date-time
+        type:
+          type: string
+          enum: [video, audio, chat, in-person]
+        duration:
+          type: integer
+          enum: [15, 30, 45, 60]
+        status:
+          type: string
+          enum: [scheduled, confirmed, in-progress, completed, cancelled, no-show]
+        reasonForVisit:
+          type: string
+        notes:
+          type: string
+
+    AppointmentResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        patientId:
+          type: string
+          format: uuid
+        providerId:
+          type: string
+          format: uuid
+        scheduledAt:
+          type: string
+          format: date-time
+        duration:
+          type: integer
+        type:
+          type: string
+        status:
+          type: string
+        reasonForVisit:
+          type: string
+        notes:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    PaginatedAppointments:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AppointmentResponse'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    # ==========================================
+    # Encounter Schemas
+    # ==========================================
+    CreateEncounterRequest:
+      type: object
+      required:
+        - patientId
+        - providerId
+        - type
+      properties:
+        patientId:
+          type: string
+          format: uuid
+        providerId:
+          type: string
+          format: uuid
+        appointmentId:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [virtual, in_person, phone]
+        reasonForVisit:
+          type: string
+          minLength: 1
+          maxLength: 1000
+
+    UpdateEncounterRequest:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [planned, in_progress, finished, cancelled]
+        startedAt:
+          type: string
+          format: date-time
+        endedAt:
+          type: string
+          format: date-time
+
+    AddClinicalNoteRequest:
+      type: object
+      required:
+        - noteType
+        - content
+      properties:
+        noteType:
+          type: string
+          enum: [progress, assessment, plan, chief_complaint, history, physical_exam, diagnosis, other]
+        content:
+          type: string
+          minLength: 1
+          maxLength: 50000
+
+    EncounterResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        patientId:
+          type: string
+          format: uuid
+        providerId:
+          type: string
+          format: uuid
+        appointmentId:
+          type: string
+          format: uuid
+          nullable: true
+        type:
+          type: string
+          enum: [virtual, in_person, phone]
+        status:
+          type: string
+          enum: [planned, in_progress, finished, cancelled]
+        startedAt:
+          type: string
+          format: date-time
+          nullable: true
+        endedAt:
+          type: string
+          format: date-time
+          nullable: true
+        notes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClinicalNoteResponse'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ClinicalNoteResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        authorId:
+          type: string
+          format: uuid
+        noteType:
+          type: string
+        content:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    # ==========================================
+    # Document Schemas
+    # ==========================================
+    UploadDocumentRequest:
+      type: object
+      required:
+        - patientId
+        - type
+        - fileName
+        - mimeType
+      properties:
+        patientId:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [lab_result, imaging, prescription, other]
+        fileName:
+          type: string
+          minLength: 1
+          maxLength: 255
+        mimeType:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: "application/pdf"
+        description:
+          type: string
+          maxLength: 1000
+
+    DocumentResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        patientId:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [lab_result, imaging, prescription, other]
+        fileName:
+          type: string
+        fileUrl:
+          type: string
+          format: uri
+        mimeType:
+          type: string
+        size:
+          type: integer
+        description:
+          type: string
+          nullable: true
+        uploadedBy:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    DocumentListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/DocumentResponse'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    # ==========================================
+    # Plan & Subscription Schemas
+    # ==========================================
+    PlanResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: "Premium"
+        description:
+          type: string
+        price:
+          type: number
+          format: float
+          example: 29.99
+        currency:
+          type: string
+          example: "USD"
+        interval:
+          type: string
+          enum: [month, year]
+        features:
+          type: array
+          items:
+            type: string
+        active:
+          type: boolean
+
+    SubscriptionResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        planId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [active, cancelled, expired, past_due]
+        currentPeriodStart:
+          type: string
+          format: date-time
+        currentPeriodEnd:
+          type: string
+          format: date-time
+        cancelAtPeriodEnd:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    # ==========================================
+    # Audit & Consent Schemas
+    # ==========================================
+    AuditEventResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        action:
+          type: string
+          example: "CREATE"
+        resource:
+          type: string
+          example: "Patient"
+        resourceId:
+          type: string
+          format: uuid
+        ipAddress:
+          type: string
+        userAgent:
+          type: string
+        metadata:
+          type: object
+          additionalProperties: true
+        timestamp:
+          type: string
+          format: date-time
+
+    CreateConsentRequest:
+      type: object
+      required:
+        - patientId
+        - type
+        - granted
+      properties:
+        patientId:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [data-sharing, treatment, marketing, research]
+        granted:
+          type: boolean
+        scope:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+
+    ConsentResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        patientId:
+          type: string
+          format: uuid
+        type:
+          type: string
+        granted:
+          type: boolean
+        scope:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    # ==========================================
+    # Common Schemas
+    # ==========================================
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+          minimum: 1
+        limit:
+          type: integer
+          minimum: 1
+        total:
+          type: integer
+        totalPages:
+          type: integer
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Bad Request"
+        message:
+          type: string
+          example: "Invalid input data"
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+        timestamp:
+          type: string
+          format: date-time
+
+  # ==========================================
+  # Reusable Responses
+  # ==========================================
+  responses:
+    BadRequestError:
+      description: Bad request - Invalid input
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "Bad Request"
+            message: "Invalid input data"
+            timestamp: "2024-01-01T00:00:00Z"
+
+    UnauthorizedError:
+      description: Unauthorized - Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "Unauthorized"
+            message: "Authentication token is missing or invalid"
+            timestamp: "2024-01-01T00:00:00Z"
+
+    ForbiddenError:
+      description: Forbidden - Insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "Forbidden"
+            message: "You do not have permission to access this resource"
+            timestamp: "2024-01-01T00:00:00Z"
+
+    NotFoundError:
+      description: Not found - Resource does not exist
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "Not Found"
+            message: "The requested resource was not found"
+            timestamp: "2024-01-01T00:00:00Z"
+
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "Internal Server Error"
+            message: "An unexpected error occurred"
+            timestamp: "2024-01-01T00:00:00Z"

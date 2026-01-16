@@ -1,0 +1,398 @@
+openapi: 3.0.3
+info:
+  title: The Unified Health API Gateway
+  version: 1.0.0
+  description: |
+    The API Gateway service for The Unified Health Global Platform. This service acts as the
+    single entry point for all client requests, providing authentication, rate limiting,
+    request routing, and load balancing across backend microservices.
+
+    ## Overview
+    The API Gateway handles:
+    - **Authentication & Authorization**: JWT token validation and user context propagation
+    - **Request Routing**: Proxying requests to appropriate backend services
+    - **Rate Limiting**: Protecting backend services from abuse
+    - **Load Balancing**: Distributing traffic across service instances
+    - **Request/Response Transformation**: Header injection and path rewriting
+
+    ## Service Routing
+    All requests are authenticated and routed to the appropriate backend service:
+    - `/telehealth/*` -> Telehealth Service
+    - `/mental-health/*` -> Mental Health Service
+    - `/chronic-care/*` -> Chronic Care Service
+    - `/pharmacy/*` -> Pharmacy Service
+    - `/laboratory/*` -> Laboratory Service
+
+  contact:
+    name: API Support
+    email: support@theunifiedhealth.com
+  license:
+    name: Proprietary
+    url: https://theunifiedhealth.com/terms
+
+servers:
+  - url: http://localhost:8000
+    description: Local development server
+  - url: https://gateway-dev.unifiedhealthcare.com
+    description: Development environment
+  - url: https://gateway.unifiedhealthcare.com
+    description: Production environment
+
+tags:
+  - name: Health
+    description: Health check and monitoring endpoints
+  - name: Telehealth
+    description: Telehealth service proxy routes
+  - name: Mental Health
+    description: Mental health service proxy routes
+  - name: Chronic Care
+    description: Chronic care service proxy routes
+  - name: Pharmacy
+    description: Pharmacy service proxy routes
+  - name: Laboratory
+    description: Laboratory service proxy routes
+
+security:
+  - BearerAuth: []
+
+paths:
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Health check
+      description: Simple health check endpoint for monitoring and load balancer health probes
+      operationId: getHealth
+      security: []
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /ready:
+    get:
+      tags:
+        - Health
+      summary: Readiness check
+      description: |
+        Checks if the gateway is ready to accept traffic. This includes verification
+        of backend service connectivity and configuration validation.
+      operationId: getReadiness
+      security: []
+      responses:
+        '200':
+          description: Service is ready
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReadinessResponse'
+        '503':
+          description: Service not ready
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /telehealth/{path}:
+    get:
+      tags:
+        - Telehealth
+      summary: Proxy GET requests to Telehealth service
+      description: |
+        Proxies authenticated GET requests to the Telehealth service.
+        User context (ID, role, email) is forwarded via X-User-* headers.
+      operationId: proxyTelehealthGet
+      parameters:
+        - $ref: '#/components/parameters/PathParam'
+      responses:
+        '200':
+          description: Successful response from Telehealth service
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '502':
+          $ref: '#/components/responses/BadGatewayError'
+    post:
+      tags:
+        - Telehealth
+      summary: Proxy POST requests to Telehealth service
+      operationId: proxyTelehealthPost
+      parameters:
+        - $ref: '#/components/parameters/PathParam'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Successful response from Telehealth service
+        '201':
+          description: Resource created successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '502':
+          $ref: '#/components/responses/BadGatewayError'
+
+  /mental-health/{path}:
+    get:
+      tags:
+        - Mental Health
+      summary: Proxy GET requests to Mental Health service
+      description: |
+        Proxies authenticated GET requests to the Mental Health service.
+        Supports therapy sessions, assessments, and crisis support endpoints.
+      operationId: proxyMentalHealthGet
+      parameters:
+        - $ref: '#/components/parameters/PathParam'
+      responses:
+        '200':
+          description: Successful response from Mental Health service
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '502':
+          $ref: '#/components/responses/BadGatewayError'
+    post:
+      tags:
+        - Mental Health
+      summary: Proxy POST requests to Mental Health service
+      operationId: proxyMentalHealthPost
+      parameters:
+        - $ref: '#/components/parameters/PathParam'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Successful response from Mental Health service
+        '201':
+          description: Resource created successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '502':
+          $ref: '#/components/responses/BadGatewayError'
+
+  /chronic-care/{path}:
+    get:
+      tags:
+        - Chronic Care
+      summary: Proxy GET requests to Chronic Care service
+      description: |
+        Proxies authenticated GET requests to the Chronic Care service.
+        Supports remote patient monitoring, care plans, and device readings.
+      operationId: proxyChronicCareGet
+      parameters:
+        - $ref: '#/components/parameters/PathParam'
+      responses:
+        '200':
+          description: Successful response from Chronic Care service
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '502':
+          $ref: '#/components/responses/BadGatewayError'
+    post:
+      tags:
+        - Chronic Care
+      summary: Proxy POST requests to Chronic Care service
+      operationId: proxyChronicCarePost
+      parameters:
+        - $ref: '#/components/parameters/PathParam'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Successful response from Chronic Care service
+        '201':
+          description: Resource created successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '502':
+          $ref: '#/components/responses/BadGatewayError'
+
+  /pharmacy/{path}:
+    get:
+      tags:
+        - Pharmacy
+      summary: Proxy GET requests to Pharmacy service
+      description: |
+        Proxies authenticated GET requests to the Pharmacy service.
+        Supports prescriptions, medication management, and pharmacy locator.
+      operationId: proxyPharmacyGet
+      parameters:
+        - $ref: '#/components/parameters/PathParam'
+      responses:
+        '200':
+          description: Successful response from Pharmacy service
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '502':
+          $ref: '#/components/responses/BadGatewayError'
+    post:
+      tags:
+        - Pharmacy
+      summary: Proxy POST requests to Pharmacy service
+      operationId: proxyPharmacyPost
+      parameters:
+        - $ref: '#/components/parameters/PathParam'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Successful response from Pharmacy service
+        '201':
+          description: Resource created successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '502':
+          $ref: '#/components/responses/BadGatewayError'
+
+  /laboratory/{path}:
+    get:
+      tags:
+        - Laboratory
+      summary: Proxy GET requests to Laboratory service
+      description: |
+        Proxies authenticated GET requests to the Laboratory service.
+        Supports lab orders, test results, and diagnostic reports.
+      operationId: proxyLaboratoryGet
+      parameters:
+        - $ref: '#/components/parameters/PathParam'
+      responses:
+        '200':
+          description: Successful response from Laboratory service
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '502':
+          $ref: '#/components/responses/BadGatewayError'
+    post:
+      tags:
+        - Laboratory
+      summary: Proxy POST requests to Laboratory service
+      operationId: proxyLaboratoryPost
+      parameters:
+        - $ref: '#/components/parameters/PathParam'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Successful response from Laboratory service
+        '201':
+          description: Resource created successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '502':
+          $ref: '#/components/responses/BadGatewayError'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token obtained from the Auth Service
+
+  parameters:
+    PathParam:
+      name: path
+      in: path
+      required: true
+      description: The path to proxy to the backend service
+      schema:
+        type: string
+
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [healthy, unhealthy]
+          example: healthy
+        timestamp:
+          type: string
+          format: date-time
+        version:
+          type: string
+          example: "1.0.0"
+        service:
+          type: string
+          example: "api-gateway"
+
+    ReadinessResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [ready, not_ready]
+          example: ready
+        checks:
+          type: object
+          properties:
+            telehealth:
+              $ref: '#/components/schemas/ServiceCheck'
+            mentalHealth:
+              $ref: '#/components/schemas/ServiceCheck'
+            chronicCare:
+              $ref: '#/components/schemas/ServiceCheck'
+            pharmacy:
+              $ref: '#/components/schemas/ServiceCheck'
+            laboratory:
+              $ref: '#/components/schemas/ServiceCheck'
+
+    ServiceCheck:
+      type: object
+      properties:
+        available:
+          type: boolean
+        latency:
+          type: string
+          example: "12ms"
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Unauthorized"
+        message:
+          type: string
+          example: "Authentication token is missing or invalid"
+        timestamp:
+          type: string
+          format: date-time
+
+  responses:
+    UnauthorizedError:
+      description: Unauthorized - Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "Unauthorized"
+            message: "Authentication token is missing or invalid"
+            timestamp: "2025-12-31T00:00:00Z"
+
+    BadGatewayError:
+      description: Bad Gateway - Backend service unavailable
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "Bad Gateway"
+            message: "Unable to reach backend service"
+            timestamp: "2025-12-31T00:00:00Z"

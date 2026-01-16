@@ -1,0 +1,16 @@
+apiVersion: v2
+name: commerce-service
+description: Commerce Service - Promotions, coupons, pricing, and in-app messaging
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - commerce
+  - promotions
+  - coupons
+  - pricing
+  - in-app-messaging
+  - marketing
+maintainers:
+  - name: Platform Team
+    email: platform@example.com

@@ -1,0 +1,1 @@
+Hi {{patientName}}, your {{testName}} results are now available. Log in to {{appUrl}} to view them securely. - {{appName}}

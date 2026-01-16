@@ -1,0 +1,64 @@
+<div style="text-align: center; margin-bottom: 24px;">
+  <div style="display: inline-block; background-color: #f56565; color: #fff; width: 64px; height: 64px; border-radius: 50%; line-height: 64px; font-size: 28px; margin-bottom: 16px;">
+    !
+  </div>
+</div>
+
+<h1 style="text-align: center;">Security Alert</h1>
+
+<p>Hi {{name}},</p>
+
+<p>We detected {{alertType}} on your The Unified Health account. Here are the details:</p>
+
+<div class="info-box" style="background-color: #fff5f5; border-left-color: #f56565;">
+  <h3>Activity Details</h3>
+  <table style="width: 100%; border-collapse: collapse;">
+    <tr>
+      <td style="padding: 8px 0; color: #6b7280;"><strong>Date & Time:</strong></td>
+      <td style="padding: 8px 0;">{{timestamp}}</td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 0; color: #6b7280;"><strong>IP Address:</strong></td>
+      <td style="padding: 8px 0;">{{ipAddress}}</td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 0; color: #6b7280;"><strong>Location:</strong></td>
+      <td style="padding: 8px 0;">{{location}}</td>
+    </tr>
+  </table>
+</div>
+
+<h2>Was This You?</h2>
+
+<p>If you recognize this activity, no further action is needed. Your account is secure.</p>
+
+<p><strong>If this wasn't you</strong>, we recommend taking the following steps immediately:</p>
+
+<div class="info-box">
+  <ol style="margin: 0; padding-left: 20px; color: #4a5568; line-height: 1.8;">
+    <li>Change your password immediately</li>
+    <li>Enable two-factor authentication if not already enabled</li>
+    <li>Review your recent account activity</li>
+    <li>Sign out of all devices</li>
+    <li>Contact our support team if you need assistance</li>
+  </ol>
+</div>
+
+<div class="text-center" style="margin-top: 24px;">
+  <a href="{{appUrl}}/account/security" class="button" style="margin-right: 12px;">Review Security Settings</a>
+  <a href="{{appUrl}}/auth/reset-password" class="button" style="background-color: #f56565;">Change Password</a>
+</div>
+
+<div class="info-box" style="margin-top: 30px; background-color: #f0f9ff; border-left-color: #667eea;">
+  <h3 style="color: #667eea;">Why Am I Receiving This?</h3>
+  <p>We send security alerts for unusual account activity to help protect your account. These alerts are an important part of keeping your health information secure.</p>
+</div>
+
+<p>
+  Stay safe,<br>
+  <strong>The Unified Health Security Team</strong>
+</p>
+
+<p style="color: #6b7280; font-size: 12px;">
+  If you have any questions or concerns, please contact our support team at {{supportEmail}}.
+</p>

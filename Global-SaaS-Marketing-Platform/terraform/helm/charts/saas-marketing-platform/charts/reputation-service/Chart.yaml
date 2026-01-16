@@ -1,0 +1,16 @@
+apiVersion: v2
+name: reputation-service
+description: Reputation Service - Reviews, testimonials, NPS, and CSAT
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - reputation
+  - reviews
+  - testimonials
+  - nps
+  - csat
+  - marketing
+maintainers:
+  - name: Platform Team
+    email: platform@example.com

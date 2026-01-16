@@ -1,0 +1,30 @@
+FROM public.ecr.aws/docker/library/node:22-slim AS base
+RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+
+FROM base AS deps
+WORKDIR /app
+COPY package.json ./
+RUN npm install
+
+FROM base AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN npx prisma generate
+RUN npm run build
+
+FROM base AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+RUN groupadd --system --gid 1001 nodejs && useradd --system --uid 1001 imaging
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/src/generated ./dist/generated
+USER imaging
+EXPOSE 3006
+ENV PORT=3006
+HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3006/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
+CMD ["node", "dist/index.js"]

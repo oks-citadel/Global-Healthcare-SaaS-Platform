@@ -1,0 +1,100 @@
+{
+  "$schema": "https://vibecode.io/schemas/config.json",
+  "workspace": {
+    "name": "Unified Health",
+    "type": "healthcare-saas",
+    "compliance": ["HIPAA", "GDPR", "SOC2"]
+  },
+  "restrictions": {
+    "allowedOutputPaths": [
+      "apps/web/src/ui/**",
+      "apps/web/src/components/**",
+      "apps/mobile/app/screens/**",
+      "apps/mobile/src/components/**",
+      "packages/ui/src/**"
+    ],
+    "blockedPatterns": [
+      "**/*.env*",
+      "**/secrets/**",
+      "**/*.tf",
+      "**/*.tfvars",
+      "**/terraform/**",
+      "**/.github/**",
+      "**/eas.json",
+      "**/app.json",
+      "**/Dockerfile*",
+      "**/docker-compose*",
+      "**/infrastructure/**",
+      "**/prisma/**",
+      "**/*.pem",
+      "**/*.key",
+      "**/credentials*"
+    ],
+    "blockedContentPatterns": [
+      "process\\.env\\.",
+      "AWS_",
+      "EXPO_TOKEN",
+      "JWT_SECRET",
+      "API_KEY",
+      "DATABASE_URL",
+      "REDIS_",
+      "password",
+      "secret",
+      "credential"
+    ]
+  },
+  "codeGeneration": {
+    "framework": {
+      "web": "next.js",
+      "mobile": "expo-router"
+    },
+    "styling": {
+      "approach": "tailwind-css",
+      "componentLibrary": "@unified-health/ui"
+    },
+    "apiCalls": {
+      "required": true,
+      "mustUse": "@unified-health/sdk",
+      "importPath": "packages/sdk/src/client"
+    },
+    "typescript": {
+      "strict": true,
+      "noAny": true
+    }
+  },
+  "security": {
+    "noHardcodedEndpoints": true,
+    "noDirectApiCalls": true,
+    "noSecretExposure": true,
+    "noInlineCredentials": true,
+    "requireInputValidation": true,
+    "requireOutputSanitization": true
+  },
+  "healthcare": {
+    "phi": {
+      "neverExpose": true,
+      "maskInLogs": true,
+      "requireEncryption": true
+    },
+    "accessControl": {
+      "roleBasedComponents": true,
+      "auditTrail": true
+    }
+  },
+  "exports": {
+    "allowedTypes": [
+      "component",
+      "hook",
+      "utility",
+      "type",
+      "style"
+    ],
+    "blockedTypes": [
+      "config",
+      "secret",
+      "credential",
+      "infrastructure",
+      "deployment"
+    ]
+  }
+}

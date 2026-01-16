@@ -1,0 +1,364 @@
+/**
+ * The Unified Health - Design System Theme
+ * Version: 1.0.0
+ *
+ * Healthcare-grade CSS variables implementing the brand design tokens.
+ * WCAG AA+ compliant with accessibility-first approach.
+ *
+ * Usage:
+ *   @import '@unified-health/asset-branding/theme.css';
+ *
+ * Or link directly:
+ *   <link rel="stylesheet" href="path/to/theme.css">
+ */
+
+:root {
+  /* =================================================================
+     BRAND COLORS - Clinical Blue (Primary)
+     Trust-first healthcare palette
+     ================================================================= */
+  --uh-clinical-blue-50: #f0f7ff;
+  --uh-clinical-blue-100: #e0effe;
+  --uh-clinical-blue-200: #b9dffc;
+  --uh-clinical-blue-300: #7cc7fa;
+  --uh-clinical-blue-400: #36aaf5;
+  --uh-clinical-blue-500: #0c8ee6;
+  --uh-clinical-blue-600: #0070c4;
+  --uh-clinical-blue-700: #01599f;
+  --uh-clinical-blue-800: #064b83;
+  --uh-clinical-blue-900: #0b3f6d;
+  --uh-clinical-blue-950: #072849;
+
+  /* Trust Black - Typography and borders */
+  --uh-trust-black-50: #f6f6f6;
+  --uh-trust-black-100: #e7e7e7;
+  --uh-trust-black-200: #d1d1d1;
+  --uh-trust-black-300: #b0b0b0;
+  --uh-trust-black-400: #888888;
+  --uh-trust-black-500: #6d6d6d;
+  --uh-trust-black-600: #5d5d5d;
+  --uh-trust-black-700: #4f4f4f;
+  --uh-trust-black-800: #454545;
+  --uh-trust-black-900: #3d3d3d;
+  --uh-trust-black-950: #1a1a1a;
+
+  /* Clinical White - Surfaces */
+  --uh-clinical-white-pure: #ffffff;
+  --uh-clinical-white-warm: #fafafa;
+  --uh-clinical-white-cool: #f8fafc;
+
+  /* Accent Green - Restrained success indicators */
+  --uh-accent-green-50: #f0fdf4;
+  --uh-accent-green-100: #dcfce7;
+  --uh-accent-green-200: #bbf7d0;
+  --uh-accent-green-300: #86efac;
+  --uh-accent-green-400: #4ade80;
+  --uh-accent-green-500: #22c55e;
+  --uh-accent-green-600: #16a34a;
+  --uh-accent-green-700: #15803d;
+  --uh-accent-green-800: #166534;
+  --uh-accent-green-900: #14532d;
+  --uh-accent-green-950: #052e16;
+
+  /* =================================================================
+     SEMANTIC COLORS
+     Consistent meaning across all interfaces
+     ================================================================= */
+
+  /* Success */
+  --uh-success-light: #dcfce7;
+  --uh-success-base: #22c55e;
+  --uh-success-dark: #15803d;
+  --uh-success-text: #14532d;
+
+  /* Warning */
+  --uh-warning-light: #fef3c7;
+  --uh-warning-base: #f59e0b;
+  --uh-warning-dark: #b45309;
+  --uh-warning-text: #78350f;
+
+  /* Error */
+  --uh-error-light: #fee2e2;
+  --uh-error-base: #ef4444;
+  --uh-error-dark: #b91c1c;
+  --uh-error-text: #7f1d1d;
+
+  /* Info */
+  --uh-info-light: #dbeafe;
+  --uh-info-base: #3b82f6;
+  --uh-info-dark: #1d4ed8;
+  --uh-info-text: #1e3a8a;
+
+  /* Critical (Clinical alerts) */
+  --uh-critical-light: #fce7f3;
+  --uh-critical-base: #ec4899;
+  --uh-critical-dark: #be185d;
+  --uh-critical-text: #831843;
+
+  /* =================================================================
+     SURFACE COLORS
+     Layered interface surfaces
+     ================================================================= */
+  --uh-surface-page: var(--uh-clinical-white-warm);
+  --uh-surface-card: var(--uh-clinical-white-pure);
+  --uh-surface-elevated: var(--uh-clinical-white-pure);
+  --uh-surface-overlay: rgba(0, 0, 0, 0.5);
+  --uh-surface-disabled: #f1f5f9;
+
+  /* =================================================================
+     TEXT COLORS
+     Accessible text hierarchy
+     ================================================================= */
+  --uh-text-primary: var(--uh-trust-black-950);
+  --uh-text-secondary: var(--uh-trust-black-700);
+  --uh-text-tertiary: var(--uh-trust-black-500);
+  --uh-text-disabled: var(--uh-trust-black-300);
+  --uh-text-inverse: var(--uh-clinical-white-pure);
+  --uh-text-link: var(--uh-clinical-blue-500);
+  --uh-text-link-hover: var(--uh-clinical-blue-600);
+
+  /* =================================================================
+     BORDER COLORS
+     ================================================================= */
+  --uh-border-default: var(--uh-trust-black-100);
+  --uh-border-strong: var(--uh-trust-black-200);
+  --uh-border-focus: var(--uh-clinical-blue-500);
+  --uh-border-error: var(--uh-error-base);
+
+  /* =================================================================
+     TYPOGRAPHY
+     Medical readability optimized
+     ================================================================= */
+  --uh-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --uh-font-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --uh-font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace;
+
+  /* Font Sizes */
+  --uh-text-xs: 0.75rem;
+  --uh-text-sm: 0.875rem;
+  --uh-text-base: 1rem;
+  --uh-text-lg: 1.125rem;
+  --uh-text-xl: 1.25rem;
+  --uh-text-2xl: 1.5rem;
+  --uh-text-3xl: 1.875rem;
+  --uh-text-4xl: 2.25rem;
+  --uh-text-5xl: 3rem;
+
+  /* Line Heights */
+  --uh-leading-xs: 1rem;
+  --uh-leading-sm: 1.25rem;
+  --uh-leading-base: 1.5rem;
+  --uh-leading-lg: 1.75rem;
+  --uh-leading-xl: 1.75rem;
+  --uh-leading-2xl: 2rem;
+  --uh-leading-3xl: 2.25rem;
+  --uh-leading-4xl: 2.5rem;
+  --uh-leading-5xl: 1;
+
+  /* Font Weights */
+  --uh-font-normal: 400;
+  --uh-font-medium: 500;
+  --uh-font-semibold: 600;
+  --uh-font-bold: 700;
+
+  /* Letter Spacing */
+  --uh-tracking-tighter: -0.05em;
+  --uh-tracking-tight: -0.025em;
+  --uh-tracking-normal: 0;
+  --uh-tracking-wide: 0.025em;
+  --uh-tracking-wider: 0.05em;
+
+  /* =================================================================
+     SPACING
+     Consistent spatial rhythm
+     ================================================================= */
+  --uh-space-0: 0;
+  --uh-space-1: 0.25rem;
+  --uh-space-2: 0.5rem;
+  --uh-space-3: 0.75rem;
+  --uh-space-4: 1rem;
+  --uh-space-5: 1.25rem;
+  --uh-space-6: 1.5rem;
+  --uh-space-8: 2rem;
+  --uh-space-10: 2.5rem;
+  --uh-space-12: 3rem;
+  --uh-space-16: 4rem;
+  --uh-space-20: 5rem;
+  --uh-space-24: 6rem;
+
+  /* =================================================================
+     BORDER RADIUS
+     ================================================================= */
+  --uh-radius-none: 0;
+  --uh-radius-sm: 0.25rem;
+  --uh-radius-base: 0.375rem;
+  --uh-radius-md: 0.5rem;
+  --uh-radius-lg: 0.75rem;
+  --uh-radius-xl: 1rem;
+  --uh-radius-2xl: 1.5rem;
+  --uh-radius-full: 9999px;
+
+  /* =================================================================
+     SHADOWS
+     Subtle elevation hierarchy
+     ================================================================= */
+  --uh-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --uh-shadow-base: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --uh-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --uh-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --uh-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --uh-shadow-inner: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+  --uh-shadow-focus-ring: 0 0 0 3px rgba(12, 142, 230, 0.4);
+
+  /* =================================================================
+     TRANSITIONS
+     Low-motion, purposeful animations
+     ================================================================= */
+  --uh-duration-instant: 0ms;
+  --uh-duration-fast: 100ms;
+  --uh-duration-normal: 200ms;
+  --uh-duration-slow: 300ms;
+
+  --uh-ease-default: cubic-bezier(0.4, 0, 0.2, 1);
+  --uh-ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --uh-ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --uh-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* =================================================================
+     ACCESSIBILITY
+     ================================================================= */
+  --uh-focus-width: 3px;
+  --uh-focus-style: solid;
+  --uh-focus-color: var(--uh-clinical-blue-500);
+  --uh-focus-offset: 2px;
+  --uh-touch-target-min: 44px;
+  --uh-touch-target-recommended: 48px;
+
+  /* =================================================================
+     Z-INDEX SCALE
+     ================================================================= */
+  --uh-z-dropdown: 1000;
+  --uh-z-sticky: 1020;
+  --uh-z-fixed: 1030;
+  --uh-z-modal-backdrop: 1040;
+  --uh-z-modal: 1050;
+  --uh-z-popover: 1060;
+  --uh-z-tooltip: 1070;
+  --uh-z-toast: 1080;
+}
+
+/* =================================================================
+   DARK THEME
+   ================================================================= */
+[data-theme="dark"],
+.dark {
+  --uh-surface-page: #0f0f0f;
+  --uh-surface-card: #1a1a1a;
+  --uh-surface-elevated: #262626;
+  --uh-surface-overlay: rgba(0, 0, 0, 0.7);
+  --uh-surface-disabled: #262626;
+
+  --uh-text-primary: #f6f6f6;
+  --uh-text-secondary: #b0b0b0;
+  --uh-text-tertiary: #888888;
+  --uh-text-disabled: #5d5d5d;
+  --uh-text-inverse: #1a1a1a;
+
+  --uh-border-default: #3d3d3d;
+  --uh-border-strong: #4f4f4f;
+
+  /* Adjusted semantic colors for dark mode */
+  --uh-success-light: #052e16;
+  --uh-success-text: #86efac;
+  --uh-warning-light: #451a03;
+  --uh-warning-text: #fcd34d;
+  --uh-error-light: #450a0a;
+  --uh-error-text: #fca5a5;
+  --uh-info-light: #172554;
+  --uh-info-text: #93c5fd;
+}
+
+/* =================================================================
+   ACCESSIBILITY: REDUCED MOTION
+   Respects user preference for reduced motion
+   ================================================================= */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* =================================================================
+   ACCESSIBILITY: HIGH CONTRAST
+   Enhanced visibility for high contrast mode
+   ================================================================= */
+@media (prefers-contrast: high) {
+  :root {
+    --uh-border-default: var(--uh-trust-black-950);
+    --uh-border-strong: var(--uh-trust-black-950);
+    --uh-shadow-focus-ring: 0 0 0 3px var(--uh-trust-black-950);
+  }
+}
+
+/* =================================================================
+   BASE STYLES
+   Healthcare-optimized defaults
+   ================================================================= */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: var(--uh-font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--uh-surface-page);
+  color: var(--uh-text-primary);
+}
+
+/* Focus styles for accessibility */
+:focus-visible {
+  outline: var(--uh-focus-width) var(--uh-focus-style) var(--uh-focus-color);
+  outline-offset: var(--uh-focus-offset);
+  box-shadow: var(--uh-shadow-focus-ring);
+}
+
+/* Link styles */
+a {
+  color: var(--uh-text-link);
+  text-decoration: none;
+  transition: color var(--uh-duration-fast) var(--uh-ease-default);
+}
+
+a:hover {
+  color: var(--uh-text-link-hover);
+  text-decoration: underline;
+}
+
+/* Button reset */
+button {
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+}
+
+/* Selection */
+::selection {
+  background-color: var(--uh-clinical-blue-200);
+  color: var(--uh-clinical-blue-900);
+}

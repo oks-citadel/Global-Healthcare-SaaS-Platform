@@ -1,0 +1,8 @@
+# Ignore generated files
+/generated/
+
+# Keep migrations in version control
+# Migrations should be committed
+
+# Keep seed data in version control
+# Seed data JSON files should be committed

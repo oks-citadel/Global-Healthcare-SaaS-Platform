@@ -1,0 +1,170 @@
+/**
+ * Test Fixtures for Imaging Service
+ */
+
+export const mockImagingOrder = {
+  id: 'order-123',
+  orderNumber: 'IMG-1234567890-ABC123',
+  patientId: 'patient-123',
+  providerId: 'provider-123',
+  facilityId: 'facility-123',
+  priority: 'ROUTINE' as const,
+  modality: 'CT' as const,
+  bodyPart: 'CHEST',
+  clinicalIndication: 'Cough, rule out pneumonia',
+  instructions: 'With contrast if kidney function allows',
+  status: 'ORDERED' as const,
+  scheduledAt: new Date('2025-01-15T09:00:00Z'),
+  requestedAt: new Date('2025-01-10T14:00:00Z'),
+  requestedBy: 'provider-123',
+  transportRequired: false,
+  contrastAllergy: false,
+  createdAt: new Date('2025-01-10T14:00:00Z'),
+  updatedAt: new Date('2025-01-10T14:00:00Z'),
+  studies: [],
+};
+
+export const mockStudy = {
+  id: 'study-123',
+  orderId: 'order-123',
+  accessionNumber: 'ACC-1234567890-ABC123',
+  studyInstanceUID: '1.2.840.1234567890.123456',
+  studyDate: new Date('2025-01-15T09:30:00Z'),
+  studyTime: '09:30:00',
+  studyDescription: 'CT Chest with contrast',
+  modality: 'CT' as const,
+  bodyPart: 'CHEST',
+  patientId: 'patient-123',
+  patientName: 'John Doe',
+  patientDOB: new Date('1980-05-15'),
+  patientSex: 'M',
+  performingPhysician: 'Dr. Smith',
+  operatorName: 'Tech Johnson',
+  institutionName: 'Unified Health Imaging Center',
+  stationName: 'CT-Scanner-1',
+  numberOfSeries: 2,
+  numberOfInstances: 150,
+  status: 'COMPLETED' as const,
+  priority: 'ROUTINE' as const,
+  createdAt: new Date('2025-01-15T09:30:00Z'),
+  updatedAt: new Date('2025-01-15T10:00:00Z'),
+  images: [],
+  reports: [],
+  order: undefined,
+};
+
+export const mockDicomImage = {
+  id: 'image-123',
+  studyId: 'study-123',
+  seriesInstanceUID: '1.2.840.1234567890.123456.1',
+  sopInstanceUID: '1.2.840.1234567890.123456.1.1',
+  instanceNumber: 1,
+  seriesNumber: 1,
+  seriesDescription: 'Axial Images',
+  imageType: 'ORIGINAL\\PRIMARY\\AXIAL',
+  photometricInterpretation: 'MONOCHROME2',
+  rows: 512,
+  columns: 512,
+  bitsAllocated: 16,
+  bitsStored: 12,
+  pixelSpacing: '0.5\\0.5',
+  sliceThickness: 2.5,
+  sliceLocation: 0,
+  storageUrl: 's3://imaging-bucket/study-123/image-123.dcm',
+  thumbnailUrl: 's3://imaging-bucket/study-123/thumbnails/image-123.jpg',
+  fileSize: BigInt(2048000),
+  transferSyntaxUID: '1.2.840.10008.1.2.1',
+  createdAt: new Date('2025-01-15T09:35:00Z'),
+  updatedAt: new Date('2025-01-15T09:35:00Z'),
+};
+
+export const mockRadiologyReport = {
+  id: 'report-123',
+  reportNumber: 'RPT-1234567890-ABC123',
+  studyId: 'study-123',
+  radiologistId: 'radiologist-123',
+  radiologistName: 'Dr. Jane Wilson',
+  clinicalHistory: 'Persistent cough for 2 weeks, smoker',
+  technique: 'CT of chest performed with IV contrast',
+  comparison: 'Chest X-ray 2024-06-15',
+  findings: 'Lungs are clear. No consolidation or effusion. Heart size normal.',
+  impression: 'No acute cardiopulmonary process.',
+  recommendations: 'None',
+  status: 'PRELIMINARY' as const,
+  preliminaryDate: new Date('2025-01-15T11:00:00Z'),
+  finalizedDate: null,
+  amendedDate: null,
+  amendmentReason: null,
+  signedBy: null,
+  signedAt: null,
+  template: 'standard_ct_chest',
+  createdAt: new Date('2025-01-15T11:00:00Z'),
+  updatedAt: new Date('2025-01-15T11:00:00Z'),
+  study: undefined,
+};
+
+export const mockFinalReport = {
+  ...mockRadiologyReport,
+  id: 'report-final-123',
+  status: 'FINAL' as const,
+  finalizedDate: new Date('2025-01-15T12:00:00Z'),
+  signedBy: 'Dr. Jane Wilson',
+  signedAt: new Date('2025-01-15T12:00:00Z'),
+};
+
+export const mockCriticalFinding = {
+  id: 'finding-123',
+  studyId: 'study-123',
+  reportId: 'report-123',
+  finding: 'Pulmonary embolism in right main pulmonary artery',
+  severity: 'CRITICAL' as const,
+  category: 'pulmonary',
+  bodyPart: 'CHEST',
+  reportedBy: 'Dr. Jane Wilson',
+  reportedAt: new Date('2025-01-15T11:30:00Z'),
+  notifiedTo: ['provider-123', 'on-call-123'],
+  acknowledgedBy: null,
+  acknowledgedAt: null,
+  followUpRequired: true,
+  followUpAction: 'Urgent anticoagulation therapy',
+  followUpStatus: 'PENDING',
+  notes: 'Patient notified, recommend immediate treatment',
+  createdAt: new Date('2025-01-15T11:30:00Z'),
+  updatedAt: new Date('2025-01-15T11:30:00Z'),
+};
+
+export const mockCreateOrderInput = {
+  patientId: 'patient-123',
+  providerId: 'provider-123',
+  facilityId: 'facility-123',
+  priority: 'ROUTINE' as const,
+  modality: 'CT' as const,
+  bodyPart: 'CHEST',
+  clinicalIndication: 'Persistent cough, rule out pneumonia',
+  instructions: 'With contrast',
+  requestedBy: 'provider-123',
+};
+
+export const mockCreateStudyInput = {
+  orderId: 'order-123',
+  studyDate: new Date('2025-01-15T09:30:00Z'),
+  studyDescription: 'CT Chest with contrast',
+  modality: 'CT' as const,
+  bodyPart: 'CHEST',
+  patientId: 'patient-123',
+  patientName: 'John Doe',
+};
+
+export const mockCreateReportInput = {
+  studyId: 'study-123',
+  radiologistId: 'radiologist-123',
+  radiologistName: 'Dr. Jane Wilson',
+  findings: 'Lungs are clear.',
+  impression: 'No acute findings.',
+};
+
+export const mockUser = {
+  id: 'user-123',
+  email: 'radiologist@example.com',
+  role: 'provider',
+};

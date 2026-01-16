@@ -1,0 +1,82 @@
+{
+  "name": "@unified-health/asset-branding",
+  "version": "1.0.0",
+  "description": "Healthcare-grade brand system and design tokens for The Unified Health platform",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./tokens": {
+      "import": "./dist/tokens.json",
+      "require": "./dist/tokens.json"
+    },
+    "./tokens.json": "./dist/tokens.json",
+    "./theme.css": "./dist/theme.css",
+    "./patient.theme.json": "./dist/patient.theme.json",
+    "./provider.theme.json": "./dist/provider.theme.json",
+    "./icons/*": "./icons/*",
+    "./tailwind": {
+      "import": "./dist/tailwind.config.mjs",
+      "require": "./dist/tailwind.config.js"
+    }
+  },
+  "files": [
+    "dist",
+    "icons",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts && pnpm build:tokens && pnpm build:css",
+    "build:tokens": "node scripts/build-tokens.js",
+    "build:css": "node scripts/build-css.js",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "lint": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "clean": "rimraf dist",
+    "prepublishOnly": "pnpm build",
+    "validate": "node scripts/validate-tokens.js"
+  },
+  "keywords": [
+    "healthcare",
+    "design-system",
+    "tokens",
+    "branding",
+    "unified-health",
+    "wcag",
+    "accessibility",
+    "hipaa"
+  ],
+  "author": "The Unified Health, Inc.",
+  "license": "UNLICENSED",
+  "private": true,
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "rimraf": "^5.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.0"
+  },
+  "peerDependencies": {
+    "tailwindcss": ">=3.4.0"
+  },
+  "peerDependenciesMeta": {
+    "tailwindcss": {
+      "optional": true
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/unified-health/asset-branding.git"
+  },
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com"
+  }
+}

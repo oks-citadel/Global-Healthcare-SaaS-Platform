@@ -1,0 +1,1 @@
+Hi {{patientName}}, your appointment with Dr. {{providerName}} on {{appointmentDate}} at {{appointmentTime}} has been cancelled. {{reason}} To reschedule, visit {{appUrl}} or call us. - {{appName}}

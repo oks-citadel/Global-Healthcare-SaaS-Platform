@@ -1,0 +1,203 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Lead Scoring Models
+model LeadScore {
+  id            String   @id @default(uuid())
+  tenantId      String   @map("tenant_id")
+  leadId        String   @map("lead_id")
+  score         Float
+  confidence    Float
+  factors       Json
+  modelVersion  String   @map("model_version")
+  predictedAt   DateTime @map("predicted_at") @default(now())
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@index([tenantId, leadId])
+  @@index([tenantId, predictedAt])
+  @@map("lead_scores")
+}
+
+// Churn Predictions
+model ChurnPrediction {
+  id              String   @id @default(uuid())
+  tenantId        String   @map("tenant_id")
+  customerId      String   @map("customer_id")
+  churnProbability Float   @map("churn_probability")
+  riskLevel       String   @map("risk_level")
+  contributingFactors Json @map("contributing_factors")
+  recommendedActions Json  @map("recommended_actions")
+  modelVersion    String   @map("model_version")
+  predictedAt     DateTime @map("predicted_at") @default(now())
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@index([tenantId, customerId])
+  @@index([tenantId, riskLevel])
+  @@map("churn_predictions")
+}
+
+// Expansion Predictions
+model ExpansionPrediction {
+  id                  String   @id @default(uuid())
+  tenantId            String   @map("tenant_id")
+  customerId          String   @map("customer_id")
+  expansionProbability Float   @map("expansion_probability")
+  predictedRevenue    Float    @map("predicted_revenue")
+  recommendedProducts Json     @map("recommended_products")
+  signals             Json
+  modelVersion        String   @map("model_version")
+  predictedAt         DateTime @map("predicted_at") @default(now())
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  @@index([tenantId, customerId])
+  @@index([tenantId, expansionProbability])
+  @@map("expansion_predictions")
+}
+
+// Campaign Forecasts
+model CampaignForecast {
+  id                String   @id @default(uuid())
+  tenantId          String   @map("tenant_id")
+  campaignId        String   @map("campaign_id")
+  forecastedReach   Int      @map("forecasted_reach")
+  forecastedClicks  Int      @map("forecasted_clicks")
+  forecastedConversions Int  @map("forecasted_conversions")
+  forecastedRevenue Float    @map("forecasted_revenue")
+  forecastedROI     Float    @map("forecasted_roi")
+  confidenceInterval Json    @map("confidence_interval")
+  assumptions       Json
+  modelVersion      String   @map("model_version")
+  forecastedAt      DateTime @map("forecasted_at") @default(now())
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@index([tenantId, campaignId])
+  @@map("campaign_forecasts")
+}
+
+// SEO Opportunities
+model SeoOpportunity {
+  id              String   @id @default(uuid())
+  tenantId        String   @map("tenant_id")
+  keyword         String
+  searchVolume    Int      @map("search_volume")
+  difficulty      Float
+  currentRank     Int?     @map("current_rank")
+  opportunityScore Float   @map("opportunity_score")
+  suggestedContent Json    @map("suggested_content")
+  competitors     Json
+  discoveredAt    DateTime @map("discovered_at") @default(now())
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@index([tenantId, opportunityScore])
+  @@index([tenantId, keyword])
+  @@map("seo_opportunities")
+}
+
+// Growth Recommendations
+model GrowthRecommendation {
+  id              String   @id @default(uuid())
+  tenantId        String   @map("tenant_id")
+  category        String
+  title           String
+  description     String
+  impact          String
+  effort          String
+  priority        Int
+  metrics         Json
+  actionItems     Json     @map("action_items")
+  status          String   @default("pending")
+  generatedAt     DateTime @map("generated_at") @default(now())
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@index([tenantId, category])
+  @@index([tenantId, priority])
+  @@map("growth_recommendations")
+}
+
+// AI Generated Content
+model GeneratedContent {
+  id              String   @id @default(uuid())
+  tenantId        String   @map("tenant_id")
+  contentType     String   @map("content_type")
+  prompt          String
+  generatedText   String   @map("generated_text") @db.Text
+  metadata        Json
+  modelUsed       String   @map("model_used")
+  tokensUsed      Int      @map("tokens_used")
+  qualityScore    Float?   @map("quality_score")
+  status          String   @default("draft")
+  generatedAt     DateTime @map("generated_at") @default(now())
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@index([tenantId, contentType])
+  @@index([tenantId, status])
+  @@map("generated_content")
+}
+
+// Content Optimization Results
+model ContentOptimization {
+  id                String   @id @default(uuid())
+  tenantId          String   @map("tenant_id")
+  originalContent   String   @map("original_content") @db.Text
+  optimizedContent  String   @map("optimized_content") @db.Text
+  optimizationType  String   @map("optimization_type")
+  improvements      Json
+  readabilityScore  Float    @map("readability_score")
+  seoScore          Float    @map("seo_score")
+  modelUsed         String   @map("model_used")
+  optimizedAt       DateTime @map("optimized_at") @default(now())
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@index([tenantId, optimizationType])
+  @@map("content_optimizations")
+}
+
+// ML Model Registry
+model MlModel {
+  id              String   @id @default(uuid())
+  name            String
+  version         String
+  type            String
+  provider        String
+  endpoint        String?
+  config          Json
+  metrics         Json
+  isActive        Boolean  @default(true) @map("is_active")
+  deployedAt      DateTime @map("deployed_at")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@unique([name, version])
+  @@index([type, isActive])
+  @@map("ml_models")
+}
+
+// Prediction Feedback for Model Improvement
+model PredictionFeedback {
+  id              String   @id @default(uuid())
+  tenantId        String   @map("tenant_id")
+  predictionType  String   @map("prediction_type")
+  predictionId    String   @map("prediction_id")
+  actualOutcome   Json     @map("actual_outcome")
+  accuracy        Float?
+  feedback        String?
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@index([tenantId, predictionType])
+  @@index([predictionId])
+  @@map("prediction_feedback")
+}

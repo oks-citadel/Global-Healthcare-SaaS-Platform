@@ -1,0 +1,145 @@
+{
+  "title": "Rendez-vous",
+  "schedule": "Planifier un rendez-vous",
+  "myAppointments": "Mes rendez-vous",
+  "allAppointments": "Tous les rendez-vous",
+  "detailsTitle": "Détails du rendez-vous",
+  "create": {
+    "title": "Planifier un nouveau rendez-vous",
+    "selectPatient": "Sélectionner un patient",
+    "selectDoctor": "Sélectionner un médecin",
+    "selectDate": "Sélectionner une date",
+    "selectTime": "Sélectionner une heure",
+    "appointmentType": "Type de rendez-vous",
+    "reason": "Motif de la visite",
+    "notes": "Notes supplémentaires",
+    "duration": "Durée",
+    "location": "Lieu",
+    "department": "Département",
+    "submit": "Planifier le rendez-vous",
+    "success": "Rendez-vous planifié avec succès"
+  },
+  "edit": {
+    "title": "Modifier le rendez-vous",
+    "submit": "Mettre à jour le rendez-vous",
+    "success": "Rendez-vous mis à jour avec succès"
+  },
+  "cancel": {
+    "title": "Annuler le rendez-vous",
+    "reason": "Motif d'annulation",
+    "confirm": "Êtes-vous sûr de vouloir annuler ce rendez-vous?",
+    "submit": "Annuler le rendez-vous",
+    "success": "Rendez-vous annulé avec succès"
+  },
+  "reschedule": {
+    "title": "Reporter le rendez-vous",
+    "selectNewDate": "Sélectionner une nouvelle date",
+    "selectNewTime": "Sélectionner une nouvelle heure",
+    "reason": "Motif du report",
+    "submit": "Reporter",
+    "success": "Rendez-vous reporté avec succès"
+  },
+  "types": {
+    "consultation": "Consultation",
+    "followUp": "Suivi",
+    "checkup": "Bilan de santé",
+    "emergency": "Urgence",
+    "vaccination": "Vaccination",
+    "laboratory": "Laboratoire",
+    "imaging": "Imagerie",
+    "surgery": "Chirurgie",
+    "therapy": "Thérapie",
+    "dental": "Dentaire",
+    "optometry": "Optométrie",
+    "other": "Autre"
+  },
+  "status": {
+    "scheduled": "Planifié",
+    "confirmed": "Confirmé",
+    "inProgress": "En cours",
+    "completed": "Terminé",
+    "cancelled": "Annulé",
+    "noShow": "Absent",
+    "rescheduled": "Reporté",
+    "pending": "En attente de confirmation"
+  },
+  "filters": {
+    "all": "Tous les rendez-vous",
+    "upcoming": "À venir",
+    "past": "Passés",
+    "today": "Aujourd'hui",
+    "thisWeek": "Cette semaine",
+    "thisMonth": "Ce mois-ci",
+    "byStatus": "Par statut",
+    "byDoctor": "Par médecin",
+    "byType": "Par type",
+    "byPatient": "Par patient"
+  },
+  "list": {
+    "patient": "Patient",
+    "doctor": "Médecin",
+    "date": "Date",
+    "time": "Heure",
+    "type": "Type",
+    "status": "Statut",
+    "actions": "Actions",
+    "noAppointments": "Aucun rendez-vous trouvé",
+    "loadMore": "Charger plus"
+  },
+  "details": {
+    "appointmentInfo": "Informations du rendez-vous",
+    "patientInfo": "Informations du patient",
+    "doctorInfo": "Informations du médecin",
+    "appointmentId": "ID du rendez-vous",
+    "scheduledBy": "Planifié par",
+    "createdAt": "Créé le",
+    "updatedAt": "Dernière mise à jour",
+    "location": "Lieu",
+    "department": "Département",
+    "room": "Numéro de chambre",
+    "notes": "Notes",
+    "vitals": "Signes vitaux",
+    "diagnosis": "Diagnostic",
+    "prescription": "Ordonnance",
+    "labOrders": "Ordres de laboratoire",
+    "nextAppointment": "Prochain rendez-vous"
+  },
+  "reminder": {
+    "title": "Rappel de rendez-vous",
+    "message": "Vous avez un rendez-vous le {{date}} à {{time}}",
+    "confirm": "Confirmer la présence",
+    "reschedule": "Reporter",
+    "cancel": "Annuler"
+  },
+  "notifications": {
+    "scheduled": "Rendez-vous planifié pour le {{date}} à {{time}}",
+    "confirmed": "Votre rendez-vous a été confirmé",
+    "cancelled": "Rendez-vous annulé",
+    "rescheduled": "Rendez-vous reporté au {{date}} à {{time}}",
+    "reminder": "Rappel: Rendez-vous dans {{time}}",
+    "doctorRunningLate": "Le médecin a {{minutes}} minutes de retard",
+    "readyToSee": "Le médecin est prêt à vous recevoir maintenant"
+  },
+  "calendar": {
+    "viewMode": "Mode d'affichage",
+    "day": "Jour",
+    "week": "Semaine",
+    "month": "Mois",
+    "agenda": "Agenda",
+    "available": "Disponible",
+    "booked": "Réservé",
+    "blocked": "Bloqué",
+    "selectSlot": "Sélectionner un créneau"
+  },
+  "validation": {
+    "patientRequired": "Le patient est obligatoire",
+    "doctorRequired": "Le médecin est obligatoire",
+    "dateRequired": "La date est obligatoire",
+    "timeRequired": "L'heure est obligatoire",
+    "typeRequired": "Le type de rendez-vous est obligatoire",
+    "reasonRequired": "Le motif de la visite est obligatoire",
+    "futureDate": "La date doit être dans le futur",
+    "slotNotAvailable": "Le créneau sélectionné n'est pas disponible",
+    "conflictingAppointment": "Un rendez-vous en conflit existe"
+  }
+}

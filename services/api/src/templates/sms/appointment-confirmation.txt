@@ -1,0 +1,1 @@
+Hi {{patientName}}, your appointment with Dr. {{providerName}} is confirmed for {{appointmentDate}} at {{appointmentTime}}. View details: {{appUrl}}/appointments/{{appointmentId}} - {{appName}}

@@ -1,0 +1,264 @@
+// Prisma Schema for Commerce Service
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Upsell/Cross-sell Offers
+model Offer {
+  id              String    @id @default(uuid())
+  key             String    @unique
+  name            String
+  description     String?
+  type            OfferType
+  sourceProducts  String[]  @map("source_products")
+  targetProducts  String[]  @map("target_products")
+  discount        Json?
+  priority        Int       @default(0)
+  targeting       Json?
+  isActive        Boolean   @default(true) @map("is_active")
+  startDate       DateTime? @map("start_date")
+  endDate         DateTime? @map("end_date")
+  impressions     Int       @default(0)
+  clicks          Int       @default(0)
+  conversions     Int       @default(0)
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@map("offers")
+}
+
+// Promotions/Coupons
+model Coupon {
+  id              String    @id @default(uuid())
+  code            String    @unique
+  name            String
+  description     String?
+  type            CouponType
+  value           Float
+  minPurchase     Float?    @map("min_purchase")
+  maxDiscount     Float?    @map("max_discount")
+  applicableProducts String[] @map("applicable_products")
+  applicablePlans String[]  @map("applicable_plans")
+  usageLimit      Int?      @map("usage_limit")
+  usageCount      Int       @default(0) @map("usage_count")
+  perUserLimit    Int?      @map("per_user_limit")
+  isActive        Boolean   @default(true) @map("is_active")
+  startDate       DateTime  @map("start_date")
+  endDate         DateTime  @map("end_date")
+  redemptions     CouponRedemption[]
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@map("coupons")
+}
+
+model CouponRedemption {
+  id          String    @id @default(uuid())
+  couponId    String    @map("coupon_id")
+  userId      String    @map("user_id")
+  orderId     String?   @map("order_id")
+  discount    Float
+  redeemedAt  DateTime  @default(now()) @map("redeemed_at")
+  coupon      Coupon    @relation(fields: [couponId], references: [id], onDelete: Cascade)
+
+  @@map("coupon_redemptions")
+}
+
+// Pricing Experiments
+model PricingExperiment {
+  id              String    @id @default(uuid())
+  key             String    @unique
+  name            String
+  description     String?
+  status          ExperimentStatus @default(DRAFT)
+  productId       String    @map("product_id")
+  basePrice       Float     @map("base_price")
+  currency        String    @default("USD")
+  variants        PricingVariant[]
+  targetSegments  String[]  @map("target_segments")
+  trafficPercent  Float     @default(100) @map("traffic_percent")
+  startDate       DateTime? @map("start_date")
+  endDate         DateTime? @map("end_date")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@map("pricing_experiments")
+}
+
+model PricingVariant {
+  id              String    @id @default(uuid())
+  experimentId    String    @map("experiment_id")
+  key             String
+  name            String
+  price           Float
+  isControl       Boolean   @default(false) @map("is_control")
+  weight          Float     @default(50)
+  impressions     Int       @default(0)
+  conversions     Int       @default(0)
+  revenue         Float     @default(0)
+  experiment      PricingExperiment @relation(fields: [experimentId], references: [id], onDelete: Cascade)
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@unique([experimentId, key])
+  @@map("pricing_variants")
+}
+
+// In-App Messages
+model InAppMessage {
+  id              String    @id @default(uuid())
+  key             String    @unique
+  name            String
+  type            MessageType
+  title           String
+  body            String
+  ctaText         String?   @map("cta_text")
+  ctaUrl          String?   @map("cta_url")
+  imageUrl        String?   @map("image_url")
+  targeting       Json?
+  triggerType     TriggerType @map("trigger_type")
+  triggerConfig   Json?     @map("trigger_config")
+  frequency       MessageFrequency @default(ONCE)
+  priority        Int       @default(0)
+  isActive        Boolean   @default(true) @map("is_active")
+  startDate       DateTime? @map("start_date")
+  endDate         DateTime? @map("end_date")
+  impressions     Int       @default(0)
+  clicks          Int       @default(0)
+  dismissals      Int       @default(0)
+  triggers        MessageTrigger[]
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@map("inapp_messages")
+}
+
+model MessageTrigger {
+  id          String    @id @default(uuid())
+  messageId   String    @map("message_id")
+  userId      String    @map("user_id")
+  action      TriggerAction
+  triggeredAt DateTime  @default(now()) @map("triggered_at")
+  metadata    Json?
+  message     InAppMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@map("message_triggers")
+}
+
+// Trial Conversion
+model TrialUser {
+  id              String    @id @default(uuid())
+  userId          String    @unique @map("user_id")
+  email           String?
+  planId          String?   @map("plan_id")
+  trialStartDate  DateTime  @map("trial_start_date")
+  trialEndDate    DateTime  @map("trial_end_date")
+  status          TrialStatus @default(ACTIVE)
+  convertedAt     DateTime? @map("converted_at")
+  engagementScore Float     @default(0) @map("engagement_score")
+  lastActivityAt  DateTime? @map("last_activity_at")
+  nudges          TrialNudge[]
+  metadata        Json?
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@map("trial_users")
+}
+
+model TrialNudge {
+  id          String    @id @default(uuid())
+  trialUserId String    @map("trial_user_id")
+  type        NudgeType
+  channel     NudgeChannel
+  content     Json
+  sentAt      DateTime  @default(now()) @map("sent_at")
+  openedAt    DateTime? @map("opened_at")
+  clickedAt   DateTime? @map("clicked_at")
+  convertedAt DateTime? @map("converted_at")
+  trialUser   TrialUser @relation(fields: [trialUserId], references: [id], onDelete: Cascade)
+
+  @@map("trial_nudges")
+}
+
+// Enums
+enum OfferType {
+  UPSELL
+  CROSS_SELL
+  BUNDLE
+  ADDON
+}
+
+enum CouponType {
+  PERCENTAGE
+  FIXED_AMOUNT
+  FREE_TRIAL_EXTENSION
+  FREE_ADDON
+}
+
+enum ExperimentStatus {
+  DRAFT
+  RUNNING
+  PAUSED
+  CONCLUDED
+  ARCHIVED
+}
+
+enum MessageType {
+  BANNER
+  MODAL
+  TOOLTIP
+  SLIDEOUT
+  FULLSCREEN
+}
+
+enum TriggerType {
+  PAGE_VIEW
+  EVENT
+  TIME_BASED
+  SCROLL_DEPTH
+  EXIT_INTENT
+  INACTIVITY
+}
+
+enum TriggerAction {
+  IMPRESSION
+  CLICK
+  DISMISS
+  CONVERT
+}
+
+enum MessageFrequency {
+  ONCE
+  ONCE_PER_SESSION
+  ALWAYS
+  DAILY
+  WEEKLY
+}
+
+enum TrialStatus {
+  ACTIVE
+  EXPIRED
+  CONVERTED
+  CANCELLED
+}
+
+enum NudgeType {
+  WELCOME
+  FEATURE_HIGHLIGHT
+  USAGE_TIP
+  UPGRADE_PROMPT
+  TRIAL_ENDING
+  LAST_CHANCE
+}
+
+enum NudgeChannel {
+  EMAIL
+  IN_APP
+  PUSH
+  SMS
+}

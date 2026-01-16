@@ -1,0 +1,376 @@
+generator client {
+  output   = "./../src/generated/client"
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// Chargemaster (CDM) Management
+// ==========================================
+
+model ChargemasterItem {
+  id                    String   @id @default(uuid())
+  organizationId        String
+  code                  String   // Internal CDM code
+  description           String
+  cptCode               String?  // CPT procedure code
+  hcpcsCode             String?  // HCPCS code
+  revenueCode           String?  // Revenue code
+  departmentCode        String?
+  departmentName        String?
+  grossCharge           Decimal  @db.Decimal(12, 2)
+  discountedCashPrice   Decimal? @db.Decimal(12, 2)
+  deidentifiedMinimum   Decimal? @db.Decimal(12, 2)
+  deidentifiedMaximum   Decimal? @db.Decimal(12, 2)
+  ndcCode               String?  // NDC for drugs
+  drugUnitOfMeasure     String?
+  drugQuantity          Decimal? @db.Decimal(10, 4)
+  modifiers             String[] // CPT modifiers
+  isShoppable           Boolean  @default(false)
+  isBundled             Boolean  @default(false)
+  bundleComponents      Json?    // Array of component items
+  effectiveDate         DateTime @default(now())
+  expirationDate        DateTime?
+  isActive              Boolean  @default(true)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  payerRates            PayerContractRate[]
+  priceEstimates        PriceEstimate[]
+  shoppableServices     ShoppableService[]
+
+  @@unique([organizationId, code])
+  @@index([organizationId])
+  @@index([cptCode])
+  @@index([hcpcsCode])
+  @@index([isShoppable])
+  @@index([isActive])
+}
+
+// ==========================================
+// Shoppable Services (CMS 70 Shoppable Services)
+// ==========================================
+
+model ShoppableService {
+  id                    String   @id @default(uuid())
+  organizationId        String
+  chargemasterItemId    String?
+  chargemasterItem      ChargemasterItem? @relation(fields: [chargemasterItemId], references: [id])
+  serviceName           String
+  serviceDescription    String
+  cptCode               String?
+  hcpcsCode             String?
+  cmsShoppableCategory  String?  // One of the 70 CMS shoppable services
+  plainLanguageDesc     String   // Patient-friendly description
+  typicalPatientClass   String?  // Inpatient, Outpatient, etc.
+  settingOfCare         String?  // Hospital, ASC, Office, etc.
+  ancillaryServices     Json?    // List of typically bundled services
+  grossCharge           Decimal  @db.Decimal(12, 2)
+  discountedCashPrice   Decimal  @db.Decimal(12, 2)
+  minNegotiatedRate     Decimal  @db.Decimal(12, 2)
+  maxNegotiatedRate     Decimal  @db.Decimal(12, 2)
+  isPackagePrice        Boolean  @default(false)
+  packageIncludes       Json?    // What's included in package
+  packageExcludes       Json?    // What's excluded
+  effectiveDate         DateTime @default(now())
+  expirationDate        DateTime?
+  isActive              Boolean  @default(true)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([organizationId])
+  @@index([cptCode])
+  @@index([hcpcsCode])
+  @@index([cmsShoppableCategory])
+  @@index([isActive])
+}
+
+// ==========================================
+// Payer Contracts and Negotiated Rates
+// ==========================================
+
+model PayerContract {
+  id                    String   @id @default(uuid())
+  organizationId        String
+  payerId               String
+  payerName             String
+  planType              String   // Commercial, Medicare Advantage, Medicaid MCO
+  planName              String?
+  ein                   String?  // Employer Identification Number
+  contractType          String   // Fee-for-service, Capitation, Value-based
+  effectiveDate         DateTime
+  terminationDate       DateTime?
+  allowedAmountBasis    String?  // Percentage of Medicare, Fee Schedule, etc.
+  feeScheduleVersion    String?
+  isActive              Boolean  @default(true)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  rates                 PayerContractRate[]
+
+  @@index([organizationId])
+  @@index([payerId])
+  @@index([payerName])
+  @@index([effectiveDate])
+  @@index([isActive])
+}
+
+model PayerContractRate {
+  id                    String   @id @default(uuid())
+  payerContractId       String
+  payerContract         PayerContract @relation(fields: [payerContractId], references: [id], onDelete: Cascade)
+  chargemasterItemId    String
+  chargemasterItem      ChargemasterItem @relation(fields: [chargemasterItemId], references: [id], onDelete: Cascade)
+  cptCode               String?
+  hcpcsCode             String?
+  modifiers             String[]
+  negotiatedRate        Decimal  @db.Decimal(12, 2)
+  rateType              RateType @default(fixed)
+  percentageOfCharge    Decimal? @db.Decimal(5, 2)
+  percentageOfMedicare  Decimal? @db.Decimal(5, 2)
+  minimumAmount         Decimal? @db.Decimal(12, 2)
+  maximumAmount         Decimal? @db.Decimal(12, 2)
+  effectiveDate         DateTime @default(now())
+  expirationDate        DateTime?
+  isActive              Boolean  @default(true)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([payerContractId])
+  @@index([chargemasterItemId])
+  @@index([cptCode])
+  @@index([isActive])
+}
+
+enum RateType {
+  fixed
+  percentage_of_charge
+  percentage_of_medicare
+  case_rate
+  per_diem
+  capitation
+}
+
+// ==========================================
+// Good Faith Estimate (No Surprises Act)
+// ==========================================
+
+model GoodFaithEstimate {
+  id                    String   @id @default(uuid())
+  organizationId        String
+  patientId             String
+  scheduledServiceDate  DateTime?
+  estimateDate          DateTime @default(now())
+  expirationDate        DateTime
+  status                GFEStatus @default(draft)
+  primaryDiagnosis      String?
+  primaryDiagnosisCode  String?  // ICD-10
+  scheduledProcedures   Json     // Array of CPT/HCPCS codes
+  providerNPI           String?
+  providerName          String?
+  providerType          String?
+  facilityNPI           String?
+  facilityName          String?
+  facilityType          String?
+  patientInsuranceType  String?  // Self-pay, Commercial, Medicare, etc.
+  estimatedTotal        Decimal  @db.Decimal(12, 2)
+  discountedCashPrice   Decimal? @db.Decimal(12, 2)
+  patientResponsibility Decimal? @db.Decimal(12, 2)
+  coInsuranceAmount     Decimal? @db.Decimal(12, 2)
+  deductibleAmount      Decimal? @db.Decimal(12, 2)
+  copayAmount           Decimal? @db.Decimal(12, 2)
+  disclaimer            String?
+  validForDays          Int      @default(365)
+  deliveredAt           DateTime?
+  deliveredMethod       String?  // Email, Portal, Print
+  patientSignature      String?
+  patientSignedAt       DateTime?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  lineItems             GFELineItem[]
+
+  @@index([organizationId])
+  @@index([patientId])
+  @@index([status])
+  @@index([scheduledServiceDate])
+}
+
+model GFELineItem {
+  id                    String   @id @default(uuid())
+  goodFaithEstimateId   String
+  goodFaithEstimate     GoodFaithEstimate @relation(fields: [goodFaithEstimateId], references: [id], onDelete: Cascade)
+  serviceCode           String   // CPT or HCPCS
+  serviceDescription    String
+  modifiers             String[]
+  quantity              Int      @default(1)
+  unitPrice             Decimal  @db.Decimal(12, 2)
+  totalPrice            Decimal  @db.Decimal(12, 2)
+  providerNPI           String?
+  providerType          String?  // Physician, Facility, Lab, etc.
+  serviceLocation       String?
+  estimatedDate         DateTime?
+  isRecurring           Boolean  @default(false)
+  recurringPeriod       String?  // Weekly, Monthly, etc.
+  notes                 String?
+  createdAt             DateTime @default(now())
+
+  @@index([goodFaithEstimateId])
+  @@index([serviceCode])
+}
+
+enum GFEStatus {
+  draft
+  pending
+  sent
+  delivered
+  acknowledged
+  expired
+  disputed
+}
+
+// ==========================================
+// Price Estimates
+// ==========================================
+
+model PriceEstimate {
+  id                    String   @id @default(uuid())
+  organizationId        String
+  patientId             String?
+  chargemasterItemId    String?
+  chargemasterItem      ChargemasterItem? @relation(fields: [chargemasterItemId], references: [id])
+  serviceCode           String   // CPT or HCPCS
+  serviceDescription    String
+  diagnosisCode         String?  // ICD-10
+  diagnosisDescription  String?
+  payerId               String?
+  payerName             String?
+  planType              String?
+  grossCharge           Decimal  @db.Decimal(12, 2)
+  negotiatedRate        Decimal? @db.Decimal(12, 2)
+  discountedCashPrice   Decimal? @db.Decimal(12, 2)
+  estimatedInsPayment   Decimal? @db.Decimal(12, 2)
+  estimatedPatientResp  Decimal? @db.Decimal(12, 2)
+  deductibleRemaining   Decimal? @db.Decimal(12, 2)
+  outOfPocketRemaining  Decimal? @db.Decimal(12, 2)
+  notes                 String?
+  createdAt             DateTime @default(now())
+  expiresAt             DateTime
+
+  @@index([organizationId])
+  @@index([patientId])
+  @@index([serviceCode])
+  @@index([payerId])
+}
+
+// ==========================================
+// Machine-Readable Files (MRF)
+// ==========================================
+
+model MachineReadableFile {
+  id                    String   @id @default(uuid())
+  organizationId        String
+  fileName              String
+  fileType              MRFFileType
+  version               String
+  schemaVersion         String   // CMS schema version
+  generatedAt           DateTime @default(now())
+  validFrom             DateTime
+  validTo               DateTime
+  fileUrl               String?  // S3/storage URL
+  fileSizeBytes         BigInt?
+  recordCount           Int?
+  status                MRFStatus @default(pending)
+  errorMessage          String?
+  lastPublishedAt       DateTime?
+  complianceCheckPassed Boolean  @default(false)
+  complianceCheckDate   DateTime?
+  complianceIssues      Json?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([organizationId])
+  @@index([fileType])
+  @@index([generatedAt])
+  @@index([status])
+}
+
+enum MRFFileType {
+  standard_charges      // Hospital price transparency
+  in_network_rates      // Payer in-network rates
+  out_of_network_allowed // Payer out-of-network
+  prescription_drugs    // Drug pricing
+  negotiated_rates      // Payer negotiated rates table
+}
+
+enum MRFStatus {
+  pending
+  generating
+  generated
+  published
+  failed
+  archived
+}
+
+// ==========================================
+// Compliance Monitoring
+// ==========================================
+
+model ComplianceAudit {
+  id                    String   @id @default(uuid())
+  organizationId        String
+  auditType             ComplianceAuditType
+  auditDate             DateTime @default(now())
+  auditorName           String?
+  findings              Json     // Array of compliance findings
+  overallScore          Decimal? @db.Decimal(5, 2)
+  passedChecks          Int      @default(0)
+  failedChecks          Int      @default(0)
+  warningChecks         Int      @default(0)
+  recommendations       Json?
+  remedationDeadline    DateTime?
+  remediationStatus     String?
+  notes                 String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([organizationId])
+  @@index([auditType])
+  @@index([auditDate])
+}
+
+enum ComplianceAuditType {
+  cms_hospital_price_transparency
+  no_surprises_act_gfe
+  payer_transparency_rule
+  state_price_transparency
+  internal_audit
+}
+
+// ==========================================
+// Price Comparison Cache
+// ==========================================
+
+model PriceComparisonCache {
+  id                    String   @id @default(uuid())
+  serviceCode           String   // CPT or HCPCS
+  zipCode               String
+  searchRadius          Int      @default(25) // miles
+  results               Json     // Array of facility/price pairs
+  resultCount           Int
+  minPrice              Decimal  @db.Decimal(12, 2)
+  maxPrice              Decimal  @db.Decimal(12, 2)
+  averagePrice          Decimal  @db.Decimal(12, 2)
+  medianPrice           Decimal  @db.Decimal(12, 2)
+  cachedAt              DateTime @default(now())
+  expiresAt             DateTime
+
+  @@unique([serviceCode, zipCode, searchRadius])
+  @@index([serviceCode])
+  @@index([zipCode])
+  @@index([expiresAt])
+}

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Flask - laboratory icon -->
+  <path d="M9 3h6"/>
+  <path d="M10 9V3"/>
+  <path d="M14 9V3"/>
+  <path d="M10 9L5 18a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3L14 9"/>
+  <path d="M7 17h10"/>
+</svg>

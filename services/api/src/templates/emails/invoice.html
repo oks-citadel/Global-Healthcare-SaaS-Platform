@@ -1,0 +1,141 @@
+<h1>Invoice for Your Visit</h1>
+
+<p>Hi {{patientName}},</p>
+
+<p>Thank you for choosing The Unified Health. Here's your invoice for the recent visit.</p>
+
+<div class="info-box">
+  <h3>Invoice Details</h3>
+  <table class="details-table">
+    <tr>
+      <td>Invoice Number:</td>
+      <td><strong>{{invoiceNumber}}</strong></td>
+    </tr>
+    <tr>
+      <td>Invoice Date:</td>
+      <td>{{invoiceDate}}</td>
+    </tr>
+    <tr>
+      <td>Visit Date:</td>
+      <td>{{visitDate}}</td>
+    </tr>
+    <tr>
+      <td>Provider:</td>
+      <td>{{providerName}}</td>
+    </tr>
+    <tr>
+      <td>Payment Status:</td>
+      <td><strong style="color: {{statusColor}};">{{paymentStatus}}</strong></td>
+    </tr>
+  </table>
+</div>
+
+<h2>Services & Charges</h2>
+
+<table class="details-table">
+  {{#each items}}
+  <tr>
+    <td>{{description}}</td>
+    <td style="text-align: right;"><strong>{{amount}}</strong></td>
+  </tr>
+  {{/each}}
+  <tr style="border-top: 2px solid #2d3748;">
+    <td><strong>Subtotal:</strong></td>
+    <td style="text-align: right;"><strong>{{subtotal}}</strong></td>
+  </tr>
+  {{#if discount}}
+  <tr>
+    <td>Discount ({{discountPercent}}%):</td>
+    <td style="text-align: right; color: #48bb78;">-{{discount}}</td>
+  </tr>
+  {{/if}}
+  {{#if tax}}
+  <tr>
+    <td>Tax:</td>
+    <td style="text-align: right;">{{tax}}</td>
+  </tr>
+  {{/if}}
+  {{#if insuranceCovered}}
+  <tr>
+    <td>Insurance Coverage:</td>
+    <td style="text-align: right; color: #48bb78;">-{{insuranceCovered}}</td>
+  </tr>
+  {{/if}}
+  <tr style="border-top: 2px solid #2d3748; font-size: 18px;">
+    <td><strong>Total Amount:</strong></td>
+    <td style="text-align: right;"><strong>{{totalAmount}}</strong></td>
+  </tr>
+  {{#if amountDue}}
+  <tr style="font-size: 18px;">
+    <td><strong>Amount Due:</strong></td>
+    <td style="text-align: right; color: #ed8936;"><strong>{{amountDue}}</strong></td>
+  </tr>
+  {{/if}}
+</table>
+
+{{#if insuranceInfo}}
+<div class="info-box" style="background-color: #f0fff4; border-left-color: #48bb78;">
+  <h3 style="color: #2f855a;">Insurance Information</h3>
+  <p>
+    <strong>Insurance Provider:</strong> {{insuranceInfo.provider}}<br>
+    <strong>Policy Number:</strong> {{insuranceInfo.policyNumber}}<br>
+    <strong>Claim Status:</strong> {{insuranceInfo.claimStatus}}
+  </p>
+</div>
+{{/if}}
+
+{{#if isPending}}
+<div class="info-box" style="background-color: #fffaf0; border-left-color: #ed8936;">
+  <h3 style="color: #c05621;">Payment Required</h3>
+  <p>Your payment is due by <strong>{{dueDate}}</strong>.</p>
+</div>
+
+<div class="text-center">
+  <a href="{{paymentUrl}}" class="btn btn-primary">Pay Now</a>
+</div>
+{{/if}}
+
+{{#if isPaid}}
+<div class="info-box" style="background-color: #f0fff4; border-left-color: #48bb78;">
+  <h3 style="color: #2f855a;">Payment Received</h3>
+  <p>
+    Thank you! Your payment of <strong>{{totalAmount}}</strong> was received on <strong>{{paymentDate}}</strong>.
+  </p>
+  <p><strong>Transaction ID:</strong> {{transactionId}}</p>
+</div>
+{{/if}}
+
+<h2>Payment Methods</h2>
+
+<p>We accept the following payment methods:</p>
+
+<ul style="color: #4a5568;">
+  <li>Credit/Debit Cards (Visa, MasterCard, American Express)</li>
+  <li>PayPal</li>
+  <li>Bank Transfer</li>
+  <li>Insurance (if applicable)</li>
+</ul>
+
+<div class="text-center">
+  <a href="{{appUrl}}/invoices/{{invoiceId}}" class="btn btn-primary">View Invoice</a>
+  <a href="{{appUrl}}/invoices/{{invoiceId}}/download" class="btn btn-secondary">Download PDF</a>
+</div>
+
+<div class="info-box" style="margin-top: 30px;">
+  <h3>Billing Questions?</h3>
+  <p>
+    If you have questions about this invoice, please contact our billing department:<br>
+    Email: <a href="mailto:billing@theunifiedhealth.com">billing@theunifiedhealth.com</a><br>
+    Phone: <a href="tel:{{billingPhone}}">{{billingPhone}}</a>
+  </p>
+</div>
+
+<p class="text-muted" style="margin-top: 30px;">
+  <strong>Note:</strong> This is an electronic invoice. No signature is required.
+  Please retain this invoice for your records.
+</p>
+
+<p>
+  Thank you for your business.<br>
+  <strong>The Unified Health Team</strong>
+</p>

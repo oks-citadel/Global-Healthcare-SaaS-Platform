@@ -1,0 +1,38 @@
+{
+  "name": "@unified-health/adapters",
+  "version": "1.0.0",
+  "description": "Provider adapter interfaces and implementations for healthcare integrations",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "jest",
+    "lint": "eslint src --ext .ts",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "healthcare",
+    "adapters",
+    "ehr",
+    "hie",
+    "fhir",
+    "integration"
+  ],
+  "author": "Global Healthcare Platform",
+  "license": "MIT",
+  "dependencies": {
+    "@global-health/fhir": "workspace:*",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "@types/jest": "^29.5.11",
+    "@types/node": "^20.10.0",
+    "eslint": "^9.0.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.0",
+    "typescript": "^5.3.3",
+    "typescript-eslint": "^8.0.0"
+  }
+}

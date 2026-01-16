@@ -1,0 +1,92 @@
+{
+  "title": "Dashboard",
+  "welcome": "Welcome back, {{name}}!",
+  "overview": "Overview",
+  "stats": {
+    "appointments": "Appointments",
+    "patients": "Total Patients",
+    "doctors": "Healthcare Providers",
+    "revenue": "Revenue",
+    "upcomingAppointments": "Upcoming Appointments",
+    "todayAppointments": "Today's Appointments",
+    "pendingApprovals": "Pending Approvals",
+    "newPatients": "New Patients",
+    "occupancyRate": "Occupancy Rate",
+    "averageWaitTime": "Avg. Wait Time",
+    "patientSatisfaction": "Patient Satisfaction",
+    "completedAppointments": "Completed Appointments"
+  },
+  "quickActions": {
+    "title": "Quick Actions",
+    "scheduleAppointment": "Schedule Appointment",
+    "addPatient": "Add Patient",
+    "viewReports": "View Reports",
+    "manageStaff": "Manage Staff",
+    "billing": "Billing & Invoices",
+    "inventory": "Inventory",
+    "prescriptions": "Prescriptions",
+    "labResults": "Lab Results"
+  },
+  "recentActivity": {
+    "title": "Recent Activity",
+    "viewAll": "View All",
+    "noActivity": "No recent activity",
+    "appointmentScheduled": "Appointment scheduled",
+    "appointmentCompleted": "Appointment completed",
+    "appointmentCancelled": "Appointment cancelled",
+    "patientRegistered": "New patient registered",
+    "prescriptionIssued": "Prescription issued",
+    "labResultAvailable": "Lab result available",
+    "invoicePaid": "Invoice paid",
+    "reportGenerated": "Report generated"
+  },
+  "appointments": {
+    "title": "Upcoming Appointments",
+    "today": "Today",
+    "thisWeek": "This Week",
+    "noAppointments": "No upcoming appointments",
+    "viewSchedule": "View Full Schedule",
+    "patient": "Patient",
+    "doctor": "Doctor",
+    "time": "Time",
+    "type": "Type",
+    "status": "Status"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark all as read",
+    "noNotifications": "No new notifications",
+    "viewAll": "View All",
+    "new": "New",
+    "appointmentReminder": "Appointment Reminder",
+    "labResultReady": "Lab Result Ready",
+    "prescriptionRefill": "Prescription Refill Due",
+    "systemAlert": "System Alert"
+  },
+  "calendar": {
+    "title": "Calendar",
+    "viewMonth": "Month View",
+    "viewWeek": "Week View",
+    "viewDay": "Day View",
+    "today": "Today",
+    "events": "Events"
+  },
+  "performance": {
+    "title": "Performance Metrics",
+    "monthly": "Monthly",
+    "quarterly": "Quarterly",
+    "yearly": "Yearly",
+    "comparison": "Comparison",
+    "trend": "Trend",
+    "growth": "Growth",
+    "decline": "Decline"
+  },
+  "alerts": {
+    "title": "System Alerts",
+    "critical": "Critical",
+    "warning": "Warning",
+    "info": "Information",
+    "dismiss": "Dismiss",
+    "viewDetails": "View Details"
+  }
+}

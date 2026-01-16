@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    /* Primary: Trust Blue (#2563EB) - HSL: 217.2 91.2% 52.9% */
+    --primary: 217.2 91.2% 52.9%;
+    --primary-foreground: 210 40% 98%;
+    /* Secondary: Health Green (#16A34A) - HSL: 142.1 76.2% 36.3% */
+    --secondary: 142.1 76.2% 36.3%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Accent: Innovation Purple (#9333EA) - HSL: 271.5 81.3% 55.9% */
+    --accent: 271.5 81.3% 55.9%;
+    --accent-foreground: 210 40% 98%;
+    /* Tertiary: Modern Teal (#0D9488) - HSL: 174.7 83.9% 31.6% */
+    --tertiary: 174.7 83.9% 31.6%;
+    --tertiary-foreground: 210 40% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 217.2 91.2% 52.9%;
+    --radius: 0.5rem;
+    /* Sidebar Active Gradient */
+    --sidebar-active-start: 217.2 91.2% 52.9%;
+    --sidebar-active-end: 224.3 76.3% 48%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    /* Primary: Trust Blue (#2563EB) */
+    --primary: 217.2 91.2% 52.9%;
+    --primary-foreground: 210 40% 98%;
+    /* Secondary: Health Green (#16A34A) */
+    --secondary: 142.1 70% 45%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    /* Accent: Innovation Purple (#9333EA) */
+    --accent: 271.5 81.3% 55.9%;
+    --accent-foreground: 210 40% 98%;
+    /* Tertiary: Modern Teal (#0D9488) */
+    --tertiary: 174.7 83.9% 31.6%;
+    --tertiary-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 217.2 91.2% 52.9%;
+    /* Sidebar Active Gradient */
+    --sidebar-active-start: 217.2 91.2% 52.9%;
+    --sidebar-active-end: 224.3 76.3% 48%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Sidebar Active State Gradient */
+.sidebar-active {
+  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+}

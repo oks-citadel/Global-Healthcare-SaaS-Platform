@@ -1,0 +1,909 @@
+openapi: 3.0.3
+info:
+  title: The Unified Health Notification Service
+  version: 1.0.0
+  description: |
+    The Notification Service for The Unified Health Global Platform. This service manages
+    all notification delivery across multiple channels including email, SMS, push
+    notifications, and in-app messages.
+
+    ## Features
+    - **Multi-Channel Delivery**: Send notifications via email, SMS, push, or in-app
+    - **Template Management**: Create and manage reusable notification templates
+    - **User Preferences**: Respect user notification preferences per channel
+    - **Scheduling**: Schedule notifications for future delivery
+    - **Bulk Notifications**: Send batch notifications efficiently
+    - **Delivery Tracking**: Track notification delivery status
+
+    ## Notification Channels
+    - `email`: Email notifications via SMTP/SendGrid
+    - `sms`: SMS notifications via Twilio
+    - `push`: Push notifications via Firebase Cloud Messaging
+    - `in_app`: In-application notifications
+
+    ## Priority Levels
+    - `low`: Non-urgent notifications (marketing, updates)
+    - `normal`: Standard notifications (appointment reminders)
+    - `high`: Important notifications (prescription ready)
+    - `urgent`: Critical notifications (lab results, alerts)
+
+  contact:
+    name: API Support
+    email: support@theunifiedhealth.com
+  license:
+    name: Proprietary
+    url: https://theunifiedhealth.com/terms
+
+servers:
+  - url: http://localhost:3005
+    description: Local development server
+  - url: https://notifications-dev.unifiedhealthcare.com
+    description: Development environment
+  - url: https://notifications.unifiedhealthcare.com
+    description: Production environment
+
+tags:
+  - name: Health
+    description: Health check and monitoring endpoints
+  - name: Notifications
+    description: Notification management endpoints
+  - name: Templates
+    description: Notification template management
+  - name: Preferences
+    description: User notification preferences
+
+security:
+  - BearerAuth: []
+
+paths:
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Health check
+      description: Simple health check endpoint for monitoring
+      operationId: getHealth
+      security: []
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /notifications:
+    post:
+      tags:
+        - Notifications
+      summary: Send a notification
+      description: |
+        Create and send a notification to a user. Admin users can send to any user,
+        non-admin users can only send notifications to themselves.
+      operationId: createNotification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateNotificationRequest'
+      responses:
+        '201':
+          description: Notification created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /notifications/bulk:
+    post:
+      tags:
+        - Notifications
+      summary: Bulk send notifications
+      description: |
+        Send multiple notifications in a single request. Admin only.
+        Maximum 1000 notifications per request.
+      operationId: bulkCreateNotifications
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkNotificationRequest'
+      responses:
+        '202':
+          description: Notifications queued for delivery
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkNotificationResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /notifications/user/{userId}:
+    get:
+      tags:
+        - Notifications
+      summary: Get user notifications
+      description: |
+        Retrieve notifications for a specific user. Users can only access their
+        own notifications unless they are an admin.
+      operationId: getUserNotifications
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, queued, sent, delivered, failed, read]
+        - name: channel
+          in: query
+          schema:
+            type: string
+            enum: [email, sms, push, in_app]
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        '200':
+          description: List of notifications
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationListResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /notifications/user/{userId}/read-all:
+    patch:
+      tags:
+        - Notifications
+      summary: Mark all notifications as read
+      description: Mark all unread notifications as read for a user
+      operationId: markAllAsRead
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Notifications marked as read
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      updated:
+                        type: integer
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /notifications/{notificationId}:
+    get:
+      tags:
+        - Notifications
+      summary: Get notification by ID
+      description: Retrieve a specific notification
+      operationId: getNotification
+      parameters:
+        - name: notificationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Notification found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+    delete:
+      tags:
+        - Notifications
+      summary: Delete notification
+      description: Delete a notification. Users can only delete their own notifications.
+      operationId: deleteNotification
+      parameters:
+        - name: notificationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Notification deleted
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /notifications/{notificationId}/read:
+    patch:
+      tags:
+        - Notifications
+      summary: Mark notification as read
+      description: Mark a specific notification as read
+      operationId: markAsRead
+      parameters:
+        - name: notificationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Notification marked as read
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /templates:
+    get:
+      tags:
+        - Templates
+      summary: List notification templates
+      description: Retrieve all notification templates with optional filtering
+      operationId: listTemplates
+      parameters:
+        - name: channel
+          in: query
+          schema:
+            type: string
+            enum: [email, sms, push, in_app]
+        - name: type
+          in: query
+          schema:
+            type: string
+        - name: locale
+          in: query
+          schema:
+            type: string
+        - name: isActive
+          in: query
+          schema:
+            type: boolean
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: List of templates
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateListResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+    post:
+      tags:
+        - Templates
+      summary: Create notification template
+      description: Create a new notification template. Admin only.
+      operationId: createTemplate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTemplateRequest'
+      responses:
+        '201':
+          description: Template created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '409':
+          description: Template with name already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /templates/{templateId}:
+    get:
+      tags:
+        - Templates
+      summary: Get template by ID
+      description: Retrieve a specific notification template
+      operationId: getTemplate
+      parameters:
+        - name: templateId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Template found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+    put:
+      tags:
+        - Templates
+      summary: Update template
+      description: Update a notification template. Admin only.
+      operationId: updateTemplate
+      parameters:
+        - name: templateId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTemplateRequest'
+      responses:
+        '200':
+          description: Template updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+    delete:
+      tags:
+        - Templates
+      summary: Delete template
+      description: Delete a notification template. Admin only.
+      operationId: deleteTemplate
+      parameters:
+        - name: templateId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Template deleted
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /templates/{templateId}/toggle:
+    patch:
+      tags:
+        - Templates
+      summary: Toggle template active status
+      description: Enable or disable a notification template. Admin only.
+      operationId: toggleTemplate
+      parameters:
+        - name: templateId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Template status toggled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /templates/{templateId}/render:
+    post:
+      tags:
+        - Templates
+      summary: Render template
+      description: Render a template with provided variables for preview
+      operationId: renderTemplate
+      parameters:
+        - name: templateId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                variables:
+                  type: object
+                  additionalProperties: true
+      responses:
+        '200':
+          description: Rendered template
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RenderedTemplateResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /templates/name/{templateName}:
+    get:
+      tags:
+        - Templates
+      summary: Get template by name
+      description: Retrieve a notification template by its unique name
+      operationId: getTemplateByName
+      parameters:
+        - name: templateName
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Template found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT access token from Auth Service
+
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [healthy, unhealthy]
+          example: healthy
+        timestamp:
+          type: string
+          format: date-time
+        version:
+          type: string
+          example: "1.0.0"
+        service:
+          type: string
+          example: "notification-service"
+
+    CreateNotificationRequest:
+      type: object
+      required:
+        - userId
+        - type
+        - message
+        - channel
+      properties:
+        userId:
+          type: string
+          format: uuid
+        type:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: "appointment_reminder"
+        title:
+          type: string
+          maxLength: 200
+          example: "Appointment Reminder"
+        message:
+          type: string
+          minLength: 1
+          example: "Your appointment is scheduled for tomorrow at 10:00 AM"
+        channel:
+          type: string
+          enum: [email, sms, push, in_app]
+        priority:
+          type: string
+          enum: [low, normal, high, urgent]
+          default: normal
+        metadata:
+          type: object
+          additionalProperties: true
+        scheduledAt:
+          type: string
+          format: date-time
+          description: Schedule for future delivery
+        templateId:
+          type: string
+          format: uuid
+
+    BulkNotificationRequest:
+      type: object
+      required:
+        - notifications
+      properties:
+        notifications:
+          type: array
+          minItems: 1
+          maxItems: 1000
+          items:
+            $ref: '#/components/schemas/CreateNotificationRequest'
+
+    NotificationResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: '#/components/schemas/Notification'
+
+    Notification:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        type:
+          type: string
+        title:
+          type: string
+        message:
+          type: string
+        channel:
+          type: string
+          enum: [email, sms, push, in_app]
+        priority:
+          type: string
+          enum: [low, normal, high, urgent]
+        status:
+          type: string
+          enum: [pending, queued, sent, delivered, failed, read]
+        metadata:
+          type: object
+        scheduledAt:
+          type: string
+          format: date-time
+        sentAt:
+          type: string
+          format: date-time
+        deliveredAt:
+          type: string
+          format: date-time
+        readAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    NotificationListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            notifications:
+              type: array
+              items:
+                $ref: '#/components/schemas/Notification'
+            pagination:
+              $ref: '#/components/schemas/Pagination'
+
+    BulkNotificationResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            queued:
+              type: integer
+            batchId:
+              type: string
+              format: uuid
+            notificationIds:
+              type: array
+              items:
+                type: string
+                format: uuid
+
+    CreateTemplateRequest:
+      type: object
+      required:
+        - name
+        - type
+        - channel
+        - body
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: "appointment_reminder_email"
+        type:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: "appointment_reminder"
+        channel:
+          type: string
+          enum: [email, sms, push, in_app]
+        subject:
+          type: string
+          maxLength: 200
+          example: "Appointment Reminder - {{providerName}}"
+        body:
+          type: string
+          minLength: 1
+          example: "Hello {{patientName}}, this is a reminder for your appointment on {{date}} at {{time}}."
+        variables:
+          type: array
+          items:
+            type: string
+          example: ["patientName", "providerName", "date", "time"]
+        locale:
+          type: string
+          minLength: 2
+          maxLength: 10
+          default: "en"
+
+    UpdateTemplateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        type:
+          type: string
+          minLength: 1
+          maxLength: 100
+        channel:
+          type: string
+          enum: [email, sms, push, in_app]
+        subject:
+          type: string
+          maxLength: 200
+        body:
+          type: string
+          minLength: 1
+        variables:
+          type: array
+          items:
+            type: string
+        locale:
+          type: string
+          minLength: 2
+          maxLength: 10
+
+    TemplateResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: '#/components/schemas/Template'
+
+    Template:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        type:
+          type: string
+        channel:
+          type: string
+          enum: [email, sms, push, in_app]
+        subject:
+          type: string
+        body:
+          type: string
+        variables:
+          type: array
+          items:
+            type: string
+        locale:
+          type: string
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    TemplateListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            templates:
+              type: array
+              items:
+                $ref: '#/components/schemas/Template'
+            pagination:
+              $ref: '#/components/schemas/Pagination'
+
+    RenderedTemplateResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            subject:
+              type: string
+            body:
+              type: string
+            channel:
+              type: string
+
+    Pagination:
+      type: object
+      properties:
+        limit:
+          type: integer
+        offset:
+          type: integer
+        total:
+          type: integer
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+            details:
+              type: array
+              items:
+                type: object
+
+  responses:
+    UnauthorizedError:
+      description: Unauthorized - Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    ForbiddenError:
+      description: Forbidden - Insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    NotFoundError:
+      description: Not found - Resource does not exist
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'

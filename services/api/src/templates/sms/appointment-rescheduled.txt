@@ -1,0 +1,1 @@
+Hi {{patientName}}, your appointment with Dr. {{providerName}} has been rescheduled from {{oldDate}} at {{oldTime}} to {{newDate}} at {{newTime}}. View details: {{appUrl}}/appointments/{{appointmentId}} - {{appName}}

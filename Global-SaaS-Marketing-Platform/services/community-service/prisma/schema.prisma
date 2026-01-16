@@ -1,0 +1,188 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Post {
+  id           String    @id @default(uuid())
+  tenantId     String    @map("tenant_id")
+  authorId     String    @map("author_id")
+  title        String
+  content      String
+  category     String?
+  tags         String[]
+  status       PostStatus @default(PUBLISHED)
+  isPinned     Boolean   @default(false) @map("is_pinned")
+  viewCount    Int       @default(0) @map("view_count")
+  likeCount    Int       @default(0) @map("like_count")
+  commentCount Int       @default(0) @map("comment_count")
+  shareCount   Int       @default(0) @map("share_count")
+  isVisible    Boolean   @default(true) @map("is_visible")
+  moderationStatus ModerationStatus @default(PENDING) @map("moderation_status")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+
+  comments     Comment[]
+  reactions    Reaction[]
+  shares       Share[]
+  reports      Report[]
+
+  @@index([tenantId])
+  @@index([authorId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("posts")
+}
+
+model Comment {
+  id           String    @id @default(uuid())
+  tenantId     String    @map("tenant_id")
+  postId       String    @map("post_id")
+  authorId     String    @map("author_id")
+  parentId     String?   @map("parent_id")
+  content      String
+  likeCount    Int       @default(0) @map("like_count")
+  isEdited     Boolean   @default(false) @map("is_edited")
+  isVisible    Boolean   @default(true) @map("is_visible")
+  moderationStatus ModerationStatus @default(PENDING) @map("moderation_status")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+
+  post         Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  parent       Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies      Comment[] @relation("CommentReplies")
+  reactions    Reaction[]
+  reports      Report[]
+
+  @@index([tenantId])
+  @@index([postId])
+  @@index([parentId])
+  @@index([createdAt])
+  @@map("comments")
+}
+
+model Reaction {
+  id           String    @id @default(uuid())
+  tenantId     String    @map("tenant_id")
+  userId       String    @map("user_id")
+  targetType   TargetType @map("target_type")
+  postId       String?   @map("post_id")
+  commentId    String?   @map("comment_id")
+  reactionType String    @map("reaction_type")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  post         Post?     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  comment      Comment?  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, userId, targetType, postId, commentId, reactionType])
+  @@index([tenantId])
+  @@index([postId])
+  @@index([commentId])
+  @@map("reactions")
+}
+
+model Share {
+  id           String    @id @default(uuid())
+  tenantId     String    @map("tenant_id")
+  contentType  String    @map("content_type")
+  contentId    String    @map("content_id")
+  postId       String?   @map("post_id")
+  platform     String
+  userId       String?   @map("user_id")
+  metadata     Json?
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  post         Post?     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([contentId])
+  @@index([platform])
+  @@index([createdAt])
+  @@map("shares")
+}
+
+model Report {
+  id           String    @id @default(uuid())
+  tenantId     String    @map("tenant_id")
+  targetType   TargetType @map("target_type")
+  postId       String?   @map("post_id")
+  commentId    String?   @map("comment_id")
+  reporterId   String    @map("reporter_id")
+  reason       ReportReason
+  description  String?
+  status       ReportStatus @default(PENDING)
+  reviewedBy   String?   @map("reviewed_by")
+  reviewedAt   DateTime? @map("reviewed_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  post         Post?     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  comment      Comment?  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("reports")
+}
+
+model ModerationAction {
+  id           String    @id @default(uuid())
+  tenantId     String    @map("tenant_id")
+  targetType   TargetType @map("target_type")
+  targetId     String    @map("target_id")
+  action       ModerationActionType
+  moderatorId  String    @map("moderator_id")
+  reason       String?
+  notes        String?
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  @@index([tenantId])
+  @@index([targetId])
+  @@index([createdAt])
+  @@map("moderation_actions")
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum TargetType {
+  POST
+  COMMENT
+}
+
+enum ModerationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ReportReason {
+  SPAM
+  HARASSMENT
+  INAPPROPRIATE
+  MISINFORMATION
+  OTHER
+}
+
+enum ReportStatus {
+  PENDING
+  REVIEWED
+  DISMISSED
+  ACTIONED
+}
+
+enum ModerationActionType {
+  APPROVE
+  REJECT
+  HIDE
+  DELETE
+  WARN
+}

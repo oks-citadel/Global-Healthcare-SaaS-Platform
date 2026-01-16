@@ -1,0 +1,122 @@
+version: 0.2
+
+# ============================================
+# The Unified Health Platform - AWS CodeBuild Spec
+# ============================================
+# Builds Docker images and pushes to Amazon ECR
+# Domain: theunifiedhealth.com
+# AWS Account: 992382449461
+# Region: us-east-1
+# ============================================
+
+env:
+  variables:
+    DOCKER_BUILDKIT: "1"
+    DEFAULT_AWS_ACCOUNT_ID: "992382449461"
+    DEFAULT_AWS_REGION: "us-east-1"
+  exported-variables:
+    - IMAGE_TAG
+    - IMAGE_URI
+
+phases:
+  pre_build:
+    commands:
+      - echo "=== Pre-Build Phase ==="
+      - echo "Logging in to Amazon ECR..."
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+      - echo "Setting image tag..."
+      - export COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - export IMAGE_TAG=${COMMIT_HASH:-latest}
+      - export IMAGE_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$IMAGE_TAG
+      - echo "Image URI:" $IMAGE_URI
+      - echo "Service Path:" $SERVICE_PATH
+
+  build:
+    commands:
+      - echo "=== Build Phase ==="
+      - echo "Building Docker image for $SERVICE_NAME..."
+      - cd $CODEBUILD_SRC_DIR
+
+      # Select Dockerfile: prefer service-specific, fallback to monorepo Dockerfiles
+      - |
+        # Check if service has its own Dockerfile
+        if [[ -f "${SERVICE_PATH}/Dockerfile" ]]; then
+          echo "Using service-specific Dockerfile: ${SERVICE_PATH}/Dockerfile"
+          docker build -t $IMAGE_URI \
+            --build-arg NODE_ENV=production \
+            --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+            --build-arg VCS_REF=$COMMIT_HASH \
+            -f ${SERVICE_PATH}/Dockerfile \
+            ${SERVICE_PATH}
+        elif [[ "$SERVICE_PATH" == apps/* ]]; then
+          DOCKERFILE="docker/Dockerfile.app"
+          echo "Building Next.js app with monorepo $DOCKERFILE"
+          docker build -t $IMAGE_URI \
+            --build-arg SERVICE_PATH=$SERVICE_PATH \
+            --build-arg SERVICE_NAME=$SERVICE_NAME \
+            --build-arg NODE_ENV=production \
+            --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+            --build-arg VCS_REF=$COMMIT_HASH \
+            -f $DOCKERFILE \
+            .
+        else
+          DOCKERFILE="docker/Dockerfile.service"
+          echo "Building service with monorepo $DOCKERFILE"
+          docker build -t $IMAGE_URI \
+            --build-arg SERVICE_PATH=$SERVICE_PATH \
+            --build-arg SERVICE_NAME=$SERVICE_NAME \
+            --build-arg NODE_ENV=production \
+            --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+            --build-arg VCS_REF=$COMMIT_HASH \
+            -f $DOCKERFILE \
+            .
+        fi
+
+  post_build:
+    commands:
+      - echo "=== Post-Build Phase ==="
+      - echo "Pushing Docker image to ECR..."
+      - docker push $IMAGE_URI
+
+      # Also tag as latest for the branch (may fail with immutable tags - non-blocking)
+      - docker tag $IMAGE_URI $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:latest
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:latest || echo "Latest tag push skipped (immutable or already exists)"
+
+      # Generate imagedefinitions.json for ECS/EKS deployment
+      - echo "Generating image definitions..."
+      - |
+        cat > imagedefinitions.json << EOF
+        [
+          {
+            "name": "$SERVICE_NAME",
+            "imageUri": "$IMAGE_URI"
+          }
+        ]
+        EOF
+
+      # Generate Kubernetes manifest patch
+      - |
+        cat > k8s-patch.yaml << EOF
+        spec:
+          template:
+            spec:
+              containers:
+                - name: $SERVICE_NAME
+                  image: $IMAGE_URI
+        EOF
+
+      - echo "Build completed successfully!"
+      - echo "Image URI:" $IMAGE_URI
+
+artifacts:
+  files:
+    - imagedefinitions.json
+    - k8s-patch.yaml
+    - appspec.yml
+  discard-paths: yes
+
+cache:
+  paths:
+    - "/root/.npm/**/*"
+    - "/root/.pnpm-store/**/*"
+    - "node_modules/**/*"

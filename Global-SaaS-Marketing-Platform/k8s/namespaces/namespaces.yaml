@@ -1,0 +1,137 @@
+################################################################################
+# Kubernetes Namespace Definitions
+# Global SaaS Marketing Platform
+################################################################################
+
+# SEO Namespace
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: seo
+  labels:
+    name: seo
+    app.kubernetes.io/part-of: saas-marketing-platform
+    app.kubernetes.io/component: seo
+    environment: production
+---
+# Content Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: content
+  labels:
+    name: content
+    app.kubernetes.io/part-of: saas-marketing-platform
+    app.kubernetes.io/component: content
+    environment: production
+---
+# Analytics Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: analytics
+  labels:
+    name: analytics
+    app.kubernetes.io/part-of: saas-marketing-platform
+    app.kubernetes.io/component: analytics
+    environment: production
+---
+# Personalization Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: personalization
+  labels:
+    name: personalization
+    app.kubernetes.io/part-of: saas-marketing-platform
+    app.kubernetes.io/component: personalization
+    environment: production
+---
+# Lifecycle Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: lifecycle
+  labels:
+    name: lifecycle
+    app.kubernetes.io/part-of: saas-marketing-platform
+    app.kubernetes.io/component: lifecycle
+    environment: production
+---
+# Growth Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: growth
+  labels:
+    name: growth
+    app.kubernetes.io/part-of: saas-marketing-platform
+    app.kubernetes.io/component: growth
+    environment: production
+---
+# Commerce Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: commerce
+  labels:
+    name: commerce
+    app.kubernetes.io/part-of: saas-marketing-platform
+    app.kubernetes.io/component: commerce
+    environment: production
+---
+# AI Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ai
+  labels:
+    name: ai
+    app.kubernetes.io/part-of: saas-marketing-platform
+    app.kubernetes.io/component: ai
+    environment: production
+---
+# Community Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: community
+  labels:
+    name: community
+    app.kubernetes.io/part-of: saas-marketing-platform
+    app.kubernetes.io/component: community
+    environment: production
+---
+# Reputation Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: reputation
+  labels:
+    name: reputation
+    app.kubernetes.io/part-of: saas-marketing-platform
+    app.kubernetes.io/component: reputation
+    environment: production
+---
+# Localization Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: localization
+  labels:
+    name: localization
+    app.kubernetes.io/part-of: saas-marketing-platform
+    app.kubernetes.io/component: localization
+    environment: production
+---
+# Observability Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: observability
+  labels:
+    name: observability
+    app.kubernetes.io/part-of: saas-marketing-platform
+    app.kubernetes.io/component: observability
+    environment: production

@@ -1,0 +1,313 @@
+# Staging Environment Values
+# Used for pre-production testing and validation
+
+global:
+  environment: staging
+  namespace: marketing-platform-staging
+
+  # AWS Configuration
+  aws:
+    region: us-east-1
+    accountId: "123456789012"
+
+  # Image configuration
+  imageRegistry: 123456789012.dkr.ecr.us-east-1.amazonaws.com
+  imagePullSecrets: []
+
+  # Ingress configuration
+  ingress:
+    enabled: true
+    className: alb
+    annotations:
+      kubernetes.io/ingress.class: alb
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/target-type: ip
+      alb.ingress.kubernetes.io/healthcheck-path: /health
+      alb.ingress.kubernetes.io/healthcheck-interval-seconds: "30"
+      alb.ingress.kubernetes.io/healthcheck-timeout-seconds: "5"
+      alb.ingress.kubernetes.io/healthy-threshold-count: "2"
+      alb.ingress.kubernetes.io/unhealthy-threshold-count: "3"
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+      alb.ingress.kubernetes.io/ssl-redirect: "443"
+      alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:123456789012:certificate/staging-cert-id
+      alb.ingress.kubernetes.io/wafv2-acl-arn: arn:aws:wafv2:us-east-1:123456789012:regional/webacl/staging-waf/xxxxx
+    domain: staging.marketing.example.com
+    tls:
+      enabled: true
+
+  # Database configuration
+  database:
+    host: marketing-staging-db.cluster-xxxxx.us-east-1.rds.amazonaws.com
+    port: 5432
+    sslMode: require
+
+  # Redis configuration
+  redis:
+    host: marketing-staging-redis.xxxxx.cache.amazonaws.com
+    port: 6379
+    tls: true
+
+  # Kafka configuration
+  kafka:
+    brokers:
+      - b-1.marketing-staging-kafka.xxxxx.kafka.us-east-1.amazonaws.com:9096
+      - b-2.marketing-staging-kafka.xxxxx.kafka.us-east-1.amazonaws.com:9096
+    saslEnabled: true
+
+  # S3 configuration
+  s3:
+    bucket: marketing-staging-assets
+    region: us-east-1
+
+  # Observability
+  observability:
+    metrics:
+      enabled: true
+      port: 9090
+    tracing:
+      enabled: true
+      samplingRate: 0.5
+    logging:
+      level: info
+      format: json
+
+# Service-specific overrides for staging
+seo-service:
+  enabled: true
+  replicaCount: 2
+  image:
+    tag: staging
+  serviceAccount:
+    irsaRoleArn: arn:aws:iam::123456789012:role/marketing-staging-seo-service
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 5
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+  networkPolicy:
+    enabled: true
+
+content-service:
+  enabled: true
+  replicaCount: 2
+  image:
+    tag: staging
+  serviceAccount:
+    irsaRoleArn: arn:aws:iam::123456789012:role/marketing-staging-content-service
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 8
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+  networkPolicy:
+    enabled: true
+
+analytics-service:
+  enabled: true
+  replicaCount: 2
+  image:
+    tag: staging
+  serviceAccount:
+    irsaRoleArn: arn:aws:iam::123456789012:role/marketing-staging-analytics-service
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 15
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+  networkPolicy:
+    enabled: true
+
+personalization-service:
+  enabled: true
+  replicaCount: 2
+  image:
+    tag: staging
+  serviceAccount:
+    irsaRoleArn: arn:aws:iam::123456789012:role/marketing-staging-personalization-service
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 8
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+  networkPolicy:
+    enabled: true
+
+lifecycle-service:
+  enabled: true
+  replicaCount: 2
+  image:
+    tag: staging
+  serviceAccount:
+    irsaRoleArn: arn:aws:iam::123456789012:role/marketing-staging-lifecycle-service
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 8
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+  networkPolicy:
+    enabled: true
+
+growth-service:
+  enabled: true
+  replicaCount: 2
+  image:
+    tag: staging
+  serviceAccount:
+    irsaRoleArn: arn:aws:iam::123456789012:role/marketing-staging-growth-service
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 8
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+  networkPolicy:
+    enabled: true
+
+commerce-service:
+  enabled: true
+  replicaCount: 2
+  image:
+    tag: staging
+  serviceAccount:
+    irsaRoleArn: arn:aws:iam::123456789012:role/marketing-staging-commerce-service
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 8
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+  networkPolicy:
+    enabled: true
+
+reputation-service:
+  enabled: true
+  replicaCount: 2
+  image:
+    tag: staging
+  serviceAccount:
+    irsaRoleArn: arn:aws:iam::123456789012:role/marketing-staging-reputation-service
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 5
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+  networkPolicy:
+    enabled: true
+
+localization-service:
+  enabled: true
+  replicaCount: 2
+  image:
+    tag: staging
+  serviceAccount:
+    irsaRoleArn: arn:aws:iam::123456789012:role/marketing-staging-localization-service
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 8
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+  networkPolicy:
+    enabled: true
+
+ai-service:
+  enabled: true
+  replicaCount: 2
+  image:
+    tag: staging
+  serviceAccount:
+    irsaRoleArn: arn:aws:iam::123456789012:role/marketing-staging-ai-service
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 4Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+  networkPolicy:
+    enabled: true

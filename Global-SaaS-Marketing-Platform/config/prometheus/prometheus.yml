@@ -1,0 +1,109 @@
+# Prometheus Configuration for Global SaaS Marketing Platform
+# Local Development Environment
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    environment: development
+    platform: marketing
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+rule_files: []
+
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # SEO Service
+  - job_name: 'seo-service'
+    static_configs:
+      - targets: ['host.docker.internal:3001']
+    metrics_path: /metrics
+    scrape_interval: 30s
+
+  # Content Service
+  - job_name: 'content-service'
+    static_configs:
+      - targets: ['host.docker.internal:3002']
+    metrics_path: /metrics
+    scrape_interval: 30s
+
+  # Analytics Service
+  - job_name: 'analytics-service'
+    static_configs:
+      - targets: ['host.docker.internal:3003']
+    metrics_path: /metrics
+    scrape_interval: 30s
+
+  # Personalization Service
+  - job_name: 'personalization-service'
+    static_configs:
+      - targets: ['host.docker.internal:3004']
+    metrics_path: /metrics
+    scrape_interval: 30s
+
+  # Lifecycle Service
+  - job_name: 'lifecycle-service'
+    static_configs:
+      - targets: ['host.docker.internal:3005']
+    metrics_path: /metrics
+    scrape_interval: 30s
+
+  # Growth Service
+  - job_name: 'growth-service'
+    static_configs:
+      - targets: ['host.docker.internal:3006']
+    metrics_path: /metrics
+    scrape_interval: 30s
+
+  # Commerce Service
+  - job_name: 'commerce-service'
+    static_configs:
+      - targets: ['host.docker.internal:3007']
+    metrics_path: /metrics
+    scrape_interval: 30s
+
+  # Reputation Service
+  - job_name: 'reputation-service'
+    static_configs:
+      - targets: ['host.docker.internal:3008']
+    metrics_path: /metrics
+    scrape_interval: 30s
+
+  # Localization Service
+  - job_name: 'localization-service'
+    static_configs:
+      - targets: ['host.docker.internal:3009']
+    metrics_path: /metrics
+    scrape_interval: 30s
+
+  # AI Service
+  - job_name: 'ai-service'
+    static_configs:
+      - targets: ['host.docker.internal:3010']
+    metrics_path: /metrics
+    scrape_interval: 30s
+
+  # Community Service
+  - job_name: 'community-service'
+    static_configs:
+      - targets: ['host.docker.internal:3011']
+    metrics_path: /metrics
+    scrape_interval: 30s
+
+  # Redis metrics
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']
+
+  # PostgreSQL metrics (if using exporter)
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres:5432']

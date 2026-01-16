@@ -1,0 +1,426 @@
+{
+  "auditDate": "2025-12-30T00:00:00.000Z",
+  "dockerfiles": [
+    {
+      "path": "Dockerfile.web.pnpm",
+      "baseImage": "node:20-alpine",
+      "issues": [
+        "Base image uses minor version tag (20-alpine) - should use specific patch version for reproducibility"
+      ],
+      "securityScore": 9,
+      "productionReady": true,
+      "recommendations": [
+        "Pin base image to specific patch version (e.g., node:20.18-alpine)"
+      ],
+      "strengths": [
+        "Multi-stage build (5 stages) optimizes image size",
+        "Non-root user configured (nodejs:1001)",
+        "dumb-init for proper signal handling",
+        "HEALTHCHECK defined with appropriate intervals",
+        "NODE_ENV=production set",
+        "Proper .dockerignore exists",
+        "Layer caching optimized with separate dependency stage",
+        "Uses Alpine for minimal attack surface"
+      ]
+    },
+    {
+      "path": "apps/mobile/Dockerfile",
+      "baseImage": "node:20-alpine",
+      "issues": [
+        "FIXED: Was using pnpm@latest, eas-cli@latest, expo-cli@latest - now pinned to specific versions",
+        "No HEALTHCHECK defined for builder/development stages"
+      ],
+      "securityScore": 7,
+      "productionReady": false,
+      "recommendations": [
+        "Add HEALTHCHECK for CI/EAS build stage",
+        "Consider using dumb-init for signal handling in development stage"
+      ],
+      "strengths": [
+        "Multi-stage build (4 stages)",
+        "Non-root user configured (expo:1001)",
+        "Proper cache mount for faster builds",
+        "Alpine base for smaller image",
+        ".dockerignore exists"
+      ]
+    },
+    {
+      "path": "apps/web/Dockerfile",
+      "baseImage": "node:20.18-alpine",
+      "issues": [
+        "FIXED: Was using non-existent node:25-alpine, now uses node:20.18-alpine",
+        "Uses pnpm@latest in corepack prepare - should pin version"
+      ],
+      "securityScore": 9,
+      "productionReady": true,
+      "recommendations": [
+        "Pin pnpm version in corepack prepare (e.g., pnpm@9.15.0)"
+      ],
+      "strengths": [
+        "Multi-stage build (3 stages)",
+        "Non-root user configured (nodejs:1001)",
+        "dumb-init for proper signal handling",
+        "HEALTHCHECK defined",
+        "NODE_ENV=production set",
+        "Alpine base image",
+        "Proper .dockerignore exists"
+      ]
+    },
+    {
+      "path": "services/api-gateway/Dockerfile",
+      "baseImage": "node:20-alpine",
+      "issues": [
+        "Base image uses minor version tag only",
+        "No HEALTHCHECK defined",
+        "No dumb-init/tini for signal handling",
+        "Copies all node_modules including devDependencies"
+      ],
+      "securityScore": 6,
+      "productionReady": false,
+      "recommendations": [
+        "Pin base image to specific patch version",
+        "Add HEALTHCHECK instruction",
+        "Install and use dumb-init for proper signal handling",
+        "Prune devDependencies before copying to production stage"
+      ],
+      "strengths": [
+        "Multi-stage build (3 stages)",
+        "Non-root user configured (gateway:1001)",
+        "NODE_ENV=production set",
+        ".dockerignore exists"
+      ]
+    },
+    {
+      "path": "services/api/Dockerfile",
+      "baseImage": "node:20.18-alpine",
+      "issues": [
+        "FIXED: Was using non-existent node:25-alpine, now uses node:20.18-alpine"
+      ],
+      "securityScore": 10,
+      "productionReady": true,
+      "recommendations": [],
+      "strengths": [
+        "Multi-stage build (3 stages)",
+        "Non-root user configured (nodejs:1001)",
+        "dumb-init for proper signal handling",
+        "HEALTHCHECK defined with proper intervals",
+        "NODE_ENV=production set",
+        "Alpine base image",
+        "Proper pruning of devDependencies",
+        "OpenSSL installed for Prisma",
+        "Comprehensive .dockerignore"
+      ]
+    },
+    {
+      "path": "services/auth-service/Dockerfile",
+      "baseImage": "node:20-alpine",
+      "issues": [
+        "Base image uses minor version tag only",
+        "No dumb-init/tini for signal handling",
+        "Removes package-lock.json which affects reproducibility"
+      ],
+      "securityScore": 7,
+      "productionReady": true,
+      "recommendations": [
+        "Pin base image to specific patch version",
+        "Install and use dumb-init for proper signal handling",
+        "Keep package-lock.json for reproducible builds"
+      ],
+      "strengths": [
+        "Multi-stage build (2 stages)",
+        "Non-root user configured (nodejs:1001)",
+        "HEALTHCHECK defined",
+        ".dockerignore exists"
+      ]
+    },
+    {
+      "path": "services/chronic-care-service/Dockerfile",
+      "baseImage": "node:20.18-slim",
+      "issues": [
+        "FIXED: Was using node:20-slim, now uses node:20.18-slim",
+        "No HEALTHCHECK defined",
+        "No dumb-init/tini for signal handling",
+        "Using slim instead of Alpine (larger attack surface)"
+      ],
+      "securityScore": 6,
+      "productionReady": false,
+      "recommendations": [
+        "Add HEALTHCHECK instruction",
+        "Install and use dumb-init for proper signal handling",
+        "Consider migrating to Alpine base for smaller image"
+      ],
+      "strengths": [
+        "Multi-stage build (4 stages)",
+        "Non-root user configured (chroniccare:1001)",
+        "NODE_ENV=production set",
+        ".dockerignore exists"
+      ]
+    },
+    {
+      "path": "services/imaging-service/Dockerfile",
+      "baseImage": "node:20.18-slim",
+      "issues": [
+        "FIXED: Was using node:20-slim, now uses node:20.18-slim",
+        "No dumb-init/tini for signal handling",
+        "Using slim instead of Alpine (larger attack surface)"
+      ],
+      "securityScore": 7,
+      "productionReady": true,
+      "recommendations": [
+        "Install and use dumb-init for proper signal handling",
+        "Consider migrating to Alpine base for smaller image"
+      ],
+      "strengths": [
+        "Multi-stage build (4 stages)",
+        "Non-root user configured (imaging:1001)",
+        "HEALTHCHECK defined",
+        "NODE_ENV=production set",
+        ".dockerignore exists"
+      ]
+    },
+    {
+      "path": "services/laboratory-service/Dockerfile",
+      "baseImage": "node:20.18-slim",
+      "issues": [
+        "FIXED: Was using node:20-slim, now uses node:20.18-slim",
+        "No HEALTHCHECK defined",
+        "No dumb-init/tini for signal handling",
+        "Using slim instead of Alpine (larger attack surface)"
+      ],
+      "securityScore": 6,
+      "productionReady": false,
+      "recommendations": [
+        "Add HEALTHCHECK instruction",
+        "Install and use dumb-init for proper signal handling",
+        "Consider migrating to Alpine base for smaller image"
+      ],
+      "strengths": [
+        "Multi-stage build (4 stages)",
+        "Non-root user configured (laboratory:1001)",
+        "NODE_ENV=production set",
+        ".dockerignore exists"
+      ]
+    },
+    {
+      "path": "services/mental-health-service/Dockerfile",
+      "baseImage": "node:20.18-slim",
+      "issues": [
+        "FIXED: Was using node:20-slim, now uses node:20.18-slim",
+        "No HEALTHCHECK defined",
+        "No dumb-init/tini for signal handling",
+        "Using slim instead of Alpine (larger attack surface)"
+      ],
+      "securityScore": 6,
+      "productionReady": false,
+      "recommendations": [
+        "Add HEALTHCHECK instruction",
+        "Install and use dumb-init for proper signal handling",
+        "Consider migrating to Alpine base for smaller image"
+      ],
+      "strengths": [
+        "Multi-stage build (4 stages)",
+        "Non-root user configured (mentalhealth:1001)",
+        "NODE_ENV=production set",
+        ".dockerignore exists"
+      ]
+    },
+    {
+      "path": "services/pharmacy-service/Dockerfile",
+      "baseImage": "node:20.18-slim",
+      "issues": [
+        "FIXED: Was using node:20-slim, now uses node:20.18-slim",
+        "No HEALTHCHECK defined",
+        "No dumb-init/tini for signal handling",
+        "Using slim instead of Alpine (larger attack surface)"
+      ],
+      "securityScore": 6,
+      "productionReady": false,
+      "recommendations": [
+        "Add HEALTHCHECK instruction",
+        "Install and use dumb-init for proper signal handling",
+        "Consider migrating to Alpine base for smaller image"
+      ],
+      "strengths": [
+        "Multi-stage build (4 stages)",
+        "Non-root user configured (pharmacy:1001)",
+        "NODE_ENV=production set",
+        ".dockerignore exists"
+      ]
+    },
+    {
+      "path": "services/telehealth-service/Dockerfile",
+      "baseImage": "node:20.18-slim",
+      "issues": [
+        "FIXED: Was using node:20-slim, now uses node:20.18-slim",
+        "No HEALTHCHECK defined",
+        "No dumb-init/tini for signal handling",
+        "Using slim instead of Alpine (larger attack surface)"
+      ],
+      "securityScore": 6,
+      "productionReady": false,
+      "recommendations": [
+        "Add HEALTHCHECK instruction",
+        "Install and use dumb-init for proper signal handling",
+        "Consider migrating to Alpine base for smaller image"
+      ],
+      "strengths": [
+        "Multi-stage build (4 stages)",
+        "Non-root user configured (telehealth:1001)",
+        "NODE_ENV=production set",
+        ".dockerignore exists"
+      ]
+    }
+  ],
+  "composeFiles": [
+    {
+      "path": "docker-compose.yml",
+      "services": ["api", "postgres", "redis", "mongodb", "elasticsearch", "minio", "hapi-fhir"],
+      "issues": [
+        "FIXED: minio/minio:latest changed to minio/minio:RELEASE.2024-12-18T13-15-44Z",
+        "FIXED: hapiproject/hapi:latest changed to hapiproject/hapi:v7.6.0",
+        "mongodb uses mongo:7 - should use specific version",
+        "Development environment exposes database credentials in environment variables",
+        "No resource limits defined for services",
+        "mongodb missing healthcheck"
+      ]
+    },
+    {
+      "path": "docker-compose.prod.yml",
+      "services": ["api", "web", "nginx"],
+      "issues": [
+        "FIXED: nginx:alpine changed to nginx:1.27-alpine",
+        "Uses IMAGE_TAG:-latest as fallback - should require explicit version",
+        "SSL volumes mounted from local path - ensure certificates are not included in git"
+      ],
+      "strengths": [
+        "Resource limits and reservations defined",
+        "Proper restart policies configured",
+        "Logging configuration with size limits",
+        "Health checks defined for all services",
+        "Replicas configured for high availability"
+      ]
+    },
+    {
+      "path": "docker-compose.ci.yml",
+      "services": ["api", "web", "postgres", "redis", "test"],
+      "issues": [
+        "Uses cache_from with :latest tag",
+        "Test service has no healthcheck"
+      ],
+      "strengths": [
+        "Uses tmpfs for faster tests",
+        "Health checks for database services",
+        "Isolated network for CI",
+        "Proper service dependencies with conditions"
+      ]
+    },
+    {
+      "path": "services/auth-service/docker-compose.yml",
+      "services": ["auth-db", "auth-service"],
+      "issues": [
+        "CORS_ORIGIN set to '*' - should be restricted in production",
+        "Default JWT_SECRET fallback in environment",
+        "No resource limits defined"
+      ],
+      "strengths": [
+        "Health checks defined",
+        "Proper service dependencies with health conditions"
+      ]
+    },
+    {
+      "path": "services/docker-compose.microservices.yml",
+      "services": ["api-gateway", "telehealth-service", "mental-health-service", "chronic-care-service", "pharmacy-service", "laboratory-service", "postgres", "redis"],
+      "issues": [
+        "All services have CORS_ORIGIN=* - security risk",
+        "Database password 'postgres' used - weak credentials",
+        "No resource limits defined",
+        "No health checks for microservices"
+      ],
+      "strengths": [
+        "Proper network isolation",
+        "Volume persistence configured",
+        "Restart policy configured"
+      ]
+    },
+    {
+      "path": "services/imaging-service/docker-compose.yml",
+      "services": ["imaging-service", "postgres"],
+      "issues": [
+        "No health check for postgres",
+        "Weak database credentials (imaging_pass)",
+        "No resource limits defined"
+      ],
+      "strengths": [
+        "Volume persistence configured",
+        "Proper network configuration",
+        "Restart policy configured"
+      ]
+    }
+  ],
+  "dockerignoreFiles": [
+    {
+      "path": ".dockerignore",
+      "quality": "good",
+      "includes": ["node_modules", "dist", ".next", ".git", ".env files", "tests", "IDE files"],
+      "missing": []
+    },
+    {
+      "path": "services/api/.dockerignore",
+      "quality": "comprehensive",
+      "includes": ["node_modules", "dist", "coverage", ".env files", ".git", "docs", "CI/CD files", "IDE files", "Docker files", "logs", "temp files"],
+      "missing": []
+    },
+    {
+      "path": "apps/web/.dockerignore",
+      "quality": "comprehensive",
+      "includes": ["node_modules", ".next", "coverage", ".env files", ".git", "docs", "CI/CD files", "IDE files", "Docker files", "logs", "temp files", ".vercel"],
+      "missing": []
+    }
+  ],
+  "summary": {
+    "totalDockerfiles": 12,
+    "productionReady": 5,
+    "needsFixes": 7,
+    "averageSecurityScore": 7.08,
+    "criticalIssuesFixed": [
+      "FIXED: apps/web/Dockerfile - Changed node:25-alpine to node:20.18-alpine",
+      "FIXED: services/api/Dockerfile - Changed node:25-alpine to node:20.18-alpine",
+      "FIXED: apps/mobile/Dockerfile - Pinned pnpm@9.15.0, eas-cli@12.6.2, expo-cli@6.3.12",
+      "FIXED: services/chronic-care-service/Dockerfile - Changed node:20-slim to node:20.18-slim",
+      "FIXED: services/imaging-service/Dockerfile - Changed node:20-slim to node:20.18-slim",
+      "FIXED: services/laboratory-service/Dockerfile - Changed node:20-slim to node:20.18-slim",
+      "FIXED: services/mental-health-service/Dockerfile - Changed node:20-slim to node:20.18-slim",
+      "FIXED: services/pharmacy-service/Dockerfile - Changed node:20-slim to node:20.18-slim",
+      "FIXED: services/telehealth-service/Dockerfile - Changed node:20-slim to node:20.18-slim",
+      "FIXED: docker-compose.yml - Changed minio/minio:latest to minio/minio:RELEASE.2024-12-18T13-15-44Z",
+      "FIXED: docker-compose.yml - Changed hapiproject/hapi:latest to hapiproject/hapi:v7.6.0",
+      "FIXED: docker-compose.prod.yml - Changed nginx:alpine to nginx:1.27-alpine"
+    ],
+    "remainingCriticalIssues": [
+      "services/api-gateway/Dockerfile - Missing HEALTHCHECK and dumb-init",
+      "services/chronic-care-service/Dockerfile - Missing HEALTHCHECK",
+      "services/laboratory-service/Dockerfile - Missing HEALTHCHECK",
+      "services/mental-health-service/Dockerfile - Missing HEALTHCHECK",
+      "services/pharmacy-service/Dockerfile - Missing HEALTHCHECK",
+      "services/telehealth-service/Dockerfile - Missing HEALTHCHECK",
+      "Multiple docker-compose files have weak database credentials",
+      "Multiple services have CORS_ORIGIN=* which is a security risk"
+    ],
+    "bestPracticesAdopted": [
+      "All Dockerfiles use multi-stage builds",
+      "All production Dockerfiles configure non-root users",
+      "NODE_ENV=production is set in all production images",
+      "Comprehensive .dockerignore files exist for all services",
+      "Alpine/slim base images used for minimal attack surface"
+    ],
+    "recommendations": [
+      "Add HEALTHCHECK to all Dockerfiles missing it",
+      "Install and configure dumb-init/tini in all production images for proper signal handling",
+      "Consider standardizing on Alpine base images across all services",
+      "Implement secrets management for database credentials instead of environment variables",
+      "Restrict CORS_ORIGIN to specific domains in production",
+      "Add resource limits to all docker-compose service definitions",
+      "Consider using Docker Buildx for more efficient multi-platform builds"
+    ]
+  }
+}

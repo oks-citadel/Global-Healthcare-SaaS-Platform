@@ -1,0 +1,112 @@
+[
+  {
+    "email": "john.doe@example.com",
+    "gender": "male",
+    "bloodType": "O+",
+    "allergies": ["Penicillin", "Peanuts"],
+    "emergencyContact": {
+      "name": "Jane Doe",
+      "relationship": "Spouse",
+      "phone": "+1-555-0301"
+    }
+  },
+  {
+    "email": "jane.smith@example.com",
+    "gender": "female",
+    "bloodType": "A+",
+    "allergies": ["Latex"],
+    "emergencyContact": {
+      "name": "John Smith",
+      "relationship": "Spouse",
+      "phone": "+1-555-0302"
+    }
+  },
+  {
+    "email": "robert.brown@example.com",
+    "gender": "male",
+    "bloodType": "B+",
+    "allergies": [],
+    "emergencyContact": {
+      "name": "Susan Brown",
+      "relationship": "Mother",
+      "phone": "+1-555-0303"
+    }
+  },
+  {
+    "email": "maria.garcia@example.com",
+    "gender": "female",
+    "bloodType": "AB+",
+    "allergies": ["Sulfa drugs"],
+    "emergencyContact": {
+      "name": "Carlos Garcia",
+      "relationship": "Father",
+      "phone": "+1-555-0304"
+    }
+  },
+  {
+    "email": "david.miller@example.com",
+    "gender": "male",
+    "bloodType": "O-",
+    "allergies": ["Shellfish", "Ibuprofen"],
+    "emergencyContact": {
+      "name": "Mary Miller",
+      "relationship": "Mother",
+      "phone": "+1-555-0305"
+    }
+  },
+  {
+    "email": "lisa.wilson@example.com",
+    "gender": "female",
+    "bloodType": "A-",
+    "allergies": ["Aspirin"],
+    "emergencyContact": {
+      "name": "Tom Wilson",
+      "relationship": "Spouse",
+      "phone": "+1-555-0306"
+    }
+  },
+  {
+    "email": "james.taylor@example.com",
+    "gender": "male",
+    "bloodType": "B-",
+    "allergies": [],
+    "emergencyContact": {
+      "name": "Sarah Taylor",
+      "relationship": "Sister",
+      "phone": "+1-555-0307"
+    }
+  },
+  {
+    "email": "patricia.anderson@example.com",
+    "gender": "female",
+    "bloodType": "AB-",
+    "allergies": ["Codeine", "Dairy"],
+    "emergencyContact": {
+      "name": "Robert Anderson",
+      "relationship": "Spouse",
+      "phone": "+1-555-0308"
+    }
+  },
+  {
+    "email": "michael.thomas@example.com",
+    "gender": "male",
+    "bloodType": "O+",
+    "allergies": ["Cats"],
+    "emergencyContact": {
+      "name": "Linda Thomas",
+      "relationship": "Mother",
+      "phone": "+1-555-0309"
+    }
+  },
+  {
+    "email": "jennifer.jackson@example.com",
+    "gender": "female",
+    "bloodType": "A+",
+    "allergies": ["Pollen", "Dust mites"],
+    "emergencyContact": {
+      "name": "William Jackson",
+      "relationship": "Spouse",
+      "phone": "+1-555-0310"
+    }
+  }
+]

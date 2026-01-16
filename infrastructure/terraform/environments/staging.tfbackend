@@ -1,0 +1,36 @@
+# ============================================
+# Staging Environment Backend Configuration
+# ============================================
+# AWS S3 backend for Terraform state management
+# Staging uses similar security controls as production for realistic testing
+#
+# IMPORTANT: Before using this backend, run the setup script:
+#   ./setup-backend.sh --env staging
+#
+# Usage: terraform init -backend-config=environments/staging.tfbackend
+
+# S3 Bucket Configuration
+# The bucket name includes your AWS account ID for uniqueness
+# Update this after running setup-backend.sh
+bucket         = "unified-health-tfstate-staging-ACCOUNT_ID"
+key            = "env/staging/terraform.tfstate"
+region         = "us-east-1"
+
+# Encryption - Always enabled for security
+encrypt        = true
+
+# DynamoDB table for state locking
+# Prevents concurrent modifications to the state
+dynamodb_table = "unified-health-terraform-locks-staging"
+
+# Optional: Use KMS key for additional encryption
+# kms_key_id   = "alias/unified-health-terraform-staging"
+
+# Optional: Enable assume role for cross-account access
+# role_arn     = "arn:aws:iam::ACCOUNT_ID:role/TerraformStateAccess"
+
+# Optional: External ID for assume role (if required by the role trust policy)
+# external_id  = "unified-health-terraform"
+
+# Optional: Session name for assume role
+# session_name = "TerraformStaging"

@@ -1,0 +1,12 @@
+This is a test document for E2E testing.
+
+Document Type: Lab Results
+Patient: Test Patient
+Date: 2024-01-01
+
+Test Results:
+- Hemoglobin: 14.5 g/dL (Normal)
+- White Blood Cell Count: 7,500 cells/mcL (Normal)
+- Platelet Count: 250,000 cells/mcL (Normal)
+
+All results are within normal range.

@@ -1,0 +1,274 @@
+# Development Environment Values
+# Used for local development and testing
+
+global:
+  environment: dev
+  namespace: marketing-platform-dev
+
+  # AWS Configuration
+  aws:
+    region: us-east-1
+    accountId: "123456789012"
+
+  # Image configuration
+  imageRegistry: ""
+  imagePullSecrets: []
+
+  # Ingress configuration
+  ingress:
+    enabled: true
+    className: alb
+    annotations:
+      kubernetes.io/ingress.class: alb
+      alb.ingress.kubernetes.io/scheme: internal
+      alb.ingress.kubernetes.io/target-type: ip
+      alb.ingress.kubernetes.io/healthcheck-path: /health
+      alb.ingress.kubernetes.io/certificate-arn: ""
+    domain: dev.marketing.example.com
+    tls:
+      enabled: false
+
+  # Database configuration
+  database:
+    host: marketing-dev-db.cluster-xxxxx.us-east-1.rds.amazonaws.com
+    port: 5432
+    sslMode: require
+
+  # Redis configuration
+  redis:
+    host: marketing-dev-redis.xxxxx.cache.amazonaws.com
+    port: 6379
+    tls: true
+
+  # Kafka configuration
+  kafka:
+    brokers:
+      - b-1.marketing-dev-kafka.xxxxx.kafka.us-east-1.amazonaws.com:9096
+    saslEnabled: true
+
+  # S3 configuration
+  s3:
+    bucket: marketing-dev-assets
+    region: us-east-1
+
+  # Observability
+  observability:
+    metrics:
+      enabled: true
+      port: 9090
+    tracing:
+      enabled: true
+      samplingRate: 1.0
+    logging:
+      level: debug
+      format: json
+
+# Service-specific overrides for development
+seo-service:
+  enabled: true
+  replicaCount: 1
+  image:
+    tag: dev
+  resources:
+    limits:
+      cpu: 250m
+      memory: 256Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+  autoscaling:
+    enabled: false
+  podDisruptionBudget:
+    enabled: false
+  networkPolicy:
+    enabled: false
+
+content-service:
+  enabled: true
+  replicaCount: 1
+  image:
+    tag: dev
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  autoscaling:
+    enabled: false
+  podDisruptionBudget:
+    enabled: false
+  networkPolicy:
+    enabled: false
+
+analytics-service:
+  enabled: true
+  replicaCount: 1
+  image:
+    tag: dev
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  autoscaling:
+    enabled: false
+  podDisruptionBudget:
+    enabled: false
+  networkPolicy:
+    enabled: false
+
+personalization-service:
+  enabled: true
+  replicaCount: 1
+  image:
+    tag: dev
+  resources:
+    limits:
+      cpu: 250m
+      memory: 256Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+  autoscaling:
+    enabled: false
+  podDisruptionBudget:
+    enabled: false
+  networkPolicy:
+    enabled: false
+
+lifecycle-service:
+  enabled: true
+  replicaCount: 1
+  image:
+    tag: dev
+  resources:
+    limits:
+      cpu: 250m
+      memory: 256Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+  autoscaling:
+    enabled: false
+  podDisruptionBudget:
+    enabled: false
+  networkPolicy:
+    enabled: false
+
+growth-service:
+  enabled: true
+  replicaCount: 1
+  image:
+    tag: dev
+  resources:
+    limits:
+      cpu: 250m
+      memory: 256Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+  autoscaling:
+    enabled: false
+  podDisruptionBudget:
+    enabled: false
+  networkPolicy:
+    enabled: false
+
+commerce-service:
+  enabled: true
+  replicaCount: 1
+  image:
+    tag: dev
+  resources:
+    limits:
+      cpu: 250m
+      memory: 256Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+  autoscaling:
+    enabled: false
+  podDisruptionBudget:
+    enabled: false
+  networkPolicy:
+    enabled: false
+
+reputation-service:
+  enabled: true
+  replicaCount: 1
+  image:
+    tag: dev
+  resources:
+    limits:
+      cpu: 250m
+      memory: 256Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+  autoscaling:
+    enabled: false
+  podDisruptionBudget:
+    enabled: false
+  networkPolicy:
+    enabled: false
+
+localization-service:
+  enabled: true
+  replicaCount: 1
+  image:
+    tag: dev
+  resources:
+    limits:
+      cpu: 250m
+      memory: 256Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+  autoscaling:
+    enabled: false
+  podDisruptionBudget:
+    enabled: false
+  networkPolicy:
+    enabled: false
+
+ai-service:
+  enabled: true
+  replicaCount: 1
+  image:
+    tag: dev
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+  autoscaling:
+    enabled: false
+  podDisruptionBudget:
+    enabled: false
+  networkPolicy:
+    enabled: false
+
+community-service:
+  enabled: true
+  replicaCount: 1
+  image:
+    tag: dev
+  resources:
+    limits:
+      cpu: 250m
+      memory: 256Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+  autoscaling:
+    enabled: false
+  podDisruptionBudget:
+    enabled: false
+  networkPolicy:
+    enabled: false

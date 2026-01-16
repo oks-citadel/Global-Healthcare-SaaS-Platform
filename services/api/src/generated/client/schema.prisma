@@ -1,0 +1,1020 @@
+// This is your Prisma schema file
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  output          = "./../src/generated/client"
+  provider        = "prisma-client-js"
+  previewFeatures = ["metrics", "tracing"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+
+  // Connection pooling configuration
+  // Use connection_limit and pool_timeout for PgBouncer or built-in pooling
+  // Example: postgresql://user:password@host:port/db?connection_limit=20&pool_timeout=10
+
+  // For direct connection (without PgBouncer):
+  // - connection_limit: Max connections per Prisma Client instance (default: num_cpus * 2 + 1)
+  // - pool_timeout: Time in seconds to wait for a connection (default: 10)
+  // - connect_timeout: Database connection timeout in seconds (default: 5)
+  // - socket_timeout: Query timeout in seconds (default: 0 - no timeout)
+
+  // For Prisma Data Proxy / Accelerate (production):
+  // directUrl is used for migrations, url is used for queries
+  directUrl = env("DIRECT_DATABASE_URL")
+}
+
+// ==========================================
+// Multi-Tenant Support
+// SECURITY: All data queries MUST include tenantId scoping
+// ==========================================
+
+model Tenant {
+  id       String       @id @default(uuid())
+  name     String
+  slug     String       @unique // URL-friendly identifier
+  domain   String?      @unique // Optional custom domain
+  status   TenantStatus @default(active)
+  settings Json? // Tenant-specific configuration
+
+  // Billing
+  stripeCustomerId      String?   @unique
+  subscriptionTier      String    @default("free")
+  subscriptionStatus    String    @default("active")
+  subscriptionExpiresAt DateTime?
+
+  // Relations
+  users        User[]
+  patients     Patient[]
+  providers    Provider[]
+  appointments Appointment[]
+  encounters   Encounter[]
+  documents    Document[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+  @@index([status])
+  @@index([subscriptionTier, status])
+}
+
+enum TenantStatus {
+  active
+  suspended
+  pending
+  deleted
+}
+
+// ==========================================
+// User & Authentication
+// ==========================================
+
+model User {
+  id            String     @id @default(uuid())
+  email         String     @unique
+  password      String
+  firstName     String
+  lastName      String
+  phone         String?
+  dateOfBirth   DateTime?
+  role          Role       @default(patient)
+  status        UserStatus @default(active)
+  emailVerified Boolean    @default(false)
+
+  // SECURITY: Multi-tenant isolation
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Relations
+  patient       Patient?
+  provider      Provider?
+  refreshTokens RefreshToken[]
+  auditEvents   AuditEvent[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([email, tenantId]) // Email unique within tenant
+  @@index([email])
+  @@index([role])
+  @@index([status])
+  @@index([role, status])
+  @@index([createdAt])
+  @@index([tenantId])
+  @@index([tenantId, role])
+  @@index([tenantId, status])
+}
+
+enum Role {
+  patient
+  provider
+  admin
+}
+
+enum UserStatus {
+  active
+  inactive
+  pending
+  suspended
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+  @@index([userId, expiresAt])
+}
+
+// ==========================================
+// Patient & Health Records
+// ==========================================
+
+model Patient {
+  id                  String   @id @default(uuid())
+  userId              String   @unique
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  medicalRecordNumber String   @unique
+  dateOfBirth         DateTime
+  gender              Gender
+  bloodType           String?
+  allergies           String[]
+
+  // SECURITY: Multi-tenant isolation
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Emergency contact (JSON)
+  emergencyContact Json?
+
+  // Relations
+  appointments Appointment[]
+  encounters   Encounter[]
+  documents    Document[]
+  consents     Consent[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([medicalRecordNumber])
+  @@index([tenantId])
+  @@index([tenantId, medicalRecordNumber])
+}
+
+enum Gender {
+  male
+  female
+  other
+  prefer_not_to_say
+}
+
+// ==========================================
+// Provider
+// ==========================================
+
+model Provider {
+  id            String   @id @default(uuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  licenseNumber String   @unique
+  specialty     String[]
+  bio           String?
+  available     Boolean  @default(true)
+
+  // SECURITY: Multi-tenant isolation
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Relations
+  appointments Appointment[]
+  encounters   Encounter[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([specialty])
+  @@index([available])
+  @@index([licenseNumber])
+  @@index([tenantId])
+  @@index([tenantId, specialty])
+  @@index([tenantId, available])
+}
+
+// ==========================================
+// Appointments & Visits
+// ==========================================
+
+model Appointment {
+  id             String            @id @default(uuid())
+  patientId      String
+  patient        Patient           @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  providerId     String
+  provider       Provider          @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  scheduledAt    DateTime
+  duration       Int // in minutes
+  type           AppointmentType
+  status         AppointmentStatus @default(scheduled)
+  reasonForVisit String?
+  notes          String?
+
+  // SECURITY: Multi-tenant isolation
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Relations
+  visit     Visit?
+  encounter Encounter?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([patientId])
+  @@index([providerId])
+  @@index([scheduledAt])
+  @@index([status])
+  @@index([patientId, scheduledAt])
+  @@index([providerId, scheduledAt])
+  @@index([tenantId])
+  @@index([tenantId, scheduledAt])
+  @@index([tenantId, status])
+}
+
+enum AppointmentType {
+  video
+  audio
+  chat
+  in_person
+}
+
+enum AppointmentStatus {
+  scheduled
+  confirmed
+  in_progress
+  completed
+  cancelled
+  no_show
+}
+
+model Visit {
+  id            String      @id @default(uuid())
+  appointmentId String      @unique
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  sessionToken  String      @unique
+  status        VisitStatus @default(waiting)
+  startedAt     DateTime?
+  endedAt       DateTime?
+
+  // Relations
+  messages ChatMessage[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([appointmentId])
+  @@index([sessionToken])
+  @@index([status])
+}
+
+enum VisitStatus {
+  waiting
+  in_progress
+  completed
+  cancelled
+}
+
+model ChatMessage {
+  id          String   @id @default(uuid())
+  visitId     String
+  visit       Visit    @relation(fields: [visitId], references: [id], onDelete: Cascade)
+  senderId    String
+  message     String
+  attachments String[]
+  timestamp   DateTime @default(now())
+
+  @@index([visitId])
+  @@index([timestamp])
+  @@index([visitId, timestamp])
+}
+
+// ==========================================
+// Clinical Records
+// ==========================================
+
+model Encounter {
+  id            String          @id @default(uuid())
+  patientId     String
+  patient       Patient         @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  providerId    String
+  provider      Provider        @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  appointmentId String?         @unique
+  appointment   Appointment?    @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  type          EncounterType
+  status        EncounterStatus @default(planned)
+  startedAt     DateTime?
+  endedAt       DateTime?
+
+  // SECURITY: Multi-tenant isolation
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Relations
+  notes ClinicalNote[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([patientId])
+  @@index([providerId])
+  @@index([status])
+  @@index([patientId, createdAt])
+  @@index([providerId, createdAt])
+  @@index([tenantId])
+  @@index([tenantId, patientId])
+  @@index([tenantId, providerId])
+}
+
+enum EncounterType {
+  virtual
+  in_person
+  phone
+}
+
+enum EncounterStatus {
+  planned
+  in_progress
+  finished
+  cancelled
+}
+
+model ClinicalNote {
+  id          String    @id @default(uuid())
+  encounterId String
+  encounter   Encounter @relation(fields: [encounterId], references: [id], onDelete: Cascade)
+  authorId    String
+  noteType    String
+  content     String
+  timestamp   DateTime  @default(now())
+
+  @@index([encounterId])
+  @@index([authorId])
+  @@index([timestamp])
+}
+
+model Document {
+  id          String       @id @default(uuid())
+  patientId   String
+  patient     Patient      @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  type        DocumentType
+  fileName    String
+  fileUrl     String
+  blobName    String? // Azure Blob Storage blob name
+  mimeType    String
+  size        Int
+  description String?
+  uploadedBy  String
+  version     Int          @default(1) // Document version number
+
+  // SECURITY: Multi-tenant isolation
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([patientId])
+  @@index([type])
+  @@index([patientId, createdAt])
+  @@index([uploadedBy])
+  @@index([blobName])
+  @@index([patientId, type])
+  @@index([tenantId])
+  @@index([tenantId, patientId])
+}
+
+enum DocumentType {
+  lab_result
+  imaging
+  prescription
+  other
+}
+
+// ==========================================
+// Billing & Subscriptions
+// ==========================================
+
+model Plan {
+  id          String       @id
+  name        String
+  description String
+  price       Decimal      @db.Decimal(10, 2)
+  currency    String       @default("USD")
+  interval    PlanInterval
+  features    String[]
+  active      Boolean      @default(true)
+
+  // Relations
+  subscriptions Subscription[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([active])
+  @@index([interval])
+  @@index([active, interval])
+}
+
+enum PlanInterval {
+  monthly
+  annual
+}
+
+model Subscription {
+  id                   String             @id @default(uuid())
+  userId               String
+  planId               String
+  plan                 Plan               @relation(fields: [planId], references: [id], onDelete: Restrict)
+  status               SubscriptionStatus @default(active)
+  stripeSubscriptionId String?            @unique
+  currentPeriodStart   DateTime
+  currentPeriodEnd     DateTime
+  cancelAtPeriodEnd    Boolean            @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([userId, status])
+  @@index([currentPeriodEnd])
+  @@index([planId])
+  @@index([status, currentPeriodEnd])
+}
+
+enum SubscriptionStatus {
+  active
+  past_due
+  cancelled
+  expired
+}
+
+model PaymentMethod {
+  id                    String            @id @default(uuid())
+  userId                String
+  stripePaymentMethodId String            @unique
+  type                  PaymentMethodType
+  last4                 String
+  brand                 String? // visa, mastercard, amex, etc.
+  expiryMonth           Int?
+  expiryYear            Int?
+  isDefault             Boolean           @default(false)
+  billingAddress        Json?
+
+  // Relations
+  payments Payment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([userId, isDefault])
+}
+
+enum PaymentMethodType {
+  card
+  bank_account
+  us_bank_account
+}
+
+model Payment {
+  id                    String         @id @default(uuid())
+  userId                String
+  paymentMethodId       String?
+  paymentMethod         PaymentMethod? @relation(fields: [paymentMethodId], references: [id], onDelete: SetNull)
+  stripePaymentIntentId String?        @unique
+  amount                Decimal        @db.Decimal(10, 2)
+  currency              String         @default("USD")
+  status                PaymentStatus  @default(pending)
+  description           String?
+  metadata              Json?
+
+  // Relations
+  invoice   Invoice? @relation(fields: [invoiceId], references: [id])
+  invoiceId String?
+
+  failedReason   String?
+  refundedAmount Decimal?  @db.Decimal(10, 2)
+  refundedAt     DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([userId, status])
+  @@index([createdAt])
+}
+
+enum PaymentStatus {
+  pending
+  processing
+  succeeded
+  failed
+  cancelled
+  refunded
+  partially_refunded
+}
+
+model Invoice {
+  id              String        @id @default(uuid())
+  userId          String
+  invoiceNumber   String        @unique
+  stripeInvoiceId String?       @unique
+  status          InvoiceStatus @default(draft)
+  subtotal        Decimal       @db.Decimal(10, 2)
+  tax             Decimal       @default(0) @db.Decimal(10, 2)
+  discount        Decimal       @default(0) @db.Decimal(10, 2)
+  total           Decimal       @db.Decimal(10, 2)
+  currency        String        @default("USD")
+  dueDate         DateTime?
+  paidAt          DateTime?
+  notes           String?
+
+  // Relations
+  items    InvoiceItem[]
+  payments Payment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([userId, status])
+  @@index([dueDate])
+  @@index([invoiceNumber])
+}
+
+enum InvoiceStatus {
+  draft
+  sent
+  paid
+  partially_paid
+  overdue
+  cancelled
+  refunded
+}
+
+model InvoiceItem {
+  id          String  @id @default(uuid())
+  invoiceId   String
+  invoice     Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  description String
+  quantity    Int     @default(1)
+  unitPrice   Decimal @db.Decimal(10, 2)
+  amount      Decimal @db.Decimal(10, 2)
+  metadata    Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([invoiceId])
+}
+
+// ==========================================
+// Health Packages & Diagnostics
+// ==========================================
+
+model HealthPackage {
+  id          String                @id @default(uuid())
+  name        String
+  description String
+  category    HealthPackageCategory
+  price       Decimal               @db.Decimal(10, 2)
+  currency    String                @default("USD")
+  duration    Int // Duration in minutes
+  active      Boolean               @default(true)
+  popular     Boolean               @default(false)
+
+  // What's included
+  tests         String[] // List of test names
+  consultations Int      @default(1)
+  followUps     Int      @default(0)
+
+  // Relations
+  bookings HealthPackageBooking[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
+  @@index([active])
+  @@index([popular])
+}
+
+enum HealthPackageCategory {
+  general_checkup
+  cardiac
+  diabetes
+  womens_health
+  mens_health
+  senior_citizen
+  executive
+  pre_employment
+  sports_fitness
+}
+
+model HealthPackageBooking {
+  id            String        @id @default(uuid())
+  patientId     String
+  packageId     String
+  package       HealthPackage @relation(fields: [packageId], references: [id])
+  status        BookingStatus @default(scheduled)
+  scheduledDate DateTime
+  completedAt   DateTime?
+  notes         String?
+
+  // Results
+  reportUrl         String?
+  reportGeneratedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([patientId])
+  @@index([packageId])
+  @@index([status])
+  @@index([scheduledDate])
+}
+
+enum BookingStatus {
+  scheduled
+  in_progress
+  completed
+  cancelled
+  no_show
+}
+
+model DiagnosticTest {
+  id             String             @id @default(uuid())
+  name           String
+  code           String             @unique // Lab test code
+  category       DiagnosticCategory
+  description    String?
+  preparation    String? // Fasting requirements, etc.
+  sampleType     String? // Blood, Urine, etc.
+  turnaroundTime String? // e.g., "24-48 hours"
+  price          Decimal            @db.Decimal(10, 2)
+  currency       String             @default("USD")
+  active         Boolean            @default(true)
+
+  // Reference ranges (JSON for flexibility)
+  referenceRanges Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
+  @@index([code])
+  @@index([active])
+}
+
+enum DiagnosticCategory {
+  hematology
+  biochemistry
+  immunology
+  microbiology
+  pathology
+  radiology
+  cardiology
+  endocrinology
+  other
+}
+
+model LabResult {
+  id             String          @id @default(uuid())
+  patientId      String
+  encounterId    String?
+  testCode       String
+  testName       String
+  value          String
+  unit           String?
+  referenceRange String?
+  status         LabResultStatus @default(pending)
+  isAbnormal     Boolean         @default(false)
+  notes          String?
+  performedBy    String?
+  verifiedBy     String?
+  collectedAt    DateTime?
+  resultedAt     DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([patientId])
+  @@index([encounterId])
+  @@index([testCode])
+  @@index([status])
+  @@index([patientId, createdAt])
+}
+
+enum LabResultStatus {
+  pending
+  processing
+  completed
+  cancelled
+}
+
+// ==========================================
+// Prescriptions
+// ==========================================
+
+model Prescription {
+  id          String             @id @default(uuid())
+  patientId   String
+  providerId  String
+  encounterId String?
+  status      PrescriptionStatus @default(active)
+
+  // Relations
+  items PrescriptionItem[]
+
+  notes      String?
+  validFrom  DateTime  @default(now())
+  validUntil DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([patientId])
+  @@index([providerId])
+  @@index([encounterId])
+  @@index([status])
+  @@index([validUntil])
+}
+
+enum PrescriptionStatus {
+  active
+  completed
+  cancelled
+  expired
+}
+
+model PrescriptionItem {
+  id               String       @id @default(uuid())
+  prescriptionId   String
+  prescription     Prescription @relation(fields: [prescriptionId], references: [id], onDelete: Cascade)
+  medicationName   String
+  dosage           String
+  frequency        String // e.g., "twice daily"
+  duration         String? // e.g., "7 days"
+  quantity         Int?
+  refillsAllowed   Int          @default(0)
+  refillsUsed      Int          @default(0)
+  instructions     String?
+  isGenericAllowed Boolean      @default(true)
+
+  createdAt DateTime @default(now())
+
+  @@index([prescriptionId])
+  @@index([medicationName])
+}
+
+// ==========================================
+// Consent & Audit
+// ==========================================
+
+model Consent {
+  id        String      @id @default(uuid())
+  patientId String
+  patient   Patient     @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  type      ConsentType
+  granted   Boolean
+  scope     String?
+  expiresAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([patientId])
+  @@index([type])
+  @@index([patientId, type])
+  @@index([granted])
+  @@index([expiresAt])
+}
+
+enum ConsentType {
+  data_sharing
+  treatment
+  marketing
+  research
+}
+
+model AuditEvent {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action     String
+  resource   String
+  resourceId String?
+  details    Json?
+  ipAddress  String?
+  userAgent  String?
+  timestamp  DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([resource])
+  @@index([timestamp])
+  @@index([userId, timestamp])
+  @@index([resource, action])
+}
+
+// ==========================================
+// Push Notifications
+// ==========================================
+
+model DeviceToken {
+  id          String   @id @default(uuid())
+  userId      String
+  token       String   @unique
+  platform    Platform
+  deviceName  String?
+  deviceModel String?
+  osVersion   String?
+  appVersion  String?
+  active      Boolean  @default(true)
+  lastUsedAt  DateTime @default(now())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([token])
+  @@index([platform])
+  @@index([userId, active])
+}
+
+enum Platform {
+  ios
+  android
+  web
+}
+
+model PushNotification {
+  id           String             @id @default(uuid())
+  userId       String
+  title        String
+  body         String
+  data         Json?
+  type         NotificationType
+  status       NotificationStatus @default(pending)
+  sentAt       DateTime?
+  readAt       DateTime?
+  failedReason String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([type])
+  @@index([userId, status])
+  @@index([createdAt])
+}
+
+enum NotificationType {
+  appointment_reminder
+  appointment_confirmation
+  appointment_cancelled
+  message_received
+  prescription_ready
+  lab_results_available
+  payment_due
+  payment_received
+  general
+}
+
+enum NotificationStatus {
+  pending
+  sent
+  delivered
+  read
+  failed
+}
+
+model NotificationPreference {
+  id     String @id @default(uuid())
+  userId String @unique
+
+  // Channel preferences
+  emailEnabled Boolean @default(true)
+  smsEnabled   Boolean @default(true)
+  pushEnabled  Boolean @default(true)
+
+  // Notification type preferences
+  appointmentReminders Boolean @default(true)
+  messageAlerts        Boolean @default(true)
+  prescriptionAlerts   Boolean @default(true)
+  labResultAlerts      Boolean @default(true)
+  paymentAlerts        Boolean @default(true)
+  marketingEmails      Boolean @default(false)
+
+  // Quiet hours
+  quietHoursEnabled  Boolean @default(false)
+  quietHoursStart    String? // HH:MM format
+  quietHoursEnd      String? // HH:MM format
+  quietHoursTimezone String? @default("UTC")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+// ==========================================
+// Webhook Event Logging
+// ==========================================
+
+model WebhookEventLog {
+  id               String             @id @default(uuid())
+  eventType        String
+  eventId          String             @unique
+  status           WebhookEventStatus @default(pending)
+  payload          Json
+  error            String?
+  retryCount       Int                @default(0)
+  processingTimeMs Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([eventId])
+  @@index([eventType])
+  @@index([status])
+  @@index([createdAt])
+  @@index([eventType, status])
+}
+
+enum WebhookEventStatus {
+  pending
+  processing
+  succeeded
+  failed
+}
+
+// ==========================================
+// Billing Transaction Logging (Audit Trail)
+// ==========================================
+
+model BillingTransactionLog {
+  id               String                   @id @default(uuid())
+  userId           String
+  transactionType  BillingTransactionType
+  stripeId         String? // Stripe payment intent, refund, or subscription ID
+  amount           Decimal?                 @db.Decimal(10, 2)
+  currency         String?
+  status           BillingTransactionStatus @default(pending)
+  idempotencyKey   String?                  @unique
+  metadata         Json?
+  error            String?
+  processingTimeMs Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([transactionType])
+  @@index([status])
+  @@index([createdAt])
+  @@index([userId, transactionType])
+  @@index([stripeId])
+  @@index([idempotencyKey])
+}
+
+enum BillingTransactionType {
+  CHARGE
+  REFUND
+  SUBSCRIPTION_CREATE
+  SUBSCRIPTION_UPDATE
+  SUBSCRIPTION_CANCEL
+  PAYMENT_METHOD_ADD
+  PAYMENT_METHOD_REMOVE
+  INVOICE_PAID
+  INVOICE_FAILED
+}
+
+enum BillingTransactionStatus {
+  pending
+  processing
+  succeeded
+  failed
+}

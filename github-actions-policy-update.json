@@ -1,0 +1,110 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "ECRGetToken",
+            "Effect": "Allow",
+            "Action": [
+                "ecr:GetAuthorizationToken"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "ECRPushPullUnifiedHealth",
+            "Effect": "Allow",
+            "Action": [
+                "ecr:BatchCheckLayerAvailability",
+                "ecr:GetDownloadUrlForLayer",
+                "ecr:BatchGetImage",
+                "ecr:PutImage",
+                "ecr:InitiateLayerUpload",
+                "ecr:UploadLayerPart",
+                "ecr:CompleteLayerUpload",
+                "ecr:DescribeRepositories",
+                "ecr:DescribeImages",
+                "ecr:ListImages",
+                "ecr:TagResource"
+            ],
+            "Resource": "arn:aws:ecr:us-east-1:992382449461:repository/unified-health-prod/*"
+        },
+        {
+            "Sid": "EKSAccess",
+            "Effect": "Allow",
+            "Action": [
+                "eks:DescribeCluster",
+                "eks:ListClusters"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "STSAccess",
+            "Effect": "Allow",
+            "Action": [
+                "sts:GetCallerIdentity"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "S3TerraformState",
+            "Effect": "Allow",
+            "Action": [
+                "s3:GetObject",
+                "s3:PutObject",
+                "s3:ListBucket",
+                "s3:DeleteObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::unified-health-terraform-state-992382449461",
+                "arn:aws:s3:::unified-health-terraform-state-992382449461/*"
+            ]
+        },
+        {
+            "Sid": "DynamoDBTerraformLock",
+            "Effect": "Allow",
+            "Action": [
+                "dynamodb:GetItem",
+                "dynamodb:PutItem",
+                "dynamodb:DeleteItem"
+            ],
+            "Resource": "arn:aws:dynamodb:us-east-1:992382449461:table/unified-health-terraform-locks"
+        },
+        {
+            "Sid": "SecretsManagerRead",
+            "Effect": "Allow",
+            "Action": [
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:DescribeSecret"
+            ],
+            "Resource": "arn:aws:secretsmanager:us-east-1:992382449461:secret:unified-health/*"
+        },
+        {
+            "Sid": "TerraformPlanReadAccess",
+            "Effect": "Allow",
+            "Action": [
+                "ec2:Describe*",
+                "rds:Describe*",
+                "elasticache:Describe*",
+                "eks:Describe*",
+                "route53:Get*",
+                "route53:List*",
+                "acm:Describe*",
+                "acm:List*",
+                "iam:Get*",
+                "iam:List*",
+                "kms:Describe*",
+                "kms:List*",
+                "sns:Get*",
+                "sns:List*",
+                "sqs:Get*",
+                "sqs:List*",
+                "ses:Get*",
+                "ses:List*",
+                "cloudwatch:Describe*",
+                "cloudwatch:Get*",
+                "logs:Describe*",
+                "logs:Get*"
+            ],
+            "Resource": "*"
+        }
+    ]
+}

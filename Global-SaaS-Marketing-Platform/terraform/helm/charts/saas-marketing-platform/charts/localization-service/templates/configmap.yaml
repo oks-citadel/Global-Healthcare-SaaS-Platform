@@ -1,0 +1,32 @@
+{{- if .Values.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "localization-service.fullname" . }}
+  labels:
+    {{- include "localization-service.labels" . | nindent 4 }}
+data:
+  {{- range $key, $value := .Values.configMap.data }}
+  {{ $key }}: {{ $value | quote }}
+  {{- end }}
+  SERVICE_NAME: {{ include "localization-service.fullname" . }}
+  SERVICE_VERSION: {{ .Chart.AppVersion | quote }}
+  {{- if .Values.global }}
+  {{- if .Values.global.database }}
+  DATABASE_HOST: {{ .Values.global.database.host | quote }}
+  DATABASE_PORT: {{ .Values.global.database.port | quote }}
+  DATABASE_SSL_MODE: {{ .Values.global.database.sslMode | quote }}
+  {{- end }}
+  {{- if .Values.global.redis }}
+  REDIS_HOST: {{ .Values.global.redis.host | quote }}
+  REDIS_PORT: {{ .Values.global.redis.port | quote }}
+  REDIS_TLS: {{ .Values.global.redis.tls | quote }}
+  {{- end }}
+  {{- if .Values.global.observability }}
+  METRICS_ENABLED: {{ .Values.global.observability.metrics.enabled | quote }}
+  METRICS_PORT: {{ .Values.global.observability.metrics.port | quote }}
+  TRACING_ENABLED: {{ .Values.global.observability.tracing.enabled | quote }}
+  TRACING_SAMPLING_RATE: {{ .Values.global.observability.tracing.samplingRate | quote }}
+  {{- end }}
+  {{- end }}
+{{- end }}

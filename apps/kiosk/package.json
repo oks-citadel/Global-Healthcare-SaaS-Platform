@@ -1,0 +1,41 @@
+{
+  "name": "@unified-health/kiosk",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Touch-screen kiosk application for hospital lobbies",
+  "scripts": {
+    "dev": "npx next dev -p 3004",
+    "build": "npx next build",
+    "start": "npx next start -p 3004",
+    "lint": "eslint . --ignore-pattern node_modules --ignore-pattern .next",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "next": "14.2.35",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-hook-form": "^7.51.0",
+    "zod": "^3.23.8",
+    "@hookform/resolvers": "^3.3.4",
+    "clsx": "^2.1.0",
+    "date-fns": "^3.6.0",
+    "lucide-react": "^0.378.0"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.2.0",
+    "@eslint/js": "^9.17.0",
+    "@types/node": "^20.12.7",
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.0",
+    "typescript": "^5.3.3",
+    "tailwindcss": "^3.4.3",
+    "postcss": "^8.4.38",
+    "autoprefixer": "^10.4.19",
+    "eslint": "^9.39.2",
+    "eslint-config-next": "14.2.35",
+    "typescript-eslint": "^8.19.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

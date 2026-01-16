@@ -1,0 +1,210 @@
+################################################################################
+# Outputs - Development Environment
+# Global SaaS Marketing Platform
+################################################################################
+
+################################################################################
+# VPC Outputs
+################################################################################
+
+output "vpc_id" {
+  description = "ID of the VPC"
+  value       = module.networking.vpc_id
+}
+
+output "vpc_cidr" {
+  description = "CIDR block of the VPC"
+  value       = module.networking.vpc_cidr
+}
+
+output "private_subnet_ids" {
+  description = "IDs of private subnets"
+  value       = module.networking.private_subnet_ids
+}
+
+output "public_subnet_ids" {
+  description = "IDs of public subnets"
+  value       = module.networking.public_subnet_ids
+}
+
+################################################################################
+# EKS Outputs
+################################################################################
+
+output "eks_cluster_name" {
+  description = "Name of the EKS cluster"
+  value       = module.eks_cluster.cluster_name
+}
+
+output "eks_cluster_endpoint" {
+  description = "Endpoint for EKS cluster"
+  value       = module.eks_cluster.cluster_endpoint
+}
+
+output "eks_cluster_certificate_authority" {
+  description = "Certificate authority data for EKS cluster"
+  value       = module.eks_cluster.cluster_certificate_authority_data
+  sensitive   = true
+}
+
+output "eks_kubeconfig_command" {
+  description = "AWS CLI command to update kubeconfig"
+  value       = module.eks_cluster.kubeconfig_command
+}
+
+output "eks_oidc_provider_arn" {
+  description = "ARN of EKS OIDC provider"
+  value       = module.eks_cluster.oidc_provider_arn
+}
+
+################################################################################
+# Database Outputs
+################################################################################
+
+output "aurora_cluster_endpoint" {
+  description = "Aurora cluster writer endpoint"
+  value       = module.databases.aurora_cluster_endpoint
+}
+
+output "aurora_reader_endpoint" {
+  description = "Aurora cluster reader endpoint"
+  value       = module.databases.aurora_cluster_reader_endpoint
+}
+
+output "aurora_master_user_secret_arn" {
+  description = "ARN of Aurora master user secret"
+  value       = module.databases.aurora_master_user_secret_arn
+}
+
+output "redis_primary_endpoint" {
+  description = "Redis primary endpoint"
+  value       = module.databases.redis_primary_endpoint_address
+}
+
+output "dynamodb_table_arns" {
+  description = "ARNs of DynamoDB tables"
+  value       = module.databases.dynamodb_table_arns
+}
+
+################################################################################
+# Storage Outputs
+################################################################################
+
+output "public_assets_bucket" {
+  description = "Public assets S3 bucket name"
+  value       = module.storage.public_assets_bucket_id
+}
+
+output "private_bucket" {
+  description = "Private S3 bucket name"
+  value       = module.storage.private_bucket_id
+}
+
+output "uploads_bucket" {
+  description = "Uploads S3 bucket name"
+  value       = module.storage.uploads_bucket_id
+}
+
+output "efs_file_system_id" {
+  description = "EFS file system ID"
+  value       = module.storage.efs_file_system_id
+}
+
+################################################################################
+# CloudFront Outputs
+################################################################################
+
+output "cloudfront_distribution_id" {
+  description = "CloudFront distribution ID"
+  value       = module.edge_cloudfront.distribution_id
+}
+
+output "cloudfront_distribution_domain" {
+  description = "CloudFront distribution domain name"
+  value       = module.edge_cloudfront.distribution_domain_name
+}
+
+################################################################################
+# Messaging Outputs
+################################################################################
+
+output "event_bus_name" {
+  description = "EventBridge event bus name"
+  value       = module.messaging.event_bus_name
+}
+
+output "sqs_queue_urls" {
+  description = "SQS queue URLs"
+  value       = module.messaging.sqs_queue_urls
+}
+
+output "sns_topic_arns" {
+  description = "SNS topic ARNs"
+  value       = module.messaging.sns_topic_arns
+}
+
+################################################################################
+# Data Lake Outputs
+################################################################################
+
+output "data_lake_bucket" {
+  description = "Data lake S3 bucket name"
+  value       = module.data_lake.data_lake_bucket_id
+}
+
+output "glue_database_name" {
+  description = "Glue catalog database name"
+  value       = module.data_lake.glue_catalog_database_name
+}
+
+output "athena_workgroup" {
+  description = "Athena workgroup name"
+  value       = module.data_lake.athena_workgroup_name
+}
+
+################################################################################
+# Email Outputs
+################################################################################
+
+output "ses_domain_identity_arn" {
+  description = "SES domain identity ARN"
+  value       = module.email.ses_domain_identity_arn
+}
+
+output "ses_configuration_set" {
+  description = "SES configuration set name"
+  value       = module.email.ses_configuration_set_name
+}
+
+################################################################################
+# Observability Outputs
+################################################################################
+
+output "amp_workspace_endpoint" {
+  description = "AMP workspace endpoint"
+  value       = module.observability.amp_workspace_endpoint
+}
+
+output "alerts_topic_arn" {
+  description = "Alerts SNS topic ARN"
+  value       = module.observability.alerts_topic_arn
+}
+
+################################################################################
+# Security Outputs
+################################################################################
+
+output "kms_main_key_arn" {
+  description = "Main KMS key ARN"
+  value       = module.security_baseline.main_kms_key_arn
+}
+
+output "waf_cloudfront_acl_arn" {
+  description = "WAF CloudFront ACL ARN"
+  value       = module.security_baseline.waf_cloudfront_acl_arn
+}
+
+output "waf_alb_acl_arn" {
+  description = "WAF ALB ACL ARN"
+  value       = module.security_baseline.waf_alb_acl_arn
+}

@@ -1,0 +1,767 @@
+openapi: 3.0.3
+info:
+  title: The Unified Health Telehealth Service
+  version: 1.0.0
+  description: |
+    The Telehealth Service for The Unified Health Global Platform. This service manages
+    virtual healthcare appointments, video/audio visits, real-time messaging, and
+    WebRTC session coordination.
+
+    ## Features
+    - **Appointment Management**: Schedule, update, and cancel telehealth appointments
+    - **Virtual Visits**: Manage video, audio, and chat-based consultations
+    - **Real-time Messaging**: In-visit chat with file attachments
+    - **WebRTC Coordination**: ICE server configuration and session management
+    - **Billing Integration**: Automatic billing event generation on visit completion
+
+    ## Visit Types
+    - `video`: Video consultation with WebRTC
+    - `audio`: Audio-only consultation
+    - `chat`: Text-based asynchronous consultation
+    - `in_person`: Traditional in-person appointments
+
+    ## Visit Lifecycle
+    1. Patient creates appointment
+    2. Visit session created from appointment
+    3. Provider starts the visit
+    4. Patient and provider communicate (video/audio/chat)
+    5. Provider ends the visit
+    6. Billing event triggered automatically
+
+  contact:
+    name: API Support
+    email: support@theunifiedhealth.com
+  license:
+    name: Proprietary
+    url: https://theunifiedhealth.com/terms
+
+servers:
+  - url: http://localhost:3003
+    description: Local development server
+  - url: https://telehealth-dev.unifiedhealthcare.com
+    description: Development environment
+  - url: https://telehealth.unifiedhealthcare.com
+    description: Production environment
+
+tags:
+  - name: Health
+    description: Health check and monitoring endpoints
+  - name: Appointments
+    description: Appointment management endpoints
+  - name: Visits
+    description: Virtual visit session management
+  - name: Messages
+    description: In-visit messaging endpoints
+
+security:
+  - BearerAuth: []
+
+paths:
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Health check
+      description: Simple health check endpoint for monitoring
+      operationId: getHealth
+      security: []
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /appointments:
+    get:
+      tags:
+        - Appointments
+      summary: List appointments
+      description: |
+        Get all appointments for the authenticated user. Patients see their appointments,
+        providers see appointments where they are the assigned provider.
+      operationId: listAppointments
+      parameters:
+        - name: status
+          in: query
+          description: Filter by appointment status
+          schema:
+            type: string
+            enum: [scheduled, confirmed, in_progress, completed, cancelled, no_show]
+        - name: startDate
+          in: query
+          description: Filter appointments from this date
+          schema:
+            type: string
+            format: date-time
+        - name: endDate
+          in: query
+          description: Filter appointments until this date
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: List of appointments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppointmentListResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+    post:
+      tags:
+        - Appointments
+      summary: Create appointment
+      description: |
+        Create a new telehealth appointment. Only patients can create appointments.
+        Providers are notified of new appointments.
+      operationId: createAppointment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAppointmentRequest'
+      responses:
+        '201':
+          description: Appointment created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppointmentResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          description: Only patients can create appointments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /appointments/{id}:
+    get:
+      tags:
+        - Appointments
+      summary: Get appointment by ID
+      description: Retrieve a specific appointment with its associated visit if exists
+      operationId: getAppointment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Appointment found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppointmentDetailResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+    patch:
+      tags:
+        - Appointments
+      summary: Update appointment
+      description: Update appointment details. Both patient and provider can update.
+      operationId: updateAppointment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAppointmentRequest'
+      responses:
+        '200':
+          description: Appointment updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppointmentResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+    delete:
+      tags:
+        - Appointments
+      summary: Cancel appointment
+      description: Cancel an appointment. Both patient and provider can cancel.
+      operationId: cancelAppointment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Appointment cancelled successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Appointment cancelled successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /visits/{appointmentId}:
+    post:
+      tags:
+        - Visits
+      summary: Create visit from appointment
+      description: |
+        Create a virtual visit session from an existing appointment.
+        Returns WebRTC configuration (ICE servers) and session token.
+      operationId: createVisit
+      parameters:
+        - name: appointmentId
+          in: path
+          required: true
+          description: The appointment ID to create a visit for
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '201':
+          description: Visit created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /visits/{visitId}:
+    get:
+      tags:
+        - Visits
+      summary: Get visit details
+      description: Retrieve visit details including chat messages
+      operationId: getVisit
+      parameters:
+        - name: visitId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Visit found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitDetailResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /visits/{visitId}/start:
+    post:
+      tags:
+        - Visits
+      summary: Start visit
+      description: |
+        Mark the visit as started. Only the assigned provider can start the visit.
+        Records the start time for billing purposes.
+      operationId: startVisit
+      parameters:
+        - name: visitId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Visit started successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          description: Only the assigned provider can start the visit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /visits/{visitId}/end:
+    post:
+      tags:
+        - Visits
+      summary: End visit
+      description: |
+        Mark the visit as completed. Only the assigned provider can end the visit.
+        Calculates duration and triggers billing event automatically.
+      operationId: endVisit
+      parameters:
+        - name: visitId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Visit ended successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitEndResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          description: Only the assigned provider can end the visit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /visits/{visitId}/messages:
+    get:
+      tags:
+        - Messages
+      summary: Get visit messages
+      description: Retrieve all chat messages for a visit
+      operationId: getVisitMessages
+      parameters:
+        - name: visitId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of messages
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageListResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+    post:
+      tags:
+        - Messages
+      summary: Send chat message
+      description: Send a chat message during a visit. Supports file attachments via URLs.
+      operationId: sendMessage
+      parameters:
+        - name: visitId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendMessageRequest'
+      responses:
+        '201':
+          description: Message sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        JWT access token from Auth Service. User context (ID, role, email)
+        is extracted from the token for authorization.
+
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [healthy, unhealthy]
+          example: healthy
+        timestamp:
+          type: string
+          format: date-time
+        version:
+          type: string
+          example: "1.0.0"
+        service:
+          type: string
+          example: "telehealth-service"
+
+    CreateAppointmentRequest:
+      type: object
+      required:
+        - providerId
+        - scheduledAt
+        - duration
+        - type
+      properties:
+        providerId:
+          type: string
+          format: uuid
+          description: The healthcare provider's user ID
+        scheduledAt:
+          type: string
+          format: date-time
+          description: Scheduled start time
+        duration:
+          type: integer
+          minimum: 15
+          maximum: 120
+          description: Duration in minutes
+          example: 30
+        type:
+          type: string
+          enum: [video, audio, chat, in_person]
+          description: Type of appointment
+        reasonForVisit:
+          type: string
+          maxLength: 1000
+          description: Reason for the visit
+        notes:
+          type: string
+          description: Additional notes
+
+    UpdateAppointmentRequest:
+      type: object
+      properties:
+        scheduledAt:
+          type: string
+          format: date-time
+        duration:
+          type: integer
+          minimum: 15
+          maximum: 120
+        status:
+          type: string
+          enum: [scheduled, confirmed, in_progress, completed, cancelled, no_show]
+        notes:
+          type: string
+
+    Appointment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        patientId:
+          type: string
+          format: uuid
+        providerId:
+          type: string
+          format: uuid
+        scheduledAt:
+          type: string
+          format: date-time
+        duration:
+          type: integer
+        type:
+          type: string
+          enum: [video, audio, chat, in_person]
+        status:
+          type: string
+          enum: [scheduled, confirmed, in_progress, completed, cancelled, no_show]
+        reasonForVisit:
+          type: string
+        notes:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    AppointmentResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Appointment'
+        message:
+          type: string
+
+    AppointmentDetailResponse:
+      type: object
+      properties:
+        data:
+          allOf:
+            - $ref: '#/components/schemas/Appointment'
+            - type: object
+              properties:
+                visit:
+                  $ref: '#/components/schemas/Visit'
+
+    AppointmentListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Appointment'
+        count:
+          type: integer
+
+    Visit:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        appointmentId:
+          type: string
+          format: uuid
+        sessionToken:
+          type: string
+          description: Unique session token for WebRTC
+        roomId:
+          type: string
+          description: Virtual room identifier
+        status:
+          type: string
+          enum: [waiting, in_progress, completed]
+        startedAt:
+          type: string
+          format: date-time
+        endedAt:
+          type: string
+          format: date-time
+        durationMinutes:
+          type: integer
+        iceServers:
+          type: object
+          description: WebRTC ICE server configuration
+          properties:
+            iceServers:
+              type: array
+              items:
+                type: object
+                properties:
+                  urls:
+                    type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    VisitResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Visit'
+        message:
+          type: string
+
+    VisitDetailResponse:
+      type: object
+      properties:
+        data:
+          allOf:
+            - $ref: '#/components/schemas/Visit'
+            - type: object
+              properties:
+                appointment:
+                  $ref: '#/components/schemas/Appointment'
+                messages:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Message'
+
+    VisitEndResponse:
+      type: object
+      properties:
+        data:
+          allOf:
+            - $ref: '#/components/schemas/Visit'
+            - type: object
+              properties:
+                durationMinutes:
+                  type: integer
+                billingTriggered:
+                  type: boolean
+        message:
+          type: string
+
+    SendMessageRequest:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          minLength: 1
+          maxLength: 5000
+        attachments:
+          type: array
+          items:
+            type: string
+            format: uri
+          description: URLs to attached files
+
+    Message:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        visitId:
+          type: string
+          format: uuid
+        senderId:
+          type: string
+          format: uuid
+        senderRole:
+          type: string
+          enum: [patient, provider]
+        message:
+          type: string
+        attachments:
+          type: array
+          items:
+            type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    MessageResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Message'
+        message:
+          type: string
+
+    MessageListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Message'
+        count:
+          type: integer
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Not Found"
+        message:
+          type: string
+          example: "Appointment not found"
+        details:
+          type: array
+          items:
+            type: object
+
+  responses:
+    UnauthorizedError:
+      description: Unauthorized - Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "Unauthorized"
+            message: "Authentication token is missing or invalid"
+
+    ForbiddenError:
+      description: Forbidden - Insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "Forbidden"
+            message: "Access denied"
+
+    NotFoundError:
+      description: Not found - Resource does not exist
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "Not Found"
+            message: "Resource not found"

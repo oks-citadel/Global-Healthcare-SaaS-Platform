@@ -1,0 +1,212 @@
+// Prisma Schema for Personalization Service
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Profile
+model Profile {
+  id              String    @id @default(uuid())
+  externalUserId  String    @unique @map("external_user_id")
+  email           String?
+  firstName       String?   @map("first_name")
+  lastName        String?   @map("last_name")
+  timezone        String?
+  locale          String?
+  metadata        Json?
+  traits          ProfileTrait[]
+  segmentMemberships SegmentMembership[]
+  experimentAssignments ExperimentAssignment[]
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@map("profiles")
+}
+
+// User Traits
+model Trait {
+  id              String    @id @default(uuid())
+  key             String    @unique
+  name            String
+  description     String?
+  dataType        TraitDataType @map("data_type")
+  category        String?
+  isComputed      Boolean   @default(false) @map("is_computed")
+  computeRule     Json?     @map("compute_rule")
+  profileTraits   ProfileTrait[]
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@map("traits")
+}
+
+model ProfileTrait {
+  id          String    @id @default(uuid())
+  profileId   String    @map("profile_id")
+  traitId     String    @map("trait_id")
+  value       Json
+  source      String?
+  confidence  Float?
+  profile     Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  trait       Trait     @relation(fields: [traitId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@unique([profileId, traitId])
+  @@map("profile_traits")
+}
+
+// Segments
+model Segment {
+  id              String    @id @default(uuid())
+  key             String    @unique
+  name            String
+  description     String?
+  rules           Json
+  isActive        Boolean   @default(true) @map("is_active")
+  isDynamic       Boolean   @default(true) @map("is_dynamic")
+  memberCount     Int       @default(0) @map("member_count")
+  memberships     SegmentMembership[]
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@map("segments")
+}
+
+model SegmentMembership {
+  id          String    @id @default(uuid())
+  profileId   String    @map("profile_id")
+  segmentId   String    @map("segment_id")
+  enteredAt   DateTime  @default(now()) @map("entered_at")
+  exitedAt    DateTime? @map("exited_at")
+  profile     Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  segment     Segment   @relation(fields: [segmentId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, segmentId])
+  @@map("segment_memberships")
+}
+
+// Personalization Rules
+model PersonalizationRule {
+  id              String    @id @default(uuid())
+  key             String    @unique
+  name            String
+  description     String?
+  type            PersonalizationRuleType
+  priority        Int       @default(0)
+  conditions      Json
+  actions         Json
+  isActive        Boolean   @default(true) @map("is_active")
+  startDate       DateTime? @map("start_date")
+  endDate         DateTime? @map("end_date")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@map("personalization_rules")
+}
+
+// Experiments (A/B Testing)
+model Experiment {
+  id              String    @id @default(uuid())
+  key             String    @unique
+  name            String
+  description     String?
+  hypothesis      String?
+  status          ExperimentStatus @default(DRAFT)
+  type            ExperimentType   @default(AB_TEST)
+  targetSegments  String[]  @map("target_segments")
+  trafficPercent  Float     @default(100) @map("traffic_percent")
+  startDate       DateTime? @map("start_date")
+  endDate         DateTime? @map("end_date")
+  variants        ExperimentVariant[]
+  assignments     ExperimentAssignment[]
+  results         ExperimentResult?
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@map("experiments")
+}
+
+model ExperimentVariant {
+  id              String    @id @default(uuid())
+  experimentId    String    @map("experiment_id")
+  key             String
+  name            String
+  description     String?
+  isControl       Boolean   @default(false) @map("is_control")
+  weight          Float     @default(50)
+  payload         Json?
+  experiment      Experiment @relation(fields: [experimentId], references: [id], onDelete: Cascade)
+  assignments     ExperimentAssignment[]
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@unique([experimentId, key])
+  @@map("experiment_variants")
+}
+
+model ExperimentAssignment {
+  id              String    @id @default(uuid())
+  experimentId    String    @map("experiment_id")
+  variantId       String    @map("variant_id")
+  profileId       String    @map("profile_id")
+  assignedAt      DateTime  @default(now()) @map("assigned_at")
+  experiment      Experiment @relation(fields: [experimentId], references: [id], onDelete: Cascade)
+  variant         ExperimentVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  profile         Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([experimentId, profileId])
+  @@map("experiment_assignments")
+}
+
+model ExperimentResult {
+  id              String    @id @default(uuid())
+  experimentId    String    @unique @map("experiment_id")
+  winningVariant  String?   @map("winning_variant")
+  confidence      Float?
+  sampleSize      Int       @map("sample_size")
+  metrics         Json
+  conclusion      String?
+  concludedAt     DateTime? @map("concluded_at")
+  experiment      Experiment @relation(fields: [experimentId], references: [id], onDelete: Cascade)
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@map("experiment_results")
+}
+
+// Enums
+enum TraitDataType {
+  STRING
+  NUMBER
+  BOOLEAN
+  DATE
+  ARRAY
+  OBJECT
+}
+
+enum PersonalizationRuleType {
+  CONTENT
+  RECOMMENDATION
+  NEXT_BEST_ACTION
+  TARGETING
+}
+
+enum ExperimentStatus {
+  DRAFT
+  RUNNING
+  PAUSED
+  CONCLUDED
+  ARCHIVED
+}
+
+enum ExperimentType {
+  AB_TEST
+  MULTIVARIATE
+  SPLIT_URL
+  FEATURE_FLAG
+}

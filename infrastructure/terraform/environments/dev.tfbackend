@@ -1,0 +1,36 @@
+# ============================================
+# Development Environment Backend Configuration
+# ============================================
+# AWS S3 backend for Terraform state management
+# Enables state locking via DynamoDB, versioning, and team collaboration
+#
+# IMPORTANT: Before using this backend, run the setup script:
+#   ./setup-backend.sh --env dev
+#
+# Usage: terraform init -backend-config=environments/dev.tfbackend
+
+# S3 Bucket Configuration
+# The bucket name includes your AWS account ID for uniqueness
+# Update this after running setup-backend.sh
+bucket         = "unified-health-tfstate-dev-ACCOUNT_ID"
+key            = "env/dev/terraform.tfstate"
+region         = "us-east-1"
+
+# Encryption - Always enabled for security
+encrypt        = true
+
+# DynamoDB table for state locking
+# Prevents concurrent modifications to the state
+dynamodb_table = "unified-health-terraform-locks-dev"
+
+# Optional: Use KMS key for additional encryption (recommended for sensitive environments)
+# kms_key_id   = "alias/unified-health-terraform-dev"
+
+# Optional: Enable assume role for cross-account access
+# role_arn     = "arn:aws:iam::ACCOUNT_ID:role/TerraformStateAccess"
+
+# Optional: External ID for assume role (if required by the role trust policy)
+# external_id  = "unified-health-terraform"
+
+# Optional: Session name for assume role
+# session_name = "TerraformDev"

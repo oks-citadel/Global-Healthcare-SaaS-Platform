@@ -1,0 +1,62 @@
+apiVersion: v2
+name: saas-marketing-platform
+description: Global SaaS Marketing Platform - Umbrella Helm Chart
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - marketing
+  - saas
+  - platform
+  - seo
+  - analytics
+  - personalization
+  - ai
+maintainers:
+  - name: Platform Team
+    email: platform@example.com
+dependencies:
+  - name: seo-service
+    version: 1.0.0
+    repository: file://charts/seo-service
+    condition: seo-service.enabled
+  - name: content-service
+    version: 1.0.0
+    repository: file://charts/content-service
+    condition: content-service.enabled
+  - name: analytics-service
+    version: 1.0.0
+    repository: file://charts/analytics-service
+    condition: analytics-service.enabled
+  - name: personalization-service
+    version: 1.0.0
+    repository: file://charts/personalization-service
+    condition: personalization-service.enabled
+  - name: lifecycle-service
+    version: 1.0.0
+    repository: file://charts/lifecycle-service
+    condition: lifecycle-service.enabled
+  - name: growth-service
+    version: 1.0.0
+    repository: file://charts/growth-service
+    condition: growth-service.enabled
+  - name: commerce-service
+    version: 1.0.0
+    repository: file://charts/commerce-service
+    condition: commerce-service.enabled
+  - name: reputation-service
+    version: 1.0.0
+    repository: file://charts/reputation-service
+    condition: reputation-service.enabled
+  - name: localization-service
+    version: 1.0.0
+    repository: file://charts/localization-service
+    condition: localization-service.enabled
+  - name: ai-service
+    version: 1.0.0
+    repository: file://charts/ai-service
+    condition: ai-service.enabled
+  - name: community-service
+    version: 1.0.0
+    repository: file://charts/community-service
+    condition: community-service.enabled

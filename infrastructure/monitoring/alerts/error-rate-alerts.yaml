@@ -1,0 +1,146 @@
+# Prometheus Alerting Rules - Error Rates
+# Global Healthcare SaaS Platform
+# Focus: HTTP error monitoring (>5% 5xx responses)
+
+groups:
+  # ==========================================
+  # Error Rate Alerts
+  # ==========================================
+  - name: error_rates
+    interval: 30s
+    rules:
+      # Warning: Error rate exceeds 5%
+      - alert: HighErrorRate
+        expr: |
+          (
+            sum(rate(http_requests_total{status_code=~"5..", namespace="unified-health"}[5m])) by (job)
+            /
+            sum(rate(http_requests_total{namespace="unified-health"}[5m])) by (job)
+          ) * 100 > 5
+        for: 5m
+        labels:
+          severity: warning
+          category: errors
+          team: platform-sre
+        annotations:
+          summary: "High error rate on {{ $labels.job }}: {{ $value | printf \"%.2f\" }}%"
+          description: |
+            Service {{ $labels.job }} is experiencing an error rate of {{ $value | printf "%.2f" }}%.
+            This exceeds the 5% threshold and may indicate service issues.
+          runbook_url: "https://runbooks.unifiedhealth.io/high-error-rate"
+          dashboard_url: "https://grafana.unifiedhealth.io/d/healthcare-platform-overview"
+
+      # Critical: Error rate exceeds 10%
+      - alert: CriticalErrorRate
+        expr: |
+          (
+            sum(rate(http_requests_total{status_code=~"5..", namespace="unified-health"}[5m])) by (job)
+            /
+            sum(rate(http_requests_total{namespace="unified-health"}[5m])) by (job)
+          ) * 100 > 10
+        for: 2m
+        labels:
+          severity: critical
+          category: errors
+          team: platform-sre
+          escalation: urgent
+        annotations:
+          summary: "CRITICAL error rate on {{ $labels.job }}: {{ $value | printf \"%.2f\" }}%"
+          description: |
+            Service {{ $labels.job }} is experiencing a critical error rate of {{ $value | printf "%.2f" }}%.
+            This exceeds the 10% threshold and requires immediate attention.
+          runbook_url: "https://runbooks.unifiedhealth.io/critical-error-rate"
+
+      # Warning: 4xx client error rate is high
+      - alert: HighClientErrorRate
+        expr: |
+          (
+            sum(rate(http_requests_total{status_code=~"4..", namespace="unified-health"}[5m])) by (job)
+            /
+            sum(rate(http_requests_total{namespace="unified-health"}[5m])) by (job)
+          ) * 100 > 20
+        for: 10m
+        labels:
+          severity: warning
+          category: errors
+          team: platform-sre
+        annotations:
+          summary: "High client error rate on {{ $labels.job }}: {{ $value | printf \"%.2f\" }}%"
+          description: |
+            Service {{ $labels.job }} is experiencing a high 4xx error rate of {{ $value | printf "%.2f" }}%.
+            This may indicate client-side issues or API misuse.
+          runbook_url: "https://runbooks.unifiedhealth.io/client-errors"
+
+      # Warning: Specific 5xx error code spike
+      - alert: Error5xxSpike
+        expr: |
+          increase(http_requests_total{status_code=~"5..", namespace="unified-health"}[5m]) > 50
+        for: 5m
+        labels:
+          severity: warning
+          category: errors
+          team: platform-sre
+        annotations:
+          summary: "5xx error spike detected on {{ $labels.job }}"
+          description: |
+            Service {{ $labels.job }} has recorded {{ $value }} 5xx errors in the last 5 minutes.
+            Check logs for root cause.
+          runbook_url: "https://runbooks.unifiedhealth.io/error-spike"
+
+      # Critical: All requests failing
+      - alert: AllRequestsFailing
+        expr: |
+          (
+            sum(rate(http_requests_total{status_code=~"5..", namespace="unified-health"}[5m])) by (job)
+            /
+            sum(rate(http_requests_total{namespace="unified-health"}[5m])) by (job)
+          ) >= 0.95
+        for: 2m
+        labels:
+          severity: critical
+          category: errors
+          team: platform-sre
+          escalation: urgent
+        annotations:
+          summary: "Almost all requests failing on {{ $labels.job }}"
+          description: |
+            Service {{ $labels.job }} has 95% or more requests failing.
+            The service is effectively unavailable.
+          runbook_url: "https://runbooks.unifiedhealth.io/service-failure"
+
+      # Warning: Authentication failures spike
+      - alert: HighAuthenticationFailures
+        expr: |
+          (
+            sum(rate(user_login_attempts_total{status="failed"}[5m]))
+            /
+            sum(rate(user_login_attempts_total[5m]))
+          ) > 0.3
+        for: 5m
+        labels:
+          severity: warning
+          category: security
+          team: platform-sre
+        annotations:
+          summary: "High authentication failure rate"
+          description: |
+            Authentication failure rate is {{ $value | humanizePercentage }}.
+            This may indicate credential issues or a potential security incident.
+          runbook_url: "https://runbooks.unifiedhealth.io/auth-failures"
+
+      # Critical: Critical errors detected
+      - alert: CriticalErrorsDetected
+        expr: |
+          increase(critical_errors_total[5m]) > 10
+        for: 1m
+        labels:
+          severity: critical
+          category: errors
+          team: platform-sre
+        annotations:
+          summary: "Critical errors detected in {{ $labels.component }}"
+          description: |
+            {{ $value }} critical errors detected in {{ $labels.component }}.
+            Error type: {{ $labels.type }}
+            Immediate investigation required.
+          runbook_url: "https://runbooks.unifiedhealth.io/critical-errors"

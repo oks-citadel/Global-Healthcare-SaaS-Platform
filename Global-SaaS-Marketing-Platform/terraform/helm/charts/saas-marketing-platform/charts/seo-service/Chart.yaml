@@ -1,0 +1,14 @@
+apiVersion: v2
+name: seo-service
+description: SEO Service - Sitemap generation, robots.txt management, and SEO APIs
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - seo
+  - sitemap
+  - robots
+  - marketing
+maintainers:
+  - name: Platform Team
+    email: platform@example.com

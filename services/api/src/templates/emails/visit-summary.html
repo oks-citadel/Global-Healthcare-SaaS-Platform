@@ -1,0 +1,101 @@
+<h1>Visit Summary</h1>
+
+<p>Hi {{patientName}},</p>
+
+<p>Thank you for your recent visit. Here's a summary of your appointment:</p>
+
+<div class="info-box">
+  <h3>Visit Information</h3>
+  <table class="details-table">
+    <tr>
+      <td>Visit Date:</td>
+      <td><strong>{{visitDate}}</strong></td>
+    </tr>
+    <tr>
+      <td>Provider:</td>
+      <td><strong>{{providerName}}</strong></td>
+    </tr>
+    <tr>
+      <td>Specialty:</td>
+      <td>{{specialty}}</td>
+    </tr>
+    <tr>
+      <td>Visit Type:</td>
+      <td>{{visitType}}</td>
+    </tr>
+  </table>
+</div>
+
+{{#if diagnosis}}
+<h2>Diagnosis</h2>
+<p>{{diagnosis}}</p>
+{{/if}}
+
+{{#if prescriptions}}
+<h2>Prescriptions</h2>
+<div class="info-box">
+  {{#each prescriptions}}
+  <div style="margin-bottom: 15px;">
+    <p style="margin: 0;">
+      <strong>{{name}}</strong> - {{dosage}}<br>
+      <span style="color: #718096; font-size: 14px;">{{instructions}}</span>
+    </p>
+  </div>
+  {{/each}}
+</div>
+<p>Your prescriptions have been sent to your preferred pharmacy.</p>
+{{/if}}
+
+{{#if labOrders}}
+<h2>Lab Tests Ordered</h2>
+<ul style="color: #4a5568;">
+  {{#each labOrders}}
+  <li>{{this}}</li>
+  {{/each}}
+</ul>
+<p>Please schedule your lab tests within the next 7 days.</p>
+{{/if}}
+
+{{#if followUp}}
+<h2>Follow-Up Care</h2>
+<div class="info-box" style="background-color: #fffaf0; border-left-color: #ed8936;">
+  <p>{{followUp}}</p>
+  {{#if followUpDate}}
+  <p><strong>Next Appointment:</strong> {{followUpDate}}</p>
+  {{/if}}
+</div>
+{{/if}}
+
+{{#if notes}}
+<h2>Provider Notes</h2>
+<p>{{notes}}</p>
+{{/if}}
+
+<h2>Next Steps</h2>
+
+<ul style="color: #4a5568;">
+  <li>Review your visit summary and prescriptions</li>
+  <li>Take medications as prescribed</li>
+  <li>Schedule any recommended follow-up appointments</li>
+  <li>Complete any ordered lab tests</li>
+  <li>Contact us if you have questions or concerns</li>
+</ul>
+
+<div class="text-center">
+  <a href="{{appUrl}}/visits/{{visitId}}" class="btn btn-primary">View Full Summary</a>
+  <a href="{{appUrl}}/appointments/book?provider={{providerId}}" class="btn btn-secondary">Book Follow-Up</a>
+</div>
+
+<div class="info-box" style="margin-top: 30px;">
+  <h3>Have Questions?</h3>
+  <p>If you have any questions about your visit or care plan, please don't hesitate to reach out:</p>
+  <p>
+    <a href="{{appUrl}}/messages/new?provider={{providerId}}">Message Your Provider</a> |
+    <a href="tel:{{supportPhone}}">Call Support</a>
+  </p>
+</div>
+
+<p>
+  Thank you for choosing The Unified Health.<br>
+  <strong>The Unified Health Team</strong>
+</p>

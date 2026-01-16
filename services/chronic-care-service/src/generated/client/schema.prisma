@@ -1,0 +1,765 @@
+generator client {
+  output   = "./../src/generated/client"
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// Chronic Care Domain
+// ==========================================
+
+model CarePlan {
+  id             String     @id @default(uuid())
+  patientId      String
+  providerId     String
+  condition      String
+  status         PlanStatus @default(active)
+  startDate      DateTime   @default(now())
+  endDate        DateTime?
+  goals          Json
+  interventions  Json
+  reviewSchedule String?
+  nextReviewDate DateTime?
+
+  // Relations
+  tasks  CareTask[]
+  vitals VitalReading[]
+  alerts Alert[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([patientId])
+  @@index([providerId])
+  @@index([status])
+  @@index([nextReviewDate])
+}
+
+enum PlanStatus {
+  active
+  completed
+  suspended
+  cancelled
+}
+
+model CareTask {
+  id          String     @id @default(uuid())
+  carePlanId  String
+  carePlan    CarePlan   @relation(fields: [carePlanId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  taskType    TaskType
+  frequency   String
+  dueDate     DateTime?
+  completedAt DateTime?
+  status      TaskStatus @default(pending)
+  notes       String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([carePlanId])
+  @@index([status])
+  @@index([dueDate])
+}
+
+enum TaskType {
+  medication
+  measurement
+  exercise
+  diet
+  appointment
+  other
+}
+
+enum TaskStatus {
+  pending
+  completed
+  missed
+  cancelled
+}
+
+model MonitoringDevice {
+  id                String       @id @default(uuid())
+  patientId         String
+  deviceType        DeviceType
+  manufacturer      String?
+  model             String?
+  serialNumber      String       @unique
+  status            DeviceStatus @default(active)
+  lastSyncAt        DateTime?
+  batteryLevel      Int?
+  firmwareVersion   String?
+  softwareVersion   String?
+  certificateExpiry DateTime?
+  lastSecurityScan  DateTime?
+
+  readings VitalReading[]
+
+  // Security relations
+  vulnerabilities    DeviceVulnerability[]
+  patches            DevicePatch[]
+  incidents          SecurityIncident[]
+  networkAssignments DeviceNetworkAssignment[]
+  recallStatuses     DeviceRecallStatus[]
+  riskAssessments    DeviceRiskAssessment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([patientId])
+  @@index([deviceType])
+  @@index([status])
+  @@index([serialNumber])
+}
+
+enum DeviceType {
+  blood_pressure_monitor
+  glucose_meter
+  pulse_oximeter
+  weight_scale
+  thermometer
+  heart_rate_monitor
+  peak_flow_meter
+  ecg_monitor
+}
+
+enum DeviceStatus {
+  active
+  inactive
+  maintenance
+  decommissioned
+}
+
+model VitalReading {
+  id         String            @id @default(uuid())
+  patientId  String
+  carePlanId String?
+  carePlan   CarePlan?         @relation(fields: [carePlanId], references: [id], onDelete: SetNull)
+  deviceId   String?
+  device     MonitoringDevice? @relation(fields: [deviceId], references: [id], onDelete: SetNull)
+  vitalType  VitalType
+  value      Float
+  unit       String
+  isAbnormal Boolean           @default(false)
+  notes      String?
+  recordedAt DateTime          @default(now())
+
+  createdAt DateTime @default(now())
+
+  @@index([patientId])
+  @@index([carePlanId])
+  @@index([deviceId])
+  @@index([vitalType])
+  @@index([recordedAt])
+  @@index([patientId, recordedAt])
+}
+
+enum VitalType {
+  blood_pressure_systolic
+  blood_pressure_diastolic
+  heart_rate
+  blood_glucose
+  oxygen_saturation
+  temperature
+  weight
+  respiratory_rate
+  peak_flow
+}
+
+model Alert {
+  id             String        @id @default(uuid())
+  patientId      String
+  carePlanId     String?
+  carePlan       CarePlan?     @relation(fields: [carePlanId], references: [id], onDelete: SetNull)
+  alertType      AlertType
+  severity       AlertSeverity
+  title          String
+  description    String
+  status         AlertStatus   @default(new)
+  acknowledgedBy String?
+  acknowledgedAt DateTime?
+  resolvedAt     DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([patientId])
+  @@index([carePlanId])
+  @@index([status])
+  @@index([severity])
+  @@index([createdAt])
+}
+
+enum AlertType {
+  vital_out_of_range
+  missed_medication
+  missed_measurement
+  device_offline
+  no_activity
+  threshold_exceeded
+}
+
+enum AlertSeverity {
+  info
+  warning
+  critical
+}
+
+enum AlertStatus {
+  new
+  acknowledged
+  resolved
+  dismissed
+}
+
+model Goal {
+  id          String     @id @default(uuid())
+  patientId   String
+  carePlanId  String?
+  title       String
+  description String?
+  goalType    GoalType
+  targetValue Float?
+  targetUnit  String?
+  targetDate  DateTime?
+  frequency   String?
+  status      GoalStatus @default(active)
+  completedAt DateTime?
+
+  progress GoalProgress[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([patientId])
+  @@index([carePlanId])
+  @@index([status])
+  @@index([goalType])
+}
+
+model GoalProgress {
+  id           String   @id @default(uuid())
+  goalId       String
+  goal         Goal     @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  value        Float
+  currentValue Float?
+  currentUnit  String?
+  notes        String?
+  recordedAt   DateTime @default(now())
+
+  createdAt DateTime @default(now())
+
+  @@index([goalId])
+  @@index([recordedAt])
+}
+
+enum GoalType {
+  vital_sign
+  activity
+  lifestyle
+  clinical_outcome
+  weight_loss
+  blood_pressure
+  blood_glucose
+  exercise
+  medication_adherence
+  diet
+  sleep
+  stress_management
+  other
+}
+
+enum GoalStatus {
+  achieved
+  active
+  completed
+  paused
+  cancelled
+}
+
+model AlertThreshold {
+  id          String    @id @default(uuid())
+  patientId   String
+  carePlanId  String?
+  vitalType   VitalType
+  condition   String?
+  minValue    Float?
+  maxValue    Float?
+  criticalMin Float?
+  criticalMax Float?
+  warningMin  Float?
+  warningMax  Float?
+  isActive    Boolean   @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([patientId])
+  @@index([vitalType])
+  @@index([isActive])
+}
+
+model CarePlanTemplate {
+  id             String  @id @default(uuid())
+  name           String
+  description    String?
+  condition      String
+  goals          Json
+  interventions  Json
+  tasks          Json?
+  reviewSchedule String?
+  thresholds     Json?
+  version        Int     @default(1)
+  isActive       Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([condition])
+  @@index([isActive])
+}
+
+model PatientEngagement {
+  id             String         @id @default(uuid())
+  patientId      String
+  carePlanId     String?
+  engagementType EngagementType
+  activityType   String
+  description    String?
+  metadata       Json?
+  recordedAt     DateTime       @default(now())
+
+  createdAt DateTime @default(now())
+
+  @@index([patientId])
+  @@index([carePlanId])
+  @@index([engagementType])
+  @@index([recordedAt])
+}
+
+enum EngagementType {
+  device_sync
+  vital_reading
+  goal_progress
+  medication_taken
+  appointment_kept
+  task_completed
+  education_viewed
+  message_sent
+  other
+}
+
+// ==========================================
+// Medical Device Security Domain
+// ==========================================
+
+model DeviceVulnerability {
+  id               String                @id @default(uuid())
+  deviceId         String
+  device           MonitoringDevice      @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  cveId            String?
+  title            String
+  description      String
+  severity         VulnerabilitySeverity
+  cvssScore        Float?
+  affectedVersion  String?
+  fixedVersion     String?
+  exploitAvailable Boolean               @default(false)
+  status           VulnerabilityStatus   @default(open)
+  discoveredAt     DateTime              @default(now())
+  resolvedAt       DateTime?
+  resolvedBy       String?
+  resolutionNotes  String?
+  source           String? // CVE, manufacturer advisory, internal scan
+  references       Json? // Array of reference URLs
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([deviceId])
+  @@index([cveId])
+  @@index([severity])
+  @@index([status])
+  @@index([discoveredAt])
+}
+
+enum VulnerabilitySeverity {
+  critical
+  high
+  medium
+  low
+  informational
+}
+
+enum VulnerabilityStatus {
+  open
+  in_progress
+  mitigated
+  resolved
+  accepted_risk
+  false_positive
+}
+
+model DevicePatch {
+  id                   String           @id @default(uuid())
+  deviceId             String
+  device               MonitoringDevice @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  patchVersion         String
+  currentVersion       String
+  description          String?
+  releaseNotes         String?
+  criticality          PatchCriticality @default(recommended)
+  scheduledDate        DateTime?
+  appliedDate          DateTime?
+  appliedBy            String?
+  status               PatchStatus      @default(pending)
+  rollbackVersion      String?
+  testingRequired      Boolean          @default(false)
+  testingCompletedAt   DateTime?
+  testingNotes         String?
+  approvedBy           String?
+  approvedAt           DateTime?
+  failureReason        String?
+  vulnerabilitiesFixed Json? // Array of CVE IDs addressed
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([deviceId])
+  @@index([status])
+  @@index([scheduledDate])
+  @@index([criticality])
+}
+
+enum PatchCriticality {
+  critical
+  security
+  recommended
+  optional
+}
+
+enum PatchStatus {
+  pending
+  approved
+  scheduled
+  in_progress
+  completed
+  failed
+  rolled_back
+  cancelled
+}
+
+model SecurityIncident {
+  id                   String            @id @default(uuid())
+  deviceId             String?
+  device               MonitoringDevice? @relation(fields: [deviceId], references: [id], onDelete: SetNull)
+  incidentType         IncidentType
+  severity             IncidentSeverity
+  title                String
+  description          String
+  affectedSystems      Json? // Array of affected system identifiers
+  affectedPatients     Json? // Array of affected patient IDs (anonymized if needed)
+  detectedAt           DateTime          @default(now())
+  detectedBy           String
+  reportedBy           String
+  status               IncidentStatus    @default(detected)
+  assignedTo           String?
+  containedAt          DateTime?
+  resolvedAt           DateTime?
+  rootCause            String?
+  remediationSteps     Json?
+  lessonsLearned       String?
+  timeline             Json? // Array of timeline events
+  evidence             Json? // Array of evidence/artifact references
+  notificationsSent    Boolean           @default(false)
+  regulatoryReported   Boolean           @default(false)
+  regulatoryReportDate DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([deviceId])
+  @@index([incidentType])
+  @@index([severity])
+  @@index([status])
+  @@index([detectedAt])
+}
+
+enum IncidentType {
+  unauthorized_access
+  data_breach
+  malware
+  ransomware
+  firmware_tampering
+  network_intrusion
+  denial_of_service
+  physical_tampering
+  configuration_change
+  anomalous_behavior
+  credential_compromise
+  other
+}
+
+enum IncidentSeverity {
+  critical
+  high
+  medium
+  low
+}
+
+enum IncidentStatus {
+  detected
+  investigating
+  contained
+  eradicating
+  recovering
+  resolved
+  closed
+}
+
+model NetworkSegment {
+  id                     String         @id @default(uuid())
+  name                   String         @unique
+  description            String?
+  vlanId                 Int?
+  subnetCidr             String?
+  securityLevel          SecurityLevel
+  isolationLevel         IsolationLevel @default(standard)
+  allowedProtocols       Json? // Array of allowed protocols
+  firewallRules          Json?
+  complianceRequirements Json? // HIPAA, FDA, etc.
+  monitoringEnabled      Boolean        @default(true)
+  isActive               Boolean        @default(true)
+
+  devices DeviceNetworkAssignment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([securityLevel])
+  @@index([isActive])
+}
+
+enum SecurityLevel {
+  critical
+  high
+  medium
+  low
+  public
+}
+
+enum IsolationLevel {
+  air_gapped
+  strict
+  standard
+  relaxed
+}
+
+model DeviceNetworkAssignment {
+  id                  String           @id @default(uuid())
+  deviceId            String
+  device              MonitoringDevice @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  segmentId           String
+  segment             NetworkSegment   @relation(fields: [segmentId], references: [id], onDelete: Cascade)
+  ipAddress           String?
+  macAddress          String?
+  assignedAt          DateTime         @default(now())
+  assignedBy          String
+  status              AssignmentStatus @default(active)
+  complianceStatus    ComplianceStatus @default(pending)
+  lastComplianceCheck DateTime?
+  complianceNotes     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([deviceId, segmentId])
+  @@index([deviceId])
+  @@index([segmentId])
+  @@index([status])
+  @@index([complianceStatus])
+}
+
+enum AssignmentStatus {
+  active
+  suspended
+  removed
+}
+
+enum ComplianceStatus {
+  compliant
+  non_compliant
+  pending
+  exempt
+}
+
+model FDARecall {
+  id                  String       @id @default(uuid())
+  recallNumber        String       @unique
+  recallClass         RecallClass
+  productDescription  String
+  manufacturer        String
+  reasonForRecall     String
+  distributionPattern String?
+  initiatedDate       DateTime
+  terminatedDate      DateTime?
+  status              RecallStatus @default(ongoing)
+  affectedModels      Json? // Array of affected model numbers
+  lotNumbers          Json? // Array of affected lot numbers
+  healthHazard        String?
+  remedyDescription   String?
+  lastCheckedAt       DateTime     @default(now())
+
+  // Tracking affected devices in our system
+  affectedDevices DeviceRecallStatus[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([manufacturer])
+  @@index([status])
+  @@index([recallClass])
+  @@index([initiatedDate])
+}
+
+enum RecallClass {
+  class_I // Most serious - reasonable probability of serious health issues
+  class_II // May cause temporary health problems
+  class_III // Not likely to cause health problems
+}
+
+enum RecallStatus {
+  ongoing
+  completed
+  terminated
+}
+
+model DeviceRecallStatus {
+  id               String             @id @default(uuid())
+  deviceId         String
+  device           MonitoringDevice   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  recallId         String
+  recall           FDARecall          @relation(fields: [recallId], references: [id], onDelete: Cascade)
+  status           DeviceRecallAction @default(pending)
+  actionTaken      String?
+  actionDate       DateTime?
+  actionBy         String?
+  notes            String?
+  patientNotified  Boolean            @default(false)
+  providerNotified Boolean            @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([deviceId, recallId])
+  @@index([deviceId])
+  @@index([recallId])
+  @@index([status])
+}
+
+enum DeviceRecallAction {
+  pending
+  under_review
+  device_replaced
+  device_repaired
+  device_removed
+  no_action_required
+  patient_contacted
+}
+
+model SecurityAuditLog {
+  id              String  @id @default(uuid())
+  entityType      String // device, vulnerability, patch, incident, etc.
+  entityId        String
+  action          String // create, update, delete, scan, etc.
+  performedBy     String
+  performedByRole String?
+  previousState   Json?
+  newState        Json?
+  ipAddress       String?
+  userAgent       String?
+  details         String?
+  riskLevel       String?
+
+  createdAt DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([performedBy])
+  @@index([action])
+  @@index([createdAt])
+}
+
+model ManufacturerAdvisory {
+  id               String                @id @default(uuid())
+  manufacturer     String
+  advisoryId       String                @unique
+  title            String
+  description      String
+  severity         VulnerabilitySeverity
+  affectedProducts Json // Array of product models
+  affectedVersions Json? // Version range affected
+  fixedVersion     String?
+  workaround       String?
+  publishedDate    DateTime
+  lastUpdatedDate  DateTime?
+  cveReferences    Json? // Array of related CVE IDs
+  status           AdvisoryStatus        @default(active)
+  source           String? // URL to original advisory
+  acknowledgedAt   DateTime?
+  acknowledgedBy   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([manufacturer])
+  @@index([severity])
+  @@index([status])
+  @@index([publishedDate])
+}
+
+enum AdvisoryStatus {
+  active
+  superseded
+  resolved
+  archived
+}
+
+model DeviceRiskAssessment {
+  id                 String           @id @default(uuid())
+  deviceId           String
+  device             MonitoringDevice @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  overallRiskScore   Float
+  vulnerabilityScore Float            @default(0)
+  patchScore         Float            @default(0)
+  networkScore       Float            @default(0)
+  complianceScore    Float            @default(0)
+  incidentScore      Float            @default(0)
+  agingScore         Float            @default(0)
+  riskLevel          RiskLevel
+  riskFactors        Json // Detailed breakdown of risk factors
+  recommendations    Json? // Array of recommended actions
+  assessedAt         DateTime         @default(now())
+  assessedBy         String?
+  nextAssessmentDue  DateTime?
+  notes              String?
+
+  createdAt DateTime @default(now())
+
+  @@index([deviceId])
+  @@index([riskLevel])
+  @@index([assessedAt])
+  @@index([overallRiskScore])
+}
+
+enum RiskLevel {
+  critical
+  high
+  medium
+  low
+  minimal
+}

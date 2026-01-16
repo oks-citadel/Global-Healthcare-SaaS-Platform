@@ -1,0 +1,139 @@
+generator client {
+  output   = "./../src/generated/client"
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// Laboratory Domain
+// ==========================================
+
+model LabOrder {
+  id           String        @id @default(uuid())
+  patientId    String
+  providerId   String
+  encounterId  String?
+  orderNumber  String        @unique
+  status       OrderStatus   @default(pending)
+  priority     OrderPriority @default(routine)
+  tests        LabTest[]
+  clinicalInfo String? // Clinical indication
+  orderedAt    DateTime      @default(now())
+  collectedAt  DateTime?
+  completedAt  DateTime?
+  reportUrl    String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@index([patientId])
+  @@index([providerId])
+  @@index([status])
+  @@index([orderNumber])
+  @@index([orderedAt])
+}
+
+enum OrderStatus {
+  pending
+  collected
+  processing
+  completed
+  cancelled
+}
+
+enum OrderPriority {
+  routine
+  urgent
+  stat
+}
+
+model LabTest {
+  id          String       @id @default(uuid())
+  orderId     String
+  order       LabOrder     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  testCode    String
+  testName    String
+  category    TestCategory
+  status      TestStatus   @default(pending)
+  verifiedAt  DateTime?
+  performedBy String?
+  performedAt DateTime?
+  verifiedBy  String?
+  results     LabResult[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([orderId])
+  @@index([testCode])
+  @@index([status])
+}
+
+enum TestCategory {
+  hematology
+  biochemistry
+  immunology
+  microbiology
+  pathology
+  radiology
+  cardiology
+  endocrinology
+  other
+}
+
+enum TestStatus {
+  pending
+  processing
+  completed
+  cancelled
+}
+
+model LabResult {
+  id             String    @id @default(uuid())
+  testId         String
+  test           LabTest   @relation(fields: [testId], references: [id], onDelete: Cascade)
+  componentName  String
+  componentCode  String?
+  numericValue   Float?
+  value          String
+  unit           String?
+  referenceRange String?
+  isAbnormal     Boolean   @default(false)
+  isCritical     Boolean   @default(false)
+  abnormalFlag   String? // H (High), L (Low), A (Abnormal)
+  notes          String?
+  interpretation String?
+  verifiedAt     DateTime?
+  performedBy    String?
+  performedAt    DateTime?
+  verifiedBy     String?
+  resultedAt     DateTime  @default(now())
+  createdAt      DateTime  @default(now())
+
+  @@index([testId])
+  @@index([isAbnormal])
+  @@index([resultedAt])
+}
+
+model DiagnosticTest {
+  id              String       @id @default(uuid())
+  name            String
+  code            String       @unique
+  category        TestCategory
+  description     String?
+  preparation     String?
+  sampleType      String? // Blood, Urine, Tissue, etc.
+  turnaroundTime  String? // e.g., "24-48 hours"
+  price           Decimal      @db.Decimal(10, 2)
+  currency        String       @default("USD")
+  referenceRanges Json?
+  isActive        Boolean      @default(true)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([code])
+  @@index([category])
+  @@index([isActive])
+}

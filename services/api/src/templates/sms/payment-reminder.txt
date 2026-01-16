@@ -1,0 +1,1 @@
+Hi {{patientName}}, you have an outstanding balance of {{amount}} due by {{dueDate}}. Pay now: {{appUrl}}/invoices/{{invoiceId}}/pay - {{appName}}

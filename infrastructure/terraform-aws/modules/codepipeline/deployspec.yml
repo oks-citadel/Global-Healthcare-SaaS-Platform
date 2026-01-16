@@ -1,0 +1,137 @@
+version: 0.2
+
+# ============================================
+# The Unified Health Platform - Deploy Spec
+# ============================================
+# Deploy to ECS Fargate using AWS CLI
+# ============================================
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.11
+    commands:
+      - echo "Installing jq for JSON processing..."
+      - yum install -y jq || apt-get install -y jq
+
+  pre_build:
+    commands:
+      - echo "Configuring deployment for ECS cluster ${ECS_CLUSTER_NAME}..."
+      - echo "Verifying cluster exists..."
+      - aws ecs describe-clusters --clusters $ECS_CLUSTER_NAME --region $AWS_REGION
+      - echo "Listing current services..."
+      - aws ecs list-services --cluster $ECS_CLUSTER_NAME --region $AWS_REGION
+
+  build:
+    commands:
+      - echo "Deploying to ECS cluster ${ECS_CLUSTER_NAME}..."
+      - echo "Listing available artifacts..."
+      - ls -la
+
+      # Deploy web-app service
+      - |
+        if [ -f "web-app-image.txt" ]; then
+          WEB_APP_IMAGE=$(cat web-app-image.txt)
+          echo "Updating web-app service with image: ${WEB_APP_IMAGE}"
+
+          # Get current task definition
+          TASK_DEF=$(aws ecs describe-services \
+            --cluster "$ECS_CLUSTER_NAME" \
+            --services "web-app" \
+            --query 'services[0].taskDefinition' \
+            --output text --region $AWS_REGION 2>/dev/null || echo "")
+
+          if [ -n "$TASK_DEF" ] && [ "$TASK_DEF" != "None" ]; then
+            # Get task definition JSON
+            TASK_DEF_JSON=$(aws ecs describe-task-definition \
+              --task-definition "$TASK_DEF" \
+              --query 'taskDefinition' \
+              --region $AWS_REGION)
+
+            # Update container image
+            NEW_TASK_DEF=$(echo "$TASK_DEF_JSON" | jq \
+              --arg IMAGE "$WEB_APP_IMAGE" \
+              '.containerDefinitions = [.containerDefinitions[] | if .name == "web-app" then .image = $IMAGE else . end]' | \
+              jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)')
+
+            # Register new task definition
+            NEW_TASK_DEF_ARN=$(aws ecs register-task-definition \
+              --cli-input-json "$NEW_TASK_DEF" \
+              --query 'taskDefinition.taskDefinitionArn' \
+              --output text --region $AWS_REGION)
+
+            # Update service
+            aws ecs update-service \
+              --cluster "$ECS_CLUSTER_NAME" \
+              --service "web-app" \
+              --task-definition "$NEW_TASK_DEF_ARN" \
+              --force-new-deployment \
+              --region $AWS_REGION
+
+            echo "web-app service updated successfully"
+          else
+            echo "web-app service not found, skipping..."
+          fi
+        fi
+
+      # Deploy api service
+      - |
+        if [ -f "api-image.txt" ]; then
+          API_IMAGE=$(cat api-image.txt)
+          echo "Updating api service with image: ${API_IMAGE}"
+
+          TASK_DEF=$(aws ecs describe-services \
+            --cluster "$ECS_CLUSTER_NAME" \
+            --services "api" \
+            --query 'services[0].taskDefinition' \
+            --output text --region $AWS_REGION 2>/dev/null || echo "")
+
+          if [ -n "$TASK_DEF" ] && [ "$TASK_DEF" != "None" ]; then
+            TASK_DEF_JSON=$(aws ecs describe-task-definition \
+              --task-definition "$TASK_DEF" \
+              --query 'taskDefinition' \
+              --region $AWS_REGION)
+
+            NEW_TASK_DEF=$(echo "$TASK_DEF_JSON" | jq \
+              --arg IMAGE "$API_IMAGE" \
+              '.containerDefinitions = [.containerDefinitions[] | if .name == "api" then .image = $IMAGE else . end]' | \
+              jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)')
+
+            NEW_TASK_DEF_ARN=$(aws ecs register-task-definition \
+              --cli-input-json "$NEW_TASK_DEF" \
+              --query 'taskDefinition.taskDefinitionArn' \
+              --output text --region $AWS_REGION)
+
+            aws ecs update-service \
+              --cluster "$ECS_CLUSTER_NAME" \
+              --service "api" \
+              --task-definition "$NEW_TASK_DEF_ARN" \
+              --force-new-deployment \
+              --region $AWS_REGION
+
+            echo "api service updated successfully"
+          else
+            echo "api service not found, skipping..."
+          fi
+        fi
+
+      # Wait for services to stabilize
+      - echo "Waiting for services to stabilize..."
+      - aws ecs wait services-stable --cluster $ECS_CLUSTER_NAME --services web-app api --region $AWS_REGION || echo "Some services may not exist yet"
+
+  post_build:
+    commands:
+      - echo "Deployment completed at $(date)"
+      - echo "Verifying deployment status..."
+
+      # List all services in the cluster
+      - aws ecs list-services --cluster $ECS_CLUSTER_NAME --region $AWS_REGION
+
+      # Get service details
+      - echo "Web App Service:"
+      - aws ecs describe-services --cluster $ECS_CLUSTER_NAME --services web-app --region $AWS_REGION --query 'services[0].{status:status,runningCount:runningCount,desiredCount:desiredCount,taskDefinition:taskDefinition}' 2>/dev/null || echo "web-app service not found"
+
+      - echo "API Service:"
+      - aws ecs describe-services --cluster $ECS_CLUSTER_NAME --services api --region $AWS_REGION --query 'services[0].{status:status,runningCount:runningCount,desiredCount:desiredCount,taskDefinition:taskDefinition}' 2>/dev/null || echo "api service not found"
+
+      - echo "ECS Fargate deployment completed successfully!"

@@ -1,0 +1,59 @@
+################################################################################
+# Development Environment Variables
+# Global SaaS Marketing Platform
+################################################################################
+
+# General Configuration
+project_name = "marketing-platform"
+environment  = "dev"
+aws_region   = "us-east-1"
+cost_center  = "development"
+
+# VPC Configuration
+vpc_cidr = "10.0.0.0/16"
+
+# EKS Configuration
+eks_cluster_version = "1.29"
+
+# Allowed AWS Regions
+allowed_regions = ["us-east-1", "us-west-2"]
+
+# WAF Configuration
+waf_blocked_countries = []
+
+# CloudFront Configuration
+cloudfront_domain_names = ["dev.example.com"]
+acm_certificate_arn     = ""  # ACM certificate ARN for CloudFront
+
+# Route53 Configuration
+route53_zone_id = ""  # Route53 hosted zone ID
+
+# CORS Configuration
+cors_allowed_origins = [
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "https://dev.example.com"
+]
+
+# SES Configuration
+ses_domain_name           = "dev.example.com"
+ses_tracking_domain       = "track.dev.example.com"
+dmarc_email               = "dmarc@example.com"
+ses_allowed_from_addresses = ["noreply@dev.example.com"]
+
+# OpenSearch Configuration
+create_opensearch_service_linked_role = true
+opensearch_master_user_arn            = ""  # IAM user/role ARN for OpenSearch access
+
+# Shield Advanced (disabled for dev)
+enable_shield_advanced = false
+
+# Geo Restriction
+geo_restriction_type      = "none"
+geo_restriction_locations = []
+
+# Lake Formation
+lake_formation_admin_arn = ""  # IAM user/role ARN for Lake Formation admin
+
+# Alerting
+alert_email_addresses = ["dev-alerts@example.com"]

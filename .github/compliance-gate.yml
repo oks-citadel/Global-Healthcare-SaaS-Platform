@@ -1,0 +1,207 @@
+# ============================================================================
+# UNIFIED HEALTH - COMPLIANCE GATE CONFIGURATION
+# ============================================================================
+# Healthcare-grade compliance checks for HIPAA, SOC2, and GDPR
+# This configuration is used by CI/CD pipelines to enforce compliance
+# ============================================================================
+
+version: "1.0"
+framework: "healthcare-saas"
+
+# ============================================
+# HIPAA Technical Safeguards
+# ============================================
+hipaa:
+  required: true
+  controls:
+    # Access Control (164.312(a)(1))
+    access_control:
+      - unique_user_identification
+      - emergency_access_procedure
+      - automatic_logoff
+      - encryption_and_decryption
+
+    # Audit Controls (164.312(b))
+    audit:
+      - audit_logging_enabled
+      - tamper_proof_logs
+      - log_retention_minimum: 6_years
+
+    # Integrity Controls (164.312(c)(1))
+    integrity:
+      - data_validation
+      - error_correcting
+      - authentication_of_phi
+
+    # Transmission Security (164.312(e)(1))
+    transmission:
+      - encryption_in_transit: true
+      - tls_minimum_version: "1.2"
+      - certificate_validation: true
+
+# ============================================
+# Code Security Checks
+# ============================================
+security:
+  # Secret Detection
+  secrets:
+    enabled: true
+    tools:
+      - gitleaks
+      - truffleHog
+    patterns_blocked:
+      - "AWS_SECRET"
+      - "PRIVATE_KEY"
+      - "password\\s*="
+      - "api[_-]?key\\s*="
+      - "bearer\\s+[a-zA-Z0-9]+"
+
+  # Dependency Scanning
+  dependencies:
+    audit_level: high
+    block_on_critical: true
+    allowed_licenses:
+      - MIT
+      - Apache-2.0
+      - BSD-2-Clause
+      - BSD-3-Clause
+      - ISC
+
+  # Container Security
+  containers:
+    scan_on_build: true
+    block_high_vulnerabilities: true
+    base_image_requirements:
+      - no_root_user
+      - minimal_packages
+      - signed_images
+
+# ============================================
+# PHI Protection Rules
+# ============================================
+phi_protection:
+  # Client-side rules
+  frontend:
+    no_phi_in_logs: true
+    no_phi_in_urls: true
+    no_phi_in_localstorage: true
+    secure_storage_required: true
+
+  # Patterns to block
+  blocked_patterns:
+    - social_security_number: "\\d{3}-\\d{2}-\\d{4}"
+    - date_of_birth_exposed: "dob|dateOfBirth|birth_date"
+    - medical_record_number: "mrn|medicalRecordNumber"
+
+  # Required masking
+  required_masking:
+    - patient_name
+    - address
+    - phone_number
+    - email
+    - insurance_id
+
+# ============================================
+# Mobile App Requirements
+# ============================================
+mobile:
+  ios:
+    required_entitlements:
+      - healthkit
+      - push_notifications
+    privacy_descriptions_required:
+      - NSHealthShareUsageDescription
+      - NSHealthUpdateUsageDescription
+      - NSFaceIDUsageDescription
+      - NSCameraUsageDescription
+
+  android:
+    required_permissions:
+      - USE_BIOMETRIC
+      - USE_FINGERPRINT
+    target_sdk_minimum: 33
+    build_type: app-bundle
+
+  common:
+    certificate_pinning: recommended
+    root_detection: recommended
+    secure_storage: required
+    biometric_auth: required
+
+# ============================================
+# API Security
+# ============================================
+api:
+  authentication:
+    method: jwt
+    token_expiry_max: 3600  # 1 hour
+    refresh_token_rotation: true
+
+  rate_limiting:
+    enabled: true
+    default_limit: 100
+    window_seconds: 60
+
+  cors:
+    allowed_origins:
+      - https://unifiedhealth.com
+      - https://*.unifiedhealth.com
+    credentials: true
+
+  headers_required:
+    - X-Request-ID
+    - X-Correlation-ID
+
+# ============================================
+# Infrastructure Requirements
+# ============================================
+infrastructure:
+  aws:
+    encryption_at_rest: required
+    encryption_in_transit: required
+    vpc_isolation: required
+    waf_enabled: required
+    cloudtrail_enabled: required
+
+  database:
+    encryption: required
+    backup_retention_days: 35
+    point_in_time_recovery: required
+    audit_logging: required
+
+# ============================================
+# CI/CD Gate Rules
+# ============================================
+gates:
+  # Must pass before PR merge
+  pull_request:
+    - lint
+    - typecheck
+    - unit_tests
+    - security_scan
+    - phi_scan
+
+  # Must pass before staging deploy
+  staging:
+    - all_pr_checks
+    - integration_tests
+    - e2e_tests
+    - compliance_scan
+
+  # Must pass before production deploy
+  production:
+    - all_staging_checks
+    - penetration_test_passed
+    - security_review_approved
+    - hipaa_checklist_complete
+    - manual_approval
+
+# ============================================
+# Reporting
+# ============================================
+reporting:
+  generate_sbom: true
+  compliance_report: true
+  vulnerability_report: true
+  audit_trail: true
+  retention_days: 2190  # 6 years for HIPAA

@@ -1,0 +1,139 @@
+# ============================================
+# UnifiedHealth Web Frontend - pnpm Monorepo Build
+# ============================================
+FROM node:22-alpine AS base
+
+RUN apk add --no-cache libc6-compat && rm -rf /var/cache/apk/*
+
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable && corepack prepare pnpm@9 --activate
+
+WORKDIR /app
+
+# ============================================
+# Stage 2: Install dependencies
+# ============================================
+FROM base AS deps
+
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
+COPY apps/web/package.json ./apps/web/
+COPY packages/sdk/package.json ./packages/sdk/
+COPY packages/i18n/package.json ./packages/i18n/
+COPY packages/asset-branding/package.json ./packages/asset-branding/
+
+# Configure pnpm to handle peer dependency conflicts (React 19 + older packages like Stripe)
+RUN echo "auto-install-peers=true" > .npmrc && \
+    echo "strict-peer-dependencies=false" >> .npmrc
+
+RUN pnpm install --no-frozen-lockfile
+
+# ============================================
+# Stage 3: Build SDK
+# ============================================
+FROM base AS sdk-builder
+
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/packages/sdk/node_modules ./packages/sdk/node_modules
+COPY packages/sdk ./packages/sdk
+
+WORKDIR /app/packages/sdk
+RUN pnpm build
+RUN ls -la dist/ && test -f dist/index.js
+
+# ============================================
+# Stage 3b: Build i18n
+# ============================================
+FROM base AS i18n-builder
+
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/packages/i18n/node_modules ./packages/i18n/node_modules
+COPY packages/i18n ./packages/i18n
+
+WORKDIR /app/packages/i18n
+RUN pnpm build
+RUN ls -la dist/ && test -f dist/index.js
+
+# ============================================
+# Stage 3c: Build asset-branding
+# ============================================
+FROM base AS asset-branding-builder
+
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/packages/asset-branding/node_modules ./packages/asset-branding/node_modules
+COPY packages/asset-branding ./packages/asset-branding
+
+WORKDIR /app/packages/asset-branding
+RUN pnpm build
+RUN ls -la dist/ && test -f dist/index.js
+
+# ============================================
+# Stage 4: Build Web App
+# ============================================
+FROM base AS builder
+
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules
+COPY --from=sdk-builder /app/packages/sdk ./packages/sdk
+COPY --from=i18n-builder /app/packages/i18n ./packages/i18n
+COPY --from=asset-branding-builder /app/packages/asset-branding ./packages/asset-branding
+COPY apps/web ./apps/web
+COPY package.json pnpm-workspace.yaml turbo.json* ./
+
+WORKDIR /app/apps/web
+
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
+ENV CI=true
+
+ARG BUILD_DATE
+ARG VERSION
+ARG GIT_SHA
+ARG GIT_BRANCH
+
+ENV BUILD_DATE=${BUILD_DATE}
+ENV VERSION=${VERSION}
+ENV GIT_SHA=${GIT_SHA}
+ENV GIT_BRANCH=${GIT_BRANCH}
+
+RUN NEXT_TELEMETRY_DISABLED=1 npx next build --webpack
+RUN ls -la .next/standalone/ && ls -la .next/static/
+
+# ============================================
+# Stage 5: Production Runtime
+# ============================================
+FROM node:22-alpine AS production
+
+LABEL maintainer="UnifiedHealth Platform Team"
+LABEL org.opencontainers.image.title="UnifiedHealth Web Frontend"
+LABEL org.opencontainers.image.description="UnifiedHealth Patient Portal - Next.js Application"
+LABEL org.opencontainers.image.vendor="UnifiedHealth"
+
+RUN apk add --no-cache dumb-init ca-certificates wget && apk upgrade --no-cache && rm -rf /var/cache/apk/*
+
+WORKDIR /app
+
+RUN addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001 -G nodejs
+
+ENV NODE_ENV=production
+ENV CI=true
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+
+# Copy standalone build including node_modules from Next.js output
+# Next.js standalone output contains everything needed to run the app
+# In monorepo, standalone preserves folder structure: .next/standalone/apps/web/server.js
+COPY --from=builder --chown=nodejs:nodejs /app/apps/web/.next/standalone/ ./
+COPY --from=builder --chown=nodejs:nodejs /app/apps/web/.next/static ./apps/web/.next/static
+COPY --from=builder --chown=nodejs:nodejs /app/apps/web/public ./apps/web/public
+
+USER nodejs
+EXPOSE 3000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1
+
+ENTRYPOINT ["dumb-init", "--"]
+# In monorepo standalone, server.js is at apps/web/server.js
+CMD ["node", "apps/web/server.js"]

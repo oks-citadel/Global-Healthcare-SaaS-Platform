@@ -1,0 +1,33 @@
+{
+  "name": "@unified-health/verification-system",
+  "version": "1.0.0",
+  "description": "Multi-Agent Verification System for Global SaaS Marketing Platform",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "verify": "ts-node src/index.ts",
+    "verify:architecture": "ts-node src/agents/platform-architecture.ts",
+    "verify:kubernetes": "ts-node src/agents/kubernetes-eks.ts",
+    "verify:seo": "ts-node src/agents/seo-discoverability.ts",
+    "verify:content": "ts-node src/agents/content-publishing.ts",
+    "verify:analytics": "ts-node src/agents/analytics-attribution.ts",
+    "verify:experimentation": "ts-node src/agents/experimentation-personalization.ts",
+    "verify:lifecycle": "ts-node src/agents/lifecycle-email.ts",
+    "verify:security": "ts-node src/agents/security-compliance.ts",
+    "verify:cost": "ts-node src/agents/cost-reliability.ts",
+    "verify:cicd": "ts-node src/agents/cicd-gatekeeper.ts",
+    "report": "ts-node src/report-generator.ts"
+  },
+  "dependencies": {
+    "@kubernetes/client-node": "^0.20.0",
+    "axios": "^1.6.5",
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0",
+    "yaml": "^2.3.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.6",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}

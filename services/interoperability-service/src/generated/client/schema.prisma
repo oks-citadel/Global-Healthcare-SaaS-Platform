@@ -1,0 +1,507 @@
+generator client {
+  output   = "./../src/generated/client"
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// Trading Partner Management
+// ==========================================
+
+model TradingPartner {
+  id           String             @id @default(uuid())
+  name         String
+  type         TradingPartnerType
+  endpoint     String
+  certificates Json? // { publicKey, privateKey, certificateChain }
+  status       PartnerStatus      @default(pending)
+
+  // Connection details
+  authType      AuthenticationType @default(oauth2)
+  clientId      String?
+  clientSecret  String? // Encrypted
+  tokenEndpoint String?
+  scopes        String[]
+
+  // FHIR-specific
+  fhirVersion       String? // R4, STU3, etc.
+  supportedProfiles String[]
+
+  // X12-specific
+  isaId String? // ISA Interchange ID
+  gsId  String? // GS Functional Group ID
+
+  // Direct messaging
+  directDomain String?
+  smtpHost     String?
+  smtpPort     Int?
+
+  // Metadata
+  contactName  String?
+  contactEmail String?
+  contactPhone String?
+  notes        String?
+
+  transactions TransactionLog[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([name])
+  @@index([type])
+  @@index([status])
+  @@index([isaId])
+  @@index([directDomain])
+}
+
+enum TradingPartnerType {
+  payer
+  provider
+  clearinghouse
+  hie
+  ehr_vendor
+  lab
+  pharmacy
+  public_health
+  qhin
+  carequality
+  commonwell
+}
+
+enum PartnerStatus {
+  pending
+  active
+  suspended
+  terminated
+}
+
+enum AuthenticationType {
+  none
+  basic
+  oauth2
+  mutual_tls
+  saml
+  smart_on_fhir
+}
+
+// ==========================================
+// Transaction Logging
+// ==========================================
+
+model TransactionLog {
+  id            String               @id @default(uuid())
+  transactionId String               @unique
+  type          TransactionType
+  direction     TransactionDirection
+  status        TransactionStatus    @default(pending)
+
+  // Partner reference
+  partnerId String?
+  partner   TradingPartner? @relation(fields: [partnerId], references: [id])
+
+  // Payload details
+  payload     Json? // Original request/response
+  payloadHash String? // SHA-256 hash for integrity
+  contentType String? // application/json, application/xml, etc.
+
+  // Transaction details
+  requestUrl      String?
+  requestMethod   String?
+  responseCode    Int?
+  responseMessage String?
+
+  // Error handling
+  errorCode    String?
+  errorMessage String?
+  retryCount   Int     @default(0)
+  maxRetries   Int     @default(3)
+
+  // Timing
+  initiatedAt      DateTime  @default(now())
+  completedAt      DateTime?
+  processingTimeMs Int?
+
+  // Audit
+  userId        String?
+  correlationId String? // For tracing across services
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([transactionId])
+  @@index([type])
+  @@index([direction])
+  @@index([status])
+  @@index([partnerId])
+  @@index([initiatedAt])
+  @@index([correlationId])
+}
+
+enum TransactionType {
+  fhir_read
+  fhir_search
+  fhir_create
+  fhir_update
+  fhir_delete
+  fhir_batch
+  x12_270_eligibility
+  x12_271_eligibility_response
+  x12_276_claim_status
+  x12_277_claim_status_response
+  x12_278_prior_auth
+  x12_835_payment
+  x12_837_claim
+  ccda_query
+  ccda_retrieve
+  ccda_submit
+  direct_message_send
+  direct_message_receive
+  tefca_query
+  tefca_response
+  carequality_query
+  carequality_retrieve
+  commonwell_link
+  commonwell_query
+}
+
+enum TransactionDirection {
+  inbound
+  outbound
+}
+
+enum TransactionStatus {
+  pending
+  processing
+  completed
+  failed
+  timeout
+  cancelled
+  retrying
+}
+
+// ==========================================
+// Network Participation
+// ==========================================
+
+model NetworkParticipant {
+  id            String            @id @default(uuid())
+  network       HealthcareNetwork
+  participantId String // Network-assigned ID (OID, etc.)
+  status        ParticipantStatus @default(pending)
+
+  // Organization details
+  organizationName String
+  organizationOid  String? // OID for the organization
+  npi              String? // National Provider Identifier
+
+  // Capabilities
+  capabilities      Json? // Network-specific capabilities
+  supportedPurposes String[] // Treatment, Payment, Operations, etc.
+
+  // Endpoints
+  queryEndpoint    String?
+  retrieveEndpoint String?
+  submitEndpoint   String?
+
+  // Certificates
+  certificates Json? // Public certificates for network
+
+  // TEFCA-specific
+  tefcaRole String? // QHIN, Participant, Subparticipant
+
+  // Carequality-specific
+  carequalityId  String?
+  implementerOid String?
+
+  // CommonWell-specific
+  commonwellId    String?
+  commonwellOrgId String?
+
+  // Dates
+  enrollmentDate DateTime?
+  lastVerified   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([network, participantId])
+  @@index([network])
+  @@index([status])
+  @@index([organizationOid])
+  @@index([npi])
+  @@index([carequalityId])
+  @@index([commonwellId])
+}
+
+enum HealthcareNetwork {
+  tefca
+  carequality
+  commonwell
+  ehealth_exchange
+  surescripts
+  direct_trust
+  state_hie
+}
+
+enum ParticipantStatus {
+  pending
+  active
+  suspended
+  withdrawn
+}
+
+// ==========================================
+// Direct Messaging
+// ==========================================
+
+model DirectAddress {
+  id          String              @id @default(uuid())
+  address     String              @unique // e.g., provider@direct.hospital.org
+  certificate String? // PEM-encoded X.509 certificate
+  privateKey  String? // Encrypted private key
+  domain      String // direct.hospital.org
+  status      DirectAddressStatus @default(pending)
+
+  // Owner information
+  ownerType DirectAddressOwner
+  ownerId   String // User or Organization ID
+  ownerName String?
+
+  // Trust anchor
+  trustAnchor String? // Trust anchor certificate
+  trustBundle String? // URL to trust bundle
+
+  // Certificate details
+  certificateExpiry DateTime?
+  issuerDn          String?
+  subjectDn         String?
+
+  // HISP information
+  hispId   String?
+  hispName String?
+
+  // Statistics
+  messagesSent     Int       @default(0)
+  messagesReceived Int       @default(0)
+  lastActivity     DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([address])
+  @@index([domain])
+  @@index([status])
+  @@index([ownerId])
+  @@index([certificateExpiry])
+}
+
+enum DirectAddressStatus {
+  pending
+  active
+  suspended
+  revoked
+  expired
+}
+
+enum DirectAddressOwner {
+  user
+  organization
+  department
+  system
+}
+
+// ==========================================
+// FHIR Endpoint Registry
+// ==========================================
+
+model FhirEndpoint {
+  id          String         @id @default(uuid())
+  name        String
+  url         String
+  fhirVersion String // R4, STU3, DSTU2
+  status      EndpointStatus @default(active)
+
+  // Capabilities
+  capabilityStatement Json? // Cached CapabilityStatement
+  supportedResources  String[]
+  supportedOperations String[]
+
+  // Authentication
+  authType          AuthenticationType @default(oauth2)
+  tokenEndpoint     String?
+  authorizeEndpoint String?
+  clientId          String?
+  clientSecret      String? // Encrypted
+  scopes            String[]
+
+  // SMART on FHIR
+  smartEnabled  Boolean @default(false)
+  smartMetadata Json?
+
+  // Organization
+  organizationName String?
+  organizationNpi  String?
+
+  // Monitoring
+  lastHealthCheck   DateTime?
+  healthStatus      String?
+  avgResponseTimeMs Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([name])
+  @@index([status])
+  @@index([fhirVersion])
+  @@index([organizationNpi])
+}
+
+enum EndpointStatus {
+  active
+  inactive
+  testing
+  deprecated
+}
+
+// ==========================================
+// C-CDA Document Registry
+// ==========================================
+
+model CCDADocument {
+  id           String           @id @default(uuid())
+  documentId   String           @unique // XDS document unique ID
+  documentType CCDADocumentType
+  patientId    String
+
+  // Document metadata
+  title               String?
+  creationTime        DateTime
+  effectiveTime       DateTime?
+  confidentialityCode String?
+  languageCode        String    @default("en-US")
+
+  // Author information
+  authorId           String?
+  authorName         String?
+  authorOrganization String?
+
+  // Custodian
+  custodianId   String?
+  custodianName String?
+
+  // Storage
+  storageLocation String? // S3 URL or file path
+  contentHash     String? // SHA-256 hash
+  sizeBytes       Int?
+  mimeType        String  @default("application/xml")
+
+  // Exchange status
+  exchangeStatus     DocumentExchangeStatus @default(local)
+  sourceNetwork      String?
+  sourceOrganization String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([documentId])
+  @@index([patientId])
+  @@index([documentType])
+  @@index([creationTime])
+  @@index([exchangeStatus])
+}
+
+enum CCDADocumentType {
+  ccd // Continuity of Care Document
+  discharge_summary
+  progress_note
+  history_and_physical
+  consultation_note
+  operative_note
+  procedure_note
+  referral_note
+  transfer_summary
+  care_plan
+  unstructured
+}
+
+enum DocumentExchangeStatus {
+  local
+  shared
+  received
+  pending_send
+  send_failed
+}
+
+// ==========================================
+// X12 Transaction Sets
+// ==========================================
+
+model X12Transaction {
+  id               String             @id @default(uuid())
+  transactionSetId String // ISA control number
+  transactionType  X12TransactionType
+
+  // Interchange envelope
+  isaControlNumber String
+  gsControlNumber  String
+  stControlNumber  String
+
+  // Sender/Receiver
+  senderId          String
+  senderQualifier   String
+  receiverId        String
+  receiverQualifier String
+
+  // Content
+  rawContent    String? // Original X12 content
+  parsedContent Json? // Parsed segments
+
+  // Processing
+  status             X12Status @default(received)
+  acknowledgmentCode String? // TA1, 999, 997
+  errors             Json?
+
+  // Dates
+  interchangeDate DateTime
+  processedAt     DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([transactionSetId])
+  @@index([transactionType])
+  @@index([isaControlNumber])
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([status])
+  @@index([interchangeDate])
+}
+
+enum X12TransactionType {
+  x270_eligibility_inquiry
+  x271_eligibility_response
+  x276_claim_status_inquiry
+  x277_claim_status_response
+  x278_prior_auth_request
+  x278_prior_auth_response
+  x835_payment_remittance
+  x837_professional_claim
+  x837_institutional_claim
+  x837_dental_claim
+  x999_acknowledgment
+  x997_acknowledgment
+  ta1_acknowledgment
+}
+
+enum X12Status {
+  received
+  validated
+  processing
+  completed
+  rejected
+  error
+}

@@ -1,0 +1,1 @@
+Hi {{patientName}}, reminder to take your {{medicationName}} ({{dosage}}) at {{time}}. - {{appName}}

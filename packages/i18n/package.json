@@ -1,0 +1,53 @@
+{
+  "name": "@unified-health/i18n",
+  "version": "1.0.0",
+  "description": "Internationalization package for Unified Health Platform",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./hooks/useTranslation": {
+      "types": "./src/hooks/useTranslation.ts",
+      "import": "./src/hooks/useTranslation.ts",
+      "require": "./src/hooks/useTranslation.ts"
+    },
+    "./locales/*": "./src/locales/*"
+  },
+  "scripts": {
+    "build": "npx tsup src/index.ts --format cjs,esm --dts",
+    "dev": "npx tsup src/index.ts --format cjs,esm --dts --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "i18next": "^25.7.3",
+    "i18next-browser-languagedetector": "^8.2.0",
+    "i18next-fs-backend": "^2.3.1",
+    "i18next-http-backend": "^3.0.2",
+    "react-i18next": "^14.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "@types/node": "^20.10.5",
+    "@types/react": "^18.2.45",
+    "eslint": "^9.17.0",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.3",
+    "typescript-eslint": "^8.19.0"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0 || ^19.0.0"
+  },
+  "keywords": [
+    "i18n",
+    "internationalization",
+    "localization",
+    "translation",
+    "healthcare"
+  ]
+}

@@ -1,0 +1,15 @@
+apiVersion: v2
+name: analytics-service
+description: Analytics Service - Event ingestion, funnels, and attribution tracking
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - analytics
+  - events
+  - funnels
+  - attribution
+  - marketing
+maintainers:
+  - name: Platform Team
+    email: platform@example.com

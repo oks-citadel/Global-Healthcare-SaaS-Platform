@@ -1,0 +1,15 @@
+apiVersion: v2
+name: content-service
+description: Content Service - CMS, publishing, and content versioning
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - cms
+  - content
+  - publishing
+  - versioning
+  - marketing
+maintainers:
+  - name: Platform Team
+    email: platform@example.com

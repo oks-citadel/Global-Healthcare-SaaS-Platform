@@ -1,0 +1,289 @@
+# ============================================
+# UnifiedHealth Platform - Security Gate Configuration
+# Defines security requirements for CI/CD pipeline
+# ============================================
+
+version: '1.0'
+
+# ============================================
+# Security Gate Thresholds
+# ============================================
+
+thresholds:
+  # Vulnerability severity levels
+  vulnerabilities:
+    critical: 0      # No critical vulnerabilities allowed
+    high: 0          # No high vulnerabilities allowed
+    medium: 5        # Max 5 medium vulnerabilities
+    low: 20          # Max 20 low vulnerabilities
+
+  # Code quality
+  code_quality:
+    min_coverage: 80              # Minimum 80% code coverage
+    max_complexity: 15            # Maximum cyclomatic complexity
+    max_duplications: 3           # Maximum 3% code duplication
+
+  # Security analysis
+  security:
+    secrets_allowed: 0            # No secrets allowed
+    sast_critical: 0              # No critical SAST findings
+    sast_high: 0                  # No high SAST findings
+    container_critical: 0         # No critical container vulnerabilities
+    container_high: 0             # No high container vulnerabilities
+
+  # License compliance
+  licenses:
+    forbidden:
+      - GPL-3.0
+      - AGPL-3.0
+      - LGPL-3.0
+      - SSPL
+    allowed:
+      - MIT
+      - Apache-2.0
+      - BSD-2-Clause
+      - BSD-3-Clause
+      - ISC
+
+# ============================================
+# Security Checks Configuration
+# ============================================
+
+checks:
+  # Dependency scanning
+  dependency_scan:
+    enabled: true
+    tools:
+      - pnpm-audit
+      - snyk
+    fail_on_error: true
+    check_dev_dependencies: true
+
+  # Secret detection
+  secret_detection:
+    enabled: true
+    tools:
+      - gitleaks
+      - trivy
+      - trufflehog
+    fail_on_error: true
+    scan_history: true
+
+  # Static analysis (SAST)
+  static_analysis:
+    enabled: true
+    tools:
+      - eslint
+      - codeql
+      - sonarqube
+    fail_on_error: true
+    include_typescript: true
+
+  # Container security
+  container_security:
+    enabled: true
+    tools:
+      - trivy
+    fail_on_error: true
+    scan_base_images: true
+    generate_sbom: true
+
+  # License compliance
+  license_compliance:
+    enabled: true
+    fail_on_forbidden: true
+
+  # Infrastructure security
+  infrastructure_security:
+    enabled: true
+    tools:
+      - trivy
+      - terraform-validate
+    fail_on_error: true
+
+# ============================================
+# Deployment Gates
+# ============================================
+
+deployment_gates:
+  # Development environment
+  development:
+    required_checks:
+      - linting
+      - type_checking
+      - unit_tests
+    security_level: medium
+    auto_deploy: true
+
+  # Staging environment
+  staging:
+    required_checks:
+      - linting
+      - type_checking
+      - unit_tests
+      - integration_tests
+      - dependency_scan
+      - secret_detection
+      - static_analysis
+    security_level: high
+    auto_deploy: true
+    requires_approval: false
+
+  # Production environment
+  production:
+    required_checks:
+      - linting
+      - type_checking
+      - unit_tests
+      - integration_tests
+      - e2e_tests
+      - dependency_scan
+      - secret_detection
+      - static_analysis
+      - container_security
+      - license_compliance
+      - infrastructure_security
+    security_level: critical
+    auto_deploy: false
+    requires_approval: true
+    min_approvers: 2
+    required_approvers:
+      - security-team
+      - platform-lead
+
+# ============================================
+# Compliance Requirements
+# ============================================
+
+compliance:
+  # HIPAA compliance checks
+  hipaa:
+    enabled: true
+    requirements:
+      - encryption_at_rest
+      - encryption_in_transit
+      - access_logging
+      - audit_trails
+      - automatic_logout
+      - data_retention_policy
+
+  # GDPR compliance checks
+  gdpr:
+    enabled: true
+    requirements:
+      - data_minimization
+      - right_to_erasure
+      - data_portability
+      - consent_management
+      - privacy_by_design
+
+  # PCI DSS compliance (for payment processing)
+  pci_dss:
+    enabled: true
+    requirements:
+      - no_card_data_storage
+      - encryption_of_cardholder_data
+      - secure_transmission
+      - access_control
+
+# ============================================
+# Alerting & Notifications
+# ============================================
+
+notifications:
+  # Slack notifications
+  slack:
+    enabled: true
+    webhook_secret: SLACK_WEBHOOK_URL
+    notify_on:
+      - security_gate_failure
+      - critical_vulnerability
+      - secret_detected
+      - compliance_violation
+
+  # Email notifications
+  email:
+    enabled: true
+    recipients:
+      - security@unifiedhealth.com
+      - devops@unifiedhealth.com
+    notify_on:
+      - security_gate_failure
+      - critical_vulnerability
+
+  # GitHub notifications
+  github:
+    enabled: true
+    notify_on:
+      - pr_comment
+      - security_alert
+      - dependency_update
+
+# ============================================
+# Exemptions & Overrides
+# ============================================
+
+exemptions:
+  # Allow specific vulnerabilities (with justification)
+  vulnerabilities:
+    # Example:
+    # - cve: CVE-2024-XXXXX
+    #   reason: "False positive - not applicable to our use case"
+    #   expires: "2025-03-01"
+    #   approved_by: "security-team"
+
+  # Allow specific packages with forbidden licenses
+  licenses:
+    # Example:
+    # - package: "some-gpl-package"
+    #   license: "GPL-3.0"
+    #   reason: "Only used in development, not distributed"
+    #   approved_by: "legal-team"
+
+# ============================================
+# Reporting
+# ============================================
+
+reporting:
+  # Generate security reports
+  enabled: true
+  formats:
+    - json
+    - sarif
+    - html
+    - markdown
+
+  # Report storage
+  storage:
+    type: artifacts
+    retention_days: 90
+
+  # Metrics to track
+  metrics:
+    - vulnerability_trends
+    - security_gate_pass_rate
+    - mean_time_to_remediation
+    - coverage_trends
+
+# ============================================
+# Automation
+# ============================================
+
+automation:
+  # Automated dependency updates
+  dependency_updates:
+    enabled: true
+    schedule: weekly
+    auto_merge: false
+    create_pr: true
+
+  # Automated secret rotation
+  secret_rotation:
+    enabled: true
+    schedule: monthly
+
+  # Automated security patches
+  security_patches:
+    enabled: true
+    auto_apply: false
+    notify: true

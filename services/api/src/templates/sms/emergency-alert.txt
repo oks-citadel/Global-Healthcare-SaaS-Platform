@@ -1,0 +1,1 @@
+URGENT: {{recipientName}}, {{patientName}} - {{alertType}}: {{message}} {{contactInfo}} - {{appName}}

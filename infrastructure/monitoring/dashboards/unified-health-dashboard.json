@@ -1,0 +1,882 @@
+{
+  "widgets": [
+    {
+      "type": "text",
+      "x": 0,
+      "y": 0,
+      "width": 24,
+      "height": 1,
+      "properties": {
+        "markdown": "# Unified Health Platform - CloudWatch Dashboard\n**Environment:** ${ENVIRONMENT} | **Region:** ${AWS::Region} | **Last Updated:** Auto-refresh every 1 minute"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 1,
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "title": "API Request Rate",
+        "view": "timeSeries",
+        "stacked": false,
+        "metrics": [
+          ["UnifiedHealth", "APIRequests", "Service", "unified-health-api", "Environment", "${ENVIRONMENT}", {"stat": "Sum", "period": 60}]
+        ],
+        "region": "${AWS::Region}",
+        "period": 60,
+        "yAxis": {
+          "left": {
+            "label": "Requests/min",
+            "showUnits": false
+          }
+        },
+        "annotations": {
+          "horizontal": [
+            {
+              "label": "High Traffic",
+              "value": 1000,
+              "color": "#ff7f0e"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "metric",
+      "x": 6,
+      "y": 1,
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "title": "API Latency (P50, P90, P99)",
+        "view": "timeSeries",
+        "stacked": false,
+        "metrics": [
+          ["UnifiedHealth", "APILatency", "Service", "unified-health-api", "Environment", "${ENVIRONMENT}", {"stat": "p50", "period": 300, "label": "P50"}],
+          ["...", {"stat": "p90", "period": 300, "label": "P90"}],
+          ["...", {"stat": "p99", "period": 300, "label": "P99"}]
+        ],
+        "region": "${AWS::Region}",
+        "yAxis": {
+          "left": {
+            "label": "Milliseconds",
+            "showUnits": false
+          }
+        },
+        "annotations": {
+          "horizontal": [
+            {
+              "label": "SLA Target",
+              "value": 500,
+              "color": "#2ca02c"
+            },
+            {
+              "label": "Warning",
+              "value": 1000,
+              "color": "#ff7f0e"
+            },
+            {
+              "label": "Critical",
+              "value": 2000,
+              "color": "#d62728"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "metric",
+      "x": 12,
+      "y": 1,
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "title": "API Error Rate",
+        "view": "timeSeries",
+        "stacked": false,
+        "metrics": [
+          ["UnifiedHealth", "APIErrors", "Service", "unified-health-api", "Environment", "${ENVIRONMENT}", {"stat": "Sum", "period": 300, "color": "#d62728"}]
+        ],
+        "region": "${AWS::Region}",
+        "yAxis": {
+          "left": {
+            "label": "Errors/5min",
+            "showUnits": false,
+            "min": 0
+          }
+        },
+        "annotations": {
+          "horizontal": [
+            {
+              "label": "Alert Threshold",
+              "value": 10,
+              "color": "#d62728"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "metric",
+      "x": 18,
+      "y": 1,
+      "width": 6,
+      "height": 6,
+      "properties": {
+        "title": "Error Rate by Status Code",
+        "view": "timeSeries",
+        "stacked": true,
+        "metrics": [
+          ["UnifiedHealth", "APIErrors", "StatusCode", "400", "Service", "unified-health-api", {"stat": "Sum", "period": 300, "label": "4xx Client"}],
+          ["...", "StatusCode", "500", "...", {"stat": "Sum", "period": 300, "label": "5xx Server", "color": "#d62728"}]
+        ],
+        "region": "${AWS::Region}",
+        "yAxis": {
+          "left": {
+            "label": "Count",
+            "showUnits": false,
+            "min": 0
+          }
+        }
+      }
+    },
+    {
+      "type": "text",
+      "x": 0,
+      "y": 7,
+      "width": 24,
+      "height": 1,
+      "properties": {
+        "markdown": "## Database Performance"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 8,
+      "width": 8,
+      "height": 6,
+      "properties": {
+        "title": "DB Connection Pool",
+        "view": "timeSeries",
+        "stacked": true,
+        "metrics": [
+          ["UnifiedHealth", "DBConnectionPoolActive", "Service", "unified-health-api", {"stat": "Average", "period": 60, "label": "Active", "color": "#2ca02c"}],
+          [".", "DBConnectionPoolIdle", ".", ".", {"stat": "Average", "period": 60, "label": "Idle", "color": "#1f77b4"}],
+          [".", "DBConnectionPoolWaiting", ".", ".", {"stat": "Average", "period": 60, "label": "Waiting", "color": "#ff7f0e"}]
+        ],
+        "region": "${AWS::Region}",
+        "yAxis": {
+          "left": {
+            "label": "Connections",
+            "showUnits": false,
+            "min": 0
+          }
+        }
+      }
+    },
+    {
+      "type": "metric",
+      "x": 8,
+      "y": 8,
+      "width": 8,
+      "height": 6,
+      "properties": {
+        "title": "DB Query Duration (P95)",
+        "view": "timeSeries",
+        "stacked": false,
+        "metrics": [
+          ["UnifiedHealth", "DBQueryDuration", "Operation", "SELECT", {"stat": "p95", "period": 300, "label": "SELECT"}],
+          ["...", "Operation", "INSERT", {"stat": "p95", "period": 300, "label": "INSERT"}],
+          ["...", "Operation", "UPDATE", {"stat": "p95", "period": 300, "label": "UPDATE"}],
+          ["...", "Operation", "DELETE", {"stat": "p95", "period": 300, "label": "DELETE"}]
+        ],
+        "region": "${AWS::Region}",
+        "yAxis": {
+          "left": {
+            "label": "Milliseconds",
+            "showUnits": false
+          }
+        },
+        "annotations": {
+          "horizontal": [
+            {
+              "label": "Slow Query",
+              "value": 500,
+              "color": "#ff7f0e"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "metric",
+      "x": 16,
+      "y": 8,
+      "width": 8,
+      "height": 6,
+      "properties": {
+        "title": "DB Queries per Second",
+        "view": "timeSeries",
+        "stacked": false,
+        "metrics": [
+          ["UnifiedHealth", "DBQueryDuration", {"stat": "SampleCount", "period": 60, "label": "Total Queries"}]
+        ],
+        "region": "${AWS::Region}",
+        "yAxis": {
+          "left": {
+            "label": "Queries/min",
+            "showUnits": false
+          }
+        }
+      }
+    },
+    {
+      "type": "text",
+      "x": 0,
+      "y": 14,
+      "width": 24,
+      "height": 1,
+      "properties": {
+        "markdown": "## Cache Performance"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 15,
+      "width": 8,
+      "height": 5,
+      "properties": {
+        "title": "Cache Hit Rate",
+        "view": "gauge",
+        "metrics": [
+          [{"expression": "100 * m1 / (m1 + m2)", "label": "Hit Rate %", "id": "e1"}],
+          ["UnifiedHealth", "CacheHits", {"stat": "Sum", "period": 300, "visible": false, "id": "m1"}],
+          [".", "CacheMisses", {"stat": "Sum", "period": 300, "visible": false, "id": "m2"}]
+        ],
+        "region": "${AWS::Region}",
+        "yAxis": {
+          "left": {
+            "min": 0,
+            "max": 100
+          }
+        },
+        "annotations": {
+          "horizontal": [
+            {
+              "color": "#d62728",
+              "value": 70
+            },
+            {
+              "color": "#ff7f0e",
+              "value": 85
+            },
+            {
+              "color": "#2ca02c",
+              "value": 95
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "metric",
+      "x": 8,
+      "y": 15,
+      "width": 8,
+      "height": 5,
+      "properties": {
+        "title": "Cache Operations",
+        "view": "timeSeries",
+        "stacked": false,
+        "metrics": [
+          ["UnifiedHealth", "CacheHits", {"stat": "Sum", "period": 60, "label": "Hits", "color": "#2ca02c"}],
+          [".", "CacheMisses", {"stat": "Sum", "period": 60, "label": "Misses", "color": "#d62728"}]
+        ],
+        "region": "${AWS::Region}",
+        "yAxis": {
+          "left": {
+            "label": "Operations/min",
+            "showUnits": false
+          }
+        }
+      }
+    },
+    {
+      "type": "metric",
+      "x": 16,
+      "y": 15,
+      "width": 8,
+      "height": 5,
+      "properties": {
+        "title": "Cache by Name",
+        "view": "timeSeries",
+        "stacked": false,
+        "metrics": [
+          ["UnifiedHealth", "CacheHits", "CacheName", "sessions", {"stat": "Sum", "period": 300, "label": "Sessions"}],
+          ["...", "CacheName", "users", {"stat": "Sum", "period": 300, "label": "Users"}],
+          ["...", "CacheName", "appointments", {"stat": "Sum", "period": 300, "label": "Appointments"}]
+        ],
+        "region": "${AWS::Region}"
+      }
+    },
+    {
+      "type": "text",
+      "x": 0,
+      "y": 20,
+      "width": 24,
+      "height": 1,
+      "properties": {
+        "markdown": "## Business Metrics - Healthcare Operations"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 21,
+      "width": 6,
+      "height": 5,
+      "properties": {
+        "title": "Appointments Created",
+        "view": "timeSeries",
+        "stacked": true,
+        "metrics": [
+          ["UnifiedHealth", "AppointmentsCreated", "AppointmentType", "in-person", {"stat": "Sum", "period": 3600, "label": "In-Person"}],
+          ["...", "AppointmentType", "telehealth", {"stat": "Sum", "period": 3600, "label": "Telehealth"}],
+          ["...", "AppointmentType", "follow-up", {"stat": "Sum", "period": 3600, "label": "Follow-up"}]
+        ],
+        "region": "${AWS::Region}",
+        "yAxis": {
+          "left": {
+            "label": "Count/hour",
+            "showUnits": false
+          }
+        }
+      }
+    },
+    {
+      "type": "metric",
+      "x": 6,
+      "y": 21,
+      "width": 6,
+      "height": 5,
+      "properties": {
+        "title": "Consultations Completed",
+        "view": "singleValue",
+        "metrics": [
+          ["UnifiedHealth", "ConsultationsCompleted", {"stat": "Sum", "period": 86400, "label": "Today"}]
+        ],
+        "region": "${AWS::Region}",
+        "sparkline": true
+      }
+    },
+    {
+      "type": "metric",
+      "x": 12,
+      "y": 21,
+      "width": 6,
+      "height": 5,
+      "properties": {
+        "title": "Patients Registered",
+        "view": "singleValue",
+        "metrics": [
+          ["UnifiedHealth", "PatientsRegistered", {"stat": "Sum", "period": 86400, "label": "Today"}]
+        ],
+        "region": "${AWS::Region}",
+        "sparkline": true
+      }
+    },
+    {
+      "type": "metric",
+      "x": 18,
+      "y": 21,
+      "width": 6,
+      "height": 5,
+      "properties": {
+        "title": "Prescriptions Issued",
+        "view": "singleValue",
+        "metrics": [
+          ["UnifiedHealth", "PrescriptionsIssued", {"stat": "Sum", "period": 86400, "label": "Today"}]
+        ],
+        "region": "${AWS::Region}",
+        "sparkline": true
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 26,
+      "width": 8,
+      "height": 5,
+      "properties": {
+        "title": "Payment Processing",
+        "view": "timeSeries",
+        "stacked": false,
+        "metrics": [
+          ["UnifiedHealth", "PaymentsSuccessful", {"stat": "Sum", "period": 3600, "label": "Successful", "color": "#2ca02c"}],
+          [".", "PaymentsFailed", {"stat": "Sum", "period": 3600, "label": "Failed", "color": "#d62728"}]
+        ],
+        "region": "${AWS::Region}",
+        "yAxis": {
+          "left": {
+            "label": "Transactions/hour",
+            "showUnits": false
+          }
+        }
+      }
+    },
+    {
+      "type": "metric",
+      "x": 8,
+      "y": 26,
+      "width": 8,
+      "height": 5,
+      "properties": {
+        "title": "Lab Orders & Results",
+        "view": "timeSeries",
+        "stacked": false,
+        "metrics": [
+          ["UnifiedHealth", "LabOrdersCreated", {"stat": "Sum", "period": 3600, "label": "Orders Created", "color": "#1f77b4"}],
+          [".", "LabResultsReady", {"stat": "Sum", "period": 3600, "label": "Results Ready", "color": "#2ca02c"}]
+        ],
+        "region": "${AWS::Region}"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 16,
+      "y": 26,
+      "width": 8,
+      "height": 5,
+      "properties": {
+        "title": "Consultation Duration (Avg)",
+        "view": "timeSeries",
+        "stacked": false,
+        "metrics": [
+          ["UnifiedHealth", "ConsultationDuration", {"stat": "Average", "period": 3600, "label": "Avg Minutes"}]
+        ],
+        "region": "${AWS::Region}",
+        "yAxis": {
+          "left": {
+            "label": "Minutes",
+            "showUnits": false
+          }
+        }
+      }
+    },
+    {
+      "type": "text",
+      "x": 0,
+      "y": 31,
+      "width": 24,
+      "height": 1,
+      "properties": {
+        "markdown": "## Security & Authentication"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 32,
+      "width": 8,
+      "height": 5,
+      "properties": {
+        "title": "Login Attempts",
+        "view": "timeSeries",
+        "stacked": false,
+        "metrics": [
+          ["UnifiedHealth", "LoginSuccess", {"stat": "Sum", "period": 300, "label": "Successful", "color": "#2ca02c"}],
+          [".", "LoginFailure", {"stat": "Sum", "period": 300, "label": "Failed", "color": "#d62728"}]
+        ],
+        "region": "${AWS::Region}",
+        "yAxis": {
+          "left": {
+            "label": "Attempts/5min",
+            "showUnits": false
+          }
+        }
+      }
+    },
+    {
+      "type": "metric",
+      "x": 8,
+      "y": 32,
+      "width": 8,
+      "height": 5,
+      "properties": {
+        "title": "Medical Record Access",
+        "view": "timeSeries",
+        "stacked": true,
+        "metrics": [
+          ["UnifiedHealth", "MedicalRecordAccesses", "AccessType", "view", {"stat": "Sum", "period": 300, "label": "View"}],
+          ["...", "AccessType", "edit", {"stat": "Sum", "period": 300, "label": "Edit"}],
+          ["...", "AccessType", "export", {"stat": "Sum", "period": 300, "label": "Export"}]
+        ],
+        "region": "${AWS::Region}"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 16,
+      "y": 32,
+      "width": 8,
+      "height": 5,
+      "properties": {
+        "title": "User Registrations by Role",
+        "view": "pie",
+        "metrics": [
+          ["UnifiedHealth", "UserRegistrations", "Role", "patient", {"stat": "Sum", "period": 86400}],
+          ["...", "Role", "doctor", {"stat": "Sum", "period": 86400}],
+          ["...", "Role", "nurse", {"stat": "Sum", "period": 86400}],
+          ["...", "Role", "admin", {"stat": "Sum", "period": 86400}]
+        ],
+        "region": "${AWS::Region}"
+      }
+    },
+    {
+      "type": "text",
+      "x": 0,
+      "y": 37,
+      "width": 24,
+      "height": 1,
+      "properties": {
+        "markdown": "## Telehealth & Video Calls"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 38,
+      "width": 6,
+      "height": 5,
+      "properties": {
+        "title": "Video Call Duration",
+        "view": "timeSeries",
+        "stacked": false,
+        "metrics": [
+          ["UnifiedHealth", "VideoCallDuration", {"stat": "Average", "period": 300, "label": "Avg Duration (sec)"}]
+        ],
+        "region": "${AWS::Region}"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 6,
+      "y": 38,
+      "width": 6,
+      "height": 5,
+      "properties": {
+        "title": "Video Call Quality - Packet Loss",
+        "view": "timeSeries",
+        "stacked": false,
+        "metrics": [
+          ["UnifiedHealth", "VideoCallPacketLoss", {"stat": "Average", "period": 300, "label": "Avg Packet Loss %", "color": "#d62728"}]
+        ],
+        "region": "${AWS::Region}",
+        "yAxis": {
+          "left": {
+            "label": "Percent",
+            "showUnits": false,
+            "max": 10
+          }
+        },
+        "annotations": {
+          "horizontal": [
+            {
+              "label": "Acceptable",
+              "value": 1,
+              "color": "#2ca02c"
+            },
+            {
+              "label": "Poor",
+              "value": 5,
+              "color": "#d62728"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "metric",
+      "x": 12,
+      "y": 38,
+      "width": 6,
+      "height": 5,
+      "properties": {
+        "title": "Video Call Latency",
+        "view": "timeSeries",
+        "stacked": false,
+        "metrics": [
+          ["UnifiedHealth", "VideoCallLatency", {"stat": "Average", "period": 300, "label": "Avg Latency (ms)"}],
+          [".", "VideoCallJitter", {"stat": "Average", "period": 300, "label": "Avg Jitter (ms)"}]
+        ],
+        "region": "${AWS::Region}",
+        "yAxis": {
+          "left": {
+            "label": "Milliseconds",
+            "showUnits": false
+          }
+        }
+      }
+    },
+    {
+      "type": "metric",
+      "x": 18,
+      "y": 38,
+      "width": 6,
+      "height": 5,
+      "properties": {
+        "title": "Telehealth Consultations",
+        "view": "singleValue",
+        "metrics": [
+          ["UnifiedHealth", "ConsultationsStarted", "ConsultationType", "telehealth", {"stat": "Sum", "period": 86400, "label": "Today"}]
+        ],
+        "region": "${AWS::Region}",
+        "sparkline": true
+      }
+    },
+    {
+      "type": "text",
+      "x": 0,
+      "y": 43,
+      "width": 24,
+      "height": 1,
+      "properties": {
+        "markdown": "## System Health & Infrastructure"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 44,
+      "width": 8,
+      "height": 5,
+      "properties": {
+        "title": "CPU Utilization",
+        "view": "timeSeries",
+        "stacked": false,
+        "metrics": [
+          ["UnifiedHealth", "cpu_usage_user", {"stat": "Average", "period": 60, "label": "User"}],
+          [".", "cpu_usage_system", {"stat": "Average", "period": 60, "label": "System"}],
+          [".", "cpu_usage_iowait", {"stat": "Average", "period": 60, "label": "IO Wait"}]
+        ],
+        "region": "${AWS::Region}",
+        "yAxis": {
+          "left": {
+            "label": "Percent",
+            "showUnits": false,
+            "max": 100
+          }
+        }
+      }
+    },
+    {
+      "type": "metric",
+      "x": 8,
+      "y": 44,
+      "width": 8,
+      "height": 5,
+      "properties": {
+        "title": "Memory Utilization",
+        "view": "timeSeries",
+        "stacked": false,
+        "metrics": [
+          ["UnifiedHealth", "mem_used_percent", {"stat": "Average", "period": 60, "label": "Used %"}]
+        ],
+        "region": "${AWS::Region}",
+        "yAxis": {
+          "left": {
+            "label": "Percent",
+            "showUnits": false,
+            "max": 100
+          }
+        },
+        "annotations": {
+          "horizontal": [
+            {
+              "label": "Warning",
+              "value": 80,
+              "color": "#ff7f0e"
+            },
+            {
+              "label": "Critical",
+              "value": 90,
+              "color": "#d62728"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "metric",
+      "x": 16,
+      "y": 44,
+      "width": 8,
+      "height": 5,
+      "properties": {
+        "title": "Disk Utilization",
+        "view": "timeSeries",
+        "stacked": false,
+        "metrics": [
+          ["UnifiedHealth", "disk_used_percent", {"stat": "Average", "period": 60, "label": "Used %"}]
+        ],
+        "region": "${AWS::Region}",
+        "yAxis": {
+          "left": {
+            "label": "Percent",
+            "showUnits": false,
+            "max": 100
+          }
+        },
+        "annotations": {
+          "horizontal": [
+            {
+              "label": "Warning",
+              "value": 80,
+              "color": "#ff7f0e"
+            },
+            {
+              "label": "Critical",
+              "value": 90,
+              "color": "#d62728"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 49,
+      "width": 12,
+      "height": 5,
+      "properties": {
+        "title": "Network Traffic",
+        "view": "timeSeries",
+        "stacked": false,
+        "metrics": [
+          ["UnifiedHealth", "bytes_sent", {"stat": "Sum", "period": 60, "label": "Bytes Sent"}],
+          [".", "bytes_recv", {"stat": "Sum", "period": 60, "label": "Bytes Received"}]
+        ],
+        "region": "${AWS::Region}",
+        "yAxis": {
+          "left": {
+            "label": "Bytes",
+            "showUnits": false
+          }
+        }
+      }
+    },
+    {
+      "type": "metric",
+      "x": 12,
+      "y": 49,
+      "width": 12,
+      "height": 5,
+      "properties": {
+        "title": "TCP Connections",
+        "view": "timeSeries",
+        "stacked": true,
+        "metrics": [
+          ["UnifiedHealth", "tcp_established", {"stat": "Average", "period": 60, "label": "Established"}],
+          [".", "tcp_time_wait", {"stat": "Average", "period": 60, "label": "Time Wait"}],
+          [".", "tcp_close_wait", {"stat": "Average", "period": 60, "label": "Close Wait"}]
+        ],
+        "region": "${AWS::Region}"
+      }
+    },
+    {
+      "type": "text",
+      "x": 0,
+      "y": 54,
+      "width": 24,
+      "height": 1,
+      "properties": {
+        "markdown": "## Alarms Status"
+      }
+    },
+    {
+      "type": "alarm",
+      "x": 0,
+      "y": 55,
+      "width": 6,
+      "height": 4,
+      "properties": {
+        "title": "API Health",
+        "alarms": [
+          "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:UnifiedHealth-HighAPILatency",
+          "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:UnifiedHealth-HighErrorRate"
+        ]
+      }
+    },
+    {
+      "type": "alarm",
+      "x": 6,
+      "y": 55,
+      "width": 6,
+      "height": 4,
+      "properties": {
+        "title": "Database Health",
+        "alarms": [
+          "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:UnifiedHealth-DBConnectionPoolExhausted",
+          "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:UnifiedHealth-HighDBQueryLatency"
+        ]
+      }
+    },
+    {
+      "type": "alarm",
+      "x": 12,
+      "y": 55,
+      "width": 6,
+      "height": 4,
+      "properties": {
+        "title": "Cache Health",
+        "alarms": [
+          "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:UnifiedHealth-LowCacheHitRate"
+        ]
+      }
+    },
+    {
+      "type": "alarm",
+      "x": 18,
+      "y": 55,
+      "width": 6,
+      "height": 4,
+      "properties": {
+        "title": "Infrastructure",
+        "alarms": [
+          "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:UnifiedHealth-HighCPU",
+          "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:UnifiedHealth-HighMemory"
+        ]
+      }
+    },
+    {
+      "type": "log",
+      "x": 0,
+      "y": 59,
+      "width": 24,
+      "height": 6,
+      "properties": {
+        "title": "Recent Error Logs",
+        "query": "SOURCE '/unified-health/${ENVIRONMENT}/api' | fields @timestamp, @message | filter level = 'error' | sort @timestamp desc | limit 50",
+        "region": "${AWS::Region}",
+        "view": "table"
+      }
+    },
+    {
+      "type": "log",
+      "x": 0,
+      "y": 65,
+      "width": 24,
+      "height": 6,
+      "properties": {
+        "title": "Slow Requests (>1s)",
+        "query": "SOURCE '/unified-health/${ENVIRONMENT}/api' | fields @timestamp, method, path, duration, statusCode | filter duration > 1000 | sort @timestamp desc | limit 50",
+        "region": "${AWS::Region}",
+        "view": "table"
+      }
+    }
+  ]
+}

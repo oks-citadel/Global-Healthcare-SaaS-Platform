@@ -1,0 +1,690 @@
+// SEO Service Prisma Schema
+// Manages SEO data, crawl results, audits, and content optimization
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// TENANT & CONFIGURATION
+// ==========================================
+
+model Tenant {
+  id              String   @id @default(uuid())
+  slug            String   @unique
+  name            String
+  domain          String   @unique
+  defaultLocale   String   @default("en")
+  supportedLocales String[] @default(["en"])
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  pages           Page[]
+  sitemaps        Sitemap[]
+  seoAudits       SeoAudit[]
+  keywordResearch KeywordResearch[]
+  contentAnalysis ContentAnalysis[]
+  webVitals       WebVitals[]
+  robotsConfig    RobotsConfig?
+  manifestConfig  ManifestConfig?
+
+  @@index([slug])
+  @@index([domain])
+  @@map("tenants")
+}
+
+// ==========================================
+// PAGE & METADATA MANAGEMENT
+// ==========================================
+
+model Page {
+  id                String   @id @default(uuid())
+  tenantId          String
+  slug              String
+  locale            String   @default("en")
+
+  // Basic SEO
+  title             String
+  metaDescription   String?
+  metaKeywords      String[]
+
+  // Canonical & Hreflang
+  canonicalUrl      String?
+  hreflangTags      Json?    // { locale: url } mapping
+
+  // Open Graph
+  ogTitle           String?
+  ogDescription     String?
+  ogImage           String?
+  ogType            String?  @default("website")
+
+  // Twitter Cards
+  twitterCard       String?  @default("summary_large_image")
+  twitterTitle      String?
+  twitterDescription String?
+  twitterImage      String?
+
+  // Technical
+  robotsDirectives  String?  @default("index, follow")
+  structuredData    Json?    // JSON-LD schema
+  priority          Float    @default(0.5)
+  changeFrequency   ChangeFrequency @default(WEEKLY)
+
+  // Status
+  isPublished       Boolean  @default(true)
+  isIndexable       Boolean  @default(true)
+  lastCrawled       DateTime?
+  lastModified      DateTime @default(now())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  tenant            Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  contentAnalyses   ContentAnalysis[]
+  webVitals         WebVitals[]
+  internalLinks     InternalLink[] @relation("SourcePage")
+  incomingLinks     InternalLink[] @relation("TargetPage")
+
+  @@unique([tenantId, slug, locale])
+  @@index([tenantId])
+  @@index([slug])
+  @@index([locale])
+  @@index([lastModified])
+  @@index([isPublished, isIndexable])
+  @@map("pages")
+}
+
+enum ChangeFrequency {
+  ALWAYS
+  HOURLY
+  DAILY
+  WEEKLY
+  MONTHLY
+  YEARLY
+  NEVER
+}
+
+// ==========================================
+// SITEMAP MANAGEMENT
+// ==========================================
+
+model Sitemap {
+  id              String       @id @default(uuid())
+  tenantId        String
+  locale          String?
+  type            SitemapType  @default(PAGES)
+
+  // Content
+  xmlContent      String?      @db.Text
+  urlCount        Int          @default(0)
+
+  // Cache
+  etag            String?
+  lastGenerated   DateTime?
+  cacheExpiry     DateTime?
+
+  // Status
+  isActive        Boolean      @default(true)
+  generationError String?
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  // Relations
+  tenant          Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, locale, type])
+  @@index([tenantId])
+  @@index([type])
+  @@map("sitemaps")
+}
+
+enum SitemapType {
+  INDEX
+  PAGES
+  BLOG
+  PRODUCTS
+  IMAGES
+  VIDEOS
+  NEWS
+}
+
+// ==========================================
+// ROBOTS.TXT & MANIFEST CONFIGURATION
+// ==========================================
+
+model RobotsConfig {
+  id              String   @id @default(uuid())
+  tenantId        String   @unique
+
+  // Rules
+  userAgentRules  Json     // [{ userAgent: string, rules: { allow: [], disallow: [] } }]
+  sitemapUrls     String[]
+  crawlDelay      Int?
+
+  // Custom additions
+  customDirectives String?  @db.Text
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  tenant          Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@map("robots_configs")
+}
+
+model ManifestConfig {
+  id                String   @id @default(uuid())
+  tenantId          String   @unique
+
+  // PWA Manifest
+  name              String
+  shortName         String?
+  description       String?
+  startUrl          String   @default("/")
+  display           String   @default("standalone")
+  backgroundColor   String   @default("#ffffff")
+  themeColor        String   @default("#000000")
+  orientation       String   @default("portrait-primary")
+
+  // Icons
+  icons             Json     // [{ src, sizes, type, purpose }]
+
+  // Additional
+  scope             String?
+  lang              String   @default("en")
+  dir               String   @default("ltr")
+  categories        String[]
+  screenshots       Json?    // [{ src, sizes, type }]
+  shortcuts         Json?    // [{ name, url, description, icons }]
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  tenant            Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@map("manifest_configs")
+}
+
+// ==========================================
+// SEO AUDIT & CRAWL
+// ==========================================
+
+model SeoAudit {
+  id              String       @id @default(uuid())
+  tenantId        String
+
+  // Audit metadata
+  auditType       AuditType    @default(FULL)
+  status          AuditStatus  @default(PENDING)
+
+  // Results
+  score           Float?       // 0-100
+  issues          Json?        // [{ type, severity, message, url, recommendations }]
+  summary         Json?        // { critical, warnings, passed, info }
+
+  // Crawl stats
+  pagesScanned    Int          @default(0)
+  errorsFound     Int          @default(0)
+  warningsFound   Int          @default(0)
+
+  // Timing
+  scheduledAt     DateTime?
+  startedAt       DateTime?
+  completedAt     DateTime?
+  duration        Int?         // seconds
+
+  // Error handling
+  errorMessage    String?
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  // Relations
+  tenant          Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  auditItems      AuditItem[]
+
+  @@index([tenantId])
+  @@index([status])
+  @@index([scheduledAt])
+  @@map("seo_audits")
+}
+
+enum AuditType {
+  FULL
+  TECHNICAL
+  CONTENT
+  LINKS
+  PERFORMANCE
+  ACCESSIBILITY
+}
+
+enum AuditStatus {
+  PENDING
+  SCHEDULED
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+model AuditItem {
+  id              String       @id @default(uuid())
+  auditId         String
+
+  // Issue details
+  category        String       // technical, content, performance, etc.
+  type            String       // missing_title, duplicate_meta, slow_page, etc.
+  severity        Severity
+
+  // Location
+  url             String?
+  element         String?      // CSS selector or element description
+
+  // Description
+  message         String
+  recommendation  String?
+
+  // Additional data
+  metadata        Json?
+
+  createdAt       DateTime     @default(now())
+
+  // Relations
+  audit           SeoAudit     @relation(fields: [auditId], references: [id], onDelete: Cascade)
+
+  @@index([auditId])
+  @@index([severity])
+  @@index([category])
+  @@map("audit_items")
+}
+
+enum Severity {
+  CRITICAL
+  ERROR
+  WARNING
+  INFO
+  PASSED
+}
+
+// ==========================================
+// KEYWORD RESEARCH
+// ==========================================
+
+model KeywordResearch {
+  id                String   @id @default(uuid())
+  tenantId          String
+
+  // Query
+  keyword           String
+  locale            String   @default("en")
+
+  // Metrics
+  searchVolume      Int?
+  cpc               Float?   // Cost per click
+  competition       Float?   // 0-1
+  difficulty        Float?   // 0-100
+
+  // Intent analysis
+  searchIntent      SearchIntent?
+  intentConfidence  Float?
+
+  // Related data
+  relatedKeywords   Json?    // [{ keyword, volume, relevance }]
+  longTailVariants  Json?    // [{ keyword, volume }]
+  questions         Json?    // [{ question, volume }]
+
+  // SERP features
+  serpFeatures      String[] // featured_snippet, people_also_ask, etc.
+
+  // Tracking
+  currentRank       Int?
+  rankHistory       Json?    // [{ date, position }]
+
+  lastUpdated       DateTime @default(now())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  tenant            Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, keyword, locale])
+  @@index([tenantId])
+  @@index([keyword])
+  @@index([searchIntent])
+  @@map("keyword_research")
+}
+
+enum SearchIntent {
+  INFORMATIONAL
+  NAVIGATIONAL
+  COMMERCIAL
+  TRANSACTIONAL
+}
+
+// ==========================================
+// CONTENT ANALYSIS & OPTIMIZATION
+// ==========================================
+
+model ContentAnalysis {
+  id                  String   @id @default(uuid())
+  tenantId            String
+  pageId              String?
+
+  // Content source
+  url                 String?
+  content             String?  @db.Text
+
+  // Scores (0-100)
+  overallScore        Float?
+  readabilityScore    Float?
+  keywordScore        Float?
+  structureScore      Float?
+  engagementScore     Float?
+
+  // Readability metrics
+  fleschKincaid       Float?
+  avgSentenceLength   Float?
+  avgWordLength       Float?
+  wordCount           Int?
+  paragraphCount      Int?
+
+  // Keyword analysis
+  targetKeyword       String?
+  keywordDensity      Float?
+  keywordPlacements   Json?    // { title, h1, firstParagraph, etc. }
+
+  // Structure analysis
+  headingStructure    Json?    // { h1Count, h2Count, ... }
+  imageAnalysis       Json?    // { count, withAlt, withoutAlt }
+  linkAnalysis        Json?    // { internal, external, broken }
+
+  // NLP suggestions
+  nlpSuggestions      Json?    // [{ type, current, suggested, reason }]
+
+  // Content freshness
+  contentAge          Int?     // days since last update
+  freshnessScore      Float?
+
+  analyzedAt          DateTime @default(now())
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  // Relations
+  tenant              Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  page                Page?    @relation(fields: [pageId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId])
+  @@index([pageId])
+  @@index([overallScore])
+  @@map("content_analyses")
+}
+
+// ==========================================
+// INTERNAL LINKING
+// ==========================================
+
+model InternalLink {
+  id              String   @id @default(uuid())
+  sourcePageId    String
+  targetPageId    String
+
+  // Link details
+  anchorText      String?
+  context         String?  // Surrounding text
+  linkType        LinkType @default(CONTENT)
+
+  // Analysis
+  relevanceScore  Float?   // 0-1 semantic relevance
+  isFollow        Boolean  @default(true)
+
+  // Status
+  isBroken        Boolean  @default(false)
+  lastChecked     DateTime?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  sourcePage      Page     @relation("SourcePage", fields: [sourcePageId], references: [id], onDelete: Cascade)
+  targetPage      Page     @relation("TargetPage", fields: [targetPageId], references: [id], onDelete: Cascade)
+
+  @@unique([sourcePageId, targetPageId])
+  @@index([sourcePageId])
+  @@index([targetPageId])
+  @@map("internal_links")
+}
+
+enum LinkType {
+  NAVIGATION
+  CONTENT
+  FOOTER
+  SIDEBAR
+  BREADCRUMB
+  RELATED
+}
+
+// ==========================================
+// TECHNICAL SEO - WEB VITALS & PERFORMANCE
+// ==========================================
+
+model WebVitals {
+  id              String   @id @default(uuid())
+  tenantId        String
+  pageId          String?
+  url             String
+
+  // Core Web Vitals
+  lcp             Float?   // Largest Contentful Paint (ms)
+  fid             Float?   // First Input Delay (ms) - deprecated but stored
+  inp             Float?   // Interaction to Next Paint (ms)
+  cls             Float?   // Cumulative Layout Shift
+
+  // Additional metrics
+  fcp             Float?   // First Contentful Paint (ms)
+  ttfb            Float?   // Time to First Byte (ms)
+  si              Float?   // Speed Index
+  tbt             Float?   // Total Blocking Time (ms)
+
+  // Scores (0-100)
+  performanceScore Float?
+  accessibilityScore Float?
+  bestPracticesScore Float?
+  seoScore        Float?
+
+  // Device type
+  deviceType      DeviceType @default(DESKTOP)
+
+  // Full report
+  fullReport      Json?
+
+  measuredAt      DateTime @default(now())
+  createdAt       DateTime @default(now())
+
+  // Relations
+  tenant          Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  page            Page?    @relation(fields: [pageId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId])
+  @@index([pageId])
+  @@index([url])
+  @@index([measuredAt])
+  @@map("web_vitals")
+}
+
+enum DeviceType {
+  MOBILE
+  DESKTOP
+  TABLET
+}
+
+// ==========================================
+// INDEX COVERAGE & CANONICAL TRACKING
+// ==========================================
+
+model IndexCoverage {
+  id              String          @id @default(uuid())
+  url             String
+  tenantId        String?
+
+  // Status
+  indexStatus     IndexStatus     @default(UNKNOWN)
+  crawlStatus     CrawlStatus     @default(NOT_CRAWLED)
+
+  // Details
+  lastCrawled     DateTime?
+  lastIndexed     DateTime?
+  indexedVersion  String?         // Hash of indexed content
+
+  // Issues
+  issues          Json?           // [{ type, message }]
+  robotsBlocked   Boolean         @default(false)
+  noindexDetected Boolean         @default(false)
+
+  // Canonical
+  declaredCanonical String?
+  googleSelectedCanonical String?
+  canonicalMismatch Boolean       @default(false)
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@unique([url])
+  @@index([tenantId])
+  @@index([indexStatus])
+  @@map("index_coverage")
+}
+
+enum IndexStatus {
+  INDEXED
+  NOT_INDEXED
+  EXCLUDED
+  DISCOVERED
+  UNKNOWN
+}
+
+enum CrawlStatus {
+  CRAWLED
+  NOT_CRAWLED
+  CRAWL_ERROR
+  BLOCKED
+}
+
+// ==========================================
+// HREFLANG MAPPING
+// ==========================================
+
+model HreflangMapping {
+  id              String   @id @default(uuid())
+  tenantId        String?
+
+  // Group identifier
+  groupId         String   // Pages that are translations of each other share this
+
+  // Page info
+  url             String
+  locale          String
+  region          String?  // Optional region code (e.g., US, GB)
+
+  // Validation
+  isValid         Boolean  @default(true)
+  hasReturnTag    Boolean  @default(false) // Reciprocal tag exists
+  issues          Json?
+
+  lastValidated   DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([url, locale])
+  @@index([groupId])
+  @@index([tenantId])
+  @@map("hreflang_mappings")
+}
+
+// ==========================================
+// SCHEMA/STRUCTURED DATA
+// ==========================================
+
+model StructuredDataTemplate {
+  id              String   @id @default(uuid())
+  tenantId        String?
+
+  // Template info
+  name            String
+  schemaType      String   // Organization, Product, Article, etc.
+  template        Json     // JSON-LD template with placeholders
+
+  // Usage
+  isDefault       Boolean  @default(false)
+  isActive        Boolean  @default(true)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([tenantId])
+  @@index([schemaType])
+  @@map("structured_data_templates")
+}
+
+// ==========================================
+// REINDEX QUEUE
+// ==========================================
+
+model ReindexJob {
+  id              String       @id @default(uuid())
+  tenantId        String?
+
+  // Job details
+  jobType         ReindexJobType @default(SITEMAP)
+  status          JobStatus    @default(PENDING)
+  priority        Int          @default(5) // 1-10, higher = more urgent
+
+  // Target
+  targetUrls      String[]
+
+  // Progress
+  processedCount  Int          @default(0)
+  totalCount      Int          @default(0)
+
+  // Timing
+  scheduledAt     DateTime?
+  startedAt       DateTime?
+  completedAt     DateTime?
+
+  // Results
+  result          Json?
+  errorMessage    String?
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([status])
+  @@index([scheduledAt])
+  @@index([tenantId])
+  @@map("reindex_jobs")
+}
+
+enum ReindexJobType {
+  SITEMAP
+  SINGLE_URL
+  BULK_URLS
+  FULL_SITE
+}
+
+enum JobStatus {
+  PENDING
+  SCHEDULED
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELLED
+}

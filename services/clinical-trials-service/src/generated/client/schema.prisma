@@ -1,0 +1,491 @@
+generator client {
+  output   = "./../src/generated/client"
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// Clinical Trial Models
+// ==========================================
+
+model ClinicalTrial {
+  id                    String      @id @default(uuid())
+  nctId                 String      @unique // ClinicalTrials.gov NCT ID
+  title                 String
+  officialTitle         String?
+  briefSummary          String?
+  detailedDescription   String?
+  status                TrialStatus @default(not_yet_recruiting)
+  phase                 TrialPhase?
+  studyType             StudyType   @default(interventional)
+  primaryPurpose        String?
+  interventionModel     String?
+  masking               String?
+  allocation            String?
+  enrollmentCount       Int?
+  enrollmentType        String?
+  startDate             DateTime?
+  completionDate        DateTime?
+  primaryCompletionDate DateTime?
+  lastUpdatedDate       DateTime?
+  sponsorName           String?
+  sponsorType           String?
+  leadSponsorClass      String?
+  collaborators         String[]
+  conditions            String[]
+  interventions         Json[]
+  keywords              String[]
+  meshTerms             String[]
+  primaryOutcomes       Json[]
+  secondaryOutcomes     Json[]
+  eligibilityCriteria   Json? // Structured criteria
+  eligibilityText       String? // Raw text criteria
+  healthyVolunteers     Boolean     @default(false)
+  minimumAge            Int? // in years
+  maximumAge            Int? // in years
+  gender                String?
+  contactName           String?
+  contactPhone          String?
+  contactEmail          String?
+  overallOfficial       Json?
+  locations             Json[] // External location data from registry
+  fhirResearchStudy     Json? // Full FHIR R4 ResearchStudy resource
+  lastSyncedAt          DateTime?
+
+  sites          TrialSite[]
+  patientMatches PatientMatch[]
+  enrollments    Enrollment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([nctId])
+  @@index([status])
+  @@index([phase])
+  @@index([studyType])
+  @@index([conditions])
+  @@index([startDate])
+  @@index([completionDate])
+}
+
+enum TrialStatus {
+  not_yet_recruiting
+  recruiting
+  enrolling_by_invitation
+  active_not_recruiting
+  suspended
+  terminated
+  completed
+  withdrawn
+  unknown
+}
+
+enum TrialPhase {
+  early_phase_1
+  phase_1
+  phase_1_2
+  phase_2
+  phase_2_3
+  phase_3
+  phase_4
+  not_applicable
+}
+
+enum StudyType {
+  interventional
+  observational
+  expanded_access
+  patient_registry
+}
+
+// ==========================================
+// Trial Sites
+// ==========================================
+
+model TrialSite {
+  id                    String        @id @default(uuid())
+  trialId               String
+  trial                 ClinicalTrial @relation(fields: [trialId], references: [id], onDelete: Cascade)
+  facilityName          String
+  facilityId            String? // External facility ID
+  status                SiteStatus    @default(pending)
+  city                  String
+  state                 String?
+  country               String
+  zipCode               String?
+  latitude              Float?
+  longitude             Float?
+  contactName           String?
+  contactPhone          String?
+  contactEmail          String?
+  principalInvestigator String?
+  recruitmentStatus     String?
+  targetEnrollment      Int?
+  currentEnrollment     Int           @default(0)
+  isActive              Boolean       @default(true)
+
+  enrollments Enrollment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([trialId, facilityName, city])
+  @@index([trialId])
+  @@index([status])
+  @@index([city])
+  @@index([state])
+  @@index([country])
+  @@index([latitude, longitude])
+  @@index([isActive])
+}
+
+enum SiteStatus {
+  pending
+  active
+  recruiting
+  closed
+  suspended
+  withdrawn
+}
+
+// ==========================================
+// Patient Matching
+// ==========================================
+
+model PatientMatch {
+  id                  String            @id @default(uuid())
+  patientId           String
+  trialId             String
+  trial               ClinicalTrial     @relation(fields: [trialId], references: [id], onDelete: Cascade)
+  matchScore          Float // 0-100 match percentage
+  eligibilityStatus   EligibilityStatus @default(unknown)
+  matchedCriteria     Json // Array of matched criterion IDs
+  unmatchedCriteria   Json // Array of unmatched criterion IDs
+  uncertainCriteria   Json? // Criteria needing manual review
+  matchDetails        Json? // Detailed matching breakdown
+  distance            Float? // Distance to nearest site in miles
+  nearestSiteId       String?
+  reviewStatus        ReviewStatus      @default(pending)
+  reviewedBy          String?
+  reviewedAt          DateTime?
+  reviewNotes         String?
+  patientNotified     Boolean           @default(false)
+  notifiedAt          DateTime?
+  isInterested        Boolean?
+  interestExpressedAt DateTime?
+  expiresAt           DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([patientId, trialId])
+  @@index([patientId])
+  @@index([trialId])
+  @@index([matchScore])
+  @@index([eligibilityStatus])
+  @@index([reviewStatus])
+  @@index([expiresAt])
+}
+
+enum EligibilityStatus {
+  eligible
+  potentially_eligible
+  ineligible
+  unknown
+  requires_screening
+}
+
+enum ReviewStatus {
+  pending
+  approved
+  rejected
+  needs_info
+}
+
+// ==========================================
+// Enrollment Management
+// ==========================================
+
+model Enrollment {
+  id                  String           @id @default(uuid())
+  patientId           String
+  trialId             String
+  trial               ClinicalTrial    @relation(fields: [trialId], references: [id], onDelete: Cascade)
+  siteId              String
+  site                TrialSite        @relation(fields: [siteId], references: [id])
+  status              EnrollmentStatus @default(screening)
+  studySubjectId      String? // Subject ID assigned by study
+  screeningDate       DateTime?
+  enrollmentDate      DateTime?
+  randomizationDate   DateTime?
+  armAssignment       String?
+  withdrawalDate      DateTime?
+  withdrawalReason    String?
+  completionDate      DateTime?
+  primaryInvestigator String?
+  studyCoordinator    String?
+  notes               String?
+
+  consentRecords ConsentRecord[]
+  statusHistory  EnrollmentStatusHistory[]
+  visits         TrialVisit[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([patientId, trialId])
+  @@index([patientId])
+  @@index([trialId])
+  @@index([siteId])
+  @@index([status])
+  @@index([enrollmentDate])
+}
+
+enum EnrollmentStatus {
+  screening
+  screen_failed
+  enrolled
+  randomized
+  active
+  on_hold
+  withdrawn
+  completed
+  lost_to_follow_up
+}
+
+model EnrollmentStatusHistory {
+  id           String            @id @default(uuid())
+  enrollmentId String
+  enrollment   Enrollment        @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  fromStatus   EnrollmentStatus?
+  toStatus     EnrollmentStatus
+  reason       String?
+  changedBy    String
+  changedAt    DateTime          @default(now())
+
+  @@index([enrollmentId])
+  @@index([changedAt])
+}
+
+// ==========================================
+// Consent Management
+// ==========================================
+
+model ConsentRecord {
+  id                 String      @id @default(uuid())
+  enrollmentId       String
+  enrollment         Enrollment  @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  consentType        ConsentType
+  consentFormId      String?
+  consentFormVersion String?
+  signedAt           DateTime
+  signedBy           String // Patient ID
+  witnessName        String?
+  witnessSignedAt    DateTime?
+  coordinatorName    String?
+  coordinatorId      String?
+  documentUrl        String?
+  isActive           Boolean     @default(true)
+  revokedAt          DateTime?
+  revokedReason      String?
+  expiresAt          DateTime?
+  notes              String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([enrollmentId])
+  @@index([consentType])
+  @@index([signedAt])
+  @@index([isActive])
+}
+
+enum ConsentType {
+  main_study
+  optional_sub_study
+  genetic_testing
+  biobanking
+  future_contact
+  data_sharing
+  imaging
+  amendment
+  reconsent
+}
+
+// ==========================================
+// Trial Visits
+// ==========================================
+
+model TrialVisit {
+  id                 String      @id @default(uuid())
+  enrollmentId       String
+  enrollment         Enrollment  @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  visitNumber        Int
+  visitName          String
+  visitType          VisitType   @default(scheduled)
+  scheduledDate      DateTime?
+  actualDate         DateTime?
+  status             VisitStatus @default(scheduled)
+  completedBy        String?
+  notes              String?
+  protocolDeviations String?
+  missedReason       String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([enrollmentId, visitNumber])
+  @@index([enrollmentId])
+  @@index([scheduledDate])
+  @@index([status])
+}
+
+enum VisitType {
+  screening
+  baseline
+  scheduled
+  unscheduled
+  early_termination
+  follow_up
+  closeout
+}
+
+enum VisitStatus {
+  scheduled
+  completed
+  missed
+  rescheduled
+  cancelled
+}
+
+// ==========================================
+// Investigators and Staff
+// ==========================================
+
+model Investigator {
+  id              String             @id @default(uuid())
+  userId          String? // Link to auth service
+  firstName       String
+  lastName        String
+  email           String             @unique
+  phone           String?
+  specialty       String?
+  institution     String?
+  npiNumber       String?            @unique
+  licenseNumber   String?
+  licenseState    String?
+  cvUrl           String?
+  isActive        Boolean            @default(true)
+  roles           InvestigatorRole[]
+  certifications  Json[] // GCP, IATA, etc.
+  trainingRecords Json[]
+
+  siteAssignments InvestigatorSiteAssignment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([email])
+  @@index([npiNumber])
+  @@index([isActive])
+}
+
+enum InvestigatorRole {
+  principal_investigator
+  sub_investigator
+  study_coordinator
+  research_nurse
+  data_manager
+  pharmacist
+  laboratory
+}
+
+model InvestigatorSiteAssignment {
+  id             String           @id @default(uuid())
+  investigatorId String
+  investigator   Investigator     @relation(fields: [investigatorId], references: [id], onDelete: Cascade)
+  siteId         String
+  trialId        String
+  role           InvestigatorRole
+  startDate      DateTime         @default(now())
+  endDate        DateTime?
+  isActive       Boolean          @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([investigatorId, siteId, trialId, role])
+  @@index([investigatorId])
+  @@index([siteId])
+  @@index([trialId])
+  @@index([isActive])
+}
+
+// ==========================================
+// Notifications
+// ==========================================
+
+model TrialNotification {
+  id             String               @id @default(uuid())
+  recipientId    String
+  recipientType  RecipientType
+  type           NotificationType
+  title          String
+  message        String
+  trialId        String?
+  enrollmentId   String?
+  matchId        String?
+  priority       NotificationPriority @default(normal)
+  isRead         Boolean              @default(false)
+  readAt         DateTime?
+  sentAt         DateTime             @default(now())
+  deliveryMethod DeliveryMethod       @default(in_app)
+  externalId     String? // Email ID, SMS ID, etc.
+
+  createdAt DateTime @default(now())
+
+  @@index([recipientId])
+  @@index([recipientType])
+  @@index([type])
+  @@index([isRead])
+  @@index([sentAt])
+}
+
+enum RecipientType {
+  patient
+  investigator
+  coordinator
+  sponsor
+  admin
+}
+
+enum NotificationType {
+  new_match
+  eligibility_update
+  enrollment_status
+  visit_reminder
+  consent_required
+  trial_status_change
+  document_ready
+  action_required
+  general
+}
+
+enum NotificationPriority {
+  low
+  normal
+  high
+  urgent
+}
+
+enum DeliveryMethod {
+  in_app
+  email
+  sms
+  push
+}
