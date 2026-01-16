@@ -727,7 +727,7 @@ export class BillingReconciliationService {
         );
       }
 
-      const responseData = await response.json();
+      const responseData = (await response.json()) as { status?: string };
       logger.info("PagerDuty alert sent successfully", {
         dedupKey,
         discrepancy: result.discrepancy,

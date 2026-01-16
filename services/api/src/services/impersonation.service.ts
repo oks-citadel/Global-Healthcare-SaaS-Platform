@@ -509,7 +509,7 @@ export class ImpersonationService {
       data: {
         userId: entry.adminId,
         action: entry.action,
-        resourceType: "IMPERSONATION",
+        resource: "IMPERSONATION",
         resourceId: entry.targetUserId,
         details: {
           sessionId: entry.sessionId,
@@ -540,7 +540,7 @@ export class ImpersonationService {
         type: "SECURITY",
         title: "Support Access Active",
         message: `A Unified Health support representative is accessing your account to assist with ticket #${session.ticketId || "N/A"}. This access will automatically expire in ${this.config.maxDurationMinutes} minutes.`,
-        metadata: {
+        data: {
           sessionId: session.sessionId,
           adminEmail: session.adminEmail,
           reason: session.reason,
@@ -559,7 +559,7 @@ export class ImpersonationService {
         type: "SECURITY",
         title: "Support Access Ended",
         message: `Support access to your account has ended. If you did not request support, please contact us immediately.`,
-        metadata: {
+        data: {
           sessionId: session.sessionId,
           duration: Math.round(
             ((session.endedAt?.getTime() || Date.now()) -

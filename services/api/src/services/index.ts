@@ -36,10 +36,38 @@ export * from "./stripe-webhook.service.js";
 // Notifications & Communications
 export * from "./notification.service.js";
 export * from "./push.service.js";
-export * from "./email.service.js";
 export * from "./email-templates.service.js";
-export * from "./sms.service.js";
 export * from "./sms-templates.service.js";
+
+// Email service exports (explicit to avoid naming conflicts)
+export {
+  sendWelcomeEmail,
+  sendPasswordResetEmail,
+  sendAppointmentConfirmation as sendAppointmentConfirmationEmail,
+  sendAppointmentReminder as sendAppointmentReminderEmail,
+  sendVisitSummary,
+  sendInvoice,
+  emailService,
+} from "./email.service.js";
+
+// SMS service exports (explicit to avoid naming conflicts)
+export {
+  sendAppointmentReminder as sendAppointmentReminderSms,
+  sendAppointmentConfirmation as sendAppointmentConfirmationSms,
+  sendVisitLink,
+  sendVerificationCode,
+  sendPrescriptionReady,
+  sendTestResultsAvailable,
+  sendPaymentReminder,
+  sendAppointmentCancellation,
+  sendAppointmentRescheduled,
+  sendPaymentConfirmation,
+  sendLabResultsAvailable,
+  sendReferralNotification,
+  sendMedicationReminder,
+  sendEmergencyAlert,
+  smsService,
+} from "./sms.service.js";
 
 // Scheduling
 export * from "./surgical-scheduling.service.js";
