@@ -102,8 +102,8 @@ const DEFAULT_CONFIG: ImpersonationConfig = {
   maxDurationMinutes: 60,
   requireTicketId: true,
   notifyUser: true,
-  allowedRoles: ["ADMIN", "SUPER_ADMIN", "SUPPORT"],
-  excludedRoles: ["ADMIN", "SUPER_ADMIN"], // Cannot impersonate other admins
+  allowedRoles: ["ADMIN", "super_admin", "SUPPORT"],
+  excludedRoles: ["ADMIN", "super_admin"], // Cannot impersonate other admins
   rateLimitMaxAttempts: RATE_LIMIT_MAX_ATTEMPTS,
   rateLimitWindowSeconds: RATE_LIMIT_WINDOW_SECONDS,
 };
@@ -186,7 +186,7 @@ export class ImpersonationService {
     // Check if target is protected (admin/super-admin)
     if (this.config.excludedRoles.includes(targetUser.role)) {
       // Only super-admins can impersonate other admins
-      if (admin.role !== "SUPER_ADMIN") {
+      if (admin.role !== "super_admin") {
         throw new ImpersonationError(
           "CANNOT_IMPERSONATE_ADMIN",
           "Cannot impersonate admin users without super-admin privileges",

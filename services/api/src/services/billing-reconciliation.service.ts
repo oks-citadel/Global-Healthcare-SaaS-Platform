@@ -342,15 +342,7 @@ export class BillingReconciliationService {
   private async fetchDatabasePayments(
     startDate: Date,
     endDate: Date,
-  ): Promise<
-    Array<{
-      id: string;
-      stripePaymentIntentId: string | null;
-      amount: number;
-      status: string;
-      createdAt: Date;
-    }>
-  > {
+  ) {
     return this.prisma.payment.findMany({
       where: {
         createdAt: {
@@ -375,14 +367,7 @@ export class BillingReconciliationService {
   private async fetchDatabaseRefunds(
     startDate: Date,
     endDate: Date,
-  ): Promise<
-    Array<{
-      id: string;
-      stripeRefundId: string | null;
-      amount: number;
-      createdAt: Date;
-    }>
-  > {
+  ) {
     return this.prisma.refund.findMany({
       where: {
         createdAt: {
@@ -811,9 +796,9 @@ export class BillingReconciliationService {
  * with proper Stripe and Prisma dependencies
  */
 export async function createBillingReconciliationService(): Promise<BillingReconciliationService> {
-  const { stripe } = await import("../lib/stripe.js");
+  const { getStripeInstance } = await import("../lib/stripe.js");
   const { prisma } = await import("../lib/prisma.js");
-  return new BillingReconciliationService(stripe, prisma);
+  return new BillingReconciliationService(getStripeInstance(), prisma);
 }
 
 export default BillingReconciliationService;

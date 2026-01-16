@@ -3,7 +3,7 @@
  * Production-ready Redis client for session management in the auth service
  */
 
-import Redis, { Redis as RedisClient } from 'ioredis';
+import { Redis } from 'ioredis';
 import { logger } from './logger.js';
 
 /**
@@ -43,7 +43,7 @@ export interface SessionData {
  * Provides distributed session management with Redis backend
  */
 export class RedisSessionStore {
-  private client: RedisClient | null = null;
+  private client: Redis | null = null;
   private isConnected: boolean = false;
   private readonly keyPrefix: string;
   private readonly sessionTTL: number; // in seconds

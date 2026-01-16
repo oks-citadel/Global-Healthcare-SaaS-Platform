@@ -38,6 +38,14 @@ export const stripe = {
 };
 
 /**
+ * Get the full Stripe client instance
+ * Use this when you need the full Stripe API (e.g., for services that require Stripe type)
+ */
+export function getStripeInstance(): Stripe {
+  return getStripeClient();
+}
+
+/**
  * Helper function to create a Stripe customer
  */
 export const createStripeCustomer = async (params: {
