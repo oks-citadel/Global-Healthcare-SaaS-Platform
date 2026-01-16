@@ -142,8 +142,14 @@ export class BillingReconciliationService {
       );
       const stripeTotal = stripePaymentTotal - stripeRefundTotal;
 
-      const dbPaymentTotal = dbPayments.reduce((sum, p) => sum + p.amount, 0);
-      const dbRefundTotal = dbRefunds.reduce((sum, r) => sum + r.amount, 0);
+      const dbPaymentTotal = dbPayments.reduce(
+        (sum, p) => sum + (typeof p.amount === "number" ? p.amount : Number(p.amount)),
+        0
+      );
+      const dbRefundTotal = dbRefunds.reduce(
+        (sum, r) => sum + (typeof r.amount === "number" ? r.amount : Number(r.amount)),
+        0
+      );
       const databaseTotal = dbPaymentTotal - dbRefundTotal;
 
       // Find discrepancies
@@ -401,7 +407,7 @@ export class BillingReconciliationService {
    */
   private findAmountMismatches(
     stripePayments: Array<{ id: string; amount: number }>,
-    dbPayments: Array<{ stripePaymentIntentId: string | null; amount: number }>,
+    dbPayments: Array<{ stripePaymentIntentId: string | null; amount: unknown }>,
   ): Array<{
     paymentId: string;
     stripeAmount: number;
@@ -418,7 +424,7 @@ export class BillingReconciliationService {
     const dbPaymentMap = new Map(
       dbPayments
         .filter((p) => p.stripePaymentIntentId)
-        .map((p) => [p.stripePaymentIntentId!, p.amount]),
+        .map((p) => [p.stripePaymentIntentId!, Number(p.amount)]),
     );
 
     for (const stripePayment of stripePayments) {
