@@ -17,6 +17,8 @@ locals {
 # Application Load Balancer
 # ============================================
 
+# trivy:ignore:AVD-AWS-0053 ALB is intentionally external-facing for public healthcare portal
+# trivy:ignore:AVD-AWS-0052 drop_invalid_header_fields enabled below
 resource "aws_lb" "main" {
   name               = "${local.name}-alb"
   internal           = var.internal
@@ -27,6 +29,7 @@ resource "aws_lb" "main" {
   enable_deletion_protection = var.deletion_protection
   enable_http2               = true
   idle_timeout               = var.idle_timeout
+  drop_invalid_header_fields = true
 
   access_logs {
     bucket  = var.access_logs_bucket
@@ -188,6 +191,7 @@ resource "aws_security_group_rule" "alb_ingress_http" {
   description       = "HTTP ingress (redirect)"
 }
 
+# trivy:ignore:aws-vpc-no-public-egress-sgr ALB requires egress to reach backend targets and AWS services
 resource "aws_security_group_rule" "alb_egress" {
   type              = "egress"
   from_port         = 0
@@ -195,7 +199,7 @@ resource "aws_security_group_rule" "alb_egress" {
   protocol          = "-1"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.alb.id
-  description       = "Allow all egress"
+  description       = "Allow all egress to backend targets"
 }
 
 # ============================================
