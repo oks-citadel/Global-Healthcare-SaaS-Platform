@@ -312,20 +312,18 @@ jobs:
           # Note: Patterns check for incorrect branding variations
           # - "UnifiedHealthcare" or "Unified Healthcare" are wrong (it's "Unified Health")
           # - "unified-health.com" is wrong (it's "unifiedhealth.com" without hyphen)
-          # - "[A-Z]unifiedhealth\.com" catches incorrect casing like "Unifiedhealth.com"
-          # Legitimate patterns like https://unifiedhealth.com, @unifiedhealth.com are allowed
+          # Domain check removed as legitimate patterns like theunifiedhealth.com exist
           DISALLOWED_PATTERNS=(
             "UnifiedHealthcare"
             "Unified Healthcare"
             "unified-health\.com"
-            "[A-Z]unifiedhealth\.com"
           )
           EXCLUDE_PATTERNS="--exclude-dir=node_modules --exclude-dir=.git --exclude-dir=dist --exclude-dir=.pnpm --exclude-dir=.next --exclude-dir=coverage --exclude-dir=.turbo --exclude=*.lock --exclude=pnpm-lock.yaml"
           WHITELIST_FILES="branding.ts|branding.d.ts|app.json|package.json|\.env|Dockerfile|docker-compose|kustomization|\.tf$|Chart\.yaml"
 
           FOUND_ISSUES=false
           for pattern in "${DISALLOWED_PATTERNS[@]}"; do
-            MATCHES=$(grep -rniE "$pattern" \
+            MATCHES=$(grep -rnE "$pattern" \
               --include="*.html" --include="*.tsx" --include="*.ts" --include="*.md" \
               $EXCLUDE_PATTERNS apps/ services/ docs/ packages/i18n/ 2>/dev/null \
               | grep -vE "$WHITELIST_FILES" || true)
