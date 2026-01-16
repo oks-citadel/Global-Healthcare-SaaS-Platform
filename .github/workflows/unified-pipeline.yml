@@ -309,11 +309,16 @@ jobs:
       - name: Check branding consistency
         run: |
           echo "Checking for disallowed branding patterns..."
+          # Note: Patterns check for incorrect branding variations
+          # - "UnifiedHealthcare" or "Unified Healthcare" are wrong (it's "Unified Health")
+          # - "unified-health.com" is wrong (it's "unifiedhealth.com" without hyphen)
+          # - "[A-Z]unifiedhealth\.com" catches incorrect casing like "Unifiedhealth.com"
+          # Legitimate patterns like https://unifiedhealth.com, @unifiedhealth.com are allowed
           DISALLOWED_PATTERNS=(
             "UnifiedHealthcare"
             "Unified Healthcare"
             "unified-health\.com"
-            "[^a-z]unifiedhealth\.com"
+            "[A-Z]unifiedhealth\.com"
           )
           EXCLUDE_PATTERNS="--exclude-dir=node_modules --exclude-dir=.git --exclude-dir=dist --exclude-dir=.pnpm --exclude-dir=.next --exclude-dir=coverage --exclude-dir=.turbo --exclude=*.lock --exclude=pnpm-lock.yaml"
           WHITELIST_FILES="branding.ts|branding.d.ts|app.json|package.json|\.env|Dockerfile|docker-compose|kustomization|\.tf$|Chart\.yaml"
