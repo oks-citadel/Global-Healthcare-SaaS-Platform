@@ -5,6 +5,17 @@ module.exports = {
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
+  safelist: [
+    'bg-uh-dark',
+    'bg-uh-bright',
+    'text-uh-teal',
+    'text-uh-slate-900',
+    'text-uh-slate-500',
+    'text-uh-slate-600',
+    'text-uh-slate-700',
+    'border-uh-slate-200',
+    'border-uh-slate-300',
+  ],
   darkMode: 'class',
   theme: {
     extend: {
