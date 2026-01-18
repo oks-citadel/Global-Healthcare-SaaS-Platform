@@ -8,7 +8,7 @@ import { PricingGrid, BillingToggle, type PricingTier } from '@/components/prici
 import { SectionDark } from '@/components/theme/UnifiedHealthDarkBackground';
 
 /**
- * Landing Page - The Unified Health
+ * Landing Page - TheUnifiedHealth
  *
  * Premium dark landing page with Healing Aurora gradients.
  * Showcases the platform's features and value proposition.
@@ -100,7 +100,7 @@ export default function LandingPage() {
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annual'>('monthly');
 
   return (
-    <LandingLayout isHero showNav showFooter>
+    <LandingLayout isHero showNav showFooter showWatermark>
       {/* Hero Section */}
       <section className="relative pt-32 pb-24 lg:pt-40 lg:pb-32">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -108,18 +108,18 @@ export default function LandingPage() {
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-8">
               <span className="w-2 h-2 bg-uh-teal rounded-full animate-pulse" />
-              <span className="text-sm text-white/80">Now available in 50+ countries</span>
+              <span className="text-sm text-white/80">Global Healthcare Excellence</span>
             </div>
 
             {/* Headline */}
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight">
-              Healthcare Without
-              <span className="block text-gradient-healing">Borders</span>
+              Unified Healthcare
+              <span className="block text-gradient-healing">Without Borders</span>
             </h1>
 
             {/* Subheadline */}
             <p className="text-lg md:text-xl text-white/70 max-w-2xl mx-auto mb-10 leading-relaxed">
-              The Unified Health connects patients with healthcare providers globally,
+              TheUnifiedHealth connects patients with healthcare providers globally,
               delivering secure, compliant, and accessible care for everyone.
             </p>
 
@@ -228,7 +228,7 @@ export default function LandingPage() {
               Ready to Transform Healthcare?
             </h2>
             <p className="text-lg text-white/60 mb-8 max-w-xl mx-auto">
-              Join thousands of healthcare providers and patients using The Unified Health
+              Join thousands of healthcare providers and patients using TheUnifiedHealth
               to deliver and receive better care.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">

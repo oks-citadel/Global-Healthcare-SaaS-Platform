@@ -4,26 +4,29 @@ import React from 'react';
 import Link from 'next/link';
 
 /**
- * BrandLogo - The Unified Health
+ * BrandLogo - TheUnifiedHealth
  *
+ * Official logo representing the complete healthcare ecosystem.
  * Single source of truth for all logo implementations across the platform.
- * Ensures consistent branding on landing pages, interior pages, and all portals.
  *
- * The logo features an abstract symbol representing:
- * - Global reach (circular/globe form)
- * - Unity and connection (two embracing curves)
- * - Healthcare without borders (flowing, caring gesture)
- * - Hidden "U" shape in negative space
+ * Logo Elements & Meaning:
+ * 1. Circular Shape - Continuity of care, integrated systems, complete patient-to-provider loop
+ * 2. Medical Cross (Blue) - Clinical medicine, hospitals, trust, safety, compliance
+ * 3. Human Figure (Blue/Orange) - Patient/clinician at the center, human-first design
+ * 4. Heart (Orange) - Care, compassion, outcomes, patient wellbeing
+ * 5. Leaf (Green) - Holistic health, prevention, wellness, sustainability
+ * 6. Flowing Arc (Blue/Green) - Data flow, integration, interoperability
  *
- * Usage:
- * - Landing/dark pages: <BrandLogo variant="light" />
- * - Interior/bright pages: <BrandLogo variant="dark" />
- * - Compact spaces: <BrandLogo size="sm" />
- * - Without link: <BrandLogo href={null} />
+ * Color Meaning:
+ * - Blue → Trust, medicine, security, compliance
+ * - Green → Health, growth, sustainability
+ * - Orange → Humanity, care, outcomes
+ *
+ * Placement Rule: Top-right corner on every screen
  */
 
 export type BrandLogoVariant = 'light' | 'dark' | 'auto';
-export type BrandLogoSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+export type BrandLogoSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'watermark';
 
 export interface BrandLogoProps {
   /** Visual variant - 'light' for dark backgrounds, 'dark' for light backgrounds */
@@ -44,118 +47,214 @@ export interface BrandLogoProps {
 
 const sizeConfig = {
   xs: {
-    iconSize: 24,
+    iconSize: 28,
     text: 'text-sm',
     tagline: 'text-[8px]',
-    gap: 'gap-1.5',
+    gap: 'gap-2',
   },
   sm: {
-    iconSize: 32,
+    iconSize: 36,
     text: 'text-base',
     tagline: 'text-[9px]',
     gap: 'gap-2',
   },
   md: {
-    iconSize: 40,
+    iconSize: 44,
     text: 'text-lg',
     tagline: 'text-[10px]',
-    gap: 'gap-2.5',
+    gap: 'gap-3',
   },
   lg: {
-    iconSize: 48,
+    iconSize: 52,
     text: 'text-xl',
     tagline: 'text-xs',
     gap: 'gap-3',
   },
   xl: {
-    iconSize: 64,
+    iconSize: 72,
     text: 'text-2xl',
     tagline: 'text-sm',
     gap: 'gap-4',
   },
+  watermark: {
+    iconSize: 400,
+    text: 'text-6xl',
+    tagline: 'text-xl',
+    gap: 'gap-6',
+  },
 };
 
 /**
- * LogoIcon - The abstract symbol representing unity and global healthcare
+ * TheUnifiedHealthLogo - Official Logo Icon
  *
- * Design elements:
- * - Two curved arcs that embrace each other, forming a globe-like shape
- * - The negative space between curves subtly suggests a "U" shape
- * - Flowing lines represent care, connection, and movement
- * - Circular composition suggests completeness and global reach
+ * A unified, circular logo representing the complete healthcare ecosystem:
+ * - Medical cross anchors clinical credibility
+ * - Human figure centers the patient/provider
+ * - Heart symbolizes compassion and care
+ * - Leaf represents holistic wellness
+ * - Flowing arcs show integration and data flow
  */
 interface LogoIconProps {
   size: number;
-  variant: 'gradient' | 'solid' | 'white';
+  variant: 'full-color' | 'white' | 'monochrome';
   className?: string;
+  opacity?: number;
 }
 
-function LogoIcon({ size, variant, className = '' }: LogoIconProps) {
-  const gradientId = `brand-gradient-${React.useId()}`;
-
-  const getFill = () => {
-    switch (variant) {
-      case 'gradient':
-        return `url(#${gradientId})`;
-      case 'solid':
-        return '#1D4ED8'; // blue-600
-      case 'white':
-        return '#FFFFFF';
-      default:
-        return `url(#${gradientId})`;
-    }
+function LogoIcon({ size, variant, className = '', opacity = 1 }: LogoIconProps) {
+  const gradientIds = {
+    blue: `uh-blue-${React.useId()}`,
+    green: `uh-green-${React.useId()}`,
+    orange: `uh-orange-${React.useId()}`,
+    arc: `uh-arc-${React.useId()}`,
   };
+
+  // Brand colors
+  const colors = {
+    medicalBlue: '#1E40AF',      // Primary trust color
+    medicalBlueDark: '#1E3A8A',
+    medicalBlueLight: '#3B82F6',
+    healthGreen: '#059669',      // Wellness, sustainability
+    healthGreenLight: '#10B981',
+    careOrange: '#EA580C',       // Humanity, warmth
+    careOrangeLight: '#F97316',
+    white: '#FFFFFF',
+  };
+
+  const isWhite = variant === 'white';
+  const isMonochrome = variant === 'monochrome';
+  const fillBlue = isWhite ? colors.white : (isMonochrome ? colors.medicalBlue : `url(#${gradientIds.blue})`);
+  const fillGreen = isWhite ? colors.white : (isMonochrome ? colors.healthGreen : colors.healthGreen);
+  const fillOrange = isWhite ? colors.white : (isMonochrome ? colors.medicalBlue : colors.careOrange);
 
   return (
     <svg
       width={size}
       height={size}
-      viewBox="0 0 40 40"
+      viewBox="0 0 100 100"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={`transition-transform duration-300 ${className}`}
+      style={{ opacity }}
       aria-hidden="true"
     >
       <defs>
-        <linearGradient
-          id={gradientId}
-          x1="0%"
-          y1="0%"
-          x2="100%"
-          y2="100%"
-        >
-          <stop offset="0%" stopColor="#1E3A8A" />
-          <stop offset="50%" stopColor="#2563EB" />
-          <stop offset="100%" stopColor="#0D9488" />
+        {/* Blue gradient for medical cross */}
+        <linearGradient id={gradientIds.blue} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor={colors.medicalBlueDark} />
+          <stop offset="100%" stopColor={colors.medicalBlueLight} />
+        </linearGradient>
+        {/* Green gradient for leaf */}
+        <linearGradient id={gradientIds.green} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor={colors.healthGreen} />
+          <stop offset="100%" stopColor={colors.healthGreenLight} />
+        </linearGradient>
+        {/* Orange gradient for heart */}
+        <linearGradient id={gradientIds.orange} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor={colors.careOrange} />
+          <stop offset="100%" stopColor={colors.careOrangeLight} />
+        </linearGradient>
+        {/* Arc gradient blue to green */}
+        <linearGradient id={gradientIds.arc} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor={colors.medicalBlue} />
+          <stop offset="100%" stopColor={colors.healthGreen} />
         </linearGradient>
       </defs>
 
-      {/* Left embracing curve - represents global reach and care */}
-      <path
-        d="M8 20C8 12.268 14.268 6 22 6C24.5 6 26.85 6.6 28.95 7.65C26.5 5.35 23.15 4 19.5 4C10.94 4 4 10.94 4 19.5C4 25.5 7.5 30.7 12.5 33.15C9.65 29.85 8 25.15 8 20Z"
-        fill={getFill()}
+      {/* Outer circle boundary - unity and completeness */}
+      <circle
+        cx="50"
+        cy="50"
+        r="46"
+        stroke={fillBlue}
+        strokeWidth="2"
+        fill="none"
+        opacity="0.3"
       />
 
-      {/* Right embracing curve - represents unity and connection */}
+      {/* Medical Cross (Blue) - Clinical medicine, trust, compliance */}
+      <g>
+        {/* Vertical bar of cross */}
+        <rect
+          x="44"
+          y="20"
+          width="12"
+          height="35"
+          rx="2"
+          fill={fillBlue}
+        />
+        {/* Horizontal bar of cross */}
+        <rect
+          x="32"
+          y="30"
+          width="36"
+          height="12"
+          rx="2"
+          fill={fillBlue}
+        />
+      </g>
+
+      {/* Human Figure - Patient/Clinician at center */}
+      <g>
+        {/* Head (Orange - humanity) */}
+        <circle
+          cx="50"
+          cy="62"
+          r="6"
+          fill={fillOrange}
+        />
+        {/* Body (Blue - professional) */}
+        <path
+          d="M50 68 L50 80 M42 74 L50 70 L58 74"
+          stroke={fillBlue}
+          strokeWidth="3"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+      </g>
+
+      {/* Heart (Orange) - Care, compassion, outcomes */}
       <path
-        d="M32 20C32 27.732 25.732 34 18 34C15.5 34 13.15 33.4 11.05 32.35C13.5 34.65 16.85 36 20.5 36C29.06 36 36 29.06 36 20.5C36 14.5 32.5 9.3 27.5 6.85C30.35 10.15 32 14.85 32 20Z"
-        fill={getFill()}
+        d="M26 50 C26 44 32 40 38 44 C40 46 40 48 38 50 L26 62 L14 50 C12 48 12 46 14 44 C20 40 26 44 26 50 Z"
+        fill={fillOrange}
+        transform="scale(0.5) translate(8, 70)"
+        opacity="0.9"
       />
 
-      {/* Central connecting element - the bridge of unity */}
+      {/* Leaf (Green) - Holistic health, wellness, sustainability */}
       <path
-        d="M20 8C13.373 8 8 13.373 8 20C8 22.85 9.05 25.45 10.8 27.45C10.3 25.15 10 22.65 10 20C10 14.477 14.477 10 20 10C25.523 10 30 14.477 30 20C30 22.65 29.7 25.15 29.2 27.45C30.95 25.45 32 22.85 32 20C32 13.373 26.627 8 20 8Z"
-        fill={getFill()}
+        d="M78 65 Q85 55 78 45 Q70 55 78 65 M78 65 L78 72"
+        stroke={fillGreen}
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        fill="none"
+      />
+      <ellipse
+        cx="78"
+        cy="55"
+        rx="5"
+        ry="10"
+        fill={fillGreen}
         opacity="0.7"
       />
 
-      {/* Inner accent - adds depth and dimension */}
-      <circle
-        cx="20"
-        cy="20"
-        r="6"
-        fill={getFill()}
-        opacity="0.4"
+      {/* Flowing Arc (Blue to Green) - Data flow, integration, interoperability */}
+      <path
+        d="M15 50 Q15 20 50 15 Q85 20 85 50"
+        stroke={isWhite ? colors.white : `url(#${gradientIds.arc})`}
+        strokeWidth="3"
+        strokeLinecap="round"
+        fill="none"
+        opacity="0.6"
+      />
+      <path
+        d="M20 75 Q50 90 80 75"
+        stroke={isWhite ? colors.white : `url(#${gradientIds.arc})`}
+        strokeWidth="3"
+        strokeLinecap="round"
+        fill="none"
+        opacity="0.6"
       />
     </svg>
   );
@@ -168,7 +267,7 @@ export function BrandLogo({
   href = '/',
   className = '',
   iconOnly = false,
-  ariaLabel = 'The Unified Health - Home',
+  ariaLabel = 'TheUnifiedHealth - Home',
 }: BrandLogoProps) {
   const config = sizeConfig[size];
 
@@ -176,7 +275,7 @@ export function BrandLogo({
   const getStyles = () => {
     if (variant === 'auto') {
       return {
-        iconVariant: 'gradient' as const,
+        iconVariant: 'full-color' as const,
         text: 'text-foreground',
         tagline: 'text-muted-foreground',
         wordmarkGradient: true,
@@ -191,7 +290,7 @@ export function BrandLogo({
       };
     }
     return {
-      iconVariant: 'gradient' as const,
+      iconVariant: 'full-color' as const,
       text: 'text-slate-800',
       tagline: 'text-slate-500',
       wordmarkGradient: true,
@@ -206,7 +305,7 @@ export function BrandLogo({
       role="img"
       aria-label={ariaLabel}
     >
-      {/* Icon Mark - Abstract Unity Symbol */}
+      {/* Official TheUnifiedHealth Logo */}
       <div className="relative group-hover:scale-105 transition-transform duration-300">
         <LogoIcon
           size={config.iconSize}
@@ -214,23 +313,23 @@ export function BrandLogo({
         />
       </div>
 
-      {/* Wordmark */}
+      {/* Wordmark - Modern, clean, authoritative */}
       {!iconOnly && (
         <div className="flex flex-col">
           {styles.wordmarkGradient ? (
             <span
-              className={`${config.text} font-semibold tracking-tight bg-gradient-to-r from-blue-800 via-blue-600 to-teal-600 bg-clip-text text-transparent`}
+              className={`${config.text} font-semibold tracking-tight bg-gradient-to-r from-blue-900 via-blue-700 to-emerald-600 bg-clip-text text-transparent`}
             >
-              The Unified Health
+              TheUnifiedHealth
             </span>
           ) : (
             <span className={`${config.text} font-semibold tracking-tight ${styles.text}`}>
-              The Unified Health
+              TheUnifiedHealth
             </span>
           )}
           {showTagline && (
-            <span className={`${config.tagline} italic ${styles.tagline} -mt-0.5`}>
-              Healthcare Without Borders
+            <span className={`${config.tagline} ${styles.tagline} -mt-0.5 font-medium`}>
+              Global Healthcare Excellence
             </span>
           )}
         </div>
@@ -251,6 +350,32 @@ export function BrandLogo({
     >
       <LogoContent />
     </Link>
+  );
+}
+
+/**
+ * LogoWatermark - Subtle background watermark for landing pages
+ * Uses the official logo at large scale with low opacity
+ */
+export function LogoWatermark({
+  className = '',
+  opacity = 0.05
+}: {
+  className?: string;
+  opacity?: number;
+}) {
+  return (
+    <div
+      className={`absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden ${className}`}
+      aria-hidden="true"
+    >
+      <LogoIcon
+        size={600}
+        variant="full-color"
+        opacity={opacity}
+        className="animate-uh-pulse-soft"
+      />
+    </div>
   );
 }
 
@@ -295,19 +420,14 @@ export function BrandLogoFull({
 }
 
 /**
- * Standalone LogoIcon export for use in favicons, loading states, etc.
- */
-export { LogoIcon };
-
-/**
  * Portal-specific logo variations
  */
 export function AdminPortalLogo(props: Omit<BrandLogoProps, 'ariaLabel'>) {
   const textColor = props.variant === 'light' ? 'text-white/60' : 'text-muted-foreground';
   return (
     <div className="flex flex-col">
-      <BrandLogo {...props} ariaLabel="The Unified Health Admin Portal" />
-      <span className={`text-[10px] uppercase tracking-widest ${textColor} ml-[52px] -mt-1`}>
+      <BrandLogo {...props} ariaLabel="TheUnifiedHealth Admin Portal" />
+      <span className={`text-[10px] uppercase tracking-widest ${textColor} ml-[56px] -mt-1`}>
         Admin Portal
       </span>
     </div>
@@ -318,8 +438,8 @@ export function ProviderPortalLogo(props: Omit<BrandLogoProps, 'ariaLabel'>) {
   const textColor = props.variant === 'light' ? 'text-white/60' : 'text-muted-foreground';
   return (
     <div className="flex flex-col">
-      <BrandLogo {...props} ariaLabel="The Unified Health Provider Portal" />
-      <span className={`text-[10px] uppercase tracking-widest ${textColor} ml-[52px] -mt-1`}>
+      <BrandLogo {...props} ariaLabel="TheUnifiedHealth Provider Portal" />
+      <span className={`text-[10px] uppercase tracking-widest ${textColor} ml-[56px] -mt-1`}>
         Provider Portal
       </span>
     </div>
@@ -330,12 +450,29 @@ export function PatientPortalLogo(props: Omit<BrandLogoProps, 'ariaLabel'>) {
   const textColor = props.variant === 'light' ? 'text-white/60' : 'text-muted-foreground';
   return (
     <div className="flex flex-col">
-      <BrandLogo {...props} ariaLabel="The Unified Health Patient Portal" />
-      <span className={`text-[10px] uppercase tracking-widest ${textColor} ml-[52px] -mt-1`}>
+      <BrandLogo {...props} ariaLabel="TheUnifiedHealth Patient Portal" />
+      <span className={`text-[10px] uppercase tracking-widest ${textColor} ml-[56px] -mt-1`}>
         Patient Portal
       </span>
     </div>
   );
 }
 
+/**
+ * TopRightLogo - Consistent logo placement component
+ * Places logo in top-right corner as per brand guidelines
+ */
+export function TopRightLogo({
+  variant = 'auto',
+  size = 'sm',
+  className = '',
+}: Pick<BrandLogoProps, 'variant' | 'size' | 'className'>) {
+  return (
+    <div className={`absolute top-4 right-4 md:top-6 md:right-6 z-50 ${className}`}>
+      <BrandLogo variant={variant} size={size} />
+    </div>
+  );
+}
+
+export { LogoIcon };
 export default BrandLogo;

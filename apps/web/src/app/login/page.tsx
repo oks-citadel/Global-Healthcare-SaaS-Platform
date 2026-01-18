@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation';
 import { useLogin, useAuth } from '@/hooks/useAuth';
 import { getErrorMessage } from '@/lib/api';
 import { cn } from '@/lib/utils';
-import { BrandLogo } from '@/components/brand/BrandLogo';
+import { BrandLogo, TopRightLogo, LogoWatermark } from '@/components/brand/BrandLogo';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -47,7 +47,13 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex bg-uh-bg-dark relative overflow-hidden">
+      {/* Logo Watermark */}
+      <LogoWatermark opacity={0.03} />
+
+      {/* Top Right Logo - Brand placement rule */}
+      <TopRightLogo variant="light" size="sm" />
+
       {/* Background Aurora Effects */}
       <div className="absolute inset-0 pointer-events-none">
         <div
@@ -248,7 +254,7 @@ export default function LoginPage() {
                 </div>
                 <div className="relative flex justify-center text-sm">
                   <span className="px-3 bg-white text-uh-slate-500">
-                    New to Unified Health?
+                    New to TheUnifiedHealth?
                   </span>
                 </div>
               </div>

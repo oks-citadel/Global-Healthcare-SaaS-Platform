@@ -14,7 +14,7 @@ export default function MainLayout({
   showSidebar = true
 }: MainLayoutProps) {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-uh-bg-bright">
       <Header />
       <div className="flex">
         {showSidebar && <Sidebar />}

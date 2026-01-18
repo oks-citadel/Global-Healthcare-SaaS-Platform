@@ -2,14 +2,18 @@
 
 import React from 'react';
 import { UnifiedHealthDarkBackground } from '../theme/UnifiedHealthDarkBackground';
-import { BrandLogo } from '../brand/BrandLogo';
+import { BrandLogo, LogoWatermark } from '../brand/BrandLogo';
 import Link from 'next/link';
 
 /**
  * LandingLayout
  *
  * Premium dark layout for landing pages, marketing pages, and authentication.
- * Features Healing Aurora gradients and glass morphism navigation.
+ * Features:
+ * - Healing Aurora gradients (medical blue, green, teal)
+ * - Glass morphism navigation
+ * - Logo watermark background (subtle, elegant)
+ * - Logo in top-right of navigation (brand placement rule)
  */
 
 export interface LandingLayoutProps {
@@ -20,6 +24,8 @@ export interface LandingLayoutProps {
   showFooter?: boolean;
   /** Is this a hero page (extra gradient intensity) */
   isHero?: boolean;
+  /** Show logo watermark background */
+  showWatermark?: boolean;
 }
 
 export function LandingLayout({
@@ -27,9 +33,13 @@ export function LandingLayout({
   showNav = true,
   showFooter = true,
   isHero = false,
+  showWatermark = false,
 }: LandingLayoutProps) {
   return (
     <UnifiedHealthDarkBackground isHero={isHero} showAurora>
+      {/* Logo Watermark - Subtle background element */}
+      {showWatermark && <LogoWatermark opacity={0.04} />}
+
       {/* Navigation */}
       {showNav && <LandingNav />}
 
@@ -44,6 +54,7 @@ export function LandingLayout({
 
 /**
  * LandingNav - Glass morphism navigation for landing pages
+ * Logo positioned on the right side per brand guidelines
  */
 export function LandingNav() {
   return (
@@ -51,10 +62,7 @@ export function LandingNav() {
       <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="glass rounded-b-2xl mt-0 px-6 py-4">
           <div className="flex items-center justify-between">
-            {/* Logo */}
-            <BrandLogo variant="light" size="md" />
-
-            {/* Navigation Links */}
+            {/* Navigation Links (Left) */}
             <div className="hidden md:flex items-center gap-8">
               <NavLink href="/features">Features</NavLink>
               <NavLink href="/pricing">Pricing</NavLink>
@@ -62,7 +70,7 @@ export function LandingNav() {
               <NavLink href="/contact">Contact</NavLink>
             </div>
 
-            {/* Auth Buttons */}
+            {/* Auth Buttons (Center-Left on mobile) */}
             <div className="flex items-center gap-4">
               <Link
                 href="/login"
@@ -77,6 +85,9 @@ export function LandingNav() {
                 Get Started
               </Link>
             </div>
+
+            {/* Logo (Right) - Brand placement rule: top-right */}
+            <BrandLogo variant="light" size="md" />
           </div>
         </div>
       </nav>

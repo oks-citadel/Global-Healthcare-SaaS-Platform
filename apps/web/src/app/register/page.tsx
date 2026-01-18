@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import { useRegister, useAuth } from '@/hooks/useAuth';
 import { getErrorMessage } from '@/lib/api';
 import { cn } from '@/lib/utils';
+import { BrandLogo, TopRightLogo, LogoWatermark } from '@/components/brand/BrandLogo';
 
 const registerSchema = z.object({
   firstName: z.string().min(2, 'First name must be at least 2 characters'),
@@ -59,25 +60,54 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-2xl w-full space-y-8">
+    <div className="min-h-screen flex items-center justify-center bg-uh-bg-dark py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Logo Watermark */}
+      <LogoWatermark opacity={0.03} />
+
+      {/* Top Right Logo - Brand placement rule */}
+      <TopRightLogo variant="light" size="sm" />
+
+      {/* Background Aurora Effects */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div
+          className="absolute -top-1/4 -left-1/4 w-1/2 h-1/2 rounded-full"
+          style={{
+            background: 'radial-gradient(circle, rgba(30, 64, 175, 0.15) 0%, transparent 70%)',
+            filter: 'blur(60px)',
+          }}
+        />
+        <div
+          className="absolute -top-1/4 right-0 w-2/3 h-2/3 rounded-full"
+          style={{
+            background: 'radial-gradient(circle, rgba(5, 150, 105, 0.12) 0%, transparent 70%)',
+            filter: 'blur(80px)',
+          }}
+        />
+        <div
+          className="absolute bottom-0 left-1/4 w-1/2 h-1/2 rounded-full"
+          style={{
+            background: 'radial-gradient(circle, rgba(234, 88, 12, 0.1) 0%, transparent 70%)',
+            filter: 'blur(70px)',
+          }}
+        />
+      </div>
+
+      <div className="max-w-2xl w-full space-y-8 relative z-10">
         {/* Header */}
         <div className="text-center">
-          <div className="flex justify-center mb-4">
-            <div className="w-16 h-16 bg-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-2xl">U</span>
-            </div>
+          <div className="flex justify-center mb-6">
+            <BrandLogo variant="light" size="lg" href="/" />
           </div>
-          <h2 className="text-3xl font-bold text-gray-900">
+          <h2 className="text-3xl font-bold text-white">
             Create your account
           </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Join Unified Health to access quality healthcare
+          <p className="mt-2 text-sm text-white/60">
+            Join TheUnifiedHealth to access quality healthcare globally
           </p>
         </div>
 
         {/* Registration Form */}
-        <div className="bg-white py-8 px-6 shadow rounded-lg">
+        <div className="bg-white py-8 px-6 shadow-xl rounded-2xl">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Name Fields */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -348,8 +378,8 @@ export default function RegisterPage() {
               type="submit"
               disabled={register.isPending}
               className={cn(
-                'w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors',
-                register.isPending && 'opacity-50 cursor-not-allowed'
+                'btn-uh btn-uh-primary w-full py-3',
+                register.isPending && 'opacity-60 cursor-not-allowed'
               )}
             >
               {register.isPending ? 'Creating account...' : 'Create account'}

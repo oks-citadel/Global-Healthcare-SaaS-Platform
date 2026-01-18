@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { DashboardBackground } from '../theme/UnifiedHealthBrightBackground';
-import { BrandLogo } from '../brand/BrandLogo';
+import { BrandLogo, BrandLogoMark } from '../brand/BrandLogo';
 import Link from 'next/link';
 
 /**
@@ -209,14 +209,17 @@ function InteriorTopNav({ onMenuClick, user }: TopNavProps) {
   return (
     <header className="h-16 bg-white border-b border-uh-slate-200 sticky top-0 z-30">
       <div className="h-full flex items-center justify-between px-4 lg:px-8">
-        {/* Mobile Menu Button */}
-        <button
-          onClick={onMenuClick}
-          className="lg:hidden p-2 -ml-2 text-uh-slate-500 hover:text-uh-slate-700 focus-ring rounded-lg"
-          aria-label="Open navigation menu"
-        >
-          <MenuIcon />
-        </button>
+        {/* Mobile Menu Button & Logo */}
+        <div className="flex items-center gap-3 lg:hidden">
+          <button
+            onClick={onMenuClick}
+            className="p-2 -ml-2 text-uh-slate-500 hover:text-uh-slate-700 focus-ring rounded-lg"
+            aria-label="Open navigation menu"
+          >
+            <MenuIcon />
+          </button>
+          <BrandLogoMark variant="dark" size="xs" />
+        </div>
 
         {/* Search (Desktop) */}
         <div className="hidden lg:flex flex-1 max-w-lg">
@@ -261,6 +264,11 @@ function InteriorTopNav({ onMenuClick, user }: TopNavProps) {
               </div>
             </div>
           )}
+
+          {/* Logo Mark - Brand placement rule: top-right */}
+          <div className="hidden lg:block border-l border-uh-slate-200 pl-4 ml-2">
+            <BrandLogoMark variant="dark" size="xs" />
+          </div>
         </div>
       </div>
     </header>
