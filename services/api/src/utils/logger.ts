@@ -91,8 +91,10 @@ export const logger = winston.createLogger({
   ],
 });
 
-// Add file transport in production
-if (config.env === 'production') {
+// Add file transport in production (skip in containerized environments like Railway)
+const isContainerized = process.env.RAILWAY_ENVIRONMENT || process.env.CONTAINER_ENV;
+
+if (config.env === 'production' && !isContainerized) {
   logger.add(
     new winston.transports.File({
       filename: 'logs/error.log',
