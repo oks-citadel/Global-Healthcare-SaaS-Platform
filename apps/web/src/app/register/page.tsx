@@ -60,7 +60,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-uh-bg-dark py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-uh-dark py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       {/* Logo Watermark */}
       <LogoWatermark opacity={0.03} />
 
