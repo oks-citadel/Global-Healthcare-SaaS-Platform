@@ -60,12 +60,12 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden" style={{ backgroundColor: '#0A0A0F' }}>
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden" style={{ backgroundColor: '#FDF8F3' }}>
       {/* Logo Watermark */}
       <LogoWatermark opacity={0.03} />
 
       {/* Top Right Logo - Brand placement rule */}
-      <TopRightLogo variant="light" size="sm" />
+      <TopRightLogo variant="dark" size="sm" />
 
       {/* Background Aurora Effects */}
       <div className="absolute inset-0 pointer-events-none">
@@ -96,12 +96,12 @@ export default function RegisterPage() {
         {/* Header */}
         <div className="text-center">
           <div className="flex justify-center mb-6">
-            <BrandLogo variant="light" size="lg" href="/" />
+            <BrandLogo variant="dark" size="lg" href="/" />
           </div>
-          <h2 className="text-3xl font-bold text-white">
+          <h2 className="text-3xl font-bold text-gray-900">
             Create your account
           </h2>
-          <p className="mt-2 text-sm text-white/60">
+          <p className="mt-2 text-sm text-gray-600">
             Join TheUnifiedHealth to access quality healthcare globally
           </p>
         </div>

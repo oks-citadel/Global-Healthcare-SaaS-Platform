@@ -47,12 +47,12 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex relative overflow-hidden" style={{ backgroundColor: '#0A0A0F' }}>
+    <div className="min-h-screen flex relative overflow-hidden" style={{ backgroundColor: '#FDF8F3' }}>
       {/* Logo Watermark */}
       <LogoWatermark opacity={0.03} />
 
       {/* Top Right Logo - Brand placement rule */}
-      <TopRightLogo variant="light" size="sm" />
+      <TopRightLogo variant="dark" size="sm" />
 
       {/* Background Aurora Effects */}
       <div className="absolute inset-0 pointer-events-none">
@@ -84,12 +84,12 @@ export default function LoginPage() {
       {/* Left Side - Branding */}
       <div className="hidden lg:flex lg:w-1/2 items-center justify-center relative z-10 p-12">
         <div className="max-w-md">
-          <BrandLogo variant="light" size="xl" showTagline href="/" />
-          <p className="mt-6 text-lg text-white/60 leading-relaxed">
+          <BrandLogo variant="dark" size="xl" showTagline href="/" />
+          <p className="mt-6 text-lg text-gray-600 leading-relaxed">
             Access your healthcare portal to manage appointments, view records,
             and connect with providers worldwide.
           </p>
-          <div className="mt-8 flex items-center gap-8 text-sm text-white/40">
+          <div className="mt-8 flex items-center gap-8 text-sm text-gray-500">
             <div className="flex items-center gap-2">
               <ShieldIcon className="w-4 h-4" />
               HIPAA Compliant
@@ -107,7 +107,7 @@ export default function LoginPage() {
         <div className="w-full max-w-md">
           {/* Mobile Logo */}
           <div className="lg:hidden mb-8 text-center">
-            <BrandLogo variant="light" size="lg" href="/" className="inline-flex" />
+            <BrandLogo variant="dark" size="lg" href="/" className="inline-flex" />
           </div>
 
           {/* Form Card */}
@@ -271,13 +271,13 @@ export default function LoginPage() {
           </div>
 
           {/* Footer */}
-          <p className="mt-8 text-center text-xs text-white/40">
+          <p className="mt-8 text-center text-xs text-gray-500">
             By signing in, you agree to our{' '}
-            <Link href="/terms" className="text-white/60 hover:text-white transition-colors">
+            <Link href="/terms" className="text-gray-600 hover:text-gray-900 transition-colors">
               Terms of Service
             </Link>{' '}
             and{' '}
-            <Link href="/privacy" className="text-white/60 hover:text-white transition-colors">
+            <Link href="/privacy" className="text-gray-600 hover:text-gray-900 transition-colors">
               Privacy Policy
             </Link>
           </p>

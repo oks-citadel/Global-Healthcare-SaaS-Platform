@@ -38,12 +38,12 @@ export default function ForgotPasswordPage() {
 
   if (emailSent) {
     return (
-      <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden" style={{ backgroundColor: '#0A0A0F' }}>
+      <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden" style={{ backgroundColor: '#FDF8F3' }}>
         {/* Logo Watermark */}
         <LogoWatermark opacity={0.03} />
 
         {/* Top Right Logo - Brand placement rule */}
-        <TopRightLogo variant="light" size="sm" />
+        <TopRightLogo variant="dark" size="sm" />
 
         {/* Background Aurora Effects */}
         <div className="absolute inset-0 pointer-events-none">
@@ -66,17 +66,17 @@ export default function ForgotPasswordPage() {
         <div className="max-w-md w-full space-y-8 relative z-10">
           <div className="text-center">
             <div className="flex justify-center mb-6">
-              <BrandLogo variant="light" size="lg" href="/" />
+              <BrandLogo variant="dark" size="lg" href="/" />
             </div>
             <div className="flex justify-center mb-4">
               <div className="w-16 h-16 bg-uh-emerald rounded-2xl flex items-center justify-center">
-                <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-10 h-10 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
             </div>
-            <h2 className="text-3xl font-bold text-white">Check your email</h2>
-            <p className="mt-2 text-sm text-white/60">
+            <h2 className="text-3xl font-bold text-gray-900">Check your email</h2>
+            <p className="mt-2 text-sm text-gray-600">
               We've sent a password reset link to your email address.
               Please check your inbox and follow the instructions.
             </p>
@@ -112,12 +112,12 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden" style={{ backgroundColor: '#0A0A0F' }}>
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden" style={{ backgroundColor: '#FDF8F3' }}>
       {/* Logo Watermark */}
       <LogoWatermark opacity={0.03} />
 
       {/* Top Right Logo - Brand placement rule */}
-      <TopRightLogo variant="light" size="sm" />
+      <TopRightLogo variant="dark" size="sm" />
 
       {/* Background Aurora Effects */}
       <div className="absolute inset-0 pointer-events-none">
@@ -147,10 +147,10 @@ export default function ForgotPasswordPage() {
       <div className="max-w-md w-full space-y-8 relative z-10">
         <div className="text-center">
           <div className="flex justify-center mb-6">
-            <BrandLogo variant="light" size="lg" href="/" />
+            <BrandLogo variant="dark" size="lg" href="/" />
           </div>
-          <h2 className="text-3xl font-bold text-white">Reset your password</h2>
-          <p className="mt-2 text-sm text-white/60">
+          <h2 className="text-3xl font-bold text-gray-900">Reset your password</h2>
+          <p className="mt-2 text-sm text-gray-600">
             Enter your email address and we'll send you a link to reset your password
           </p>
         </div>

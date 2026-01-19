@@ -63,17 +63,17 @@ function ResetPasswordForm() {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <div className="flex justify-center mb-6">
-            <BrandLogo variant="light" size="lg" href="/" />
+            <BrandLogo variant="dark" size="lg" href="/" />
           </div>
           <div className="flex justify-center mb-4">
             <div className="w-16 h-16 bg-red-500 rounded-2xl flex items-center justify-center">
-              <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-10 h-10 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </div>
           </div>
-          <h2 className="text-3xl font-bold text-white">Invalid reset link</h2>
-          <p className="mt-2 text-sm text-white/60">
+          <h2 className="text-3xl font-bold text-gray-900">Invalid reset link</h2>
+          <p className="mt-2 text-sm text-gray-600">
             This password reset link is invalid or has expired.
           </p>
         </div>
@@ -95,17 +95,17 @@ function ResetPasswordForm() {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <div className="flex justify-center mb-6">
-            <BrandLogo variant="light" size="lg" href="/" />
+            <BrandLogo variant="dark" size="lg" href="/" />
           </div>
           <div className="flex justify-center mb-4">
             <div className="w-16 h-16 bg-uh-emerald rounded-2xl flex items-center justify-center">
-              <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-10 h-10 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
           </div>
-          <h2 className="text-3xl font-bold text-white">Password reset successful</h2>
-          <p className="mt-2 text-sm text-white/60">
+          <h2 className="text-3xl font-bold text-gray-900">Password reset successful</h2>
+          <p className="mt-2 text-sm text-gray-600">
             Your password has been successfully reset. Redirecting to login...
           </p>
         </div>
@@ -126,10 +126,10 @@ function ResetPasswordForm() {
     <div className="max-w-md w-full space-y-8">
       <div className="text-center">
         <div className="flex justify-center mb-6">
-          <BrandLogo variant="light" size="lg" href="/" />
+          <BrandLogo variant="dark" size="lg" href="/" />
         </div>
-        <h2 className="text-3xl font-bold text-white">Set new password</h2>
-        <p className="mt-2 text-sm text-white/60">
+        <h2 className="text-3xl font-bold text-gray-900">Set new password</h2>
+        <p className="mt-2 text-sm text-gray-600">
           Enter your new password below
         </p>
       </div>
@@ -262,12 +262,12 @@ function LoadingFallback() {
 
 export default function ResetPasswordPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden" style={{ backgroundColor: '#0A0A0F' }}>
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden" style={{ backgroundColor: '#FDF8F3' }}>
       {/* Logo Watermark */}
       <LogoWatermark opacity={0.03} />
 
       {/* Top Right Logo - Brand placement rule */}
-      <TopRightLogo variant="light" size="sm" />
+      <TopRightLogo variant="dark" size="sm" />
 
       {/* Background Aurora Effects */}
       <div className="absolute inset-0 pointer-events-none">
