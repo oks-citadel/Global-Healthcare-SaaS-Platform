@@ -18,7 +18,8 @@ const registerSchema = z.object({
   phone: z.string().optional(),
   dateOfBirth: z.string().optional(),
   gender: z.enum(['male', 'female', 'other']).optional(),
-  password: z.string().min(8, 'Password must be at least 8 characters')
+  // Password requirements: 12+ chars, uppercase, lowercase, number (matches backend)
+  password: z.string().min(12, 'Password must be at least 12 characters')
     .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
     .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
     .regex(/[0-9]/, 'Password must contain at least one number'),
@@ -40,7 +41,7 @@ export default function RegisterPage() {
     handleSubmit,
     formState: { errors },
   } = useForm<RegisterFormData>({
-    resolver: zodResolver(registerSchema as any),
+    resolver: zodResolver(registerSchema),
   });
 
   // Redirect if already authenticated

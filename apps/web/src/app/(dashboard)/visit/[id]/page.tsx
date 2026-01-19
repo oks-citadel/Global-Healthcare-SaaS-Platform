@@ -33,7 +33,8 @@ export default function VirtualVisitPage() {
   const [showChat, setShowChat] = useState(false);
   const [showQuality, setShowQuality] = useState(false);
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+  // API service runs on port 8080 by default (consistent with src/lib/api.ts)
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
   // Initialize video call
   const videoCall = useVideoCall({

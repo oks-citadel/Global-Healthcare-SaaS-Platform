@@ -13,7 +13,8 @@ import { TopLeftLogo, CenteredHeroLogo, LogoWatermark } from '@/components/brand
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  // Password minimum matches registration requirements (12 chars)
+  password: z.string().min(12, 'Password must be at least 12 characters'),
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
@@ -28,7 +29,7 @@ export default function LoginPage() {
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema as any),
+    resolver: zodResolver(loginSchema),
   });
 
   // Redirect if already authenticated
