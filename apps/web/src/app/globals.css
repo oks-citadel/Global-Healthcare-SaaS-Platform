@@ -423,15 +423,6 @@
   .animation-delay-4000 {
     animation-delay: 4000ms;
   }
-
-  /* UH Background Colors - explicitly defined for Tailwind v4 compatibility */
-  .bg-uh-dark {
-    background-color: #0A0A0F;
-  }
-
-  .bg-uh-bright {
-    background-color: #FFFFFF;
-  }
 }
 
 /* -------- Animations -------- */
@@ -470,4 +461,13 @@
 .animate-uh-shimmer {
   animation: uh-shimmer 2s linear infinite;
   background-size: 200% 100%;
+}
+
+/* -------- Essential UH Background Utilities (outside @layer to prevent purging) -------- */
+.bg-uh-dark {
+  background-color: #0A0A0F !important;
+}
+
+.bg-uh-bright {
+  background-color: #FFFFFF !important;
 }
