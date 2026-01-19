@@ -51,8 +51,8 @@ export default function LoginPage() {
       {/* Logo Watermark */}
       <LogoWatermark opacity={0.03} />
 
-      {/* Top Right Logo - Brand placement rule */}
-      <TopRightLogo variant="dark" size="sm" />
+      {/* Top Right Logo - Brand placement rule (enlarged for visibility) */}
+      <TopRightLogo variant="dark" size="md" />
 
       {/* Background Aurora Effects */}
       <div className="absolute inset-0 pointer-events-none">
@@ -81,22 +81,23 @@ export default function LoginPage() {
         />
       </div>
 
-      {/* Left Side - Branding */}
+      {/* Left Side - Branding (Enhanced hero-size logo) */}
       <div className="hidden lg:flex lg:w-1/2 items-center justify-center relative z-10 p-12">
-        <div className="max-w-md">
-          <BrandLogo variant="dark" size="xl" showTagline href="/" />
-          <p className="mt-6 text-lg text-gray-600 leading-relaxed">
+        <div className="max-w-lg">
+          {/* Large, bold logo for hero visibility */}
+          <BrandLogo variant="dark" size="2xl" showTagline href="/" />
+          <p className="mt-8 text-xl text-gray-600 leading-relaxed">
             Access your healthcare portal to manage appointments, view records,
             and connect with providers worldwide.
           </p>
-          <div className="mt-8 flex items-center gap-8 text-sm text-gray-500">
-            <div className="flex items-center gap-2">
-              <ShieldIcon className="w-4 h-4" />
-              HIPAA Compliant
+          <div className="mt-10 flex items-center gap-10 text-base text-gray-500">
+            <div className="flex items-center gap-3">
+              <ShieldIcon className="w-6 h-6" />
+              <span className="font-medium">HIPAA Compliant</span>
             </div>
-            <div className="flex items-center gap-2">
-              <LockIcon className="w-4 h-4" />
-              256-bit Encryption
+            <div className="flex items-center gap-3">
+              <LockIcon className="w-6 h-6" />
+              <span className="font-medium">256-bit Encryption</span>
             </div>
           </div>
         </div>
@@ -105,9 +106,9 @@ export default function LoginPage() {
       {/* Right Side - Login Form */}
       <div className="flex-1 flex items-center justify-center relative z-10 p-8 lg:p-12">
         <div className="w-full max-w-md">
-          {/* Mobile Logo */}
+          {/* Mobile Logo (Enhanced size) */}
           <div className="lg:hidden mb-8 text-center">
-            <BrandLogo variant="dark" size="lg" href="/" className="inline-flex" />
+            <BrandLogo variant="dark" size="xl" showTagline href="/" className="inline-flex" />
           </div>
 
           {/* Form Card */}
@@ -254,7 +255,7 @@ export default function LoginPage() {
                 </div>
                 <div className="relative flex justify-center text-sm">
                   <span className="px-3 bg-white text-uh-slate-500">
-                    New to TheUnifiedHealth?
+                    New to The Unified Health?
                   </span>
                 </div>
               </div>

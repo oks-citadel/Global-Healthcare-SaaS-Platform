@@ -64,8 +64,8 @@ export default function RegisterPage() {
       {/* Logo Watermark */}
       <LogoWatermark opacity={0.03} />
 
-      {/* Top Right Logo - Brand placement rule */}
-      <TopRightLogo variant="dark" size="sm" />
+      {/* Top Right Logo - Brand placement rule (enlarged) */}
+      <TopRightLogo variant="dark" size="md" />
 
       {/* Background Aurora Effects */}
       <div className="absolute inset-0 pointer-events-none">
@@ -93,16 +93,16 @@ export default function RegisterPage() {
       </div>
 
       <div className="max-w-2xl w-full space-y-8 relative z-10">
-        {/* Header */}
+        {/* Header with enhanced logo */}
         <div className="text-center">
-          <div className="flex justify-center mb-6">
-            <BrandLogo variant="dark" size="lg" href="/" />
+          <div className="flex justify-center mb-8">
+            <BrandLogo variant="dark" size="xl" showTagline href="/" />
           </div>
           <h2 className="text-3xl font-bold text-gray-900">
             Create your account
           </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Join TheUnifiedHealth to access quality healthcare globally
+          <p className="mt-3 text-base text-gray-600">
+            Join The Unified Health to access quality healthcare globally
           </p>
         </div>
 

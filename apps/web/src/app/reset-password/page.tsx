@@ -63,7 +63,7 @@ function ResetPasswordForm() {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <div className="flex justify-center mb-6">
-            <BrandLogo variant="dark" size="lg" href="/" />
+            <BrandLogo variant="dark" size="xl" showTagline href="/" />
           </div>
           <div className="flex justify-center mb-4">
             <div className="w-16 h-16 bg-red-500 rounded-2xl flex items-center justify-center">
@@ -95,7 +95,7 @@ function ResetPasswordForm() {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <div className="flex justify-center mb-6">
-            <BrandLogo variant="dark" size="lg" href="/" />
+            <BrandLogo variant="dark" size="xl" showTagline href="/" />
           </div>
           <div className="flex justify-center mb-4">
             <div className="w-16 h-16 bg-uh-emerald rounded-2xl flex items-center justify-center">
@@ -126,7 +126,7 @@ function ResetPasswordForm() {
     <div className="max-w-md w-full space-y-8">
       <div className="text-center">
         <div className="flex justify-center mb-6">
-          <BrandLogo variant="dark" size="lg" href="/" />
+          <BrandLogo variant="dark" size="xl" showTagline href="/" />
         </div>
         <h2 className="text-3xl font-bold text-gray-900">Set new password</h2>
         <p className="mt-2 text-sm text-gray-600">
@@ -267,7 +267,7 @@ export default function ResetPasswordPage() {
       <LogoWatermark opacity={0.03} />
 
       {/* Top Right Logo - Brand placement rule */}
-      <TopRightLogo variant="dark" size="sm" />
+      <TopRightLogo variant="dark" size="md" />
 
       {/* Background Aurora Effects */}
       <div className="absolute inset-0 pointer-events-none">
