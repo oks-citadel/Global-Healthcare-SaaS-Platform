@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useResetPassword } from '@/hooks/useSettings';
 import { cn } from '@/lib/utils';
-import { BrandLogo, TopRightLogo, LogoWatermark } from '@/components/brand/BrandLogo';
+import { TopLeftLogo, CenteredHeroLogo, LogoWatermark } from '@/components/brand/BrandLogo';
 
 const resetPasswordSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -43,7 +43,7 @@ export default function ForgotPasswordPage() {
         <LogoWatermark opacity={0.03} />
 
         {/* Top Right Logo - Brand placement rule */}
-        <TopRightLogo variant="dark" size="md" />
+        <TopLeftLogo variant="dark" size="lg" />
 
         {/* Background Aurora Effects */}
         <div className="absolute inset-0 pointer-events-none">
@@ -66,7 +66,7 @@ export default function ForgotPasswordPage() {
         <div className="max-w-md w-full space-y-8 relative z-10">
           <div className="text-center">
             <div className="flex justify-center mb-6">
-              <BrandLogo variant="dark" size="xl" showTagline href="/" />
+              <CenteredHeroLogo variant="dark" showTagline={false} />
             </div>
             <div className="flex justify-center mb-4">
               <div className="w-16 h-16 bg-uh-emerald rounded-2xl flex items-center justify-center">
@@ -117,7 +117,7 @@ export default function ForgotPasswordPage() {
       <LogoWatermark opacity={0.03} />
 
       {/* Top Right Logo - Brand placement rule */}
-      <TopRightLogo variant="dark" size="md" />
+      <TopLeftLogo variant="dark" size="lg" />
 
       {/* Background Aurora Effects */}
       <div className="absolute inset-0 pointer-events-none">
@@ -147,7 +147,7 @@ export default function ForgotPasswordPage() {
       <div className="max-w-md w-full space-y-8 relative z-10">
         <div className="text-center">
           <div className="flex justify-center mb-6">
-            <BrandLogo variant="dark" size="xl" showTagline href="/" />
+            <CenteredHeroLogo variant="dark" showTagline={false} />
           </div>
           <h2 className="text-3xl font-bold text-gray-900">Reset your password</h2>
           <p className="mt-2 text-sm text-gray-600">

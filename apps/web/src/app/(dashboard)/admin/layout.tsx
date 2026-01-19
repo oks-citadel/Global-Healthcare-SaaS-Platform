@@ -1,8 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { useAuth } from '@/hooks/useAuth';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -10,6 +11,44 @@ interface AdminLayoutProps {
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, isAuthenticated, isLoading } = useAuth();
+
+  // RBAC: Redirect non-admin users
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      if (user?.role !== 'admin') {
+        router.push('/');
+      }
+    }
+  }, [user, isAuthenticated, isLoading, router]);
+
+  // Show loading state while checking auth
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-uh-slate-50 flex items-center justify-center">
+        <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-uh-teal"></div>
+      </div>
+    );
+  }
+
+  // Don't render admin content for non-admin users
+  if (!user || user.role !== 'admin') {
+    return (
+      <div className="min-h-screen bg-uh-slate-50 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-uh-slate-900">Access Denied</h2>
+          <p className="mt-2 text-uh-slate-600">You do not have permission to access this area.</p>
+          <Link
+            href="/"
+            className="mt-4 inline-block px-4 py-2 bg-uh-teal text-white rounded-lg hover:bg-uh-teal/90"
+          >
+            Return to Dashboard
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   const navItems = [
     {
@@ -123,13 +162,16 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-uh-slate-50">
       <div className="flex">
         {/* Sidebar */}
         <aside className="w-64 bg-white shadow-lg min-h-screen fixed left-0 top-0">
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-xl font-bold text-gray-900">Admin Portal</h2>
-            <p className="text-sm text-gray-500 mt-1">System Management</p>
+          <div className="p-6 border-b border-uh-slate-200">
+            <span className="text-[10px] uppercase tracking-widest font-medium text-uh-teal">
+              Admin Portal
+            </span>
+            <h2 className="text-xl font-bold text-uh-slate-900 mt-1">UnifiedHealth</h2>
+            <p className="text-sm text-uh-slate-500 mt-1">System Management</p>
           </div>
 
           <nav className="p-4">
@@ -138,10 +180,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+                    className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors focus-ring ${
                       isActive(item.href)
-                        ? 'bg-blue-50 text-blue-700 font-medium'
-                        : 'text-gray-700 hover:bg-gray-100'
+                        ? 'bg-uh-teal/10 text-uh-teal font-medium'
+                        : 'text-uh-slate-700 hover:bg-uh-slate-100'
                     }`}
                   >
                     {item.icon}
@@ -152,10 +194,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             </ul>
           </nav>
 
-          <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200">
+          <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-uh-slate-200">
             <Link
-              href="/dashboard"
-              className="flex items-center space-x-2 text-gray-600 hover:text-gray-900"
+              href="/"
+              className="flex items-center space-x-2 text-uh-slate-600 hover:text-uh-slate-900 focus-ring rounded-lg p-2"
             >
               <svg
                 className="w-5 h-5"
@@ -170,7 +212,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   d="M10 19l-7-7m0 0l7-7m-7 7h18"
                 />
               </svg>
-              <span className="text-sm">Back to Portal</span>
+              <span className="text-sm">Back to Dashboard</span>
             </Link>
           </div>
         </aside>

@@ -27,7 +27,7 @@ export function useMyAppointments(options?: UseMyAppointmentsOptions) {
     queryKey: [...patientKeys.appointments(), options],
     queryFn: async () => {
       const params = options ? { status: options.status } : {};
-      const response = await apiClient.get('/patient/appointments', { params });
+      const response = await apiClient.get('/appointments', { params });
       return response.data;
     },
   });
@@ -38,7 +38,7 @@ export function useAppointment(id: string) {
   return useQuery<Appointment>({
     queryKey: patientKeys.appointment(id),
     queryFn: async () => {
-      const response = await apiClient.get(`/patient/appointments/${id}`);
+      const response = await apiClient.get(`/appointments/${id}`);
       return response.data;
     },
     enabled: !!id,
@@ -51,7 +51,7 @@ export function useBookAppointment() {
 
   return useMutation({
     mutationFn: async (data: BookAppointmentData) => {
-      const response = await apiClient.post('/patient/appointments', data);
+      const response = await apiClient.post('/appointments', data);
       return response.data;
     },
     onSuccess: () => {
@@ -67,8 +67,7 @@ export function useCancelAppointment() {
 
   return useMutation({
     mutationFn: async (appointmentId: string) => {
-      const response = await apiClient.put(`/patient/appointments/${appointmentId}/cancel`);
-      return response.data;
+      await apiClient.delete(`/appointments/${appointmentId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: patientKeys.appointments() });
@@ -82,8 +81,9 @@ export function useRescheduleAppointment() {
 
   return useMutation({
     mutationFn: async ({ appointmentId, dateTime }: { appointmentId: string; dateTime: string }) => {
-      const response = await apiClient.put(`/patient/appointments/${appointmentId}/reschedule`, {
+      const response = await apiClient.patch(`/appointments/${appointmentId}`, {
         dateTime,
+        status: 'scheduled',
       });
       return response.data;
     },
@@ -98,7 +98,7 @@ export function useMyDocuments() {
   return useQuery<Document[]>({
     queryKey: patientKeys.documents(),
     queryFn: async () => {
-      const response = await apiClient.get('/patient/documents');
+      const response = await apiClient.get('/documents');
       return response.data;
     },
   });
@@ -125,11 +125,8 @@ export function useUploadDocument() {
       if (data.description) formData.append('description', data.description);
       if (data.tags) formData.append('tags', JSON.stringify(data.tags));
 
-      const response = await apiClient.post('/patient/documents', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      // Let axios automatically set the Content-Type with proper boundary for multipart
+      const response = await apiClient.post('/documents', formData);
       return response.data;
     },
     onSuccess: () => {
@@ -144,7 +141,7 @@ export function useDeleteDocument() {
 
   return useMutation({
     mutationFn: async (documentId: string) => {
-      const response = await apiClient.delete(`/patient/documents/${documentId}`);
+      const response = await apiClient.delete(`/documents/${documentId}`);
       return response.data;
     },
     onSuccess: () => {
@@ -158,7 +155,7 @@ export function useMyProfile() {
   return useQuery<PatientProfile>({
     queryKey: patientKeys.profile(),
     queryFn: async () => {
-      const response = await apiClient.get('/patient/profile');
+      const response = await apiClient.get('/users/me');
       return response.data;
     },
   });
@@ -170,7 +167,7 @@ export function useUpdateProfile() {
 
   return useMutation({
     mutationFn: async (data: Partial<PatientProfile>) => {
-      const response = await apiClient.put('/patient/profile', data);
+      const response = await apiClient.patch('/users/me', data);
       return response.data;
     },
     onSuccess: () => {
@@ -209,7 +206,7 @@ export function useDashboardStats() {
   return useQuery({
     queryKey: [...patientKeys.all, 'stats'],
     queryFn: async () => {
-      const response = await apiClient.get('/patient/dashboard/stats');
+      const response = await apiClient.get('/dashboard/stats');
       return response.data;
     },
   });

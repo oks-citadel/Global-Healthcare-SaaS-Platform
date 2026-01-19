@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation';
 import { useRegister, useAuth } from '@/hooks/useAuth';
 import { getErrorMessage } from '@/lib/api';
 import { cn } from '@/lib/utils';
-import { BrandLogo, TopRightLogo, LogoWatermark } from '@/components/brand/BrandLogo';
+import { TopLeftLogo, CenteredHeroLogo, LogoWatermark } from '@/components/brand/BrandLogo';
 
 const registerSchema = z.object({
   firstName: z.string().min(2, 'First name must be at least 2 characters'),
@@ -61,11 +61,11 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden" style={{ backgroundColor: '#FDF8F3' }}>
-      {/* Logo Watermark */}
-      <LogoWatermark opacity={0.03} />
+      {/* Subtle Logo Watermark */}
+      <LogoWatermark opacity={0.02} />
 
-      {/* Top Right Logo - Brand placement rule (enlarged) */}
-      <TopRightLogo variant="dark" size="md" />
+      {/* Top-Left Header Logo - Primary Brand Anchor */}
+      <TopLeftLogo variant="dark" size="lg" />
 
       {/* Background Aurora Effects */}
       <div className="absolute inset-0 pointer-events-none">
@@ -93,15 +93,13 @@ export default function RegisterPage() {
       </div>
 
       <div className="max-w-2xl w-full space-y-8 relative z-10">
-        {/* Header with enhanced logo */}
-        <div className="text-center">
-          <div className="flex justify-center mb-8">
-            <BrandLogo variant="dark" size="xl" showTagline href="/" />
-          </div>
-          <h2 className="text-3xl font-bold text-gray-900">
+        {/* Header with centered hero logo */}
+        <div className="text-center pt-12">
+          <CenteredHeroLogo variant="dark" showTagline={false} />
+          <h2 className="mt-6 text-2xl font-bold" style={{ color: '#0F2A5B' }}>
             Create your account
           </h2>
-          <p className="mt-3 text-base text-gray-600">
+          <p className="mt-2 text-base text-gray-600">
             Join The Unified Health to access quality healthcare globally
           </p>
         </div>

@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation';
 import { useLogin, useAuth } from '@/hooks/useAuth';
 import { getErrorMessage } from '@/lib/api';
 import { cn } from '@/lib/utils';
-import { BrandLogo, TopRightLogo, LogoWatermark } from '@/components/brand/BrandLogo';
+import { TopLeftLogo, CenteredHeroLogo, LogoWatermark } from '@/components/brand/BrandLogo';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -48,55 +48,57 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex relative overflow-hidden" style={{ backgroundColor: '#FDF8F3' }}>
-      {/* Logo Watermark */}
-      <LogoWatermark opacity={0.03} />
+      {/* Subtle Logo Watermark */}
+      <LogoWatermark opacity={0.02} />
 
-      {/* Top Right Logo - Brand placement rule (enlarged for visibility) */}
-      <TopRightLogo variant="dark" size="md" />
+      {/* Top-Left Header Logo - Primary Brand Anchor */}
+      <TopLeftLogo variant="dark" size="lg" />
 
       {/* Background Aurora Effects */}
       <div className="absolute inset-0 pointer-events-none">
         <div
-          className="absolute -top-1/4 -left-1/4 w-1/2 h-1/2 rounded-full animate-aurora"
+          className="absolute -top-1/4 -left-1/4 w-1/2 h-1/2 rounded-full"
           style={{
-            background: 'radial-gradient(circle, rgba(0, 212, 170, 0.15) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(15, 42, 91, 0.08) 0%, transparent 70%)',
             filter: 'blur(60px)',
           }}
         />
         <div
-          className="absolute -top-1/4 right-0 w-2/3 h-2/3 rounded-full animate-aurora"
+          className="absolute -top-1/4 right-0 w-2/3 h-2/3 rounded-full"
           style={{
-            background: 'radial-gradient(circle, rgba(79, 70, 229, 0.12) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(4, 120, 87, 0.06) 0%, transparent 70%)',
             filter: 'blur(80px)',
-            animationDelay: '-5s',
           }}
         />
         <div
-          className="absolute bottom-0 left-1/4 w-1/2 h-1/2 rounded-full animate-aurora"
+          className="absolute bottom-0 left-1/4 w-1/2 h-1/2 rounded-full"
           style={{
-            background: 'radial-gradient(circle, rgba(6, 182, 212, 0.1) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(194, 65, 12, 0.05) 0%, transparent 70%)',
             filter: 'blur(70px)',
-            animationDelay: '-10s',
           }}
         />
       </div>
 
-      {/* Left Side - Branding (Enhanced hero-size logo) */}
+      {/* Left Side - Centered Hero Branding */}
       <div className="hidden lg:flex lg:w-1/2 items-center justify-center relative z-10 p-12">
-        <div className="max-w-lg">
-          {/* Large, bold logo for hero visibility */}
-          <BrandLogo variant="dark" size="2xl" showTagline href="/" />
-          <p className="mt-8 text-xl text-gray-600 leading-relaxed">
+        <div className="text-center">
+          {/* Large Centered Hero Logo */}
+          <CenteredHeroLogo variant="dark" showTagline />
+
+          {/* Supporting Description */}
+          <p className="mt-10 text-lg text-gray-600 leading-relaxed max-w-md mx-auto">
             Access your healthcare portal to manage appointments, view records,
             and connect with providers worldwide.
           </p>
-          <div className="mt-10 flex items-center gap-10 text-base text-gray-500">
-            <div className="flex items-center gap-3">
-              <ShieldIcon className="w-6 h-6" />
+
+          {/* Trust Badges */}
+          <div className="mt-10 flex items-center justify-center gap-10 text-sm text-gray-500">
+            <div className="flex items-center gap-2">
+              <ShieldIcon className="w-5 h-5 text-[#0F2A5B]" />
               <span className="font-medium">HIPAA Compliant</span>
             </div>
-            <div className="flex items-center gap-3">
-              <LockIcon className="w-6 h-6" />
+            <div className="flex items-center gap-2">
+              <LockIcon className="w-5 h-5 text-[#0F2A5B]" />
               <span className="font-medium">256-bit Encryption</span>
             </div>
           </div>
@@ -106,18 +108,18 @@ export default function LoginPage() {
       {/* Right Side - Login Form */}
       <div className="flex-1 flex items-center justify-center relative z-10 p-8 lg:p-12">
         <div className="w-full max-w-md">
-          {/* Mobile Logo (Enhanced size) */}
-          <div className="lg:hidden mb-8 text-center">
-            <BrandLogo variant="dark" size="xl" showTagline href="/" className="inline-flex" />
+          {/* Mobile Hero Logo (centered) */}
+          <div className="lg:hidden mb-10 pt-16">
+            <CenteredHeroLogo variant="dark" showTagline />
           </div>
 
           {/* Form Card */}
-          <div className="bg-white rounded-2xl shadow-premium p-8">
+          <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-uh-slate-900">
+              <h2 className="text-2xl font-bold" style={{ color: '#0F2A5B' }}>
                 Welcome Back
               </h2>
-              <p className="mt-2 text-sm text-uh-slate-500">
+              <p className="mt-2 text-sm text-gray-500">
                 Sign in to access your healthcare portal
               </p>
             </div>
@@ -127,7 +129,7 @@ export default function LoginPage() {
               <div>
                 <label
                   htmlFor="email"
-                  className="block text-sm font-medium text-uh-slate-700 mb-1.5"
+                  className="block text-sm font-medium text-gray-700 mb-1.5"
                 >
                   Email Address
                 </label>
@@ -137,8 +139,11 @@ export default function LoginPage() {
                   type="email"
                   autoComplete="email"
                   className={cn(
-                    'input-uh-bright w-full',
-                    errors.email && 'border-red-500 focus:border-red-500 focus:ring-red-500/20'
+                    'w-full px-4 py-3 border rounded-xl text-sm transition-all duration-200',
+                    'focus:outline-none focus:ring-2 focus:ring-[#0F2A5B]/20 focus:border-[#0F2A5B]',
+                    errors.email
+                      ? 'border-red-400 focus:ring-red-500/20 focus:border-red-500'
+                      : 'border-gray-200 hover:border-gray-300'
                   )}
                   placeholder="john.doe@example.com"
                 />
@@ -153,7 +158,7 @@ export default function LoginPage() {
               <div>
                 <label
                   htmlFor="password"
-                  className="block text-sm font-medium text-uh-slate-700 mb-1.5"
+                  className="block text-sm font-medium text-gray-700 mb-1.5"
                 >
                   Password
                 </label>
@@ -163,8 +168,11 @@ export default function LoginPage() {
                   type="password"
                   autoComplete="current-password"
                   className={cn(
-                    'input-uh-bright w-full',
-                    errors.password && 'border-red-500 focus:border-red-500 focus:ring-red-500/20'
+                    'w-full px-4 py-3 border rounded-xl text-sm transition-all duration-200',
+                    'focus:outline-none focus:ring-2 focus:ring-[#0F2A5B]/20 focus:border-[#0F2A5B]',
+                    errors.password
+                      ? 'border-red-400 focus:ring-red-500/20 focus:border-red-500'
+                      : 'border-gray-200 hover:border-gray-300'
                   )}
                   placeholder="••••••••"
                 />
@@ -182,11 +190,11 @@ export default function LoginPage() {
                     id="remember-me"
                     name="remember-me"
                     type="checkbox"
-                    className="h-4 w-4 text-uh-teal focus:ring-uh-teal/20 border-uh-slate-300 rounded"
+                    className="h-4 w-4 rounded border-gray-300 text-[#0F2A5B] focus:ring-[#0F2A5B]/20"
                   />
                   <label
                     htmlFor="remember-me"
-                    className="ml-2 block text-sm text-uh-slate-600"
+                    className="ml-2 block text-sm text-gray-600"
                   >
                     Remember me
                   </label>
@@ -194,7 +202,7 @@ export default function LoginPage() {
 
                 <Link
                   href="/forgot-password"
-                  className="text-sm font-medium text-uh-teal hover:text-uh-teal-600 transition-colors"
+                  className="text-sm font-medium text-[#047857] hover:text-[#065f46] transition-colors"
                 >
                   Forgot password?
                 </Link>
@@ -229,7 +237,8 @@ export default function LoginPage() {
                 type="submit"
                 disabled={login.isPending}
                 className={cn(
-                  'btn-uh btn-uh-primary w-full py-3',
+                  'w-full py-3.5 px-4 rounded-xl font-semibold text-white transition-all duration-200',
+                  'bg-[#0F2A5B] hover:bg-[#0A1F42] focus:ring-4 focus:ring-[#0F2A5B]/20',
                   login.isPending && 'opacity-60 cursor-not-allowed'
                 )}
               >
@@ -251,10 +260,10 @@ export default function LoginPage() {
             <div className="mt-8">
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-uh-slate-200" />
+                  <div className="w-full border-t border-gray-200" />
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-3 bg-white text-uh-slate-500">
+                  <span className="px-3 bg-white text-gray-500">
                     New to The Unified Health?
                   </span>
                 </div>
@@ -263,7 +272,7 @@ export default function LoginPage() {
               <div className="mt-6 text-center">
                 <Link
                   href="/register"
-                  className="text-sm font-medium text-uh-teal hover:text-uh-teal-600 transition-colors"
+                  className="text-sm font-medium text-[#047857] hover:text-[#065f46] transition-colors"
                 >
                   Create an account
                 </Link>
@@ -291,16 +300,16 @@ export default function LoginPage() {
 // Icons
 function ShieldIcon({ className }: { className?: string }) {
   return (
-    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
     </svg>
   );
 }
 
 function LockIcon({ className }: { className?: string }) {
   return (
-    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
     </svg>
   );
 }

@@ -116,11 +116,11 @@ export default function VirtualVisitPage() {
         });
       }
 
-      // Redirect to visit summary or dashboard
-      router.push(`/dashboard/visits/${visitId}/summary`);
+      // Redirect to appointments page after visit ends
+      router.push('/appointments');
     } catch (error) {
       console.error('Error ending call:', error);
-      router.push('/dashboard');
+      router.push('/');
     }
   };
 

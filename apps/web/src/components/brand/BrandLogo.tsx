@@ -141,15 +141,15 @@ function LogoIcon({ size, variant, className = '', opacity = 1, withShadow = fal
     shadow: `uh-shadow-${React.useId()}`,
   };
 
-  // Brand colors - enhanced for better contrast
+  // Brand colors - HIGH CONTRAST medical navy for visibility
   const colors = {
-    medicalBlue: '#1E40AF',
-    medicalBlueDark: '#1E3A8A',
-    medicalBlueLight: '#3B82F6',
-    healthGreen: '#059669',
-    healthGreenLight: '#10B981',
-    careOrange: '#EA580C',
-    careOrangeLight: '#F97316',
+    medicalBlue: '#0F2A5B',        // Darker medical navy for high contrast
+    medicalBlueDark: '#0A1F42',    // Deep navy
+    medicalBlueLight: '#1E40AF',   // Lighter accent
+    healthGreen: '#047857',        // Deeper emerald
+    healthGreenLight: '#059669',
+    careOrange: '#C2410C',         // Deeper orange
+    careOrangeLight: '#EA580C',
     white: '#FFFFFF',
   };
 
@@ -352,26 +352,32 @@ export function BrandLogo({
         />
       </div>
 
-      {/* Wordmark - Modern, clean, authoritative with proper spacing */}
+      {/* Wordmark - Bold, high-contrast medical navy text */}
       {!iconOnly && (
         <div className="flex flex-col justify-center">
           {styles.wordmarkGradient ? (
             <span
-              className={`${config.text} font-semibold ${config.letterSpacing} bg-gradient-to-r from-blue-900 via-blue-700 to-emerald-600 bg-clip-text text-transparent whitespace-nowrap`}
-              style={{ letterSpacing: '0.02em' }}
+              className={`${config.text} font-bold ${config.letterSpacing} whitespace-nowrap`}
+              style={{
+                letterSpacing: '0.03em',
+                color: '#0F2A5B', // Medical navy for high contrast
+              }}
             >
               The Unified Health
             </span>
           ) : (
             <span
-              className={`${config.text} font-semibold ${config.letterSpacing} ${styles.text} whitespace-nowrap`}
-              style={{ letterSpacing: '0.02em' }}
+              className={`${config.text} font-bold ${config.letterSpacing} ${styles.text} whitespace-nowrap`}
+              style={{ letterSpacing: '0.03em' }}
             >
               The Unified Health
             </span>
           )}
           {showTagline && (
-            <span className={`${config.tagline} ${styles.tagline} font-medium whitespace-nowrap`}>
+            <span
+              className={`${config.tagline} font-medium whitespace-nowrap`}
+              style={{ color: '#047857', letterSpacing: '0.05em' }}
+            >
               Global Healthcare Excellence
             </span>
           )}
@@ -545,8 +551,24 @@ export function PatientPortalLogo(props: Omit<BrandLogoProps, 'ariaLabel'>) {
 }
 
 /**
- * TopRightLogo - Consistent logo placement component
- * Places logo in top-right corner as per brand guidelines
+ * TopLeftLogo - Primary brand anchor in header
+ * Places full logo (icon + text) in top-left corner
+ */
+export function TopLeftLogo({
+  variant = 'dark',
+  size = 'lg',
+  className = '',
+}: Pick<BrandLogoProps, 'variant' | 'size' | 'className'>) {
+  return (
+    <div className={`absolute top-4 left-4 md:top-6 md:left-8 z-50 ${className}`}>
+      <BrandLogo variant={variant} size={size} />
+    </div>
+  );
+}
+
+/**
+ * TopRightLogo - Secondary brand mark placement
+ * Places icon-only logo in top-right corner
  */
 export function TopRightLogo({
   variant = 'auto',
@@ -556,6 +578,48 @@ export function TopRightLogo({
   return (
     <div className={`absolute top-4 right-4 md:top-6 md:right-6 z-50 ${className}`}>
       <BrandLogoMark variant={variant} size={size} />
+    </div>
+  );
+}
+
+/**
+ * CenteredHeroLogo - Large centered logo for auth/landing pages
+ * Displays logo icon with brand name underneath
+ */
+export function CenteredHeroLogo({
+  variant = 'dark',
+  showTagline = true,
+  className = '',
+}: {
+  variant?: BrandLogoVariant;
+  showTagline?: boolean;
+  className?: string;
+}) {
+  const styles = variant === 'light'
+    ? { text: 'text-white', tagline: 'text-white/70' }
+    : { text: 'text-[#0F2A5B]', tagline: 'text-[#047857]' };
+
+  return (
+    <div className={`flex flex-col items-center ${className}`}>
+      <LogoIcon
+        size={120}
+        variant={variant === 'light' ? 'white' : 'full-color'}
+        withShadow={variant !== 'light'}
+      />
+      <h1
+        className={`mt-4 text-3xl md:text-4xl font-bold tracking-wide ${styles.text}`}
+        style={{ letterSpacing: '0.04em' }}
+      >
+        The Unified Health
+      </h1>
+      {showTagline && (
+        <p
+          className={`mt-2 text-base md:text-lg font-medium ${styles.tagline}`}
+          style={{ letterSpacing: '0.06em' }}
+        >
+          Global Healthcare Excellence
+        </p>
+      )}
     </div>
   );
 }
