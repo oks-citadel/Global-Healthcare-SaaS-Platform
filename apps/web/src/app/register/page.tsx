@@ -313,7 +313,7 @@ export default function RegisterPage() {
                 Password must contain:
               </p>
               <ul className="text-xs text-gray-600 space-y-1">
-                <li>• At least 8 characters</li>
+                <li>• At least 12 characters</li>
                 <li>• One uppercase letter</li>
                 <li>• One lowercase letter</li>
                 <li>• One number</li>
