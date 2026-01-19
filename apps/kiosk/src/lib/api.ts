@@ -5,7 +5,8 @@
  * All functions make actual API calls to the backend services.
  */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'
+// API runs on port 8080 - this is the correct default port for all environments
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api'
 
 // Types
 import type { Patient, Appointment, Payment, QueueStatus } from '@/types'

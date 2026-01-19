@@ -7,14 +7,17 @@ import { BadRequestError } from '../utils/errors.js';
  * Secure cookie configuration for JWT tokens
  * httpOnly: true - Prevents XSS attacks from accessing tokens via JavaScript
  * secure: true - Only sent over HTTPS in production
- * sameSite: 'strict' - Prevents CSRF attacks
+ * sameSite: 'lax' - Allows cookies to be sent on cross-origin requests from same site
+ *                   (e.g., between localhost ports during development). 'lax' still
+ *                   provides CSRF protection for unsafe methods while permitting
+ *                   top-level navigations needed for cross-port authentication.
  */
 const isProduction = process.env.NODE_ENV === 'production';
 
 const ACCESS_TOKEN_COOKIE_OPTIONS: CookieOptions = {
   httpOnly: true,
   secure: isProduction,
-  sameSite: 'strict',
+  sameSite: 'lax',
   maxAge: 15 * 60 * 1000, // 15 minutes
   path: '/',
 };
@@ -22,7 +25,7 @@ const ACCESS_TOKEN_COOKIE_OPTIONS: CookieOptions = {
 const REFRESH_TOKEN_COOKIE_OPTIONS: CookieOptions = {
   httpOnly: true,
   secure: isProduction,
-  sameSite: 'strict',
+  sameSite: 'lax',
   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   path: '/',
 };

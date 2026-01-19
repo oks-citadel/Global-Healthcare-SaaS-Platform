@@ -15,7 +15,7 @@ const registerSchema = z.object({
   firstName: z.string().min(2, 'First name must be at least 2 characters'),
   lastName: z.string().min(2, 'Last name must be at least 2 characters'),
   email: z.string().email('Invalid email address'),
-  phoneNumber: z.string().optional(),
+  phone: z.string().optional(),
   dateOfBirth: z.string().optional(),
   gender: z.enum(['male', 'female', 'other']).optional(),
   password: z.string().min(8, 'Password must be at least 8 characters')
@@ -196,14 +196,14 @@ export default function RegisterPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label
-                  htmlFor="phoneNumber"
+                  htmlFor="phone"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
                   Phone Number
                 </label>
                 <input
-                  {...registerField('phoneNumber')}
-                  id="phoneNumber"
+                  {...registerField('phone')}
+                  id="phone"
                   type="tel"
                   autoComplete="tel"
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"

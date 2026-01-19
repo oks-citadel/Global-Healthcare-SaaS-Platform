@@ -140,7 +140,7 @@ exports.Prisma.TenantScalarFieldEnum = {
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   email: 'email',
-  password: 'password',
+  passwordHash: 'passwordHash',
   firstName: 'firstName',
   lastName: 'lastName',
   phone: 'phone',
@@ -548,6 +548,59 @@ exports.Prisma.BillingTransactionLogScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.RefundScalarFieldEnum = {
+  id: 'id',
+  stripeRefundId: 'stripeRefundId',
+  stripePaymentIntentId: 'stripePaymentIntentId',
+  amount: 'amount',
+  currency: 'currency',
+  status: 'status',
+  reason: 'reason',
+  metadata: 'metadata',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ReconciliationReportScalarFieldEnum = {
+  id: 'id',
+  date: 'date',
+  stripeTotal: 'stripeTotal',
+  databaseTotal: 'databaseTotal',
+  discrepancy: 'discrepancy',
+  discrepancyPercentage: 'discrepancyPercentage',
+  status: 'status',
+  details: 'details',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.AuditLogScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  action: 'action',
+  resource: 'resource',
+  resourceId: 'resourceId',
+  details: 'details',
+  ipAddress: 'ipAddress',
+  userAgent: 'userAgent',
+  sessionId: 'sessionId',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.NotificationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  type: 'type',
+  title: 'title',
+  message: 'message',
+  data: 'data',
+  read: 'read',
+  readAt: 'readAt',
+  channel: 'channel',
+  priority: 'priority',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -587,7 +640,8 @@ exports.TenantStatus = exports.$Enums.TenantStatus = {
 exports.Role = exports.$Enums.Role = {
   patient: 'patient',
   provider: 'provider',
-  admin: 'admin'
+  admin: 'admin',
+  super_admin: 'super_admin'
 };
 
 exports.UserStatus = exports.$Enums.UserStatus = {
@@ -790,6 +844,27 @@ exports.BillingTransactionStatus = exports.$Enums.BillingTransactionStatus = {
   failed: 'failed'
 };
 
+exports.RefundStatus = exports.$Enums.RefundStatus = {
+  pending: 'pending',
+  succeeded: 'succeeded',
+  failed: 'failed',
+  canceled: 'canceled'
+};
+
+exports.NotificationChannel = exports.$Enums.NotificationChannel = {
+  in_app: 'in_app',
+  email: 'email',
+  sms: 'sms',
+  push: 'push'
+};
+
+exports.NotificationPriority = exports.$Enums.NotificationPriority = {
+  low: 'low',
+  normal: 'normal',
+  high: 'high',
+  urgent: 'urgent'
+};
+
 exports.Prisma.ModelName = {
   Tenant: 'Tenant',
   User: 'User',
@@ -820,7 +895,11 @@ exports.Prisma.ModelName = {
   PushNotification: 'PushNotification',
   NotificationPreference: 'NotificationPreference',
   WebhookEventLog: 'WebhookEventLog',
-  BillingTransactionLog: 'BillingTransactionLog'
+  BillingTransactionLog: 'BillingTransactionLog',
+  Refund: 'Refund',
+  ReconciliationReport: 'ReconciliationReport',
+  AuditLog: 'AuditLog',
+  Notification: 'Notification'
 };
 
 /**

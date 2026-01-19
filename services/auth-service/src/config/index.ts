@@ -210,7 +210,11 @@ export const config = {
   },
 
   cors: {
-    origin: getOptionalEnv("CORS_ORIGIN", "*"),
+    // Note: Wildcard origin (*) cannot be used with credentials: true
+    // Browsers will reject CORS responses that use Access-Control-Allow-Origin: *
+    // when Access-Control-Allow-Credentials: true is also set.
+    // Always use explicit origins when credentials are enabled.
+    origin: getOptionalEnv("CORS_ORIGIN", "http://localhost:3000,http://localhost:3001,http://localhost:3002"),
     credentials: true,
   },
 

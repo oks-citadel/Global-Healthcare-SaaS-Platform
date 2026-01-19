@@ -50,7 +50,7 @@ export const authService = {
     const user = await prisma.user.create({
       data: {
         email: input.email,
-        password: hashedPassword,
+        passwordHash: hashedPassword,
         firstName: input.firstName,
         lastName: input.lastName,
         phone: input.phone || null,
@@ -97,7 +97,7 @@ export const authService = {
     }
 
     // Verify password
-    const validPassword = await bcrypt.compare(input.password, user.password);
+    const validPassword = await bcrypt.compare(input.password, user.passwordHash);
     if (!validPassword) {
       throw new UnauthorizedError('Invalid credentials');
     }

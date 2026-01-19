@@ -26,7 +26,7 @@ export interface RegisterData {
   password: string;
   firstName: string;
   lastName: string;
-  phoneNumber?: string;
+  phone?: string;
   dateOfBirth?: string;
   gender?: 'male' | 'female' | 'other';
 }
