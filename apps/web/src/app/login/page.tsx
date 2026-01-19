@@ -47,7 +47,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex bg-uh-dark relative overflow-hidden">
+    <div className="min-h-screen flex relative overflow-hidden" style={{ backgroundColor: '#0A0A0F' }}>
       {/* Logo Watermark */}
       <LogoWatermark opacity={0.03} />
 
