@@ -41,7 +41,8 @@ export default function RegisterPage() {
     handleSubmit,
     formState: { errors },
   } = useForm<RegisterFormData>({
-    resolver: zodResolver(registerSchema),
+    // Type cast needed due to Zod v3/v4 version mismatch with @hookform/resolvers
+    resolver: zodResolver(registerSchema as any),
   });
 
   // Redirect if already authenticated

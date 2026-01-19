@@ -29,7 +29,8 @@ export default function LoginPage() {
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
+    // Type cast needed due to Zod v3/v4 version mismatch with @hookform/resolvers
+    resolver: zodResolver(loginSchema as any),
   });
 
   // Redirect if already authenticated
