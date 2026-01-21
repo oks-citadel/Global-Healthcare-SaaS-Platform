@@ -7,7 +7,7 @@
     "dev": "npx next dev -p 3002",
     "build": "npx next build",
     "start": "npx next start -p 3002",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx --ignore-pattern node_modules --ignore-pattern .next",
+    "lint": "eslint . --ignore-pattern node_modules --ignore-pattern .next",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

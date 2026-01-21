@@ -116,7 +116,7 @@ interface EngagementProvider {
 
 // Mock implementations
 class MockLocationProvider implements LocationProvider {
-  async getLocation(userId: string): Promise<UserContext['location'] | undefined> {
+  async getLocation(_userId: string): Promise<UserContext['location'] | undefined> {
     return {
       latitude: 40.7128,
       longitude: -74.006,
@@ -142,7 +142,7 @@ class MockDeviceProvider implements DeviceProvider {
 }
 
 class MockActivityProvider implements ActivityProvider {
-  async getCurrentActivity(userId: string): Promise<UserContext['activity'] | undefined> {
+  async getCurrentActivity(_userId: string): Promise<UserContext['activity'] | undefined> {
     return {
       currentActivity: 'stationary',
       confidence: 0.95,
@@ -152,7 +152,7 @@ class MockActivityProvider implements ActivityProvider {
 }
 
 class MockHealthProvider implements HealthProvider {
-  async getHealthContext(patientId: string): Promise<UserContext['health'] | undefined> {
+  async getHealthContext(_patientId: string): Promise<UserContext['health'] | undefined> {
     return {
       recentVitals: {
         blood_pressure: {
@@ -177,7 +177,7 @@ class MockHealthProvider implements HealthProvider {
 }
 
 class MockScheduleProvider implements ScheduleProvider {
-  async getScheduleContext(userId: string): Promise<UserContext['schedule'] | undefined> {
+  async getScheduleContext(_userId: string): Promise<UserContext['schedule'] | undefined> {
     const now = new Date();
     const currentHour = now.getHours();
     const isQuietHours = currentHour >= 22 || currentHour < 7;
@@ -195,7 +195,7 @@ class MockScheduleProvider implements ScheduleProvider {
 }
 
 class MockPreferencesProvider implements PreferencesProvider {
-  async getPreferences(userId: string): Promise<UserContext['preferences'] | undefined> {
+  async getPreferences(_userId: string): Promise<UserContext['preferences'] | undefined> {
     return {
       timezone: 'America/New_York',
       quietHoursStart: '22:00',
@@ -207,7 +207,7 @@ class MockPreferencesProvider implements PreferencesProvider {
 }
 
 class MockEngagementProvider implements EngagementProvider {
-  async getEngagementContext(userId: string): Promise<UserContext['engagement'] | undefined> {
+  async getEngagementContext(_userId: string): Promise<UserContext['engagement'] | undefined> {
     return {
       lastAppOpen: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
       lastNotificationInteraction: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),

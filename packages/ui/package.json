@@ -16,7 +16,7 @@
   "scripts": {
     "build": "npx tsup src/index.ts --format cjs,esm --dts --external react --external react-dom",
     "dev": "npx tsup src/index.ts --format cjs,esm --dts --external react --external react-dom --watch",
-    "lint": "eslint src --ext .ts,.tsx",
+    "lint": "eslint src",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",

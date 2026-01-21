@@ -172,7 +172,7 @@ export function createMetricsReporter(userConfig: ReporterConfig = {}) {
     /**
      * Set user ID for attribution
      */
-    setUserId(userId: string): void {
+    setUserId(_userId: string): void {
       // Update metadata for future reports
       sessionId = generateSessionId();
     },

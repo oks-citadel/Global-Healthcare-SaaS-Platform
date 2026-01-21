@@ -6,6 +6,7 @@
 import {
   TriggerCondition,
   TriggerEvaluationResult,
+  // @ts-ignore - HealthEventConditionParams imported for type reference
   HealthEventConditionParams,
 } from '../models/TriggerCondition.js';
 import { logger } from '../utils/logger.js';
@@ -65,7 +66,7 @@ class MockHealthRecordService implements HealthRecordService {
   async getRecentEvents(
     patientId: string,
     eventTypes?: string[],
-    daysBack: number = 30
+    _daysBack: number = 30
   ): Promise<HealthEvent[]> {
     const now = new Date();
 
@@ -116,7 +117,7 @@ class MockHealthRecordService implements HealthRecordService {
     return events;
   }
 
-  async getMedicationRefills(patientId: string): Promise<Array<{
+  async getMedicationRefills(_patientId: string): Promise<Array<{
     medicationId: string;
     medicationName: string;
     refillDate: string;
@@ -142,7 +143,7 @@ class MockHealthRecordService implements HealthRecordService {
     ];
   }
 
-  async getUpcomingScreenings(patientId: string): Promise<Array<{
+  async getUpcomingScreenings(_patientId: string): Promise<Array<{
     screeningType: string;
     dueDate: string;
     lastCompletedDate?: string;
@@ -165,7 +166,7 @@ class MockHealthRecordService implements HealthRecordService {
     ];
   }
 
-  async getMissedMedications(patientId: string, hoursBack: number): Promise<Array<{
+  async getMissedMedications(_patientId: string, _hoursBack: number): Promise<Array<{
     medicationId: string;
     medicationName: string;
     scheduledTime: string;

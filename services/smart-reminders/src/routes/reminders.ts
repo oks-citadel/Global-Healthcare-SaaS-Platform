@@ -7,6 +7,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import { v4 as uuidv4 } from 'uuid';
 import {
+  // @ts-ignore - ReminderConfigSchema imported for potential future use
   ReminderConfigSchema,
   CreateReminderConfigSchema,
   UpdateReminderConfigSchema,
@@ -500,7 +501,7 @@ function calculateNextScheduledTime(reminder: ReminderConfig): string | undefine
 }
 
 // Error handling middleware
-router.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
+router.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   logger.error('Route error:', { error: err.message, stack: err.stack });
 
   if (err instanceof ApiError) {

@@ -13,8 +13,13 @@
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
+    "build:noturbo": "pnpm -r run build",
+    "build:services": "pnpm -r --filter \"@unified-health/*-service\" run build",
+    "build:packages": "pnpm -r --filter \"@unified-health/*\" --filter \"!@unified-health/*-service\" --filter \"!@unified-health/admin\" --filter \"!@unified-health/web\" --filter \"!@unified-health/mobile\" --filter \"!@unified-health/kiosk\" --filter \"!@unified-health/provider-portal\" run build",
+    "build:apps": "pnpm -r --filter \"@unified-health/admin\" --filter \"@unified-health/web\" --filter \"@unified-health/mobile\" --filter \"@unified-health/kiosk\" --filter \"@unified-health/provider-portal\" run build",
     "test": "turbo run test",
     "test:unit": "turbo run test:unit",
+    "test:unit:noturbo": "pnpm -r --parallel run test:unit",
     "test:integration": "turbo run test:integration",
     "test:coverage": "turbo run test:coverage",
     "test:e2e": "turbo run test:e2e",
@@ -42,8 +47,10 @@
     "test:report": "pnpm exec allure generate reports/allure-results -o reports/allure-report --clean && pnpm exec allure open reports/allure-report",
     "test:report:ui": "cd tests/ui && pnpm exec playwright show-report",
     "lint": "turbo run lint",
+    "lint:noturbo": "pnpm -r --parallel run lint",
     "lint:fix": "turbo run lint:fix",
     "typecheck": "turbo run typecheck",
+    "typecheck:noturbo": "pnpm -r --parallel run typecheck",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "clean": "turbo run clean && rm -rf node_modules",
@@ -78,7 +85,7 @@
     "lint-staged": "^16.2.7",
     "next": "^16.1.0",
     "prettier": "^3.1.1",
-    "turbo": "^2.6.3",
+    "turbo": "2.0.14",
     "typescript": "^5.3.3"
   },
   "lint-staged": {

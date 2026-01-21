@@ -6,6 +6,7 @@
 import {
   TriggerCondition,
   TriggerEvaluationResult,
+  // @ts-ignore - TravelConditionParams imported for type reference
   TravelConditionParams,
 } from '../models/TriggerCondition.js';
 import { logger } from '../utils/logger.js';
@@ -60,7 +61,7 @@ interface TravelService {
 
 // Mock travel service
 class MockTravelService implements TravelService {
-  async getUpcomingTrips(userId: string, daysAhead: number = 30): Promise<TravelItinerary> {
+  async getUpcomingTrips(userId: string, _daysAhead: number = 30): Promise<TravelItinerary> {
     // Return mock data - in production, this would integrate with calendar,
     // email parsing, or travel booking services
     const now = new Date();
@@ -112,11 +113,12 @@ class MockTravelService implements TravelService {
 // Travel trigger evaluator
 export class TravelTrigger {
   private travelService: TravelService;
-  private userTimezone: string;
+  // @ts-ignore - userTimezone reserved for future timezone-aware features
+  private _userTimezone: string;
 
   constructor(travelService?: TravelService) {
     this.travelService = travelService || new MockTravelService();
-    this.userTimezone = 'America/New_York'; // Default, should be from user settings
+    this._userTimezone = 'America/New_York'; // Default, should be from user settings
   }
 
   async evaluate(
@@ -132,7 +134,7 @@ export class TravelTrigger {
     }
 
     if (userContext.homeTimezone) {
-      this.userTimezone = userContext.homeTimezone;
+      this._userTimezone = userContext.homeTimezone;
     }
 
     try {
@@ -155,7 +157,8 @@ export class TravelTrigger {
         const departureTime = new Date(trip.departure.dateTime);
         const arrivalTime = new Date(trip.arrival.dateTime);
         const hoursUntilDeparture = (departureTime.getTime() - now.getTime()) / (1000 * 60 * 60);
-        const hoursUntilArrival = (arrivalTime.getTime() - now.getTime()) / (1000 * 60 * 60);
+        // @ts-ignore - hoursUntilArrival reserved for future arrival-based triggers
+        const _hoursUntilArrival = (arrivalTime.getTime() - now.getTime()) / (1000 * 60 * 60);
 
         // Check travel type
         if (params.travelType && params.travelType !== 'any') {

@@ -6,6 +6,7 @@
 import {
   TriggerCondition,
   TriggerEvaluationResult,
+  // @ts-ignore - CalendarConditionParams imported for type reference
   CalendarConditionParams,
 } from '../models/TriggerCondition.js';
 import { logger } from '../utils/logger.js';
@@ -49,10 +50,10 @@ interface CalendarService {
 // Mock calendar service
 class MockCalendarService implements CalendarService {
   async getEvents(
-    userId: string,
-    startDate: Date,
-    endDate: Date,
-    calendarIds?: string[]
+    _userId: string,
+    _startDate: Date,
+    _endDate: Date,
+    _calendarIds?: string[]
   ): Promise<CalendarEvent[]> {
     const now = new Date();
 

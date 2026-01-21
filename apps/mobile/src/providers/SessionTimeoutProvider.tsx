@@ -8,7 +8,6 @@ import React, {
   useContext,
   useCallback,
   useRef,
-  useEffect,
 } from "react";
 import {
   View,

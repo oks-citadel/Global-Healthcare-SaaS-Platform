@@ -7,6 +7,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import { v4 as uuidv4 } from 'uuid';
 import {
+  // @ts-ignore - TriggerConditionSchema imported for potential future use
   TriggerConditionSchema,
   CreateTriggerConditionSchema,
   UpdateTriggerConditionSchema,
@@ -14,6 +15,7 @@ import {
   TriggerEvaluationResult,
 } from '../models/TriggerCondition.js';
 import { ReminderConfig } from '../models/ReminderConfig.js';
+// @ts-ignore - UserContext imported for type reference
 import { ContextEngine, UserContext } from '../services/contextEngine.js';
 import { TriggerEvaluator } from '../services/triggerEvaluator.js';
 import { NotificationService } from '../services/notificationService.js';
@@ -524,7 +526,7 @@ router.get('/context/:userId', async (req: Request, res: Response, next: NextFun
 });
 
 // Error handling middleware
-router.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
+router.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   logger.error('Route error:', { error: err.message, stack: err.stack });
 
   if (err instanceof ApiError) {

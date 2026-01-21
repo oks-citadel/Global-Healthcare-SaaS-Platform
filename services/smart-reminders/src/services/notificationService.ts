@@ -69,7 +69,7 @@ class MockSmsProvider implements SmsProvider {
 }
 
 class MockEmailProvider implements EmailProvider {
-  async send(email: string, subject: string, body: string) {
+  async send(email: string, subject: string, _body: string) {
     logger.info(`[Mock Email] Sending to ${email}: ${subject}`);
     return { success: true, messageId: `email-${Date.now()}` };
   }

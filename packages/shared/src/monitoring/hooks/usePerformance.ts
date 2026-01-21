@@ -61,7 +61,7 @@ export function usePerformance(options: UsePerformanceOptions): UsePerformanceRe
 
     collector.recordMetric(metric);
     reporter?.reportCustomMetric(metric);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   // Track render time
   useEffect(() => {

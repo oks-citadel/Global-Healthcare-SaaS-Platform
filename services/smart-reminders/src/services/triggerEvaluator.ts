@@ -258,7 +258,7 @@ export class TriggerEvaluator {
     }
   }
 
-  private getTodayTriggerCount(trigger: TriggerCondition): number {
+  private getTodayTriggerCount(_trigger: TriggerCondition): number {
     // In a real implementation, this would query the database
     // For now, return 0 (would need to track trigger history)
     return 0;

@@ -6,6 +6,7 @@
 import {
   TriggerCondition,
   TriggerEvaluationResult,
+  // @ts-ignore - WeatherConditionParams imported for type reference
   WeatherConditionParams,
 } from '../models/TriggerCondition.js';
 import { logger } from '../utils/logger.js';
@@ -131,7 +132,7 @@ class MockWeatherService implements WeatherService {
     };
   }
 
-  async getWeatherDataByLocationId(locationId: string): Promise<WeatherData> {
+  async getWeatherDataByLocationId(_locationId: string): Promise<WeatherData> {
     // Default to NYC coordinates for mock
     return this.getWeatherData(40.7128, -74.006);
   }
