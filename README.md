@@ -68,7 +68,7 @@ This section outlines the standards for contributing to and maintaining this doc
 - [1. Production Status](#1-production-status)
 - [2. Executive Summary](#2-executive-summary)
 - [3. Platform at a Glance](#3-platform-at-a-glance)
-- [4. Platform Capabilities (21 Enterprise Modules)](#4-platform-capabilities-21-enterprise-modules)
+- [4. Platform Capabilities (22 Enterprise Modules)](#4-platform-capabilities-21-enterprise-modules)
   - [4.1 Clinical Operations](#41-clinical-operations)
   - [4.2 Compliance & Security](#42-compliance--security)
   - [4.3 Data & Analytics](#43-data--analytics)
@@ -102,14 +102,14 @@ This section outlines the standards for contributing to and maintaining this doc
 
 | Component            | Status              | Details                                     |
 | -------------------- | ------------------- | ------------------------------------------- |
-| **Backend Services** | ✅ Production Ready | 21 enterprise modules fully operational     |
+| **Backend Services** | ✅ Production Ready | 22 enterprise modules fully operational     |
 | **CI/CD Pipelines**  | ✅ Operational      | GitHub Actions workflows configured         |
 | **Compliance**       | ✅ Compliant        | HIPAA, GDPR, POPIA frameworks implemented   |
 | **Frontend Apps**    | ✅ Production Ready | 5 applications with real API integration    |
 | **Infrastructure**   | ✅ Configured       | AWS/Azure Terraform modules ready           |
 | **Security**         | ✅ Hardened         | Rate limiting, JWT auth, encryption enabled |
 
-### 1.2 Services Status (21 Enterprise Modules)
+### 1.2 Services Status (22 Enterprise Modules)
 
 | Service                    | Port | Status   | Database           | Rate Limiting |
 | -------------------------- | ---- | -------- | ------------------ | ------------- |
@@ -120,7 +120,8 @@ This section outlines the standards for contributing to and maintaining this doc
 | Chronic Care Service       | 3003 | ✅ Ready | PostgreSQL         | ✅            |
 | Clinical Trials Service    | 3014 | ✅ Ready | PostgreSQL         | ✅            |
 | Core API                   | 8080 | ✅ Ready | PostgreSQL         | ✅            |
-| Data Normalization Engine  | 3024 | ✅ Ready | PostgreSQL         | ✅            |
+| Data Normalization Engine  | N/A  | ✅ Ready | Package (FHIR)     | N/A           |
+| Interoperability Service   | 3025 | ✅ Ready | PostgreSQL         | ✅            |
 | Denial Management Service  | 3010 | ✅ Ready | PostgreSQL         | ✅            |
 | Enviro Health Service      | 3022 | ✅ Ready | PostgreSQL         | ✅            |
 | Home Health Service        | 3019 | ✅ Ready | PostgreSQL         | ✅            |
@@ -268,7 +269,7 @@ A unified, enterprise-grade healthcare platform connecting patients, providers, 
 | **Cloud Regions** | Multi-Region (Africa, Americas, Asia-Pacific, Europe, Middle East) |
 | **Compliance Frameworks** | 5 (GDPR, HIPAA, HITRUST, POPIA, SOC 2) |
 | **Data Standards** | 6+ Healthcare Standards |
-| **Integrated Modules** | 21 Enterprise Modules |
+| **Integrated Modules** | 22 Enterprise Modules |
 | **Interoperability** | C-CDA, DICOM, FHIR R4, HL7v2, NCPDP, X12 EDI |
 
 ### 3.1 How The Platform Works
@@ -287,7 +288,7 @@ A unified, enterprise-grade healthcare platform connecting patients, providers, 
 
 ---
 
-## 4. Platform Capabilities (21 Enterprise Modules)
+## 4. Platform Capabilities (22 Enterprise Modules)
 
 ### 4.1 Clinical Operations
 
@@ -654,7 +655,7 @@ Our EHR telehealth integration enables healthcare providers to conduct virtual v
          |                       |                       |
          v                       v                       v
 +-----------------------------------------------------------------------------+
-|                   MICROSERVICES LAYER (21 Enterprise Modules)                |
+|                   MICROSERVICES LAYER (22 Enterprise Modules)                |
 |                                                                              |
 |  +---------------- DOMAIN 1: CLINICAL OPERATIONS -----------------------+   |
 |  | +-----------+ +-----------+ +-----------+ +-----------+              |   |
@@ -745,7 +746,7 @@ Our EHR telehealth integration enables healthcare providers to conduct virtual v
 
 ## 9. Microservices Architecture (Detailed)
 
-The platform consists of **21 enterprise microservices** organized across 6 operational domains, each following Domain-Driven Design principles with independent databases, APIs, and deployment lifecycles.
+The platform consists of **22 enterprise microservices** organized across 6 operational domains, each following Domain-Driven Design principles with independent databases, APIs, and deployment lifecycles.
 
 ### 9.1 Core Infrastructure Services
 
