@@ -4,12 +4,16 @@
  * Features: Retry logic, rate limiting, error handling, sandbox mode support
  */
 
-import {
-  SESClient,
-  SendEmailCommand,
-  GetSendQuotaCommand,
-  type GetSendQuotaCommandOutput,
-} from '@aws-sdk/client-ses';
+import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const { GetSendQuotaCommand } = require('@aws-sdk/client-ses');
+
+// Type definition for GetSendQuotaCommand output
+interface GetSendQuotaCommandOutput {
+  Max24HourSend?: number;
+  MaxSendRate?: number;
+  SentLast24Hours?: number;
+}
 import { logger } from '../../utils/logger.js';
 import {
   EmailOptions,
