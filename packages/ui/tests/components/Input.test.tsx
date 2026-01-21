@@ -10,17 +10,17 @@ describe('Input Component', () => {
 
   it('should handle value changes', () => {
     const handleChange = vi.fn();
-    render(<Input value="" onChange={handleChange} />);
+    render(<Input value="" onChange={handleChange} placeholder="test-input" />);
 
-    const input = screen.getByRole('textbox');
+    const input = screen.getByPlaceholderText('test-input');
     fireEvent.change(input, { target: { value: 'test' } });
 
     expect(handleChange).toHaveBeenCalled();
   });
 
   it('should be disabled when disabled prop is true', () => {
-    render(<Input disabled />);
-    expect(screen.getByRole('textbox')).toBeDisabled();
+    render(<Input disabled placeholder="disabled-input" />);
+    expect(screen.getByPlaceholderText('disabled-input')).toBeDisabled();
   });
 
   it('should show error state', () => {
@@ -34,24 +34,26 @@ describe('Input Component', () => {
   });
 
   it('should support different input types', () => {
-    const { rerender } = render(<Input type="text" />);
-    expect(screen.getByRole('textbox')).toHaveAttribute('type', 'text');
+    const { rerender, container } = render(<Input type="text" placeholder="type-test" />);
+    expect(screen.getByPlaceholderText('type-test')).toHaveAttribute('type', 'text');
 
-    rerender(<Input type="password" />);
-    expect(screen.getByRole('textbox')).toHaveAttribute('type', 'password');
+    rerender(<Input type="password" placeholder="type-test" />);
+    // Password inputs don't have textbox role, so query by placeholder
+    expect(screen.getByPlaceholderText('type-test')).toHaveAttribute('type', 'password');
 
-    rerender(<Input type="email" />);
-    expect(screen.getByRole('textbox')).toHaveAttribute('type', 'email');
+    rerender(<Input type="email" placeholder="type-test" />);
+    expect(screen.getByPlaceholderText('type-test')).toHaveAttribute('type', 'email');
   });
 
   it('should show required indicator', () => {
     render(<Input label="Email" required />);
-    expect(screen.getByText(/\*/)).toBeInTheDocument();
+    expect(screen.getByText('Email')).toBeInTheDocument();
+    expect(screen.getByText('*')).toBeInTheDocument();
   });
 
   it('should apply custom className', () => {
-    render(<Input className="custom-input" />);
-    expect(screen.getByRole('textbox')).toHaveClass('custom-input');
+    render(<Input className="custom-input" placeholder="custom-class-input" />);
+    expect(screen.getByPlaceholderText('custom-class-input')).toHaveClass('custom-input');
   });
 
   it('should render with helper text', () => {
@@ -60,7 +62,7 @@ describe('Input Component', () => {
   });
 
   it('should support maxLength attribute', () => {
-    render(<Input maxLength={10} />);
-    expect(screen.getByRole('textbox')).toHaveAttribute('maxLength', '10');
+    render(<Input maxLength={10} placeholder="maxlength-input" />);
+    expect(screen.getByPlaceholderText('maxlength-input')).toHaveAttribute('maxLength', '10');
   });
 });

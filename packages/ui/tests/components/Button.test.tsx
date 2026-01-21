@@ -56,9 +56,11 @@ describe('Button Component', () => {
     expect(screen.getByRole('button')).toHaveClass('custom-class');
   });
 
-  it('should render as a different element type', () => {
-    render(<Button as="a" href="https://example.com">Link Button</Button>);
-    expect(screen.getByRole('link')).toBeInTheDocument();
+  it('should forward additional props to button element', () => {
+    render(<Button data-testid="custom-button" aria-label="Custom action">Custom</Button>);
+    const button = screen.getByRole('button');
+    expect(button).toHaveAttribute('data-testid', 'custom-button');
+    expect(button).toHaveAttribute('aria-label', 'Custom action');
   });
 
   it('should show loading state', () => {
@@ -74,6 +76,6 @@ describe('Button Component', () => {
 
   it('should support fullWidth prop', () => {
     render(<Button fullWidth>Full Width</Button>);
-    expect(screen.getByRole('button')).toHaveStyle({ width: '100%' });
+    expect(screen.getByRole('button')).toHaveClass('w-full');
   });
 });

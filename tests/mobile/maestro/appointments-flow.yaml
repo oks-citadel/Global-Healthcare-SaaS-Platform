@@ -1,0 +1,146 @@
+# Maestro E2E Test - Appointments Flow
+# Run: maestro test tests/mobile/maestro/appointments-flow.yaml
+
+appId: com.unifiedhealth.mobile
+---
+
+# Setup: Login first
+- launchApp:
+    clearState: true
+
+- tapOn: "Email"
+- inputText: "patient@test.unified.health"
+- tapOn: "Password"
+- inputText: "TestPassword123!"
+- tapOn: "Sign In"
+
+- waitForAnimationToEnd
+- assertVisible:
+    text: "Welcome"
+    timeout: 10000
+
+---
+# Test: View Appointments List
+- tapOn:
+    id: "appointments-tab"
+
+- assertVisible: "My Appointments"
+
+# Check for appointment cards or empty state
+- assertVisible:
+    anyOf:
+      - "No upcoming appointments"
+      - id: "appointment-card"
+    timeout: 5000
+
+---
+# Test: View Appointment Details
+- tapOn:
+    id: "appointments-tab"
+
+- waitForAnimationToEnd
+
+# If appointments exist, tap first one
+- runFlow:
+    when:
+      visible:
+        id: "appointment-card"
+    commands:
+      - tapOn:
+          id: "appointment-card"
+          index: 0
+      - assertVisible: "Appointment Details"
+      - assertVisible: "Provider"
+      - assertVisible: "Date"
+      - assertVisible: "Time"
+      - back
+
+---
+# Test: Filter Appointments
+- tapOn:
+    id: "appointments-tab"
+
+- waitForAnimationToEnd
+
+# Open filter
+- tapOn:
+    id: "filter-button"
+    optional: true
+
+- runFlow:
+    when:
+      visible: "Filter"
+    commands:
+      - tapOn: "Upcoming"
+      - tapOn: "Apply"
+      - waitForAnimationToEnd
+
+      - tapOn:
+          id: "filter-button"
+      - tapOn: "Past"
+      - tapOn: "Apply"
+      - waitForAnimationToEnd
+
+      - tapOn:
+          id: "filter-button"
+      - tapOn: "All"
+      - tapOn: "Apply"
+
+---
+# Test: Cancel Appointment
+- tapOn:
+    id: "appointments-tab"
+
+- waitForAnimationToEnd
+
+- runFlow:
+    when:
+      visible:
+        id: "appointment-card"
+    commands:
+      - tapOn:
+          id: "appointment-card"
+          index: 0
+      - assertVisible: "Appointment Details"
+
+      - scrollUntilVisible:
+          element: "Cancel Appointment"
+          direction: DOWN
+
+      - tapOn: "Cancel Appointment"
+      - assertVisible: "Cancel this appointment?"
+
+      # Cancel the cancellation (don't actually cancel)
+      - tapOn: "No, Keep It"
+      - assertVisible: "Appointment Details"
+      - back
+
+---
+# Test: Reschedule Appointment
+- tapOn:
+    id: "appointments-tab"
+
+- waitForAnimationToEnd
+
+- runFlow:
+    when:
+      visible:
+        id: "appointment-card"
+    commands:
+      - tapOn:
+          id: "appointment-card"
+          index: 0
+
+      - scrollUntilVisible:
+          element: "Reschedule"
+          direction: DOWN
+          optional: true
+
+      - runFlow:
+          when:
+            visible: "Reschedule"
+          commands:
+            - tapOn: "Reschedule"
+            - assertVisible: "Select New Date"
+            - back
+            - back

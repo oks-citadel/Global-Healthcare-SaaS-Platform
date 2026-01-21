@@ -1,0 +1,350 @@
+name: QA Nightly Regression
+
+on:
+  schedule:
+    # Run at 2 AM UTC every day
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      full_suite:
+        description: 'Run full regression suite'
+        required: false
+        default: 'true'
+        type: boolean
+
+env:
+  NODE_VERSION: '22.x'
+  PNPM_VERSION: '9.0.0'
+
+jobs:
+  # ============================================
+  # Setup Test Environment
+  # ============================================
+  setup:
+    name: Setup Test Environment
+    runs-on: ubuntu-latest
+    outputs:
+      timestamp: ${{ steps.timestamp.outputs.value }}
+
+    steps:
+      - name: Generate timestamp
+        id: timestamp
+        run: echo "value=$(date +%Y%m%d_%H%M%S)" >> $GITHUB_OUTPUT
+
+  # ============================================
+  # Full API Regression Tests
+  # ============================================
+  api-regression:
+    name: API Full Regression
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: setup
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: unified_health_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Setup database
+        run: |
+          pnpm --filter @unified-health/api db:generate
+          pnpm --filter @unified-health/api db:migrate
+          pnpm --filter @unified-health/api db:seed || true
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/unified_health_test
+
+      - name: Start API server
+        run: |
+          pnpm --filter @unified-health/api build
+          pnpm --filter @unified-health/api start &
+          sleep 10
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/unified_health_test
+          REDIS_URL: redis://localhost:6379
+          JWT_SECRET: test-jwt-secret
+          JWT_REFRESH_SECRET: test-jwt-refresh-secret
+          NODE_ENV: test
+
+      - name: Wait for API
+        run: timeout 60 bash -c 'until curl -s http://localhost:3001/health; do sleep 2; done'
+
+      - name: Run full API regression
+        run: |
+          cd tests/api
+          pnpm vitest run --config vitest.config.ts --reporter=json --reporter=junit --outputFile.json=../../reports/api/regression-results.json --outputFile.junit=../../reports/api/junit.xml
+        env:
+          TEST_API_URL: http://localhost:3001/api/v1
+          TEST_DATABASE_URL: postgresql://test:test@localhost:5432/unified_health_test
+
+      - name: Generate Allure results
+        run: |
+          mkdir -p reports/api/allure-results
+          cp reports/api/junit.xml reports/api/allure-results/
+        if: always()
+
+      - name: Upload API regression results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: api-regression-${{ needs.setup.outputs.timestamp }}
+          path: reports/api/
+          retention-days: 30
+
+  # ============================================
+  # Full UI Regression Tests
+  # ============================================
+  ui-regression:
+    name: UI Full Regression
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    needs: setup
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [web-chromium, web-firefox, web-webkit, admin-chromium, provider-chromium, kiosk-chromium]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps
+
+      - name: Build apps
+        run: |
+          pnpm --filter @unified-health/web build || true
+          pnpm --filter @unified-health/admin build || true
+          pnpm --filter @unified-health/provider-portal build || true
+          pnpm --filter @unified-health/kiosk build || true
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:3001/api/v1
+
+      - name: Start apps
+        run: |
+          pnpm --filter @unified-health/web start &
+          pnpm --filter @unified-health/admin start &
+          pnpm --filter @unified-health/provider-portal start &
+          pnpm --filter @unified-health/kiosk start &
+          sleep 15
+        env:
+          NODE_ENV: test
+
+      - name: Run Playwright tests
+        run: |
+          cd tests/ui
+          pnpm exec playwright test --project=${{ matrix.project }} --reporter=html --reporter=json --reporter=junit
+        env:
+          CI: true
+          TEST_BASE_URL: http://localhost:3000
+          WEB_URL: http://localhost:3000
+          ADMIN_URL: http://localhost:3001
+          PROVIDER_URL: http://localhost:3002
+          KIOSK_URL: http://localhost:3003
+
+      - name: Upload Playwright results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-${{ matrix.project }}-${{ needs.setup.outputs.timestamp }}
+          path: |
+            tests/ui/playwright-report/
+            tests/ui/test-results/
+            reports/ui/
+          retention-days: 30
+
+  # ============================================
+  # Performance Tests (k6)
+  # ============================================
+  performance-tests:
+    name: Performance Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: setup
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: unified_health_test
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install k6
+        run: |
+          sudo gpg -k
+          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install k6
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Setup and start API
+        run: |
+          pnpm --filter @unified-health/api db:generate
+          pnpm --filter @unified-health/api db:migrate
+          pnpm --filter @unified-health/api build
+          pnpm --filter @unified-health/api start &
+          sleep 10
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/unified_health_test
+          REDIS_URL: redis://localhost:6379
+          JWT_SECRET: test-jwt-secret
+          NODE_ENV: test
+
+      - name: Wait for API
+        run: timeout 60 bash -c 'until curl -s http://localhost:3001/health; do sleep 2; done'
+
+      - name: Run k6 smoke test
+        run: |
+          cd tests/perf/k6
+          k6 run --out json=../../../reports/perf/k6-results.json smoke.js
+        env:
+          K6_API_URL: http://localhost:3001/api/v1
+
+      - name: Run k6 load test
+        run: |
+          cd tests/perf/k6
+          k6 run --out json=../../../reports/perf/k6-load-results.json load.js
+        env:
+          K6_API_URL: http://localhost:3001/api/v1
+
+      - name: Upload performance results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: perf-results-${{ needs.setup.outputs.timestamp }}
+          path: reports/perf/
+          retention-days: 30
+
+  # ============================================
+  # Generate and Publish Reports
+  # ============================================
+  publish-reports:
+    name: Publish Reports
+    runs-on: ubuntu-latest
+    needs: [api-regression, ui-regression, performance-tests]
+    if: always()
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: all-artifacts/
+
+      - name: Setup Allure
+        run: |
+          wget https://github.com/allure-framework/allure2/releases/download/2.25.0/allure-2.25.0.tgz
+          tar -xzf allure-2.25.0.tgz
+          echo "$PWD/allure-2.25.0/bin" >> $GITHUB_PATH
+
+      - name: Collect Allure results
+        run: |
+          mkdir -p allure-results
+          find all-artifacts -name "allure-results" -type d -exec cp -r {}/* allure-results/ \; || true
+          find all-artifacts -name "*.xml" -exec cp {} allure-results/ \; || true
+
+      - name: Generate Allure report
+        run: |
+          allure generate allure-results -o allure-report --clean
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        if: github.ref == 'refs/heads/main'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./allure-report
+          destination_dir: qa-reports/${{ needs.setup.outputs.timestamp }}
+
+      - name: Upload Allure report
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report-${{ needs.setup.outputs.timestamp }}
+          path: allure-report/
+          retention-days: 90
+
+      - name: Summary
+        run: |
+          echo "## Nightly QA Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Timestamp:** $(date)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Results" >> $GITHUB_STEP_SUMMARY
+          echo "- API Regression: ${{ needs.api-regression.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- UI Regression: ${{ needs.ui-regression.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Performance: ${{ needs.performance-tests.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "[View Full Report](https://\${{ github.repository_owner }}.github.io/\${{ github.event.repository.name }}/qa-reports/\${{ needs.setup.outputs.timestamp }})" >> $GITHUB_STEP_SUMMARY

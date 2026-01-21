@@ -3,18 +3,18 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { Modal } from '../../src/components/Modal';
 
 describe('Modal Component', () => {
-  it('should render modal when open is true', () => {
+  it('should render modal when isOpen is true', () => {
     render(
-      <Modal open onClose={() => {}}>
+      <Modal isOpen onClose={() => {}}>
         <div>Modal Content</div>
       </Modal>
     );
     expect(screen.getByText('Modal Content')).toBeInTheDocument();
   });
 
-  it('should not render when open is false', () => {
+  it('should not render when isOpen is false', () => {
     render(
-      <Modal open={false} onClose={() => {}}>
+      <Modal isOpen={false} onClose={() => {}}>
         <div>Modal Content</div>
       </Modal>
     );
@@ -24,12 +24,12 @@ describe('Modal Component', () => {
   it('should call onClose when close button is clicked', () => {
     const handleClose = vi.fn();
     render(
-      <Modal open onClose={handleClose}>
+      <Modal isOpen onClose={handleClose}>
         <div>Modal Content</div>
       </Modal>
     );
 
-    const closeButton = screen.getByRole('button', { name: /close/i });
+    const closeButton = screen.getByRole('button', { name: /close modal/i });
     fireEvent.click(closeButton);
 
     expect(handleClose).toHaveBeenCalledTimes(1);
@@ -38,7 +38,7 @@ describe('Modal Component', () => {
   it('should call onClose when backdrop is clicked', () => {
     const handleClose = vi.fn();
     render(
-      <Modal open onClose={handleClose}>
+      <Modal isOpen onClose={handleClose}>
         <div>Modal Content</div>
       </Modal>
     );
@@ -52,7 +52,7 @@ describe('Modal Component', () => {
   it('should not close when clicking inside modal content', () => {
     const handleClose = vi.fn();
     render(
-      <Modal open onClose={handleClose}>
+      <Modal isOpen onClose={handleClose}>
         <div>Modal Content</div>
       </Modal>
     );
@@ -63,7 +63,7 @@ describe('Modal Component', () => {
 
   it('should render modal with title', () => {
     render(
-      <Modal open onClose={() => {}} title="Modal Title">
+      <Modal isOpen onClose={() => {}} title="Modal Title">
         <div>Modal Content</div>
       </Modal>
     );
@@ -72,24 +72,24 @@ describe('Modal Component', () => {
 
   it('should support different sizes', () => {
     const { rerender } = render(
-      <Modal open onClose={() => {}} size="sm">
+      <Modal isOpen onClose={() => {}} size="sm">
         <div>Small Modal</div>
       </Modal>
     );
     expect(screen.getByText('Small Modal')).toBeInTheDocument();
 
     rerender(
-      <Modal open onClose={() => {}} size="lg">
+      <Modal isOpen onClose={() => {}} size="lg">
         <div>Large Modal</div>
       </Modal>
     );
     expect(screen.getByText('Large Modal')).toBeInTheDocument();
   });
 
-  it('should prevent closing when closeOnBackdrop is false', () => {
+  it('should prevent closing when closeOnOverlay is false', () => {
     const handleClose = vi.fn();
     render(
-      <Modal open onClose={handleClose} closeOnBackdrop={false}>
+      <Modal isOpen onClose={handleClose} closeOnOverlay={false}>
         <div>Modal Content</div>
       </Modal>
     );

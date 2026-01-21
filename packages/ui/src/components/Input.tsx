@@ -25,6 +25,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
       disabled,
       type = 'text',
       id,
+      required,
       ...props
     },
     ref
@@ -56,6 +57,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             className="block text-sm font-medium text-gray-700"
           >
             {label}
+            {required && <span className="text-error-500 ml-1">*</span>}
           </label>
         )}
 
@@ -71,6 +73,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             id={inputId}
             type={type}
             disabled={disabled}
+            required={required}
             className={clsx(
               baseInputStyles,
               sizeStyles[inputSize],

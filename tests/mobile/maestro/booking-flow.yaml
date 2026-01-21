@@ -1,0 +1,205 @@
+# Maestro E2E Test - Appointment Booking Flow
+# Run: maestro test tests/mobile/maestro/booking-flow.yaml
+
+appId: com.unifiedhealth.mobile
+---
+
+# Setup: Login first
+- launchApp:
+    clearState: true
+
+- tapOn: "Email"
+- inputText: "patient@test.unified.health"
+- tapOn: "Password"
+- inputText: "TestPassword123!"
+- tapOn: "Sign In"
+
+- waitForAnimationToEnd
+- assertVisible:
+    text: "Welcome"
+    timeout: 10000
+
+---
+# Test: Start Booking from Dashboard
+- tapOn:
+    anyOf:
+      - "Book Appointment"
+      - id: "book-appointment-button"
+
+- assertVisible:
+    anyOf:
+      - "Select Provider"
+      - "Choose a Provider"
+    timeout: 5000
+
+---
+# Test: Complete Booking Flow
+- launchApp
+
+# Navigate to booking
+- tapOn:
+    anyOf:
+      - "Book Appointment"
+      - id: "book-appointment-button"
+
+- waitForAnimationToEnd
+
+# Step 1: Select Provider
+- assertVisible: "Select Provider"
+
+- runFlow:
+    when:
+      visible:
+        id: "provider-card"
+    commands:
+      - tapOn:
+          id: "provider-card"
+          index: 0
+      - tapOn:
+          anyOf:
+            - "Continue"
+            - "Next"
+
+# Step 2: Select Appointment Type
+- assertVisible: "Appointment Type"
+
+- tapOn:
+    anyOf:
+      - "Video Visit"
+      - "In-Person"
+      - id: "appointment-type-video"
+
+- tapOn:
+    anyOf:
+      - "Continue"
+      - "Next"
+
+# Step 3: Select Date
+- assertVisible:
+    anyOf:
+      - "Select Date"
+      - "Choose Date"
+
+# Select a date (tap on first available)
+- tapOn:
+    id: "available-date"
+    index: 0
+    optional: true
+
+# Fallback: tap on calendar day
+- tapOn:
+    className: ".*CalendarDay.*"
+    index: 7
+    optional: true
+
+- tapOn:
+    anyOf:
+      - "Continue"
+      - "Next"
+
+# Step 4: Select Time Slot
+- assertVisible:
+    anyOf:
+      - "Select Time"
+      - "Available Times"
+
+- tapOn:
+    id: "time-slot"
+    index: 0
+
+- tapOn:
+    anyOf:
+      - "Continue"
+      - "Next"
+
+# Step 5: Enter Reason
+- assertVisible:
+    anyOf:
+      - "Reason for Visit"
+      - "Visit Reason"
+
+- tapOn:
+    anyOf:
+      - id: "reason-input"
+      - "Describe your symptoms"
+
+- inputText: "Annual checkup and wellness visit"
+
+- tapOn:
+    anyOf:
+      - "Continue"
+      - "Next"
+
+# Step 6: Review and Confirm
+- assertVisible:
+    anyOf:
+      - "Review"
+      - "Confirm Appointment"
+
+- assertVisible: "Annual checkup"
+
+- tapOn:
+    anyOf:
+      - "Confirm Booking"
+      - "Book Appointment"
+
+# Step 7: Success
+- assertVisible:
+    anyOf:
+      - "Appointment Confirmed"
+      - "Booking Successful"
+      - "Success"
+    timeout: 10000
+
+- tapOn:
+    anyOf:
+      - "Done"
+      - "View Appointments"
+      - "OK"
+
+---
+# Test: Booking Validation
+- launchApp
+
+- tapOn:
+    anyOf:
+      - "Book Appointment"
+      - id: "book-appointment-button"
+
+- waitForAnimationToEnd
+
+# Try to proceed without selecting provider
+- tapOn:
+    anyOf:
+      - "Continue"
+      - "Next"
+
+- assertVisible:
+    anyOf:
+      - "Please select a provider"
+      - "Provider required"
+
+---
+# Test: View Provider Details During Booking
+- launchApp
+
+- tapOn:
+    anyOf:
+      - "Book Appointment"
+      - id: "book-appointment-button"
+
+- waitForAnimationToEnd
+
+# Tap on provider info icon
+- tapOn:
+    id: "provider-info"
+    index: 0
+    optional: true
+
+- runFlow:
+    when:
+      visible: "Provider Details"
+    commands:
+      - assertVisible: "Specialties"
+      - assertVisible: "Languages"
+      - back

@@ -1,0 +1,128 @@
+# Maestro E2E Test - Authentication Flow
+# Run: maestro test tests/mobile/maestro/auth-flow.yaml
+
+appId: com.unifiedhealth.mobile
+---
+
+# Test: Login Flow
+- launchApp
+
+- assertVisible: "Welcome"
+- assertVisible: "Login"
+
+# Enter credentials
+- tapOn: "Email"
+- inputText: "patient@test.unified.health"
+
+- tapOn: "Password"
+- inputText: "TestPassword123!"
+
+# Submit login
+- tapOn: "Sign In"
+
+# Wait for dashboard
+- waitForAnimationToEnd
+- assertVisible:
+    text: "Welcome"
+    timeout: 10000
+
+# Verify dashboard elements
+- assertVisible: "Appointments"
+- assertVisible: "Messages"
+
+# Test: Logout Flow
+- tapOn:
+    id: "profile-tab"
+- assertVisible: "Settings"
+
+- scrollUntilVisible:
+    element: "Sign Out"
+    direction: DOWN
+
+- tapOn: "Sign Out"
+
+# Confirm logout
+- tapOn: "Confirm"
+
+# Should be back at login
+- assertVisible: "Login"
+
+---
+# Test: Login Validation
+- launchApp:
+    clearState: true
+
+# Try empty submission
+- tapOn: "Sign In"
+- assertVisible: "Email is required"
+
+# Try invalid email
+- tapOn: "Email"
+- inputText: "invalid-email"
+- tapOn: "Sign In"
+- assertVisible: "Invalid email"
+
+# Clear and try invalid password
+- clearText: "Email"
+- inputText: "patient@test.unified.health"
+- tapOn: "Password"
+- inputText: "short"
+- tapOn: "Sign In"
+- assertVisible: "Password must be at least"
+
+---
+# Test: Forgot Password
+- launchApp:
+    clearState: true
+
+- tapOn: "Forgot Password"
+- assertVisible: "Reset Password"
+
+- tapOn: "Email"
+- inputText: "patient@test.unified.health"
+
+- tapOn: "Send Reset Link"
+
+- assertVisible:
+    text: "Check your email"
+    timeout: 5000
+
+- tapOn: "Back to Login"
+- assertVisible: "Login"
+
+---
+# Test: Registration Flow
+- launchApp:
+    clearState: true
+
+- tapOn: "Create Account"
+- assertVisible: "Register"
+
+# Fill registration form
+- tapOn: "First Name"
+- inputText: "Test"
+
+- tapOn: "Last Name"
+- inputText: "User"
+
+- tapOn: "Email"
+- inputText: "newuser@test.unified.health"
+
+- tapOn: "Password"
+- inputText: "SecurePassword123!"
+
+- tapOn: "Confirm Password"
+- inputText: "SecurePassword123!"
+
+# Accept terms
+- tapOn:
+    id: "terms-checkbox"
+
+- tapOn: "Create Account"
+
+# Should show verification message or dashboard
+- assertVisible:
+    anyOf:
+      - "Verify your email"
+      - "Welcome"
+    timeout: 10000

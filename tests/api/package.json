@@ -1,0 +1,23 @@
+{
+  "name": "@unified-health/tests-api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:contracts": "vitest run contracts/",
+    "test:integration": "vitest run integration/",
+    "test:regression": "vitest run regression/",
+    "test:smoke": "vitest run smoke/",
+    "test:all": "vitest run"
+  },
+  "devDependencies": {
+    "vitest": "^2.1.0",
+    "@types/node": "^20.19.0",
+    "typescript": "^5.3.3",
+    "ajv": "^8.17.0",
+    "ajv-formats": "^3.0.0"
+  }
+}

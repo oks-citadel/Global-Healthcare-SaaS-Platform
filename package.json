@@ -18,6 +18,29 @@
     "test:integration": "turbo run test:integration",
     "test:coverage": "turbo run test:coverage",
     "test:e2e": "turbo run test:e2e",
+    "test:api": "cd tests/api && pnpm vitest run",
+    "test:api:watch": "cd tests/api && pnpm vitest",
+    "test:api:smoke": "cd tests/api && pnpm vitest run smoke/",
+    "test:api:contracts": "cd tests/api && pnpm vitest run contracts/",
+    "test:api:integration": "cd tests/api && pnpm vitest run integration/",
+    "test:api:regression": "cd tests/api && pnpm vitest run regression/",
+    "test:ui": "cd tests/ui && pnpm exec playwright test",
+    "test:ui:smoke": "cd tests/ui && pnpm exec playwright test specs/smoke/",
+    "test:ui:web": "cd tests/ui && pnpm exec playwright test --project=web-chromium",
+    "test:ui:admin": "cd tests/ui && pnpm exec playwright test --project=admin-chromium",
+    "test:ui:provider": "cd tests/ui && pnpm exec playwright test --project=provider-chromium",
+    "test:ui:kiosk": "cd tests/ui && pnpm exec playwright test --project=kiosk-chromium",
+    "test:ui:a11y": "cd tests/ui && pnpm exec playwright test specs/accessibility/",
+    "test:ui:visual": "cd tests/ui && pnpm exec playwright test specs/visual/",
+    "test:ui:headed": "cd tests/ui && pnpm exec playwright test --headed",
+    "test:ui:debug": "cd tests/ui && pnpm exec playwright test --debug",
+    "test:perf": "cd tests/perf/k6 && k6 run smoke.js",
+    "test:perf:load": "cd tests/perf/k6 && k6 run load.js",
+    "test:smoke": "pnpm test:api:smoke && pnpm test:ui:smoke",
+    "test:regression": "pnpm test:api:regression && pnpm test:ui",
+    "test:seed": "pnpm ts-node tests/scripts/seed-test-data.ts",
+    "test:report": "pnpm exec allure generate reports/allure-results -o reports/allure-report --clean && pnpm exec allure open reports/allure-report",
+    "test:report:ui": "cd tests/ui && pnpm exec playwright show-report",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",
     "typecheck": "turbo run typecheck",
@@ -27,9 +50,11 @@
     "db:migrate": "pnpm --filter @unified-health/api db:migrate",
     "db:seed": "pnpm --filter @unified-health/api db:seed",
     "db:generate": "pnpm --filter @unified-health/api db:generate",
+    "db:reset": "pnpm --filter @unified-health/api db:reset",
     "docker:build": "docker compose build",
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
+    "docker:test": "docker compose -f docker-compose.test.yml up -d",
     "prepare": "husky install",
     "security:scan": "bash scripts/security-scan.sh",
     "security:agent": "npx ts-node tools/security-agent/scan.ts",
@@ -42,7 +67,9 @@
     "security:pr": "pnpm security:audit && pnpm security:agent && pnpm security:abuse-tests",
     "security:all": "pnpm security:audit && pnpm security:secrets && pnpm security:agent && pnpm lint && pnpm typecheck",
     "sbom:generate": "echo 'Use CI pipeline or run: bash scripts/generate-sbom.sh (requires Syft)'",
-    "sbom:generate:all": "bash scripts/generate-sbom.sh"
+    "sbom:generate:all": "bash scripts/generate-sbom.sh",
+    "qa:pr": "pnpm lint && pnpm typecheck && pnpm test:unit && pnpm test:smoke",
+    "qa:full": "pnpm qa:pr && pnpm test:regression && pnpm test:perf"
   },
   "devDependencies": {
     "@commitlint/cli": "^18.4.3",
@@ -79,5 +106,8 @@
       "dompurify@<3.2.4": "3.2.4",
       "tar-fs@>=3.0.0 <3.1.1": "3.1.1"
     }
+  },
+  "dependencies": {
+    "web-vitals": "^5.1.0"
   }
 }

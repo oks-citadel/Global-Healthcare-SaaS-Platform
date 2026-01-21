@@ -1,0 +1,262 @@
+# Maestro E2E Test - Telehealth Video Visit Flow
+# Run: maestro test tests/mobile/maestro/telehealth-flow.yaml
+
+appId: com.unifiedhealth.mobile
+---
+
+# Setup: Login first
+- launchApp:
+    clearState: true
+
+- tapOn: "Email"
+- inputText: "patient@test.unified.health"
+- tapOn: "Password"
+- inputText: "TestPassword123!"
+- tapOn: "Sign In"
+
+- waitForAnimationToEnd
+- assertVisible:
+    text: "Welcome"
+    timeout: 10000
+
+---
+# Test: Join Video Visit from Appointment
+- tapOn:
+    id: "appointments-tab"
+
+- waitForAnimationToEnd
+
+# Find a video appointment
+- runFlow:
+    when:
+      visible:
+        anyOf:
+          - "Video Visit"
+          - id: "video-appointment"
+    commands:
+      - tapOn:
+          anyOf:
+            - id: "video-appointment"
+            - text: "Video Visit"
+          index: 0
+
+      - assertVisible: "Appointment Details"
+
+      # Look for join button
+      - runFlow:
+          when:
+            visible:
+              anyOf:
+                - "Join Video Call"
+                - "Start Visit"
+          commands:
+            - tapOn:
+                anyOf:
+                  - "Join Video Call"
+                  - "Start Visit"
+
+            # Handle permissions
+            - runFlow:
+                when:
+                  visible: "Allow"
+                commands:
+                  - tapOn: "Allow"
+
+            # Should see video UI
+            - assertVisible:
+                anyOf:
+                  - id: "video-container"
+                  - id: "local-video"
+                  - "Connecting"
+                timeout: 10000
+
+            # End call
+            - tapOn:
+                id: "end-call-button"
+
+            - assertVisible:
+                anyOf:
+                  - "Call Ended"
+                  - "Visit Summary"
+
+---
+# Test: Pre-Call Device Check
+- tapOn:
+    id: "appointments-tab"
+
+- waitForAnimationToEnd
+
+- runFlow:
+    when:
+      visible:
+        anyOf:
+          - "Video Visit"
+          - id: "video-appointment"
+    commands:
+      - tapOn:
+          anyOf:
+            - id: "video-appointment"
+            - text: "Video Visit"
+          index: 0
+
+      - tapOn:
+          anyOf:
+            - "Test Devices"
+            - "Check Setup"
+          optional: true
+
+      - runFlow:
+          when:
+            visible:
+              anyOf:
+                - "Device Check"
+                - "Test Camera"
+          commands:
+            - assertVisible: "Camera"
+            - assertVisible: "Microphone"
+            - assertVisible: "Speaker"
+            - back
+
+---
+# Test: Video Call Controls
+- tapOn:
+    id: "appointments-tab"
+
+- waitForAnimationToEnd
+
+- runFlow:
+    when:
+      visible:
+        anyOf:
+          - "Video Visit"
+          - id: "video-appointment"
+    commands:
+      - tapOn:
+          anyOf:
+            - id: "video-appointment"
+            - text: "Video Visit"
+          index: 0
+
+      - runFlow:
+          when:
+            visible:
+              anyOf:
+                - "Join Video Call"
+                - "Start Visit"
+          commands:
+            - tapOn:
+                anyOf:
+                  - "Join Video Call"
+                  - "Start Visit"
+
+            - waitForAnimationToEnd:
+                timeout: 10000
+
+            # Test mute button
+            - tapOn:
+                id: "mute-button"
+                optional: true
+            - tapOn:
+                id: "mute-button"
+                optional: true
+
+            # Test camera toggle
+            - tapOn:
+                id: "camera-toggle"
+                optional: true
+            - tapOn:
+                id: "camera-toggle"
+                optional: true
+
+            # Test speaker toggle
+            - tapOn:
+                id: "speaker-toggle"
+                optional: true
+
+            # End call
+            - tapOn:
+                id: "end-call-button"
+
+---
+# Test: Chat During Video Call
+- tapOn:
+    id: "appointments-tab"
+
+- waitForAnimationToEnd
+
+- runFlow:
+    when:
+      visible:
+        anyOf:
+          - "Video Visit"
+          - id: "video-appointment"
+    commands:
+      - tapOn:
+          anyOf:
+            - id: "video-appointment"
+            - text: "Video Visit"
+          index: 0
+
+      - runFlow:
+          when:
+            visible:
+              anyOf:
+                - "Join Video Call"
+                - "Start Visit"
+          commands:
+            - tapOn:
+                anyOf:
+                  - "Join Video Call"
+                  - "Start Visit"
+
+            - waitForAnimationToEnd:
+                timeout: 10000
+
+            # Open chat
+            - tapOn:
+                id: "chat-button"
+                optional: true
+
+            - runFlow:
+                when:
+                  visible:
+                    id: "video-chat-input"
+                commands:
+                  - tapOn:
+                      id: "video-chat-input"
+                  - inputText: "Can you hear me?"
+                  - tapOn:
+                      id: "send-chat"
+                  - waitForAnimationToEnd
+
+                  # Close chat
+                  - tapOn:
+                      id: "close-chat"
+
+            # End call
+            - tapOn:
+                id: "end-call-button"
+
+---
+# Test: Handle Network Issues
+- launchApp
+
+# This test simulates checking for network error handling UI
+- tapOn:
+    id: "appointments-tab"
+
+- waitForAnimationToEnd
+
+# Network error states should be visible when offline
+- runFlow:
+    when:
+      visible:
+        anyOf:
+          - "No internet connection"
+          - "Network error"
+          - "Offline"
+    commands:
+      - assertVisible:
+          anyOf:
+            - "Retry"
+            - "Try Again"

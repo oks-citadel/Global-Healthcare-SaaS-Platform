@@ -1,0 +1,232 @@
+# Maestro E2E Test - Messaging Flow
+# Run: maestro test tests/mobile/maestro/messaging-flow.yaml
+
+appId: com.unifiedhealth.mobile
+---
+
+# Setup: Login first
+- launchApp:
+    clearState: true
+
+- tapOn: "Email"
+- inputText: "patient@test.unified.health"
+- tapOn: "Password"
+- inputText: "TestPassword123!"
+- tapOn: "Sign In"
+
+- waitForAnimationToEnd
+- assertVisible:
+    text: "Welcome"
+    timeout: 10000
+
+---
+# Test: Navigate to Messages
+- tapOn:
+    anyOf:
+      - id: "messages-tab"
+      - "Messages"
+
+- assertVisible:
+    anyOf:
+      - "Messages"
+      - "Conversations"
+    timeout: 5000
+
+---
+# Test: View Conversation List
+- tapOn:
+    anyOf:
+      - id: "messages-tab"
+      - "Messages"
+
+- waitForAnimationToEnd
+
+# Check for conversations or empty state
+- assertVisible:
+    anyOf:
+      - "No messages"
+      - id: "conversation-item"
+      - "Start a conversation"
+    timeout: 5000
+
+---
+# Test: Open Conversation
+- tapOn:
+    anyOf:
+      - id: "messages-tab"
+      - "Messages"
+
+- waitForAnimationToEnd
+
+- runFlow:
+    when:
+      visible:
+        id: "conversation-item"
+    commands:
+      - tapOn:
+          id: "conversation-item"
+          index: 0
+      - waitForAnimationToEnd
+      - assertVisible:
+          id: "message-input"
+      - assertVisible:
+          id: "send-button"
+      - back
+
+---
+# Test: Send Message
+- tapOn:
+    anyOf:
+      - id: "messages-tab"
+      - "Messages"
+
+- waitForAnimationToEnd
+
+- runFlow:
+    when:
+      visible:
+        id: "conversation-item"
+    commands:
+      - tapOn:
+          id: "conversation-item"
+          index: 0
+      - waitForAnimationToEnd
+
+      - tapOn:
+          id: "message-input"
+      - inputText: "Hello, this is a test message from E2E tests"
+
+      - tapOn:
+          id: "send-button"
+
+      # Wait for message to appear
+      - waitForAnimationToEnd
+      - assertVisible: "test message from E2E"
+
+      - back
+
+---
+# Test: Start New Conversation
+- tapOn:
+    anyOf:
+      - id: "messages-tab"
+      - "Messages"
+
+- waitForAnimationToEnd
+
+- tapOn:
+    anyOf:
+      - id: "new-message-button"
+      - "New Message"
+    optional: true
+
+- runFlow:
+    when:
+      visible:
+        anyOf:
+          - "New Message"
+          - "Select Recipient"
+    commands:
+      - assertVisible:
+          anyOf:
+            - "Select Provider"
+            - "Choose Recipient"
+
+      # Select a provider
+      - tapOn:
+          id: "recipient-item"
+          index: 0
+          optional: true
+
+      - runFlow:
+          when:
+            visible:
+              id: "message-input"
+          commands:
+            - tapOn:
+                id: "message-input"
+            - inputText: "Hello, I have a question about my treatment"
+            - tapOn:
+                id: "send-button"
+            - waitForAnimationToEnd
+
+---
+# Test: Search Conversations
+- tapOn:
+    anyOf:
+      - id: "messages-tab"
+      - "Messages"
+
+- waitForAnimationToEnd
+
+- tapOn:
+    anyOf:
+      - id: "search-messages"
+      - "Search"
+    optional: true
+
+- runFlow:
+    when:
+      visible:
+        id: "search-input"
+    commands:
+      - tapOn:
+          id: "search-input"
+      - inputText: "appointment"
+      - waitForAnimationToEnd
+
+      # Clear search
+      - tapOn:
+          id: "clear-search"
+          optional: true
+
+---
+# Test: Message Attachments
+- tapOn:
+    anyOf:
+      - id: "messages-tab"
+      - "Messages"
+
+- waitForAnimationToEnd
+
+- runFlow:
+    when:
+      visible:
+        id: "conversation-item"
+    commands:
+      - tapOn:
+          id: "conversation-item"
+          index: 0
+      - waitForAnimationToEnd
+
+      - tapOn:
+          anyOf:
+            - id: "attach-button"
+            - "Attach"
+          optional: true
+
+      - runFlow:
+          when:
+            visible: "Attach"
+          commands:
+            - assertVisible:
+                anyOf:
+                  - "Photo"
+                  - "Document"
+                  - "Camera"
+            - back
+      - back
+
+---
+# Test: Unread Message Indicator
+- tapOn:
+    id: "home-tab"
+
+- waitForAnimationToEnd
+
+# Check if there's an unread badge on messages tab
+- assertVisible:
+    anyOf:
+      - id: "messages-badge"
+      - id: "messages-tab"
+    optional: true

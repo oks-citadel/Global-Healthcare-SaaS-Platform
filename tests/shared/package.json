@@ -1,0 +1,17 @@
+{
+  "name": "@unified-health/tests-shared",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./utils/index.ts",
+  "exports": {
+    ".": "./utils/index.ts",
+    "./utils": "./utils/index.ts",
+    "./utils/*": "./utils/*.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.0",
+    "typescript": "^5.3.3",
+    "vitest": "^2.1.0"
+  }
+}

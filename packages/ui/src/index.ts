@@ -67,3 +67,43 @@ export type {
   ErrorEmptyStateProps,
   LoadingEmptyStateProps,
 } from './components/EmptyStates';
+
+// Skeleton Loading Components
+export {
+  Skeleton,
+  SkeletonText,
+  SkeletonAvatar,
+  SkeletonCard,
+  SkeletonTable,
+  AppointmentSkeleton,
+  PatientCardSkeleton,
+  VitalsSkeleton,
+  LabResultSkeleton,
+  useSkeleton,
+  useSkeletonGroup,
+} from './components/Skeleton';
+
+export type {
+  SkeletonProps,
+  SkeletonTextProps,
+  SkeletonAvatarProps,
+  SkeletonCardProps,
+  SkeletonTableProps,
+  AppointmentSkeletonProps,
+  PatientCardSkeletonProps,
+  VitalsSkeletonProps,
+  LabResultSkeletonProps,
+  UseSkeletonOptions,
+  UseSkeletonReturn,
+  UseSkeletonGroupOptions,
+  UseSkeletonGroupReturn,
+} from './components/Skeleton';
+
+// Utilities
+export { cn } from './utils/cn';
+
+// Animation System
+export * from './animations';
+
+// Optimistic UI Patterns
+export * from './patterns/optimistic';
