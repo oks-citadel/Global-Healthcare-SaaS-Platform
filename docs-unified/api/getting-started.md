@@ -1,6 +1,6 @@
-# Getting Started with Unified Healthcare Platform API
+# Getting Started with Unified Health Platform API
 
-Welcome to the Unified Healthcare Platform API documentation. This guide will help you get started with integrating our API into your applications.
+Welcome to the Unified Health Platform API documentation. This guide will help you get started with integrating our API into your applications.
 
 ## Table of Contents
 
@@ -15,7 +15,7 @@ Welcome to the Unified Healthcare Platform API documentation. This guide will he
 
 ## Overview
 
-The Unified Healthcare Platform API is a RESTful API that provides comprehensive healthcare management capabilities, including:
+The Unified Health Platform API is a RESTful API that provides comprehensive healthcare management capabilities, including:
 
 - Patient information management
 - Appointment scheduling

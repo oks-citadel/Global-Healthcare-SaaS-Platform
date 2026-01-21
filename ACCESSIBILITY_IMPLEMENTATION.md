@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document summarizes the complete accessibility implementation for the Unified Healthcare Platform, ensuring WCAG 2.1 Level AA compliance across the web application.
+This document summarizes the complete accessibility implementation for the Unified Health Platform, ensuring WCAG 2.1 Level AA compliance across the web application.
 
 ## Implementation Status: ✅ COMPLETE
 
@@ -333,7 +333,7 @@ export default function Page() {
       </Main>
 
       <Footer>
-        <FooterCopyright>© 2024 Unified Healthcare</FooterCopyright>
+        <FooterCopyright>© 2024 Unified Health</FooterCopyright>
       </Footer>
     </PageLayout>
   );

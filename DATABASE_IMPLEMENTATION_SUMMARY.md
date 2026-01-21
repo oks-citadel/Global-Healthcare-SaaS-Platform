@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document summarizes the production-ready database configuration, backup/restore system, and performance monitoring implementation for the Unified Healthcare Platform.
+This document summarizes the production-ready database configuration, backup/restore system, and performance monitoring implementation for the Unified Health Platform.
 
 ## Implementation Date
 
@@ -524,7 +524,7 @@ log_lock_waits = on
 
 ## License
 
-Part of the Unified Healthcare Platform
+Part of the Unified Health Platform
 
 ## Contributors
 

@@ -2,7 +2,7 @@
 
 ###############################################################################
 # Monitoring Infrastructure Deployment Script
-# Unified Healthcare Platform
+# Unified Health Platform
 #
 # This script deploys all monitoring and observability components:
 # - Azure Application Insights

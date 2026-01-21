@@ -1,7 +1,7 @@
 ---
 # ============================================
 # Centralized Logging Configuration
-# Unified Healthcare Platform
+# Unified Health Platform
 # ============================================
 
 apiVersion: logging.unified-health.io/v1

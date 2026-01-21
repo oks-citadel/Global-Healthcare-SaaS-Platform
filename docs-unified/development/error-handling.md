@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Unified Healthcare Platform implements a comprehensive error handling and resilience system to ensure robust, reliable operation even under adverse conditions. This guide covers all aspects of error handling, from error codes to circuit breakers.
+The Unified Health Platform implements a comprehensive error handling and resilience system to ensure robust, reliable operation even under adverse conditions. This guide covers all aspects of error handling, from error codes to circuit breakers.
 
 ## Table of Contents
 

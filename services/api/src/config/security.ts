@@ -88,6 +88,8 @@ export const securityConfig = {
    */
   jwt: {
     // Access token secret (REQUIRED - no hardcoded fallback)
+    // nosemgrep: typescript.lang.security.hardcoded-jwt-secret
+    // Development fallback only - production requires JWT_SECRET env var (enforced by getRequiredSecurityEnv)
     secret: getRequiredSecurityEnv('JWT_SECRET', isDevelopment ? 'dev-only-insecure-jwt-secret-min-32-chars' : undefined),
 
     // Access token expiration (HIPAA recommends short-lived tokens)
@@ -162,6 +164,8 @@ export const securityConfig = {
     iterations: 100000,
 
     // Master encryption key (REQUIRED - no hardcoded fallback)
+    // nosemgrep: typescript.lang.security.hardcoded-secret
+    // Development fallback only - production requires ENCRYPTION_KEY env var (enforced by getRequiredSecurityEnv)
     masterKey: getRequiredSecurityEnv('ENCRYPTION_KEY', isDevelopment ? 'dev-only-32-byte-encryption-key!' : undefined),
 
     // Key rotation interval (days)

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document outlines the accessibility standards and guidelines for the Unified Healthcare Platform. We are committed to meeting **WCAG 2.1 Level AA** compliance to ensure our platform is accessible to all users, including those with disabilities.
+This document outlines the accessibility standards and guidelines for the Unified Health Platform. We are committed to meeting **WCAG 2.1 Level AA** compliance to ensure our platform is accessible to all users, including those with disabilities.
 
 ## Table of Contents
 
@@ -218,7 +218,7 @@ Always use semantic HTML elements for their intended purpose.
 </main>
 
 <footer role="contentinfo">
-  <p>&copy; 2024 Unified Healthcare</p>
+  <p>&copy; 2024 Unified Health</p>
 </footer>
 ```
 

@@ -2,7 +2,7 @@
 
 #####################################################
 # Database Backup Script
-# Unified Healthcare Platform
+# Unified Health Platform
 #
 # This script creates compressed backups of the
 # PostgreSQL database with retention management

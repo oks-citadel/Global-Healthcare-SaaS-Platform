@@ -1,6 +1,6 @@
 # Monitoring and Observability
 
-This document describes the monitoring, logging, and observability infrastructure for the Unified Healthcare Platform.
+This document describes the monitoring, logging, and observability infrastructure for the Unified Health Platform.
 
 ## Table of Contents
 
@@ -17,7 +17,7 @@ This document describes the monitoring, logging, and observability infrastructur
 
 ## Overview
 
-The Unified Healthcare Platform uses a comprehensive monitoring stack built on industry-standard tools:
+The Unified Health Platform uses a comprehensive monitoring stack built on industry-standard tools:
 
 - **Prometheus**: Metrics collection and storage
 - **Grafana**: Visualization and dashboards

@@ -1,10 +1,10 @@
 # API Documentation and SDK Setup Guide
 
-This guide explains how to set up, use, and generate the API documentation and TypeScript SDK for the Unified Healthcare Platform.
+This guide explains how to set up, use, and generate the API documentation and TypeScript SDK for the Unified Health Platform.
 
 ## Overview
 
-The Unified Healthcare Platform includes:
+The Unified Health Platform includes:
 
 1. **Swagger/OpenAPI Documentation** - Interactive API documentation
 2. **TypeScript SDK** - Type-safe client library for API access

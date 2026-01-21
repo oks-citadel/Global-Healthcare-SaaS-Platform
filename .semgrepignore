@@ -1,0 +1,98 @@
+# Semgrep Ignore File for Global Healthcare SaaS Platform
+# This file specifies paths that should be excluded from Semgrep scanning
+
+# =============================================================================
+# Generated Files - Auto-generated code that should not be scanned
+# =============================================================================
+
+# Prisma generated client (auto-generated ORM code)
+services/api/src/generated/
+**/generated/
+
+# Build outputs
+**/dist/
+**/build/
+**/.next/
+**/out/
+
+# =============================================================================
+# Third-Party Dependencies
+# =============================================================================
+
+# Node modules (dependencies are scanned by dependency checkers, not SAST)
+**/node_modules/
+
+# Vendor directories
+**/vendor/
+
+# =============================================================================
+# Test Files - Test fixtures may contain intentional security patterns
+# =============================================================================
+
+# Test files often contain mock credentials and intentional vulnerabilities
+**/*.test.ts
+**/*.test.js
+**/*.spec.ts
+**/*.spec.js
+**/tests/
+**/test/
+**/__tests__/
+**/__mocks__/
+
+# Test fixtures and mock data
+**/fixtures/
+**/mocks/
+**/*.mock.ts
+**/*.mock.js
+
+# =============================================================================
+# Configuration Examples - Example files for documentation
+# =============================================================================
+
+# Example configuration files (not used in production)
+**/*.example
+**/*.example.*
+**/example/
+**/examples/
+
+# Sample and demo files
+**/sample/
+**/samples/
+**/demo/
+
+# =============================================================================
+# Documentation
+# =============================================================================
+
+# Markdown and documentation files
+**/*.md
+**/docs/
+**/documentation/
+
+# =============================================================================
+# IDE and Editor Files
+# =============================================================================
+
+**/.idea/
+**/.vscode/
+**/*.swp
+**/*.swo
+
+# =============================================================================
+# CI/CD Configuration
+# =============================================================================
+
+# GitHub Actions workflows (these contain configuration, not code)
+.github/
+
+# =============================================================================
+# Specific File Exceptions with Justification
+# =============================================================================
+
+# Demo store contains intentional hardcoded credentials for demo mode
+# This file is ONLY used when DEMO_MODE=true (non-production)
+# The credentials are well-documented and expected
+# services/api/src/lib/demo-store.ts - handled with inline nosemgrep comments
+
+# Encryption example file - contains educational examples
+# services/api/src/lib/encryption.example.ts - handled with inline nosemgrep comments

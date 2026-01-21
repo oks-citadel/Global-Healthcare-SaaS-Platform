@@ -55,7 +55,8 @@ export function generateCacheKey(
   }
 
   const keyString = keyComponents.join('|');
-  return `cache:${crypto.createHash('md5').update(keyString).digest('hex')}`;
+  // Using SHA-256 for cache key generation (secure hash function)
+  return `cache:${crypto.createHash('sha256').update(keyString).digest('hex').substring(0, 32)}`;
 }
 
 /**
@@ -63,7 +64,9 @@ export function generateCacheKey(
  */
 export function generateETag(body: any): string {
   const content = typeof body === 'string' ? body : JSON.stringify(body);
-  return `"${crypto.createHash('md5').update(content).digest('hex')}"`;
+  // Using SHA-256 for ETag generation (secure hash function)
+  // Truncated to 32 chars for reasonable ETag length while maintaining uniqueness
+  return `"${crypto.createHash('sha256').update(content).digest('hex').substring(0, 32)}"`;
 }
 
 /**

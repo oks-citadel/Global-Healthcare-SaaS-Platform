@@ -1,7 +1,7 @@
 @echo off
 REM ####################################################
 REM Database Backup Script (Windows)
-REM Unified Healthcare Platform
+REM Unified Health Platform
 REM ####################################################
 
 setlocal enabledelayedexpansion

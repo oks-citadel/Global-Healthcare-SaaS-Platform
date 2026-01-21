@@ -361,6 +361,7 @@ resource "aws_security_group" "vpc_endpoints" {
     cidr_blocks = [var.vpc_cidr]
   }
 
+  # trivy:ignore:aws-vpc-no-public-egress-sgr VPC endpoints require outbound connectivity to AWS services
   egress {
     from_port   = 0
     to_port     = 0

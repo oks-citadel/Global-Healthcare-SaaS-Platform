@@ -2,7 +2,7 @@
 
 ## Overview
 
-Complete internationalization setup for the Unified Healthcare Platform with support for:
+Complete internationalization setup for the Unified Health Platform with support for:
 - **Languages**: English (en), Spanish (es), French (fr)
 - **Platforms**: Web (Next.js), Mobile (React Native), API (Express)
 - **Features**: Auto-detection, persistence, typed translations, formatting helpers

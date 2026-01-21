@@ -12,7 +12,7 @@
 
 ## Overview
 
-This guide provides comprehensive performance optimization strategies for the Unified Healthcare Platform. Following these practices will ensure optimal performance, scalability, and user experience.
+This guide provides comprehensive performance optimization strategies for the Unified Health Platform. Following these practices will ensure optimal performance, scalability, and user experience.
 
 ### Performance Goals
 - **API Response Time**: < 200ms (p95)

@@ -1,7 +1,7 @@
 # Third-Party Integrations Summary
 
 ## Overview
-This document provides a high-level summary of all third-party service integrations implemented in the Unified Healthcare Platform.
+This document provides a high-level summary of all third-party service integrations implemented in the Unified Health Platform.
 
 ---
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ###############################################################################
-# Unified Healthcare Platform - Complete Test Suite Runner
+# Unified Health Platform - Complete Test Suite Runner
 # Runs all API tests including integration tests, load tests, and validation
 ###############################################################################
 
@@ -121,7 +121,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Start
-print_header "Unified Healthcare Platform - API Test Suite"
+print_header "Unified Health Platform - API Test Suite"
 
 # Check prerequisites
 print_info "Checking prerequisites..."

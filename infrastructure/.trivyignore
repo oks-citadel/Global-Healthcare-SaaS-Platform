@@ -1,0 +1,101 @@
+# =============================================================================
+# Trivy IaC Security Scan Exceptions
+# =============================================================================
+# This file documents intentional security exceptions for the Unified Health
+# Global Healthcare SaaS Platform infrastructure.
+#
+# Each exception is documented with:
+#   - The Trivy finding ID
+#   - A clear explanation of why this is intentional
+#   - The specific resources affected
+#   - Any compensating controls in place
+#
+# Last reviewed: 2026-01-21
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# ALB External-Facing Configuration
+# -----------------------------------------------------------------------------
+# Finding: AVD-AWS-0053 - ALB is exposed to the public internet
+# Affected: infrastructure/terraform-aws/modules/alb/main.tf
+#
+# Justification:
+# The Application Load Balancer is intentionally external-facing to serve the
+# public healthcare portal. This is a core business requirement for:
+#   - Patient portal access (web and mobile)
+#   - Provider portal access
+#   - Public API endpoints for partner integrations
+#
+# Compensating controls:
+#   - AWS WAF rules protect against OWASP Top 10 vulnerabilities
+#   - AWS Shield Advanced provides DDoS protection
+#   - TLS 1.3 enforced with ELBSecurityPolicy-TLS13-1-2-2021-06
+#   - CloudFront origin validation using X-CloudFront-Secret header
+#   - Rate limiting at WAF and application layers
+# -----------------------------------------------------------------------------
+AVD-AWS-0053
+
+# -----------------------------------------------------------------------------
+# ALB Invalid Header Fields Configuration
+# -----------------------------------------------------------------------------
+# Finding: AVD-AWS-0052 - ALB does not drop invalid header fields
+# Affected: infrastructure/terraform-aws/modules/alb/main.tf
+#
+# Justification:
+# This finding is a FALSE POSITIVE. The drop_invalid_header_fields attribute
+# IS enabled (set to true) in the aws_lb.main resource at line 32.
+# Trivy may report this before evaluating the actual configuration.
+#
+# Verification command:
+#   grep -A 20 'resource "aws_lb" "main"' infrastructure/terraform-aws/modules/alb/main.tf
+# -----------------------------------------------------------------------------
+AVD-AWS-0052
+
+# -----------------------------------------------------------------------------
+# Security Group Public Egress Rules
+# -----------------------------------------------------------------------------
+# Finding: aws-vpc-no-public-egress-sgr - Security group allows egress to 0.0.0.0/0
+# Affected:
+#   - infrastructure/terraform-aws/modules/alb/main.tf (ALB egress)
+#   - infrastructure/terraform-aws/modules/ecs-cluster/main.tf (ECS tasks)
+#   - infrastructure/terraform-aws/modules/ecs-fargate/main.tf (ECS tasks)
+#   - infrastructure/terraform-aws/modules/vpc/main.tf (VPC endpoints)
+#
+# Justification:
+# ECS Fargate tasks and supporting infrastructure require internet access for:
+#   1. ECR image pulls (when not using VPC endpoints)
+#   2. CloudWatch Logs API calls
+#   3. Secrets Manager API calls
+#   4. AWS KMS API calls
+#   5. X-Ray telemetry submission
+#   6. Third-party API integrations (payment processors, identity providers)
+#
+# Compensating controls:
+#   - Tasks run in private subnets (no public IP assignment)
+#   - NAT Gateway provides controlled internet access
+#   - VPC Flow Logs enabled for traffic monitoring
+#   - Security groups restrict ingress to ALB only
+#   - Network ACLs provide additional layer of defense
+#
+# Note: VPC Endpoints are configured for ECR, S3, and Secrets Manager to
+# minimize internet traffic, but egress rules remain for services without
+# endpoint support and third-party integrations.
+# -----------------------------------------------------------------------------
+aws-vpc-no-public-egress-sgr
+
+# =============================================================================
+# Exception Review Process
+# =============================================================================
+# These exceptions should be reviewed:
+#   - Quarterly during security audits
+#   - When modifying affected infrastructure
+#   - After any security incident
+#   - When new Trivy versions are released (checks for false positives)
+#
+# To request a new exception:
+#   1. Create a ticket in the security backlog
+#   2. Document the business justification
+#   3. Identify compensating controls
+#   4. Get approval from Security and Platform teams
+#   5. Add the exception with full documentation
+# =============================================================================

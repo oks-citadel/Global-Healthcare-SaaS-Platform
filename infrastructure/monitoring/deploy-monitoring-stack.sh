@@ -2,7 +2,7 @@
 
 # ============================================
 # Monitoring Stack Deployment Script
-# Unified Healthcare Platform
+# Unified Health Platform
 # ============================================
 
 set -e

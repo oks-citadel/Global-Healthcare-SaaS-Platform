@@ -1,6 +1,6 @@
 # Encryption Implementation Guide
 
-**Platform:** Unified Healthcare SaaS Platform
+**Platform:** Unified Health SaaS Platform
 **Compliance:** HIPAA Security Rule (45 CFR § 164.312(a)(2)(iv))
 **Standard:** AES-256-GCM with PBKDF2 Key Derivation
 **Last Updated:** 2025-12-17
@@ -23,7 +23,7 @@
 
 ## Overview
 
-The Unified Healthcare Platform implements **military-grade encryption** to protect Protected Health Information (PHI) in compliance with HIPAA requirements.
+The Unified Health Platform implements **military-grade encryption** to protect Protected Health Information (PHI) in compliance with HIPAA requirements.
 
 ### Encryption Strategy
 

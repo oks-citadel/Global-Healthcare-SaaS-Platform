@@ -1,7 +1,7 @@
 ---
 # ============================================
 # Azure Monitor Alert Rules Configuration
-# Unified Healthcare Platform
+# Unified Health Platform
 # ============================================
 
 apiVersion: monitoring.azure.com/v1

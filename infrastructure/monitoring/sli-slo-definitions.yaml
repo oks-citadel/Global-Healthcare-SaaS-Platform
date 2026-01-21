@@ -2,7 +2,7 @@
 # ============================================
 # Service Level Indicators (SLIs) and
 # Service Level Objectives (SLOs)
-# Unified Healthcare Platform
+# Unified Health Platform
 # ============================================
 
 apiVersion: slo.unified-health.io/v1

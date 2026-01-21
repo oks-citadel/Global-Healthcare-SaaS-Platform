@@ -197,8 +197,8 @@ The `branding-check` job:
 | Pattern | Reason |
 |---------|--------|
 | `UnifiedHealth` | Missing space |
-| `Unified Healthcare` | Old variant |
-| `unified-health.com` | Wrong domain |
+| `Unified Healthcare` | Old variant (should be "Unified Health") |
+| `unified-health.com` | Wrong domain (should be theunifiedhealth.com) |
 | `theunifiedhealth.com` | Wrong domain |
 
 ---

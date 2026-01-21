@@ -1,5 +1,5 @@
 # Monitoring Integration Guide
-## Unified Healthcare Platform
+## Unified Health Platform
 
 Complete guide for integrating comprehensive monitoring, metrics, and alerting across all services.
 

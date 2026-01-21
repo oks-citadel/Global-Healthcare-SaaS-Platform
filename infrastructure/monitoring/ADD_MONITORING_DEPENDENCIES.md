@@ -1,6 +1,6 @@
 # Adding Monitoring Dependencies to Services
 
-This guide explains how to add monitoring dependencies to all microservices in the Unified Healthcare Platform.
+This guide explains how to add monitoring dependencies to all microservices in the Unified Health Platform.
 
 ---
 

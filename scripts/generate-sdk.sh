@@ -12,7 +12,7 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 echo -e "${BLUE}========================================${NC}"
-echo -e "${BLUE}Unified Healthcare Platform${NC}"
+echo -e "${BLUE}Unified Health Platform${NC}"
 echo -e "${BLUE}SDK Generation Script${NC}"
 echo -e "${BLUE}========================================${NC}"
 echo ""

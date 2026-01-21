@@ -1,6 +1,6 @@
 # API Documentation
 
-Comprehensive documentation for the Unified Healthcare Platform API.
+Comprehensive documentation for the Unified Health Platform API.
 
 > **Related Documentation:**
 > - [API Reference (Complete)](../../docs/api/README.md) - Comprehensive API reference with rate limits, SDKs, FHIR
@@ -15,7 +15,7 @@ Comprehensive documentation for the Unified Healthcare Platform API.
 
 ## Overview
 
-The Unified Healthcare Platform API is a comprehensive RESTful API for managing healthcare operations:
+The Unified Health Platform API is a comprehensive RESTful API for managing healthcare operations:
 
 - Patient information management
 - Appointment scheduling

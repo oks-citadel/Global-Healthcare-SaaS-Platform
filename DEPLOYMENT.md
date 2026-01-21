@@ -149,8 +149,8 @@ Configure the following secrets in your GitHub repository:
 | `AWS_REGION` | AWS region | `us-east-1` |
 | `ECR_REGISTRY` | ECR registry URL | `123456789.dkr.ecr.us-east-1.amazonaws.com` |
 | `SLACK_WEBHOOK_URL` | Slack webhook for notifications | `your-slack-webhook-url |
-| `STAGING_URL` | Staging environment URL | `https://staging.unified-health.com` |
-| `STAGING_API_URL` | Staging API URL | `https://api-staging.unified-health.com` |
+| `STAGING_URL` | Staging environment URL | `https://staging.theunifiedhealth.com` |
+| `STAGING_API_URL` | Staging API URL | `https://api-staging.theunifiedhealth.com` |
 | `EMAIL_USERNAME` | SMTP username | `notifications@company.com` |
 | `EMAIL_PASSWORD` | SMTP password | `***` |
 | `NOTIFICATION_EMAIL` | Email for alerts | `devops@company.com` |
@@ -217,10 +217,10 @@ aws eks update-kubeconfig --name unified-health-eks-prod --region us-east-1
 kubectl get svc -n ingress-nginx ingress-nginx-controller
 
 # Create DNS A records:
-# staging.unified-health.com -> <staging-ip>
-# api-staging.unified-health.com -> <staging-ip>
-# unified-health.com -> <production-ip>
-# api.unified-health.com -> <production-ip>
+# staging.theunifiedhealth.com -> <staging-ip>
+# api-staging.theunifiedhealth.com -> <staging-ip>
+# theunifiedhealth.com -> <production-ip>
+# api.theunifiedhealth.com -> <production-ip>
 ```
 
 ### 4. Configure TLS Certificates
@@ -238,7 +238,7 @@ metadata:
 spec:
   acme:
     server: https://acme-v02.api.letsencrypt.org/directory
-    email: admin@unified-health.com
+    email: admin@theunifiedhealth.com
     privateKeySecretRef:
       name: letsencrypt-prod
     solvers:

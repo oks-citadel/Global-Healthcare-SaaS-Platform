@@ -1,6 +1,6 @@
 # Stripe Payment Integration
 
-This document provides comprehensive information about the Stripe payment integration for the Unified Healthcare Platform.
+This document provides comprehensive information about the Stripe payment integration for the Unified Health Platform.
 
 ## Table of Contents
 

@@ -113,7 +113,7 @@ export default function LandingPage() {
 
             {/* Headline */}
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight">
-              Unified Healthcare
+              Unified Health
               <span className="block text-gradient-healing">Without Borders</span>
             </h1>
 

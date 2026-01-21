@@ -1,6 +1,6 @@
 # Global → Region → Country Segmentation Architecture
 
-**World Unified Healthcare Platform - Data Residency & Compliance Architecture**
+**World Unified Health Platform - Data Residency & Compliance Architecture**
 
 ## Overview
 

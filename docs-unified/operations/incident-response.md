@@ -1,6 +1,6 @@
 # Incident Response Runbook
 
-This document defines the incident response procedures for the Unified Healthcare Platform, ensuring rapid detection, response, and recovery from service disruptions and security incidents.
+This document defines the incident response procedures for the Unified Health Platform, ensuring rapid detection, response, and recovery from service disruptions and security incidents.
 
 ## Table of Contents
 
@@ -20,7 +20,7 @@ This document defines the incident response procedures for the Unified Healthcar
 
 ### Purpose
 
-This runbook provides structured procedures for responding to incidents affecting the Unified Healthcare Platform. Given the healthcare context and HIPAA compliance requirements, rapid and documented response is critical.
+This runbook provides structured procedures for responding to incidents affecting the Unified Health Platform. Given the healthcare context and HIPAA compliance requirements, rapid and documented response is critical.
 
 ### Scope
 
@@ -303,11 +303,11 @@ DATA IMPACT
 [Statement about data integrity/PHI exposure if applicable]
 
 We sincerely apologize for any inconvenience this may have caused.
-If you have any questions, please contact support@unified-health.com.
+If you have any questions, please contact support@theunifiedhealth.com.
 
 Sincerely,
 [Name]
-Unified Healthcare Platform Team
+Unified Health Platform Team
 ```
 
 ### Internal Slack Update Template

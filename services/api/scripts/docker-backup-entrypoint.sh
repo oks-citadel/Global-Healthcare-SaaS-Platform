@@ -2,7 +2,7 @@
 
 #####################################################
 # Docker Backup Container Entrypoint
-# Unified Healthcare Platform
+# Unified Health Platform
 #
 # This script runs as a sidecar container to handle
 # automated database backups in containerized

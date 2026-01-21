@@ -1,5 +1,5 @@
 # Monitoring and Observability Verification Checklist
-## Unified Healthcare Platform
+## Unified Health Platform
 
 **Date:** _______________
 **Verified By:** _______________

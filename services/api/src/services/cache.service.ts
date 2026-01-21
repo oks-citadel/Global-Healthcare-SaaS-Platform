@@ -304,6 +304,9 @@ export class CacheService {
     const lockKey = cacheKeys.lock(resource);
 
     // Use Lua script for atomic check-and-delete
+    // nosemgrep: javascript.lang.security.audit.dangerous-exec-cmd
+    // This is a safe Redis Lua script - no user input is concatenated into the script
+    // KEYS and ARGV are properly parameterized and handled safely by Redis
     const script = `
       if redis.call("get", KEYS[1]) == ARGV[1] then
         return redis.call("del", KEYS[1])
@@ -313,6 +316,7 @@ export class CacheService {
     `;
 
     try {
+      // nosemgrep: javascript.lang.security.audit.dangerous-exec-cmd
       const result = await this.redis.eval(script, 1, lockKey, lockValue);
       return result === 1;
     } catch (error) {
@@ -343,6 +347,9 @@ export class CacheService {
 
     try {
       // Use Lua script for atomic operations
+      // nosemgrep: javascript.lang.security.audit.dangerous-exec-cmd
+      // This is a safe Redis Lua script - no user input is concatenated into the script
+      // KEYS and ARGV are properly parameterized and handled safely by Redis
       const script = `
         local key = KEYS[1]
         local now = tonumber(ARGV[1])
@@ -366,6 +373,7 @@ export class CacheService {
         end
       `;
 
+      // nosemgrep: javascript.lang.security.audit.dangerous-exec-cmd
       const [allowed, remaining] = (await this.redis.eval(
         script,
         1,

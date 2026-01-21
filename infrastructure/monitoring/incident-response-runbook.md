@@ -1,5 +1,5 @@
 # Incident Response Runbook
-## Unified Healthcare Platform
+## Unified Health Platform
 
 **Version:** 1.0
 **Last Updated:** 2025-12-17
@@ -23,7 +23,7 @@
 
 ## Overview
 
-This runbook provides standardized procedures for responding to incidents affecting the Unified Healthcare Platform. All incidents must be handled according to HIPAA compliance requirements and patient safety considerations.
+This runbook provides standardized procedures for responding to incidents affecting the Unified Health Platform. All incidents must be handled according to HIPAA compliance requirements and patient safety considerations.
 
 ### Key Principles
 

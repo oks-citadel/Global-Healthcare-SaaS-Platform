@@ -1,6 +1,6 @@
-# Terraform AWS Infrastructure - Unified Healthcare Platform
+# Terraform AWS Infrastructure - Unified Health Platform
 
-This directory contains Terraform configurations for deploying the Unified Healthcare Platform infrastructure on Amazon Web Services (AWS).
+This directory contains Terraform configurations for deploying the Unified Health Platform infrastructure on Amazon Web Services (AWS).
 
 ## Table of Contents
 

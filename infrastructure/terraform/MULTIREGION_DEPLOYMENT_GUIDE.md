@@ -88,7 +88,7 @@ Each region is fully independent with:
 
 ### Step 1: Clone and Navigate
 ```bash
-cd "C:/Users/Dell/OneDrive/Documents/Unified Healthcare Platform/Global-Healthcare-SaaS-Platform/infrastructure/terraform"
+cd "C:/Users/Dell/OneDrive/Documents/Unified Health Platform/Global-Healthcare-SaaS-Platform/infrastructure/terraform"
 ```
 
 ### Step 2: Review and Customize Configuration

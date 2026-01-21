@@ -1,6 +1,6 @@
 # Monolith Extraction Plan
 
-**World Unified Healthcare Platform - Strangler Pattern Migration**
+**World Unified Health Platform - Strangler Pattern Migration**
 
 ## Executive Summary
 

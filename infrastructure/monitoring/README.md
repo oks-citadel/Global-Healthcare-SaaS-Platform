@@ -1,7 +1,7 @@
 # Monitoring and Observability Setup
-## Unified Healthcare Platform
+## Unified Health Platform
 
-This directory contains all monitoring, observability, and incident response configurations for the Unified Healthcare Platform.
+This directory contains all monitoring, observability, and incident response configurations for the Unified Health Platform.
 
 ---
 

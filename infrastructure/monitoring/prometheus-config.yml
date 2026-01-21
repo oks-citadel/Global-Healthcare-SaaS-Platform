@@ -1,4 +1,4 @@
-# Prometheus Configuration for Unified Healthcare Platform
+# Prometheus Configuration for Unified Health Platform
 # Production-ready monitoring setup with service discovery and alerting
 
 global:

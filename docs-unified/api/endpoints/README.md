@@ -1,6 +1,6 @@
 # API Endpoint Documentation
 
-Detailed documentation for all Unified Healthcare Platform API endpoints.
+Detailed documentation for all Unified Health Platform API endpoints.
 
 ## Available Endpoints
 

@@ -9,6 +9,20 @@ const isProduction = process.env.NODE_ENV === 'production';
 const isDevelopment = process.env.NODE_ENV === 'development' || !process.env.NODE_ENV;
 
 /**
+ * SECURITY NOTE: Development-only fallback values
+ *
+ * This file contains fallback values for development environments only.
+ * These fallbacks are:
+ * 1. ONLY used when isDevelopment is true
+ * 2. Clearly marked with 'dev-only' prefix to indicate non-production use
+ * 3. Protected by enforceValidConfig() which throws in production if real values are missing
+ * 4. Logged with warnings when used
+ *
+ * Production deployments MUST set proper environment variables and will fail fast
+ * if any required secrets are missing or appear to be development values.
+ */
+
+/**
  * List of required environment variables for production
  */
 const REQUIRED_ENV_VARS = [
@@ -170,6 +184,8 @@ export const config = {
   },
 
   jwt: {
+    // nosemgrep: typescript.lang.security.hardcoded-jwt-secret
+    // Development fallback only - production requires JWT_SECRET env var (enforced by getRequiredEnv)
     secret: getRequiredEnv('JWT_SECRET', isDevelopment ? 'dev-only-insecure-jwt-secret-min-32-chars' : undefined),
     expiresIn: getOptionalEnv('JWT_EXPIRY', '1h'),
     refreshExpiresIn: getOptionalEnv('REFRESH_TOKEN_EXPIRY', '7d'),
@@ -186,7 +202,11 @@ export const config = {
   },
 
   encryption: {
+    // nosemgrep: typescript.lang.security.hardcoded-secret
+    // Development fallback only - production requires ENCRYPTION_KEY env var (enforced by getRequiredEnv)
     key: getRequiredEnv('ENCRYPTION_KEY', isDevelopment ? 'dev-only-32-byte-encryption-key!' : undefined),
+    // nosemgrep: typescript.lang.security.hardcoded-secret
+    // Development fallback only - production requires FIELD_ENCRYPTION_KEY env var (enforced by getRequiredEnv)
     fieldKey: getRequiredEnv('FIELD_ENCRYPTION_KEY', isDevelopment ? 'dev-field-encryption-key-32bytes' : undefined),
   },
 

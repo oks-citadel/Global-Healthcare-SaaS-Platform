@@ -1,6 +1,6 @@
 # Security Hardening Checklist
 
-**Platform:** Unified Healthcare SaaS Platform
+**Platform:** Unified Health SaaS Platform
 **Compliance:** HIPAA, GDPR, SOC 2, OWASP Top 10
 **Last Updated:** 2025-12-17
 

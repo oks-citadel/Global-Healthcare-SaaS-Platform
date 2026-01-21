@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document outlines the HIPAA-compliant security measures implemented in the Unified Healthcare Platform. The platform is designed to protect Protected Health Information (PHI) in accordance with the Health Insurance Portability and Accountability Act (HIPAA) Security Rule (45 CFR Parts 160, 162, and 164).
+This document outlines the HIPAA-compliant security measures implemented in the Unified Health Platform. The platform is designed to protect Protected Health Information (PHI) in accordance with the Health Insurance Portability and Accountability Act (HIPAA) Security Rule (45 CFR Parts 160, 162, and 164).
 
 ## Table of Contents
 

@@ -1,6 +1,6 @@
 # Security Documentation
 
-This directory contains comprehensive security and HIPAA compliance documentation for the Unified Healthcare Platform.
+This directory contains comprehensive security and HIPAA compliance documentation for the Unified Health Platform.
 
 ## Documents
 

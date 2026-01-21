@@ -479,4 +479,4 @@ Quality reports are sent every 5 seconds and can be used to:
 
 ## License
 
-This implementation is part of the Unified Healthcare Platform project.
+This implementation is part of the Unified Health Platform project.

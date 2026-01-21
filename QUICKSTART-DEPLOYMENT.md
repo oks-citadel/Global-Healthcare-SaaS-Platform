@@ -129,7 +129,7 @@ aws ecs describe-services \
   --services unified-health-api
 
 # Test health endpoint via ALB
-curl https://api-staging.unified-health.com/health
+curl https://api-staging.theunifiedhealth.com/health
 
 # Should return: {"status":"ok"}
 ```
@@ -148,8 +148,8 @@ AWS_SECRET_ACCESS_KEY = <secret-access-key-from-step-1.1>
 AWS_REGION = us-east-1
 ECR_REGISTRY = <your-account-id>.dkr.ecr.us-east-1.amazonaws.com
 SLACK_WEBHOOK_URL = your-slack-webhook-url
-STAGING_URL = https://staging.unified-health.com
-STAGING_API_URL = https://api-staging.unified-health.com
+STAGING_URL = https://staging.theunifiedhealth.com
+STAGING_API_URL = https://api-staging.theunifiedhealth.com
 ```
 
 ### 3.2 Test CI/CD
@@ -222,10 +222,10 @@ make status-production
 
 ```bash
 # Staging API health
-curl https://api-staging.unified-health.com/health
+curl https://api-staging.theunifiedhealth.com/health
 
 # Production API health
-curl https://api.unified-health.com/health
+curl https://api.theunifiedhealth.com/health
 ```
 
 ### 5.3 Check Monitoring

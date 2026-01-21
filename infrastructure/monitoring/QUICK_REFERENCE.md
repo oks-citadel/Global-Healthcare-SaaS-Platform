@@ -1,5 +1,5 @@
 # Monitoring Quick Reference Guide
-## Unified Healthcare Platform
+## Unified Health Platform
 
 **For:** On-Call Engineers, SREs, DevOps
 **Quick Links:** [Dashboards](#dashboards) | [Alerts](#common-alerts) | [Queries](#useful-queries) | [Commands](#useful-commands)

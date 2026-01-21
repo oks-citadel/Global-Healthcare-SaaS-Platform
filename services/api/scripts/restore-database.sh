@@ -2,7 +2,7 @@
 
 #####################################################
 # Database Restore Script
-# Unified Healthcare Platform
+# Unified Health Platform
 #
 # This script restores PostgreSQL database from
 # backup files with safety checks

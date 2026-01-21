@@ -2,7 +2,7 @@
 
 #####################################################
 # Automated Backup Cron Setup Script
-# Unified Healthcare Platform
+# Unified Health Platform
 #
 # This script sets up automated database backups
 # using crontab

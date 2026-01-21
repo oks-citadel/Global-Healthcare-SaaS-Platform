@@ -1,7 +1,7 @@
 # Stripe Integration Configuration Checklist
 
 ## Overview
-This checklist ensures proper configuration of Stripe for the Unified Healthcare Platform, including payment processing, subscriptions, and webhook handling.
+This checklist ensures proper configuration of Stripe for the Unified Health Platform, including payment processing, subscriptions, and webhook handling.
 
 ---
 

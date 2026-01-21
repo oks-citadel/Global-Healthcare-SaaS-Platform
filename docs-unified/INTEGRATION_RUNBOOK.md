@@ -1,7 +1,7 @@
 # Third-Party Integration Runbook
 
 ## Overview
-This runbook provides comprehensive setup, configuration, and operational instructions for all third-party service integrations in the Unified Healthcare Platform.
+This runbook provides comprehensive setup, configuration, and operational instructions for all third-party service integrations in the Unified Health Platform.
 
 ---
 
