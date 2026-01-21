@@ -1,16 +1,23 @@
 import { Request, Response, NextFunction } from 'express';
 
-export interface UserRequest extends Request {
-  user?: {
-    id: string;
-    email: string;
-    role: string;
-  };
+// Extend Express Request type
+declare global {
+  namespace Express {
+    interface Request {
+      user?: {
+        id: string;
+        email: string;
+        role: string;
+      };
+    }
+  }
 }
+
+export type UserRequest = Request;
 
 export const extractUser = (
   req: UserRequest,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ): void => {
   const userId = req.headers['x-user-id'] as string;
