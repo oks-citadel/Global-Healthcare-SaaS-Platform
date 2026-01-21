@@ -73,7 +73,8 @@ const chronicCareConfigSchema = z.object({
 // Type Exports
 // ============================================================================
 
-type ChronicCareConfigEnv = z.infer<typeof chronicCareConfigSchema>;
+/** Type inferred from schema for internal validation */
+export type ChronicCareConfigEnv = z.infer<typeof chronicCareConfigSchema>;
 
 export interface ChronicCareConfig {
   env: 'development' | 'production' | 'test';

@@ -55,7 +55,8 @@ interface VulnerabilityScanResult {
   references?: string[];
 }
 
-interface RiskScoreBreakdown {
+/** Risk score breakdown returned by device risk assessments */
+export interface RiskScoreBreakdown {
   vulnerabilityScore: number;
   patchScore: number;
   networkScore: number;
@@ -413,8 +414,8 @@ export class DeviceSecurityService {
   }
 
   private getKnownDeviceTypeVulnerabilities(
-    deviceType: DeviceType,
-    manufacturer?: string | null
+    _deviceType: DeviceType,
+    _manufacturer?: string | null
   ): VulnerabilityScanResult[] {
     // Placeholder for real CVE integration
     // Would query NVD API, manufacturer feeds, etc.

@@ -11,7 +11,7 @@ export interface UserRequest extends Request {
 // Extract user from headers set by API Gateway
 export const extractUser = (
   req: UserRequest,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ): void => {
   const userId = req.headers['x-user-id'] as string;

@@ -345,7 +345,8 @@ test.describe('Performance Tests', () => {
       const resourceTimings: { name: string; startTime: number; duration: number }[] = [];
 
       page.on('response', async (response) => {
-        const timing = await response.timing().catch(() => null);
+        const request = response.request();
+        const timing = request.timing();
         if (timing) {
           resourceTimings.push({
             name: response.url(),
@@ -651,9 +652,10 @@ test.describe('Performance Tests', () => {
       page.on('response', (response) => {
         const url = response.url();
         if (url.includes('/api/')) {
-          const timing = response.timing();
+          const request = response.request();
+          const timing = request.timing();
           apiTimes.push({
-            url: url.split('/api/')[1],
+            url: url.split('/api/')[1] || url,
             time: timing.responseEnd - timing.startTime,
           });
         }

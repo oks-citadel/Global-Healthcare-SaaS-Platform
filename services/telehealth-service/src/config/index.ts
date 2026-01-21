@@ -71,7 +71,8 @@ const telehealthConfigSchema = z.object({
 // Type Exports
 // ============================================================================
 
-type TelehealthConfigEnv = z.infer<typeof telehealthConfigSchema>;
+/** Type inferred from schema for internal validation */
+export type TelehealthConfigEnv = z.infer<typeof telehealthConfigSchema>;
 
 export interface TelehealthConfig {
   env: 'development' | 'production' | 'test';

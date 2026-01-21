@@ -13,7 +13,6 @@ export class MfaUtils {
   private static readonly ALGORITHM = "aes-256-gcm";
   private static readonly IV_LENGTH = 16;
   private static readonly AUTH_TAG_LENGTH = 16;
-  private static readonly BACKUP_CODE_LENGTH = 8;
   private static readonly BACKUP_CODE_COUNT = 10;
 
   private static getEncryptionKey(): Buffer {

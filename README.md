@@ -12,7 +12,7 @@
 [![Build Status](https://github.com/oks-citadel/Global-Healthcare-SaaS-Platform/actions/workflows/web-frontend-deploy.yml/badge.svg)](https://github.com/oks-citadel/Global-Healthcare-SaaS-Platform/actions)
 [![License](https://img.shields.io/badge/License-Proprietary-blue.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/Version-1.0.0-green.svg)](CHANGELOG.md)
-[![Status](https://img.shields.io/badge/Status-Production_Ready-success.svg)](#production-status)
+[![Status](https://img.shields.io/badge/Status-Production_Ready-success.svg)](#1-production-status)
 [![HIPAA](https://img.shields.io/badge/HIPAA-Compliant-brightgreen.svg)](docs/compliance/HIPAA.md)
 [![FHIR](https://img.shields.io/badge/FHIR-R4-orange.svg)](docs/interoperability/FHIR.md)
 [![GDPR](https://img.shields.io/badge/GDPR-Compliant-blue.svg)](docs/compliance/GDPR.md)
@@ -23,96 +23,137 @@
 
 ---
 
-## Table of Contents
+## Documentation Guidelines
 
-- [Production Status](#production-status)
-- [Executive Summary](#executive-summary)
-- [Platform at a Glance](#platform-at-a-glance)
-- [Platform Capabilities (21 Enterprise Modules)](#platform-capabilities-21-enterprise-modules)
-  - [Domain 1: Clinical Operations](#domain-1-clinical-operations)
-  - [Domain 2: Patient Engagement](#domain-2-patient-engagement)
-  - [Domain 3: Revenue Cycle Management](#domain-3-revenue-cycle-management)
-  - [Domain 4: Data & Analytics](#domain-4-data--analytics)
-  - [Domain 5: Compliance & Security](#domain-5-compliance--security)
-  - [Domain 6: Specialty Solutions](#domain-6-specialty-solutions)
-- [EHR Telehealth Integration](#ehr-telehealth-integration-module-21)
-- [Healthcare Data Standards & Interoperability](#healthcare-data-standards--interoperability)
-- [Key Features](#key-features)
-- [Architecture](#architecture)
-- [Microservices Architecture (Detailed)](#microservices-architecture-detailed)
-- [Project Structure](#project-structure)
-- [Technology Stack](#technology-stack)
-- [Business Logic & Domain Scope](#business-logic--domain-scope)
-- [Subscription Model](#subscription-model)
-- [User Research & Personas](#user-research--personas)
-- [Quick Start](#quick-start)
-- [CI/CD Pipeline](#cicd-pipeline)
-- [Security & Compliance](#security--compliance)
-- [API Documentation](#api-documentation)
-- [Contributing](#contributing)
+This section outlines the standards for contributing to and maintaining this documentation.
+
+### How to Contribute to Documentation
+
+1. **Fork and Branch**: Create a feature branch from `main` with the naming convention `docs/description-of-change`
+2. **Follow Standards**: Adhere to the naming conventions and section ordering rules below
+3. **Test Links**: Verify all internal links and anchors work correctly before submitting
+4. **Review Process**: Submit a Pull Request with a clear description of documentation changes
+5. **Conventional Commits**: Use commit messages like `docs: update API documentation` or `docs: add new module section`
+
+### Naming Conventions
+
+| Element | Convention | Example |
+|---------|------------|---------|
+| Section Headers | Title Case with section numbers | `## 4. Platform Capabilities` |
+| Subsection Headers | Title Case with decimal numbering | `### 4.1 Clinical Operations` |
+| Table Column Headers | **Bold** with Title Case | `| **Module** | **Description** |` |
+| File References | Lowercase with hyphens | `docs/compliance/hipaa-guide.md` |
+| Code References | Backticks with exact case | `` `AuthService` ``, `` `/api/v1/patients` `` |
+| Module Names | Title Case | `AI Clinical Documentation` |
+| Service Names | Title Case with "Service" suffix | `Auth Service`, `Pharmacy Service` |
+
+### Section Ordering Rules
+
+1. **Main Sections**: Numbered sequentially (1, 2, 3, etc.) in logical reading order
+2. **Subsections**: Use decimal notation (4.1, 4.2, 4.3) ordered alphabetically by topic name
+3. **Lists within Sections**:
+   - Services: Alphabetically within each domain
+   - Technologies: Alphabetically by technology name
+   - API Endpoints: Alphabetically by endpoint path
+   - Features: Assigned sequential numerical IDs (F-001, F-002, etc.)
+4. **Tables**:
+   - Module tables: Sequential numerical IDs (1, 2, 3...)
+   - Service tables: Alphabetically by service name or by port number
+   - Sorted consistently within each table type
 
 ---
 
-## Production Status
+## Table of Contents
+
+- [1. Production Status](#1-production-status)
+- [2. Executive Summary](#2-executive-summary)
+- [3. Platform at a Glance](#3-platform-at-a-glance)
+- [4. Platform Capabilities (21 Enterprise Modules)](#4-platform-capabilities-21-enterprise-modules)
+  - [4.1 Clinical Operations](#41-clinical-operations)
+  - [4.2 Compliance & Security](#42-compliance--security)
+  - [4.3 Data & Analytics](#43-data--analytics)
+  - [4.4 Patient Engagement](#44-patient-engagement)
+  - [4.5 Revenue Cycle Management](#45-revenue-cycle-management)
+  - [4.6 Specialty Solutions](#46-specialty-solutions)
+- [5. EHR Telehealth Integration](#5-ehr-telehealth-integration-module-21)
+- [6. Healthcare Data Standards & Interoperability](#6-healthcare-data-standards--interoperability)
+- [7. Key Features](#7-key-features)
+- [8. Architecture](#8-architecture)
+- [9. Microservices Architecture (Detailed)](#9-microservices-architecture-detailed)
+- [10. Project Structure](#10-project-structure)
+- [11. Technology Stack](#11-technology-stack)
+- [12. Business Logic & Domain Scope](#12-business-logic--domain-scope)
+- [13. Subscription Model](#13-subscription-model)
+- [14. User Research & Personas](#14-user-research--personas)
+- [15. Quick Start](#15-quick-start)
+- [16. CI/CD Pipeline](#16-cicd-pipeline)
+- [17. Security & Compliance](#17-security--compliance)
+- [18. API Documentation](#18-api-documentation)
+- [19. Contributing](#19-contributing)
+- [20. Support](#20-support)
+
+---
+
+## 1. Production Status
 
 > **Last Updated:** January 20, 2026
 
-### Platform Readiness Overview
+### 1.1 Platform Readiness Overview
 
 | Component            | Status              | Details                                     |
 | -------------------- | ------------------- | ------------------------------------------- |
 | **Backend Services** | ✅ Production Ready | 21 enterprise modules fully operational     |
+| **CI/CD Pipelines**  | ✅ Operational      | GitHub Actions workflows configured         |
+| **Compliance**       | ✅ Compliant        | HIPAA, GDPR, POPIA frameworks implemented   |
 | **Frontend Apps**    | ✅ Production Ready | 5 applications with real API integration    |
 | **Infrastructure**   | ✅ Configured       | AWS/Azure Terraform modules ready           |
-| **CI/CD Pipelines**  | ✅ Operational      | GitHub Actions workflows configured         |
 | **Security**         | ✅ Hardened         | Rate limiting, JWT auth, encryption enabled |
-| **Compliance**       | ✅ Compliant        | HIPAA, GDPR, POPIA frameworks implemented   |
 
-### Services Status (21 Enterprise Modules)
+### 1.2 Services Status (21 Enterprise Modules)
 
 | Service                    | Port | Status   | Database           | Rate Limiting |
 | -------------------------- | ---- | -------- | ------------------ | ------------- |
+| AI Health Service          | 3020 | ✅ Ready | PostgreSQL         | ✅            |
 | API Gateway                | 3000 | ✅ Ready | Stateless          | ✅            |
+| Attendance AI Service      | 3021 | ✅ Ready | PostgreSQL         | ✅            |
 | Auth Service               | 3001 | ✅ Ready | PostgreSQL         | ✅            |
-| Core API                   | 8080 | ✅ Ready | PostgreSQL         | ✅            |
-| Telehealth Service         | 3001 | ✅ Ready | PostgreSQL         | ✅            |
-| Mental Health Service      | 3002 | ✅ Ready | PostgreSQL         | ✅            |
 | Chronic Care Service       | 3003 | ✅ Ready | PostgreSQL         | ✅            |
-| Pharmacy Service           | 3004 | ✅ Ready | PostgreSQL         | ✅            |
-| Laboratory Service         | 3005 | ✅ Ready | PostgreSQL         | ✅            |
-| Imaging Service            | 3006 | ✅ Ready | PostgreSQL         | ✅            |
-| Notification Service       | 3007 | ✅ Ready | PostgreSQL + Redis | ✅            |
 | Clinical Trials Service    | 3014 | ✅ Ready | PostgreSQL         | ✅            |
+| Core API                   | 8080 | ✅ Ready | PostgreSQL         | ✅            |
+| Data Normalization Engine  | 3024 | ✅ Ready | PostgreSQL         | ✅            |
 | Denial Management Service  | 3010 | ✅ Ready | PostgreSQL         | ✅            |
+| Enviro Health Service      | 3022 | ✅ Ready | PostgreSQL         | ✅            |
 | Home Health Service        | 3019 | ✅ Ready | PostgreSQL         | ✅            |
+| Imaging Service            | 3006 | ✅ Ready | PostgreSQL         | ✅            |
+| Laboratory Service         | 3005 | ✅ Ready | PostgreSQL         | ✅            |
+| Mental Health Service      | 3002 | ✅ Ready | PostgreSQL         | ✅            |
+| Notification Service       | 3007 | ✅ Ready | PostgreSQL + Redis | ✅            |
+| Pharmacy Service           | 3004 | ✅ Ready | PostgreSQL         | ✅            |
 | Population Health Service  | 3013 | ✅ Ready | PostgreSQL         | ✅            |
 | Price Transparency Service | 3011 | ✅ Ready | PostgreSQL         | ✅            |
-| Vendor Risk Service        | 3016 | ✅ Ready | PostgreSQL         | ✅            |
-| AI Health Service          | 3020 | ✅ Ready | PostgreSQL         | ✅            |
-| Attendance AI Service      | 3021 | ✅ Ready | PostgreSQL         | ✅            |
-| Enviro Health Service      | 3022 | ✅ Ready | PostgreSQL         | ✅            |
 | Smart Reminders Service    | 3023 | ✅ Ready | PostgreSQL         | ✅            |
-| Data Normalization Engine  | 3024 | ✅ Ready | PostgreSQL         | ✅            |
+| Telehealth Service         | 3001 | ✅ Ready | PostgreSQL         | ✅            |
+| Vendor Risk Service        | 3016 | ✅ Ready | PostgreSQL         | ✅            |
 
-### Frontend Applications Status
+### 1.3 Frontend Applications Status
 
 | Application     | Port | Status   | API Integration | Security Config |
 | --------------- | ---- | -------- | --------------- | --------------- |
-| Web Portal      | 3000 | ✅ Ready | Real API calls  | ✅ Hardened     |
-| Provider Portal | 3002 | ✅ Ready | Real API calls  | ✅ Hardened     |
 | Admin Dashboard | 3001 | ✅ Ready | Real API calls  | ✅ Hardened     |
-| Mobile App      | N/A  | ✅ Ready | Real API calls  | ✅ Hardened     |
 | Kiosk App       | 3004 | ✅ Ready | Real API calls  | ✅ Hardened     |
+| Mobile App      | N/A  | ✅ Ready | Real API calls  | ✅ Hardened     |
+| Provider Portal | 3002 | ✅ Ready | Real API calls  | ✅ Hardened     |
+| Web Portal      | 3000 | ✅ Ready | Real API calls  | ✅ Hardened     |
 
-### Revenue Readiness Score: 100/100
+### 1.4 Revenue Readiness Score: 100/100
 
+- ✅ Billing API Endpoints
+- ✅ Invoice Generation
+- ✅ Multi-Currency Support (50+ currencies)
 - ✅ Payment Processing (Stripe Integration)
 - ✅ Subscription Management (6-tier plans)
-- ✅ Multi-Currency Support (50+ currencies)
-- ✅ Invoice Generation
-- ✅ Billing API Endpoints
 
-### Pre-Deployment Checklist
+### 1.5 Pre-Deployment Checklist
 
 ```bash
 # 1. Install dependencies
@@ -134,89 +175,89 @@ pnpm build && pnpm start
 
 ---
 
-## Executive Summary
+## 2. Executive Summary
 
-### The Problem: Fragmented Global Healthcare Delivery
+### 2.1 The Problem: Fragmented Global Healthcare Delivery
 
 Healthcare systems worldwide face critical challenges that cost lives and drain resources:
 
 | Challenge                          | Impact                                             | Current Reality                                        |
 | ---------------------------------- | -------------------------------------------------- | ------------------------------------------------------ |
+| **Digital Divide**                 | Unequal access to telehealth                       | 40% of emerging markets lack reliable connectivity     |
 | **Fragmented Patient Records**     | Medical errors, duplicate tests, delayed diagnoses | Average patient has records in 6+ disconnected systems |
+| **Lack of Preventive Focus**       | Reactive vs. proactive care                        | Only 8% of healthcare spending on prevention           |
 | **Limited Access to Care**         | 50% of world lacks basic healthcare access         | Rural areas: 2+ hours to nearest provider              |
+| **Prohibitive Costs**              | Delayed treatment, worse outcomes                  | Traditional EHR: $500K+ implementation                 |
 | **Provider Administrative Burden** | Burnout, reduced patient time                      | 34% of physician time spent on documentation           |
 | **Siloed Specialty Care**          | Poor care coordination, treatment gaps             | Mental health + chronic care rarely integrated         |
-| **Prohibitive Costs**              | Delayed treatment, worse outcomes                  | Traditional EHR: $500K+ implementation                 |
-| **Lack of Preventive Focus**       | Reactive vs. proactive care                        | Only 8% of healthcare spending on prevention           |
-| **Digital Divide**                 | Unequal access to telehealth                       | 40% of emerging markets lack reliable connectivity     |
 
-### The Solution: UnifiedHealth Global Platform
+### 2.2 The Solution: UnifiedHealth Global Platform
 
 UnifiedHealth is a **next-generation, AI-powered healthcare SaaS platform** that transforms fragmented healthcare delivery into a unified, intelligent ecosystem. By consolidating telehealth, preventive care, chronic disease management, mental health services, pharmacy operations, and diagnostics into a single patient-centric system, we enable healthcare organizations to deliver better outcomes at lower costs.
 
-### Why UnifiedHealth Wins
+### 2.3 Why UnifiedHealth Wins
 
 | Capability             | UnifiedHealth               | Traditional EHR       | Telehealth Apps |
 | ---------------------- | --------------------------- | --------------------- | --------------- |
-| **Deployment Time**    | 24-72 hours (SaaS)          | 6-12 months           | 2-4 weeks       |
-| **Offline Support**    | Full functionality          | None                  | None            |
-| **Multi-Currency**     | 50+ currencies              | USD only              | Limited         |
 | **AI Integration**     | Native AI/ML workflows      | Add-on modules        | Basic           |
-| **Health Checkups**    | Complete engine             | None                  | None            |
-| **Global Regions**     | 5 continents, 50+ countries | Single region         | US-focused      |
-| **Starting Cost**      | $500/month                  | $500K+ implementation | Per-visit fees  |
-| **FHIR Native**        | Built-in R4 compliance      | Retrofitted           | None            |
-| **Mental Health**      | Fully integrated            | Separate system       | Limited         |
 | **Chronic Care + IoT** | Real-time monitoring        | Manual entry          | None            |
+| **Deployment Time**    | 24-72 hours (SaaS)          | 6-12 months           | 2-4 weeks       |
+| **FHIR Native**        | Built-in R4 compliance      | Retrofitted           | None            |
+| **Global Regions**     | 5 continents, 50+ countries | Single region         | US-focused      |
+| **Health Checkups**    | Complete engine             | None                  | None            |
+| **Mental Health**      | Fully integrated            | Separate system       | Limited         |
+| **Multi-Currency**     | 50+ currencies              | USD only              | Limited         |
+| **Offline Support**    | Full functionality          | None                  | None            |
+| **Starting Cost**      | $500/month                  | $500K+ implementation | Per-visit fees  |
 
-### Strategic Value Proposition
-
-**For Patients:**
-
-- Single app for all healthcare needs
-- AI-powered symptom assessment and triage
-- Family health management in one place
-- Access care anywhere, anytime (offline-first)
-- Transparent pricing in local currency
-
-**For Healthcare Providers:**
-
-- Reduce documentation time by 40% with AI assistance
-- Unified view of patient across all touchpoints
-- Built-in billing and subscription management
-- FHIR-compliant data exchange with any system
-- White-label deployment options
-
-**For Healthcare Organizations:**
-
-- Deploy in days, not months
-- Multi-tenant architecture with data isolation
-- Compliance built-in (HIPAA, GDPR, POPIA)
-- Enterprise analytics and population health insights
-- Scalable from single clinic to multi-national enterprise
+### 2.4 Strategic Value Proposition
 
 **For Employers & Insurers:**
 
-- Comprehensive employee wellness platform
-- Reduce healthcare costs through prevention
-- Real-time utilization analytics
 - Chronic disease management reduces claims
+- Comprehensive employee wellness platform
+- Real-time utilization analytics
+- Reduce healthcare costs through prevention
 
-### Market Opportunity
+**For Healthcare Organizations:**
+
+- Compliance built-in (HIPAA, GDPR, POPIA)
+- Deploy in days, not months
+- Enterprise analytics and population health insights
+- Multi-tenant architecture with data isolation
+- Scalable from single clinic to multi-national enterprise
+
+**For Healthcare Providers:**
+
+- Built-in billing and subscription management
+- FHIR-compliant data exchange with any system
+- Reduce documentation time by 40% with AI assistance
+- Unified view of patient across all touchpoints
+- White-label deployment options
+
+**For Patients:**
+
+- Access care anywhere, anytime (offline-first)
+- AI-powered symptom assessment and triage
+- Family health management in one place
+- Single app for all healthcare needs
+- Transparent pricing in local currency
+
+### 2.5 Market Opportunity
 
 The global digital health market is projected to reach **$1.5 trillion by 2030**, driven by:
 
-- Post-pandemic telehealth adoption (500%+ growth sustained)
 - Chronic disease epidemic (60% of adults have 1+ condition)
-- Mental health crisis (demand up 25% annually)
 - Emerging market healthcare expansion
+- Mental health crisis (demand up 25% annually)
+- Post-pandemic telehealth adoption (500%+ growth sustained)
 - Value-based care transition
 
 UnifiedHealth is uniquely positioned to capture this opportunity with the **only platform combining preventive care + clinical services + AI + global compliance** in a single offering.
 
 ---
 
-## Platform at a Glance
+## 3. Platform at a Glance
 
 > **One Platform. Complete Healthcare.**
 
@@ -224,13 +265,13 @@ A unified, enterprise-grade healthcare platform connecting patients, providers, 
 
 | Metric | Value |
 |--------|-------|
-| **Integrated Modules** | 21 Enterprise Modules |
+| **Cloud Regions** | Multi-Region (Africa, Americas, Asia-Pacific, Europe, Middle East) |
+| **Compliance Frameworks** | 5 (GDPR, HIPAA, HITRUST, POPIA, SOC 2) |
 | **Data Standards** | 6+ Healthcare Standards |
-| **Compliance Frameworks** | 5 (HIPAA, GDPR, POPIA, SOC 2, HITRUST) |
-| **Cloud Regions** | Multi-Region (Americas, Europe, Asia-Pacific, Africa, Middle East) |
-| **Interoperability** | FHIR R4, HL7v2, C-CDA, DICOM, X12 EDI, NCPDP |
+| **Integrated Modules** | 21 Enterprise Modules |
+| **Interoperability** | C-CDA, DICOM, FHIR R4, HL7v2, NCPDP, X12 EDI |
 
-### How The Platform Works
+### 3.1 How The Platform Works
 
 ```
 ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
@@ -246,118 +287,118 @@ A unified, enterprise-grade healthcare platform connecting patients, providers, 
 
 ---
 
-## Platform Capabilities (21 Enterprise Modules)
+## 4. Platform Capabilities (21 Enterprise Modules)
 
-### Domain 1: Clinical Operations
+### 4.1 Clinical Operations
 
 Streamline clinical workflows, documentation, and care coordination.
 
-| # | Module | Description | Key Features | Integrations |
-|---|--------|-------------|--------------|--------------|
-| 1 | **AI Clinical Documentation** | Ambient listening that auto-generates clinical notes and suggests billing codes | Voice-to-SOAP notes, Auto ICD-10/CPT coding, Provider attestation, Multi-specialty templates | EHR systems, FHIR R4, C-CDA |
-| 2 | **Prior Authorization Automation** | AI-driven payer submissions with real-time eligibility verification | Real-time eligibility checks, Clinical criteria matching, Auto-submission, Appeal generation | X12 278/275, Payer APIs, FHIR CRD/DTR |
-| 3 | **Care Coordination Hub** | Multi-provider care plan management for complex patients | Shared care plans, Task assignment, Secure messaging, ADT alerts, SDOH tracking | FHIR CarePlan, Direct messaging, HIEs |
-| 4 | **Surgical Scheduling Optimizer** | AI-powered OR scheduling to maximize utilization | Block optimization, Case duration prediction, Resource allocation, Cancellation prediction | EHR scheduling, OR management systems |
-| 21 | **EHR Telehealth Integration** ⭐ | Seamless virtual care embedded directly within EHR workflows | One-click video visits, SMART on FHIR auth, Auto-documentation, Multi-party sessions, RPM integration | FHIR R4 APIs, SMART on FHIR OAuth 2.0, HL7 ADT/SIU, WebRTC |
+| ID | Module | Description | Key Features | Integrations |
+|----|--------|-------------|--------------|--------------|
+| 1 | **AI Clinical Documentation** | Ambient listening that auto-generates clinical notes and suggests billing codes | Auto ICD-10/CPT coding, Multi-specialty templates, Provider attestation, Voice-to-SOAP notes | C-CDA, EHR systems, FHIR R4 |
+| 2 | **Care Coordination Hub** | Multi-provider care plan management for complex patients | ADT alerts, SDOH tracking, Secure messaging, Shared care plans, Task assignment | Direct messaging, FHIR CarePlan, HIEs |
+| 3 | **EHR Telehealth Integration** | Seamless virtual care embedded directly within EHR workflows | Auto-documentation, Multi-party sessions, One-click video visits, RPM integration, SMART on FHIR auth | FHIR R4 APIs, HL7 ADT/SIU, SMART on FHIR OAuth 2.0, WebRTC |
+| 4 | **Prior Authorization Automation** | AI-driven payer submissions with real-time eligibility verification | Appeal generation, Auto-submission, Clinical criteria matching, Real-time eligibility checks | FHIR CRD/DTR, Payer APIs, X12 278/275 |
+| 5 | **Surgical Scheduling Optimizer** | AI-powered OR scheduling to maximize utilization | Block optimization, Cancellation prediction, Case duration prediction, Resource allocation | EHR scheduling, OR management systems |
 
-**Benefits:** 50%+ documentation time savings, reduced physician burnout, improved coding accuracy, 10-15% OR utilization improvement.
-
----
-
-### Domain 2: Patient Engagement
-
-Empower patients with digital tools for better health outcomes.
-
-| # | Module | Description | Key Features | Integrations |
-|---|--------|-------------|--------------|--------------|
-| 5 | **Chronic Care Management** | Remote monitoring + care plan adherence for value-based programs | Device integration (BP, glucose, weight), Care plan tracking, Alert escalation, Billing automation | Bluetooth/cellular devices, FHIR Observation |
-| 6 | **Digital Front Door** | Pre-visit registration, insurance verification, and intake | Online scheduling, Insurance card OCR, Eligibility check, Digital consents, Copay estimation | X12 270/271, FHIR Patient/Coverage |
-| 7 | **Medication Adherence** | Smart reminders and pharmacy coordination | Multi-channel reminders, Refill coordination, Drug interaction alerts, Adherence analytics | NCPDP SCRIPT, Pharmacy networks, FHIR MedicationRequest |
-| 8 | **Post-Discharge Follow-Up** | Automated check-ins and readmission prevention | Automated outreach, Symptom assessment, Risk scoring, Escalation workflows | ADT feeds, FHIR Encounter |
-
-**Benefits:** Better chronic disease control, CCM/RPM revenue capture, 20%+ readmission reduction, improved PDC scores.
+**Benefits:** 10-15% OR utilization improvement, 50%+ documentation time savings, improved coding accuracy, reduced physician burnout.
 
 ---
 
-### Domain 3: Revenue Cycle Management
-
-Optimize financial performance from claim to collection.
-
-| # | Module | Description | Key Features | Integrations |
-|---|--------|-------------|--------------|--------------|
-| 9 | **AI Denial Management** | Predict denials before submission and automate appeals | Pre-submission prediction, Root cause analysis, Auto-appeal generation, Payer analytics | X12 835/837, Clearinghouses |
-| 10 | **Price Transparency** | Compliance tools for pricing disclosure requirements | Machine-readable files, Good faith estimates, Patient price lookup, Compliance monitoring | Chargemaster, Payer contracts |
-| 11 | **Patient Financing** | Embedded payment plans in clinical workflows | Payment plan creation, Credit assessment, Financial assistance screening, Collections optimization | EHR billing, Payment processors |
-
-**Benefits:** 30%+ denial reduction, faster recovery, regulatory compliance, improved collections, reduced bad debt.
-
----
-
-### Domain 4: Data & Analytics
-
-Transform healthcare data into actionable insights.
-
-| # | Module | Description | Key Features | Integrations |
-|---|--------|-------------|--------------|--------------|
-| 12 | **Data Normalization Engine** ⭐ | Standardize multi-source clinical data for analytics | HL7v2 → FHIR transformation, Terminology mapping, Data quality scoring, Patient matching | HL7v2, FHIR R4, C-CDA, X12, Custom files |
-| 13 | **Population Health** | Risk stratification for ACOs and value-based care | Multi-factor risk models, Care gap identification, Quality measure tracking, SDOH integration | Claims data, FHIR Bundles, Health exchanges |
-| 14 | **Clinical Trial Matching** | AI-powered patient-to-trial matching | Eligibility parsing, EHR-based matching, Site feasibility, Regulatory compliance | Trial registries, FHIR ResearchStudy |
-
-**Benefits:** Analytics-ready data, true interoperability, high-risk patient identification, quality bonus achievement, faster trial enrollment.
-
----
-
-### Domain 5: Compliance & Security
+### 4.2 Compliance & Security
 
 Automate compliance and protect sensitive health data.
 
-| # | Module | Description | Key Features | Integrations |
-|---|--------|-------------|--------------|--------------|
-| 15 | **HIPAA Compliance Automation** ⭐ | Continuous monitoring and audit trail generation | Policy templates, Risk assessment automation, Training tracking, Incident management, Audit logs | SIEM platforms, Cloud providers, HR systems |
-| 16 | **Vendor Risk Management** ⭐ | Third-party security and BAA lifecycle management | Security questionnaires, Continuous monitoring, BAA management, Risk scoring | Security rating services, Contract management |
-| 17 | **Medical Device Security** | IoMT discovery and vulnerability management | Device discovery, Vulnerability scanning, Network segmentation, Anomaly detection | Network infrastructure, Asset management |
+| ID | Module | Description | Key Features | Integrations |
+|----|--------|-------------|--------------|--------------|
+| 6 | **HIPAA Compliance Automation** | Continuous monitoring and audit trail generation | Audit logs, Incident management, Policy templates, Risk assessment automation, Training tracking | Cloud providers, HR systems, SIEM platforms |
+| 7 | **Medical Device Security** | IoMT discovery and vulnerability management | Anomaly detection, Device discovery, Network segmentation, Vulnerability scanning | Asset management, Network infrastructure |
+| 8 | **Vendor Risk Management** | Third-party security and BAA lifecycle management | BAA management, Continuous monitoring, Risk scoring, Security questionnaires | Contract management, Security rating services |
 
-**Benefits:** Audit readiness, reduced compliance burden, third-party visibility, reduced attack surface, regulatory compliance.
+**Benefits:** Audit readiness, reduced attack surface, reduced compliance burden, regulatory compliance, third-party visibility.
 
 ---
 
-### Domain 6: Specialty Solutions
+### 4.3 Data & Analytics
+
+Transform healthcare data into actionable insights.
+
+| ID | Module | Description | Key Features | Integrations |
+|----|--------|-------------|--------------|--------------|
+| 9 | **Clinical Trial Matching** | AI-powered patient-to-trial matching | EHR-based matching, Eligibility parsing, Regulatory compliance, Site feasibility | FHIR ResearchStudy, Trial registries |
+| 10 | **Data Normalization Engine** | Standardize multi-source clinical data for analytics | Data quality scoring, HL7v2 to FHIR transformation, Patient matching, Terminology mapping | C-CDA, Custom files, FHIR R4, HL7v2, X12 |
+| 11 | **Population Health** | Risk stratification for ACOs and value-based care | Care gap identification, Multi-factor risk models, Quality measure tracking, SDOH integration | Claims data, FHIR Bundles, Health exchanges |
+
+**Benefits:** Analytics-ready data, faster trial enrollment, high-risk patient identification, quality bonus achievement, true interoperability.
+
+---
+
+### 4.4 Patient Engagement
+
+Empower patients with digital tools for better health outcomes.
+
+| ID | Module | Description | Key Features | Integrations |
+|----|--------|-------------|--------------|--------------|
+| 12 | **Chronic Care Management** | Remote monitoring + care plan adherence for value-based programs | Alert escalation, Billing automation, Care plan tracking, Device integration (BP, glucose, weight) | Bluetooth/cellular devices, FHIR Observation |
+| 13 | **Digital Front Door** | Pre-visit registration, insurance verification, and intake | Copay estimation, Digital consents, Eligibility check, Insurance card OCR, Online scheduling | FHIR Patient/Coverage, X12 270/271 |
+| 14 | **Medication Adherence** | Smart reminders and pharmacy coordination | Adherence analytics, Drug interaction alerts, Multi-channel reminders, Refill coordination | FHIR MedicationRequest, NCPDP SCRIPT, Pharmacy networks |
+| 15 | **Post-Discharge Follow-Up** | Automated check-ins and readmission prevention | Automated outreach, Escalation workflows, Risk scoring, Symptom assessment | ADT feeds, FHIR Encounter |
+
+**Benefits:** 20%+ readmission reduction, better chronic disease control, CCM/RPM revenue capture, improved PDC scores.
+
+---
+
+### 4.5 Revenue Cycle Management
+
+Optimize financial performance from claim to collection.
+
+| ID | Module | Description | Key Features | Integrations |
+|----|--------|-------------|--------------|--------------|
+| 16 | **AI Denial Management** | Predict denials before submission and automate appeals | Auto-appeal generation, Payer analytics, Pre-submission prediction, Root cause analysis | Clearinghouses, X12 835/837 |
+| 17 | **Patient Financing** | Embedded payment plans in clinical workflows | Collections optimization, Credit assessment, Financial assistance screening, Payment plan creation | EHR billing, Payment processors |
+| 18 | **Price Transparency** | Compliance tools for pricing disclosure requirements | Compliance monitoring, Good faith estimates, Machine-readable files, Patient price lookup | Chargemaster, Payer contracts |
+
+**Benefits:** 30%+ denial reduction, faster recovery, improved collections, reduced bad debt, regulatory compliance.
+
+---
+
+### 4.6 Specialty Solutions
 
 Purpose-built tools for specialized care settings.
 
-| # | Module | Description | Key Features | Integrations |
-|---|--------|-------------|--------------|--------------|
-| 18 | **Behavioral Health Platform** | EHR + billing + telehealth for mental health practices | Therapy note templates, Outcome assessments, Integrated telehealth, Group therapy support | Clearinghouses, WebRTC telehealth, FHIR QuestionnaireResponse |
-| 19 | **Home Health Workforce** | Scheduling, EVV compliance, and route optimization | Electronic visit verification, Route optimization, Mobile caregiver app, Payroll integration | State EVV systems, Payroll systems |
-| 20 | **Imaging Workflow** | DICOM routing and AI-assisted reading prioritization | Intelligent routing, AI triage, Worklist management, Critical findings alerts | DICOM, HL7 ORM/ORU, PACS systems |
+| ID | Module | Description | Key Features | Integrations |
+|----|--------|-------------|--------------|--------------|
+| 19 | **Behavioral Health Platform** | EHR + billing + telehealth for mental health practices | Group therapy support, Integrated telehealth, Outcome assessments, Therapy note templates | Clearinghouses, FHIR QuestionnaireResponse, WebRTC telehealth |
+| 20 | **Home Health Workforce** | Scheduling, EVV compliance, and route optimization | Electronic visit verification, Mobile caregiver app, Payroll integration, Route optimization | Payroll systems, State EVV systems |
+| 21 | **Imaging Workflow** | DICOM routing and AI-assisted reading prioritization | AI triage, Critical findings alerts, Intelligent routing, Worklist management | DICOM, HL7 ORM/ORU, PACS systems |
 
-**Benefits:** Specialty-optimized workflows, regulatory compliance, reduced travel time, faster turnaround, critical case prioritization.
+**Benefits:** Critical case prioritization, faster turnaround, reduced travel time, regulatory compliance, specialty-optimized workflows.
 
 ---
 
-## EHR Telehealth Integration (Module #21)
+## 5. EHR Telehealth Integration (Module #21)
 
-### Seamless Virtual Care Within Your Clinical Workflow
+### 5.1 Seamless Virtual Care Within Your Clinical Workflow
 
 Our EHR telehealth integration enables healthcare providers to conduct virtual visits directly from their existing clinical workflows. Using industry-standard FHIR APIs and SMART on FHIR authentication, the platform provides a unified experience for both providers and patients.
 
-### Provider Experience
+### 5.2 Patient Experience
 
 | Feature | Description | Capabilities |
 |---------|-------------|--------------|
-| **Provider Desktop Application** | Launch video visits with one click directly from the provider workflow | Integrated patient context, Real-time documentation, Multi-specialty support |
-| **Mobile Provider Apps** | Conduct visits from mobile devices with full EHR access | iOS and Android support, Secure authentication, Offline documentation |
-| **Clinic-to-Clinic Workflows** | Support teleconsultation between facilities and specialists | Remote specialist consults, Multi-party video, Shared screen viewing |
-
-### Patient Experience
-
-| Feature | Description | Capabilities |
-|---------|-------------|--------------|
-| **Patient Portal Integration** | Patients launch visits from their secure health portal | No downloads required, Mobile-optimized, Pre-visit check-in |
+| **Family & Caregiver Access** | Include family members or caregivers in visits | Care team collaboration, Interpreter services, Multi-party support |
 | **Flexible Join Options** | Multiple ways for patients to connect | Email/SMS links, Portal launch, QR code access |
-| **Family & Caregiver Access** | Include family members or caregivers in visits | Multi-party support, Interpreter services, Care team collaboration |
+| **Patient Portal Integration** | Patients launch visits from their secure health portal | Mobile-optimized, No downloads required, Pre-visit check-in |
 
-### Technical Architecture
+### 5.3 Provider Experience
+
+| Feature | Description | Capabilities |
+|---------|-------------|--------------|
+| **Clinic-to-Clinic Workflows** | Support teleconsultation between facilities and specialists | Multi-party video, Remote specialist consults, Shared screen viewing |
+| **Mobile Provider Apps** | Conduct visits from mobile devices with full EHR access | Android support, iOS support, Offline documentation, Secure authentication |
+| **Provider Desktop Application** | Launch video visits with one click directly from the provider workflow | Integrated patient context, Multi-specialty support, Real-time documentation |
+
+### 5.4 Technical Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -387,9 +428,30 @@ Our EHR telehealth integration enables healthcare providers to conduct virtual v
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-### Supported Workflows
+### 5.5 Supported Workflows
 
-#### 1. Scheduled Video Visit
+#### 5.5.1 On-Demand Virtual Visit
+```
+1. Patient requests urgent virtual visit
+2. Triage questionnaire completed
+3. Available provider matched
+4. Immediate video session launched
+5. Visit conducted and documented
+6. Prescriptions, referrals as needed
+7. Summary shared with primary care
+```
+
+#### 5.5.2 Remote Monitoring Check-In
+```
+1. Patient vitals received from RPM devices
+2. Alert triggered based on thresholds
+3. Care team notified
+4. Video check-in initiated
+5. Intervention documented
+6. Care plan adjusted if needed
+```
+
+#### 5.5.3 Scheduled Video Visit
 ```
 1. Appointment created in EHR scheduler
 2. Patient receives confirmation with join instructions
@@ -401,28 +463,7 @@ Our EHR telehealth integration enables healthcare providers to conduct virtual v
 8. Follow-up scheduling and care plan updates
 ```
 
-#### 2. On-Demand Virtual Visit
-```
-1. Patient requests urgent virtual visit
-2. Triage questionnaire completed
-3. Available provider matched
-4. Immediate video session launched
-5. Visit conducted and documented
-6. Prescriptions, referrals as needed
-7. Summary shared with primary care
-```
-
-#### 3. Remote Monitoring Check-In
-```
-1. Patient vitals received from RPM devices
-2. Alert triggered based on thresholds
-3. Care team notified
-4. Video check-in initiated
-5. Intervention documented
-6. Care plan adjusted if needed
-```
-
-### Telehealth Compliance
+### 5.6 Telehealth Compliance
 
 | Standard | Status | Description |
 |----------|--------|-------------|
@@ -433,250 +474,128 @@ Our EHR telehealth integration enables healthcare providers to conduct virtual v
 
 ---
 
-## Healthcare Data Standards & Interoperability
+## 6. Healthcare Data Standards & Interoperability
 
-### Healthcare Data Standards
-
-| Standard | Description | Use Cases |
-|----------|-------------|-----------|
-| **FHIR R4** | Modern REST-based clinical data exchange | Primary interoperability standard |
-| **HL7v2** | Legacy message-based integration | ADT, ORM, ORU, SIU messages |
-| **C-CDA** | Clinical document architecture | Care summaries, transitions |
-| **DICOM** | Medical imaging standard | Radiology, cardiology imaging |
-| **X12 EDI** | Administrative transactions | Claims, eligibility, authorization |
-| **NCPDP SCRIPT** | Pharmacy transactions | E-prescribing, refills |
-
-### Terminology Standards
-
-| Code System | Domain | Description |
-|-------------|--------|-------------|
-| **SNOMED CT** | Clinical terms | Comprehensive clinical terminology |
-| **LOINC** | Lab observations | Laboratory test codes |
-| **ICD-10-CM** | Diagnoses | Diagnosis classification |
-| **CPT/HCPCS** | Procedures | Procedure billing codes |
-| **RxNorm** | Medications | Drug terminology |
-| **NDC** | Drug products | National drug codes |
-| **CVX** | Vaccines | Vaccine administered codes |
-| **UCUM** | Units of measure | Unified units system |
-
-### EHR System Connectivity
-
-#### FHIR-Based Integration
-- SMART on FHIR OAuth 2.0 authentication
-- US Core Data for Interoperability (USCDI)
-- Bulk FHIR for population data export
-- CDS Hooks for clinical decision support
-
-#### Legacy Integration
-- HL7v2 message parsing and routing
-- MLLP and HTTP transport
-- Interface engine connectivity
-- Flat file processing
-
-### Cloud & Security Infrastructure
+### 6.1 Cloud & Security Infrastructure
 
 | Component | Features |
 |-----------|----------|
-| **Multi-Cloud** | Healthcare-certified regions, Country data residency options, Kubernetes orchestration, Auto-scaling infrastructure |
-| **Security** | Zero-trust architecture, AES-256 encryption, TLS 1.3 in transit, HSM key management |
-| **Audit** | Immutable audit trails, 7-year log retention, Real-time anomaly detection, Compliance reporting |
+| **Audit** | 7-year log retention, Compliance reporting, Immutable audit trails, Real-time anomaly detection |
+| **Multi-Cloud** | Auto-scaling infrastructure, Country data residency options, Healthcare-certified regions, Kubernetes orchestration |
+| **Security** | AES-256 encryption, HSM key management, TLS 1.3 in transit, Zero-trust architecture |
+
+### 6.2 EHR System Connectivity
+
+#### 6.2.1 FHIR-Based Integration
+- Bulk FHIR for population data export
+- CDS Hooks for clinical decision support
+- SMART on FHIR OAuth 2.0 authentication
+- US Core Data for Interoperability (USCDI)
+
+#### 6.2.2 Legacy Integration
+- Flat file processing
+- HL7v2 message parsing and routing
+- Interface engine connectivity
+- MLLP and HTTP transport
+
+### 6.3 Healthcare Data Standards
+
+| Standard | Description | Use Cases |
+|----------|-------------|-----------|
+| **C-CDA** | Clinical document architecture | Care summaries, transitions |
+| **DICOM** | Medical imaging standard | Cardiology imaging, Radiology |
+| **FHIR R4** | Modern REST-based clinical data exchange | Primary interoperability standard |
+| **HL7v2** | Legacy message-based integration | ADT, ORM, ORU, SIU messages |
+| **NCPDP SCRIPT** | Pharmacy transactions | E-prescribing, refills |
+| **X12 EDI** | Administrative transactions | Authorization, Claims, Eligibility |
+
+### 6.4 Terminology Standards
+
+| Code System | Domain | Description |
+|-------------|--------|-------------|
+| **CPT/HCPCS** | Procedures | Procedure billing codes |
+| **CVX** | Vaccines | Vaccine administered codes |
+| **ICD-10-CM** | Diagnoses | Diagnosis classification |
+| **LOINC** | Lab observations | Laboratory test codes |
+| **NDC** | Drug products | National drug codes |
+| **RxNorm** | Medications | Drug terminology |
+| **SNOMED CT** | Clinical terms | Comprehensive clinical terminology |
+| **UCUM** | Units of measure | Unified units system |
 
 ---
 
-## Key Features
+## 7. Key Features
 
-### Clinical Services
-
-| Feature               | Description                             | Key Capabilities                                            |
-| --------------------- | --------------------------------------- | ----------------------------------------------------------- |
-| **Telemedicine**      | HD video, audio, and chat consultations | WebRTC peer-to-peer, waiting room, screen sharing           |
-| **15+ Specialties**   | Comprehensive specialty coverage        | Cardiology, dermatology, neurology, psychiatry, oncology    |
-| **E-Prescriptions**   | Digital prescription management         | Drug interaction checking, allergy alerts, pharmacy network |
-| **Care Coordination** | Seamless referral management            | Second opinions, care team collaboration, handoffs          |
-
-### Health Checkup Engine
-
-- AI-powered package recommendations based on demographics and risk factors
-- 50+ laboratory tests (CBC, metabolic panels, tumor markers, hormones)
-- Imaging diagnostics (X-ray, ultrasound, mammography, DEXA, ECG) with AI analysis
-- Automated workflow with digital queue management
-
-**Package Categories:**
-
-- General Wellness (50+ tests)
-- Cardiac Risk Assessment
-- Diabetes Screening & Management
-- Women's Health (including mammography)
-- Men's Health (including PSA)
-- Executive Health (comprehensive)
-- Pediatric Wellness
-- Pre-employment Screening
-- Annual Physical
-
-### Mental Health Services
-
-| Service                      | Description                                       |
-| ---------------------------- | ------------------------------------------------- |
-| **Licensed Therapy**         | Individual, couples, family, group sessions       |
-| **Validated Assessments**    | PHQ-9, GAD-7, PCL-5, AUDIT, DAST, MDQ, YBOCS, PSS |
-| **24/7 Crisis Intervention** | Escalation protocols, hotline integration         |
-| **Digital Therapeutics**     | CBT modules, mindfulness, meditation library      |
-
-### Chronic Care Management
+### 7.1 Chronic Care Management
 
 | Disease Program   | Monitoring                 | Interventions                               |
 | ----------------- | -------------------------- | ------------------------------------------- |
-| **Diabetes**      | Glucose, HbA1c, foot exams | Medication adjustment, nutrition counseling |
-| **Hypertension**  | BP monitoring, heart rate  | Lifestyle modification, med titration       |
-| **COPD**          | SpO2, peak flow, symptoms  | Inhaler technique, pulmonary rehab          |
-| **Heart Disease** | ECG, weight, symptoms      | Cardiac rehab, risk factor management       |
-| **Arthritis**     | Pain scores, mobility      | Physical therapy, medication management     |
+| **Arthritis**     | Mobility, Pain scores      | Medication management, Physical therapy     |
+| **COPD**          | Peak flow, SpO2, Symptoms  | Inhaler technique, Pulmonary rehab          |
+| **Diabetes**      | Foot exams, Glucose, HbA1c | Medication adjustment, Nutrition counseling |
+| **Heart Disease** | ECG, Symptoms, Weight      | Cardiac rehab, Risk factor management       |
+| **Hypertension**  | BP monitoring, Heart rate  | Lifestyle modification, Med titration       |
 
 **IoT Device Integration:**
 
+- Activity trackers
 - Blood pressure monitors
 - Glucose meters
 - Pulse oximeters
 - Weight scales
-- Activity trackers
 
-### Enterprise Features
+### 7.2 Clinical Services
 
-- **Multi-tenant architecture** with complete data isolation
-- **White-label customization** (branding, domains, workflows)
-- **SSO integration** (SAML 2.0, OIDC)
-- **Enterprise analytics** and reporting dashboards
+| Feature ID | Feature               | Description                             | Key Capabilities                                            |
+|------------|-----------------------|-----------------------------------------|-------------------------------------------------------------|
+| F-001 | **15+ Specialties**   | Comprehensive specialty coverage        | Cardiology, Dermatology, Neurology, Oncology, Psychiatry    |
+| F-002 | **Care Coordination** | Seamless referral management            | Care team collaboration, Handoffs, Second opinions          |
+| F-003 | **E-Prescriptions**   | Digital prescription management         | Allergy alerts, Drug interaction checking, Pharmacy network |
+| F-004 | **Telemedicine**      | HD video, audio, and chat consultations | Screen sharing, Waiting room, WebRTC peer-to-peer           |
+
+### 7.3 Enterprise Features
+
 - **API access** for third-party integrations
 - **Bulk user management** and provisioning
 - **Custom compliance** configurations per region
+- **Enterprise analytics** and reporting dashboards
+- **Multi-tenant architecture** with complete data isolation
+- **SSO integration** (OIDC, SAML 2.0)
+- **White-label customization** (branding, domains, workflows)
+
+### 7.4 Health Checkup Engine
+
+- 50+ laboratory tests (CBC, hormones, metabolic panels, tumor markers)
+- AI-powered package recommendations based on demographics and risk factors
+- Automated workflow with digital queue management
+- Imaging diagnostics (DEXA, ECG, Mammography, Ultrasound, X-ray) with AI analysis
+
+**Package Categories:**
+
+- Annual Physical
+- Cardiac Risk Assessment
+- Diabetes Screening & Management
+- Executive Health (comprehensive)
+- General Wellness (50+ tests)
+- Men's Health (including PSA)
+- Pediatric Wellness
+- Pre-employment Screening
+- Women's Health (including mammography)
+
+### 7.5 Mental Health Services
+
+| Service                      | Description                                       |
+| ---------------------------- | ------------------------------------------------- |
+| **24/7 Crisis Intervention** | Escalation protocols, hotline integration         |
+| **Digital Therapeutics**     | CBT modules, meditation library, mindfulness      |
+| **Licensed Therapy**         | Couples, Family, Group, Individual sessions       |
+| **Validated Assessments**    | AUDIT, DAST, GAD-7, MDQ, PCL-5, PHQ-9, PSS, YBOCS |
 
 ---
 
-## Architecture
+## 8. Architecture
 
-### System Architecture Diagram
-
-```
-+-----------------------------------------------------------------------------+
-|                              CLIENT LAYER                                    |
-|  +-----------+  +-----------+  +-----------+  +-----------+  +--------+     |
-|  |Web Portal |  |Mobile App |  |Admin Panel|  | Provider  |  | Kiosk  |     |
-|  |(Next.js 16|  |(React     |  |(Next.js 14|  |  Portal   |  |  App   |     |
-|  | Port 3000)|  | Native)   |  | Port 3001)|  | Port 3002 |  | 3004   |     |
-|  +-----+-----+  +-----+-----+  +-----+-----+  +-----+-----+  +---+----+     |
-+--------+---------------+---------------+---------------+---------+-----------+
-         |               |               |               |         |
-         +-------+-------+-------+-------+-------+-------+---------+
-                                 |
-                        +--------v--------+
-                        |   CloudFlare    |
-                        |   CDN + WAF     |
-                        +--------+--------+
-                                 |
-                                 v
-+-----------------------------------------------------------------------------+
-|                           API GATEWAY LAYER                                  |
-|  +-----------------------------------------------------------------------+  |
-|  |                      Express API Gateway (Port 3000)                   |  |
-|  |  +--------+  +--------+  +--------+  +--------+  +--------+          |  |
-|  |  |  JWT   |  |  Rate  |  |  CORS  |  |Service |  | Health |          |  |
-|  |  |  Auth  |  |Limiting|  |Handler |  |Registry|  | Checks |          |  |
-|  |  +--------+  +--------+  +--------+  +--------+  +--------+          |  |
-|  +-----------------------------------------------------------------------+  |
-+-----------------------------------------------------------------------------+
-                                 |
-         +-----------------------+-----------------------+
-         |                       |                       |
-         v                       v                       v
-+-----------------------------------------------------------------------------+
-|                   MICROSERVICES LAYER (21 Enterprise Modules)                |
-|                                                                              |
-|  +---------------- DOMAIN 1: CLINICAL OPERATIONS -----------------------+   |
-|  | +-----------+ +-----------+ +-----------+ +-----------+              |   |
-|  | |AI Clinical| |   Prior   | |   Care    | | Surgical  |              |   |
-|  | |   Doc     | |   Auth    | |Coordination|  Scheduler |              |   |
-|  | |  (8080)   | |  (3004)   | |  (3002)   | |  (8080)   |              |   |
-|  | +-----------+ +-----------+ +-----------+ +-----------+              |   |
-|  +----------------------------------------------------------------------+   |
-|                                                                              |
-|  +---------------- DOMAIN 2: PATIENT ENGAGEMENT ------------------------+   |
-|  | +-----------+ +-----------+ +-----------+ +-----------+              |   |
-|  | | Chronic   | | Patient   | |Medication | |   Post    |              |   |
-|  | |   Care    | |  Intake   | | Adherence | | Discharge |              |   |
-|  | |  (3003)   | |  (8080)   | |  (3004)   | |  (8080)   |              |   |
-|  | +-----------+ +-----------+ +-----------+ +-----------+              |   |
-|  +----------------------------------------------------------------------+   |
-|                                                                              |
-|  +---------------- DOMAIN 3: REVENUE CYCLE MGMT ------------------------+   |
-|  | +-----------+ +-----------+ +-----------+                            |   |
-|  | |AI Denial  | |  Price    | | Patient   |                            |   |
-|  | |   Mgmt    | |Transparent| | Financing |                            |   |
-|  | |  (3010)   | |  (3011)   | |  (8080)   |                            |   |
-|  | +-----------+ +-----------+ +-----------+                            |   |
-|  +----------------------------------------------------------------------+   |
-|                                                                              |
-|  +---------------- DOMAIN 4: DATA & ANALYTICS --------------------------+   |
-|  | +-----------+ +-----------+ +-----------+                            |   |
-|  | |   Data    | |Population | | Clinical  |                            |   |
-|  | |   Norm    | |  Health   | |  Trials   |                            |   |
-|  | |  (8080)   | |  (3013)   | |  (3014)   |                            |   |
-|  | +-----------+ +-----------+ +-----------+                            |   |
-|  +----------------------------------------------------------------------+   |
-|                                                                              |
-|  +---------------- DOMAIN 5: COMPLIANCE & SECURITY ---------------------+   |
-|  | +-----------+ +-----------+ +-----------+                            |   |
-|  | |  HIPAA    | | Vendor    | |  Device   |                            |   |
-|  | |Compliance | |   Risk    | | Security  |                            |   |
-|  | | (Audit)   | |  (3016)   | |  (3003)   |                            |   |
-|  | +-----------+ +-----------+ +-----------+                            |   |
-|  +----------------------------------------------------------------------+   |
-|                                                                              |
-|  +---------------- DOMAIN 6: SPECIALTY & NICHE -------------------------+   |
-|  | +-----------+ +-----------+ +-----------+ +-----------+              |   |
-|  | |  Mental   | |  Home     | | Imaging   | |Telehealth |              |   |
-|  | |  Health   | |  Health   | | Workflow  | |  + EHR    |              |   |
-|  | |  (3002)   | |  (3019)   | |  (3006)   | |  (3001)   |              |   |
-|  | +-----------+ +-----------+ +-----------+ +-----------+              |   |
-|  +----------------------------------------------------------------------+   |
-|                                                                              |
-|  +---------------------- CORE INFRASTRUCTURE ---------------------------+   |
-|  | +-----------+ +-----------+ +-----------+ +-----------+ +----------+ |   |
-|  | |   API     | |   Auth    | |Notification| |Laboratory | | Pharmacy| |   |
-|  | | Gateway   | | Service   | | Service   | | Service   | | Service | |   |
-|  | |  (3000)   | |  (3001)   | |  (3006)   | |  (3005)   | |  (3004) | |   |
-|  | +-----------+ +-----------+ +-----------+ +-----------+ +----------+ |   |
-|  +----------------------------------------------------------------------+   |
-+-----------------------------------------------------------------------------+
-                                 |
-         +-----------------------+-----------------------+
-         |                       |                       |
-         v                       v                       v
-+-----------------------------------------------------------------------------+
-|                              DATA LAYER                                      |
-|  +-----------+  +-----------+  +-----------+  +-----------+                 |
-|  |PostgreSQL |  |   Redis   |  |Elasticsearch| |  MinIO   |                 |
-|  | 15+Prisma |  |  7 Cache  |  |   8.11.3   |  |S3 Storage|                 |
-|  | Primary DB|  |  +Queues  |  |   Search   |  |  Files   |                 |
-|  +-----------+  +-----------+  +-----------+  +-----------+                 |
-|                                                                              |
-|  +-----------+  +-----------+  +-----------+  +-----------+                 |
-|  |  MongoDB  |  | HAPI FHIR |  |  Amazon   |  |   AWS     |                 |
-|  |  7 (FHIR) |  |  Server   |  |    S3     |  |  Secrets  |                 |
-|  |           |  |    R4     |  |  Storage  |  |  Manager  |                 |
-|  +-----------+  +-----------+  +-----------+  +-----------+                 |
-+-----------------------------------------------------------------------------+
-                                 |
-                                 v
-+-----------------------------------------------------------------------------+
-|                          OBSERVABILITY LAYER                                 |
-|  +-----------+  +-----------+  +-----------+  +-----------+                 |
-|  |Prometheus |  |  Jaeger   |  |  Winston  |  |Application|                 |
-|  |  Metrics  |  |  Tracing  |  |  Logging  |  | Insights  |                 |
-|  +-----------+  +-----------+  +-----------+  +-----------+                 |
-+-----------------------------------------------------------------------------+
-```
-
-### Multi-Region Deployment
+### 8.1 Multi-Region Deployment
 
 ```
                          +---------------------+
@@ -700,156 +619,280 @@ Our EHR telehealth integration enables healthcare providers to conduct virtual v
     Data Residency: Patient data stays in-region per compliance requirements
 ```
 
+### 8.2 System Architecture Diagram
+
+```
++-----------------------------------------------------------------------------+
+|                              CLIENT LAYER                                    |
+|  +-----------+  +-----------+  +-----------+  +-----------+  +--------+     |
+|  |Admin Panel|  | Kiosk App |  |Mobile App |  | Provider  |  |Web     |     |
+|  |(Next.js 14|  | (Port     |  |(React     |  |  Portal   |  |Portal  |     |
+|  | Port 3001)|  |  3004)    |  | Native)   |  | Port 3002 |  |(Next.js|     |
+|  +-----+-----+  +-----+-----+  +-----+-----+  +-----+-----+  |16 3000)|     |
++--------+---------------+---------------+---------------+-----+---+----------+
+         |               |               |               |         |
+         +-------+-------+-------+-------+-------+-------+---------+
+                                 |
+                        +--------v--------+
+                        |   CloudFlare    |
+                        |   CDN + WAF     |
+                        +--------+--------+
+                                 |
+                                 v
++-----------------------------------------------------------------------------+
+|                           API GATEWAY LAYER                                  |
+|  +-----------------------------------------------------------------------+  |
+|  |                      Express API Gateway (Port 3000)                   |  |
+|  |  +--------+  +--------+  +--------+  +--------+  +--------+          |  |
+|  |  | CORS   |  | Health |  |  JWT   |  |  Rate  |  |Service |          |  |
+|  |  |Handler |  | Checks |  |  Auth  |  |Limiting|  |Registry|          |  |
+|  |  +--------+  +--------+  +--------+  +--------+  +--------+          |  |
+|  +-----------------------------------------------------------------------+  |
++-----------------------------------------------------------------------------+
+                                 |
+         +-----------------------+-----------------------+
+         |                       |                       |
+         v                       v                       v
++-----------------------------------------------------------------------------+
+|                   MICROSERVICES LAYER (21 Enterprise Modules)                |
+|                                                                              |
+|  +---------------- DOMAIN 1: CLINICAL OPERATIONS -----------------------+   |
+|  | +-----------+ +-----------+ +-----------+ +-----------+              |   |
+|  | |AI Clinical| |   Care    | |   Prior   | | Surgical  |              |   |
+|  | |   Doc     | |Coordination|    Auth    | |  Scheduler|              |   |
+|  | |  (8080)   | |  (3002)   | |  (3004)   | |  (8080)   |              |   |
+|  | +-----------+ +-----------+ +-----------+ +-----------+              |   |
+|  +----------------------------------------------------------------------+   |
+|                                                                              |
+|  +---------------- DOMAIN 2: COMPLIANCE & SECURITY --------------------+   |
+|  | +-----------+ +-----------+ +-----------+                            |   |
+|  | |  Device   | |  HIPAA    | | Vendor    |                            |   |
+|  | | Security  | |Compliance | |   Risk    |                            |   |
+|  | |  (3003)   | | (Audit)   | |  (3016)   |                            |   |
+|  | +-----------+ +-----------+ +-----------+                            |   |
+|  +----------------------------------------------------------------------+   |
+|                                                                              |
+|  +---------------- DOMAIN 3: DATA & ANALYTICS --------------------------+   |
+|  | +-----------+ +-----------+ +-----------+                            |   |
+|  | | Clinical  | |   Data    | |Population |                            |   |
+|  | |  Trials   | |   Norm    | |  Health   |                            |   |
+|  | |  (3014)   | |  (8080)   | |  (3013)   |                            |   |
+|  | +-----------+ +-----------+ +-----------+                            |   |
+|  +----------------------------------------------------------------------+   |
+|                                                                              |
+|  +---------------- DOMAIN 4: PATIENT ENGAGEMENT ------------------------+   |
+|  | +-----------+ +-----------+ +-----------+ +-----------+              |   |
+|  | | Chronic   | |Medication | |   Post    | |  Patient  |              |   |
+|  | |   Care    | | Adherence | | Discharge | |  Intake   |              |   |
+|  | |  (3003)   | |  (3004)   | |  (8080)   | |  (8080)   |              |   |
+|  | +-----------+ +-----------+ +-----------+ +-----------+              |   |
+|  +----------------------------------------------------------------------+   |
+|                                                                              |
+|  +---------------- DOMAIN 5: REVENUE CYCLE MGMT ------------------------+   |
+|  | +-----------+ +-----------+ +-----------+                            |   |
+|  | |AI Denial  | | Patient   | |  Price    |                            |   |
+|  | |   Mgmt    | | Financing | |Transparent|                            |   |
+|  | |  (3010)   | |  (8080)   | |  (3011)   |                            |   |
+|  | +-----------+ +-----------+ +-----------+                            |   |
+|  +----------------------------------------------------------------------+   |
+|                                                                              |
+|  +---------------- DOMAIN 6: SPECIALTY SOLUTIONS -----------------------+   |
+|  | +-----------+ +-----------+ +-----------+ +-----------+              |   |
+|  | |Behavioral | |  Home     | | Imaging   | |Telehealth |              |   |
+|  | |  Health   | |  Health   | | Workflow  | |  + EHR    |              |   |
+|  | |  (3002)   | |  (3019)   | |  (3006)   | |  (3001)   |              |   |
+|  | +-----------+ +-----------+ +-----------+ +-----------+              |   |
+|  +----------------------------------------------------------------------+   |
+|                                                                              |
+|  +---------------------- CORE INFRASTRUCTURE ---------------------------+   |
+|  | +-----------+ +-----------+ +-----------+ +-----------+ +----------+ |   |
+|  | |   API     | |   Auth    | |Laboratory | |Notification| | Pharmacy| |   |
+|  | | Gateway   | | Service   | | Service   | | Service   | | Service | |   |
+|  | |  (3000)   | |  (3001)   | |  (3005)   | |  (3006)   | |  (3004) | |   |
+|  | +-----------+ +-----------+ +-----------+ +-----------+ +----------+ |   |
+|  +----------------------------------------------------------------------+   |
++-----------------------------------------------------------------------------+
+                                 |
+         +-----------------------+-----------------------+
+         |                       |                       |
+         v                       v                       v
++-----------------------------------------------------------------------------+
+|                              DATA LAYER                                      |
+|  +-----------+  +-----------+  +-----------+  +-----------+                 |
+|  |Elasticsearch| |  MinIO   |  |  MongoDB  |  |PostgreSQL |                 |
+|  |   8.11.3   |  |S3 Storage|  |  7 (FHIR) |  | 15+Prisma |                 |
+|  |   Search   |  |  Files   |  |           |  | Primary DB|                 |
+|  +-----------+  +-----------+  +-----------+  +-----------+                 |
+|                                                                              |
+|  +-----------+  +-----------+  +-----------+  +-----------+                 |
+|  |  Amazon   |  |   AWS     |  | HAPI FHIR |  |   Redis   |                 |
+|  |    S3     |  |  Secrets  |  |  Server   |  |  7 Cache  |                 |
+|  |  Storage  |  |  Manager  |  |    R4     |  |  +Queues  |                 |
+|  +-----------+  +-----------+  +-----------+  +-----------+                 |
++-----------------------------------------------------------------------------+
+                                 |
+                                 v
++-----------------------------------------------------------------------------+
+|                          OBSERVABILITY LAYER                                 |
+|  +-----------+  +-----------+  +-----------+  +-----------+                 |
+|  |Application|  |  Jaeger   |  |Prometheus |  |  Winston  |                 |
+|  | Insights  |  |  Tracing  |  |  Metrics  |  |  Logging  |                 |
+|  +-----------+  +-----------+  +-----------+  +-----------+                 |
++-----------------------------------------------------------------------------+
+```
+
 ---
 
-## Microservices Architecture (Detailed)
+## 9. Microservices Architecture (Detailed)
 
 The platform consists of **21 enterprise microservices** organized across 6 operational domains, each following Domain-Driven Design principles with independent databases, APIs, and deployment lifecycles.
 
-### Service Overview by Domain
+### 9.1 Core Infrastructure Services
 
-#### Domain 1: Clinical Operations (4 Modules)
+| ID | Service | Port | Database | Primary Responsibility |
+|----|---------|------|----------|------------------------|
+| - | API Gateway | 3000 | None (stateless) | JWT validation, Rate limiting, Request routing |
+| - | Auth Service | 3001 | PostgreSQL (auth_db) | Authentication, JWT issuance, MFA |
+| - | Laboratory Service | 3005 | PostgreSQL (laboratory_db) | Lab orders, LOINC codes, Results |
+| - | Notification Service | 3006 | PostgreSQL + Redis | Email, Push notifications, SMS |
+| - | Pharmacy Service | 3004 | PostgreSQL (pharmacy_db) | Drug interactions, E-prescriptions, PDMP |
 
-| #   | Service                   | Port | Database                      | Primary Responsibility                              |
-| --- | ------------------------- | ---- | ----------------------------- | --------------------------------------------------- |
-| 1   | AI Clinical Documentation | 8080 | PostgreSQL (healthcare_db)    | Ambient listening, AI SOAP notes, coding assistance |
-| 2   | Prior Authorization       | 3004 | PostgreSQL (pharmacy_db)      | Payer rules, electronic submission, status tracking |
-| 3   | Care Coordination         | 3002 | PostgreSQL (mental_health_db) | Care transitions, provider messaging, task routing  |
-| 4   | Surgical Scheduling       | 8080 | PostgreSQL (healthcare_db)    | OR block scheduling, AI duration prediction         |
+### 9.2 Service Overview by Domain
 
-#### Domain 2: Patient Engagement (4 Modules)
+#### 9.2.1 Domain 1: Clinical Operations (5 Modules)
 
-| #   | Service              | Port | Database                     | Primary Responsibility                              |
-| --- | -------------------- | ---- | ---------------------------- | --------------------------------------------------- |
-| 5   | Chronic Care Service | 3003 | PostgreSQL (chronic_care_db) | Care plans, IoT vitals, remote patient monitoring   |
-| 6   | Patient Intake       | 8080 | PostgreSQL (healthcare_db)   | Digital forms, insurance verification, waitlists    |
-| 7   | Medication Adherence | 3004 | PostgreSQL (pharmacy_db)     | Smart reminders, refill automation, PDMP queries    |
-| 8   | Post-Discharge       | 8080 | PostgreSQL (healthcare_db)   | LACE+ scoring, automated outreach, readmission risk |
+| ID | Service | Port | Database | Primary Responsibility |
+|----|---------|------|----------|------------------------|
+| 1 | AI Clinical Documentation | 8080 | PostgreSQL (healthcare_db) | AI SOAP notes, Ambient listening, Coding assistance |
+| 2 | Care Coordination | 3002 | PostgreSQL (mental_health_db) | Care transitions, Provider messaging, Task routing |
+| 3 | EHR Telehealth Integration | 3001 | PostgreSQL (telehealth_db) | Epic/Cerner integration, Waiting room, WebRTC video |
+| 4 | Prior Authorization | 3004 | PostgreSQL (pharmacy_db) | Electronic submission, Payer rules, Status tracking |
+| 5 | Surgical Scheduling | 8080 | PostgreSQL (healthcare_db) | AI duration prediction, OR block scheduling |
 
-#### Domain 3: Revenue Cycle Management (3 Modules)
+#### 9.2.2 Domain 2: Compliance & Security (3 Modules)
 
-| #   | Service              | Port | Database                   | Primary Responsibility                                 |
-| --- | -------------------- | ---- | -------------------------- | ------------------------------------------------------ |
-| 9   | AI Denial Management | 3010 | PostgreSQL (denial_db)     | Denial prediction, appeal letter AI, recovery tracking |
-| 10  | Price Transparency   | 3011 | PostgreSQL (pricing_db)    | CMS compliance, MRF generation, Good Faith Estimates   |
-| 11  | Patient Financing    | 8080 | PostgreSQL (healthcare_db) | Payment plans, credit checks, collection workflows     |
+| ID | Service | Port | Database | Primary Responsibility |
+|----|---------|------|----------|------------------------|
+| 6 | HIPAA Compliance | N/A | PostgreSQL (audit_db) | Access logging, BAA automation, Breach detection |
+| 7 | Medical Device Security | 3003 | PostgreSQL (chronic_care_db) | FDA recalls, Patch management, Vulnerability scanning |
+| 8 | Vendor Risk Management | 3016 | PostgreSQL (vendor_db) | Contract tracking, Third-party security assessments |
 
-#### Domain 4: Data & Analytics (3 Modules)
+#### 9.2.3 Domain 3: Data & Analytics (3 Modules)
 
-| #   | Service                 | Port | Database                   | Primary Responsibility                                   |
-| --- | ----------------------- | ---- | -------------------------- | -------------------------------------------------------- |
-| 12  | Data Normalization      | 8080 | PostgreSQL (healthcare_db) | FHIR R4, HL7v2, C-CDA parsing, terminology mapping       |
-| 13  | Population Health       | 3013 | PostgreSQL (population_db) | Cohort analysis, risk stratification, HEDIS/CMS Stars    |
-| 14  | Clinical Trial Matching | 3014 | PostgreSQL (trials_db)     | ClinicalTrials.gov API, eligibility matching, enrollment |
+| ID | Service | Port | Database | Primary Responsibility |
+|----|---------|------|----------|------------------------|
+| 9 | Clinical Trial Matching | 3014 | PostgreSQL (trials_db) | ClinicalTrials.gov API, Eligibility matching, Enrollment |
+| 10 | Data Normalization | 8080 | PostgreSQL (healthcare_db) | C-CDA parsing, FHIR R4, HL7v2, Terminology mapping |
+| 11 | Population Health | 3013 | PostgreSQL (population_db) | Cohort analysis, HEDIS/CMS Stars, Risk stratification |
 
-#### Domain 5: Compliance & Security (3 Modules)
+#### 9.2.4 Domain 4: Patient Engagement (4 Modules)
 
-| #   | Service                 | Port | Database                     | Primary Responsibility                                |
-| --- | ----------------------- | ---- | ---------------------------- | ----------------------------------------------------- |
-| 15  | HIPAA Compliance        | N/A  | PostgreSQL (audit_db)        | BAA automation, access logging, breach detection      |
-| 16  | Vendor Risk Management  | 3016 | PostgreSQL (vendor_db)       | Third-party security assessments, contract tracking   |
-| 17  | Medical Device Security | 3003 | PostgreSQL (chronic_care_db) | FDA recalls, vulnerability scanning, patch management |
+| ID | Service | Port | Database | Primary Responsibility |
+|----|---------|------|----------|------------------------|
+| 12 | Chronic Care Service | 3003 | PostgreSQL (chronic_care_db) | Care plans, IoT vitals, Remote patient monitoring |
+| 13 | Medication Adherence | 3004 | PostgreSQL (pharmacy_db) | PDMP queries, Refill automation, Smart reminders |
+| 14 | Patient Intake | 8080 | PostgreSQL (healthcare_db) | Digital forms, Insurance verification, Waitlists |
+| 15 | Post-Discharge | 8080 | PostgreSQL (healthcare_db) | Automated outreach, LACE+ scoring, Readmission risk |
 
-#### Domain 6: Specialty & Niche (4 Modules)
+#### 9.2.5 Domain 5: Revenue Cycle Management (3 Modules)
 
-| #   | Service               | Port | Database                      | Primary Responsibility                              |
-| --- | --------------------- | ---- | ----------------------------- | --------------------------------------------------- |
-| 18  | Mental Health Service | 3002 | PostgreSQL (mental_health_db) | Therapy sessions, PHQ-9/GAD-7, crisis intervention  |
-| 19  | Home Health Workforce | 3019 | PostgreSQL (home_health_db)   | Visit scheduling, EVV, caregiver management         |
-| 20  | Imaging Workflow      | 3006 | PostgreSQL (imaging_db)       | DICOM integration, AI findings, critical alerts     |
-| 21  | Telehealth + EHR      | 3001 | PostgreSQL (telehealth_db)    | WebRTC video, waiting room, Epic/Cerner integration |
+| ID | Service | Port | Database | Primary Responsibility |
+|----|---------|------|----------|------------------------|
+| 16 | AI Denial Management | 3010 | PostgreSQL (denial_db) | Appeal letter AI, Denial prediction, Recovery tracking |
+| 17 | Patient Financing | 8080 | PostgreSQL (healthcare_db) | Collection workflows, Credit checks, Payment plans |
+| 18 | Price Transparency | 3011 | PostgreSQL (pricing_db) | CMS compliance, Good Faith Estimates, MRF generation |
 
-### Core Infrastructure Services
+#### 9.2.6 Domain 6: Specialty Solutions (4 Modules)
 
-| #   | Service              | Port | Database                   | Primary Responsibility                         |
-| --- | -------------------- | ---- | -------------------------- | ---------------------------------------------- |
-| -   | API Gateway          | 3000 | None (stateless)           | Request routing, JWT validation, rate limiting |
-| -   | Auth Service         | 3001 | PostgreSQL (auth_db)       | Authentication, JWT issuance, MFA              |
-| -   | Notification Service | 3006 | PostgreSQL + Redis         | Email, SMS, Push notifications                 |
-| -   | Laboratory Service   | 3005 | PostgreSQL (laboratory_db) | Lab orders, results, LOINC codes               |
-| -   | Pharmacy Service     | 3004 | PostgreSQL (pharmacy_db)   | E-prescriptions, drug interactions, PDMP       |
+| ID | Service | Port | Database | Primary Responsibility |
+|----|---------|------|----------|------------------------|
+| 19 | Behavioral Health Platform | 3002 | PostgreSQL (mental_health_db) | Crisis intervention, PHQ-9/GAD-7, Therapy sessions |
+| 20 | Home Health Workforce | 3019 | PostgreSQL (home_health_db) | Caregiver management, EVV, Visit scheduling |
+| 21 | Imaging Workflow | 3006 | PostgreSQL (imaging_db) | AI findings, Critical alerts, DICOM integration |
 
 ---
 
-### 1. API Gateway Service
+### 9.3 Service Details
+
+#### 9.3.1 API Gateway Service
 
 | Property       | Details                           |
 | -------------- | --------------------------------- |
+| **Database**   | None (stateless proxy)            |
 | **Port**       | 3000                              |
 | **Tech Stack** | Express.js, http-proxy-middleware |
-| **Database**   | None (stateless proxy)            |
 
 **Responsibilities:**
 
 - Central entry point for all API requests
+- CORS handling and security headers
+- Health check aggregation
 - JWT token validation and authentication
 - Rate limiting and request throttling
-- CORS handling and security headers
 - Service discovery and request routing
-- Health check aggregation
 
 **Key Routes:**
 
 ```
-POST   /auth/*           -> Auth Service (3001)
 GET    /api/v1/patients  -> API Service (8080)
-POST   /appointments     -> Telehealth Service (3001)
-GET    /mental-health/*  -> Mental Health Service (3002)
 GET    /chronic-care/*   -> Chronic Care Service (3003)
-POST   /pharmacy/*       -> Pharmacy Service (3004)
-GET    /laboratory/*     -> Laboratory Service (3005)
 GET    /imaging/*        -> Imaging Service (3006)
+GET    /laboratory/*     -> Laboratory Service (3005)
+GET    /mental-health/*  -> Mental Health Service (3002)
+POST   /appointments     -> Telehealth Service (3001)
+POST   /auth/*           -> Auth Service (3001)
+POST   /pharmacy/*       -> Pharmacy Service (3004)
 ```
 
 **Service Registry Configuration:**
 
 ```javascript
 const services = {
-  auth: { target: "http://auth-service:3001", pathRewrite: { "^/auth": "" } },
   api: { target: "http://api-service:8080", pathRewrite: { "^/api": "" } },
-  telehealth: { target: "http://telehealth-service:3001" },
-  mentalHealth: { target: "http://mental-health-service:3002" },
+  auth: { target: "http://auth-service:3001", pathRewrite: { "^/auth": "" } },
   chronicCare: { target: "http://chronic-care-service:3003" },
-  pharmacy: { target: "http://pharmacy-service:3004" },
-  laboratory: { target: "http://laboratory-service:3005" },
   imaging: { target: "http://imaging-service:3006" },
+  laboratory: { target: "http://laboratory-service:3005" },
+  mentalHealth: { target: "http://mental-health-service:3002" },
+  pharmacy: { target: "http://pharmacy-service:3004" },
+  telehealth: { target: "http://telehealth-service:3001" },
 };
 ```
 
-**Dependencies:** `express`, `http-proxy-middleware`, `jsonwebtoken`, `express-rate-limit`, `helmet`, `cors`
+**Dependencies:** `cors`, `express`, `express-rate-limit`, `helmet`, `http-proxy-middleware`, `jsonwebtoken`
 
 ---
 
-### 2. Auth Service
+#### 9.3.2 Auth Service
 
 | Property       | Details                |
 | -------------- | ---------------------- |
+| **Database**   | PostgreSQL (`auth_db`) |
 | **Port**       | 3001                   |
 | **Tech Stack** | Express.js, Prisma ORM |
-| **Database**   | PostgreSQL (`auth_db`) |
 
 **Responsibilities:**
 
-- User registration with email verification
 - Login/logout with JWT issuance
-- Refresh token rotation
-- Password reset flow
 - Multi-factor authentication (MFA)
 - OAuth2/OIDC integration (Google, Microsoft)
+- Password reset flow
+- Refresh token rotation
 - Session management
+- User registration with email verification
 
 **Key Endpoints:**
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/auth/register` | User registration |
+| `POST` | `/auth/forgot-password` | Password reset initiation |
 | `POST` | `/auth/login` | Login and JWT issuance |
 | `POST` | `/auth/logout` | Invalidate refresh tokens |
-| `POST` | `/auth/refresh` | Rotate refresh token |
-| `POST` | `/auth/forgot-password` | Password reset initiation |
-| `POST` | `/auth/reset-password` | Password reset completion |
-| `POST` | `/auth/verify-email` | Email verification |
 | `POST` | `/auth/mfa/enable` | Enable 2FA |
 | `POST` | `/auth/mfa/verify` | Verify 2FA code |
+| `POST` | `/auth/refresh` | Rotate refresh token |
+| `POST` | `/auth/register` | User registration |
+| `POST` | `/auth/reset-password` | Password reset completion |
+| `POST` | `/auth/verify-email` | Email verification |
 
 **Database Models:**
 
@@ -878,263 +921,52 @@ model RefreshToken {
 
 **Inter-Service Communication:**
 
-- Publishes: `USER_REGISTERED`, `USER_VERIFIED`, `PASSWORD_CHANGED` events
-- Consumed by: Notification Service, API Service
+- Publishes: `PASSWORD_CHANGED`, `USER_REGISTERED`, `USER_VERIFIED` events
+- Consumed by: API Service, Notification Service
 
-**Dependencies:** `bcryptjs`, `jsonwebtoken`, `speakeasy`, `nodemailer`, `@prisma/client`
-
----
-
-### 3. Core API Service
-
-| Property       | Details                      |
-| -------------- | ---------------------------- |
-| **Port**       | 8080                         |
-| **Tech Stack** | Express.js, Prisma ORM       |
-| **Database**   | PostgreSQL (`healthcare_db`) |
-
-**Responsibilities:**
-
-- Patient profile management
-- Provider profile and availability
-- Health package management
-- Subscription and billing (Stripe integration)
-- Document management
-- Audit logging
-- FHIR R4 data export
-
-**Key Endpoints:**
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET/PUT` | `/patients/:id` | Patient profile CRUD |
-| `GET` | `/providers` | Search providers |
-| `GET/PUT` | `/providers/:id` | Provider profile |
-| `POST` | `/subscriptions` | Create subscription |
-| `POST` | `/payments` | Process payment |
-| `GET` | `/health-packages` | List health packages |
-| `POST` | `/health-packages/book` | Book health package |
-| `GET` | `/documents` | List patient documents |
-| `POST` | `/documents/upload` | Upload document |
-| `GET` | `/fhir/Patient/:id` | FHIR patient export |
-
-**Database Models (31 total):**
-
-```
-User, Patient, Provider, Appointment, Visit, Encounter, ClinicalNote,
-Document, Prescription, PrescriptionItem, HealthPackage, HealthPackageBooking,
-DiagnosticTest, LabResult, Plan, Subscription, Payment, PaymentMethod,
-Invoice, InvoiceItem, DeviceToken, PushNotification, NotificationPreference,
-AuditEvent, WebhookEventLog, Consent, ChatMessage, RefreshToken
-```
-
-**External Integrations:**
-
-- **Stripe**: Payment processing, subscription management
-- **AWS S3**: Document storage
-- **SendGrid**: Transactional emails
-
-**Dependencies:** `stripe`, `@aws-sdk/client-s3`, `multer`, `@prisma/client`, `winston`
+**Dependencies:** `@prisma/client`, `bcryptjs`, `jsonwebtoken`, `nodemailer`, `speakeasy`
 
 ---
 
-### 4. Telehealth Service
-
-| Property       | Details                           |
-| -------------- | --------------------------------- |
-| **Port**       | 3001                              |
-| **Tech Stack** | Express.js, Socket.io, Prisma ORM |
-| **Database**   | PostgreSQL (`telehealth_db`)      |
-
-**Responsibilities:**
-
-- Appointment scheduling and management
-- Video consultation room management
-- WebRTC signaling for peer-to-peer video
-- Waiting room functionality
-- In-call chat messaging
-- Call recording consent
-- Post-consultation notes
-
-**Key Endpoints:**
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/appointments` | Create appointment |
-| `GET` | `/appointments/:id` | Get appointment details |
-| `PUT` | `/appointments/:id/status` | Update status |
-| `GET` | `/appointments/patient/:id` | Patient appointments |
-| `GET` | `/appointments/provider/:id` | Provider schedule |
-| `POST` | `/consultations/:id/start` | Start consultation |
-| `POST` | `/consultations/:id/end` | End consultation |
-
-**WebSocket Events:**
-| Event | Direction | Description |
-|-------|-----------|-------------|
-| `JOIN_ROOM` | Client -> Server | Join consultation room |
-| `LEAVE_ROOM` | Client -> Server | Leave consultation |
-| `OFFER` | Client <-> Client | WebRTC SDP offer |
-| `ANSWER` | Client <-> Client | WebRTC SDP answer |
-| `ICE_CANDIDATE` | Client <-> Client | ICE candidate exchange |
-| `CHAT_MESSAGE` | Bidirectional | In-call text chat |
-| `PARTICIPANT_JOINED` | Server -> Client | New participant notification |
-| `CALL_ENDED` | Server -> Client | Call termination |
-
-**Database Models:**
-
-```prisma
-model Appointment {
-  id          String   @id @default(uuid())
-  patientId   String
-  providerId  String
-  scheduledAt DateTime
-  duration    Int      @default(30)
-  type        AppointmentType // VIDEO, AUDIO, CHAT, IN_PERSON
-  status      AppointmentStatus // SCHEDULED, IN_PROGRESS, COMPLETED, CANCELLED
-  roomId      String?
-  notes       String?
-}
-
-model Consultation {
-  id            String   @id @default(uuid())
-  appointmentId String   @unique
-  startedAt     DateTime
-  endedAt       DateTime?
-  recording     Boolean  @default(false)
-  chatMessages  ChatMessage[]
-}
-```
-
-**Dependencies:** `socket.io`, `simple-peer`, `@prisma/client`, `ioredis` (for Socket.io adapter)
-
----
-
-### 5. Mental Health Service
-
-| Property       | Details                         |
-| -------------- | ------------------------------- |
-| **Port**       | 3002                            |
-| **Tech Stack** | Express.js, Prisma ORM          |
-| **Database**   | PostgreSQL (`mental_health_db`) |
-
-**Responsibilities:**
-
-- Therapy session management (individual, couples, family, group)
-- Validated clinical assessments
-- Mood tracking and journaling
-- Crisis intervention protocols
-- Treatment plan management
-- Therapist matching
-- Digital therapeutic content
-
-**Key Endpoints:**
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/sessions` | Book therapy session |
-| `GET` | `/sessions/:patientId` | Patient session history |
-| `POST` | `/assessments` | Submit assessment |
-| `GET` | `/assessments/:patientId` | Assessment history |
-| `POST` | `/mood-entries` | Log mood entry |
-| `GET` | `/mood-entries/:patientId` | Mood tracking data |
-| `POST` | `/crisis/escalate` | Crisis escalation |
-| `GET` | `/therapists` | Search therapists |
-| `GET` | `/content/cbt-modules` | CBT content library |
-
-**Validated Assessments:**
-| Assessment | Description | Scoring |
-|------------|-------------|---------|
-| **PHQ-9** | Depression screening | 0-27 (>=10 moderate) |
-| **GAD-7** | Anxiety screening | 0-21 (>=10 moderate) |
-| **PCL-5** | PTSD checklist | 0-80 (>=33 probable PTSD) |
-| **AUDIT** | Alcohol use | 0-40 (>=8 hazardous) |
-| **DAST-10** | Drug abuse screening | 0-10 (>=3 moderate) |
-| **MDQ** | Bipolar disorder | Positive if >=7 |
-| **Y-BOCS** | OCD severity | 0-40 (>=16 moderate) |
-| **PSS** | Perceived stress | 0-40 (>=14 moderate) |
-
-**Database Models:**
-
-```prisma
-model TherapySession {
-  id          String   @id @default(uuid())
-  patientId   String
-  therapistId String
-  sessionType SessionType // INDIVIDUAL, COUPLES, FAMILY, GROUP
-  scheduledAt DateTime
-  duration    Int      @default(50)
-  notes       String?
-  status      SessionStatus
-}
-
-model Assessment {
-  id         String   @id @default(uuid())
-  patientId  String
-  type       AssessmentType
-  responses  Json
-  score      Int
-  severity   String
-  completedAt DateTime
-}
-
-model MoodEntry {
-  id        String   @id @default(uuid())
-  patientId String
-  mood      Int      // 1-10 scale
-  energy    Int      // 1-10 scale
-  anxiety   Int      // 1-10 scale
-  notes     String?
-  createdAt DateTime @default(now())
-}
-```
-
-**Crisis Protocol:**
-
-- Automatic escalation for high-risk scores
-- 24/7 crisis hotline integration
-- Emergency contact notification
-- Safety plan generation
-
-**Dependencies:** `@prisma/client`, `express-validator`, `winston`
-
----
-
-### 6. Chronic Care Service
+#### 9.3.3 Chronic Care Service
 
 | Property       | Details                                   |
 | -------------- | ----------------------------------------- |
-| **Port**       | 3003                                      |
-| **Tech Stack** | Express.js, Prisma ORM, Bull (job queues) |
 | **Database**   | PostgreSQL (`chronic_care_db`)            |
+| **Port**       | 3003                                      |
+| **Tech Stack** | Bull (job queues), Express.js, Prisma ORM |
 
 **Responsibilities:**
 
-- Care plan creation and management
-- IoT device data ingestion
-- Vital signs monitoring
 - Alert generation and escalation
-- Medication adherence tracking
+- Care plan creation and management
+- Disease-specific protocols (COPD, diabetes, hypertension, etc.)
 - Goal setting and progress tracking
-- Disease-specific protocols (diabetes, hypertension, COPD, etc.)
+- IoT device data ingestion
+- Medication adherence tracking
+- Vital signs monitoring
 
 **Key Endpoints:**
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/care-plans` | Create care plan |
-| `GET` | `/care-plans/:patientId` | Get patient care plan |
-| `PUT` | `/care-plans/:id` | Update care plan |
-| `POST` | `/vitals` | Submit vital reading |
-| `GET` | `/vitals/:patientId` | Get vital history |
-| `POST` | `/devices/register` | Register IoT device |
 | `GET` | `/alerts/:patientId` | Get patient alerts |
-| `POST` | `/goals` | Set health goal |
+| `GET` | `/care-plans/:patientId` | Get patient care plan |
 | `GET` | `/goals/:patientId/progress` | Goal progress |
+| `GET` | `/vitals/:patientId` | Get vital history |
+| `POST` | `/care-plans` | Create care plan |
+| `POST` | `/devices/register` | Register IoT device |
+| `POST` | `/goals` | Set health goal |
+| `POST` | `/vitals` | Submit vital reading |
+| `PUT` | `/care-plans/:id` | Update care plan |
 
 **Supported IoT Devices:**
 | Device Type | Metrics | Brands Supported |
 |-------------|---------|-----------------|
-| Blood Pressure Monitor | Systolic, Diastolic, Pulse | Omron, Withings, iHealth |
-| Glucose Meter | Blood glucose, HbA1c | Dexcom, Abbott, Accu-Chek |
-| Pulse Oximeter | SpO2, Heart Rate | Masimo, Nonin |
-| Smart Scale | Weight, BMI, Body Fat | Withings, Fitbit, Garmin |
-| Activity Tracker | Steps, Sleep, Heart Rate | Apple, Fitbit, Garmin |
+| Activity Tracker | Heart Rate, Sleep, Steps | Apple, Fitbit, Garmin |
+| Blood Pressure Monitor | Diastolic, Pulse, Systolic | iHealth, Omron, Withings |
+| Glucose Meter | Blood glucose, HbA1c | Abbott, Accu-Chek, Dexcom |
+| Pulse Oximeter | Heart Rate, SpO2 | Masimo, Nonin |
+| Smart Scale | BMI, Body Fat, Weight | Fitbit, Garmin, Withings |
 
 **Database Models:**
 
@@ -1174,143 +1006,194 @@ model Alert {
 **Alert Thresholds:**
 | Condition | Critical Alert | Warning Alert |
 |-----------|---------------|---------------|
-| Blood Pressure | >180/120 or <90/60 | >140/90 or <100/70 |
 | Blood Glucose | >300 or <70 mg/dL | >180 or <80 mg/dL |
-| SpO2 | <90% | <94% |
+| Blood Pressure | >180/120 or <90/60 | >140/90 or <100/70 |
 | Heart Rate | >150 or <40 bpm | >100 or <50 bpm |
+| SpO2 | <90% | <94% |
 
 **Dependencies:** `@prisma/client`, `bull`, `ioredis`, `node-cron`
 
 ---
 
-### 7. Pharmacy Service
+#### 9.3.4 Core API Service
 
-| Property       | Details                    |
-| -------------- | -------------------------- |
-| **Port**       | 3004                       |
-| **Tech Stack** | Express.js, Prisma ORM     |
-| **Database**   | PostgreSQL (`pharmacy_db`) |
+| Property       | Details                      |
+| -------------- | ---------------------------- |
+| **Database**   | PostgreSQL (`healthcare_db`) |
+| **Port**       | 8080                         |
+| **Tech Stack** | Express.js, Prisma ORM       |
 
 **Responsibilities:**
 
-- E-prescription management
-- Drug database and formulary
-- Drug interaction checking
-- Allergy alert system
-- Refill management
-- Pharmacy network integration
-- Medication delivery tracking
+- Audit logging
+- Document management
+- FHIR R4 data export
+- Health package management
+- Patient profile management
+- Provider profile and availability
+- Subscription and billing (Stripe integration)
 
 **Key Endpoints:**
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/prescriptions` | Create prescription |
-| `GET` | `/prescriptions/:id` | Get prescription |
-| `GET` | `/prescriptions/patient/:id` | Patient prescriptions |
-| `POST` | `/prescriptions/:id/refill` | Request refill |
-| `GET` | `/medications/search` | Search drug database |
-| `POST` | `/interactions/check` | Check drug interactions |
-| `GET` | `/pharmacies` | Find nearby pharmacies |
-| `POST` | `/orders` | Place pharmacy order |
-| `GET` | `/orders/:id/track` | Track delivery |
+| `GET` | `/documents` | List patient documents |
+| `GET` | `/fhir/Patient/:id` | FHIR patient export |
+| `GET` | `/health-packages` | List health packages |
+| `GET` | `/providers` | Search providers |
+| `GET/PUT` | `/patients/:id` | Patient profile CRUD |
+| `GET/PUT` | `/providers/:id` | Provider profile |
+| `POST` | `/documents/upload` | Upload document |
+| `POST` | `/health-packages/book` | Book health package |
+| `POST` | `/payments` | Process payment |
+| `POST` | `/subscriptions` | Create subscription |
 
-**Drug Interaction Checking:**
+**Database Models (31 total):**
 
-```javascript
-// Interaction severity levels
-CONTRAINDICATED; // Do not use together
-SEVERE; // Use alternative if possible
-MODERATE; // Monitor closely
-MINOR; // Generally safe, be aware
 ```
+Appointment, AuditEvent, ChatMessage, ClinicalNote, Consent, DeviceToken,
+DiagnosticTest, Document, Encounter, HealthPackage, HealthPackageBooking,
+Invoice, InvoiceItem, LabResult, NotificationPreference, Patient, Payment,
+PaymentMethod, Plan, Prescription, PrescriptionItem, Provider, PushNotification,
+RefreshToken, Subscription, User, Visit, WebhookEventLog
+```
+
+**External Integrations:**
+
+- **AWS S3**: Document storage
+- **SendGrid**: Transactional emails
+- **Stripe**: Payment processing, subscription management
+
+**Dependencies:** `@aws-sdk/client-s3`, `@prisma/client`, `multer`, `stripe`, `winston`
+
+---
+
+#### 9.3.5 Imaging Service
+
+| Property       | Details                   |
+| -------------- | ------------------------- |
+| **Database**   | PostgreSQL (`imaging_db`) |
+| **Port**       | 3006                      |
+| **Tech Stack** | Express.js, Prisma ORM    |
+
+**Responsibilities:**
+
+- AI-assisted image analysis
+- DICOM image handling
+- Multi-modality support
+- PACS integration
+- Radiology order management
+- Report generation and delivery
+
+**Key Endpoints:**
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/modalities` | List imaging modalities |
+| `GET` | `/orders/:id` | Get order details |
+| `GET` | `/orders/patient/:id` | Patient imaging orders |
+| `GET` | `/reports/:orderId` | Get imaging report |
+| `GET` | `/studies/:id` | Get study images |
+| `POST` | `/orders` | Create imaging order |
+| `POST` | `/reports` | Submit radiology report |
+| `POST` | `/studies/:id/upload` | Upload DICOM study |
+
+**Supported Modalities:**
+| Modality | Description | AI Features |
+|----------|-------------|-------------|
+| **CT** | Computed tomography | Abnormality highlighting |
+| **DEXA** | Bone density | Osteoporosis scoring |
+| **ECG** | Electrocardiogram | Arrhythmia detection |
+| **Mammography** | Breast imaging | CAD (Computer-Aided Detection) |
+| **MRI** | Magnetic resonance | Brain lesion detection |
+| **Ultrasound** | Sonography | Measurement assistance |
+| **X-Ray** | General radiography | Lung nodule detection |
 
 **Database Models:**
 
 ```prisma
-model Prescription {
+model ImagingOrder {
   id          String   @id @default(uuid())
   patientId   String
   providerId  String
-  status      PrescriptionStatus // ACTIVE, FILLED, EXPIRED, CANCELLED
-  items       PrescriptionItem[]
-  pharmacyId  String?
+  modality    Modality
+  bodyPart    String
+  indication  String
+  status      OrderStatus
+  priority    Priority
+  scheduledAt DateTime?
+  study       Study?
+  report      ImagingReport?
   createdAt   DateTime @default(now())
-  expiresAt   DateTime
 }
 
-model PrescriptionItem {
-  id             String   @id @default(uuid())
-  prescriptionId String
-  medicationId   String
-  dosage         String
-  frequency      String
-  quantity       Int
-  refillsAllowed Int
-  refillsUsed    Int      @default(0)
-  instructions   String?
+model Study {
+  id        String   @id @default(uuid())
+  orderId   String   @unique
+  studyUid  String   @unique // DICOM Study Instance UID
+  accession String
+  images    Image[]
+  performedAt DateTime
 }
 
-model Medication {
-  id             String   @id @default(uuid())
-  name           String
-  genericName    String
-  ndc            String   @unique // National Drug Code
-  strength       String
-  form           String   // TABLET, CAPSULE, LIQUID, INJECTION
-  manufacturer   String
-  interactions   Json     // Drug interaction data
+model ImagingReport {
+  id           String   @id @default(uuid())
+  orderId      String   @unique
+  radiologistId String
+  findings     String
+  impression   String
+  critical     Boolean  @default(false)
+  signedAt     DateTime
 }
 ```
 
 **External Integrations:**
 
-- **DrugBank API**: Drug information and interactions
-- **Surescripts**: E-prescribing network
-- **Pharmacy chains**: CVS, Walgreens, independent pharmacies
+- **AI Providers**: Aidoc, Google Health AI
+- **DICOM Standard**: Image storage and retrieval
+- **PACS Systems**: dcm4chee, Orthanc
 
-**Dependencies:** `@prisma/client`, `axios`, `express-validator`
+**Dependencies:** `@prisma/client`, `cornerstone-core`, `dicom-parser`, `multer`
 
 ---
 
-### 8. Laboratory Service
+#### 9.3.6 Laboratory Service
 
 | Property       | Details                      |
 | -------------- | ---------------------------- |
+| **Database**   | PostgreSQL (`laboratory_db`) |
 | **Port**       | 3005                         |
 | **Tech Stack** | Express.js, Prisma ORM       |
-| **Database**   | PostgreSQL (`laboratory_db`) |
 
 **Responsibilities:**
 
-- Lab order management
-- Test catalog maintenance
-- Result processing and delivery
-- Reference range interpretation
 - Abnormal result flagging
 - HL7/FHIR result ingestion
 - Lab network integration
+- Lab order management
+- Reference range interpretation
+- Result processing and delivery
+- Test catalog maintenance
 
 **Key Endpoints:**
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/orders` | Create lab order |
+| `GET` | `/labs` | Find lab locations |
 | `GET` | `/orders/:id` | Get order details |
 | `GET` | `/orders/patient/:id` | Patient lab orders |
-| `POST` | `/results` | Submit lab result |
 | `GET` | `/results/:orderId` | Get order results |
 | `GET` | `/tests` | List available tests |
 | `GET` | `/tests/:code` | Test details |
-| `GET` | `/labs` | Find lab locations |
+| `POST` | `/orders` | Create lab order |
+| `POST` | `/results` | Submit lab result |
 
 **Test Catalog (Sample):**
 | Category | Tests |
 |----------|-------|
-| **Hematology** | CBC, ESR, Coagulation Panel |
-| **Chemistry** | BMP, CMP, Lipid Panel, LFT, RFT |
-| **Endocrine** | TSH, T3, T4, Cortisol, HbA1c |
-| **Cardiac** | Troponin, BNP, CK-MB |
-| **Tumor Markers** | PSA, CA-125, CEA, AFP |
-| **Infectious** | HIV, Hepatitis Panel, STI Panel |
+| **Cardiac** | BNP, CK-MB, Troponin |
+| **Chemistry** | BMP, CMP, LFT, Lipid Panel, RFT |
+| **Endocrine** | Cortisol, HbA1c, T3, T4, TSH |
+| **Hematology** | CBC, Coagulation Panel, ESR |
+| **Infectious** | Hepatitis Panel, HIV, STI Panel |
+| **Tumor Markers** | AFP, CA-125, CEA, PSA |
 | **Urinalysis** | Complete UA, Microalbumin |
 
 **Database Models:**
@@ -1355,154 +1238,155 @@ model LabTest {
 
 **External Integrations:**
 
-- **Quest Diagnostics**: Lab network
-- **LabCorp**: Lab network
 - **HL7 FHIR**: DiagnosticReport resources
+- **LabCorp**: Lab network
+- **Quest Diagnostics**: Lab network
 
-**Dependencies:** `@prisma/client`, `hl7`, `fhir`, `decimal.js`
+**Dependencies:** `@prisma/client`, `decimal.js`, `fhir`, `hl7`
 
 ---
 
-### 9. Imaging Service
+#### 9.3.7 Mental Health Service
 
-| Property       | Details                   |
-| -------------- | ------------------------- |
-| **Port**       | 3006                      |
-| **Tech Stack** | Express.js, Prisma ORM    |
-| **Database**   | PostgreSQL (`imaging_db`) |
+| Property       | Details                         |
+| -------------- | ------------------------------- |
+| **Database**   | PostgreSQL (`mental_health_db`) |
+| **Port**       | 3002                            |
+| **Tech Stack** | Express.js, Prisma ORM          |
 
 **Responsibilities:**
 
-- Radiology order management
-- DICOM image handling
-- Report generation and delivery
-- AI-assisted image analysis
-- PACS integration
-- Multi-modality support
+- Crisis intervention protocols
+- Digital therapeutic content
+- Mood tracking and journaling
+- Therapist matching
+- Therapy session management (couples, family, group, individual)
+- Treatment plan management
+- Validated clinical assessments
 
 **Key Endpoints:**
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/orders` | Create imaging order |
-| `GET` | `/orders/:id` | Get order details |
-| `GET` | `/orders/patient/:id` | Patient imaging orders |
-| `POST` | `/studies/:id/upload` | Upload DICOM study |
-| `GET` | `/studies/:id` | Get study images |
-| `POST` | `/reports` | Submit radiology report |
-| `GET` | `/reports/:orderId` | Get imaging report |
-| `GET` | `/modalities` | List imaging modalities |
+| `GET` | `/assessments/:patientId` | Assessment history |
+| `GET` | `/content/cbt-modules` | CBT content library |
+| `GET` | `/mood-entries/:patientId` | Mood tracking data |
+| `GET` | `/sessions/:patientId` | Patient session history |
+| `GET` | `/therapists` | Search therapists |
+| `POST` | `/assessments` | Submit assessment |
+| `POST` | `/crisis/escalate` | Crisis escalation |
+| `POST` | `/mood-entries` | Log mood entry |
+| `POST` | `/sessions` | Book therapy session |
 
-**Supported Modalities:**
-| Modality | Description | AI Features |
-|----------|-------------|-------------|
-| **X-Ray** | General radiography | Lung nodule detection |
-| **CT** | Computed tomography | Abnormality highlighting |
-| **MRI** | Magnetic resonance | Brain lesion detection |
-| **Ultrasound** | Sonography | Measurement assistance |
-| **Mammography** | Breast imaging | CAD (Computer-Aided Detection) |
-| **DEXA** | Bone density | Osteoporosis scoring |
-| **ECG** | Electrocardiogram | Arrhythmia detection |
+**Validated Assessments:**
+| Assessment | Description | Scoring |
+|------------|-------------|---------|
+| **AUDIT** | Alcohol use | 0-40 (>=8 hazardous) |
+| **DAST-10** | Drug abuse screening | 0-10 (>=3 moderate) |
+| **GAD-7** | Anxiety screening | 0-21 (>=10 moderate) |
+| **MDQ** | Bipolar disorder | Positive if >=7 |
+| **PCL-5** | PTSD checklist | 0-80 (>=33 probable PTSD) |
+| **PHQ-9** | Depression screening | 0-27 (>=10 moderate) |
+| **PSS** | Perceived stress | 0-40 (>=14 moderate) |
+| **Y-BOCS** | OCD severity | 0-40 (>=16 moderate) |
 
 **Database Models:**
 
 ```prisma
-model ImagingOrder {
+model TherapySession {
   id          String   @id @default(uuid())
   patientId   String
-  providerId  String
-  modality    Modality
-  bodyPart    String
-  indication  String
-  status      OrderStatus
-  priority    Priority
-  scheduledAt DateTime?
-  study       Study?
-  report      ImagingReport?
-  createdAt   DateTime @default(now())
+  therapistId String
+  sessionType SessionType // INDIVIDUAL, COUPLES, FAMILY, GROUP
+  scheduledAt DateTime
+  duration    Int      @default(50)
+  notes       String?
+  status      SessionStatus
 }
 
-model Study {
+model Assessment {
+  id         String   @id @default(uuid())
+  patientId  String
+  type       AssessmentType
+  responses  Json
+  score      Int
+  severity   String
+  completedAt DateTime
+}
+
+model MoodEntry {
   id        String   @id @default(uuid())
-  orderId   String   @unique
-  studyUid  String   @unique // DICOM Study Instance UID
-  accession String
-  images    Image[]
-  performedAt DateTime
-}
-
-model ImagingReport {
-  id           String   @id @default(uuid())
-  orderId      String   @unique
-  radiologistId String
-  findings     String
-  impression   String
-  critical     Boolean  @default(false)
-  signedAt     DateTime
+  patientId String
+  mood      Int      // 1-10 scale
+  energy    Int      // 1-10 scale
+  anxiety   Int      // 1-10 scale
+  notes     String?
+  createdAt DateTime @default(now())
 }
 ```
 
-**External Integrations:**
+**Crisis Protocol:**
 
-- **PACS Systems**: Orthanc, dcm4chee
-- **DICOM Standard**: Image storage and retrieval
-- **AI Providers**: Google Health AI, Aidoc
+- 24/7 crisis hotline integration
+- Automatic escalation for high-risk scores
+- Emergency contact notification
+- Safety plan generation
 
-**Dependencies:** `@prisma/client`, `dicom-parser`, `cornerstone-core`, `multer`
+**Dependencies:** `@prisma/client`, `express-validator`, `winston`
 
 ---
 
-### 10. Notification Service
+#### 9.3.8 Notification Service
 
 | Property       | Details                               |
 | -------------- | ------------------------------------- |
-| **Port**       | 3006                                  |
-| **Tech Stack** | Express.js, Bull (job queues)         |
 | **Database**   | PostgreSQL (`notification_db`), Redis |
+| **Port**       | 3006                                  |
+| **Tech Stack** | Bull (job queues), Express.js         |
 
 **Responsibilities:**
 
-- Multi-channel notification delivery (Email, SMS, Push)
-- Template management
-- Notification preferences
-- Delivery tracking and analytics
-- Scheduled notifications
 - Batch processing
+- Delivery tracking and analytics
+- Multi-channel notification delivery (Email, Push, SMS)
+- Notification preferences
+- Scheduled notifications
+- Template management
 
 **Key Endpoints:**
 | Method | Endpoint | Description |
 |--------|----------|-------------|
+| `DELETE` | `/devices/:token` | Unregister device |
+| `GET` | `/history/:userId` | User notification history |
+| `GET` | `/preferences/:userId` | Get preferences |
+| `GET` | `/templates` | List templates |
+| `POST` | `/devices/register` | Register push device |
 | `POST` | `/send` | Send notification |
 | `POST` | `/send/batch` | Batch send |
-| `GET` | `/history/:userId` | User notification history |
 | `PUT` | `/preferences/:userId` | Update preferences |
-| `GET` | `/preferences/:userId` | Get preferences |
-| `POST` | `/devices/register` | Register push device |
-| `DELETE` | `/devices/:token` | Unregister device |
-| `GET` | `/templates` | List templates |
 
 **Notification Channels:**
 | Channel | Provider | Use Cases |
 |---------|----------|-----------|
-| **Email** | SendGrid | Appointments, reports, billing |
-| **SMS** | Twilio | OTP, reminders, alerts |
-| **Push (iOS)** | APNs | Real-time updates |
-| **Push (Android)** | FCM | Real-time updates |
+| **Email** | SendGrid | Appointments, billing, reports |
 | **In-App** | WebSocket | Live notifications |
+| **Push (Android)** | FCM | Real-time updates |
+| **Push (iOS)** | APNs | Real-time updates |
+| **SMS** | Twilio | Alerts, OTP, reminders |
 
 **Notification Types:**
 
 ```javascript
 const notificationTypes = {
+  APPOINTMENT_CONFIRMED: { channels: ["email", "push"] },
   APPOINTMENT_REMINDER: {
     channels: ["email", "sms", "push"],
     timing: "-24h, -1h",
   },
-  APPOINTMENT_CONFIRMED: { channels: ["email", "push"] },
-  LAB_RESULTS_READY: { channels: ["email", "sms", "push"] },
-  PRESCRIPTION_READY: { channels: ["sms", "push"] },
-  PAYMENT_RECEIVED: { channels: ["email"] },
   CRITICAL_ALERT: { channels: ["sms", "push", "email"], priority: "high" },
+  LAB_RESULTS_READY: { channels: ["email", "sms", "push"] },
   MEDICATION_REMINDER: { channels: ["push"], recurring: true },
+  PAYMENT_RECEIVED: { channels: ["email"] },
+  PRESCRIPTION_READY: { channels: ["sms", "push"] },
 };
 ```
 
@@ -1544,16 +1428,175 @@ model NotificationPreference {
 
 **External Integrations:**
 
+- **Apple Push Notification Service (APNs)**: iOS push
+- **Firebase Cloud Messaging (FCM)**: Android push
 - **SendGrid**: Transactional email (templates, tracking)
 - **Twilio**: SMS and voice
-- **Firebase Cloud Messaging (FCM)**: Android push
-- **Apple Push Notification Service (APNs)**: iOS push
 
-**Dependencies:** `@sendgrid/mail`, `twilio`, `firebase-admin`, `apn`, `bull`, `ioredis`
+**Dependencies:** `@sendgrid/mail`, `apn`, `bull`, `firebase-admin`, `ioredis`, `twilio`
 
 ---
 
-### Inter-Service Communication
+#### 9.3.9 Pharmacy Service
+
+| Property       | Details                    |
+| -------------- | -------------------------- |
+| **Database**   | PostgreSQL (`pharmacy_db`) |
+| **Port**       | 3004                       |
+| **Tech Stack** | Express.js, Prisma ORM     |
+
+**Responsibilities:**
+
+- Allergy alert system
+- Drug database and formulary
+- Drug interaction checking
+- E-prescription management
+- Medication delivery tracking
+- Pharmacy network integration
+- Refill management
+
+**Key Endpoints:**
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/medications/search` | Search drug database |
+| `GET` | `/orders/:id/track` | Track delivery |
+| `GET` | `/pharmacies` | Find nearby pharmacies |
+| `GET` | `/prescriptions/:id` | Get prescription |
+| `GET` | `/prescriptions/patient/:id` | Patient prescriptions |
+| `POST` | `/interactions/check` | Check drug interactions |
+| `POST` | `/orders` | Place pharmacy order |
+| `POST` | `/prescriptions` | Create prescription |
+| `POST` | `/prescriptions/:id/refill` | Request refill |
+
+**Drug Interaction Checking:**
+
+```javascript
+// Interaction severity levels (alphabetical)
+CONTRAINDICATED; // Do not use together
+MINOR; // Generally safe, be aware
+MODERATE; // Monitor closely
+SEVERE; // Use alternative if possible
+```
+
+**Database Models:**
+
+```prisma
+model Prescription {
+  id          String   @id @default(uuid())
+  patientId   String
+  providerId  String
+  status      PrescriptionStatus // ACTIVE, FILLED, EXPIRED, CANCELLED
+  items       PrescriptionItem[]
+  pharmacyId  String?
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime
+}
+
+model PrescriptionItem {
+  id             String   @id @default(uuid())
+  prescriptionId String
+  medicationId   String
+  dosage         String
+  frequency      String
+  quantity       Int
+  refillsAllowed Int
+  refillsUsed    Int      @default(0)
+  instructions   String?
+}
+
+model Medication {
+  id             String   @id @default(uuid())
+  name           String
+  genericName    String
+  ndc            String   @unique // National Drug Code
+  strength       String
+  form           String   // TABLET, CAPSULE, LIQUID, INJECTION
+  manufacturer   String
+  interactions   Json     // Drug interaction data
+}
+```
+
+**External Integrations:**
+
+- **DrugBank API**: Drug information and interactions
+- **Pharmacy chains**: CVS, Independent pharmacies, Walgreens
+- **Surescripts**: E-prescribing network
+
+**Dependencies:** `@prisma/client`, `axios`, `express-validator`
+
+---
+
+#### 9.3.10 Telehealth Service
+
+| Property       | Details                           |
+| -------------- | --------------------------------- |
+| **Database**   | PostgreSQL (`telehealth_db`)      |
+| **Port**       | 3001                              |
+| **Tech Stack** | Express.js, Prisma ORM, Socket.io |
+
+**Responsibilities:**
+
+- Appointment scheduling and management
+- Call recording consent
+- In-call chat messaging
+- Post-consultation notes
+- Video consultation room management
+- Waiting room functionality
+- WebRTC signaling for peer-to-peer video
+
+**Key Endpoints:**
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/appointments/:id` | Get appointment details |
+| `GET` | `/appointments/patient/:id` | Patient appointments |
+| `GET` | `/appointments/provider/:id` | Provider schedule |
+| `POST` | `/appointments` | Create appointment |
+| `POST` | `/consultations/:id/end` | End consultation |
+| `POST` | `/consultations/:id/start` | Start consultation |
+| `PUT` | `/appointments/:id/status` | Update status |
+
+**WebSocket Events:**
+| Event | Direction | Description |
+|-------|-----------|-------------|
+| `ANSWER` | Client <-> Client | WebRTC SDP answer |
+| `CALL_ENDED` | Server -> Client | Call termination |
+| `CHAT_MESSAGE` | Bidirectional | In-call text chat |
+| `ICE_CANDIDATE` | Client <-> Client | ICE candidate exchange |
+| `JOIN_ROOM` | Client -> Server | Join consultation room |
+| `LEAVE_ROOM` | Client -> Server | Leave consultation |
+| `OFFER` | Client <-> Client | WebRTC SDP offer |
+| `PARTICIPANT_JOINED` | Server -> Client | New participant notification |
+
+**Database Models:**
+
+```prisma
+model Appointment {
+  id          String   @id @default(uuid())
+  patientId   String
+  providerId  String
+  scheduledAt DateTime
+  duration    Int      @default(30)
+  type        AppointmentType // VIDEO, AUDIO, CHAT, IN_PERSON
+  status      AppointmentStatus // SCHEDULED, IN_PROGRESS, COMPLETED, CANCELLED
+  roomId      String?
+  notes       String?
+}
+
+model Consultation {
+  id            String   @id @default(uuid())
+  appointmentId String   @unique
+  startedAt     DateTime
+  endedAt       DateTime?
+  recording     Boolean  @default(false)
+  chatMessages  ChatMessage[]
+}
+```
+
+**Dependencies:** `@prisma/client`, `ioredis` (for Socket.io adapter), `simple-peer`, `socket.io`
+
+---
+
+### 9.4 Inter-Service Communication
 
 ```
 +-----------------------------------------------------------------------------+
@@ -1566,291 +1609,290 @@ model NotificationPreference {
 |   +----------+ USER_VERIFIED      |             |                           |
 |                                    |             |                           |
 |   +----------+      Events        |             |     +--------------+      |
-|   |Telehealth| -----------------> |   Redis     | --> | Notification |      |
-|   | Service  | APPOINTMENT_BOOKED |   Pub/Sub   |     |   Service    |      |
-|   +----------+ CONSULTATION_ENDED |             |     +--------------+      |
-|                                    |             |                           |
-|   +----------+      Events        |             |                           |
-|   | Chronic  | -----------------> |             |                           |
-|   |   Care   | CRITICAL_ALERT     |             |                           |
-|   +----------+ GOAL_ACHIEVED      |             |                           |
+|   | Chronic  | -----------------> |   Redis     | --> | Notification |      |
+|   |   Care   | CRITICAL_ALERT     |   Pub/Sub   |     |   Service    |      |
+|   +----------+ GOAL_ACHIEVED      |             |     +--------------+      |
 |                                    |             |                           |
 |   +----------+      Events        |             |                           |
 |   |Laboratory| -----------------> |             |                           |
-|   | Service  | RESULTS_READY      +-------------+                           |
-|   +----------+ CRITICAL_RESULT                                              |
+|   | Service  | CRITICAL_RESULT    |             |                           |
+|   +----------+ RESULTS_READY      +-------------+                           |
+|                                                                              |
+|   +----------+      Events                                                  |
+|   |Telehealth| -----------------> (Redis Pub/Sub)                           |
+|   | Service  | APPOINTMENT_BOOKED                                           |
+|   +----------+ CONSULTATION_ENDED                                           |
 |                                                                              |
 +-----------------------------------------------------------------------------+
 |                        SYNCHRONOUS HTTP CALLS                                |
 +-----------------------------------------------------------------------------+
 |                                                                              |
-|   API Gateway ------> Auth Service (JWT validation)                         |
-|   Telehealth  ------> API Service (Patient lookup)                          |
-|   Pharmacy    ------> API Service (Prescription creation)                   |
-|   Laboratory  ------> API Service (Order creation)                          |
 |   All Services -----> Notification Service (Send notifications)             |
+|   API Gateway ------> Auth Service (JWT validation)                         |
+|   Laboratory  ------> API Service (Order creation)                          |
+|   Pharmacy    ------> API Service (Prescription creation)                   |
+|   Telehealth  ------> API Service (Patient lookup)                          |
 |                                                                              |
 +-----------------------------------------------------------------------------+
 ```
 
 ---
 
-## Project Structure
+## 10. Project Structure
 
 ```
 Global-Healthcare-SaaS-Platform/
+|-- .github/workflows/                    # CI/CD Pipelines
 |-- apps/                                 # Client Applications
-|   |-- web/                              # Next.js 16 Patient Portal (Port 3000)
-|   |-- mobile/                           # React Native/Expo App (iOS + Android)
 |   |-- admin/                            # Admin Dashboard (Port 3001)
+|   |-- kiosk/                            # Hospital Kiosk (Port 3004)
+|   |-- mobile/                           # React Native/Expo App (iOS + Android)
 |   |-- provider-portal/                  # Provider Workspace (Port 3002)
-|   +-- kiosk/                            # Hospital Kiosk (Port 3004)
+|   +-- web/                              # Next.js 16 Patient Portal (Port 3000)
 |
+|-- docker-compose.yml                    # Local development
+|-- docs-unified/                         # Documentation
+|-- infrastructure/                       # Infrastructure as Code (K8s, Terraform)
+|-- k8s/production/                       # Production K8s manifests
+|-- package.json                          # Root package
+|-- packages/                             # Shared Libraries
+|   |-- adapters/                         # Third-party integrations
+|   |-- ai-workflows/                     # AI orchestration
+|   |-- compliance/                       # HIPAA/GDPR/POPIA utilities
+|   |-- country-config/                   # Country-specific configs
+|   |-- entitlements/                     # Subscription management
+|   |-- fhir/                             # FHIR R4 Resources
+|   |-- i18n/                             # Internationalization (25+ languages)
+|   |-- policy/                           # Policy engine
+|   |-- sdk/                              # TypeScript API Client
+|   +-- ui/                               # React Component Library
+|
+|-- platform/                             # Platform Architecture Specs
+|-- pnpm-workspace.yaml                   # Monorepo config
 |-- services/                             # Backend Microservices
 |   |-- api/                              # Core API Service (Port 8080)
 |   |-- api-gateway/                      # Express API Gateway
 |   |-- auth-service/                     # Authentication & JWT
-|   |-- telehealth-service/               # Video consultations
-|   |-- mental-health-service/            # Mental health
 |   |-- chronic-care-service/             # Chronic care
-|   |-- pharmacy-service/                 # E-pharmacy
-|   |-- laboratory-service/               # Lab services
 |   |-- imaging-service/                  # Medical imaging
-|   +-- notification-service/             # Email, SMS, Push
+|   |-- laboratory-service/               # Lab services
+|   |-- mental-health-service/            # Mental health
+|   |-- notification-service/             # Email, SMS, Push
+|   |-- pharmacy-service/                 # E-pharmacy
+|   +-- telehealth-service/               # Video consultations
 |
-|-- packages/                             # Shared Libraries
-|   |-- sdk/                              # TypeScript API Client
-|   |-- ui/                               # React Component Library
-|   |-- fhir/                             # FHIR R4 Resources
-|   |-- i18n/                             # Internationalization (25+ languages)
-|   |-- compliance/                       # HIPAA/GDPR/POPIA utilities
-|   |-- country-config/                   # Country-specific configs
-|   |-- policy/                           # Policy engine
-|   |-- entitlements/                     # Subscription management
-|   |-- adapters/                         # Third-party integrations
-|   +-- ai-workflows/                     # AI orchestration
-|
-|-- platform/                             # Platform Architecture Specs
-|-- infrastructure/                       # Infrastructure as Code (K8s, Terraform)
-|-- k8s/production/                       # Production K8s manifests
-|-- .github/workflows/                    # CI/CD Pipelines
-|-- docs-unified/                         # Documentation
-|-- docker-compose.yml                    # Local development
-|-- pnpm-workspace.yaml                   # Monorepo config
-|-- turbo.json                            # Turbo build config
-+-- package.json                          # Root package
++-- turbo.json                            # Turbo build config
 ```
 
 ---
 
-## Technology Stack
+## 11. Technology Stack
 
-### Frontend Technologies
-
-| Technology           | Version | Purpose                     | Status |
-| -------------------- | ------- | --------------------------- | ------ |
-| **React**            | 19.0.0  | UI Framework                | ✅     |
-| **Next.js**          | 15.1.0  | Web Application Framework   | ✅     |
-| **React Native**     | 0.76.x  | Mobile App Framework        | ✅     |
-| **Expo**             | 52.x    | Mobile Development Platform | ✅     |
-| **TypeScript**       | 5.6.3   | Type Safety                 | ✅     |
-| **Tailwind CSS**     | 3.4.x   | Utility-First Styling       | ✅     |
-| **Zustand**          | 5.0.x   | State Management            | ✅     |
-| **TanStack Query**   | 5.62.x  | Data Fetching & Caching     | ✅     |
-| **React Hook Form**  | 7.54.x  | Form Management             | ✅     |
-| **Zod**              | 3.24.x  | Schema Validation           | ✅     |
-| **Socket.io-client** | 4.8.x   | Real-time Communication     | ✅     |
-| **Recharts**         | 2.15.x  | Data Visualization          | ✅     |
-| **simple-peer**      | 9.11.x  | WebRTC Peer Connections     | ✅     |
-
-### Backend Technologies
+### 11.1 Backend Technologies
 
 | Technology        | Version | Purpose                        | Status |
 | ----------------- | ------- | ------------------------------ | ------ |
-| **Node.js**       | 20 LTS  | Runtime Environment            | ✅     |
-| **Express.js**    | 4.21.x  | Web Framework                  | ✅     |
-| **Prisma**        | 6.1.x   | ORM & Database Client          | ✅     |
-| **PostgreSQL**    | 16+     | Primary Relational Database    | ✅     |
-| **Redis**         | 7+      | Caching, Sessions & Job Queues | ✅     |
-| **MongoDB**       | 7+      | FHIR Document Storage          | ✅     |
-| **Elasticsearch** | 8.11.x  | Full-text Search               | ✅     |
-| **Socket.io**     | 4.8.x   | WebSocket Server               | ✅     |
+| **AWS SES**       | 3.x     | Email Delivery (Alternate)     | ✅     |
 | **BullMQ**        | 5.x     | Background Job Queue           | ✅     |
+| **Elasticsearch** | 8.11.x  | Full-text Search               | ✅     |
+| **Express.js**    | 4.21.x  | Web Framework                  | ✅     |
+| **MongoDB**       | 7+      | FHIR Document Storage          | ✅     |
+| **Node.js**       | 20 LTS  | Runtime Environment            | ✅     |
+| **OpenTelemetry** | 1.x     | Distributed Tracing            | ✅     |
+| **PostgreSQL**    | 16+     | Primary Relational Database    | ✅     |
+| **Prisma**        | 6.1.x   | ORM & Database Client          | ✅     |
+| **Redis**         | 7+      | Caching, Sessions & Job Queues | ✅     |
+| **SendGrid**      | 8.x     | Email Delivery                 | ✅     |
+| **Socket.io**     | 4.8.x   | WebSocket Server               | ✅     |
 | **Stripe**        | 17.x    | Payment Processing             | ✅     |
 | **Winston**       | 3.17.x  | Structured Logging             | ✅     |
-| **OpenTelemetry** | 1.x     | Distributed Tracing            | ✅     |
-| **SendGrid**      | 8.x     | Email Delivery                 | ✅     |
-| **AWS SES**       | 3.x     | Email Delivery (Alternate)     | ✅     |
 
-### Infrastructure & DevOps
+### 11.2 Frontend Technologies
+
+| Technology           | Version | Purpose                     | Status |
+| -------------------- | ------- | --------------------------- | ------ |
+| **Expo**             | 52.x    | Mobile Development Platform | ✅     |
+| **Next.js**          | 15.1.0  | Web Application Framework   | ✅     |
+| **React**            | 19.0.0  | UI Framework                | ✅     |
+| **React Hook Form**  | 7.54.x  | Form Management             | ✅     |
+| **React Native**     | 0.76.x  | Mobile App Framework        | ✅     |
+| **Recharts**         | 2.15.x  | Data Visualization          | ✅     |
+| **simple-peer**      | 9.11.x  | WebRTC Peer Connections     | ✅     |
+| **Socket.io-client** | 4.8.x   | Real-time Communication     | ✅     |
+| **Tailwind CSS**     | 3.4.x   | Utility-First Styling       | ✅     |
+| **TanStack Query**   | 5.62.x  | Data Fetching & Caching     | ✅     |
+| **TypeScript**       | 5.6.3   | Type Safety                 | ✅     |
+| **Zod**              | 3.24.x  | Schema Validation           | ✅     |
+| **Zustand**          | 5.0.x   | State Management            | ✅     |
+
+### 11.3 Infrastructure & DevOps
 
 | Technology                                  | Purpose                    | Status |
 | ------------------------------------------- | -------------------------- | ------ |
 | **Amazon ECS Fargate**                      | Serverless Containers      | ✅     |
-| **Azure Container Apps**                    | Serverless Containers      | ✅     |
 | **Amazon Elastic Container Registry (ECR)** | Docker Image Storage       | ✅     |
-| **Azure Container Registry (ACR)**          | Docker Image Storage       | ✅     |
-| **Amazon RDS for PostgreSQL**               | Managed Database           | ✅     |
-| **Azure Database for PostgreSQL**           | Managed Database           | ✅     |
 | **Amazon ElastiCache for Redis**            | Managed Cache              | ✅     |
-| **Azure Cache for Redis**                   | Managed Cache              | ✅     |
-| **AWS Secrets Manager**                     | Secrets Management         | ✅     |
-| **Azure Key Vault**                         | Secrets Management         | ✅     |
+| **Amazon RDS for PostgreSQL**               | Managed Database           | ✅     |
 | **Amazon S3**                               | File & Media Storage       | ✅     |
-| **Azure Blob Storage**                      | File & Media Storage       | ✅     |
-| **GitHub Actions**                          | CI/CD Pipelines            | ✅     |
-| **Terraform**                               | Infrastructure as Code     | ✅     |
 | **AWS CDK**                                 | Infrastructure as Code     | ✅     |
+| **AWS Secrets Manager**                     | Secrets Management         | ✅     |
+| **Azure Blob Storage**                      | File & Media Storage       | ✅     |
+| **Azure Cache for Redis**                   | Managed Cache              | ✅     |
+| **Azure Container Apps**                    | Serverless Containers      | ✅     |
+| **Azure Container Registry (ACR)**          | Docker Image Storage       | ✅     |
+| **Azure Database for PostgreSQL**           | Managed Database           | ✅     |
+| **Azure Key Vault**                         | Secrets Management         | ✅     |
 | **Docker**                                  | Containerization           | ✅     |
+| **GitHub Actions**                          | CI/CD Pipelines            | ✅     |
 | **pnpm**                                    | Package Manager            | ✅     |
+| **Terraform**                               | Infrastructure as Code     | ✅     |
 | **Turborepo**                               | Monorepo Build System      | ✅     |
 
-### Security & Compliance
+### 11.4 Security & Compliance
 
 | Technology               | Purpose                  | Status |
 | ------------------------ | ------------------------ | ------ |
-| **JWT + Refresh Tokens** | Authentication           | ✅     |
+| **AES-256-GCM**          | Field-Level Encryption   | ✅     |
+| **AWS WAF / CloudFlare** | Web Application Firewall | ✅     |
 | **bcrypt**               | Password Hashing         | ✅     |
+| **CORS**                 | Cross-Origin Protection  | ✅     |
 | **express-rate-limit**   | Rate Limiting            | ✅     |
 | **helmet**               | Security Headers         | ✅     |
-| **CORS**                 | Cross-Origin Protection  | ✅     |
-| **AES-256-GCM**          | Field-Level Encryption   | ✅     |
+| **JWT + Refresh Tokens** | Authentication           | ✅     |
 | **TLS 1.3**              | Transport Encryption     | ✅     |
-| **AWS WAF / CloudFlare** | Web Application Firewall | ✅     |
 
-### Testing Stack
+### 11.5 Testing Stack
 
 | Tool              | Purpose                     | Status |
 | ----------------- | --------------------------- | ------ |
-| **Playwright**    | E2E & Accessibility Testing | ✅     |
-| **Vitest**        | Unit & Integration Testing  | ✅     |
-| **Cypress**       | Component Testing           | ✅     |
-| **Lighthouse CI** | Performance Testing         | ✅     |
-| **Trivy**         | Container Security Scanning | ✅     |
-| **Gitleaks**      | Secret Detection            | ✅     |
 | **CodeQL**        | Static Analysis (SAST)      | ✅     |
+| **Cypress**       | Component Testing           | ✅     |
+| **Gitleaks**      | Secret Detection            | ✅     |
+| **Lighthouse CI** | Performance Testing         | ✅     |
 | **npm audit**     | Dependency Scanning         | ✅     |
+| **Playwright**    | E2E & Accessibility Testing | ✅     |
+| **Trivy**         | Container Security Scanning | ✅     |
+| **Vitest**        | Unit & Integration Testing  | ✅     |
 
 ---
 
-## Business Logic & Domain Scope
+## 12. Business Logic & Domain Scope
 
-### Healthcare Domain Model
+### 12.1 Core Business Rules
 
-The platform covers 5 core healthcare domains:
+- **Appointments**: 4 modalities (audio, chat, in-person, video) with status workflow
+- **Billing**: 6-tier subscription model, multi-currency, Stripe integration
+- **Compliance**: Audit trails, consent tracking, GDPR right to be forgotten
+- **Health Checkups**: AI-powered package recommendations, digital queue, result aggregation
+- **Prescriptions**: Allergy alerts, Drug interaction checking, Refill management
 
-1. **Patient Domain** - Patient profiles, appointments, documents, visit history
-2. **Clinical Domain** - Encounters, clinical notes, prescriptions, lab results
-3. **Provider Domain** - Provider profiles, availability, credentials, specialties
-4. **Billing Domain** - Plans, subscriptions, payments, invoices
-5. **Compliance Domain** - Audit events, consent management, data retention, FHIR translation
-
-### Database Schema (31 Models)
+### 12.2 Database Schema (31 Models)
 
 | Domain            | Models                                                           | Key Relationships                    |
 | ----------------- | ---------------------------------------------------------------- | ------------------------------------ |
-| **User & Auth**   | User, RefreshToken                                               | User -> Patient/Provider             |
-| **Patient**       | Patient, Consent                                                 | Patient -> Appointments, Documents   |
-| **Provider**      | Provider                                                         | Provider -> Appointments, Encounters |
-| **Appointments**  | Appointment, Visit, ChatMessage                                  | Appointment -> Patient, Provider     |
-| **Clinical**      | Encounter, ClinicalNote, Document                                | Encounter -> ClinicalNote            |
-| **Prescriptions** | Prescription, PrescriptionItem                                   | Prescription -> Patient, Provider    |
-| **Diagnostics**   | HealthPackage, HealthPackageBooking, DiagnosticTest, LabResult   | Package -> Booking -> Results        |
-| **Billing**       | Plan, Subscription, Payment, PaymentMethod, Invoice, InvoiceItem | User -> Subscription -> Plan         |
-| **Notifications** | DeviceToken, PushNotification, NotificationPreference            | User -> Preferences                  |
+| **Appointments**  | Appointment, ChatMessage, Visit                                  | Appointment -> Patient, Provider     |
+| **Billing**       | Invoice, InvoiceItem, Payment, PaymentMethod, Plan, Subscription | User -> Subscription -> Plan         |
+| **Clinical**      | ClinicalNote, Document, Encounter                                | Encounter -> ClinicalNote            |
 | **Compliance**    | AuditEvent, WebhookEventLog                                      | All entities -> AuditEvent           |
+| **Diagnostics**   | DiagnosticTest, HealthPackage, HealthPackageBooking, LabResult   | Package -> Booking -> Results        |
+| **Notifications** | DeviceToken, NotificationPreference, PushNotification            | User -> Preferences                  |
+| **Patient**       | Consent, Patient                                                 | Patient -> Appointments, Documents   |
+| **Prescriptions** | Prescription, PrescriptionItem                                   | Prescription -> Patient, Provider    |
+| **Provider**      | Provider                                                         | Provider -> Appointments, Encounters |
+| **User & Auth**   | RefreshToken, User                                               | User -> Patient/Provider             |
 
-### Core Business Rules
+### 12.3 Healthcare Domain Model
 
-- **Appointments**: 4 modalities (video, audio, chat, in-person) with status workflow
-- **Prescriptions**: Drug interaction checking, allergy alerts, refill management
-- **Health Checkups**: AI-powered package recommendations, digital queue, result aggregation
-- **Billing**: 6-tier subscription model, multi-currency, Stripe integration
-- **Compliance**: Audit trails, consent tracking, GDPR right to be forgotten
+The platform covers 5 core healthcare domains:
+
+1. **Billing Domain** - Invoices, Payments, Plans, Subscriptions
+2. **Clinical Domain** - Clinical notes, Encounters, Lab results, Prescriptions
+3. **Compliance Domain** - Audit events, Consent management, Data retention, FHIR translation
+4. **Patient Domain** - Appointments, Documents, Patient profiles, Visit history
+5. **Provider Domain** - Availability, Credentials, Provider profiles, Specialties
 
 ---
 
-## Subscription Model
+## 13. Subscription Model
 
-### Individual Plans
-
-| Tier                  | Monthly | Annual    | Key Features                                  |
-| --------------------- | ------- | --------- | --------------------------------------------- |
-| **Essential**         | $19/mo  | $190/yr   | Virtual GP visits, health records, scheduling |
-| **Preventive**        | $29/mo  | $290/yr   | + Wellness coaching, wearable integration     |
-| **Mental Wellness**   | $39/mo  | $390/yr   | + Therapy, psychiatry, crisis support         |
-| **Chronic Care**      | $49/mo  | $490/yr   | + Remote monitoring, IoT devices              |
-| **Specialist Access** | $59/mo  | $590/yr   | + 15+ specialties, priority scheduling        |
-| **Premium Concierge** | $199/mo | $1,990/yr | Unlimited, 24/7 VIP, family (5 members)       |
-
-### Enterprise Plans
+### 13.1 Enterprise Plans
 
 | Plan                    | Price            | Features                                 |
 | ----------------------- | ---------------- | ---------------------------------------- |
+| **Enterprise**          | $499/employee/yr | Custom integrations, Full suite, SLA     |
+| **Healthcare Provider** | Custom           | FHIR integration, Hospital deployment    |
+| **Professional**        | $249/employee/yr | + Analytics, Chronic care, Mental health |
 | **Starter**             | $99/employee/yr  | Basic telehealth, wellness content       |
-| **Professional**        | $249/employee/yr | + Mental health, chronic care, analytics |
-| **Enterprise**          | $499/employee/yr | Full suite, custom integrations, SLA     |
-| **Healthcare Provider** | Custom           | Hospital deployment, FHIR integration    |
 
-### Multi-Currency Support
+### 13.2 Individual Plans
+
+| Tier                  | Monthly | Annual    | Key Features                                  |
+| --------------------- | ------- | --------- | --------------------------------------------- |
+| **Chronic Care**      | $49/mo  | $490/yr   | + IoT devices, Remote monitoring              |
+| **Essential**         | $19/mo  | $190/yr   | Health records, Scheduling, Virtual GP visits |
+| **Mental Wellness**   | $39/mo  | $390/yr   | + Crisis support, Psychiatry, Therapy         |
+| **Premium Concierge** | $199/mo | $1,990/yr | 24/7 VIP, Family (5 members), Unlimited       |
+| **Preventive**        | $29/mo  | $290/yr   | + Wearable integration, Wellness coaching     |
+| **Specialist Access** | $59/mo  | $590/yr   | + 15+ specialties, Priority scheduling        |
+
+### 13.3 Multi-Currency Support
 
 | Region           | Currencies         | Payment Methods  |
 | ---------------- | ------------------ | ---------------- |
-| **Americas**     | USD, CAD, BRL, MXN | Stripe, Square   |
-| **Europe**       | EUR, GBP, CHF      | Stripe, Adyen    |
-| **Africa**       | NGN, KES, ZAR      | Paystack, M-Pesa |
-| **Asia-Pacific** | INR, SGD, AUD      | Razorpay, Stripe |
+| **Africa**       | KES, NGN, ZAR      | M-Pesa, Paystack |
+| **Americas**     | BRL, CAD, MXN, USD | Square, Stripe   |
+| **Asia-Pacific** | AUD, INR, SGD      | Razorpay, Stripe |
+| **Europe**       | CHF, EUR, GBP      | Adyen, Stripe    |
 
 ---
 
-## User Research & Personas
+## 14. User Research & Personas
 
-### Primary Personas
+### 14.1 Accessibility Standards (WCAG 2.1 AA)
 
-#### Sarah - The Busy Parent (Patient)
-
-- **Age**: 35-45, Moderate tech savvy
-- **Goals**: Manage family health, quick care access
-- **Pain Points**: Scattered records, waiting times, confusing billing
-- **Features**: Family dashboard, 3-click booking, medication reminders
-
-#### Dr. James - The Overworked Physician (Provider)
-
-- **Age**: 40-55, Low-Moderate tech savvy
-- **Goals**: Reduce documentation, see complete patient picture
-- **Pain Points**: 34% time on documentation, EHR complexity
-- **Features**: AI-assisted documentation, unified patient view
-
-#### Michael - HR Benefits Manager (Enterprise)
-
-- **Age**: 35-50, Moderate tech savvy
-- **Goals**: Employee wellness, demonstrate ROI
-- **Pain Points**: Multiple vendors, poor utilization data
-- **Features**: Analytics dashboard, bulk enrollment, reporting
-
-### Accessibility Standards (WCAG 2.1 AA)
-
+- 44px minimum touch targets
+- 4.5:1 color contrast ratio
 - Full ARIA labels and semantic HTML
 - Keyboard navigation with skip links
-- 4.5:1 color contrast ratio
-- 44px minimum touch targets
 - Video consultation live captions
+
+### 14.2 Primary Personas
+
+#### 14.2.1 Dr. James - The Overworked Physician (Provider)
+
+- **Age**: 40-55, Low-Moderate tech savvy
+- **Features**: AI-assisted documentation, unified patient view
+- **Goals**: Reduce documentation, see complete patient picture
+- **Pain Points**: 34% time on documentation, EHR complexity
+
+#### 14.2.2 Michael - HR Benefits Manager (Enterprise)
+
+- **Age**: 35-50, Moderate tech savvy
+- **Features**: Analytics dashboard, bulk enrollment, reporting
+- **Goals**: Employee wellness, demonstrate ROI
+- **Pain Points**: Multiple vendors, poor utilization data
+
+#### 14.2.3 Sarah - The Busy Parent (Patient)
+
+- **Age**: 35-45, Moderate tech savvy
+- **Features**: 3-click booking, Family dashboard, Medication reminders
+- **Goals**: Manage family health, quick care access
+- **Pain Points**: Confusing billing, Scattered records, Waiting times
 
 ---
 
-## Quick Start
+## 15. Quick Start
 
-### Prerequisites
+### 15.1 Access Points
 
-```bash
-# Install Node.js 20
-nvm install 20 && nvm use 20
+| Service         | URL                        |
+| --------------- | -------------------------- |
+| Admin Dashboard | http://localhost:3001      |
+| API Docs        | http://localhost:8080/docs |
+| Provider Portal | http://localhost:3002      |
+| Web Portal      | http://localhost:3000      |
 
-# Install pnpm
-npm install -g pnpm@9
-```
-
-### Development Setup
+### 15.2 Development Setup
 
 ```bash
 # Clone and install
@@ -1869,20 +1911,21 @@ pnpm db:migrate
 pnpm dev
 ```
 
-### Access Points
+### 15.3 Prerequisites
 
-| Service         | URL                        |
-| --------------- | -------------------------- |
-| Web Portal      | http://localhost:3000      |
-| Admin Dashboard | http://localhost:3001      |
-| Provider Portal | http://localhost:3002      |
-| API Docs        | http://localhost:8080/docs |
+```bash
+# Install Node.js 20
+nvm install 20 && nvm use 20
+
+# Install pnpm
+npm install -g pnpm@9
+```
 
 ---
 
-## CI/CD Pipeline
+## 16. CI/CD Pipeline
 
-### AWS CodePipeline Architecture
+### 16.1 AWS CodePipeline Architecture
 
 ```
 GitHub Repository
@@ -1908,34 +1951,7 @@ GitHub Repository
 └──────────────────┘
 ```
 
-### Pipeline Stages
-
-| Stage      | Action    | Description                           |
-| ---------- | --------- | ------------------------------------- |
-| **Source** | GitHub    | Triggered on push to main branch      |
-| **Build**  | CodeBuild | Builds Docker images for all services |
-| **Push**   | ECR       | Pushes images to container registry   |
-| **Deploy** | ECS       | Updates ECS Fargate services          |
-
-### Services Built
-
-| Service               | ECR Repository                              | Port |
-| --------------------- | ------------------------------------------- | ---- |
-| API Gateway           | `unified-health-prod/api-gateway`           | 3000 |
-| Auth Service          | `unified-health-prod/auth-service`          | 3001 |
-| Core API              | `unified-health-prod/api`                   | 8080 |
-| Telehealth Service    | `unified-health-prod/telehealth-service`    | 3001 |
-| Mental Health Service | `unified-health-prod/mental-health-service` | 3002 |
-| Chronic Care Service  | `unified-health-prod/chronic-care-service`  | 3003 |
-| Pharmacy Service      | `unified-health-prod/pharmacy-service`      | 3004 |
-| Laboratory Service    | `unified-health-prod/laboratory-service`    | 3005 |
-| Imaging Service       | `unified-health-prod/imaging-service`       | 3006 |
-| Notification Service  | `unified-health-prod/notification-service`  | 3007 |
-| Web App               | `unified-health-prod/web-app`               | 3000 |
-| Provider Portal       | `unified-health-prod/provider-portal`       | 3002 |
-| Admin Portal          | `unified-health-prod/admin-portal`          | 3001 |
-
-### Deployment Commands
+### 16.2 Deployment Commands
 
 ```bash
 # Deploy infrastructure with Terraform
@@ -1954,57 +1970,84 @@ aws ecr describe-repositories --repository-names unified-health-prod/api-gateway
 aws ecs describe-clusters --clusters unified-health-prod --region us-east-1
 ```
 
+### 16.3 Pipeline Stages
+
+| Stage      | Action    | Description                           |
+| ---------- | --------- | ------------------------------------- |
+| **Build**  | CodeBuild | Builds Docker images for all services |
+| **Deploy** | ECS       | Updates ECS Fargate services          |
+| **Push**   | ECR       | Pushes images to container registry   |
+| **Source** | GitHub    | Triggered on push to main branch      |
+
+### 16.4 Services Built
+
+| Service               | ECR Repository                              | Port |
+| --------------------- | ------------------------------------------- | ---- |
+| Admin Portal          | `unified-health-prod/admin-portal`          | 3001 |
+| API Gateway           | `unified-health-prod/api-gateway`           | 3000 |
+| Auth Service          | `unified-health-prod/auth-service`          | 3001 |
+| Chronic Care Service  | `unified-health-prod/chronic-care-service`  | 3003 |
+| Core API              | `unified-health-prod/api`                   | 8080 |
+| Imaging Service       | `unified-health-prod/imaging-service`       | 3006 |
+| Laboratory Service    | `unified-health-prod/laboratory-service`    | 3005 |
+| Mental Health Service | `unified-health-prod/mental-health-service` | 3002 |
+| Notification Service  | `unified-health-prod/notification-service`  | 3007 |
+| Pharmacy Service      | `unified-health-prod/pharmacy-service`      | 3004 |
+| Provider Portal       | `unified-health-prod/provider-portal`       | 3002 |
+| Telehealth Service    | `unified-health-prod/telehealth-service`    | 3001 |
+| Web App               | `unified-health-prod/web-app`               | 3000 |
+
 ---
 
-## Security & Compliance
+## 17. Security & Compliance
 
-### Security Features
+### 17.1 Compliance Certifications
+
+| Standard          | Status      |
+| ----------------- | ----------- |
+| **FHIR R4**       | Implemented |
+| **GDPR**          | Compliant   |
+| **HIPAA**         | Compliant   |
+| **POPIA**         | Compliant   |
+| **SOC 2 Type II** | In Progress |
+
+### 17.2 Security Features
 
 | Feature                   | Implementation                   |
 | ------------------------- | -------------------------------- |
+| **Audit Logging**         | Immutable audit trails           |
 | **Authentication**        | JWT with refresh tokens, MFA     |
 | **Authorization**         | Role-based access control (RBAC) |
 | **Encryption at Rest**    | AES-256 via AWS KMS              |
 | **Encryption in Transit** | TLS 1.3                          |
 | **Secret Management**     | AWS Secrets Manager              |
-| **Audit Logging**         | Immutable audit trails           |
-
-### Compliance Certifications
-
-| Standard          | Status      |
-| ----------------- | ----------- |
-| **HIPAA**         | Compliant   |
-| **GDPR**          | Compliant   |
-| **POPIA**         | Compliant   |
-| **FHIR R4**       | Implemented |
-| **SOC 2 Type II** | In Progress |
 
 ---
 
-## API Documentation
+## 18. API Documentation
 
-### Core Endpoints
+### 18.1 Core Endpoints
 
 | Method | Endpoint                | Description         |
 | ------ | ----------------------- | ------------------- |
+| `GET`  | `/api/v1/patients/:id`  | Get patient profile |
+| `GET`  | `/api/v1/providers`     | Search providers    |
+| `POST` | `/api/v1/appointments`  | Create appointment  |
 | `POST` | `/api/v1/auth/login`    | User login          |
 | `POST` | `/api/v1/auth/register` | User registration   |
-| `GET`  | `/api/v1/patients/:id`  | Get patient profile |
-| `POST` | `/api/v1/appointments`  | Create appointment  |
-| `GET`  | `/api/v1/providers`     | Search providers    |
 | `POST` | `/api/v1/subscriptions` | Create subscription |
 
-### WebSocket Events
+### 18.2 WebSocket Events
 
 | Event          | Direction         | Description       |
 | -------------- | ----------------- | ----------------- |
+| `CHAT_MESSAGE` | Bidirectional     | In-call messaging |
 | `JOIN_ROOM`    | Client -> Server  | Join consultation |
 | `OFFER/ANSWER` | Client <-> Client | WebRTC signaling  |
-| `CHAT_MESSAGE` | Bidirectional     | In-call messaging |
 
 ---
 
-## Contributing
+## 19. Contributing
 
 1. Fork the repository
 2. Create feature branch (`git checkout -b feature/amazing-feature`)
@@ -2014,13 +2057,13 @@ aws ecs describe-clusters --clusters unified-health-prod --region us-east-1
 
 ---
 
-## Support
+## 20. Support
 
 | Channel               | Contact                     |
 | --------------------- | --------------------------- |
-| **Technical Support** | support@unifiedhealth.io    |
 | **Enterprise Sales**  | enterprise@unifiedhealth.io |
 | **Security Issues**   | security@unifiedhealth.io   |
+| **Technical Support** | support@unifiedhealth.io    |
 
 ---
 

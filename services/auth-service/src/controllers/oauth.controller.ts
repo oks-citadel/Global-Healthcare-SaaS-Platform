@@ -2,13 +2,11 @@ import { Request, Response, NextFunction } from 'express';
 import { oauthService } from '../services/oauth.service.js';
 import {
   OAuthProviderSchema,
-  OAuthInitiateSchema,
   OAuthCallbackSchema,
   UnlinkSocialAccountSchema,
 } from '../dtos/oauth.dto.js';
 import { BadRequestError } from '../utils/errors.js';
 import { logger } from '../utils/logger.js';
-import { isProviderEnabled } from '../strategies/index.js';
 
 export class OAuthController {
   /**
@@ -76,7 +74,7 @@ export class OAuthController {
    * GET /auth/oauth/:provider/callback
    * Handle OAuth callback from provider
    */
-  async handleCallback(req: Request, res: Response, next: NextFunction) {
+  async handleCallback(req: Request, res: Response, _next: NextFunction) {
     try {
       const provider = OAuthProviderSchema.parse(req.params.provider);
 

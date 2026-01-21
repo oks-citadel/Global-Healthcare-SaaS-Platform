@@ -19,7 +19,7 @@ import {
   randomMedication,
   randomMRN,
   randomNPI,
-} from './test-data-generators';
+} from './test-data-generators.js';
 
 /**
  * Create a mock user

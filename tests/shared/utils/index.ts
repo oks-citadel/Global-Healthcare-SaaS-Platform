@@ -3,13 +3,13 @@
  */
 
 // Data Generators
-export * from './test-data-generators';
+export * from './test-data-generators.js';
 
 // Wait Helpers
-export * from './wait-helpers';
+export * from './wait-helpers.js';
 
 // Assertions
-export * from './assertions';
+export * from './assertions.js';
 
 // Mock Factories
-export * from './mock-factories';
+export * from './mock-factories.js';

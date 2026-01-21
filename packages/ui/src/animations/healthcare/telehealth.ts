@@ -3,7 +3,7 @@
  * Animations for video calls, connection states, and virtual care
  */
 
-import type { Variants, Transition } from 'framer-motion';
+import type { Variants } from 'framer-motion';
 import { DURATION, EASING } from '../constants';
 
 /**

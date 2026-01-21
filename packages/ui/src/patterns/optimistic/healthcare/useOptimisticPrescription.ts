@@ -384,11 +384,6 @@ export interface UseOptimisticPrescriptionReturn {
 const DEFAULT_PRESCRIPTION_UNDO_TIMEOUT = 10000;
 
 /**
- * Default undo timeout for controlled substances (30 seconds)
- */
-const DEFAULT_CONTROLLED_SUBSTANCE_UNDO_TIMEOUT = 30000;
-
-/**
  * Generate a temporary optimistic ID
  */
 function generateOptimisticId(): string {
@@ -423,7 +418,7 @@ export function useOptimisticPrescription(
     onError,
     onRollback,
     undoTimeout = DEFAULT_PRESCRIPTION_UNDO_TIMEOUT,
-    controlledSubstanceUndoTimeout = DEFAULT_CONTROLLED_SUBSTANCE_UNDO_TIMEOUT,
+    // Note: controlledSubstanceUndoTimeout is available for future controlled substance handling
   } = options;
 
   /**

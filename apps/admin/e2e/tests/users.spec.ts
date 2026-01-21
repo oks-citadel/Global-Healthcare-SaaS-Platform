@@ -32,7 +32,7 @@ test.describe("User Management", () => {
 
   test.describe("Users List View", () => {
     test("should display users page with search and filters", async ({
-      page,
+      page: _page,
     }) => {
       await usersPage.goto();
 
@@ -48,7 +48,7 @@ test.describe("User Management", () => {
       expect(page.url()).toContain("users");
     });
 
-    test("should display list of users", async ({ page }) => {
+    test("should display list of users", async ({ page: _page }) => {
       await usersPage.goto();
       await usersPage.waitForUsersLoad();
 
@@ -56,7 +56,7 @@ test.describe("User Management", () => {
       expect(userCount).toBeGreaterThanOrEqual(0);
     });
 
-    test("should search for users by email", async ({ page }) => {
+    test("should search for users by email", async ({ page: _page }) => {
       await usersPage.goto();
       await usersPage.waitForUsersLoad();
 
@@ -68,7 +68,7 @@ test.describe("User Management", () => {
       expect(userCount).toBeGreaterThanOrEqual(0);
     });
 
-    test("should search for users by name", async ({ page }) => {
+    test("should search for users by name", async ({ page: _page }) => {
       await usersPage.goto();
       await usersPage.waitForUsersLoad();
 
@@ -77,7 +77,7 @@ test.describe("User Management", () => {
     });
 
     test("should show no results message for non-existent user", async ({
-      page,
+      page: _page,
     }) => {
       await usersPage.goto();
 
@@ -86,7 +86,7 @@ test.describe("User Management", () => {
       await usersPage.assertNoResultsDisplayed();
     });
 
-    test("should filter users by role", async ({ page }) => {
+    test("should filter users by role", async ({ page: _page }) => {
       await usersPage.goto();
       await usersPage.waitForUsersLoad();
 
@@ -94,7 +94,7 @@ test.describe("User Management", () => {
       await usersPage.waitForUsersLoad();
     });
 
-    test("should filter users by status", async ({ page }) => {
+    test("should filter users by status", async ({ page: _page }) => {
       await usersPage.goto();
       await usersPage.waitForUsersLoad();
 
@@ -102,7 +102,7 @@ test.describe("User Management", () => {
       await usersPage.waitForUsersLoad();
     });
 
-    test("should clear filters and show all users", async ({ page }) => {
+    test("should clear filters and show all users", async ({ page: _page }) => {
       await usersPage.goto();
       await usersPage.waitForUsersLoad();
 
@@ -121,7 +121,7 @@ test.describe("User Management", () => {
 
   test.describe("Create New User", () => {
     test("should open add user form when clicking add button", async ({
-      page,
+      page: _page,
     }) => {
       await usersPage.goto();
 
@@ -131,7 +131,7 @@ test.describe("User Management", () => {
     });
 
     test("should create a new user with required information", async ({
-      page,
+      page: _page,
     }) => {
       await usersPage.goto();
 
@@ -170,7 +170,7 @@ test.describe("User Management", () => {
       await expect(errorMessage.first()).toBeVisible();
     });
 
-    test("should cancel adding user and return to list", async ({ page }) => {
+    test("should cancel adding user and return to list", async ({ page: _page }) => {
       await usersPage.goto();
 
       await usersPage.clickAddUser();
@@ -243,7 +243,7 @@ test.describe("User Management", () => {
   });
 
   test.describe("Edit User", () => {
-    test("should open edit form for existing user", async ({ page }) => {
+    test("should open edit form for existing user", async ({ page: _page }) => {
       await usersPage.goto();
       await usersPage.waitForUsersLoad();
 
@@ -252,7 +252,7 @@ test.describe("User Management", () => {
       await usersPage.assertUserModalVisible();
     });
 
-    test("should update user information", async ({ page }) => {
+    test("should update user information", async ({ page: _page }) => {
       await usersPage.goto();
       await usersPage.waitForUsersLoad();
 
@@ -267,7 +267,7 @@ test.describe("User Management", () => {
       await usersPage.waitForUsersLoad();
     });
 
-    test("should cancel editing and not save changes", async ({ page }) => {
+    test("should cancel editing and not save changes", async ({ page: _page }) => {
       await usersPage.goto();
       await usersPage.waitForUsersLoad();
 
@@ -285,7 +285,7 @@ test.describe("User Management", () => {
   });
 
   test.describe("Suspend User", () => {
-    test("should suspend an active user", async ({ page }) => {
+    test("should suspend an active user", async ({ page: _page }) => {
       await usersPage.goto();
       await usersPage.waitForUsersLoad();
 
@@ -309,7 +309,7 @@ test.describe("User Management", () => {
     });
 
     test("should show confirmation dialog before suspending", async ({
-      page,
+      page: _page,
     }) => {
       await usersPage.goto();
       await usersPage.filterByStatus("active");
@@ -330,7 +330,7 @@ test.describe("User Management", () => {
   });
 
   test.describe("Activate User", () => {
-    test("should activate a suspended user", async ({ page }) => {
+    test("should activate a suspended user", async ({ page: _page }) => {
       await usersPage.goto();
       await usersPage.filterByStatus("suspended");
       await usersPage.waitForUsersLoad();
@@ -373,7 +373,7 @@ test.describe("User Management", () => {
   });
 
   test.describe("Bulk Actions", () => {
-    test("should select all users", async ({ page }) => {
+    test("should select all users", async ({ page: _page }) => {
       await usersPage.goto();
       await usersPage.waitForUsersLoad();
 
@@ -387,7 +387,7 @@ test.describe("User Management", () => {
       }
     });
 
-    test("should select individual users", async ({ page }) => {
+    test("should select individual users", async ({ page: _page }) => {
       await usersPage.goto();
       await usersPage.waitForUsersLoad();
 
@@ -405,7 +405,7 @@ test.describe("User Management", () => {
     });
 
     test("should show bulk actions menu when users are selected", async ({
-      page,
+      page: _page,
     }) => {
       await usersPage.goto();
       await usersPage.waitForUsersLoad();
@@ -421,7 +421,7 @@ test.describe("User Management", () => {
   });
 
   test.describe("Pagination", () => {
-    test("should navigate to next page of users", async ({ page }) => {
+    test("should navigate to next page of users", async ({ page: _page }) => {
       await usersPage.goto();
       await usersPage.waitForUsersLoad();
 
@@ -437,7 +437,7 @@ test.describe("User Management", () => {
       }
     });
 
-    test("should change page size", async ({ page }) => {
+    test("should change page size", async ({ page: _page }) => {
       await usersPage.goto();
       await usersPage.waitForUsersLoad();
 
@@ -449,7 +449,7 @@ test.describe("User Management", () => {
   });
 
   test.describe("Export Users", () => {
-    test("should export users list", async ({ page }) => {
+    test("should export users list", async ({ page: _page }) => {
       await usersPage.goto();
       await usersPage.waitForUsersLoad();
 

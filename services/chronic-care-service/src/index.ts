@@ -29,7 +29,7 @@ app.use(extractUser);
 // Apply distributed rate limiting with Redis support
 app.use(generalRateLimit);
 
-app.get('/health', (req, res) => {
+app.get('/health', (_req, res) => {
   res.json({
     status: 'healthy',
     service: config.serviceName,
@@ -48,7 +48,7 @@ app.use((req, res) => {
   res.status(404).json({ error: 'Not Found', message: 'The requested resource was not found', path: req.path });
 });
 
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error('Error:', err);
   res.status(err.status || 500).json({ error: err.name || 'Internal Server Error', message: err.message || 'An unexpected error occurred' });
 });

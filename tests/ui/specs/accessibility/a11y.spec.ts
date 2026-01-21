@@ -177,7 +177,8 @@ test.describe('Accessibility Tests', () => {
       const hasVisibleFocus = await focusedElement.evaluate((el) => {
         const styles = window.getComputedStyle(el);
         // In forced colors mode, system handles focus, so just check visibility
-        return el.offsetWidth > 0 && el.offsetHeight > 0;
+        const htmlEl = el as HTMLElement;
+        return htmlEl.offsetWidth > 0 && htmlEl.offsetHeight > 0;
       });
 
       expect(hasVisibleFocus).toBe(true);

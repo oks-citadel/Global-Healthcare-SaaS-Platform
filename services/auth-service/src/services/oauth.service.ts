@@ -14,7 +14,6 @@ import {
   OAuthProvider,
   OAuthProfile,
   OAuthStateData,
-  OAuthErrorCode,
   SocialAccountResponse,
 } from '../dtos/oauth.dto.js';
 import { AuthResponse, JwtPayload } from '../dtos/auth.dto.js';
@@ -62,8 +61,9 @@ export class OAuthService {
 
   /**
    * Decrypt sensitive data
+   * Used for retrieving stored OAuth tokens for refresh operations
    */
-  private decrypt(encryptedData: string): string {
+  decrypt(encryptedData: string): string {
     const parts = encryptedData.split(':');
     if (parts.length !== 3) {
       throw new Error('Invalid encrypted data format');
@@ -654,7 +654,8 @@ export class OAuthService {
    */
   private isAllowedRedirectUrl(url: string): boolean {
     try {
-      const parsed = new URL(url);
+      // Validate URL is parseable
+      new URL(url);
 
       // Check against allowed patterns
       for (const pattern of oauthConfig.allowedRedirectPatterns) {

@@ -28,7 +28,7 @@ test.describe("Audit Log Viewing", () => {
 
   test.describe("Audit Logs List View", () => {
     test("should display audit logs page with search and filters", async ({
-      page,
+      page: _page,
     }) => {
       await auditLogsPage.goto();
 
@@ -45,7 +45,7 @@ test.describe("Audit Log Viewing", () => {
       expect(page.url()).toMatch(/audit/);
     });
 
-    test("should display list of audit logs", async ({ page }) => {
+    test("should display list of audit logs", async ({ page: _page }) => {
       await auditLogsPage.goto();
       await auditLogsPage.waitForLogsLoad();
 
@@ -53,7 +53,7 @@ test.describe("Audit Log Viewing", () => {
       expect(logCount).toBeGreaterThanOrEqual(0);
     });
 
-    test("should search audit logs by keyword", async ({ page }) => {
+    test("should search audit logs by keyword", async ({ page: _page }) => {
       await auditLogsPage.goto();
       await auditLogsPage.waitForLogsLoad();
 
@@ -63,7 +63,7 @@ test.describe("Audit Log Viewing", () => {
     });
 
     test("should show no results message for non-matching search", async ({
-      page,
+      page: _page,
     }) => {
       await auditLogsPage.goto();
 
@@ -72,7 +72,7 @@ test.describe("Audit Log Viewing", () => {
       await auditLogsPage.assertNoResultsDisplayed();
     });
 
-    test("should clear search and show all logs", async ({ page }) => {
+    test("should clear search and show all logs", async ({ page: _page }) => {
       await auditLogsPage.goto();
       await auditLogsPage.waitForLogsLoad();
 
@@ -90,7 +90,7 @@ test.describe("Audit Log Viewing", () => {
   });
 
   test.describe("Filter Audit Logs", () => {
-    test("should filter logs by action type", async ({ page }) => {
+    test("should filter logs by action type", async ({ page: _page }) => {
       await auditLogsPage.goto();
       await auditLogsPage.waitForLogsLoad();
 
@@ -99,7 +99,7 @@ test.describe("Audit Log Viewing", () => {
       await auditLogsPage.waitForLogsLoad();
     });
 
-    test("should filter logs by resource", async ({ page }) => {
+    test("should filter logs by resource", async ({ page: _page }) => {
       await auditLogsPage.goto();
       await auditLogsPage.waitForLogsLoad();
 
@@ -108,7 +108,7 @@ test.describe("Audit Log Viewing", () => {
       await auditLogsPage.waitForLogsLoad();
     });
 
-    test("should filter logs by severity", async ({ page }) => {
+    test("should filter logs by severity", async ({ page: _page }) => {
       await auditLogsPage.goto();
       await auditLogsPage.waitForLogsLoad();
 
@@ -117,7 +117,7 @@ test.describe("Audit Log Viewing", () => {
       await auditLogsPage.waitForLogsLoad();
     });
 
-    test("should filter logs by date range", async ({ page }) => {
+    test("should filter logs by date range", async ({ page: _page }) => {
       await auditLogsPage.goto();
       await auditLogsPage.waitForLogsLoad();
 
@@ -132,7 +132,7 @@ test.describe("Audit Log Viewing", () => {
       await auditLogsPage.waitForLogsLoad();
     });
 
-    test("should combine multiple filters", async ({ page }) => {
+    test("should combine multiple filters", async ({ page: _page }) => {
       await auditLogsPage.goto();
       await auditLogsPage.waitForLogsLoad();
 
@@ -142,7 +142,7 @@ test.describe("Audit Log Viewing", () => {
       await auditLogsPage.waitForLogsLoad();
     });
 
-    test("should clear all filters", async ({ page }) => {
+    test("should clear all filters", async ({ page: _page }) => {
       await auditLogsPage.goto();
       await auditLogsPage.waitForLogsLoad();
 
@@ -161,7 +161,7 @@ test.describe("Audit Log Viewing", () => {
 
   test.describe("View Log Details", () => {
     test("should display log details when clicking on log entry", async ({
-      page,
+      page: _page,
     }) => {
       await auditLogsPage.goto();
       await auditLogsPage.waitForLogsLoad();
@@ -174,7 +174,7 @@ test.describe("Audit Log Viewing", () => {
       }
     });
 
-    test("should display log timestamp in details", async ({ page }) => {
+    test("should display log timestamp in details", async ({ page: _page }) => {
       await auditLogsPage.goto();
       await auditLogsPage.waitForLogsLoad();
 
@@ -186,7 +186,7 @@ test.describe("Audit Log Viewing", () => {
       }
     });
 
-    test("should display log action in details", async ({ page }) => {
+    test("should display log action in details", async ({ page: _page }) => {
       await auditLogsPage.goto();
       await auditLogsPage.waitForLogsLoad();
 
@@ -199,7 +199,7 @@ test.describe("Audit Log Viewing", () => {
       }
     });
 
-    test("should display IP address in log details", async ({ page }) => {
+    test("should display IP address in log details", async ({ page: _page }) => {
       await auditLogsPage.goto();
       await auditLogsPage.waitForLogsLoad();
 
@@ -211,7 +211,7 @@ test.describe("Audit Log Viewing", () => {
       }
     });
 
-    test("should close log detail panel", async ({ page }) => {
+    test("should close log detail panel", async ({ page: _page }) => {
       await auditLogsPage.goto();
       await auditLogsPage.waitForLogsLoad();
 
@@ -229,7 +229,7 @@ test.describe("Audit Log Viewing", () => {
 
   test.describe("Severity Indicators", () => {
     test("should display severity levels with visual indicators", async ({
-      page,
+      page: _page,
     }) => {
       await auditLogsPage.goto();
       await auditLogsPage.waitForLogsLoad();
@@ -246,7 +246,7 @@ test.describe("Audit Log Viewing", () => {
     });
 
     test("should filter to show only critical severity logs", async ({
-      page,
+      page: _page,
     }) => {
       await auditLogsPage.goto();
       await auditLogsPage.waitForLogsLoad();
@@ -257,7 +257,7 @@ test.describe("Audit Log Viewing", () => {
     });
 
     test("should filter to show only warning severity logs", async ({
-      page,
+      page: _page,
     }) => {
       await auditLogsPage.goto();
       await auditLogsPage.waitForLogsLoad();
@@ -269,7 +269,7 @@ test.describe("Audit Log Viewing", () => {
   });
 
   test.describe("Export Audit Logs", () => {
-    test("should export logs as CSV", async ({ page }) => {
+    test("should export logs as CSV", async ({ page: _page }) => {
       await auditLogsPage.goto();
       await auditLogsPage.waitForLogsLoad();
 
@@ -280,7 +280,7 @@ test.describe("Audit Log Viewing", () => {
       }
     });
 
-    test("should export logs as Excel", async ({ page }) => {
+    test("should export logs as Excel", async ({ page: _page }) => {
       await auditLogsPage.goto();
       await auditLogsPage.waitForLogsLoad();
 
@@ -291,7 +291,7 @@ test.describe("Audit Log Viewing", () => {
       }
     });
 
-    test("should export logs as PDF", async ({ page }) => {
+    test("should export logs as PDF", async ({ page: _page }) => {
       await auditLogsPage.goto();
       await auditLogsPage.waitForLogsLoad();
 
@@ -302,7 +302,7 @@ test.describe("Audit Log Viewing", () => {
       }
     });
 
-    test("should export filtered logs", async ({ page }) => {
+    test("should export filtered logs", async ({ page: _page }) => {
       await auditLogsPage.goto();
       await auditLogsPage.waitForLogsLoad();
 
@@ -319,7 +319,7 @@ test.describe("Audit Log Viewing", () => {
   });
 
   test.describe("Pagination", () => {
-    test("should navigate to next page of logs", async ({ page }) => {
+    test("should navigate to next page of logs", async ({ page: _page }) => {
       await auditLogsPage.goto();
       await auditLogsPage.waitForLogsLoad();
 
@@ -335,7 +335,7 @@ test.describe("Audit Log Viewing", () => {
       }
     });
 
-    test("should navigate to previous page of logs", async ({ page }) => {
+    test("should navigate to previous page of logs", async ({ page: _page }) => {
       await auditLogsPage.goto();
       await auditLogsPage.waitForLogsLoad();
 
@@ -354,7 +354,7 @@ test.describe("Audit Log Viewing", () => {
       }
     });
 
-    test("should change page size", async ({ page }) => {
+    test("should change page size", async ({ page: _page }) => {
       await auditLogsPage.goto();
       await auditLogsPage.waitForLogsLoad();
 
@@ -366,11 +366,9 @@ test.describe("Audit Log Viewing", () => {
   });
 
   test.describe("Refresh Logs", () => {
-    test("should refresh audit logs", async ({ page }) => {
+    test("should refresh audit logs", async ({ page: _page }) => {
       await auditLogsPage.goto();
       await auditLogsPage.waitForLogsLoad();
-
-      const initialCount = await auditLogsPage.getLogCount();
 
       await auditLogsPage.refreshLogs();
       await auditLogsPage.waitForLogsLoad();
@@ -381,7 +379,7 @@ test.describe("Audit Log Viewing", () => {
   });
 
   test.describe("Real-time Updates", () => {
-    test("should show recent activity in logs", async ({ page }) => {
+    test("should show recent activity in logs", async ({ page: _page }) => {
       await auditLogsPage.goto();
       await auditLogsPage.waitForLogsLoad();
 
@@ -402,7 +400,7 @@ test.describe("Audit Log Viewing", () => {
   });
 
   test.describe("Permission-Based Access", () => {
-    test("should allow moderator to view audit logs", async ({ page }) => {
+    test("should allow moderator to view audit logs", async ({ page: _page }) => {
       // Logout and login as moderator
       await dashboardPage.logout();
       await loginPage.login(
@@ -416,7 +414,7 @@ test.describe("Audit Log Viewing", () => {
       await auditLogsPage.assertAuditLogsPageDisplayed();
     });
 
-    test("moderator should not be able to export logs", async ({ page }) => {
+    test("moderator should not be able to export logs", async ({ page: _page }) => {
       // Logout and login as moderator
       await dashboardPage.logout();
       await loginPage.login(

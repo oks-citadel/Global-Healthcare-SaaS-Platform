@@ -82,7 +82,8 @@ const mentalHealthConfigSchema = z.object({
 // Type Exports
 // ============================================================================
 
-type MentalHealthConfigEnv = z.infer<typeof mentalHealthConfigSchema>;
+/** Type inferred from schema for internal validation */
+export type MentalHealthConfigEnv = z.infer<typeof mentalHealthConfigSchema>;
 
 export interface MentalHealthConfig {
   env: 'development' | 'production' | 'test';

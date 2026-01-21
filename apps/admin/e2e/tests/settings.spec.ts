@@ -30,7 +30,7 @@ test.describe("System Settings", () => {
   });
 
   test.describe("Settings Page Display", () => {
-    test("should display settings page with tabs", async ({ page }) => {
+    test("should display settings page with tabs", async ({ page: _page }) => {
       await settingsPage.goto();
 
       await settingsPage.assertSettingsPageDisplayed();
@@ -46,13 +46,13 @@ test.describe("System Settings", () => {
       expect(page.url()).toContain("settings");
     });
 
-    test("should display general settings tab by default", async ({ page }) => {
+    test("should display general settings tab by default", async ({ page: _page }) => {
       await settingsPage.goto();
 
       await expect(settingsPage.systemNameInput).toBeVisible();
     });
 
-    test("should switch between settings tabs", async ({ page }) => {
+    test("should switch between settings tabs", async ({ page: _page }) => {
       await settingsPage.goto();
 
       // Switch to security tab
@@ -70,7 +70,7 @@ test.describe("System Settings", () => {
   });
 
   test.describe("General Settings", () => {
-    test("should update system name", async ({ page }) => {
+    test("should update system name", async ({ page: _page }) => {
       await settingsPage.goto();
       await settingsPage.switchToGeneralTab();
 
@@ -81,7 +81,7 @@ test.describe("System Settings", () => {
       await settingsPage.assertSuccessMessageDisplayed();
     });
 
-    test("should toggle maintenance mode", async ({ page }) => {
+    test("should toggle maintenance mode", async ({ page: _page }) => {
       await settingsPage.goto();
       await settingsPage.switchToGeneralTab();
 
@@ -98,7 +98,7 @@ test.describe("System Settings", () => {
       await settingsPage.saveSettings();
     });
 
-    test("should update data retention period", async ({ page }) => {
+    test("should update data retention period", async ({ page: _page }) => {
       await settingsPage.goto();
       await settingsPage.switchToGeneralTab();
 
@@ -113,7 +113,7 @@ test.describe("System Settings", () => {
   });
 
   test.describe("Security Settings", () => {
-    test("should update session timeout", async ({ page }) => {
+    test("should update session timeout", async ({ page: _page }) => {
       await settingsPage.goto();
       await settingsPage.switchToSecurityTab();
 
@@ -128,7 +128,7 @@ test.describe("System Settings", () => {
       expect(savedTimeout).toBe(newTimeout.toString());
     });
 
-    test("should update max login attempts", async ({ page }) => {
+    test("should update max login attempts", async ({ page: _page }) => {
       await settingsPage.goto();
       await settingsPage.switchToSecurityTab();
 
@@ -144,7 +144,7 @@ test.describe("System Settings", () => {
     });
 
     test("should toggle two-factor authentication requirement", async ({
-      page,
+      page: _page,
     }) => {
       await settingsPage.goto();
       await settingsPage.switchToSecurityTab();
@@ -162,7 +162,7 @@ test.describe("System Settings", () => {
       await settingsPage.saveSettings();
     });
 
-    test("should validate session timeout minimum value", async ({ page }) => {
+    test("should validate session timeout minimum value", async ({ page: _page }) => {
       await settingsPage.goto();
       await settingsPage.switchToSecurityTab();
 
@@ -176,11 +176,9 @@ test.describe("System Settings", () => {
   });
 
   test.describe("Notification Settings", () => {
-    test("should toggle email notifications", async ({ page }) => {
+    test("should toggle email notifications", async ({ page: _page }) => {
       await settingsPage.goto();
       await settingsPage.switchToNotificationsTab();
-
-      const initialState = await settingsPage.isEmailNotificationsEnabled();
 
       await settingsPage.toggleEmailNotifications();
       await settingsPage.saveSettings();
@@ -192,7 +190,7 @@ test.describe("System Settings", () => {
       await settingsPage.saveSettings();
     });
 
-    test("should update notification email address", async ({ page }) => {
+    test("should update notification email address", async ({ page: _page }) => {
       await settingsPage.goto();
       await settingsPage.switchToNotificationsTab();
 
@@ -204,7 +202,7 @@ test.describe("System Settings", () => {
     });
 
     test("should validate email format for notification email", async ({
-      page,
+      page: _page,
     }) => {
       await settingsPage.goto();
       await settingsPage.switchToNotificationsTab();
@@ -218,7 +216,7 @@ test.describe("System Settings", () => {
   });
 
   test.describe("Integration Settings", () => {
-    test("should display API key", async ({ page }) => {
+    test("should display API key", async ({ page: _page }) => {
       await settingsPage.goto();
       await settingsPage.switchToIntegrationsTab();
 
@@ -226,7 +224,7 @@ test.describe("System Settings", () => {
       expect(apiKey).toBeTruthy();
     });
 
-    test("should regenerate API key", async ({ page }) => {
+    test("should regenerate API key", async ({ page: _page }) => {
       await settingsPage.goto();
       await settingsPage.switchToIntegrationsTab();
 
@@ -238,7 +236,7 @@ test.describe("System Settings", () => {
       expect(newKey).not.toBe(originalKey);
     });
 
-    test("should update webhook URL", async ({ page }) => {
+    test("should update webhook URL", async ({ page: _page }) => {
       await settingsPage.goto();
       await settingsPage.switchToIntegrationsTab();
 
@@ -251,7 +249,7 @@ test.describe("System Settings", () => {
   });
 
   test.describe("Appearance Settings", () => {
-    test("should change theme", async ({ page }) => {
+    test("should change theme", async ({ page: _page }) => {
       await settingsPage.goto();
       await settingsPage.switchToAppearanceTab();
 
@@ -269,7 +267,7 @@ test.describe("System Settings", () => {
   });
 
   test.describe("Reset Settings", () => {
-    test("should reset settings to defaults", async ({ page }) => {
+    test("should reset settings to defaults", async ({ page: _page }) => {
       await settingsPage.goto();
 
       // Make some changes first
@@ -284,7 +282,7 @@ test.describe("System Settings", () => {
     });
 
     test("should show confirmation dialog before resetting", async ({
-      page,
+      page: _page,
     }) => {
       await settingsPage.goto();
 
@@ -299,7 +297,7 @@ test.describe("System Settings", () => {
   });
 
   test.describe("Settings Validation", () => {
-    test("should prevent saving invalid settings", async ({ page }) => {
+    test("should prevent saving invalid settings", async ({ page: _page }) => {
       await settingsPage.goto();
       await settingsPage.switchToSecurityTab();
 
@@ -313,7 +311,7 @@ test.describe("System Settings", () => {
     });
 
     test("should show error for invalid webhook URL format", async ({
-      page,
+      page: _page,
     }) => {
       await settingsPage.goto();
       await settingsPage.switchToIntegrationsTab();

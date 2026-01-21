@@ -18,7 +18,7 @@ function getOptionalEnv(name: string, defaultValue: string): string {
  * In production: throws an error if the provider is enabled but credentials are missing.
  * In development: returns empty string and logs warning.
  */
-function getOAuthEnv(name: string, provider: string): string {
+function getOAuthEnv(name: string, _provider: string): string {
   const value = process.env[name];
 
   if (value) {

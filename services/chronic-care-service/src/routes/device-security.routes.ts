@@ -182,7 +182,7 @@ router.get('/security/inventory', requireUser, async (req: UserRequest, res: Res
  * GET /devices/security/dashboard
  * Get security dashboard metrics
  */
-router.get('/security/dashboard', requireUser, async (req: UserRequest, res: Response) => {
+router.get('/security/dashboard', requireUser, async (_req: UserRequest, res: Response) => {
   try {
     const metrics = await DeviceSecurityService.getSecurityDashboard();
 

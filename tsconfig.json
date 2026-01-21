@@ -30,6 +30,17 @@
     "**/dist",
     "**/.next",
     "**/coverage",
-    "**/.turbo"
+    "**/.turbo",
+    "**/e2e",
+    "**/tests",
+    "tests/**",
+    "apps/**",
+    "Global-SaaS-Marketing-Platform/**",
+    "infrastructure/**",
+    "**/examples/**",
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "**/*.test.tsx",
+    "**/*.spec.tsx"
   ]
 }

@@ -34,7 +34,7 @@
  */
 
 import { useCallback, useMemo } from 'react';
-import { useOptimisticMutation, type OptimisticMutationOptions } from '../useOptimisticMutation';
+import { useOptimisticMutation } from '../useOptimisticMutation';
 
 /**
  * Appointment status types

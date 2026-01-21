@@ -25,7 +25,6 @@ export const SkeletonCard: React.FC<SkeletonCardProps> = ({
   hasActions = false,
   className,
   animation = 'pulse',
-  ...props
 }) => {
   return (
     <div

@@ -23,7 +23,7 @@ test.describe("Admin Authentication", () => {
 
   test.describe("Admin Login", () => {
     test("should display login page with all required elements", async ({
-      page,
+      page: _page,
     }) => {
       await loginPage.goto();
 
@@ -34,7 +34,7 @@ test.describe("Admin Authentication", () => {
     });
 
     test("should successfully login with valid super admin credentials", async ({
-      page,
+      page: _page,
     }) => {
       await loginPage.goto();
       await loginPage.assertLoginPageDisplayed();
@@ -58,7 +58,7 @@ test.describe("Admin Authentication", () => {
     });
 
     test("should successfully login with valid admin credentials", async ({
-      page,
+      page: _page,
     }) => {
       await loginPage.goto();
 
@@ -72,7 +72,7 @@ test.describe("Admin Authentication", () => {
     });
 
     test("should successfully login with valid moderator credentials", async ({
-      page,
+      page: _page,
     }) => {
       await loginPage.goto();
 
@@ -85,7 +85,7 @@ test.describe("Admin Authentication", () => {
       await dashboardPage.assertDashboardDisplayed();
     });
 
-    test("should show error for invalid email", async ({ page }) => {
+    test("should show error for invalid email", async ({ page: _page }) => {
       await loginPage.goto();
 
       await loginPage.login(
@@ -101,7 +101,7 @@ test.describe("Admin Authentication", () => {
       expect(isLoggedIn).toBe(false);
     });
 
-    test("should show error for invalid password", async ({ page }) => {
+    test("should show error for invalid password", async ({ page: _page }) => {
       await loginPage.goto();
 
       await loginPage.login(
@@ -117,7 +117,7 @@ test.describe("Admin Authentication", () => {
       expect(token).toBeNull();
     });
 
-    test("should show error for empty credentials", async ({ page }) => {
+    test("should show error for empty credentials", async ({ page: _page }) => {
       await loginPage.goto();
 
       await loginPage.login(
@@ -130,7 +130,7 @@ test.describe("Admin Authentication", () => {
       await loginPage.assertFieldValidationError("password");
     });
 
-    test("should show error for malformed email", async ({ page }) => {
+    test("should show error for malformed email", async ({ page: _page }) => {
       await loginPage.goto();
 
       await loginPage.fillLoginForm(
@@ -142,7 +142,7 @@ test.describe("Admin Authentication", () => {
       await loginPage.assertFieldValidationError("email");
     });
 
-    test("should toggle password visibility", async ({ page }) => {
+    test("should toggle password visibility", async ({ page: _page }) => {
       await loginPage.goto();
 
       await loginPage.fillLoginForm("test@test.com", "password123");
@@ -171,7 +171,7 @@ test.describe("Admin Authentication", () => {
       expect(page.url()).toMatch(/forgot-password|reset-password/);
     });
 
-    test("should handle locked account", async ({ page }) => {
+    test("should handle locked account", async ({ page: _page }) => {
       await loginPage.goto();
 
       await loginPage.login(
@@ -185,7 +185,7 @@ test.describe("Admin Authentication", () => {
   });
 
   test.describe("Two-Factor Authentication", () => {
-    test("should prompt for 2FA when required", async ({ page }) => {
+    test("should prompt for 2FA when required", async ({ page: _page }) => {
       await loginPage.goto();
 
       // Login with credentials
@@ -246,7 +246,7 @@ test.describe("Admin Authentication", () => {
       expect(page.url()).toContain("login");
     });
 
-    test("should require re-authentication after logout", async ({ page }) => {
+    test("should require re-authentication after logout", async ({ page: _page }) => {
       await dashboardPage.logout();
 
       // Verify on login page
@@ -316,7 +316,7 @@ test.describe("Admin Authentication", () => {
   });
 
   test.describe("Session Management", () => {
-    test("should maintain session across page refreshes", async ({ page }) => {
+    test("should maintain session across page refreshes", async ({ page: _page }) => {
       await loginPage.goto();
       await loginPage.login(
         testAdmins.admin1.email,
@@ -325,8 +325,8 @@ test.describe("Admin Authentication", () => {
       await loginPage.waitForLoginSuccess();
 
       // Refresh page
-      await page.reload();
-      await page.waitForLoadState("networkidle");
+      await loginPage.page.reload();
+      await loginPage.page.waitForLoadState("networkidle");
 
       // Should still be logged in
       await dashboardPage.assertUserLoggedIn();
@@ -388,7 +388,7 @@ test.describe("Admin Authentication", () => {
   });
 
   test.describe("Role-Based Access", () => {
-    test("should display all features for super admin", async ({ page }) => {
+    test("should display all features for super admin", async ({ page: _page }) => {
       await loginPage.goto();
       await loginPage.login(
         testAdmins.superAdmin.email,
@@ -403,7 +403,7 @@ test.describe("Admin Authentication", () => {
     });
 
     test("should display appropriate features for regular admin", async ({
-      page,
+      page: _page,
     }) => {
       await loginPage.goto();
       await loginPage.login(
@@ -417,7 +417,7 @@ test.describe("Admin Authentication", () => {
       await expect(dashboardPage.auditLogsLink).toBeVisible();
     });
 
-    test("should display limited features for moderator", async ({ page }) => {
+    test("should display limited features for moderator", async ({ page: _page }) => {
       await loginPage.goto();
       await loginPage.login(
         testAdmins.moderator1.email,

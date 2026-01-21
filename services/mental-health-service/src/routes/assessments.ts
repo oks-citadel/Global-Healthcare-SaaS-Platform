@@ -1,5 +1,5 @@
 import { Router, Response } from 'express';
-import { PrismaClient, Prisma, MentalHealthAssessment } from '../generated/client';
+import { PrismaClient, Prisma } from '../generated/client';
 import { z } from 'zod';
 import { UserRequest, requireUser } from '../middleware/extractUser';
 

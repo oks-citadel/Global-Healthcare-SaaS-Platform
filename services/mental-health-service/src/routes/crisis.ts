@@ -305,7 +305,7 @@ router.get('/active/dashboard', requireUser, async (req: UserRequest, res) => {
 });
 
 // Emergency hotline info (public endpoint)
-router.get('/hotlines/info', (req, res) => {
+router.get('/hotlines/info', (_req, res) => {
   res.json({
     emergency: {
       suicide_prevention: {

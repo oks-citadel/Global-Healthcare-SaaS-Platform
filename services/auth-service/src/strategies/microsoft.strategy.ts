@@ -5,7 +5,7 @@
  */
 
 import { OAuthBaseStrategy, OAuthTokenResponse } from './oauth-base.strategy.js';
-import { OAuthProfile, OAuthProvider } from '../dtos/oauth.dto.js';
+import { OAuthProfile } from '../dtos/oauth.dto.js';
 import { oauthConfig } from '../config/oauth.config.js';
 import { logger } from '../utils/logger.js';
 
