@@ -1,8 +1,29 @@
-// @ts-nocheck
 import { Router, Request, Response } from 'express';
 import { logger } from '../../utils/logger.js';
 import { stripeWebhookService } from '../../services/stripe-webhook.service.js';
 import { stripeWebhookIdempotency } from '../../middleware/idempotency.middleware.js';
+
+// ==========================================
+// Type Definitions
+// ==========================================
+
+interface WebhookSuccessResponse {
+  received: true;
+  processingTimeMs: number;
+}
+
+interface WebhookErrorResponse {
+  error: string;
+  received: false;
+  processingTimeMs?: number;
+}
+
+interface WebhookHealthResponse {
+  status: 'healthy' | 'unhealthy';
+  configured: boolean;
+  timestamp: string;
+  error?: string;
+}
 
 const router = Router();
 
@@ -36,14 +57,14 @@ const router = Router();
  * Endpoint URL: https://your-domain.com/webhooks/stripe
  * Events to send: Select all payment-related events
  */
-router.post('/', stripeWebhookIdempotency(), async (req: Request, res: Response): Promise<void> => {
+router.post('/', stripeWebhookIdempotency(), async (req: Request, res: Response<WebhookSuccessResponse | WebhookErrorResponse>): Promise<void> => {
   const startTime = Date.now();
 
   try {
     // Get the signature from headers
     const signature = req.headers['stripe-signature'];
 
-    if (!signature) {
+    if (!signature || typeof signature !== 'string') {
       logger.warn('Webhook request missing stripe-signature header', {
         headers: req.headers,
         ip: req.ip,
@@ -56,7 +77,11 @@ router.post('/', stripeWebhookIdempotency(), async (req: Request, res: Response)
     }
 
     // Get raw body (must be Buffer or string)
-    const payload = req.body;
+    const payload: Buffer | string = Buffer.isBuffer(req.body)
+      ? req.body
+      : typeof req.body === 'string'
+        ? req.body
+        : JSON.stringify(req.body);
 
     if (!payload) {
       logger.warn('Webhook request missing body', {
@@ -84,7 +109,7 @@ router.post('/', stripeWebhookIdempotency(), async (req: Request, res: Response)
     // Process webhook with retry mechanism
     await stripeWebhookService.processWebhookWithRetry(
       payload,
-      signature as string
+      signature
     );
 
     // Mark event as processed after successful handling
@@ -106,13 +131,15 @@ router.post('/', stripeWebhookIdempotency(), async (req: Request, res: Response)
       processingTimeMs: processingTime
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     const processingTime = Date.now() - startTime;
     const idempotencyInfo = req.webhookIdempotency;
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorStack = error instanceof Error ? error.stack : undefined;
 
     logger.error('Error processing Stripe webhook', {
-      error: error.message,
-      stack: error.stack,
+      error: errorMessage,
+      stack: errorStack,
       processingTimeMs: processingTime,
       eventId: idempotencyInfo?.eventId,
       eventType: idempotencyInfo?.eventType,
@@ -120,17 +147,17 @@ router.post('/', stripeWebhookIdempotency(), async (req: Request, res: Response)
 
     // Determine appropriate status code
     let statusCode = 500;
-    let errorMessage = 'Internal server error';
+    let responseErrorMessage = 'Internal server error';
 
-    if (error.message?.includes('signature verification failed')) {
+    if (errorMessage.includes('signature verification failed')) {
       statusCode = 400;
-      errorMessage = 'Invalid signature';
-    } else if (error.message?.includes('STRIPE_WEBHOOK_SECRET')) {
+      responseErrorMessage = 'Invalid signature';
+    } else if (errorMessage.includes('STRIPE_WEBHOOK_SECRET')) {
       statusCode = 500;
-      errorMessage = 'Webhook configuration error';
-    } else if (error.message?.includes('duplicate')) {
+      responseErrorMessage = 'Webhook configuration error';
+    } else if (errorMessage.includes('duplicate')) {
       statusCode = 200; // Return 200 for duplicate events
-      errorMessage = 'Event already processed';
+      responseErrorMessage = 'Event already processed';
       logger.info('Webhook event already processed (idempotency)', {
         processingTimeMs: processingTime,
         eventId: idempotencyInfo?.eventId,
@@ -138,7 +165,7 @@ router.post('/', stripeWebhookIdempotency(), async (req: Request, res: Response)
     }
 
     res.status(statusCode).json({
-      error: errorMessage,
+      error: responseErrorMessage,
       received: false,
       processingTimeMs: processingTime,
     });
@@ -148,7 +175,7 @@ router.post('/', stripeWebhookIdempotency(), async (req: Request, res: Response)
 /**
  * Health check endpoint for webhook service
  */
-router.get('/health', async (req: Request, res: Response): Promise<void> => {
+router.get('/health', async (_req: Request, res: Response<WebhookHealthResponse>): Promise<void> => {
   try {
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
@@ -157,10 +184,12 @@ router.get('/health', async (req: Request, res: Response): Promise<void> => {
       configured: !!webhookSecret,
       timestamp: new Date().toISOString(),
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     res.status(500).json({
       status: 'unhealthy',
-      error: error.message,
+      configured: false,
+      error: errorMessage,
       timestamp: new Date().toISOString(),
     });
   }

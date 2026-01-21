@@ -1,7 +1,6 @@
-// @ts-nocheck
 import { Request, Response, NextFunction } from 'express';
 import zlib from 'zlib';
-import { logger } from '../config/logger';
+import { logger } from '../utils/logger.js';
 
 export interface CompressionOptions {
   threshold?: number; // Minimum size in bytes to compress
@@ -201,7 +200,7 @@ export function compressionMiddleware(options: CompressionOptions = {}) {
     let compressionApplied = false;
 
     // Helper to compress and send
-    const compressAndSend = async (chunk: any, encoding?: BufferEncoding) => {
+    const compressAndSend = async (chunk: unknown, encoding?: BufferEncoding): Promise<boolean> => {
       // Only compress successful responses
       if (res.statusCode < 200 || res.statusCode >= 300) {
         return false;
@@ -218,9 +217,11 @@ export function compressionMiddleware(options: CompressionOptions = {}) {
       if (Buffer.isBuffer(chunk)) {
         buffer = chunk;
       } else if (typeof chunk === 'string') {
-        buffer = Buffer.from(chunk, encoding || 'utf8');
-      } else {
+        buffer = Buffer.from(chunk, encoding ?? 'utf8');
+      } else if (chunk != null) {
         buffer = Buffer.from(JSON.stringify(chunk), 'utf8');
+      } else {
+        return false;
       }
 
       // Check threshold
@@ -257,7 +258,7 @@ export function compressionMiddleware(options: CompressionOptions = {}) {
     };
 
     // Override send method
-    res.send = function (body: any): Response {
+    res.send = function (body: unknown): Response {
       if (compressionApplied) {
         return this;
       }
@@ -269,7 +270,7 @@ export function compressionMiddleware(options: CompressionOptions = {}) {
           }
           compressionApplied = true;
         })
-        .catch(err => {
+        .catch((err: unknown) => {
           logger.error('Error in compression middleware:', err);
           originalSend.call(this, body);
           compressionApplied = true;
@@ -279,7 +280,7 @@ export function compressionMiddleware(options: CompressionOptions = {}) {
     };
 
     // Override json method
-    res.json = function (body: any): Response {
+    res.json = function (body: unknown): Response {
       if (compressionApplied) {
         return this;
       }
@@ -293,7 +294,7 @@ export function compressionMiddleware(options: CompressionOptions = {}) {
           }
           compressionApplied = true;
         })
-        .catch(err => {
+        .catch((err: unknown) => {
           logger.error('Error in compression middleware:', err);
           originalJson.call(this, body);
           compressionApplied = true;

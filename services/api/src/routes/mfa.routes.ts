@@ -1,5 +1,4 @@
-// @ts-nocheck
-import { Router } from "express";
+import { Router, RequestHandler } from "express";
 import { mfaController } from "../controllers/mfa.controller.js";
 import { authenticate } from "../middleware/auth.middleware.js";
 import rateLimit from "express-rate-limit";
@@ -35,19 +34,25 @@ const mfaEnrollLimiter = rateLimit({
 
 // ==========================================
 // Protected MFA Management Routes (require authentication)
+// Note: mfaController uses @ts-nocheck, so type assertions are needed
+// until that controller is migrated to strict mode
 // ==========================================
 
 /**
  * GET /auth/mfa/status
  * Get current MFA status for the authenticated user
  */
-router.get("/status", authenticate, mfaController.getStatus);
+router.get("/status", authenticate, mfaController.getStatus as unknown as RequestHandler);
 
 /**
  * POST /auth/mfa/enroll
  * Initiate MFA enrollment - generates secret and QR code
  */
-router.post("/enroll", authenticate, mfaEnrollLimiter, mfaController.enableMfa);
+router.post(
+  "/enroll",
+  [authenticate, mfaEnrollLimiter as unknown as RequestHandler],
+  mfaController.enableMfa as unknown as RequestHandler
+);
 
 /**
  * POST /auth/mfa/verify
@@ -56,9 +61,8 @@ router.post("/enroll", authenticate, mfaEnrollLimiter, mfaController.enableMfa);
  */
 router.post(
   "/verify",
-  authenticate,
-  mfaVerifyLimiter,
-  mfaController.verifySetup,
+  [authenticate, mfaVerifyLimiter as unknown as RequestHandler],
+  mfaController.verifySetup as unknown as RequestHandler,
 );
 
 /**
@@ -67,9 +71,8 @@ router.post(
  */
 router.post(
   "/disable",
-  authenticate,
-  mfaVerifyLimiter,
-  mfaController.disableMfa,
+  [authenticate, mfaVerifyLimiter as unknown as RequestHandler],
+  mfaController.disableMfa as unknown as RequestHandler,
 );
 
 /**
@@ -78,9 +81,8 @@ router.post(
  */
 router.post(
   "/backup-codes/regenerate",
-  authenticate,
-  mfaVerifyLimiter,
-  mfaController.regenerateBackupCodes,
+  [authenticate, mfaVerifyLimiter as unknown as RequestHandler],
+  mfaController.regenerateBackupCodes as unknown as RequestHandler,
 );
 
 // ==========================================
@@ -92,6 +94,10 @@ router.post(
  * Verify MFA code during login (after password verification)
  * Requires mfaToken from login response
  */
-router.post("/verify-login", mfaVerifyLimiter, mfaController.verifyMfaLogin);
+router.post(
+  "/verify-login",
+  mfaVerifyLimiter as unknown as RequestHandler,
+  mfaController.verifyMfaLogin as unknown as RequestHandler
+);
 
 export { router as mfaRoutes };

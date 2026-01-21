@@ -1,11 +1,76 @@
-// @ts-nocheck
 import { CreatePatientInput, UpdatePatientInput, PatientResponse } from '../dtos/patient.dto.js';
 import { NotFoundError, ConflictError } from '../utils/errors.js';
 import { prisma } from '../lib/prisma.js';
 import { logger } from '../utils/logger.js';
+import { Prisma } from '../generated/client/index.js';
+import type { Gender } from '../generated/client/index.js';
 
+/**
+ * Interface for emergency contact stored as JSON in database
+ */
+interface EmergencyContact {
+  name: string;
+  relationship: string;
+  phone: string;
+}
+
+/**
+ * Type guard to check if a value is a valid EmergencyContact
+ */
+function isEmergencyContact(value: unknown): value is EmergencyContact {
+  if (value === null || typeof value !== 'object') {
+    return false;
+  }
+  const obj = value as Record<string, unknown>;
+  return (
+    typeof obj.name === 'string' &&
+    typeof obj.relationship === 'string' &&
+    typeof obj.phone === 'string'
+  );
+}
+
+/**
+ * Maps input gender string to Prisma Gender enum
+ */
+function mapGenderToEnum(gender: string): Gender {
+  if (gender === 'prefer-not-to-say') {
+    return 'prefer_not_to_say';
+  }
+  return gender as Gender;
+}
+
+/**
+ * Generate a unique Medical Record Number
+ */
 function generateMRN(): string {
   return `MRN-${Date.now()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+}
+
+/**
+ * Patient database record type from Prisma
+ */
+type PatientRecord = Prisma.PatientGetPayload<object>;
+
+/**
+ * Transform a patient database record to API response format
+ */
+function transformPatientToResponse(patient: PatientRecord): PatientResponse {
+  const emergencyContact = isEmergencyContact(patient.emergencyContact)
+    ? patient.emergencyContact
+    : undefined;
+
+  return {
+    id: patient.id,
+    userId: patient.userId,
+    medicalRecordNumber: patient.medicalRecordNumber,
+    dateOfBirth: patient.dateOfBirth.toISOString(),
+    gender: patient.gender,
+    bloodType: patient.bloodType ?? undefined,
+    allergies: patient.allergies,
+    emergencyContact,
+    createdAt: patient.createdAt.toISOString(),
+    updatedAt: patient.updatedAt.toISOString(),
+  };
 }
 
 export const patientService = {
@@ -27,25 +92,14 @@ export const patientService = {
         userId: input.userId,
         medicalRecordNumber: generateMRN(),
         dateOfBirth: new Date(input.dateOfBirth),
-        gender: (input.gender === 'prefer-not-to-say' ? 'prefer_not_to_say' : input.gender) as any,
-        bloodType: input.bloodType || null,
-        allergies: input.allergies || [],
-        emergencyContact: input.emergencyContact || null,
+        gender: mapGenderToEnum(input.gender),
+        bloodType: input.bloodType ?? null,
+        allergies: input.allergies ?? [],
+        emergencyContact: input.emergencyContact ?? Prisma.JsonNull,
       },
     });
 
-    return {
-      id: patient.id,
-      userId: patient.userId,
-      medicalRecordNumber: patient.medicalRecordNumber,
-      dateOfBirth: patient.dateOfBirth.toISOString(),
-      gender: patient.gender,
-      bloodType: patient.bloodType,
-      allergies: patient.allergies,
-      emergencyContact: patient.emergencyContact as any,
-      createdAt: patient.createdAt.toISOString(),
-      updatedAt: patient.updatedAt.toISOString(),
-    };
+    return transformPatientToResponse(patient);
   },
 
   /**
@@ -60,18 +114,7 @@ export const patientService = {
       throw new NotFoundError('Patient not found');
     }
 
-    return {
-      id: patient.id,
-      userId: patient.userId,
-      medicalRecordNumber: patient.medicalRecordNumber,
-      dateOfBirth: patient.dateOfBirth.toISOString(),
-      gender: patient.gender,
-      bloodType: patient.bloodType,
-      allergies: patient.allergies,
-      emergencyContact: patient.emergencyContact as any,
-      createdAt: patient.createdAt.toISOString(),
-      updatedAt: patient.updatedAt.toISOString(),
-    };
+    return transformPatientToResponse(patient);
   },
 
   /**
@@ -86,18 +129,7 @@ export const patientService = {
       return null;
     }
 
-    return {
-      id: patient.id,
-      userId: patient.userId,
-      medicalRecordNumber: patient.medicalRecordNumber,
-      dateOfBirth: patient.dateOfBirth.toISOString(),
-      gender: patient.gender,
-      bloodType: patient.bloodType,
-      allergies: patient.allergies,
-      emergencyContact: patient.emergencyContact as any,
-      createdAt: patient.createdAt.toISOString(),
-      updatedAt: patient.updatedAt.toISOString(),
-    };
+    return transformPatientToResponse(patient);
   },
 
   /**
@@ -155,28 +187,34 @@ export const patientService = {
       throw new NotFoundError('Patient not found');
     }
 
+    // Build update data with proper null handling
+    const updateData: Prisma.PatientUpdateInput = {};
+
+    if (input.dateOfBirth !== undefined) {
+      updateData.dateOfBirth = new Date(input.dateOfBirth);
+    }
+
+    if (input.gender !== undefined) {
+      updateData.gender = mapGenderToEnum(input.gender);
+    }
+
+    if (input.bloodType !== undefined) {
+      updateData.bloodType = input.bloodType;
+    }
+
+    if (input.allergies !== undefined) {
+      updateData.allergies = input.allergies;
+    }
+
+    if (input.emergencyContact !== undefined) {
+      updateData.emergencyContact = input.emergencyContact ?? Prisma.JsonNull;
+    }
+
     const updatedPatient = await prisma.patient.update({
       where: { id },
-      data: {
-        dateOfBirth: input.dateOfBirth ? new Date(input.dateOfBirth) : patient.dateOfBirth,
-        gender: input.gender || patient.gender,
-        bloodType: input.bloodType !== undefined ? input.bloodType : patient.bloodType,
-        allergies: input.allergies !== undefined ? input.allergies : patient.allergies,
-        emergencyContact: input.emergencyContact !== undefined ? input.emergencyContact : patient.emergencyContact,
-      },
+      data: updateData,
     });
 
-    return {
-      id: updatedPatient.id,
-      userId: updatedPatient.userId,
-      medicalRecordNumber: updatedPatient.medicalRecordNumber,
-      dateOfBirth: updatedPatient.dateOfBirth.toISOString(),
-      gender: updatedPatient.gender,
-      bloodType: updatedPatient.bloodType,
-      allergies: updatedPatient.allergies,
-      emergencyContact: updatedPatient.emergencyContact as any,
-      createdAt: updatedPatient.createdAt.toISOString(),
-      updatedAt: updatedPatient.updatedAt.toISOString(),
-    };
+    return transformPatientToResponse(updatedPatient);
   },
 };

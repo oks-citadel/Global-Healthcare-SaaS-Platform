@@ -1,6 +1,10 @@
-// @ts-nocheck
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+// Use CommonJS-compatible imports for modules without default exports
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const bcrypt = require('bcryptjs') as typeof import('bcryptjs');
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const jwt = require('jsonwebtoken') as typeof import('jsonwebtoken');
+import type { SignOptions } from 'jsonwebtoken';
+
 import { config } from '../config/index.js';
 import { RegisterInput, LoginInput, AuthResponse } from '../dtos/auth.dto.js';
 import { UserResponse } from '../dtos/user.dto.js';
@@ -8,12 +12,78 @@ import { ConflictError, UnauthorizedError, NotFoundError } from '../utils/errors
 import { logger } from '../utils/logger.js';
 import { prisma } from '../lib/prisma.js';
 import { isDemoMode, demoStore } from '../lib/demo-store.js';
+import type { Prisma } from '../generated/client/index.js';
+
+/**
+ * Interface representing the internal registration input with optional role
+ * Role is determined server-side, not from client input
+ */
+interface InternalRegisterInput extends RegisterInput {
+  role?: string;
+}
+
+/**
+ * User record type from Prisma for database users
+ */
+type DatabaseUser = Prisma.UserGetPayload<object>;
+
+/**
+ * Demo user structure from the demo store
+ */
+interface DemoUser {
+  id: string;
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+  phone: string | null;
+  status: string;
+  emailVerified: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+/**
+ * Union type for users from either database or demo store
+ */
+type UserRecord = DatabaseUser | DemoUser;
+
+/**
+ * JWT payload structure for refresh tokens
+ */
+interface RefreshTokenPayload {
+  userId: string;
+  iat?: number;
+  exp?: number;
+}
+
+/**
+ * Type guard to check if a JWT payload is a valid refresh token payload
+ */
+function isRefreshTokenPayload(payload: unknown): payload is RefreshTokenPayload {
+  if (payload === null || typeof payload !== 'object') {
+    return false;
+  }
+  const obj = payload as Record<string, unknown>;
+  return typeof obj.userId === 'string';
+}
+
+/**
+ * Format a date to ISO string, handling both Date objects and potential undefined/null
+ */
+function formatDate(date: Date | undefined | null): string {
+  if (date instanceof Date) {
+    return date.toISOString();
+  }
+  return new Date().toISOString();
+}
 
 export const authService = {
   /**
    * Register a new user
    */
-  async register(input: RegisterInput): Promise<AuthResponse> {
+  async register(input: InternalRegisterInput): Promise<AuthResponse> {
     // Demo mode - use in-memory store
     if (isDemoMode) {
       const existingUser = demoStore.users.findByEmail(input.email);
@@ -44,7 +114,7 @@ export const authService = {
     }
 
     // Hash password
-    const hashedPassword = await bcrypt.hash(input.password, 12);
+    const hashedPassword: string = await bcrypt.hash(input.password, 12);
 
     // Create user
     const user = await prisma.user.create({
@@ -53,9 +123,9 @@ export const authService = {
         passwordHash: hashedPassword,
         firstName: input.firstName,
         lastName: input.lastName,
-        phone: input.phone || null,
+        phone: input.phone ?? null,
         dateOfBirth: input.dateOfBirth ? new Date(input.dateOfBirth) : null,
-        role: input.role || 'patient',
+        role: 'patient', // Always default to patient - role assignment is server-side only
         status: 'active',
         emailVerified: false,
       },
@@ -78,7 +148,7 @@ export const authService = {
         throw new UnauthorizedError('Invalid credentials');
       }
 
-      const validPassword = await bcrypt.compare(input.password, user.password);
+      const validPassword: boolean = await bcrypt.compare(input.password, user.password);
       if (!validPassword) {
         throw new UnauthorizedError('Invalid credentials');
       }
@@ -97,7 +167,7 @@ export const authService = {
     }
 
     // Verify password
-    const validPassword = await bcrypt.compare(input.password, user.passwordHash);
+    const validPassword: boolean = await bcrypt.compare(input.password, user.passwordHash);
     if (!validPassword) {
       throw new UnauthorizedError('Invalid credentials');
     }
@@ -157,7 +227,13 @@ export const authService = {
     }
 
     try {
-      const payload = jwt.verify(refreshToken, config.jwt.secret) as any;
+      const payload: unknown = jwt.verify(refreshToken, config.jwt.secret);
+
+      // Validate payload structure
+      if (!isRefreshTokenPayload(payload)) {
+        throw new UnauthorizedError('Invalid refresh token payload');
+      }
+
       const user = tokenRecord.user;
 
       if (!user) {
@@ -209,7 +285,7 @@ export const authService = {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
-        phone: user.phone,
+        phone: user.phone ?? undefined,
         role: user.role,
         status: user.status,
         emailVerified: user.emailVerified,
@@ -232,7 +308,7 @@ export const authService = {
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
-      phone: user.phone,
+      phone: user.phone ?? undefined,
       role: user.role,
       status: user.status,
       emailVerified: user.emailVerified,
@@ -253,21 +329,31 @@ export const authService = {
   /**
    * Generate access and refresh tokens
    */
-  async generateTokens(user: any): Promise<AuthResponse> {
-    const accessToken = jwt.sign(
+  async generateTokens(user: UserRecord): Promise<AuthResponse> {
+    // JWT sign options - cast to SignOptions to work with the strict typing
+    // expiresIn expects StringValue | number, where StringValue is a branded type from 'ms'
+    // Using SignOptions type directly with type assertion for the string values
+    const accessTokenOptions: SignOptions = {
+      expiresIn: config.jwt.expiresIn as SignOptions['expiresIn']
+    };
+    const refreshTokenOptions: SignOptions = {
+      expiresIn: config.jwt.refreshExpiresIn as SignOptions['expiresIn']
+    };
+
+    const accessToken: string = jwt.sign(
       {
         userId: user.id,
         email: user.email,
         role: user.role,
       },
       config.jwt.secret,
-      { expiresIn: config.jwt.expiresIn }
+      accessTokenOptions
     );
 
-    const refreshToken = jwt.sign(
+    const refreshToken: string = jwt.sign(
       { userId: user.id },
       config.jwt.secret,
-      { expiresIn: config.jwt.refreshExpiresIn }
+      refreshTokenOptions
     );
 
     // Calculate expiration time (30 days from now)
@@ -298,8 +384,8 @@ export const authService = {
         firstName: user.firstName,
         lastName: user.lastName,
         role: user.role,
-        createdAt: user.createdAt?.toISOString?.() || new Date().toISOString(),
-        updatedAt: user.updatedAt?.toISOString?.() || new Date().toISOString(),
+        createdAt: formatDate(user.createdAt),
+        updatedAt: formatDate(user.updatedAt),
       },
       tokens: {
         accessToken,

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Compliance Middleware for Unified Health API
  *
@@ -74,7 +73,7 @@ export function complianceMiddleware(config: ComplianceConfig) {
 
       // 5. Response logging
       const originalJson = res.json.bind(res);
-      res.json = function (body: any) {
+      res.json = function (body: unknown): Response {
         logResponse(req, res, body, config.auditLogger, compliance, startTime);
         return originalJson(body);
       };
@@ -421,7 +420,7 @@ async function logRequest(
 async function logResponse(
   req: Request,
   res: Response,
-  body: any,
+  body: unknown,
   logger: AuditLogger,
   compliance: ComplianceContext,
   startTime: number
@@ -441,7 +440,7 @@ async function logResponse(
     details: {
       statusCode: res.statusCode,
       duration,
-      responseSize: JSON.stringify(body).length
+      responseSize: body != null ? JSON.stringify(body).length : 0
     }
   });
 }

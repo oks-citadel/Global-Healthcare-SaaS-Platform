@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Redis Caching Utilities
  *
@@ -147,7 +146,7 @@ export class CacheService {
       this.updateHitRate();
       logger.debug('Cache hit', { key: fullKey });
 
-      return JSON.parse(value) as T;
+      return JSON.parse(value as string) as T;
     } catch (error) {
       this.stats.errors++;
       logger.error('Cache get error', {
@@ -406,21 +405,33 @@ export class CacheService {
   }
 }
 
+// Type for class instances with optional cache property
+interface CacheableInstance {
+  cache?: CacheService;
+}
+
+// Type for class prototype used in method decorators
+interface CacheClassPrototype {
+  constructor: {
+    name: string;
+  };
+}
+
 /**
  * Cache decorator for methods
  */
 export function Cacheable(options: {
-  key: string | ((args: any[]) => string);
+  key: string | ((args: unknown[]) => string);
   ttl?: number;
 }) {
   return function (
-    target: any,
-    propertyKey: string,
+    _target: CacheClassPrototype,
+    _propertyKey: string,
     descriptor: PropertyDescriptor
-  ) {
-    const originalMethod = descriptor.value;
+  ): PropertyDescriptor {
+    const originalMethod = descriptor.value as (...args: unknown[]) => Promise<unknown>;
 
-    descriptor.value = async function (this: any, ...args: any[]) {
+    descriptor.value = async function (this: CacheableInstance, ...args: unknown[]): Promise<unknown> {
       const cache = this.cache || globalCache;
       if (!cache) {
         return originalMethod.apply(this, args);
@@ -433,7 +444,7 @@ export function Cacheable(options: {
 
       return cache.getOrSet(
         cacheKey,
-        () => originalMethod.apply(this, args),
+        () => originalMethod.apply(this, args) as Promise<unknown>,
         options.ttl
       );
     };
@@ -446,17 +457,17 @@ export function Cacheable(options: {
  * Cache invalidation decorator
  */
 export function CacheInvalidate(options: {
-  keys?: string | string[] | ((args: any[]) => string | string[]);
-  patterns?: string | string[] | ((args: any[]) => string | string[]);
+  keys?: string | string[] | ((args: unknown[]) => string | string[]);
+  patterns?: string | string[] | ((args: unknown[]) => string | string[]);
 }) {
   return function (
-    target: any,
-    propertyKey: string,
+    _target: CacheClassPrototype,
+    _propertyKey: string,
     descriptor: PropertyDescriptor
-  ) {
-    const originalMethod = descriptor.value;
+  ): PropertyDescriptor {
+    const originalMethod = descriptor.value as (...args: unknown[]) => Promise<unknown>;
 
-    descriptor.value = async function (this: any, ...args: any[]) {
+    descriptor.value = async function (this: CacheableInstance, ...args: unknown[]): Promise<unknown> {
       const result = await originalMethod.apply(this, args);
 
       const cache = this.cache || globalCache;
@@ -473,7 +484,7 @@ export function CacheInvalidate(options: {
         const keyArray = Array.isArray(keys) ? keys : [keys];
 
         for (const key of keyArray) {
-          await cache.delete(key).catch(err =>
+          await cache.delete(key).catch((err: unknown) =>
             logger.error('Cache invalidation error', { key, error: err })
           );
         }
@@ -488,7 +499,7 @@ export function CacheInvalidate(options: {
         const patternArray = Array.isArray(patterns) ? patterns : [patterns];
 
         for (const pattern of patternArray) {
-          await cache.deletePattern(pattern).catch(err =>
+          await cache.deletePattern(pattern).catch((err: unknown) =>
             logger.error('Cache pattern invalidation error', {
               pattern,
               error: err

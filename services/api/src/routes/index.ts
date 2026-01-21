@@ -1,5 +1,4 @@
-// @ts-nocheck
-import { Router } from 'express';
+import { Router, Request, Response, RequestHandler } from 'express';
 import { healthController } from '../controllers/health.controller.js';
 import { authController } from '../controllers/auth.controller.js';
 import { userController } from '../controllers/user.controller.js';
@@ -23,6 +22,37 @@ import stripeWebhookRouter from './webhooks/stripe.js';
 import { premiumRoutes } from './premium.routes.js';
 import { postDischargeRoutes } from './post-discharge.routes.js';
 import { surgicalRoutes } from './surgical.routes.js';
+
+// ==========================================
+// Type Definitions for Internal Billing
+// ==========================================
+
+interface TelehealthBillingRequest {
+  visitId: string;
+  appointmentId: string;
+  patientId: string;
+  providerId: string;
+  durationMinutes: number;
+  completedAt: string;
+  billable: boolean;
+}
+
+interface TelehealthBillingResponse {
+  success: boolean;
+  message: string;
+  billingResult?: {
+    paymentId?: string;
+    paymentIntentId?: string;
+    amount?: number;
+    currency?: string;
+    status?: string;
+  } | null;
+}
+
+interface BillingErrorResponse {
+  error: string;
+  message: string;
+}
 
 const router = Router();
 
@@ -157,11 +187,15 @@ router.post(
   authenticateService({ allowedServices: ['telehealth-service'] }),
   webhookIdempotency({
     source: 'telehealth',
-    getEventId: (req) => req.body?.visitId || req.headers['x-visit-id'] as string || null,
-    getEventType: () => 'telehealth-billing',
+    getEventId: (req: Request): string | null => {
+      const body = req.body as Partial<TelehealthBillingRequest> | undefined;
+      const visitIdHeader = req.headers['x-visit-id'];
+      return body?.visitId || (typeof visitIdHeader === 'string' ? visitIdHeader : null);
+    },
+    getEventType: (): string => 'telehealth-billing',
     markProcessedImmediately: false,
   }),
-  async (req, res) => {
+  async (req: Request, res: Response<TelehealthBillingResponse | BillingErrorResponse>): Promise<void> => {
   try {
     const {
       visitId,
@@ -169,9 +203,8 @@ router.post(
       patientId,
       providerId,
       durationMinutes,
-      completedAt,
       billable,
-    } = req.body;
+    } = req.body as TelehealthBillingRequest;
 
     if (!billable) {
       res.json({ success: true, message: 'Visit not billable, skipped' });
@@ -189,13 +222,16 @@ router.post(
     });
 
     // Complete the appointment billing
+    // Note: completeAppointmentBilling expects (userId, { appointmentId, additionalCharges?, paymentMethodId?, metadata? })
     const billingResult = await appointmentBillingService.completeAppointmentBilling(
       patientId,
       {
         appointmentId,
-        appointmentType: 'video',
-        durationMinutes,
-        providerId,
+        metadata: {
+          appointmentType: 'video',
+          durationMinutes: String(durationMinutes),
+          providerId,
+        },
       }
     );
 
@@ -207,7 +243,7 @@ router.post(
     logger.info('Telehealth billing completed', {
       visitId,
       appointmentId,
-      paymentId: billingResult.payment?.id,
+      paymentId: billingResult?.paymentId,
     });
 
     res.json({
@@ -215,35 +251,38 @@ router.post(
       message: 'Telehealth visit billed successfully',
       billingResult,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     const { logger } = await import('../utils/logger.js');
-    logger.error('Telehealth billing error', { error: error.message });
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    logger.error('Telehealth billing error', { error: errorMessage });
     res.status(500).json({
       error: 'Billing failed',
-      message: error.message,
+      message: errorMessage,
     });
   }
 });
 
 // ==========================================
 // Payment Endpoints (Stripe)
+// Note: paymentController uses @ts-nocheck, so type assertions are needed
+// until that controller is migrated to strict mode
 // ==========================================
-router.get('/payments/config', paymentController.getConfig);
-router.post('/payments/setup-intent', authenticate, paymentController.createSetupIntent);
-router.post('/payments/subscription', authenticate, paymentController.createSubscription);
-router.get('/payments/subscription', authenticate, paymentController.getCurrentSubscription);
-router.delete('/payments/subscription', authenticate, paymentController.cancelSubscription);
-router.post('/payments/payment-method', authenticate, paymentController.updatePaymentMethod);
-router.post('/payments/payment-method/save', authenticate, paymentController.savePaymentMethod);
-router.get('/payments/payment-methods', authenticate, paymentController.getPaymentMethods);
-router.delete('/payments/payment-method/:id', authenticate, paymentController.removePaymentMethod);
-router.post('/payments/charge', authenticate, paymentController.createCharge);
-router.get('/payments/history', authenticate, paymentController.getPaymentHistory);
-router.get('/payments/:id', authenticate, paymentController.getPayment);
+router.get('/payments/config', paymentController.getConfig as unknown as RequestHandler);
+router.post('/payments/setup-intent', authenticate, paymentController.createSetupIntent as unknown as RequestHandler);
+router.post('/payments/subscription', authenticate, paymentController.createSubscription as unknown as RequestHandler);
+router.get('/payments/subscription', authenticate, paymentController.getCurrentSubscription as unknown as RequestHandler);
+router.delete('/payments/subscription', authenticate, paymentController.cancelSubscription as unknown as RequestHandler);
+router.post('/payments/payment-method', authenticate, paymentController.updatePaymentMethod as unknown as RequestHandler);
+router.post('/payments/payment-method/save', authenticate, paymentController.savePaymentMethod as unknown as RequestHandler);
+router.get('/payments/payment-methods', authenticate, paymentController.getPaymentMethods as unknown as RequestHandler);
+router.delete('/payments/payment-method/:id', authenticate, paymentController.removePaymentMethod as unknown as RequestHandler);
+router.post('/payments/charge', authenticate, paymentController.createCharge as unknown as RequestHandler);
+router.get('/payments/history', authenticate, paymentController.getPaymentHistory as unknown as RequestHandler);
+router.get('/payments/:id', authenticate, paymentController.getPayment as unknown as RequestHandler);
 // SECURITY FIX: Payment refunds require admin authorization
-router.post('/payments/:id/refund', authenticate, authorize('admin'), paymentController.refundPayment);
-router.get('/payments/invoices', authenticate, paymentController.getInvoices);
-router.post('/payments/webhook', stripeWebhookIdempotency(), paymentController.handleWebhook);
+router.post('/payments/:id/refund', authenticate, authorize('admin'), paymentController.refundPayment as unknown as RequestHandler);
+router.get('/payments/invoices', authenticate, paymentController.getInvoices as unknown as RequestHandler);
+router.post('/payments/webhook', stripeWebhookIdempotency(), paymentController.handleWebhook as unknown as RequestHandler);
 
 // ==========================================
 // Notification Endpoints

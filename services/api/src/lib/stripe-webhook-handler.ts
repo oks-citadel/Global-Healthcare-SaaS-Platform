@@ -2,8 +2,8 @@ import Stripe from 'stripe';
 import { PrismaClient } from '../generated/client';
 import { logger } from '../utils/logger.js';
 import { constructWebhookEvent } from './stripe.js';
-import { sendEmail } from './email.js';
-import { sendSms } from './sms.js';
+import { sendEmail } from './aws-email.js';
+import { sendSms } from './aws-sms.js';
 
 const prisma = new PrismaClient();
 
@@ -23,7 +23,7 @@ export interface WebhookEventLog {
   eventType: string;
   eventId: string;
   status: 'pending' | 'processing' | 'succeeded' | 'failed';
-  payload: any;
+  payload: Stripe.Event;
   error?: string;
   retryCount: number;
   createdAt: Date;
@@ -293,12 +293,25 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription): Pro
     status = 'expired';
   }
 
+  // Cast to any to access legacy Stripe API properties that may still be present at runtime
+  const subscriptionData = subscription as unknown as {
+    current_period_start?: number;
+    current_period_end?: number;
+    cancel_at_period_end: boolean;
+    items: { data: Array<{ price: { id: string } }> };
+    id: string;
+  };
+
+  // Use billing_cycle_anchor as fallback if current_period fields are not available
+  const periodStart = subscriptionData.current_period_start ?? subscription.billing_cycle_anchor;
+  const periodEnd = subscriptionData.current_period_end ?? subscription.billing_cycle_anchor;
+
   await prisma.subscription.upsert({
     where: { stripeSubscriptionId: subscription.id },
     update: {
       status,
-      currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
-      currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
+      currentPeriodStart: new Date(periodStart * 1000),
+      currentPeriodEnd: new Date(periodEnd * 1000),
       cancelAtPeriodEnd: subscription.cancel_at_period_end,
       updatedAt: new Date(),
     },
@@ -307,8 +320,8 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription): Pro
       planId: subscription.items.data[0].price.id,
       stripeSubscriptionId: subscription.id,
       status,
-      currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
-      currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
+      currentPeriodStart: new Date(periodStart * 1000),
+      currentPeriodEnd: new Date(periodEnd * 1000),
       cancelAtPeriodEnd: subscription.cancel_at_period_end,
     },
   });
@@ -329,6 +342,10 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription): Pro
   if (userId) {
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (user && user.email) {
+      // Cast to access legacy Stripe API property that may still be present at runtime
+      const subscriptionData = subscription as unknown as { current_period_end?: number };
+      const periodEnd = subscriptionData.current_period_end ?? subscription.billing_cycle_anchor;
+
       await sendEmail({
         to: user.email,
         subject: 'Your Subscription Has Been Canceled',
@@ -336,7 +353,7 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription): Pro
         templateData: {
           name: `${user.firstName} ${user.lastName}`,
           subscriptionId: subscription.id,
-          endDate: new Date((subscription as any).current_period_end * 1000).toLocaleDateString(),
+          endDate: new Date(periodEnd * 1000).toLocaleDateString(),
         },
       });
     }
@@ -372,9 +389,9 @@ async function handleSubscriptionTrialWillEnd(subscription: Stripe.Subscription)
   }
 
   // Send SMS notification if phone number available
-  if (user.phoneNumber) {
+  if (user.phone) {
     await sendSms({
-      to: user.phoneNumber,
+      to: user.phone,
       message: `Hello ${user.firstName}, your healthcare platform trial ends in ${daysRemaining} days. Update your payment method to continue service.`,
     });
   }
@@ -441,10 +458,12 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice): Promise<v
 async function handleInvoicePaymentFailed(invoice: Stripe.Invoice): Promise<void> {
   logger.warn(`Invoice payment failed: ${invoice.id}`);
 
-  if ((invoice as any).subscription) {
-    const subscriptionId = typeof (invoice as any).subscription === 'string'
-      ? (invoice as any).subscription
-      : (invoice as any).subscription.id;
+  // Access subscription from parent.subscription_details in newer Stripe API
+  const subscriptionDetails = invoice.parent?.subscription_details;
+  if (subscriptionDetails?.subscription) {
+    const subscriptionId = typeof subscriptionDetails.subscription === 'string'
+      ? subscriptionDetails.subscription
+      : subscriptionDetails.subscription.id;
 
     await prisma.subscription.updateMany({
       where: { stripeSubscriptionId: subscriptionId },
@@ -559,7 +578,7 @@ async function handlePaymentIntentCanceled(paymentIntent: Stripe.PaymentIntent):
   await prisma.payment.updateMany({
     where: { stripePaymentIntentId: paymentIntent.id },
     data: {
-      status: 'canceled',
+      status: 'cancelled',
       updatedAt: new Date(),
     },
   });
@@ -720,15 +739,15 @@ async function handleCheckoutSessionExpired(session: Stripe.Checkout.Session): P
 // Helper Functions
 // ============================================================================
 
-async function logWebhookEvent(event: Stripe.Event): Promise<any> {
+async function logWebhookEvent(event: Stripe.Event): Promise<WebhookEventLog> {
   try {
     // In a real implementation, you would save this to a database
     // For now, we'll just log it
-    const eventLog = {
+    const eventLog: WebhookEventLog = {
       id: event.id,
       eventType: event.type,
       eventId: event.id,
-      status: 'pending' as const,
+      status: 'pending',
       payload: event,
       retryCount: 0,
       createdAt: new Date(),

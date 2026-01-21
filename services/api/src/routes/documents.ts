@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Document Routes with AWS S3 Storage Integration
  *
@@ -12,7 +11,7 @@
  */
 
 import { Router, Request, Response, NextFunction } from 'express';
-import multer from 'multer';
+import multer, { FileFilterCallback } from 'multer';
 import { Readable } from 'stream';
 import { s3StorageService } from '../lib/storage.js';
 import { documentService } from '../services/document.service.js';
@@ -22,15 +21,77 @@ import {
   BadRequestError,
   ForbiddenError,
   NotFoundError,
-  InternalServerError,
+  InternalError,
 } from '../utils/errors.js';
 import { z } from 'zod';
+
+// ==========================================
+// Type Definitions
+// ==========================================
+
+type DocumentType = 'lab_result' | 'imaging' | 'prescription' | 'other';
+type UserRole = 'patient' | 'provider' | 'admin';
+
+interface DocumentListFilters {
+  patientId?: string;
+  type?: DocumentType;
+  page: number;
+  limit: number;
+}
+
+interface DocumentResponse {
+  id: string;
+  patientId: string;
+  type: DocumentType;
+  fileName: string;
+  mimeType: string;
+  fileUrl: string;
+  blobName?: string;
+  description?: string | null;
+  size: number;
+  version?: number;
+  uploadedBy: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface DocumentUpdateInput {
+  description?: string;
+  type?: DocumentType;
+  version?: number;
+  fileUrl?: string;
+  blobName?: string;
+  size?: number;
+}
 
 const router = Router();
 
 // ==========================================
 // Multer Configuration for File Uploads
 // ==========================================
+
+// Allowed MIME types for document uploads
+const ALLOWED_MIME_TYPES: readonly string[] = [
+  'application/pdf',
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/dicom',
+  'application/dicom',
+  'text/plain',
+  'application/json',
+  'application/xml',
+  'application/hl7-v2',
+  'application/fhir+json',
+  'application/fhir+xml',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  'application/msword',
+  'application/vnd.ms-excel',
+  'image/tiff',
+  'image/bmp',
+  'image/gif',
+] as const;
 
 // Use memory storage for streaming to S3
 const upload = multer({
@@ -39,34 +100,16 @@ const upload = multer({
     fileSize: parseInt(process.env.MAX_FILE_SIZE || '104857600', 10), // 100MB default
     files: 1, // Single file upload
   },
-  fileFilter: (req, file, cb) => {
+  fileFilter: (
+    _req: Request,
+    file: Express.Multer.File,
+    cb: FileFilterCallback
+  ): void => {
     // Basic file type validation (will be validated again in service)
-    const allowedMimeTypes = [
-      'application/pdf',
-      'image/jpeg',
-      'image/jpg',
-      'image/png',
-      'image/dicom',
-      'application/dicom',
-      'text/plain',
-      'application/json',
-      'application/xml',
-      'application/hl7-v2',
-      'application/fhir+json',
-      'application/fhir+xml',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      'application/msword',
-      'application/vnd.ms-excel',
-      'image/tiff',
-      'image/bmp',
-      'image/gif',
-    ];
-
-    if (allowedMimeTypes.includes(file.mimetype)) {
+    if (ALLOWED_MIME_TYPES.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new BadRequestError(`File type '${file.mimetype}' not allowed`) as any);
+      cb(new BadRequestError(`File type '${file.mimetype}' not allowed`));
     }
   },
 });
@@ -354,7 +397,7 @@ router.get(
       const key = document.blobName || extractKeyFromUrl(document.fileUrl);
 
       if (!key) {
-        throw new InternalServerError('Document key not found');
+        throw new InternalError('Document key not found');
       }
 
       // Generate secure download URL
@@ -401,7 +444,7 @@ router.get(
       const key = document.blobName || extractKeyFromUrl(document.fileUrl);
 
       if (!key) {
-        throw new InternalServerError('Document key not found');
+        throw new InternalError('Document key not found');
       }
 
       // Thumbnail key
@@ -455,12 +498,14 @@ router.get(
         effectivePatientId = userPatient.id;
       }
 
-      const result = await documentService.listDocuments({
+      const filters: DocumentListFilters = {
         patientId: effectivePatientId,
-        type: type as any,
+        type: type as DocumentType | undefined,
         page: parseInt(page as string, 10),
         limit: parseInt(limit as string, 10),
-      });
+      };
+
+      const result = await documentService.listDocuments(filters);
 
       res.status(200).json({
         success: true,
@@ -612,12 +657,13 @@ router.post(
       });
 
       // Update document record with new version
-      const updatedDocument = await documentService.updateDocument(id, {
+      const versionUpdate: DocumentUpdateInput = {
         version: newVersion,
         fileUrl: uploadResult.url,
         blobName: uploadResult.key,
         size: req.file.size,
-      });
+      };
+      const updatedDocument = await documentService.updateDocument(id, versionUpdate);
 
       res.status(201).json({
         success: true,

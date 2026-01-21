@@ -33,6 +33,8 @@ export const DocumentResponse = z.object({
   uploadedBy: z.string().uuid(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
+  blobName: z.string().optional(),
+  version: z.number().int().optional(),
 });
 
 export const DocumentListResponse = z.object({

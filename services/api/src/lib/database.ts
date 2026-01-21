@@ -102,7 +102,7 @@ class DatabaseManager {
         },
       },
       log: this.getLogLevels(),
-      errorFormat: config.env === 'production' ? 'minimal' : 'pretty',
+      errorFormat: process.env.NODE_ENV === 'production' ? 'minimal' : 'pretty',
     });
 
     // Initialize read replica if configured
@@ -115,7 +115,7 @@ class DatabaseManager {
           },
         },
         log: this.getLogLevels(),
-        errorFormat: config.env === 'production' ? 'minimal' : 'pretty',
+        errorFormat: process.env.NODE_ENV === 'production' ? 'minimal' : 'pretty',
       });
       logger.info('Read replica configured');
     }
@@ -170,9 +170,21 @@ class DatabaseManager {
   /**
    * Setup event listeners for monitoring
    */
-  private setupEventListeners() {
+  private setupEventListeners(): void {
     // Query event listener
-    this.primaryClient.$on('query' as never, (e: any) => {
+    interface PrismaQueryEvent {
+      query: string;
+      params: string;
+      duration: number;
+      target: string;
+    }
+
+    interface PrismaLogEvent {
+      message: string;
+      target?: string;
+    }
+
+    this.primaryClient.$on('query' as never, (e: PrismaQueryEvent) => {
       this.metrics.totalQueries++;
 
       // Track slow queries
@@ -200,7 +212,7 @@ class DatabaseManager {
     });
 
     // Error event listener
-    this.primaryClient.$on('error' as never, (e: any) => {
+    this.primaryClient.$on('error' as never, (e: PrismaLogEvent) => {
       this.metrics.failedQueries++;
       logger.error('Prisma error', {
         message: e.message,
@@ -209,12 +221,12 @@ class DatabaseManager {
     });
 
     // Warning event listener
-    this.primaryClient.$on('warn' as never, (e: any) => {
+    this.primaryClient.$on('warn' as never, (e: PrismaLogEvent) => {
       logger.warn('Prisma warning', { message: e.message });
     });
 
     // Info event listener
-    this.primaryClient.$on('info' as never, (e: any) => {
+    this.primaryClient.$on('info' as never, (e: PrismaLogEvent) => {
       logger.info('Prisma info', { message: e.message });
     });
   }
@@ -432,15 +444,18 @@ class DatabaseManager {
   /**
    * Check if error is non-retryable
    */
-  private isNonRetryableError(error: any): boolean {
+  private isNonRetryableError(error: unknown): boolean {
     const nonRetryableCodes = [
       'P2002', // Unique constraint violation
       'P2003', // Foreign key constraint violation
       'P2025', // Record not found
     ];
 
-    if (error.code && nonRetryableCodes.includes(error.code)) {
-      return true;
+    if (error && typeof error === 'object' && 'code' in error) {
+      const prismaError = error as { code: string };
+      if (nonRetryableCodes.includes(prismaError.code)) {
+        return true;
+      }
     }
 
     return false;

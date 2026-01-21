@@ -1,4 +1,3 @@
-// @ts-nocheck
 import Stripe from 'stripe';
 import { logger } from '../utils/logger.js';
 
@@ -12,7 +11,7 @@ function getStripeClient(): Stripe {
       throw new Error('STRIPE_SECRET_KEY is not defined in environment variables');
     }
     _stripe = new Stripe(secretKey, {
-      apiVersion: '2023-10-16',
+      apiVersion: '2025-12-15.acacia' as Stripe.LatestApiVersion,
       typescript: true,
       appInfo: {
         name: 'Unified Health Platform',
@@ -348,12 +347,12 @@ export const getPaymentMethod = async (
  */
 export const listCustomerPaymentMethods = async (
   customerId: string,
-  type: string = 'card'
+  type: Stripe.PaymentMethodListParams['type'] = 'card'
 ): Promise<Stripe.PaymentMethod[]> => {
   try {
     const paymentMethods = await stripe.paymentMethods.list({
       customer: customerId,
-      type: type as any,
+      type,
     });
     return paymentMethods.data;
   } catch (error) {

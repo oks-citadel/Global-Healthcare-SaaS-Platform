@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * AWS S3 Storage Service for HIPAA-Compliant Document Management
  *
@@ -33,7 +32,7 @@ import {
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Readable, PassThrough } from 'stream';
 import { config } from '../config/index.js';
-import { BadRequestError, NotFoundError, InternalServerError } from '../utils/errors.js';
+import { BadRequestError, NotFoundError, InternalError } from '../utils/errors.js';
 import sharp from 'sharp';
 import crypto from 'crypto';
 import NodeClam from 'clamscan';
@@ -239,7 +238,7 @@ class VirusScannerService {
       console.error('[VirusScanner] Failed to initialize ClamAV:', this.initializationError);
 
       if (process.env.NODE_ENV === 'production' && process.env.VIRUS_SCAN_REQUIRED === 'true') {
-        throw new InternalServerError('Virus scanner initialization failed - uploads are blocked');
+        throw new InternalError('Virus scanner initialization failed - uploads are blocked');
       }
     }
   }
@@ -397,8 +396,9 @@ class S3StorageService {
       try {
         await this.s3Client.send(new HeadBucketCommand({ Bucket: BUCKET_NAME }));
         console.log(`S3 bucket '${BUCKET_NAME}' already exists`);
-      } catch (error: any) {
-        if (error.name === 'NotFound' || error.$metadata?.httpStatusCode === 404) {
+      } catch (error: unknown) {
+        const s3Error = error as { name?: string; $metadata?: { httpStatusCode?: number } };
+        if (s3Error.name === 'NotFound' || s3Error.$metadata?.httpStatusCode === 404) {
           await this.s3Client.send(new CreateBucketCommand({
             Bucket: BUCKET_NAME,
           }));
@@ -414,7 +414,7 @@ class S3StorageService {
       console.log('AWS S3 Storage initialized successfully');
     } catch (error) {
       console.error('Failed to initialize AWS S3 Storage:', error);
-      throw new InternalServerError('Failed to initialize storage service');
+      throw new InternalError('Failed to initialize storage service');
     }
   }
 
@@ -625,7 +625,7 @@ class S3StorageService {
       };
     } catch (error) {
       console.error('Failed to upload document to S3:', error);
-      throw new InternalServerError('Failed to upload document');
+      throw new InternalError('Failed to upload document');
     }
   }
 
@@ -663,8 +663,9 @@ class S3StorageService {
         Bucket: BUCKET_NAME,
         Key: key,
       }));
-    } catch (error: any) {
-      if (error.name === 'NotFound' || error.$metadata?.httpStatusCode === 404) {
+    } catch (error: unknown) {
+      const s3Error = error as { name?: string; $metadata?: { httpStatusCode?: number } };
+      if (s3Error.name === 'NotFound' || s3Error.$metadata?.httpStatusCode === 404) {
         throw new NotFoundError(`Object '${key}' not found`);
       }
       throw error;
@@ -733,8 +734,9 @@ class S3StorageService {
         Bucket: BUCKET_NAME,
         Key: key,
       }));
-    } catch (error: any) {
-      if (error.name === 'NotFound' || error.$metadata?.httpStatusCode === 404) {
+    } catch (error: unknown) {
+      const s3Error = error as { name?: string; $metadata?: { httpStatusCode?: number } };
+      if (s3Error.name === 'NotFound' || s3Error.$metadata?.httpStatusCode === 404) {
         throw new NotFoundError(`Object '${key}' not found`);
       }
       throw error;
@@ -758,7 +760,7 @@ class S3StorageService {
       }
     } catch (error) {
       console.error('Failed to delete object:', error);
-      throw new InternalServerError('Failed to delete document');
+      throw new InternalError('Failed to delete document');
     }
   }
 
@@ -811,7 +813,7 @@ class S3StorageService {
       return objects;
     } catch (error) {
       console.error('Failed to list objects:', error);
-      throw new InternalServerError('Failed to list documents');
+      throw new InternalError('Failed to list documents');
     }
   }
 
@@ -830,12 +832,13 @@ class S3StorageService {
       }));
 
       return response.Metadata as DocumentMetadata;
-    } catch (error: any) {
-      if (error.name === 'NotFound' || error.$metadata?.httpStatusCode === 404) {
+    } catch (error: unknown) {
+      const s3Error = error as { name?: string; $metadata?: { httpStatusCode?: number } };
+      if (s3Error.name === 'NotFound' || s3Error.$metadata?.httpStatusCode === 404) {
         throw new NotFoundError(`Object '${key}' not found`);
       }
       console.error('Failed to get object metadata:', error);
-      throw new InternalServerError('Failed to get document metadata');
+      throw new InternalError('Failed to get document metadata');
     }
   }
 
@@ -861,7 +864,7 @@ class S3StorageService {
       return versionedKey;
     } catch (error) {
       console.error('Failed to create object version:', error);
-      throw new InternalServerError('Failed to create document version');
+      throw new InternalError('Failed to create document version');
     }
   }
 
@@ -926,7 +929,7 @@ class S3StorageService {
       };
     } catch (error) {
       console.error(`[Virus Scan] Error scanning object '${key}':`, error);
-      throw new InternalServerError('Failed to scan document for viruses');
+      throw new InternalError('Failed to scan document for viruses');
     }
   }
 
@@ -983,12 +986,13 @@ class S3StorageService {
       }
 
       return Buffer.concat(chunks);
-    } catch (error: any) {
-      if (error.name === 'NotFound' || error.$metadata?.httpStatusCode === 404) {
+    } catch (error: unknown) {
+      const s3Error = error as { name?: string; $metadata?: { httpStatusCode?: number } };
+      if (s3Error.name === 'NotFound' || s3Error.$metadata?.httpStatusCode === 404) {
         throw new NotFoundError(`Object '${key}' not found`);
       }
       console.error('Failed to download object:', error);
-      throw new InternalServerError('Failed to download document');
+      throw new InternalError('Failed to download document');
     }
   }
 }

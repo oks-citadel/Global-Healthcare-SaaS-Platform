@@ -1,20 +1,16 @@
 /**
  * Terminology Service Hooks
- * Placeholder implementations for SNOMED CT, LOINC, ICD, RxNorm, and CVX integration
+ * Production implementations for SNOMED CT, LOINC, ICD, RxNorm, and CVX integration
  *
- * In production, these would connect to:
- * - SNOMED CT Browser/API
- * - LOINC API
- * - ICD API (WHO or national implementations)
+ * These services connect to:
+ * - SNOMED CT Snowstorm API
+ * - LOINC FHIR API (https://fhir.loinc.org)
+ * - ICD API (WHO ICD-11 and NLM ICD-10)
  * - RxNorm API (NLM)
- * - CVX (CDC Vaccine Codes)
+ * - CVX (CDC Vaccine Codes with 80+ embedded codes)
  *
- * For production implementations, use the services in ./services/:
- * - SNOMEDService from './services/snomed.service'
- * - LOINCService from './services/loinc.service'
- * - ICDService from './services/icd.service'
- * - RxNormService from './services/rxnorm.service'
- * - CVXService from './services/cvx.service'
+ * All services include caching, error handling, and timeout support.
+ * Configuration via environment variables for API keys and endpoints.
  */
 
 import type { CodeableConcept, Coding } from '../types/base';
@@ -66,47 +62,48 @@ export interface TerminologySearchResult {
 
 /**
  * SNOMED CT Terminology Service
+ * Uses the production SnomedService from ./services/snomed.service
  */
 export class SNOMEDService {
   private static readonly SYSTEM = 'http://snomed.info/sct';
 
   /**
    * Lookup a SNOMED CT concept by code
+   * Uses the production SnomedService to query the Snowstorm API
    */
   static async lookup(code: string): Promise<TerminologyLookupResult> {
-    // TODO: Implement actual SNOMED CT API integration
-    // This is a placeholder implementation
-    console.warn('SNOMED lookup called - placeholder implementation');
+    const snomedService = getSnomedService();
+    const result = await snomedService.lookup(code);
 
-    // Example codes for demonstration
-    const exampleCodes: Record<string, string> = {
-      '38341003': 'Hypertensive disorder',
-      '73211009': 'Diabetes mellitus',
-      '49436004': 'Atrial fibrillation',
+    return {
+      found: result.found,
+      code: result.code,
+      display: result.display,
+      system: result.system,
+      definition: result.fullySpecifiedName,
+      designations: result.designations?.map(d => ({
+        language: d.language,
+        use: d.use ? {
+          system: d.use.system,
+          code: d.use.code,
+          display: d.use.display,
+        } : undefined,
+        value: d.value,
+      })),
     };
-
-    if (code in exampleCodes) {
-      return {
-        found: true,
-        code,
-        display: exampleCodes[code],
-        system: this.SYSTEM,
-      };
-    }
-
-    return { found: false };
   }
 
   /**
    * Search SNOMED CT concepts
+   * Uses the production SnomedService to query the Snowstorm API
    */
   static async search(query: string, limit = 10): Promise<TerminologySearchResult> {
-    // TODO: Implement actual SNOMED CT search
-    console.warn('SNOMED search called - placeholder implementation');
+    const snomedService = getSnomedService();
+    const result = await snomedService.search(query, limit);
 
     return {
-      matches: [],
-      total: 0,
+      matches: result.matches,
+      total: result.total,
     };
   }
 
@@ -133,47 +130,44 @@ export class SNOMEDService {
 
 /**
  * LOINC Terminology Service
+ * Uses the production LoincService from ./services/loinc.service
  */
 export class LOINCService {
   private static readonly SYSTEM = 'http://loinc.org';
 
   /**
    * Lookup a LOINC code
+   * Uses the production LoincService to query the LOINC FHIR API
    */
   static async lookup(code: string): Promise<TerminologyLookupResult> {
-    // TODO: Implement actual LOINC API integration
-    console.warn('LOINC lookup called - placeholder implementation');
+    const loincService = getLoincService();
+    const result = await loincService.lookup(code);
 
-    // Example LOINC codes
-    const exampleCodes: Record<string, string> = {
-      '8480-6': 'Systolic blood pressure',
-      '8462-4': 'Diastolic blood pressure',
-      '2339-0': 'Glucose [Mass/volume] in Blood',
-      '718-7': 'Hemoglobin [Mass/volume] in Blood',
-    };
-
-    if (code in exampleCodes) {
-      return {
-        found: true,
-        code,
-        display: exampleCodes[code],
-        system: this.SYSTEM,
-      };
+    if (!result.found) {
+      return { found: false };
     }
 
-    return { found: false };
+    return {
+      found: true,
+      code: result.code,
+      display: result.display,
+      system: result.system,
+      definition: result.definition,
+      designations: result.designations,
+    };
   }
 
   /**
    * Search LOINC codes
+   * Uses the production LoincService to query the LOINC FHIR API
    */
   static async search(query: string, limit = 10): Promise<TerminologySearchResult> {
-    // TODO: Implement actual LOINC search
-    console.warn('LOINC search called - placeholder implementation');
+    const loincService = getLoincService();
+    const result = await loincService.search(query, limit);
 
     return {
-      matches: [],
-      total: 0,
+      matches: result.matches,
+      total: result.total,
     };
   }
 
@@ -200,48 +194,40 @@ export class LOINCService {
 
 /**
  * ICD-10 Terminology Service
+ * Uses the production IcdService from ./services/icd.service for actual API integration
  */
 export class ICDService {
   private static readonly SYSTEM_ICD10 = 'http://hl7.org/fhir/sid/icd-10';
   private static readonly SYSTEM_ICD10_CM = 'http://hl7.org/fhir/sid/icd-10-cm';
 
   /**
-   * Lookup an ICD-10 code
+   * Lookup an ICD-10 code using the production ICD service
+   * Integrates with WHO ICD-11 API and NLM ICD-10 API
    */
   static async lookup(code: string, system?: string): Promise<TerminologyLookupResult> {
-    // TODO: Implement actual ICD API integration
-    console.warn('ICD lookup called - placeholder implementation');
+    const icdService = getIcdService();
+    const result = await icdService.lookup(code, system);
 
-    // Example ICD-10 codes
-    const exampleCodes: Record<string, string> = {
-      'I10': 'Essential (primary) hypertension',
-      'E11': 'Type 2 diabetes mellitus',
-      'I48': 'Atrial fibrillation and flutter',
-      'J44': 'Chronic obstructive pulmonary disease',
+    return {
+      found: result.found,
+      code: result.code,
+      display: result.display,
+      system: result.system || system || this.SYSTEM_ICD10,
+      definition: result.definition,
+      designations: result.designations,
     };
-
-    if (code in exampleCodes) {
-      return {
-        found: true,
-        code,
-        display: exampleCodes[code],
-        system: system || this.SYSTEM_ICD10,
-      };
-    }
-
-    return { found: false };
   }
 
   /**
-   * Search ICD codes
+   * Search ICD codes using the production ICD service
    */
   static async search(query: string, limit = 10): Promise<TerminologySearchResult> {
-    // TODO: Implement actual ICD search
-    console.warn('ICD search called - placeholder implementation');
+    const icdService = getIcdService();
+    const result = await icdService.search(query, limit);
 
     return {
-      matches: [],
-      total: 0,
+      matches: result.matches,
+      total: result.total,
     };
   }
 
@@ -271,48 +257,47 @@ export class ICDService {
 
 /**
  * RxNorm Terminology Service
+ * Integrates with the production RxNormService from ./services/rxnorm.service
  */
 export class RxNormService {
   private static readonly SYSTEM = 'http://www.nlm.nih.gov/research/umls/rxnorm';
 
   /**
    * Lookup an RxNorm concept by RxCUI
+   * Uses the production RxNormService to query the NLM RxNorm API
    */
   static async lookup(code: string): Promise<TerminologyLookupResult> {
-    // TODO: Implement actual RxNorm API integration
-    // For production, use getRxNormService() from './services/rxnorm.service'
-    console.warn('RxNorm lookup called - placeholder implementation');
+    const service = getRxNormService();
+    const result = await service.lookup(code);
 
-    // Example RxNorm codes
-    const exampleCodes: Record<string, string> = {
-      '197361': 'Amlodipine 5 MG Oral Tablet',
-      '311671': 'Metformin 500 MG Oral Tablet',
-      '966571': 'Lisinopril 10 MG Oral Tablet',
-      '197381': 'Atorvastatin 20 MG Oral Tablet',
-    };
-
-    if (code in exampleCodes) {
-      return {
-        found: true,
-        code,
-        display: exampleCodes[code],
-        system: this.SYSTEM,
-      };
+    if (!result.found) {
+      return { found: false };
     }
 
-    return { found: false };
+    return {
+      found: true,
+      code: result.code,
+      display: result.display,
+      system: this.SYSTEM,
+      definition: result.termType ? `Term Type: ${result.termType}` : undefined,
+    };
   }
 
   /**
    * Search RxNorm drugs
+   * Uses the production RxNormService to query the NLM RxNorm API
    */
   static async search(query: string, limit = 10): Promise<TerminologySearchResult> {
-    // TODO: Implement actual RxNorm search
-    console.warn('RxNorm search called - placeholder implementation');
+    const service = getRxNormService();
+    const result = await service.search(query, limit);
 
     return {
-      matches: [],
-      total: 0,
+      matches: result.matches.map((match) => ({
+        code: match.code,
+        display: match.display,
+        system: this.SYSTEM,
+      })),
+      total: result.total,
     };
   }
 
@@ -339,33 +324,26 @@ export class RxNormService {
 
 /**
  * CVX Vaccine Terminology Service
+ * Integrates with the production CvxService from ./services/cvx.service
  */
 export class CVXService {
   private static readonly SYSTEM = 'http://hl7.org/fhir/sid/cvx';
 
   /**
    * Lookup a CVX vaccine code
+   * Uses the production CvxService with 80+ embedded vaccine codes
    */
   static async lookup(code: string): Promise<TerminologyLookupResult> {
-    // TODO: Implement actual CVX API integration
-    // For production, use getCvxService() from './services/cvx.service'
-    console.warn('CVX lookup called - placeholder implementation');
+    const cvxService = getCvxService();
+    const result = await cvxService.lookup(code);
 
-    // Example CVX codes
-    const exampleCodes: Record<string, string> = {
-      '03': 'measles, mumps and rubella virus vaccine',
-      '08': 'hepatitis B vaccine, pediatric or pediatric/adolescent dosage',
-      '115': 'tetanus toxoid, reduced diphtheria toxoid, and acellular pertussis vaccine',
-      '207': 'COVID-19 vaccine, mRNA, spike protein, LNP, preservative free, 100 mcg/0.5mL dose',
-      '208': 'COVID-19 vaccine, mRNA, spike protein, LNP, preservative free, 30 mcg/0.3mL dose',
-    };
-
-    if (code in exampleCodes) {
+    if (result.found) {
       return {
         found: true,
-        code,
-        display: exampleCodes[code],
-        system: this.SYSTEM,
+        code: result.code,
+        display: result.display,
+        system: result.system,
+        definition: result.fullName,
       };
     }
 
@@ -374,14 +352,19 @@ export class CVXService {
 
   /**
    * Search CVX vaccines
+   * Uses the production CvxService for full-text search
    */
   static async search(query: string, limit = 10): Promise<TerminologySearchResult> {
-    // TODO: Implement actual CVX search
-    console.warn('CVX search called - placeholder implementation');
+    const cvxService = getCvxService();
+    const result = await cvxService.search(query, limit);
 
     return {
-      matches: [],
-      total: 0,
+      matches: result.matches.map(match => ({
+        code: match.code,
+        display: match.display,
+        system: match.system,
+      })),
+      total: result.total,
     };
   }
 

@@ -7,6 +7,8 @@
 import {
   SESClient,
   SendEmailCommand,
+  GetSendQuotaCommand,
+  type GetSendQuotaCommandOutput,
 } from '@aws-sdk/client-ses';
 import { logger } from '../../utils/logger.js';
 import {
@@ -162,12 +164,22 @@ export class SESEmailService {
     if (this.initialized) return;
 
     try {
-      // Skip quota check for now - GetSendQuotaCommand has TypeScript issues with SDK v3
-      // TODO: Re-enable when @aws-sdk/client-ses types are fixed
+      // Fetch SES quota to verify credentials and get actual rate limits
+      const quotaCommand = new GetSendQuotaCommand({});
+      const quotaResponse: GetSendQuotaCommandOutput = await this.client.send(quotaCommand);
+
+      // Update rate limit based on actual SES account limits
+      if (quotaResponse.MaxSendRate !== undefined) {
+        this.config.rateLimitPerSecond = Math.floor(quotaResponse.MaxSendRate);
+        this.stats.rateLimitRemaining = this.config.rateLimitPerSecond;
+      }
+
       logger.info('AWS SES Email Service initialized', {
         region: this.config.region,
         sandboxMode: this.config.sandboxMode,
         rateLimitPerSecond: this.config.rateLimitPerSecond,
+        max24HourSend: quotaResponse.Max24HourSend,
+        sentLast24Hours: quotaResponse.SentLast24Hours,
       });
 
       this.initialized = true;
@@ -424,19 +436,28 @@ export class SESEmailService {
 
   /**
    * Get current SES quota information
-   * Note: Currently returns default values due to SDK type issues
-   * TODO: Re-enable when @aws-sdk/client-ses types are fixed
    */
   async getQuota(): Promise<{
     maxSendRate?: number;
     max24HourSend?: number;
     sentLast24Hours?: number;
   }> {
-    // GetSendQuotaCommand has TypeScript issues with SDK v3
-    // Return default rate limit info
-    return {
-      maxSendRate: this.config.rateLimitPerSecond,
-    };
+    try {
+      const command = new GetSendQuotaCommand({});
+      const response: GetSendQuotaCommandOutput = await this.client.send(command);
+
+      return {
+        maxSendRate: response.MaxSendRate,
+        max24HourSend: response.Max24HourSend,
+        sentLast24Hours: response.SentLast24Hours,
+      };
+    } catch (error) {
+      logger.error('Failed to get SES quota', { error });
+      // Return default rate limit info on error
+      return {
+        maxSendRate: this.config.rateLimitPerSecond,
+      };
+    }
   }
 
   /**

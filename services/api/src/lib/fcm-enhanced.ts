@@ -80,8 +80,8 @@ export interface FcmApnsConfig {
       };
       badge?: number;
       sound?: string | {
-        critical?: number;
-        name?: string;
+        critical?: boolean;
+        name: string;
         volume?: number;
       };
       threadId?: string;
@@ -113,7 +113,7 @@ export interface FcmWebpushConfig {
     tag?: string;
     renotify?: boolean;
     silent?: boolean;
-    data?: any;
+    data?: Record<string, string | number | boolean>;
   };
   fcmOptions?: {
     link?: string;
@@ -442,7 +442,7 @@ class FcmEnhancedService {
 
     // Add APNS-specific config
     if (options.apns) {
-      message.apns = options.apns;
+      message.apns = options.apns as unknown as admin.messaging.ApnsConfig;
     }
 
     // Add Webpush-specific config

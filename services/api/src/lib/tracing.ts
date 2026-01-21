@@ -1,12 +1,11 @@
-// @ts-nocheck
 import { trace, context, SpanStatusCode, Span, Tracer } from '@opentelemetry/api';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
-import { Resource } from '@opentelemetry/resources';
+import { resourceFromAttributes, defaultResource } from '@opentelemetry/resources';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
-import { SimpleSpanProcessor, BatchSpanProcessor } from '@opentelemetry/sdk-trace-base';
+import { SimpleSpanProcessor, BatchSpanProcessor, SpanExporter } from '@opentelemetry/sdk-trace-base';
 import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
 import { HttpInstrumentation } from '@opentelemetry/instrumentation-http';
-import { ExpressInstrumentation } from '@opentelemetry/instrumentation-express';
+import { ExpressInstrumentation, ExpressLayerType } from '@opentelemetry/instrumentation-express';
 import { PrismaInstrumentation } from '@prisma/instrumentation';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
 import { config } from '../config/index.js';
@@ -19,26 +18,22 @@ let tracer: Tracer | null = null;
  */
 export function initTracing(): void {
   // Create a resource to identify this service
-  const resource = Resource.default().merge(
-    new Resource({
-      [SemanticResourceAttributes.SERVICE_NAME]: 'unified-health-api',
-      [SemanticResourceAttributes.SERVICE_VERSION]: '1.0.0',
-      [SemanticResourceAttributes.DEPLOYMENT_ENVIRONMENT]: config.env,
-    })
-  );
-
-  // Create the tracer provider
-  tracerProvider = new NodeTracerProvider({
-    resource,
+  const serviceResource = resourceFromAttributes({
+    [SemanticResourceAttributes.SERVICE_NAME]: 'unified-health-api',
+    [SemanticResourceAttributes.SERVICE_VERSION]: '1.0.0',
+    [SemanticResourceAttributes.DEPLOYMENT_ENVIRONMENT]: config.env,
   });
+  const resource = defaultResource().merge(serviceResource);
 
   // Configure the Jaeger exporter
+  // Cast to SpanExporter due to version mismatch between @opentelemetry/exporter-jaeger (v1.x)
+  // and @opentelemetry/sdk-trace-base (v2.x) - interfaces are structurally compatible
   const jaegerExporter = new JaegerExporter({
     endpoint: process.env.JAEGER_ENDPOINT || 'http://localhost:14268/api/traces',
     // Alternatively, use the agent endpoint
     // host: process.env.JAEGER_AGENT_HOST || 'localhost',
     // port: parseInt(process.env.JAEGER_AGENT_PORT || '6832', 10),
-  });
+  }) as unknown as SpanExporter;
 
   // Use BatchSpanProcessor for better performance in production
   // Use SimpleSpanProcessor for development/debugging
@@ -52,7 +47,11 @@ export function initTracing(): void {
         })
       : new SimpleSpanProcessor(jaegerExporter);
 
-  tracerProvider.addSpanProcessor(spanProcessor);
+  // Create the tracer provider with span processors in config (v2.x API)
+  tracerProvider = new NodeTracerProvider({
+    resource,
+    spanProcessors: [spanProcessor],
+  });
 
   // Register the tracer provider
   tracerProvider.register();
@@ -66,7 +65,7 @@ export function initTracing(): void {
       }),
       // Express instrumentation
       new ExpressInstrumentation({
-        ignoreLayersType: ['middleware'],
+        ignoreLayersType: [ExpressLayerType.MIDDLEWARE],
       }),
       // Prisma instrumentation
       new PrismaInstrumentation(),
@@ -183,19 +182,26 @@ export function getSpanId(): string | undefined {
   return undefined;
 }
 
+// Type for class prototype used in method decorators
+interface ClassPrototype {
+  constructor: {
+    name: string;
+  };
+}
+
 /**
  * Decorator to automatically create a span for a method
  */
 export function Traced(spanName?: string) {
   return function (
-    target: unknown,
+    target: ClassPrototype,
     propertyKey: string,
     descriptor: PropertyDescriptor
   ): PropertyDescriptor {
-    const originalMethod = descriptor.value;
+    const originalMethod = descriptor.value as (...args: unknown[]) => Promise<unknown>;
     const name = spanName || `${target.constructor.name}.${propertyKey}`;
 
-    descriptor.value = async function (...args: unknown[]) {
+    descriptor.value = async function (this: unknown, ...args: unknown[]): Promise<unknown> {
       return await withSpan(
         name,
         async (span) => {

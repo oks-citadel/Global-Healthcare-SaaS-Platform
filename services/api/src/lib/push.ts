@@ -48,7 +48,7 @@ interface RetryConfig {
 export interface PushPayload {
   title: string;
   body: string;
-  data?: Record<string, any>;
+  data?: Record<string, string | number | boolean>;
   badge?: number;
   sound?: string;
   priority?: 'high' | 'normal';
@@ -382,19 +382,20 @@ class PushNotificationService {
         messageId,
         platform: 'android',
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const fcmError = error as { message?: string; code?: string };
       logger.error('FCM notification error', {
-        error: error.message,
-        errorCode: error.code,
+        error: fcmError.message,
+        errorCode: fcmError.code,
         token: token.substring(0, 20) + '...'
       });
 
       // Handle specific FCM error codes
       let errorMessage = 'Unknown FCM error';
-      if (error.code === 'messaging/invalid-registration-token' ||
-          error.code === 'messaging/registration-token-not-registered') {
+      if (fcmError.code === 'messaging/invalid-registration-token' ||
+          fcmError.code === 'messaging/registration-token-not-registered') {
         errorMessage = 'Invalid or expired token';
-      } else if (error.code === 'messaging/invalid-argument') {
+      } else if (fcmError.code === 'messaging/invalid-argument') {
         errorMessage = 'Invalid message payload';
       } else if (error instanceof Error) {
         errorMessage = error.message;
@@ -516,7 +517,7 @@ class PushNotificationService {
    * Sanitize data payload to ensure all values are strings
    * (Firebase requires all data values to be strings)
    */
-  private sanitizeData(data: Record<string, any>): Record<string, string> {
+  private sanitizeData(data: Record<string, string | number | boolean>): Record<string, string> {
     const sanitized: Record<string, string> = {};
     for (const [key, value] of Object.entries(data)) {
       if (value !== null && value !== undefined) {
@@ -632,9 +633,10 @@ class PushNotificationService {
         messageId: `apns-${Date.now()}-${token.substring(0, 8)}`,
         platform: 'ios',
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const apnsError = error as { message?: string };
       logger.error('APNS notification error', {
-        error: error.message || error,
+        error: apnsError.message || error,
         token: token.substring(0, 20) + '...',
       });
 
@@ -721,26 +723,27 @@ class PushNotificationService {
         messageId: `web-push-${Date.now()}-${subscription.endpoint.substring(subscription.endpoint.length - 8)}`,
         platform: 'web',
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Handle specific Web Push errors
+      const webPushError = error as { statusCode?: number; message?: string };
       let errorMessage = 'Unknown Web Push error';
       let shouldRetry = true;
 
-      if (error.statusCode === 404 || error.statusCode === 410) {
+      if (webPushError.statusCode === 404 || webPushError.statusCode === 410) {
         errorMessage = 'Subscription has expired or is no longer valid';
         shouldRetry = false;
-      } else if (error.statusCode === 400) {
+      } else if (webPushError.statusCode === 400) {
         errorMessage = 'Invalid subscription or payload';
         shouldRetry = false;
-      } else if (error.statusCode === 401 || error.statusCode === 403) {
+      } else if (webPushError.statusCode === 401 || webPushError.statusCode === 403) {
         errorMessage = 'Authentication error - invalid VAPID keys';
         shouldRetry = false;
-      } else if (error.statusCode === 413) {
+      } else if (webPushError.statusCode === 413) {
         errorMessage = 'Payload too large';
         shouldRetry = false;
-      } else if (error.statusCode === 429) {
+      } else if (webPushError.statusCode === 429) {
         errorMessage = 'Too many requests - rate limited';
-      } else if (error.statusCode >= 500) {
+      } else if (webPushError.statusCode && webPushError.statusCode >= 500) {
         errorMessage = 'Push service temporarily unavailable';
       } else if (error instanceof Error) {
         errorMessage = error.message;
@@ -748,7 +751,7 @@ class PushNotificationService {
 
       logger.error('Web Push notification error', {
         error: errorMessage,
-        statusCode: error.statusCode,
+        statusCode: webPushError.statusCode,
         shouldRetry,
         endpoint: token.length > 50 ? token.substring(0, 50) + '...' : 'invalid',
       });

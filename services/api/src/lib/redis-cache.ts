@@ -1,5 +1,5 @@
 import Redis, { Redis as RedisClient } from 'ioredis';
-import { logger } from '../config/logger';
+import { logger } from '../utils/logger.js';
 
 export interface CacheConfig {
   host: string;
@@ -18,9 +18,9 @@ export interface CacheEntry<T> {
   ttl?: number;
 }
 
-export interface CacheWarmingConfig {
+export interface CacheWarmingConfig<T = unknown> {
   keys: string[];
-  loader: (key: string) => Promise<any>;
+  loader: (key: string) => Promise<T>;
   ttl?: number;
 }
 
@@ -325,7 +325,7 @@ export class RedisCache {
    * Cache Warming
    * Pre-populate cache with frequently accessed data
    */
-  async warmCache(config: CacheWarmingConfig): Promise<void> {
+  async warmCache<T>(config: CacheWarmingConfig<T>): Promise<void> {
     logger.info(`Warming cache for ${config.keys.length} keys`);
 
     const promises = config.keys.map(async (key) => {

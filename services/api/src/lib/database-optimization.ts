@@ -1,5 +1,5 @@
 import { PrismaClient, Prisma } from '../generated/client';
-import { logger } from '../config/logger';
+import { logger } from '../utils/logger.js';
 
 /**
  * Database optimization configuration
@@ -27,6 +27,40 @@ export interface QueryMetrics {
 export interface ReadReplicaConfig {
   url: string;
   connectionPoolSize?: number;
+}
+
+/**
+ * PostgreSQL table statistics
+ */
+export interface TableStats {
+  schemaname: string;
+  tablename: string;
+  row_count: number;
+  dead_rows: number;
+  last_vacuum: Date | null;
+  last_autovacuum: Date | null;
+  last_analyze: Date | null;
+  last_autoanalyze: Date | null;
+}
+
+/**
+ * PostgreSQL index statistics
+ */
+export interface IndexStats {
+  index_name: string;
+  index_scans: number;
+  tuples_read: number;
+  tuples_fetched: number;
+}
+
+/**
+ * Unused index information
+ */
+export interface UnusedIndex {
+  schemaname: string;
+  tablename: string;
+  index_name: string;
+  index_scans: number;
 }
 
 /**
@@ -190,8 +224,8 @@ export class QueryOptimization {
    * Build efficient include clause
    * Avoid N+1 queries
    */
-  static buildInclude(relations: Record<string, any>): any {
-    const include: Record<string, any> = {};
+  static buildInclude(relations: Record<string, boolean | Record<string, boolean>>): Record<string, boolean | { select: Record<string, boolean> }> {
+    const include: Record<string, boolean | { select: Record<string, boolean> }> = {};
 
     Object.entries(relations).forEach(([key, value]) => {
       if (typeof value === 'boolean') {
@@ -209,15 +243,16 @@ export class QueryOptimization {
   /**
    * Batch queries to avoid N+1 problem
    */
-  static async batchLoad<T, K extends keyof T>(
-    prisma: any,
-    model: string,
-    ids: any[],
+  static async batchLoad<T>(
+    prisma: PrismaClient,
+    model: keyof PrismaClient,
+    ids: (string | number)[],
     idField: string = 'id'
   ): Promise<T[]> {
     if (ids.length === 0) return [];
 
-    return prisma[model].findMany({
+    const modelDelegate = prisma[model] as unknown as { findMany: (args: unknown) => Promise<T[]> };
+    return modelDelegate.findMany({
       where: {
         [idField]: {
           in: ids,
@@ -231,11 +266,12 @@ export class QueryOptimization {
    * Uses findFirst with select instead of count
    */
   static async exists(
-    prisma: any,
-    model: string,
-    where: any
+    prisma: PrismaClient,
+    model: keyof PrismaClient,
+    where: Record<string, unknown>
   ): Promise<boolean> {
-    const result = await prisma[model].findFirst({
+    const modelDelegate = prisma[model] as unknown as { findFirst: (args: unknown) => Promise<{ id: string } | null> };
+    const result = await modelDelegate.findFirst({
       where,
       select: { id: true },
     });
@@ -247,21 +283,28 @@ export class QueryOptimization {
    * Upsert with optimistic concurrency control
    */
   static async optimisticUpsert<T>(
-    prisma: any,
-    model: string,
-    where: any,
-    create: any,
-    update: any,
+    prisma: PrismaClient,
+    model: keyof PrismaClient,
+    where: Record<string, unknown>,
+    create: Record<string, unknown>,
+    update: Record<string, unknown>,
     versionField: string = 'version'
   ): Promise<T> {
-    const existing = await prisma[model].findUnique({
+    interface ModelDelegate {
+      findUnique: (args: unknown) => Promise<Record<string, number> | null>;
+      update: (args: unknown) => Promise<T>;
+      create: (args: unknown) => Promise<T>;
+    }
+    const modelDelegate = prisma[model] as unknown as ModelDelegate;
+
+    const existing = await modelDelegate.findUnique({
       where,
       select: { [versionField]: true },
     });
 
     if (existing) {
       // Update with version check
-      return prisma[model].update({
+      return modelDelegate.update({
         where: {
           ...where,
           [versionField]: existing[versionField],
@@ -273,7 +316,7 @@ export class QueryOptimization {
       });
     } else {
       // Create new record
-      return prisma[model].create({
+      return modelDelegate.create({
         data: {
           ...create,
           [versionField]: 1,
@@ -285,17 +328,22 @@ export class QueryOptimization {
   /**
    * Bulk insert optimization
    */
-  static async bulkInsert<T>(
-    prisma: any,
-    model: string,
-    data: any[],
+  static async bulkInsert(
+    prisma: PrismaClient,
+    model: keyof PrismaClient,
+    data: Record<string, unknown>[],
     batchSize: number = 1000
   ): Promise<number> {
     let inserted = 0;
 
+    interface CreateManyResult {
+      count: number;
+    }
+    const modelDelegate = prisma[model] as unknown as { createMany: (args: unknown) => Promise<CreateManyResult> };
+
     for (let i = 0; i < data.length; i += batchSize) {
       const batch = data.slice(i, i + batchSize);
-      const result = await prisma[model].createMany({
+      const result = await modelDelegate.createMany({
         data: batch,
         skipDuplicates: true,
       });
@@ -308,22 +356,26 @@ export class QueryOptimization {
   /**
    * Bulk update optimization
    */
-  static async bulkUpdate<T>(
-    prisma: any,
-    model: string,
-    updates: Array<{ where: any; data: any }>,
+  static async bulkUpdate(
+    prisma: PrismaClient,
+    model: keyof PrismaClient,
+    updates: Array<{ where: Record<string, unknown>; data: Record<string, unknown> }>,
     useTransaction: boolean = true
   ): Promise<number> {
+    const modelDelegate = prisma[model] as unknown as { update: (args: { where: Record<string, unknown>; data: Record<string, unknown> }) => Promise<unknown> };
+
     if (useTransaction) {
-      return prisma.$transaction(
-        updates.map(({ where, data }) =>
-          prisma[model].update({ where, data })
-        )
-      ).then((results: any[]) => results.length);
+      // Use interactive transaction to avoid PrismaPromise type issues
+      return prisma.$transaction(async () => {
+        for (const { where, data } of updates) {
+          await modelDelegate.update({ where, data });
+        }
+        return updates.length;
+      });
     } else {
       let updated = 0;
       for (const { where, data } of updates) {
-        await prisma[model].update({ where, data });
+        await modelDelegate.update({ where, data });
         updated++;
       }
       return updated;
@@ -333,13 +385,14 @@ export class QueryOptimization {
   /**
    * Efficient soft delete
    */
-  static async softDelete(
-    prisma: any,
-    model: string,
-    where: any,
+  static async softDelete<T>(
+    prisma: PrismaClient,
+    model: keyof PrismaClient,
+    where: Record<string, unknown>,
     deletedAtField: string = 'deletedAt'
-  ): Promise<any> {
-    return prisma[model].update({
+  ): Promise<T> {
+    const modelDelegate = prisma[model] as unknown as { update: (args: unknown) => Promise<T> };
+    return modelDelegate.update({
       where,
       data: {
         [deletedAtField]: new Date(),
@@ -446,7 +499,7 @@ export class IndexOptimization {
   static async analyzeQuery(
     prisma: PrismaClient,
     query: string
-  ): Promise<any> {
+  ): Promise<unknown[] | null> {
     try {
       // SECURITY: Validate query is a simple SELECT statement only
       const normalizedQuery = query.trim().toUpperCase();
@@ -468,7 +521,7 @@ export class IndexOptimization {
 
       // PostgreSQL specific EXPLAIN - only for admin/debugging purposes
       // WARNING: This still uses raw query - ensure caller validates input
-      const result = await prisma.$queryRawUnsafe(`EXPLAIN ${query}`);
+      const result = await prisma.$queryRawUnsafe<unknown[]>(`EXPLAIN ${query}`);
       return result;
     } catch (error) {
       logger.error('Failed to analyze query:', error);
@@ -482,10 +535,10 @@ export class IndexOptimization {
   static async getTableStats(
     prisma: PrismaClient,
     tableName: string
-  ): Promise<any> {
+  ): Promise<TableStats | null> {
     try {
       // PostgreSQL specific
-      const stats = await prisma.$queryRaw<any[]>`
+      const stats = await prisma.$queryRaw<TableStats[]>`
         SELECT
           schemaname,
           tablename,
@@ -512,10 +565,10 @@ export class IndexOptimization {
   static async getIndexStats(
     prisma: PrismaClient,
     tableName: string
-  ): Promise<any[]> {
+  ): Promise<IndexStats[]> {
     try {
       // PostgreSQL specific
-      const stats = await prisma.$queryRaw<any[]>`
+      const stats = await prisma.$queryRaw<IndexStats[]>`
         SELECT
           indexrelname as index_name,
           idx_scan as index_scans,
@@ -539,9 +592,9 @@ export class IndexOptimization {
   static async findUnusedIndexes(
     prisma: PrismaClient,
     minScans: number = 0
-  ): Promise<any[]> {
+  ): Promise<UnusedIndex[]> {
     try {
-      const indexes = await prisma.$queryRaw<any[]>`
+      const indexes = await prisma.$queryRaw<UnusedIndex[]>`
         SELECT
           schemaname,
           tablename,
@@ -581,14 +634,15 @@ export class TransactionOptimization {
           maxWait: 5000, // 5 seconds
           timeout: 10000, // 10 seconds
         });
-      } catch (error: any) {
-        lastError = error;
+      } catch (error: unknown) {
+        lastError = error instanceof Error ? error : new Error(String(error));
 
         // Don't retry on certain errors
+        const prismaError = error as { code?: string };
         if (
-          error.code === 'P2002' || // Unique constraint
-          error.code === 'P2003' || // Foreign key constraint
-          error.code === 'P2025' // Record not found
+          prismaError.code === 'P2002' || // Unique constraint
+          prismaError.code === 'P2003' || // Foreign key constraint
+          prismaError.code === 'P2025' // Record not found
         ) {
           throw error;
         }

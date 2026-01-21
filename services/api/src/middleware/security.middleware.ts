@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Security Middleware
  *
@@ -161,7 +160,7 @@ export function auditLog(
     const originalJson = res.json.bind(res);
 
     // Intercept response to log after success
-    res.json = function (body: unknown) {
+    res.json = function (body: unknown): Response {
       // Log the audit event asynchronously
       if (req.user) {
         const details = getDetails ? getDetails(req, res) : {};
@@ -215,8 +214,8 @@ export function validateStateChange<TState extends string>(
       );
 
       // Attach new state to request for controller to use
-      (req as any).validatedNewState = newState;
-      (req as any).previousState = currentState;
+      (req as unknown as { validatedNewState: TState }).validatedNewState = newState;
+      (req as unknown as { previousState: TState }).previousState = currentState;
 
       next();
     } catch (error) {
@@ -234,7 +233,7 @@ export function idempotency(getKey?: (req: Request) => string) {
     req: Request,
     res: Response,
     next: NextFunction,
-  ): Promise<void> => {
+  ): Promise<void | Response> => {
     try {
       // Get idempotency key from header or generate from request
       const idempotencyKey =
@@ -243,7 +242,8 @@ export function idempotency(getKey?: (req: Request) => string) {
 
       if (!idempotencyKey) {
         // No idempotency key, proceed normally
-        return next();
+        next();
+        return;
       }
 
       // Check if this key was already processed
@@ -262,7 +262,7 @@ export function idempotency(getKey?: (req: Request) => string) {
       // Store original json method to capture result
       const originalJson = res.json.bind(res);
 
-      res.json = function (body: unknown) {
+      res.json = function (body: unknown): Response {
         // Only cache successful responses
         if (res.statusCode >= 200 && res.statusCode < 300) {
           recordIdempotencyKey(idempotencyKey, body);
@@ -293,8 +293,9 @@ export function enforceTenantIsolation() {
       }
 
       // Attach tenant context to request
-      const tenantId = (req.user as any).tenantId;
-      (req as any).tenantContext = {
+      const user = req.user as { tenantId?: string } | undefined;
+      const tenantId = user?.tenantId;
+      (req as unknown as { tenantContext: { tenantId: string | undefined; enforceIsolation: boolean } }).tenantContext = {
         tenantId,
         enforceIsolation: true,
       };

@@ -1,8 +1,15 @@
-// @ts-nocheck
 import { Request, Response, NextFunction } from 'express';
 import { createClient, RedisClientType } from 'redis';
-import { TooManyRequestsError } from '../utils/errors.js';
+import { RateLimitError } from '../utils/errors.js';
 import { auditService } from '../services/audit.service.js';
+
+/**
+ * User interface for type safety
+ */
+interface RequestUser {
+  userId: string;
+  role?: string;
+}
 
 /**
  * HIPAA-Compliant Distributed Rate Limiting Middleware
@@ -124,7 +131,13 @@ const memoryIpBlockList = new Map<string, number>();
 // Rate Limit Configurations
 // ============================================
 
-const RATE_LIMIT_CONFIG = {
+interface RateLimitConfig {
+  windowMs: number;
+  max: number;
+  blockDuration?: number;
+}
+
+const RATE_LIMIT_CONFIG: Record<string, RateLimitConfig> = {
   // General API requests
   general: {
     windowMs: 15 * 60 * 1000, // 15 minutes
@@ -185,8 +198,9 @@ const REDIS_PREFIX = {
  * Get client identifier (user ID or IP)
  */
 function getClientIdentifier(req: Request): string {
-  if (req.user?.userId) {
-    return `user:${req.user.userId}`;
+  const user = req.user as RequestUser | undefined;
+  if (user?.userId) {
+    return `user:${user.userId}`;
   }
 
   const forwarded = req.headers['x-forwarded-for'];
@@ -243,7 +257,7 @@ async function isIpBlockedRedis(ip: string): Promise<boolean> {
     const blockKey = `${REDIS_PREFIX.ipBlock}${ip}`;
     const blockExpiry = await redisClient!.get(blockKey);
 
-    if (!blockExpiry) return false;
+    if (!blockExpiry || typeof blockExpiry !== 'string') return false;
 
     const expiryTime = parseInt(blockExpiry, 10);
     if (Date.now() < expiryTime) {
@@ -300,8 +314,8 @@ async function checkRateLimitRedis(
     const entryJson = await redisClient!.get(redisKey);
     let entry: RateLimitEntry;
 
-    if (entryJson) {
-      entry = JSON.parse(entryJson);
+    if (entryJson && typeof entryJson === 'string') {
+      entry = JSON.parse(entryJson) as RateLimitEntry;
 
       const windowExpired = now - entry.firstRequest > config.windowMs;
       const blockExpired = entry.blocked && entry.blockExpiry && now > entry.blockExpiry;
@@ -397,8 +411,8 @@ async function decrementRateLimitRedis(key: string): Promise<void> {
     const redisKey = `${REDIS_PREFIX.rateLimit}${key}`;
     const entryJson = await redisClient!.get(redisKey);
 
-    if (entryJson) {
-      const entry: RateLimitEntry = JSON.parse(entryJson);
+    if (entryJson && typeof entryJson === 'string') {
+      const entry: RateLimitEntry = JSON.parse(entryJson) as RateLimitEntry;
       if (entry.count > 0) {
         entry.count--;
         const ttl = await redisClient!.ttl(redisKey);
@@ -523,7 +537,7 @@ function decrementRateLimitMemory(key: string): void {
  * Create rate limit middleware
  */
 function createRateLimiter(
-  limitType: keyof typeof RATE_LIMIT_CONFIG,
+  limitType: string,
   options?: {
     skipSuccessfulRequests?: boolean;
     skipFailedRequests?: boolean;
@@ -545,7 +559,7 @@ function createRateLimiter(
         if (isRedisAvailable()) {
           try {
             const blockExpiry = await redisClient!.get(blockKey);
-            if (blockExpiry) {
+            if (blockExpiry && typeof blockExpiry === 'string') {
               resetTime = new Date(parseInt(blockExpiry, 10)).toISOString();
             }
           } catch {
@@ -561,8 +575,9 @@ function createRateLimiter(
           }
         }
 
+        const user = req.user as RequestUser | undefined;
         await auditService.logEvent({
-          userId: req.user?.userId || 'anonymous',
+          userId: user?.userId ?? 'anonymous',
           action: 'blocked_request',
           resource: 'rate_limit',
           details: {
@@ -573,10 +588,10 @@ function createRateLimiter(
             store: isRedisAvailable() ? 'redis' : 'memory',
           },
           ipAddress: ip,
-          userAgent: req.headers['user-agent'] || 'unknown',
+          userAgent: req.headers['user-agent'] ?? 'unknown',
         });
 
-        return next(new TooManyRequestsError(
+        return next(new RateLimitError(
           `IP address blocked due to excessive requests. Try again after ${resetTime}`
         ));
       }
@@ -604,8 +619,9 @@ function createRateLimiter(
         }
 
         // Log rate limit violation
+        const rateLimitUser = req.user as RequestUser | undefined;
         await auditService.logEvent({
-          userId: req.user?.userId || 'anonymous',
+          userId: rateLimitUser?.userId ?? 'anonymous',
           action: 'rate_limit_exceeded',
           resource: 'rate_limit',
           details: {
@@ -618,14 +634,14 @@ function createRateLimiter(
             store: isRedisAvailable() ? 'redis' : 'memory',
           },
           ipAddress: ip,
-          userAgent: req.headers['user-agent'] || 'unknown',
+          userAgent: req.headers['user-agent'] ?? 'unknown',
         });
 
         const message = result.blocked
           ? `Too many requests. Account temporarily blocked until ${new Date(result.resetTime).toISOString()}`
           : `Too many requests. Please try again after ${new Date(result.resetTime).toISOString()}`;
 
-        return next(new TooManyRequestsError(message));
+        return next(new RateLimitError(message));
       }
 
       // Handle conditional counting based on response status
@@ -648,12 +664,12 @@ function createRateLimiter(
           }
         };
 
-        res.send = function(data: any) {
+        res.send = function(data: unknown): Response {
           decrementCounter().catch(console.error);
           return originalSend.call(this, data);
         };
 
-        res.json = function(data: any) {
+        res.json = function(data: unknown): Response {
           decrementCounter().catch(console.error);
           return originalJson.call(this, data);
         };
@@ -711,11 +727,12 @@ export const apiKeyRateLimit = createRateLimiter('apiKey');
 /**
  * Per-user rate limiter
  */
-export const perUserRateLimit = (max: number, windowMs: number) => {
+export const perUserRateLimit = (_max: number, _windowMs: number) => {
   return createRateLimiter('general', {
     keyGenerator: (req) => {
-      if (req.user?.userId) {
-        return `user:${req.user.userId}`;
+      const user = req.user as RequestUser | undefined;
+      if (user?.userId) {
+        return `user:${user.userId}`;
       }
       return getClientIdentifier(req);
     },
@@ -725,7 +742,7 @@ export const perUserRateLimit = (max: number, windowMs: number) => {
 /**
  * Per-IP rate limiter
  */
-export const perIpRateLimit = (max: number, windowMs: number) => {
+export const perIpRateLimit = (_max: number, _windowMs: number) => {
   return createRateLimiter('general', {
     keyGenerator: (req) => `ip:${getClientIp(req)}`,
   });

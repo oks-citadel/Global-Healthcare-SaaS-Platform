@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Enhanced Security Headers Middleware
  *
@@ -142,7 +141,7 @@ export function strictSecurityHeaders(req: Request, res: Response, next: NextFun
  * Apply CORS headers based on configuration
  * Security: Never use wildcard (*) with credentials to prevent security vulnerabilities
  */
-export function corsSecurityHeaders(req: Request, res: Response, next: NextFunction): void {
+export function corsSecurityHeaders(req: Request, res: Response, next: NextFunction): void | Response {
   const origin = req.headers.origin;
 
   // Development allowed origins (localhost variants)

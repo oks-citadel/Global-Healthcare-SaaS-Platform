@@ -1,6 +1,7 @@
 import i18next, { TFunction } from 'i18next';
 import Backend from 'i18next-fs-backend';
 import path from 'path';
+import { Request, Response, NextFunction } from 'express';
 
 // Import translations for server-side
 import enCommon from '@unified-health/i18n/locales/en/common.json';
@@ -23,6 +24,25 @@ import frErrors from '@unified-health/i18n/locales/fr/errors.json';
 
 export type SupportedLanguage = 'en' | 'es' | 'fr';
 export type TranslationNamespace = 'common' | 'auth' | 'dashboard' | 'appointments' | 'errors';
+
+// Extended Request type with i18n properties
+interface I18nRequest extends Request {
+  language: SupportedLanguage;
+  t: (key: string, params?: Record<string, unknown>) => string;
+  translations: {
+    common: TFunction;
+    auth: TFunction;
+    dashboard: TFunction;
+    appointments: TFunction;
+    errors: TFunction;
+  };
+}
+
+// Error with additional properties for error handler
+interface AppError extends Error {
+  statusCode?: number;
+  errorKey?: string;
+}
 
 // Translation resources
 const resources = {
@@ -164,7 +184,7 @@ export function detectLanguage(acceptLanguage?: string): SupportedLanguage {
 export function translateError(
   errorKey: string,
   language: SupportedLanguage = 'en',
-  params?: Record<string, any>
+  params?: Record<string, unknown>
 ): string {
   const t = serverI18n.getFixedT(language, 'errors');
   return t(errorKey, params);
@@ -192,7 +212,7 @@ export function translateValidationError(
   field: string,
   validationType: string,
   language: SupportedLanguage = 'en',
-  params?: Record<string, any>
+  params?: Record<string, unknown>
 ): string {
   const t = serverI18n.getFixedT(language, 'errors');
   const validationKey = `validation.${validationType}`;
@@ -226,7 +246,7 @@ export function formatErrorResponse(
   errorKey: string,
   language: SupportedLanguage = 'en',
   statusCode: number = 500,
-  details?: any
+  details?: unknown
 ) {
   const message = translateError(errorKey, language);
 
@@ -256,7 +276,9 @@ export function formatErrorResponse(
  * });
  * ```
  */
-export function languageMiddleware(req: any, res: any, next: any) {
+export function languageMiddleware(req: Request, res: Response, next: NextFunction): void {
+  const i18nReq = req as I18nRequest;
+
   // Get language from query, header, or cookie
   const language =
     (req.query.lang as SupportedLanguage) ||
@@ -264,15 +286,15 @@ export function languageMiddleware(req: any, res: any, next: any) {
     'en';
 
   // Attach translation function to request
-  req.language = language;
-  req.t = (key: string, params?: any) => {
+  i18nReq.language = language;
+  i18nReq.t = (key: string, params?: Record<string, unknown>): string => {
     const [namespace, ...keyParts] = key.includes(':') ? key.split(':') : ['common', key];
     const t = serverI18n.getFixedT(language, namespace);
     return t(keyParts.join(':'), params);
   };
 
   // Attach translation functions for all namespaces
-  req.translations = getTranslations(language);
+  i18nReq.translations = getTranslations(language);
 
   next();
 }
@@ -285,8 +307,9 @@ export function languageMiddleware(req: any, res: any, next: any) {
  * app.use(errorHandler);
  * ```
  */
-export function errorHandler(err: any, req: any, res: any, next: any) {
-  const language = req.language || detectLanguage(req.headers['accept-language']);
+export function errorHandler(err: AppError, req: Request, res: Response, _next: NextFunction): void {
+  const i18nReq = req as I18nRequest;
+  const language = i18nReq.language || detectLanguage(req.headers['accept-language']);
 
   // Default error
   let statusCode = err.statusCode || 500;

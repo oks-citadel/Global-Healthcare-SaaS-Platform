@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Router, Request, Response } from 'express';
 import { register } from '../lib/metrics.js';
 
@@ -9,13 +8,14 @@ const router = Router();
  * Endpoint for Prometheus to scrape metrics
  * Returns metrics in Prometheus text format
  */
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', async (_req: Request, res: Response): Promise<void> => {
   try {
     res.set('Content-Type', register.contentType);
     const metrics = await register.metrics();
     res.end(metrics);
-  } catch (error) {
-    res.status(500).end(error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Failed to collect metrics';
+    res.status(500).end(errorMessage);
   }
 });
 

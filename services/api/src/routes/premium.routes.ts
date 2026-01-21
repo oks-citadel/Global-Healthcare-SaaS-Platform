@@ -1,8 +1,81 @@
-// @ts-nocheck
 import { Router, Request, Response, NextFunction } from "express";
 import { authenticate } from "../middleware/auth.middleware.js";
 import { ForbiddenError } from "../utils/errors.js";
 import { prisma } from "../lib/prisma.js";
+
+// ==========================================
+// Type Definitions
+// ==========================================
+
+interface VideoSessionRequest {
+  patientId: string;
+  providerId: string;
+}
+
+interface VideoSessionResponse {
+  success: boolean;
+  sessionId: string;
+  userId: string;
+  patientId: string;
+  providerId: string;
+  roomUrl: string;
+  expiresAt: string;
+  message: string;
+}
+
+interface SymptomsAnalysisRequest {
+  symptoms: string[];
+}
+
+interface ConditionProbability {
+  name: string;
+  probability: number;
+}
+
+interface SymptomsAnalysisResponse {
+  success: boolean;
+  analysisId: string;
+  userId: string;
+  symptoms: string[];
+  possibleConditions: ConditionProbability[];
+  recommendation: string;
+  disclaimer: string;
+  analyzedAt: string;
+}
+
+interface ExportRecordsRequest {
+  format?: string;
+  dateRange?: {
+    from: string;
+    to: string;
+  };
+}
+
+interface ExportRecordsResponse {
+  success: boolean;
+  exportId: string;
+  userId: string;
+  format: string;
+  dateRange?: {
+    from: string;
+    to: string;
+  };
+  status: string;
+  estimatedCompletionTime: string;
+  message: string;
+}
+
+interface SubscriptionWithPlan {
+  id: string;
+  userId: string;
+  status: string;
+  tier?: string;
+  plan: {
+    id: string;
+    name: string;
+    tier?: string;
+  } | null;
+}
 
 const router = Router();
 
@@ -91,8 +164,9 @@ const requirePremiumTier = async (
 
     // Check if subscription tier is premium or higher
     // Free tier subscriptions don't qualify for AI features
+    const subscriptionWithTier = subscription as unknown as SubscriptionWithPlan;
     const tier =
-      (subscription as any).tier || (subscription.plan as any)?.tier || "free";
+      subscriptionWithTier.tier || subscriptionWithTier.plan?.tier || "free";
     if (tier === "free") {
       return next(
         new PaymentRequiredError(
@@ -120,12 +194,12 @@ const premiumController = {
    */
   createVideoSession: async (
     req: Request,
-    res: Response,
+    res: Response<VideoSessionResponse>,
     next: NextFunction,
-  ) => {
+  ): Promise<void> => {
     try {
       const userId = req.user!.userId;
-      const { patientId, providerId } = req.body;
+      const { patientId, providerId } = req.body as VideoSessionRequest;
 
       // Stub response for video session creation
       res.status(200).json({
@@ -149,10 +223,14 @@ const premiumController = {
    *
    * @requires Premium tier subscription
    */
-  analyzeSymptoms: async (req: Request, res: Response, next: NextFunction) => {
+  analyzeSymptoms: async (
+    req: Request,
+    res: Response<SymptomsAnalysisResponse>,
+    next: NextFunction,
+  ): Promise<void> => {
     try {
       const userId = req.user!.userId;
-      const { symptoms } = req.body;
+      const { symptoms } = req.body as SymptomsAnalysisRequest;
 
       // Stub response for AI symptom analysis
       res.status(200).json({
@@ -184,12 +262,12 @@ const premiumController = {
    */
   exportMedicalRecords: async (
     req: Request,
-    res: Response,
+    res: Response<ExportRecordsResponse>,
     next: NextFunction,
-  ) => {
+  ): Promise<void> => {
     try {
       const userId = req.user!.userId;
-      const { format, dateRange } = req.body;
+      const { format, dateRange } = req.body as ExportRecordsRequest;
 
       // Stub response for medical records export
       res.status(200).json({
