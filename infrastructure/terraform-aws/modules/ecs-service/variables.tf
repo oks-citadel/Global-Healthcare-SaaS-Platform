@@ -252,6 +252,12 @@ variable "log_retention_days" {
   default     = 30
 }
 
+variable "kms_key_arn" {
+  description = "KMS key ARN for CloudWatch log encryption (HIPAA compliance)"
+  type        = string
+  default     = null
+}
+
 variable "enable_alarms" {
   description = "Enable CloudWatch alarms"
   type        = bool

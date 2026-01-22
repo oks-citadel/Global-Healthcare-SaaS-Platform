@@ -234,6 +234,12 @@ variable "log_groups" {
   default = {}
 }
 
+variable "log_group_kms_key_arn" {
+  description = "KMS key ARN for encrypting CloudWatch log groups (HIPAA compliance)"
+  type        = string
+  default     = null
+}
+
 # ============================================
 # Lambda Configuration
 # ============================================

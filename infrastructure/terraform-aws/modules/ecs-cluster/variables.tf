@@ -40,7 +40,7 @@ variable "redis_security_group_id" {
 }
 
 variable "kms_key_arn" {
-  description = "KMS key ARN for encrypting secrets (optional)"
+  description = "KMS key ARN for encrypting secrets and CloudWatch logs (HIPAA compliance)"
   type        = string
   default     = ""
 }

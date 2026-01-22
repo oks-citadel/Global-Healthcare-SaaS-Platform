@@ -159,6 +159,10 @@ async function incrementRedis(
   const fullKey = `rl:${SERVICE_NAME}:${key}`;
   const now = Date.now();
 
+  // nosemgrep: javascript.lang.security.audit.unsafe-eval.unsafe-eval
+  // This is Redis Lua scripting via ioredis, not JavaScript eval().
+  // The script is a static string with no user input concatenation.
+  // KEYS and ARGV are parameterized and safely handled by Redis.
   const luaScript = `
     local current = redis.call('INCR', KEYS[1])
     if current == 1 then
@@ -168,6 +172,7 @@ async function incrementRedis(
     return {current, ttl}
   `;
 
+  // nosemgrep: javascript.lang.security.audit.unsafe-eval.unsafe-eval
   const result = (await redisClient.eval(luaScript, 1, fullKey, windowMs.toString())) as [number, number];
   const [count, ttl] = result;
 

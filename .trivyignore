@@ -102,6 +102,81 @@ AVD-AWS-0104
 # -----------------------------------------------------------------------------
 AVD-AWS-0107
 
+# -----------------------------------------------------------------------------
+# KMS Key Policy Wildcard Actions
+# -----------------------------------------------------------------------------
+# Finding: AVD-AWS-0057 - IAM policy should not use wildcards for actions
+# Affected:
+#   - infrastructure/terraform-aws/modules/s3/main.tf (S3 KMS key)
+#   - infrastructure/terraform-aws/modules/cloudwatch/main.tf (CloudWatch KMS key)
+#   - infrastructure/terraform-aws/modules/secrets-manager/main.tf (Secrets KMS key)
+#   - infrastructure/terraform-aws/modules/sns-sqs/main.tf (SNS/SQS KMS key)
+#   - infrastructure/terraform-aws/modules/security/main.tf (CloudTrail KMS key)
+#   - infrastructure/terraform-aws/modules/backup/vaults.tf (Backup KMS key)
+#   - infrastructure/terraform-aws/modules/budgets/alerts.tf (Budget alerts KMS key)
+#   - infrastructure/terraform-aws/modules/ai-security/main.tf (AI security KMS key)
+#   - infrastructure/terraform-aws/modules/backup-restore-testing/main.tf (Backup testing KMS key)
+#
+# Justification:
+# This is standard AWS KMS key policy configuration. The "kms:*" action with
+# the root account principal is required by AWS for KMS key administration.
+# See: https://docs.aws.amazon.com/kms/latest/developerguide/key-policies.html
+#
+# The wildcard grant to the root account is a standard AWS pattern that enables:
+#   1. IAM policies to control key access (recommended by AWS)
+#   2. Key administrators to manage the key
+#   3. Prevention of key lockout scenarios
+#
+# Without this policy statement, the KMS key could become unmanageable if the
+# creating principal is deleted.
+#
+# Compensating controls:
+#   - Additional policy statements restrict service principals to specific actions
+#   - IAM policies provide fine-grained access control
+#   - CloudTrail logs all KMS key operations
+#   - Key rotation is enabled on all keys
+# -----------------------------------------------------------------------------
+AVD-AWS-0057
+
+# -----------------------------------------------------------------------------
+# ECR GetAuthorizationToken Wildcard Resource
+# -----------------------------------------------------------------------------
+# Finding: AVD-AWS-0057 - IAM policy uses wildcards for resources
+# Affected: infrastructure/terraform-aws/modules/ecs-fargate/main.tf
+#
+# Justification:
+# The ecr:GetAuthorizationToken API does not support resource-level permissions.
+# This is an AWS API limitation - the action must be granted with Resource: "*".
+# See: https://docs.aws.amazon.com/AmazonECR/latest/userguide/security_iam_id-based-policy-examples.html
+#
+# The action only returns a temporary authorization token and does not grant
+# access to any specific ECR repository - actual pull/push permissions are
+# controlled by separate resource-scoped policies.
+# -----------------------------------------------------------------------------
+# Note: AVD-AWS-0057 already covers this case
+
+# -----------------------------------------------------------------------------
+# CloudWatch Logs Wildcard Resources for SSM and X-Ray
+# -----------------------------------------------------------------------------
+# Finding: AVD-AWS-0057 - IAM policy uses wildcards for resources
+# Affected: infrastructure/terraform-aws/modules/ecs-fargate/main.tf
+#
+# Justification:
+# ECS task roles require the following actions with Resource: "*":
+#   - ssmmessages:* actions for ECS Exec functionality (debugging containers)
+#   - logs:CreateLogStream and logs:PutLogEvents for application logging
+#   - xray:* actions for distributed tracing
+#
+# These AWS APIs do not support resource-level permissions or require dynamic
+# resource ARNs that are not known at deployment time.
+#
+# Compensating controls:
+#   - Task roles only grant these permissions to ECS tasks
+#   - Tasks run in private subnets with no direct internet access
+#   - All API calls are logged in CloudTrail
+# -----------------------------------------------------------------------------
+# Note: AVD-AWS-0057 already covers this case
+
 # =============================================================================
 # Exception Review Process
 # =============================================================================

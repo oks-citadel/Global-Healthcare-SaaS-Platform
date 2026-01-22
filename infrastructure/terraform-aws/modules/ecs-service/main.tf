@@ -11,6 +11,7 @@
 resource "aws_cloudwatch_log_group" "service" {
   name              = "/aws/ecs/${var.cluster_name}/${var.service_name}"
   retention_in_days = var.log_retention_days
+  kms_key_id        = var.kms_key_arn
 
   tags = merge(var.tags, {
     Name    = "${var.service_name}-logs"

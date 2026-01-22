@@ -96,3 +96,21 @@ services/api/src/generated/
 
 # Encryption example file - contains educational examples
 # services/api/src/lib/encryption.example.ts - handled with inline nosemgrep comments
+
+# =============================================================================
+# Environment Files - Development configurations
+# =============================================================================
+# .env.development files contain placeholder/development values clearly marked
+# with "DO NOT use in production" warnings. These are NOT production secrets.
+**/.env.development
+**/.env.example
+**/.env.local.example
+**/.env.ses.example
+
+# =============================================================================
+# Load Testing Scripts
+# =============================================================================
+# k6 load testing scripts contain test credentials for performance testing
+**/tests/load/*.js
+**/tests/load/*.ts
+**/scripts/load-testing/**

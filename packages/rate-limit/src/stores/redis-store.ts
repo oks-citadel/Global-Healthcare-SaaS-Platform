@@ -107,7 +107,10 @@ export class RedisStore implements RateLimitStore {
     const now = Date.now();
     const ttlSeconds = Math.ceil(this.windowMs / 1000);
 
-    // Lua script for atomic increment with TTL
+    // nosemgrep: javascript.lang.security.audit.unsafe-eval.unsafe-eval
+    // This is Redis Lua scripting via ioredis, not JavaScript eval().
+    // The script is a static string with no user input concatenation.
+    // KEYS and ARGV are parameterized and safely handled by Redis.
     const luaScript = `
       local current = redis.call('INCR', KEYS[1])
       if current == 1 then
@@ -118,6 +121,7 @@ export class RedisStore implements RateLimitStore {
     `;
 
     try {
+      // nosemgrep: javascript.lang.security.audit.unsafe-eval.unsafe-eval
       const result = await this.client.eval(luaScript, 1, fullKey, this.windowMs.toString()) as [number, number];
       const [count, ttl] = result;
 

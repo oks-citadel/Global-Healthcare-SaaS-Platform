@@ -189,6 +189,7 @@ resource "aws_ecs_cluster_capacity_providers" "main" {
 resource "aws_cloudwatch_log_group" "ecs_exec" {
   name              = "/ecs/${local.cluster_name}/exec"
   retention_in_days = 30
+  kms_key_id        = var.kms_key_arn
 
   tags = local.common_tags
 }
@@ -198,6 +199,7 @@ resource "aws_cloudwatch_log_group" "services" {
 
   name              = "/ecs/${local.cluster_name}/${each.key}"
   retention_in_days = var.log_retention_days
+  kms_key_id        = var.kms_key_arn
 
   tags = merge(local.common_tags, {
     Service = each.key

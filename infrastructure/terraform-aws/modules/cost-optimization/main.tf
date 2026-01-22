@@ -248,6 +248,7 @@ resource "aws_cloudwatch_log_group" "cost_optimized" {
 
   name              = each.value.name
   retention_in_days = each.value.retention_days
+  kms_key_id        = var.log_group_kms_key_arn
   tags              = local.cost_tags
 }
 

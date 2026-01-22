@@ -59,6 +59,7 @@ resource "aws_ecs_cluster_capacity_providers" "main" {
 resource "aws_cloudwatch_log_group" "ecs_exec" {
   name              = "/aws/ecs/${var.project}-${var.environment}/exec"
   retention_in_days = var.log_retention_days
+  kms_key_id        = var.kms_key_arn != "" ? var.kms_key_arn : null
 
   tags = merge(var.tags, {
     Name = "${var.project}-${var.environment}-ecs-exec-logs"
@@ -68,6 +69,7 @@ resource "aws_cloudwatch_log_group" "ecs_exec" {
 resource "aws_cloudwatch_log_group" "ecs_cluster" {
   name              = "/aws/ecs/${var.project}-${var.environment}/cluster"
   retention_in_days = var.log_retention_days
+  kms_key_id        = var.kms_key_arn != "" ? var.kms_key_arn : null
 
   tags = merge(var.tags, {
     Name = "${var.project}-${var.environment}-cluster-logs"
