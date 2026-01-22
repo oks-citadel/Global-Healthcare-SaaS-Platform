@@ -83,6 +83,25 @@ AVD-AWS-0052
 # -----------------------------------------------------------------------------
 AVD-AWS-0104
 
+# -----------------------------------------------------------------------------
+# Public Ingress Rules for ALB
+# -----------------------------------------------------------------------------
+# Finding: AVD-AWS-0107 - Security group allows ingress from 0.0.0.0/0
+# Affected: infrastructure/terraform-aws/modules/alb/main.tf
+#
+# Justification:
+# The public-facing ALB MUST accept traffic from the internet on ports 80 and 443:
+#   - Port 443 (HTTPS): Primary healthcare portal access
+#   - Port 80 (HTTP): Redirects to HTTPS for SEO and user convenience
+#
+# Compensating controls:
+#   - WAF rules block malicious traffic patterns
+#   - Rate limiting prevents abuse
+#   - TLS 1.3 enforced on HTTPS
+#   - HTTP immediately redirects to HTTPS
+# -----------------------------------------------------------------------------
+AVD-AWS-0107
+
 # =============================================================================
 # Exception Review Process
 # =============================================================================

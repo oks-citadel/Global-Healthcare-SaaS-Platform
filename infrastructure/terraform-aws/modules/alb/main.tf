@@ -171,6 +171,7 @@ resource "aws_security_group" "alb" {
   })
 }
 
+# trivy:ignore:AVD-AWS-0107 Public ALB must accept HTTPS traffic from internet for healthcare portal
 resource "aws_security_group_rule" "alb_ingress_https" {
   type              = "ingress"
   from_port         = 443
@@ -181,6 +182,7 @@ resource "aws_security_group_rule" "alb_ingress_https" {
   description       = "HTTPS ingress"
 }
 
+# trivy:ignore:AVD-AWS-0107 Public ALB must accept HTTP traffic (redirects to HTTPS)
 resource "aws_security_group_rule" "alb_ingress_http" {
   type              = "ingress"
   from_port         = 80
