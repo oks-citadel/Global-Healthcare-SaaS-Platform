@@ -54,7 +54,7 @@ AVD-AWS-0052
 # -----------------------------------------------------------------------------
 # Security Group Public Egress Rules
 # -----------------------------------------------------------------------------
-# Finding: aws-vpc-no-public-egress-sgr - Security group allows egress to 0.0.0.0/0
+# Finding: AVD-AWS-0104 - Security group allows egress to 0.0.0.0/0
 # Affected:
 #   - infrastructure/terraform-aws/modules/alb/main.tf (ALB egress)
 #   - infrastructure/terraform-aws/modules/ecs-cluster/main.tf (ECS tasks)
@@ -81,7 +81,7 @@ AVD-AWS-0052
 # minimize internet traffic, but egress rules remain for services without
 # endpoint support and third-party integrations.
 # -----------------------------------------------------------------------------
-aws-vpc-no-public-egress-sgr
+AVD-AWS-0104
 
 # =============================================================================
 # Exception Review Process

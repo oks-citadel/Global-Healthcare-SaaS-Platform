@@ -163,7 +163,7 @@ resource "aws_security_group" "ecs_tasks" {
     security_groups = var.alb_security_group_ids
   }
 
-  # trivy:ignore:aws-vpc-no-public-egress-sgr ECS tasks require internet access for ECR image pulls and AWS API calls
+  # trivy:ignore:AVD-AWS-0104 ECS tasks require internet access for ECR image pulls and AWS API calls
   # Allow all outbound - required for pulling images from ECR, sending logs to CloudWatch, etc.
   egress {
     description = "All outbound for ECR, CloudWatch, AWS APIs"

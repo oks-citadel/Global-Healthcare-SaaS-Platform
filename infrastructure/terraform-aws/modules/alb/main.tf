@@ -191,7 +191,7 @@ resource "aws_security_group_rule" "alb_ingress_http" {
   description       = "HTTP ingress (redirect)"
 }
 
-# trivy:ignore:aws-vpc-no-public-egress-sgr ALB requires egress to reach backend targets and AWS services
+# trivy:ignore:AVD-AWS-0104 ALB requires egress to reach backend targets and AWS services
 resource "aws_security_group_rule" "alb_egress" {
   type              = "egress"
   from_port         = 0
